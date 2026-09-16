@@ -207,13 +207,13 @@ void main() {
 
       // Bottom nav bar items should be present. Search is the
       // icon-only centre button; Settings moved to the app bar (#1874).
-      // #1901 — Consumption split into Carburant ('Fuel') + Trajets
-      // ('Trips'); the Full profile flags surface both.
+      // #1901 — Consumption split into Carburant + Trajets, labelled by
+      // intent as 'Cost' + 'Drive' (#4143); the Full profile surfaces both.
       expect(find.byIcon(Icons.search), findsOneWidget);
       expect(find.text('Map'), findsOneWidget);
       expect(find.text('Favorites'), findsOneWidget);
-      expect(find.text('Fuel'), findsOneWidget);
-      expect(find.text('Trips'), findsOneWidget);
+      expect(find.text('Cost'), findsOneWidget);
+      expect(find.text('Drive'), findsOneWidget);
 
       // NavigationRail should NOT be present
       expect(find.byType(NavigationRail), findsNothing);

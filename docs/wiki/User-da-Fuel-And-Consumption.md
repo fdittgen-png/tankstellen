@@ -1,10 +1,10 @@
 # Tankbog og forbrug
 
-Niveau 2 og 3 af de [tre spareniveauer](User-da-How-It-Works#de-tre-spareniveauer): hvor meget du brænder, og hvad det reelt kostede. Fanen ⛽ **Brændstof** vises i tilstandene **Mellem** og **Fuld**.
+Niveau 2 og 3 af de [tre spareniveauer](User-da-How-It-Works#de-tre-spareniveauer): hvor meget du brænder, og hvad det reelt kostede. Fanen ⛽ **Cost** (skærmen Brændstof) vises i tilstandene **Mellem** og **Fuld**.
 
 ---
 
-## Fanen Brændstof på et blik
+## Skærmen Brændstof på et blik
 
 <img src="guide/fuel-tab.jpg" width="340" alt="Fanen Brændstof: tankniveau med rækkevidde, statistikkort med præcisionsmærke og listen over tankninger">
 
@@ -81,7 +81,7 @@ Genkendelsen kører **på enheden**; billedet uploades aldrig. Kast altid et bli
 
 ## Tankrapporten — sandhedens øjeblik
 
-Hver gang en fuld tank lukker, udgiver appen en rapport. På fanen Ture ser den sådan ud:
+Hver gang en fuld tank lukker, udgiver appen en rapport. På fanen Drive (skærmen Ture) ser den sådan ud:
 
 <img src="guide/trips-tab.jpg" width="340" alt="Tankrapport: 6,4 L/100 km, forskel til forrige tank, dækningsbjælke og kalibreringsdom">
 
@@ -111,7 +111,7 @@ Kortet kan også pege på *hvad der ændrede sig* — andel af høje omdrejninge
 
 ## Forbrugsstatistik
 
-Tryk på statistikkortet, eller **Brændstof → Forbrugsstatistik**.
+Tryk på statistikkortet, eller **fanen Cost (skærmen Brændstof) → Forbrugsstatistik**.
 
 <img src="guide/consumption-stats-1.jpg" width="340" alt="Statistikoverskrift: brændstoffilterchips, totaler og tabellen denne måned vs sidste måned">
 

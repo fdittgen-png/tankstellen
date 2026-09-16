@@ -7754,6 +7754,15 @@ class AppLocalizationsPt extends AppLocalizations {
       'Partilhe uma foto de um recibo de outra app para pré-preencher um abastecimento — data, litros, total e posto são lidos no dispositivo.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Consumo por velocidade';
 
   @override

@@ -7741,6 +7741,15 @@ class AppLocalizationsLt extends AppLocalizations {
       'Bendrinkite kvito nuotrauką iš kitos programos, kad iš anksto užpildytumėte papildymą — data, litrai, suma ir degalinė nuskaitomi įrenginyje.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Suvartojimas pagal greitį';
 
   @override

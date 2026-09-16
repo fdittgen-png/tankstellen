@@ -26,9 +26,9 @@ Sparkilo puede ser un buscador de precios de dos pantallas o un ordenador de a b
 
 | Preajuste | Obtienes | Barra inferior |
 |---|---|---|
-| **Básico** | Combustible y recarga más baratos cerca, favoritos, alertas, rutas | Favoritos · Mapa · **Buscar** |
-| **Intermedio** | Todo lo de Básico + registro manual de repostajes, consumo y coste reales | + Combustible |
-| **Completo** | Todo lo de Intermedio + grabación OBD2 automática de viajes, puntuaciones, tarjetas de fidelidad | + Viajes |
+| **Básico** | Combustible y recarga más baratos cerca, favoritos, alertas, rutas | Favoritos · Mapa · **Find** |
+| **Intermedio** | Todo lo de Básico + registro manual de repostajes, consumo y coste reales | + Cost |
+| **Completo** | Todo lo de Intermedio + grabación OBD2 automática de viajes, puntuaciones, tarjetas de fidelidad | + Drive |
 | **Personalizado** | Tu propia mezcla — en cuanto tocas un interruptor | según el caso |
 
 ### Cómo funciona de verdad
@@ -39,7 +39,7 @@ Un preajuste no es un modo en el que la app se ejecuta — es un **conjunto de i
 
 - **Desactivar una función la retira de la app, no solo de la vista** — también se detiene su trabajo en segundo plano. *Alertas de precio* apagadas detienen la comprobación periódica; *Traza GPS de viajes* apagada detiene el guardado de puntos de ruta.
 - **Los preajustes sobrescriben tu mezcla.** Tocar *Intermedio* reescribe cada interruptor. Si has ajustado a mano, quédate en Personalizado.
-- **La barra inferior cambia de forma.** Si la pestaña Combustible o Viajes ha desaparecido, tú (o un preajuste) has apagado *Estadísticas de consumo* o *Grabación OBD2 de viajes* — no es un fallo.
+- **La barra inferior cambia de forma.** Si la pestaña Cost (pantalla Combustible) o Drive (pantalla Viajes) ha desaparecido, tú (o un preajuste) has apagado *Estadísticas de consumo* o *Grabación OBD2 de viajes* — no es un fallo.
 
 ---
 

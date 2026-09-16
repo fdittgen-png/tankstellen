@@ -76,8 +76,8 @@ Das ist die folgenreichste einzelne Einstellung, denn sie bestimmt, wie viel App
 *Einstellungen → Funktionen & Nutzungsmodus. Beginne mit **Basis**, wenn du nur günstiger tanken willst; steige auf, wenn du wissen willst, warum dein Auto säuft.*
 
 - **Basis** — günstig tanken und laden, Favoriten, Alarme, Routen.
-- **Mittel** — ergänzt den **Kraftstoff**-Tab: Tankfüllungen erfassen, echter Verbrauch und echte Kosten. Ohne Hardware.
-- **Voll** — ergänzt den **Fahrten**-Tab: automatische Aufzeichnung, Fahrnoten, Kundenkarten. Ein OBD2-Adapter ist auch hier optional — Fahrten werden auch nur per GPS aufgezeichnet.
+- **Mittel** — ergänzt den **Kosten**-Tab (Bildschirm Kraftstoff): Tankfüllungen erfassen, echter Verbrauch und echte Kosten. Ohne Hardware.
+- **Voll** — ergänzt den **Fahren**-Tab (Bildschirm Fahrten): automatische Aufzeichnung, Fahrnoten, Kundenkarten. Ein OBD2-Adapter ist auch hier optional — Fahrten werden auch nur per GPS aufgezeichnet.
 
 Du kannst jederzeit wechseln, und jeder Einzelschalter, den du danach umlegst, bringt dich auf **Benutzerdefiniert**. Die vollständige Liste der Schalter — und was jeder an Akku, Daten oder Privatsphäre kostet — steht in [Einstellungen-Referenz → Funktionen & Nutzungsmodus](User-de-Settings-Reference#funktionen--nutzungsmodus).
 
@@ -103,13 +103,13 @@ Der Schlüssel liegt im hardwaregestützten Tresor (Android Keystore / iOS Keych
 
 <img src="guide/favorites.jpg" width="340" alt="Favoriten-Tab mit unterer Leiste und dem erhabenen Such-Button">
 
-*Der erhabene grüne **Such**-Button in der Mitte ist der einzige Auslöser für eine Suche in der gesamten App.*
+*Der erhabene grüne **Finden**-Button in der Mitte ist der einzige Auslöser für eine Suche in der gesamten App.*
 
 - ⭐ **Favoriten** — gespeicherte Stationen und deine Preisalarme
 - 🗺️ **Karte** — jede Station in der Nähe als preisfarbige Nadel
-- 🔍 **Suche** *(Mitte)* — in der Nähe oder entlang einer Route
-- ⛽ **Kraftstoff** — Tank, Verbrauch, Tankfüllungen *(ab Mittel)*
-- 🛣️ **Fahrten** — Fahrtenbuch und Coaching *(Voll)*
+- 🔍 **Finden** *(Mitte)* — in der Nähe oder entlang einer Route
+- ⛽ **Kosten** *(Bildschirm Kraftstoff)* — Tank, Verbrauch, Tankfüllungen *(ab Mittel)*
+- 🛣️ **Fahren** *(Bildschirm Fahrten)* — Fahrtenbuch und Coaching *(Voll)*
 
 Einstellungen sind **kein** Tab: das Zahnrad oben rechts auf den Hauptbildschirmen. Auf einem Tablet oder einem quer gehaltenen Telefon teilt sich die App in zwei Spalten, sodass Liste und Karte (oder Detail) gleichzeitig sichtbar sind.
 
@@ -119,7 +119,7 @@ Einstellungen sind **kein** Tab: das Zahnrad oben rechts auf den Hauptbildschirm
 
 <img src="guide/search-criteria-nearby.jpg" width="340" alt="Kriterien-Dialog für eine Umkreissuche">
 
-*Auf **Suche** tippen → der Kriterien-Dialog öffnet sich, vorbelegt aus deinem Profil. Anpassen, dann erneut **Suchen** tippen.*
+*Auf **Finden** tippen → der Kriterien-Dialog öffnet sich, vorbelegt aus deinem Profil. Anpassen, dann erneut tippen (**Suche starten**).*
 
 Du bekommst eine Liste, günstigste zuerst (oder nach Entfernung — deine Wahl), jede Karte mit Preis, Trend, Entfernung und Aktualität. Ein Tipp öffnet die Detailseite. Die vollständige Tour steht in [Tankstellen finden](User-de-Finding-Stations).
 

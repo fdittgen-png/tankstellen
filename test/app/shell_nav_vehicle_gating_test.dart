@@ -146,11 +146,11 @@ void main() {
         expect(find.byIcon(Icons.search), findsOneWidget);
         expect(find.text('Map'), findsOneWidget);
         expect(find.text('Favorites'), findsOneWidget);
-        // #1901 — the Carburant destination label is now 'Fuel'.
-        expect(find.text('Fuel'), findsNothing,
+        // #1901 / #4143 — the Carburant destination is labelled 'Cost'.
+        expect(find.text('Cost'), findsNothing,
             reason: 'Basic profile must not surface the Carburant tab — '
                 'no consumption features are reachable.');
-        expect(find.text('Trips'), findsNothing,
+        expect(find.text('Drive'), findsNothing,
             reason: 'Basic profile must not surface the Trajets tab.');
         expect(find.byIcon(Icons.local_gas_station_outlined),
             findsNothing);
@@ -187,8 +187,8 @@ void main() {
         expect(find.text('Favorites'), findsOneWidget);
         // #1901 — Medium profile (manualConsumption, no obd2) is
         // fuel-only ConsoMode: the Carburant tab shows, Trajets does not.
-        expect(find.text('Fuel'), findsOneWidget);
-        expect(find.text('Trips'), findsNothing,
+        expect(find.text('Cost'), findsOneWidget);
+        expect(find.text('Drive'), findsNothing,
             reason: 'Medium profile has no OBD2 trips — Trajets hidden.');
         expect(find.byIcon(Icons.local_gas_station_outlined),
             findsOneWidget);
@@ -223,8 +223,8 @@ void main() {
 
         // #1901 — Full profile (obd2TripRecording on) is fuel-and-trips
         // ConsoMode: both Carburant and Trajets destinations show.
-        expect(find.text('Fuel'), findsOneWidget);
-        expect(find.text('Trips'), findsOneWidget);
+        expect(find.text('Cost'), findsOneWidget);
+        expect(find.text('Drive'), findsOneWidget);
         expect(find.byIcon(Icons.local_gas_station_outlined),
             findsOneWidget);
         expect(find.byIcon(Icons.route_outlined), findsOneWidget);

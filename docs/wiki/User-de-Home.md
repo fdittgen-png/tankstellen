@@ -18,7 +18,7 @@ Die ganze App ist um eine Idee herum gebaut: **Ein Auto kostet auf drei voneinan
 |---|---|---|
 | **1. Preis** | *Wo ist Kraftstoff gerade am günstigsten?* | Suche, Karte, Favoriten, Alarme, Routenplanung |
 | **2. Verbrauch** | *Wie viele Liter verbrauche ich pro 100 km — und warum?* | Fahrten, Eco-Coaching, OBD2 |
-| **3. Wahrheit** | *Was habe ich wirklich bezahlt, und ist die Schätzung der App ehrlich?* | Kraftstoff-Tab, Tankfüllungen, Verbrauchsstatistik |
+| **3. Wahrheit** | *Was habe ich wirklich bezahlt, und ist die Schätzung der App ehrlich?* | Kosten-Tab (Bildschirm Kraftstoff), Tankfüllungen, Verbrauchsstatistik |
 
 Ebene 1 spart schon Geld und braucht nichts außer der App. Ebene 2 und 3 brauchen deine Tankfüllungen; Ebene 2 wird mit einem günstigen OBD2-Adapter deutlich schärfer. Wie tief du gehst, entscheidest du — siehe [Wie Sparkilo funktioniert](User-de-How-It-Works).
 
@@ -37,7 +37,7 @@ Ebene 1 spart schon Geld und braucht nichts außer der App. Ebene 2 und 3 brauch
 
 | Seite | Was du lernst |
 |---|---|
-| [Tankstellen finden](User-de-Finding-Stations) | Der zentrale Such-Button, Kriterien, Stationskarte lesen, Detailseite, Karte, Tankstellen-Radar |
+| [Tankstellen finden](User-de-Finding-Stations) | Der zentrale Finden-Button, Kriterien, Stationskarte lesen, Detailseite, Karte, Tankstellen-Radar |
 | [Routenplanung](User-de-Route-Planning) | Günstigste Stopps entlang der Route, grenzüberschreitende Korridore, die vier Strategien |
 | [Favoriten & Alarme](User-de-Favorites-And-Alerts) | Gespeicherte Stationen, Stations- und Umkreisalarme, wie die Hintergrundprüfung wirklich arbeitet |
 | [E-Auto laden](User-de-EV-Charging) | Ladepunkte über OpenChargeMap, Stecker, Leistungsfilter |

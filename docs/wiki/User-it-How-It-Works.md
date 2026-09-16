@@ -26,9 +26,9 @@ Sparkilo può essere un cercaprezzi da due schermate o un vero computer di bordo
 
 | Preimpostazione | Ottieni | Barra inferiore |
 |---|---|---|
-| **Base** | Carburante e ricarica più economici nelle vicinanze, preferiti, avvisi, itinerari | Preferiti · Mappa · **Cerca** |
-| **Medio** | Tutto Base + registro manuale dei rifornimenti, consumo e costo reali | + Carburante |
-| **Completo** | Tutto Medio + registrazione OBD2 automatica dei viaggi, punteggi di guida, carte fedeltà | + Viaggi |
+| **Base** | Carburante e ricarica più economici nelle vicinanze, preferiti, avvisi, itinerari | Preferiti · Mappa · **Find** |
+| **Medio** | Tutto Base + registro manuale dei rifornimenti, consumo e costo reali | + Cost |
+| **Completo** | Tutto Medio + registrazione OBD2 automatica dei viaggi, punteggi di guida, carte fedeltà | + Drive |
 | **Personalizzato** | La tua miscela — appena tocchi un singolo interruttore | dipende |
 
 ### Come funziona davvero
@@ -39,7 +39,7 @@ Una preimpostazione non è una modalità in cui l'app gira — è un **insieme d
 
 - **Disattivare una funzione la rimuove dall'app, non solo dalla vista** — si ferma anche il suo lavoro in background. *Avvisi di prezzo* spenti fermano il controllo periodico; *Traccia GPS dei viaggi* spenta ferma la registrazione dei punti di percorso.
 - **Le preimpostazioni sovrascrivono la tua miscela.** Toccare *Medio* riscrive ogni interruttore. Se hai regolato a mano, resta su Personalizzato.
-- **La barra inferiore cambia forma.** Se la scheda Carburante o Viaggi è sparita, tu (o una preimpostazione) hai spento *Statistiche consumi* o *Registrazione OBD2 dei viaggi* — non è un bug.
+- **La barra inferiore cambia forma.** Se la scheda Cost (schermata Carburante) o Drive (schermata Percorsi) è sparita, tu (o una preimpostazione) hai spento *Statistiche consumi* o *Registrazione OBD2 dei viaggi* — non è un bug.
 
 ---
 

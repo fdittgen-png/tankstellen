@@ -73,7 +73,7 @@ Na folha de critérios escolha o tipo **EV** e lance uma pesquisa por raio. Filt
 
 Os pontos marcam-se como favoritos tal como os postos; na horizontal e em tablet, favoritos e alertas ficam lado a lado. O cartão favorito mostra os **kW por conector**, **quantos estão livres** e os **tipos de conector**.
 
-Os alertas de preço servem de pouco no carregamento, já que a maioria dos operadores aplica tarifas fixas por kWh. As sessões de carregamento registam-se como abastecimentos: **separador Combustível → Adicionar**, com kWh em vez de litros — alimentam as mesmas estatísticas de custo por quilómetro dos abastecimentos térmicos.
+Os alertas de preço servem de pouco no carregamento, já que a maioria dos operadores aplica tarifas fixas por kWh. As sessões de carregamento registam-se como abastecimentos: **separador Cost (ecrã Combustível) → Adicionar**, com kWh em vez de litros — alimentam as mesmas estatísticas de custo por quilómetro dos abastecimentos térmicos.
 
 ---
 

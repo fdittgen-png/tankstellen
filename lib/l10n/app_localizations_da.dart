@@ -7697,6 +7697,15 @@ class AppLocalizationsDa extends AppLocalizations {
       'Del et kvitteringsfoto fra en anden app for at forudfylde en tankning — dato, liter, total og station aflæses på enheden.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Forbrug efter hastighed';
 
   @override

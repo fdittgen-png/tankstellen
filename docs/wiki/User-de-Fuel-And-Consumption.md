@@ -1,10 +1,10 @@
 # Tankbuch & Verbrauch
 
-Ebene 2 und 3 der [drei Spar-Ebenen](User-de-How-It-Works#die-drei-spar-ebenen): wie viel du verbrauchst und was es wirklich gekostet hat. Der ⛽ **Kraftstoff**-Tab erscheint in den Nutzungsmodi **Mittel** und **Voll**.
+Ebene 2 und 3 der [drei Spar-Ebenen](User-de-How-It-Works#die-drei-spar-ebenen): wie viel du verbrauchst und was es wirklich gekostet hat. Der ⛽ **Kosten**-Tab (Bildschirm Kraftstoff) erscheint in den Nutzungsmodi **Mittel** und **Voll**.
 
 ---
 
-## Der Kraftstoff-Tab auf einen Blick
+## Der Kraftstoff-Bildschirm auf einen Blick
 
 <img src="guide/fuel-tab.jpg" width="340" alt="Kraftstoff-Tab: Tankfüllstand mit Reichweite, Verbrauchsstatistik mit Genauigkeits-Badge und Liste der Tankfüllungen">
 
@@ -81,7 +81,7 @@ Die Erkennung läuft **auf dem Gerät**; das Bild wird nie hochgeladen. Sieh die
 
 ## Der Tank-Bericht — der Moment der Wahrheit
 
-Jedes Mal, wenn ein voller Tank schließt, veröffentlicht die App einen Bericht. Im Fahrten-Tab sieht er so aus:
+Jedes Mal, wenn ein voller Tank schließt, veröffentlicht die App einen Bericht. Im Fahren-Tab (Bildschirm Fahrten) sieht er so aus:
 
 <img src="guide/trips-tab.jpg" width="340" alt="Tank-Bericht: 6,4 L/100 km, Differenz zum vorherigen Tank, Abdeckungsbalken und Kalibrierungsurteil">
 
@@ -111,7 +111,7 @@ Die Karte kann auch zeigen, *was sich geändert hat* — Anteil hoher Drehzahlen
 
 ## Verbrauchsstatistik
 
-Auf die Statistikkarte tippen, oder **Kraftstoff → Verbrauchsstatistik**.
+Auf die Statistikkarte tippen, oder **Kosten-Tab (Bildschirm Kraftstoff) → Verbrauchsstatistik**.
 
 <img src="guide/consumption-stats-1.jpg" width="340" alt="Statistik-Kopf: Kraftstofffilter, Summen und Tabelle dieser Monat gegen letzten Monat">
 

@@ -1,10 +1,10 @@
 # Fuel Log & Consumption
 
-Layers 2 and 3 of the [three savings layers](User-en-How-It-Works#the-three-savings-layers): how much you burn, and what it truly cost. The ⛽ **Fuel** tab appears on the **Medium** and **Full** use modes.
+Layers 2 and 3 of the [three savings layers](User-en-How-It-Works#the-three-savings-layers): how much you burn, and what it truly cost. The ⛽ **Cost** tab (Fuel screen) appears on the **Medium** and **Full** use modes.
 
 ---
 
-## The Fuel tab at a glance
+## The Fuel screen at a glance
 
 <img src="guide/fuel-tab.jpg" width="340" alt="Fuel tab: tank level with range, consumption stats card with accuracy badge, and the fill-up list">
 
@@ -81,7 +81,7 @@ Recognition runs **on the device**; the image is never uploaded. Always glance a
 
 ## The tank report — the moment of truth
 
-Every time a full tank closes, the app publishes a report. On the Trips tab it looks like this:
+Every time a full tank closes, the app publishes a report. On the Drive tab (Trips screen) it looks like this:
 
 <img src="guide/trips-tab.jpg" width="340" alt="Tank report card: 6.4 L/100 km, delta vs previous tank, coverage bar and calibration verdict">
 
@@ -111,7 +111,7 @@ The card can also point at *what changed* — high-RPM share, harsh events per 1
 
 ## Consumption statistics
 
-Tap the stats card, or **Fuel → Consumption stats**.
+Tap the stats card, or **Cost tab (Fuel screen) → Consumption stats**.
 
 <img src="guide/consumption-stats-1.jpg" width="340" alt="Statistics header: fuel filter chips, totals, and this-month-vs-last-month table">
 

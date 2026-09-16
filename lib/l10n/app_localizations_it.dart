@@ -7744,6 +7744,15 @@ class AppLocalizationsIt extends AppLocalizations {
       'Condividi una foto dello scontrino da un\'altra app per precompilare un rifornimento — data, litri, totale e stazione vengono letti sul dispositivo.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Consumo per velocità';
 
   @override

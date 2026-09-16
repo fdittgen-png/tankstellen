@@ -1,10 +1,10 @@
 # Trips & Eco-Coaching
 
-The 🛣️ **Trips** tab is an automatic logbook plus a driving coach. It appears on the **Full** use mode.
+The 🛣️ **Drive** tab (Trips screen) is an automatic logbook plus a driving coach. It appears on the **Full** use mode.
 
 ---
 
-## The Trips tab
+## The Trips screen
 
 <img src="guide/trips-tab.jpg" width="340" alt="Trips tab: month comparison, tank report and the trip list with the start-recording button">
 

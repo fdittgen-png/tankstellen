@@ -7777,6 +7777,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Partagez une photo de ticket depuis une autre application pour pré-remplir un plein — date, litres, total et station sont lus sur l\'appareil.';
 
   @override
+  String get shellTabFind => 'Trouver';
+
+  @override
+  String get shellTabCost => 'Coûts';
+
+  @override
+  String get shellTabDrive => 'Conduite';
+
+  @override
   String get speedConsumptionCardTitle => 'Consommation par vitesse';
 
   @override

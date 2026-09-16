@@ -7701,6 +7701,15 @@ class AppLocalizationsNb extends AppLocalizations {
       'Del et kvitteringsbilde fra en annen app for å forhåndsutfylle en fylling — dato, liter, totalt og stasjon leses på enheten.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Forbruk etter hastighet';
 
   @override

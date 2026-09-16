@@ -26,9 +26,9 @@ Sparkilo can be a two-screen price finder or a full driving computer. Rather tha
 
 | Preset | You get | Bottom bar |
 |---|---|---|
-| **Basic** | Cheapest fuel and charging nearby, favourites, price alerts, route planning | Favourites · Map · **Search** |
-| **Medium** | Everything in Basic + manual fill-up logging, real consumption and cost | + Fuel |
-| **Full** | Everything in Medium + automatic OBD2 trip recording, driving scores, loyalty cards | + Trips |
+| **Basic** | Cheapest fuel and charging nearby, favourites, price alerts, route planning | Favourites · Map · **Find** |
+| **Medium** | Everything in Basic + manual fill-up logging, real consumption and cost | + Cost |
+| **Full** | Everything in Medium + automatic OBD2 trip recording, driving scores, loyalty cards | + Drive |
 | **Custom** | Your own mix — what you get the moment you flip any single switch | depends |
 
 ### How it actually works
@@ -39,7 +39,7 @@ A preset is not a mode the app runs in — it is a **named set of feature flags*
 
 - **Turning a feature off removes it from the UI, not just from view** — its background work stops too. Switching off *Price alerts* stops the periodic background check; switching off *GPS trip path* stops storing route points.
 - **Presets are destructive to your custom mix.** Tapping *Medium* overwrites every individual switch. If you have tuned things by hand, stay on Custom.
-- **The bottom bar changes shape.** If the Fuel or Trips tab has vanished, you (or a preset) turned off *Consumption tab* or *OBD2 trip recording* — not a bug.
+- **The bottom bar changes shape.** If the Cost tab (Fuel screen) or Drive tab (Trips screen) has vanished, you (or a preset) turned off *Consumption tab* or *OBD2 trip recording* — not a bug.
 
 ---
 

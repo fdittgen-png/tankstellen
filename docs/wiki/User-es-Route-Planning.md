@@ -8,7 +8,7 @@ No « el más barato cerca de mí » sino **el más barato en el camino** — la
 
 <img src="guide/search-criteria-route-1.jpg" width="340" alt="Criterios en modo ruta: salida, parada, destino, combustible, segmento, desvío, ahorro mínimo">
 
-*Toca **Buscar** → cambia a **Buscar a lo largo de la ruta**. El botón sigue desactivado hasta que haya destino y combustible.*
+*Toca **Find** → cambia a **Buscar a lo largo de la ruta**. El botón sigue desactivado hasta que haya destino y combustible.*
 
 | Campo | Significado |
 |---|---|

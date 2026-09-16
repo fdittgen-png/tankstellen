@@ -7756,6 +7756,15 @@ class AppLocalizationsEl extends AppLocalizations {
       'Κοινοποιήστε φωτογραφία απόδειξης από άλλη εφαρμογή για προσυμπλήρωση ανεφοδίασης — ημερομηνία, λίτρα, σύνολο και πρατήριο διαβάζονται στη συσκευή.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Κατανάλωση ανά ταχύτητα';
 
   @override

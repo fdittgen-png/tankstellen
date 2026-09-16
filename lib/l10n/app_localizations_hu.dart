@@ -7740,6 +7740,15 @@ class AppLocalizationsHu extends AppLocalizations {
       'Osszon meg egy bizonylat fotót egy másik alkalmazásból a tankolás előkitöltéséhez — dátum, liter, összeg és állomás az eszközön kerül beolvasásra.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Fogyasztás sebességenként';
 
   @override

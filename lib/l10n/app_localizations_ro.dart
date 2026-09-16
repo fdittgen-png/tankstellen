@@ -7755,6 +7755,15 @@ class AppLocalizationsRo extends AppLocalizations {
       'Partajați o fotografie a bonului din altă aplicație pentru a completa o realimentare — data, litrii, totalul și stația sunt citite pe dispozitiv.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Consum pe viteză';
 
   @override

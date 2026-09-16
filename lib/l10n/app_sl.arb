@@ -7782,5 +7782,20 @@
         "example": "France"
       }
     }
+  },
+  "shellTabFind": "Find",
+  "@shellTabFind": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "shellTabCost": "Cost",
+  "@shellTabCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "shellTabDrive": "Drive",
+  "@shellTabDrive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

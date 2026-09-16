@@ -76,8 +76,8 @@ Mudar de país **esvazia os dados de postos em cache**, porque os preços do for
 *Definições → Funcionalidades e modo de utilização. Comece em **Básico** se só quiser combustível mais barato; suba quando quiser saber porque é que o seu carro bebe.*
 
 - **Básico** — encontrar combustível e carregamento, favoritos, alertas, itinerários.
-- **Médio** — acrescenta o separador **Combustível**: registar abastecimentos, ver consumo e custo reais. Sem hardware.
-- **Completo** — acrescenta o separador **Viagens**: gravação automática, pontuações, cartões de fidelização. Um adaptador OBD2 continua opcional mesmo aqui — as viagens gravam-se só com GPS.
+- **Médio** — acrescenta o separador **Cost** (ecrã Combustível): registar abastecimentos, ver consumo e custo reais. Sem hardware.
+- **Completo** — acrescenta o separador **Drive** (ecrã Viagens): gravação automática, pontuações, cartões de fidelização. Um adaptador OBD2 continua opcional mesmo aqui — as viagens gravam-se só com GPS.
 
 Pode mudar quando quiser, e qualquer interruptor que toque depois coloca-o em **Personalizado**. A lista completa, e o que cada um custa em bateria, dados ou privacidade: [Referência de definições → Funcionalidades e modo de utilização](User-pt-Settings-Reference#funcionalidades-e-modo-de-utilização).
 
@@ -103,13 +103,13 @@ A chave fica no cofre de hardware (Android Keystore / Porta-chaves do iOS) e só
 
 <img src="guide/favorites.jpg" width="340" alt="Separador Favoritos com a barra inferior e o botão Pesquisar central">
 
-*O botão verde **Pesquisar** elevado ao centro é o único acionador de pesquisa de toda a aplicação.*
+*O botão verde **Find** elevado ao centro é o único acionador de pesquisa de toda a aplicação.*
 
 - ⭐ **Favoritos** — postos guardados e alertas de preço
 - 🗺️ **Mapa** — cada posto próximo como pino colorido por preço
-- 🔍 **Pesquisar** *(centro)* — por perto ou ao longo de um itinerário
-- ⛽ **Combustível** — depósito, consumo, abastecimentos *(a partir de Médio)*
-- 🛣️ **Viagens** — diário de bordo e coaching *(Completo)*
+- 🔍 **Find** *(centro)* — por perto ou ao longo de um itinerário
+- ⛽ **Cost** *(ecrã Combustível)* — depósito, consumo, abastecimentos *(a partir de Médio)*
+- 🛣️ **Drive** *(ecrã Viagens)* — diário de bordo e coaching *(Completo)*
 
 As definições **não** são um separador: é a engrenagem no canto superior direito dos ecrãs principais. Em tablet, ou telemóvel na horizontal, a aplicação divide-se em duas colunas para ver lista e mapa (ou detalhe) ao mesmo tempo.
 
@@ -119,7 +119,7 @@ As definições **não** são um separador: é a engrenagem no canto superior di
 
 <img src="guide/search-criteria-nearby.jpg" width="340" alt="Folha de critérios para uma pesquisa por perto">
 
-*Toque em **Pesquisar** → a folha de critérios abre preenchida a partir do seu perfil. Ajuste e toque de novo em **Pesquisar**.*
+*Toque em **Find** → a folha de critérios abre preenchida a partir do seu perfil. Ajuste e toque de novo no botão (**Executar pesquisa**).*
 
 Obtém uma lista do mais barato (ou por distância — à sua escolha), cada cartão com preço, tendência, distância e frescura. Um toque abre o detalhe. A visita completa: [Encontrar postos](User-pt-Finding-Stations).
 

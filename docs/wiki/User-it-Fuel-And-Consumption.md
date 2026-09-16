@@ -1,10 +1,10 @@
 # Registro rifornimenti e consumi
 
-Livelli 2 e 3 dei [tre livelli di risparmio](User-it-How-It-Works#i-tre-livelli-di-risparmio): quanto bruci, e quanto è costato davvero. La scheda ⛽ **Carburante** compare nelle modalità **Medio** e **Completo**.
+Livelli 2 e 3 dei [tre livelli di risparmio](User-it-How-It-Works#i-tre-livelli-di-risparmio): quanto bruci, e quanto è costato davvero. La scheda ⛽ **Cost** (schermata Carburante) compare nelle modalità **Medio** e **Completo**.
 
 ---
 
-## La scheda Carburante a colpo d'occhio
+## La schermata Carburante a colpo d'occhio
 
 <img src="guide/fuel-tab.jpg" width="340" alt="Scheda Carburante: livello serbatoio con autonomia, scheda statistiche con badge di precisione, elenco rifornimenti">
 
@@ -81,7 +81,7 @@ Il riconoscimento gira **sul dispositivo**; l'immagine non viene mai caricata. D
 
 ## Il rapporto del pieno — il momento della verità
 
-Ogni volta che un pieno si chiude, l'app pubblica un rapporto. Nella scheda Viaggi appare così:
+Ogni volta che un pieno si chiude, l'app pubblica un rapporto. Nella scheda Drive (schermata Percorsi) appare così:
 
 <img src="guide/trips-tab.jpg" width="340" alt="Rapporto del pieno: 6,4 L/100 km, scarto rispetto al pieno precedente, barra di copertura e verdetto di calibrazione">
 
@@ -111,7 +111,7 @@ La scheda può anche indicare *cosa è cambiato* — quota di alto regime, event
 
 ## Statistiche consumi
 
-Tocca la scheda delle statistiche, o **Carburante → Statistiche consumi**.
+Tocca la scheda delle statistiche, o **scheda Cost (schermata Carburante) → Statistiche consumi**.
 
 <img src="guide/consumption-stats-1.jpg" width="340" alt="Intestazione statistiche: chip di filtro carburante, totali e tabella questo mese vs mese scorso">
 

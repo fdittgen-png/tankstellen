@@ -1,10 +1,10 @@
 # Ture og øko-coaching
 
-Fanen 🛣️ **Ture** er en automatisk logbog plus en kørelærer. Den vises i tilstanden **Fuld**.
+Fanen 🛣️ **Drive** (skærmen Ture) er en automatisk logbog plus en kørelærer. Den vises i tilstanden **Fuld**.
 
 ---
 
-## Fanen Ture
+## Skærmen Ture
 
 <img src="guide/trips-tab.jpg" width="340" alt="Fanen Ture: månedssammenligning, tankrapport og turlisten med optageknappen">
 

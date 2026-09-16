@@ -76,8 +76,8 @@ This is the single most consequential setting, because it decides how much app y
 *Settings → Features & use mode. Start on **Basic** if you only want cheaper fuel; move up when you want to know why your car drinks.*
 
 - **Basic** — find cheap fuel and charging, favourites, alerts, routes.
-- **Medium** — adds the **Fuel** tab: log fill-ups, see real consumption and cost. No hardware needed.
-- **Full** — adds the **Trips** tab: automatic recording, driving scores, loyalty cards. An OBD2 adapter is optional even here — trips record on GPS alone.
+- **Medium** — adds the **Cost** tab (Fuel screen): log fill-ups, see real consumption and cost. No hardware needed.
+- **Full** — adds the **Drive** tab (Trips screen): automatic recording, driving scores, loyalty cards. An OBD2 adapter is optional even here — trips record on GPS alone.
 
 You can move between presets any time, and any individual switch you flip afterwards puts you on **Custom**. The full list of switches, and what each one costs you in battery, data or privacy, is in [Settings Reference → Features & use mode](User-en-Settings-Reference#features--use-mode).
 
@@ -103,13 +103,13 @@ The key is kept in the hardware-backed vault (Android Keystore / iOS Keychain) a
 
 <img src="guide/favorites.jpg" width="340" alt="Favourites tab with the bottom bar and the raised central Search button">
 
-*The raised green **Search** button in the middle notch is the only search trigger in the entire app.*
+*The raised green **Find** button in the middle notch is the only search trigger in the entire app.*
 
 - ⭐ **Favourites** — saved stations and your price alerts
 - 🗺️ **Map** — every nearby station as a price-coloured pin
-- 🔍 **Search** *(centre)* — nearby or along a route
-- ⛽ **Fuel** — tank, consumption, fill-ups *(Medium and up)*
-- 🛣️ **Trips** — logbook and coaching *(Full)*
+- 🔍 **Find** *(centre)* — nearby or along a route
+- ⛽ **Cost** *(Fuel screen)* — tank, consumption, fill-ups *(Medium and up)*
+- 🛣️ **Drive** *(Trips screen)* — logbook and coaching *(Full)*
 
 Settings is **not** a tab: it is the gear icon in the top-right of the main screens. On a tablet, or a phone held sideways, the app splits into two columns so a list and the map (or a detail) are visible at once.
 
@@ -119,7 +119,7 @@ Settings is **not** a tab: it is the gear icon in the top-right of the main scre
 
 <img src="guide/search-criteria-nearby.jpg" width="340" alt="Search criteria sheet for a nearby search">
 
-*Tap **Search** → the criteria sheet opens pre-filled from your profile. Adjust, then tap **Search** again to run it.*
+*Tap **Find** → the criteria sheet opens pre-filled from your profile. Adjust, then tap it again (**Run search**).*
 
 You get a list sorted cheapest-first (or by distance — your choice), each card showing price, trend, distance and how fresh the number is. Tap any card for the full station detail. The complete tour is in [Finding Stations](User-en-Finding-Stations).
 

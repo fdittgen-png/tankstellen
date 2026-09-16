@@ -73,7 +73,7 @@ En la hoja de criterios elige el tipo **EV** y lanza una búsqueda por radio. Fi
 
 Los puntos se marcan como favoritos igual que las gasolineras; en horizontal y en tableta, favoritos y alertas van lado a lado. La ficha favorita muestra los **kW por conector**, **cuántos están libres** y los **tipos de conector**.
 
-Las alertas de precio sirven de poco en recarga, ya que la mayoría de operadores aplica tarifas planas por kWh. Las sesiones de recarga se registran como repostajes: **pestaña Combustible → Añadir**, con kWh en vez de litros — alimentan las mismas estadísticas de coste por kilómetro que los repostajes térmicos.
+Las alertas de precio sirven de poco en recarga, ya que la mayoría de operadores aplica tarifas planas por kWh. Las sesiones de recarga se registran como repostajes: **pestaña Cost (pantalla Combustible) → Añadir**, con kWh en vez de litros — alimentan las mismas estadísticas de coste por kilómetro que los repostajes térmicos.
 
 ---
 

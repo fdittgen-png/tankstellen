@@ -100,11 +100,11 @@ Verifique também o **limiar de velocidade de arranque** no editor de veículo �
 Siga esta ordem:
 
 1. **Abra a viagem e leia o cartão de saúde da comunicação OBD2.** Se a cobertura estiver bem abaixo de 100 %, as falhas foram preenchidas com estimativas GPS e a média é uma mistura, não uma medição.
-2. **Veja o relatório do depósito no separador Viagens.** Se disser que as estimativas estão *n* % acima ou abaixo da verdade da bomba, a aplicação já sabe e acabou de se corrigir — espere movimento nas próximas viagens.
+2. **Veja o relatório do depósito no separador Drive (ecrã Viagens).** Se disser que as estimativas estão *n* % acima ou abaixo da verdade da bomba, a aplicação já sabe e acabou de se corrigir — espere movimento nas próximas viagens.
 3. **Verifique a capacidade do depósito** no veículo. Uma capacidade errada produz durante meses autonomias credíveis mas erradas.
 4. **Verifique as suas quilometragens.** O consumo é litros ÷ quilómetros, e os quilómetros vêm inteiramente do que escreve.
 5. **Verifique se marcou « Tanque cheio ».** Só as janelas de cheio a cheio podem calibrar seja o que for.
-6. **Veja o distintivo de precisão** no separador Combustível. *Baixa* significa que nada ancorou ainda o modelo — o valor é uma saída de modelo, e di-lo.
+6. **Veja o distintivo de precisão** no separador Cost (ecrã Combustível). *Baixa* significa que nada ancorou ainda o modelo — o valor é uma saída de modelo, e di-lo.
 
 Contexto: [Como funciona o Sparkilo → Como um litro se torna um número](User-pt-How-It-Works#como-um-litro-se-torna-um-número).
 
@@ -211,9 +211,9 @@ Em parte. Os favoritos mostram os últimos preços conhecidos, os mosaicos visto
 
 ---
 
-## Onde foi parar o separador Combustível ou Viagens?
+## Onde foi parar o separador Cost ou Drive?
 
-Pertencem aos modos **Médio** e **Completo**. Se um desapareceu, uma predefinição ou um interruptor desligou-o: Definições → Funcionalidades e modo de utilização → Consumo.
+O separador Cost (ecrã Combustível) e o separador Drive (ecrã Viagens) pertencem aos modos **Médio** e **Completo**. Se um desapareceu, uma predefinição ou um interruptor desligou-o: Definições → Funcionalidades e modo de utilização → Consumo.
 
 ---
 

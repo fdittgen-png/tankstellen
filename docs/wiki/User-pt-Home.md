@@ -18,7 +18,7 @@ Toda a aplicação assenta numa ideia: **um carro custa dinheiro de três formas
 |---|---|---|
 | **1. O preço** | *Onde é que o combustível está mais barato agora?* | Pesquisa, Mapa, Favoritos, Alertas, Itinerários |
 | **2. O consumo** | *Quantos litros aos 100 km, e porquê?* | Viagens, eco-coaching, OBD2 |
-| **3. A verdade** | *Quanto paguei de facto, e a estimativa da aplicação é honesta?* | Separador Combustível, abastecimentos, estatísticas de consumo |
+| **3. A verdade** | *Quanto paguei de facto, e a estimativa da aplicação é honesta?* | Separador Cost (ecrã Combustível), abastecimentos, estatísticas de consumo |
 
 O nível 1 já poupa e não precisa de nada além da aplicação. Os níveis 2 e 3 precisam dos seus abastecimentos; o nível 2 fica muito mais preciso com um adaptador OBD2 barato. Até onde ir decide você — ver [Como funciona o Sparkilo](User-pt-How-It-Works).
 
@@ -37,7 +37,7 @@ O nível 1 já poupa e não precisa de nada além da aplicação. Os níveis 2 e
 
 | Página | O que vai aprender |
 |---|---|
-| [Encontrar postos](User-pt-Finding-Stations) | O botão Pesquisar central, os critérios, ler um cartão, o detalhe, o mapa, o radar de postos |
+| [Encontrar postos](User-pt-Finding-Stations) | O botão Find central, os critérios, ler um cartão, o detalhe, o mapa, o radar de postos |
 | [Planeamento de itinerário](User-pt-Route-Planning) | As paragens mais baratas do trajeto, os corredores transfronteiriços, as quatro estratégias |
 | [Favoritos e alertas](User-pt-Favorites-And-Alerts) | Postos guardados, alertas de posto e de zona, como se comporta realmente a verificação em segundo plano |
 | [Carregamento elétrico](User-pt-EV-Charging) | Pontos de carregamento via OpenChargeMap, conectores, filtros de potência |

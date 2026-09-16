@@ -1,10 +1,10 @@
 # Registro de repostajes y consumo
 
-Niveles 2 y 3 de los [tres niveles de ahorro](User-es-How-It-Works#los-tres-niveles-de-ahorro): cuánto quemas, y cuánto costó de verdad. La pestaña ⛽ **Combustible** aparece en los modos **Intermedio** y **Completo**.
+Niveles 2 y 3 de los [tres niveles de ahorro](User-es-How-It-Works#los-tres-niveles-de-ahorro): cuánto quemas, y cuánto costó de verdad. La pestaña ⛽ **Cost** (pantalla Combustible) aparece en los modos **Intermedio** y **Completo**.
 
 ---
 
-## La pestaña Combustible de un vistazo
+## La pantalla Combustible de un vistazo
 
 <img src="guide/fuel-tab.jpg" width="340" alt="Pestaña Combustible: nivel del depósito con autonomía, ficha de estadísticas con insignia de precisión, lista de repostajes">
 
@@ -81,7 +81,7 @@ El reconocimiento se ejecuta **en el dispositivo**; la imagen nunca se sube. Ech
 
 ## El informe del depósito — el momento de la verdad
 
-Cada vez que un depósito lleno se cierra, la app publica un informe. En la pestaña Viajes aparece así:
+Cada vez que un depósito lleno se cierra, la app publica un informe. En la pestaña Drive (pantalla Viajes) aparece así:
 
 <img src="guide/trips-tab.jpg" width="340" alt="Informe del depósito: 6,4 L/100 km, diferencia con el anterior, barra de cobertura y veredicto de calibración">
 
@@ -111,7 +111,7 @@ La ficha también puede señalar *qué cambió* — proporción de alto régimen
 
 ## Estadísticas de consumo
 
-Toca la ficha de estadísticas, o **Combustible → Estadísticas de consumo**.
+Toca la ficha de estadísticas, o **pestaña Cost (pantalla Combustible) → Estadísticas de consumo**.
 
 <img src="guide/consumption-stats-1.jpg" width="340" alt="Cabecera de estadísticas: chips de filtro por combustible, totales y tabla este mes vs mes pasado">
 

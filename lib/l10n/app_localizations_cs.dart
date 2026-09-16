@@ -7710,6 +7710,15 @@ class AppLocalizationsCs extends AppLocalizations {
       'Sdílejte fotografii účtenky z jiné aplikace pro předvyplnění tankování — datum, litry, celková částka a stanice se čtou na zařízení.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Spotřeba podle rychlosti';
 
   @override

@@ -18,7 +18,7 @@ The whole app is organised around one idea: **there are three separate ways a ca
 |---|---|---|
 | **1. Price** | *Where is fuel cheapest right now?* | Search, Map, Favourites, Alerts, Route planning |
 | **2. Consumption** | *How many litres do I burn per 100 km, and why?* | Trips, eco-coaching, OBD2 |
-| **3. Truth** | *What did I actually pay, and is the app's estimate honest?* | Fuel tab, fill-ups, consumption statistics |
+| **3. Truth** | *What did I actually pay, and is the app's estimate honest?* | Cost tab (Fuel screen), fill-ups, consumption statistics |
 
 Layer 1 alone already saves money and needs nothing but the app. Layers 2 and 3 need you to log fill-ups; layer 2 gets much sharper with a cheap OBD2 adapter. You decide how far down you go — see [How Sparkilo Works](User-en-How-It-Works).
 
@@ -37,7 +37,7 @@ Layer 1 alone already saves money and needs nothing but the app. Layers 2 and 3 
 
 | Page | What you'll learn |
 |---|---|
-| [Finding Stations](User-en-Finding-Stations) | The central Search button, criteria, reading a station card, station detail, the map, the Fuel Station Radar |
+| [Finding Stations](User-en-Finding-Stations) | The central Find button, criteria, reading a station card, station detail, the map, the Fuel Station Radar |
 | [Route Planning](User-en-Route-Planning) | Cheapest stops along a route, cross-border corridors, the four strategies |
 | [Favourites & Alerts](User-en-Favorites-And-Alerts) | Saved stations, per-station and radius alerts, how the background check really behaves |
 | [EV Charging](User-en-EV-Charging) | Charging points via OpenChargeMap, connectors, power filters |

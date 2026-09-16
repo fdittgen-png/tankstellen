@@ -7692,6 +7692,15 @@ class AppLocalizationsSv extends AppLocalizations {
       'Dela ett kvittofoto från en annan app för att förifyll en tankning — datum, liter, totalt och station läses på enheten.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Förbrukning per hastighet';
 
   @override

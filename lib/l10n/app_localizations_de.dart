@@ -7739,6 +7739,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Teile ein Quittungsfoto aus einer anderen App, um einen Tankvorgang vorauszufüllen — Datum, Liter, Gesamtbetrag und Tankstelle werden auf dem Gerät erkannt.';
 
   @override
+  String get shellTabFind => 'Finden';
+
+  @override
+  String get shellTabCost => 'Kosten';
+
+  @override
+  String get shellTabDrive => 'Fahren';
+
+  @override
   String get speedConsumptionCardTitle => 'Verbrauch nach Geschwindigkeit';
 
   @override

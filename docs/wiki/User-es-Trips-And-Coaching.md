@@ -1,10 +1,10 @@
 # Viajes y eco-coaching
 
-La pestaña 🛣️ **Viajes** es un cuaderno de bitácora automático más un entrenador de conducción. Aparece en el modo **Completo**.
+La pestaña 🛣️ **Drive** (pantalla Viajes) es un cuaderno de bitácora automático más un entrenador de conducción. Aparece en el modo **Completo**.
 
 ---
 
-## La pestaña Viajes
+## La pantalla Viajes
 
 <img src="guide/trips-tab.jpg" width="340" alt="Pestaña Viajes: comparación mensual, informe del depósito y lista de viajes con el botón de grabación">
 

@@ -1,10 +1,10 @@
 # Registo de abastecimentos e consumo
 
-Níveis 2 e 3 dos [três níveis de poupança](User-pt-How-It-Works#os-três-níveis-de-poupança): quanto queima, e quanto custou de facto. O separador ⛽ **Combustível** aparece nos modos **Médio** e **Completo**.
+Níveis 2 e 3 dos [três níveis de poupança](User-pt-How-It-Works#os-três-níveis-de-poupança): quanto queima, e quanto custou de facto. O separador ⛽ **Cost** (ecrã Combustível) aparece nos modos **Médio** e **Completo**.
 
 ---
 
-## O separador Combustível num relance
+## O ecrã Combustível num relance
 
 <img src="guide/fuel-tab.jpg" width="340" alt="Separador Combustível: nível do depósito com autonomia, cartão de estatísticas com distintivo de precisão, lista de abastecimentos">
 
@@ -81,7 +81,7 @@ O reconhecimento corre **no dispositivo**; a imagem nunca é enviada. Dê sempre
 
 ## O relatório do depósito — o momento da verdade
 
-Sempre que um depósito cheio fecha, a aplicação publica um relatório. No separador Viagens aparece assim:
+Sempre que um depósito cheio fecha, a aplicação publica um relatório. No separador Drive (ecrã Viagens) aparece assim:
 
 <img src="guide/trips-tab.jpg" width="340" alt="Relatório do depósito: 6,4 L/100 km, diferença face ao anterior, barra de cobertura e veredicto de calibração">
 
@@ -111,7 +111,7 @@ O cartão também pode apontar *o que mudou* — parte de rotação alta, evento
 
 ## Estatísticas de consumo
 
-Toque no cartão de estatísticas, ou **Combustível → Estatísticas de consumo**.
+Toque no cartão de estatísticas, ou **separador Cost (ecrã Combustível) → Estatísticas de consumo**.
 
 <img src="guide/consumption-stats-1.jpg" width="340" alt="Cabeçalho das estatísticas: chips de filtro por combustível, totais e tabela este mês vs mês passado">
 

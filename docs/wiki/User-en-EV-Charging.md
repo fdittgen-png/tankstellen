@@ -73,7 +73,7 @@ From the criteria sheet, pick the **EV** type and run a radius search. Filters a
 
 Chargers can be favourited exactly like fuel stations; on landscape and tablet the favourites and alerts panes render side by side. The favourite card shows **kW per connector**, **how many are free right now**, and the **connector types**.
 
-Price alerts are of limited use for charging because most operators use flat per-kWh tariffs. Charging sessions are logged like fill-ups: **Fuel tab → Add**, with kWh instead of litres, which feeds the same cost-per-kilometre statistics as combustion fill-ups.
+Price alerts are of limited use for charging because most operators use flat per-kWh tariffs. Charging sessions are logged like fill-ups: **Cost tab (Fuel screen) → Add**, with kWh instead of litres, which feeds the same cost-per-kilometre statistics as combustion fill-ups.
 
 ---
 

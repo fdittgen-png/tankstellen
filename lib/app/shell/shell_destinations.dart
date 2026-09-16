@@ -42,6 +42,16 @@ class ShellDestinations {
 ///   * Fuel-only mode:       `Favorites · Map · [Search] · Carburant`
 ///   * Fuel + Trips mode:    `Favorites · Map · [Search] · Carburant · Trajets`
 ///
+/// ## Labels name the intent, not the surface (#4143)
+///
+/// The tabs read **Find · Cost · Drive** — *where should I stop?*,
+/// *what does my car cost?*, *how am I driving?* — while Map and
+/// Favorites keep their names. It is a rename, deliberately not a
+/// regroup: every branch index, deep link and the centre FAB's
+/// behaviour matrix (#2113) stay exactly where they were. The screens
+/// behind the tabs keep their own titles (Fuel / Trips), which say what
+/// the surface shows once you are on it.
+///
 /// Settings is **not** a tab — it lives in the top-right app bar
 /// (`SettingsAppBarAction`), reached via router branch 4 (`/profile`).
 ///
@@ -67,7 +77,7 @@ ShellDestinations resolveShellDestinations({
   final search = ShellNavItem(
     Icons.search_outlined,
     Icons.search,
-    l10n.search,
+    l10n.shellTabFind,
     isPrimary: true,
   );
   final map = ShellNavItem(Icons.map_outlined, Icons.map, l10n.map);
@@ -79,12 +89,12 @@ ShellDestinations resolveShellDestinations({
   final carburant = ShellNavItem(
     Icons.local_gas_station_outlined,
     Icons.local_gas_station,
-    l10n.consumptionTabFuel,
+    l10n.shellTabCost,
   );
   final trajets = ShellNavItem(
     Icons.route_outlined,
     Icons.route,
-    l10n.trajetsTabLabel,
+    l10n.shellTabDrive,
   );
 
   if (!showConsumption) {

@@ -359,13 +359,13 @@ void main() {
 
       // Each bottom-bar nav item carries a Semantics label. Settings
       // is no longer a tab (#1874) — it lives in the app bar.
-      // #1901 — Consumption split into Carburant ('Fuel') and Trajets
-      // ('Trips'); the Full profile flags surface both.
-      expect(find.bySemanticsLabel('Search'), findsOneWidget);
+      // #1901 — Consumption split into Carburant and Trajets; #4143
+      // labels them by intent ('Cost', 'Drive') and Search as 'Find'.
+      expect(find.bySemanticsLabel('Find'), findsOneWidget);
       expect(find.bySemanticsLabel('Map'), findsOneWidget);
       expect(find.bySemanticsLabel('Favorites'), findsOneWidget);
-      expect(find.bySemanticsLabel('Fuel'), findsOneWidget);
-      expect(find.bySemanticsLabel('Trips'), findsOneWidget);
+      expect(find.bySemanticsLabel('Cost'), findsOneWidget);
+      expect(find.bySemanticsLabel('Drive'), findsOneWidget);
 
       handle.dispose();
     });

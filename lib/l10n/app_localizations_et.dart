@@ -7691,6 +7691,15 @@ class AppLocalizationsEt extends AppLocalizations {
       'Jagage teisest rakendusest kviitungi fotot, et eeltäita tankimine — kuupäev, liitrid, kogusum ja tankla loetakse seadmel.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Tarbimine kiiruse järgi';
 
   @override

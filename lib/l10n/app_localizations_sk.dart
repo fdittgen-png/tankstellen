@@ -7727,6 +7727,15 @@ class AppLocalizationsSk extends AppLocalizations {
       'Zdieľajte fotografiu paragónu z inej aplikácie na predvyplnenie tankovania — dátum, litre, celková suma a stanica sú čítané priamo na zariadení.';
 
   @override
+  String get shellTabFind => 'Find';
+
+  @override
+  String get shellTabCost => 'Cost';
+
+  @override
+  String get shellTabDrive => 'Drive';
+
+  @override
   String get speedConsumptionCardTitle => 'Spotreba podľa rýchlosti';
 
   @override

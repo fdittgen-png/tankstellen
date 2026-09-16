@@ -76,8 +76,8 @@ C'est le réglage le plus lourd de conséquences, car il décide de la quantité
 *Réglages → Fonctions et mode d'utilisation. Commencez en **Basique** si vous voulez seulement du carburant moins cher ; montez quand vous voudrez savoir pourquoi votre voiture boit.*
 
 - **Basique** — trouver carburant et recharge, favoris, alertes, itinéraires.
-- **Moyen** — ajoute l'onglet **Carburant** : enregistrer vos pleins, voir consommation et coût réels. Aucun matériel nécessaire.
-- **Complet** — ajoute l'onglet **Trajets** : enregistrement automatique, scores de conduite, cartes de fidélité. Un adaptateur OBD2 reste facultatif même ici — les trajets s'enregistrent au GPS seul.
+- **Moyen** — ajoute l'onglet **Coûts** (écran Carburant) : enregistrer vos pleins, voir consommation et coût réels. Aucun matériel nécessaire.
+- **Complet** — ajoute l'onglet **Conduite** (écran Trajets) : enregistrement automatique, scores de conduite, cartes de fidélité. Un adaptateur OBD2 reste facultatif même ici — les trajets s'enregistrent au GPS seul.
 
 Vous pouvez changer à tout moment, et tout interrupteur individuel touché ensuite vous met en **Personnalisé**. La liste complète, et ce que chacun coûte en batterie, données ou vie privée : [Référence des réglages → Fonctions et mode d'utilisation](User-fr-Settings-Reference#fonctions-et-mode-dutilisation).
 
@@ -103,13 +103,13 @@ La clé est conservée dans le coffre matériel (Android Keystore / Trousseau iO
 
 <img src="guide/favorites.jpg" width="340" alt="Onglet Favoris avec la barre du bas et le bouton Recherche central">
 
-*Le bouton vert **Recherche** surélevé au centre est le seul déclencheur de recherche de toute l'application.*
+*Le bouton vert **Trouver** surélevé au centre est le seul déclencheur de recherche de toute l'application.*
 
 - ⭐ **Favoris** — stations enregistrées et alertes de prix
 - 🗺️ **Carte** — chaque station proche en épingle colorée par prix
-- 🔍 **Recherche** *(au centre)* — à proximité ou le long d'un trajet
-- ⛽ **Carburant** — réservoir, consommation, pleins *(à partir de Moyen)*
-- 🛣️ **Trajets** — carnet de bord et coaching *(Complet)*
+- 🔍 **Trouver** *(au centre)* — à proximité ou le long d'un trajet
+- ⛽ **Coûts** *(écran Carburant)* — réservoir, consommation, pleins *(à partir de Moyen)*
+- 🛣️ **Conduite** *(écran Trajets)* — carnet de bord et coaching *(Complet)*
 
 Les réglages **ne sont pas** un onglet : c'est l'engrenage en haut à droite des écrans principaux. Sur tablette, ou téléphone tenu à l'horizontale, l'application se divise en deux colonnes pour voir liste et carte (ou détail) en même temps.
 
@@ -119,7 +119,7 @@ Les réglages **ne sont pas** un onglet : c'est l'engrenage en haut à droite de
 
 <img src="guide/search-criteria-nearby.jpg" width="340" alt="Feuille des critères pour une recherche à proximité">
 
-*Touchez **Recherche** → la feuille de critères s'ouvre pré-remplie depuis votre profil. Ajustez, puis touchez **Rechercher** à nouveau.*
+*Touchez **Trouver** → la feuille de critères s'ouvre pré-remplie depuis votre profil. Ajustez, puis touchez-le à nouveau (**Lancer la recherche**).*
 
 Vous obtenez une liste triée du moins cher au plus cher (ou par distance — à vous de voir), chaque fiche montrant prix, tendance, distance et fraîcheur. Un appui ouvre le détail complet. La visite guidée : [Trouver des stations](User-fr-Finding-Stations).
 

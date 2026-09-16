@@ -18,7 +18,7 @@ Toda la aplicación se articula en torno a una idea: **un coche cuesta dinero de
 |---|---|---|
 | **1. El precio** | *¿Dónde está el combustible más barato ahora mismo?* | Búsqueda, Mapa, Favoritos, Alertas, Rutas |
 | **2. El consumo** | *¿Cuántos litros a los 100 km, y por qué?* | Viajes, eco-coaching, OBD2 |
-| **3. La verdad** | *¿Cuánto pagué realmente, y la estimación de la app es honesta?* | Pestaña Combustible, repostajes, estadísticas de consumo |
+| **3. La verdad** | *¿Cuánto pagué realmente, y la estimación de la app es honesta?* | Pestaña Cost (pantalla Combustible), repostajes, estadísticas de consumo |
 
 El nivel 1 ya hace ahorrar y no necesita nada más que la app. Los niveles 2 y 3 necesitan tus repostajes; el nivel 2 gana mucha precisión con un adaptador OBD2 barato. Hasta dónde llegar lo decides tú — ver [Cómo funciona Sparkilo](User-es-How-It-Works).
 
@@ -37,7 +37,7 @@ El nivel 1 ya hace ahorrar y no necesita nada más que la app. Los niveles 2 y 3
 
 | Página | Qué aprenderás |
 |---|---|
-| [Encontrar gasolineras](User-es-Finding-Stations) | El botón Buscar central, los criterios, leer una ficha, el detalle, el mapa, el radar de gasolineras |
+| [Encontrar gasolineras](User-es-Finding-Stations) | El botón Find central, los criterios, leer una ficha, el detalle, el mapa, el radar de gasolineras |
 | [Planificación de ruta](User-es-Route-Planning) | Las paradas más baratas del trayecto, los corredores transfronterizos, las cuatro estrategias |
 | [Favoritos y alertas](User-es-Favorites-And-Alerts) | Estaciones guardadas, alertas de estación y de zona, cómo se comporta de verdad la comprobación en segundo plano |
 | [Recarga eléctrica](User-es-EV-Charging) | Puntos de recarga vía OpenChargeMap, conectores, filtros de potencia |

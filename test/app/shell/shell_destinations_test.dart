@@ -37,7 +37,7 @@ void main() {
         expect(result.branchForSlot, [2, 0, 1]);
         expect(result.items.map((i) => i.label).toList(), [
           'Favorites',
-          'Search',
+          'Find',
           'Map',
         ]);
 
@@ -64,8 +64,8 @@ void main() {
       expect(result.items.map((i) => i.label).toList(), [
         'Favorites',
         'Map',
-        'Search',
-        'Fuel',
+        'Find',
+        'Cost',
       ]);
 
       // Carburant item carries the fuel-station icon.
@@ -92,9 +92,9 @@ void main() {
       expect(result.items.map((i) => i.label).toList(), [
         'Favorites',
         'Map',
-        'Search',
-        'Fuel',
-        'Trips',
+        'Find',
+        'Cost',
+        'Drive',
       ]);
 
       // Carburant carries the fuel-station icon, Trajets the route icon.
@@ -115,7 +115,7 @@ void main() {
         );
         final primaries = result.items.where((i) => i.isPrimary).toList();
         expect(primaries, hasLength(1));
-        expect(primaries.single.label, 'Search');
+        expect(primaries.single.label, 'Find');
         // The primary sits in the centre slot.
         final primarySlot = result.items.indexWhere((i) => i.isPrimary);
         expect(primarySlot, result.items.length ~/ 2);
@@ -148,9 +148,9 @@ void main() {
       expect(result.items.map((i) => i.label).toList(), [
         'Favorites',
         'Map',
-        'Search',
-        'Fuel',
-        'Trips',
+        'Find',
+        'Cost',
+        'Drive',
       ]);
     });
 
@@ -178,6 +178,29 @@ void main() {
       );
       expect(trajetsSlot, isNonNegative);
       expect(result.branchForSlot[trajetsSlot], kTrajetsBranchIndex);
+    });
+    test('#4143 — the intent labels are localized, not the surface names',
+        () {
+      // Probed in de and fr, where the intent word and the old surface
+      // word differ ('Kosten' vs 'Kraftstoff', 'Conduite' vs 'Trajets'),
+      // so a regression back to the surface keys cannot pass.
+      for (final (locale, expected) in [
+        (const Locale('de'), ['Favoriten', 'Karte', 'Finden', 'Kosten', 'Fahren']),
+        (const Locale('fr'), ['Favoris', 'Carte', 'Trouver', 'Coûts', 'Conduite']),
+      ]) {
+        final l10n = lookupAppLocalizations(locale);
+        final result = resolveShellDestinations(
+          l10n: l10n,
+          showConsumption: true,
+          showTrajets: true,
+        );
+        final labels = result.items.map((i) => i.label).toList();
+        expect(labels.skip(2), expected.skip(2), reason: '$locale');
+        expect(labels, isNot(contains(l10n.consumptionTabFuel)));
+        expect(labels, isNot(contains(l10n.trajetsTabLabel)));
+        expect(labels[0], l10n.favorites);
+        expect(labels[1], l10n.map);
+      }
     });
   });
 }

@@ -64,7 +64,7 @@ Features that don't serve at least one of those three layers don't belong.
 - **Real-time prices** from each country's official government open-data source — not crowdsourced, not scraped. The results header surfaces the live source and links straight to it (e.g. *France — Prix-Carburants (gouv.fr)*).
 - **17 countries** — Germany, France, Austria, Spain, Italy, Denmark, Portugal, Luxembourg, Slovenia, UK, Argentina, Australia, Mexico, South Korea, Chile, Greece, Romania
 - **23 languages** — from Bulgarian to Swedish, every UI surface fully translated
-- **One central search button** — a docked button seated in a concave notch at the centre of the 5-tab bottom bar (Favorites · Map · **Search** · Fuel · Trips). Tap it to open the **Search criteria** sheet — Nearby vs Search-along-route, fuel-type chips (Super E10 / E5 / 98, Diesel, LPG, CNG, E85, plus EV charging), a radius slider, an *Open only* toggle, amenity filters (Shop, Car Wash, Air, WC…), a highway / no-highway filter, and *Save as my defaults*.
+- **One central search button** — a docked button seated in a concave notch at the centre of the 5-tab bottom bar (Favorites · Map · **Find** · Cost · Drive). Tap it to open the **Search criteria** sheet — Nearby vs Search-along-route, fuel-type chips (Super E10 / E5 / 98, Diesel, LPG, CNG, E85, plus EV charging), a radius slider, an *Open only* toggle, amenity filters (Shop, Car Wash, Air, WC…), a highway / no-highway filter, and *Save as my defaults*.
 - **Every price side by side** — a comparison table with one row per station and one column per grade, each cell carrying the price, the gap to the cheapest, and what a tank of it would cost. A price-per-litre list cannot answer *which grade is cheapest for my car here*; this does.
 - **Result sorting & detail** — *N stations found*, sort by Distance / Price / A-Z / 24h-open; each card shows price, an up/down price-trend arrow, a community star rating, amenity badges, distance, last-update time, and a one-tap favourite star.
 - **Route-aware search** — plan a trip and switch between *All stations* and *Best stops*; distances are measured **along the corridor**, the cheapest stop carries a *Cheapest* badge (e.g. *117 km · 78 min · 24 stations*), and a partial-results banner means a slow country never blocks the cheap result
@@ -102,7 +102,7 @@ Features that don't serve at least one of those three layers don't belong.
 ### Layer 3 — seeing what you actually spend
 
 - **Fill-up log** — manual entry, pump-display OCR, receipt OCR, or OBD-II auto-import on disconnect; every fill shows L/100 km, the % delta vs the previous fill, and the €/L paid, exportable in one tap
-- **Fuel tab at a glance** — live tank level + estimated range (e.g. *≈ 536 km*), a fill-up summary for the current tank (km since the last full tank, litres pumped, pump consumption, how much of it your recordings actually covered), and a consumption-stats card with an accuracy indicator (*High · ±3-7 %*), the **pump calibration** factor learned from your fill-ups, average L/100 km, average cost/km, total litres, total spent and fill-up count
+- **Cost tab (Fuel screen) at a glance** — live tank level + estimated range (e.g. *≈ 536 km*), a fill-up summary for the current tank (km since the last full tank, litres pumped, pump consumption, how much of it your recordings actually covered), and a consumption-stats card with an accuracy indicator (*High · ±3-7 %*), the **pump calibration** factor learned from your fill-ups, average L/100 km, average cost/km, total litres, total spent and fill-up count
 - **Trip history** — every recorded trip with distance, duration, avg consumption, fuel used, fuel cost, and a this-month-vs-last comparison
 - **Vehicle profiles** — combustion, hybrid, or EV; tank capacity, battery, connectors, multi-vehicle households
 - **Fuel-cost calculator** — distance × consumption × price → litres, total cost, and cost/km, with smart prefill from your active vehicle and profile
@@ -180,7 +180,7 @@ Captured 2026-09-09 on Android running Sparkilo 6.0.5 against the live `Prix-Car
 
 ### Layer 3 — see what you are really spending
 
-| Fuel tab | Cost per kilometre by fuel | Which fuel is cheapest to drive on |
+| Cost tab (Fuel screen) | Cost per kilometre by fuel | Which fuel is cheapest to drive on |
 |:--:|:--:|:--:|
 | ![Fuel tab — fill-up summary for the tank of 5 September: 532 km, 34.7 L pumped, 6.5 L/100 km from the pump, recorded trips covering 88 % of it, and the pump calibration moving from x1.00 to x0.69](docs/screenshots/15-fuel-tab.jpg) | ![Consumption statistics — cost per kilometre by fuel: E85 at 0.050 €/km on 5.7 L/100 km over four full tanks, E5 at 0.127 €/km on 6.4 L/100 km, each with litres burned and CO2 per 100 km](docs/screenshots/16-cost-per-km-by-fuel.jpg) | ![Cost of driving, fuel by fuel — E85 is your cheapest fuel to drive on, E5 costs 77.48 EUR more per 1000 km, and E5 only beats E85 below 0.78 EUR per litre](docs/screenshots/17-cheapest-fuel-verdict.jpg) |
 | One fill-up, fully accounted: what you pumped, what the recordings claimed, and the correction the pump forced on them. | Cost per kilometre per fuel, from *your* measured consumption per composition — not from a spec sheet. | The verdict, with the break-even price that makes it actionable: below 0.78 €/L, E5 wins. Above it, E85 does. |

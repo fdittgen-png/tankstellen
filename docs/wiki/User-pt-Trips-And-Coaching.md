@@ -1,10 +1,10 @@
 # Viagens e eco-coaching
 
-O separador 🛣️ **Viagens** é um diário de bordo automático mais um treinador de condução. Aparece no modo **Completo**.
+O separador 🛣️ **Drive** (ecrã Viagens) é um diário de bordo automático mais um treinador de condução. Aparece no modo **Completo**.
 
 ---
 
-## O separador Viagens
+## O ecrã Viagens
 
 <img src="guide/trips-tab.jpg" width="340" alt="Separador Viagens: comparação mensal, relatório do depósito e lista de viagens com o botão de gravação">
 

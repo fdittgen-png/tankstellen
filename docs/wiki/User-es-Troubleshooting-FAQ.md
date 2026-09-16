@@ -100,11 +100,11 @@ Comprueba también el **umbral de velocidad de inicio** en el editor de vehícul
 Ve en este orden:
 
 1. **Abre el viaje y lee la ficha de salud de la comunicación OBD2.** Si la cobertura está muy por debajo del 100 %, los huecos se rellenaron con estimaciones GPS y la media es una mezcla, no una medida.
-2. **Mira el informe del depósito en la pestaña Viajes.** Si dice que las estimaciones están un *n* % por encima o por debajo de la verdad del surtidor, la app ya lo sabe y acaba de corregirse — espera movimiento en los próximos viajes.
+2. **Mira el informe del depósito en la pestaña Drive (pantalla Viajes).** Si dice que las estimaciones están un *n* % por encima o por debajo de la verdad del surtidor, la app ya lo sabe y acaba de corregirse — espera movimiento en los próximos viajes.
 3. **Comprueba la capacidad del depósito** en el vehículo. Una capacidad errónea produce durante meses autonomías creíbles pero equivocadas.
 4. **Comprueba tus kilometrajes.** El consumo es litros ÷ kilómetros, y los kilómetros vienen enteramente de lo que tecleas.
 5. **Comprueba si marcaste « Depósito lleno ».** Solo las ventanas de lleno a lleno pueden calibrar algo.
-6. **Mira la insignia de precisión** en la pestaña Combustible. *Baja* significa que nada ha anclado aún el modelo — la cifra es una salida de modelo, y lo declara.
+6. **Mira la insignia de precisión** en la pestaña Cost (pantalla Combustible). *Baja* significa que nada ha anclado aún el modelo — la cifra es una salida de modelo, y lo declara.
 
 Contexto: [Cómo funciona Sparkilo → Cómo un litro se convierte en un número](User-es-How-It-Works#cómo-un-litro-se-convierte-en-un-número).
 
@@ -211,9 +211,9 @@ En parte. Los favoritos muestran sus últimos precios conocidos, las teselas vis
 
 ---
 
-## ¿Dónde se ha ido la pestaña Combustible o Viajes?
+## ¿Dónde se ha ido la pestaña Cost o Drive?
 
-Pertenecen a los modos **Intermedio** y **Completo**. Si una ha desaparecido, un preajuste o un interruptor la ha apagado: Ajustes → Funciones y modo de uso → Consumo.
+La pestaña Cost (pantalla Combustible) y la pestaña Drive (pantalla Viajes) pertenecen a los modos **Intermedio** y **Completo**. Si una ha desaparecido, un preajuste o un interruptor la ha apagado: Ajustes → Funciones y modo de uso → Consumo.
 
 ---
 

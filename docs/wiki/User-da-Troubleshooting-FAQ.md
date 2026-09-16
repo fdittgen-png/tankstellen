@@ -100,11 +100,11 @@ Tjek også **starthastighedstærsklen** i køretøjseditoren — en langsom udk�
 Gå frem i denne rækkefølge:
 
 1. **Åbn turen og læs kortet om OBD2-kommunikationens sundhed.** Ligger dækningen langt under 100 %, blev hullerne fyldt med GPS-skøn, og turgennemsnittet er en blanding, ikke en måling.
-2. **Se tankrapporten på fanen Ture.** Står der, at skønnene ligger *n* % over eller under standersandheden, ved appen det allerede og har netop rettet sig selv — forvent bevægelse på de næste ture.
+2. **Se tankrapporten på fanen Drive (skærmen Ture).** Står der, at skønnene ligger *n* % over eller under standersandheden, ved appen det allerede og har netop rettet sig selv — forvent bevægelse på de næste ture.
 3. **Tjek tankkapaciteten** på køretøjet. En forkert kapacitet giver troværdige, men forkerte rækkevidder i månedsvis.
 4. **Tjek dine kilometerstande.** Forbrug er liter ÷ kilometer, og kilometrene kommer udelukkende fra det, du taster.
 5. **Tjek om du satte flueben i « Fuld tank ».** Kun fuld-til-fuld-vinduer kan kalibrere noget som helst.
-6. **Se præcisionsmærket** på fanen Brændstof. *Lav* betyder, at intet endnu har forankret modellen — tallet er et modeloutput, og det siger det.
+6. **Se præcisionsmærket** på fanen Cost (skærmen Brændstof). *Lav* betyder, at intet endnu har forankret modellen — tallet er et modeloutput, og det siger det.
 
 Baggrund: [Sådan fungerer Sparkilo → Hvordan en liter bliver til et tal](User-da-How-It-Works#hvordan-en-liter-bliver-til-et-tal).
 
@@ -211,9 +211,9 @@ Delvis. Favoritter viser deres sidst kendte priser, nyligt viste kortfliser er c
 
 ---
 
-## Hvor blev fanen Brændstof eller Ture af?
+## Hvor blev fanen Cost eller Drive af?
 
-De hører til tilstandene **Mellem** og **Fuld**. Er én forsvundet, har en forudindstilling eller en enkelt kontakt slået den fra: Indstillinger → Funktioner & brugstilstand → Forbrug.
+Fanen Cost (skærmen Brændstof) og fanen Drive (skærmen Ture) hører til tilstandene **Mellem** og **Fuld**. Er én forsvundet, har en forudindstilling eller en enkelt kontakt slået den fra: Indstillinger → Funktioner & brugstilstand → Forbrug.
 
 ---
 
