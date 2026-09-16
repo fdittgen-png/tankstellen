@@ -283,7 +283,6 @@ void main() {
 /// `obd2/api.dart` barrel (exempt). Same graph, new attribution — the
 /// `obd2 -> *` entries are the decomposition's measured starting point.
 const _featurePairBaseline = <String, int>{
-  'achievements -> price_history': 2,
   'alerts -> map': 1,
   'approach -> favorites': 1,
   'approach -> profile': 8,
@@ -311,7 +310,7 @@ const _featurePairBaseline = <String, int>{
   // #3884 — 5 → 4: the voice-announcements tile (and its
   // voiceAnnouncementsEnabledProvider gate) left driving_settings_section
   // for Settings → Prices & alerts.
-  'driving -> profile': 4,
+  'driving -> profile': 3,
   'driving -> search': 1,
   // #3743 (epic item 1, driving_score extraction, step 3/5) — the 35
   // edges are former INTRA-consumption imports of the trip stack
@@ -334,10 +333,9 @@ const _featurePairBaseline = <String, int>{
   // barrel when trips is extracted. All inbound edges route through
   // fill_ups/api.dart (exempt), so consumption<->achievements and
   // consumption<->carbon cycles broke (17 -> 15).
-  'fill_ups -> achievements': 1,
   'fill_ups -> carbon': 2,
   'fill_ups -> ev': 4,
-  'fill_ups -> profile': 3,
+  'fill_ups -> profile': 2,
   'fill_ups -> vehicle': 13,
   'glide_coach -> feature_management': 2,
   'itinerary -> profile': 1,
@@ -369,7 +367,7 @@ const _featurePairBaseline = <String, int>{
   // 'profile -> driving' (1 → 0) and 'profile -> widget' (1 → 0) hit
   // zero the same way (driving/api.dart + widget/api.dart), which also
   // broke the driving <-> profile and widget <-> profile cycles.
-  'profile -> feature_management': 47,
+  'profile -> feature_management': 45,
   'profile -> search': 2,
   // #3908 (Epic #3907) — 2 → 1: the dashboard's synced_data_card reach-in
   // to sync/providers is gone (the overview card imports the barrel).
@@ -424,7 +422,7 @@ const _featurePairBaseline = <String, int>{
   'trips -> driving': 5,
   'trips -> glide_coach': 4,
   'trips -> map': 2,
-  'trips -> profile': 7,
+  'trips -> profile': 6,
   'trips -> search': 2,
   'trips -> sync': 1,
   'trips -> vehicle': 19,

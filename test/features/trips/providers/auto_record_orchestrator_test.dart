@@ -592,7 +592,7 @@ void main() {
             // obd2TripRecording stays absent — autoRecord requires it
             // but the test doesn't toggle it through the central API,
             // and the fake skips dependency checks anyway.
-            Feature.gamification,
+            Feature.hapticEcoCoach,
             Feature.priceAlerts,
             Feature.priceHistory,
             Feature.routePlanning,

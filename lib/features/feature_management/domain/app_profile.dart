@@ -32,7 +32,7 @@ enum AppProfile {
   medium,
 
   /// Everything in [medium] plus OBD2 trip recording, auto-record,
-  /// gamification, consumption analytics tab, and loyalty cards.
+  /// consumption analytics tab, and loyalty cards.
   /// Vehicle + OBD2 wizard steps both shown.
   full,
 
@@ -76,7 +76,7 @@ enum AppProfile {
 /// - All Medium features
 /// - `obd2Optional` — OBD2 is required to start a trip (no GPS-only
 ///   fallback). Full users are expected to have an adapter paired.
-/// - OBD2 ergonomics: `autoRecord`, `gamification`, `loyaltyCards`,
+/// - OBD2 ergonomics: `autoRecord`, `loyaltyCards`,
 ///   `hapticEcoCoach`, `glideCoach` (the last two
 ///   `requires: {obd2TripRecording}` per the manifest)
 ///
@@ -161,7 +161,6 @@ const Map<AppProfile, Set<Feature>> appProfileBundles = {
     Feature.obd2TripRecording,
     Feature.autoRecord,
     Feature.consumptionAnalytics,
-    Feature.gamification,
     Feature.showConsumptionTab,
     Feature.hapticEcoCoach,
     Feature.glideCoach,

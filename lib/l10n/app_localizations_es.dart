@@ -1820,48 +1820,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get vehicleAdapterForget => 'Olvidar adaptador';
 
   @override
-  String get achievementsTitle => 'Logros';
-
-  @override
-  String get achievementFirstTrip => 'Primer viaje';
-
-  @override
-  String get achievementFirstTripDesc => 'Graba tu primer viaje OBD2.';
-
-  @override
-  String get achievementFirstFillUp => 'Primer repostaje';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Registra tu primer repostaje.';
-
-  @override
-  String get achievementTenTrips => '10 viajes';
-
-  @override
-  String get achievementTenTripsDesc => 'Graba 10 viajes OBD2.';
-
-  @override
-  String get achievementZeroHarsh => 'Conducción suave';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Completa un viaje de 10 km o más sin frenadas ni acelerones bruscos.';
-
-  @override
-  String get achievementEcoWeek => 'Semana ecológica';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Conduce 7 días seguidos con al menos un viaje suave cada día.';
-
-  @override
-  String get achievementPriceWin => 'Buen precio';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Registra un repostaje que mejore en un 5 % o más la media de 30 días de la estación.';
-
-  @override
   String get syncBaselinesToggleTitle =>
       'Compartir perfiles de vehículo aprendidos';
 
@@ -3321,27 +3279,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Racha suave';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Conduce 5 viajes seguidos con una puntuación de conducción suave de 80 o más.';
-
-  @override
-  String get achievementColdStartAware => 'Consciente del arranque en frío';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Mantén el coste de combustible de arranque en frío de todo un mes por debajo del 2 % del total: combina los trayectos cortos.';
-
-  @override
-  String get achievementHighwayMaster => 'Maestro de autopista';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Completa un viaje de más de 30 km a velocidad constante con una puntuación de conducción suave de 90 o más.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4892,13 +4829,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Captura viajes automáticamente por OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamificación';
-
-  @override
-  String get featureDescription_gamification =>
-      'Puntuaciones de conducción e insignias conseguidas.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Eco-coach háptico';
 
   @override
@@ -4995,10 +4925,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Muestra la pestaña de análisis de consumo en la navegación inferior.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Activa primero la grabación de viajes por OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5599,13 +5525,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'El modo basado en reglas asigna cada muestra de conducción a una única situación. El modo difuso la reparte entre todas según lo bien que encaje en cada una: más suave en torno a 60 km/h o con pendientes cambiantes, pero más lento para llenar todos los grupos.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Mostrar logros y puntuaciones';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Cuando está desactivado, las insignias, las puntuaciones y los iconos de trofeo se ocultan en toda la app.';
 
   @override
   String gdprPolicyLink(int version) {

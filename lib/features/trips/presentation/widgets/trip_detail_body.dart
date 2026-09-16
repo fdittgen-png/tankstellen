@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../profile/providers/gamification_enabled_provider.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import 'trip_detail_lessons.dart';
@@ -236,11 +235,6 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    // #1194 — gamification opt-out gates the composite driving score
-    // card. The underlying calculator still runs (cheap, pure) so
-    // toggling back on instantly restores the score without a re-render.
-    final showGamification = ref.watch(gamificationEnabledProvider);
-
     // Post-trip lessons (#2251/#3701) — see [buildTripDetailLessons].
     // Empty for EV / empty trips on the same gating rule as the card
     // below, and the registry returns [] when no rule fires (the
@@ -278,9 +272,11 @@ class _TripDetailBodyState extends ConsumerState<TripDetailBody> {
         // the top of the Insights group: a single big 0..100 number
         // with a brief breakdown chip row beneath it. EV trips and
         // empty trips are skipped on the same gating rule as the
-        // cost-line card below. #1194: also gated by gamification
-        // toggle (the score is the most game-like trip element).
-        if (showGamification && !widget.isEv && widget.samples.isNotEmpty)
+        // cost-line card below. #4252 — the gamification opt-out that
+        // used to hide this (#1194) went with the feature; the score is
+        // a driving metric, not a badge, so it now renders on the same
+        // terms as the insights card beneath it.
+        if (!widget.isEv && widget.samples.isNotEmpty)
           DrivingScoreCard(score: _score),
         // Driving insights — combustion trips only. EV trips skip
         // this card; phase 4 will land an EV-aware version. Since #2251

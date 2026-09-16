@@ -10,7 +10,6 @@ import 'package:tankstellen/features/fill_ups/data/exporters/backup/full_backup_
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
@@ -131,7 +130,6 @@ Future<void> _pumpScreen(
       fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
       activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
       vehicleProfileListProvider.overrideWith(() => _EmptyVehicleList()),
-      gamificationEnabledProvider.overrideWithValue(true),
     ],
   );
 }

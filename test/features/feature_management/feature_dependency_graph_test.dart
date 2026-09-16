@@ -11,16 +11,16 @@ void main() {
 
   group('canEnable', () {
     test('returns false when a prerequisite is disabled', () {
-      // gamification requires obd2TripRecording.
+      // hapticEcoCoach requires obd2TripRecording.
       expect(
-        canEnable(Feature.gamification, manifest, <Feature>{}),
+        canEnable(Feature.hapticEcoCoach, manifest, <Feature>{}),
         isFalse,
       );
     });
 
     test('returns true when all prerequisites are enabled', () {
       expect(
-        canEnable(Feature.gamification, manifest, <Feature>{
+        canEnable(Feature.hapticEcoCoach, manifest, <Feature>{
           Feature.obd2TripRecording,
         }),
         isTrue,
@@ -48,14 +48,14 @@ void main() {
     test(
         'returns false when the feature is enabled but a direct parent is off',
         () {
-      // gamification stored on, but obd2TripRecording (parent) is off.
+      // hapticEcoCoach stored on, but obd2TripRecording (parent) is off.
       // The user's preference is preserved (still in the set) but the
       // surface should not render.
       expect(
         isEffectivelyEnabled(
-          Feature.gamification,
+          Feature.hapticEcoCoach,
           manifest,
-          <Feature>{Feature.gamification},
+          <Feature>{Feature.hapticEcoCoach},
         ),
         isFalse,
         reason:
@@ -67,9 +67,9 @@ void main() {
     test('returns true when the feature and every ancestor are enabled', () {
       expect(
         isEffectivelyEnabled(
-          Feature.gamification,
+          Feature.hapticEcoCoach,
           manifest,
-          <Feature>{Feature.obd2TripRecording, Feature.gamification},
+          <Feature>{Feature.obd2TripRecording, Feature.hapticEcoCoach},
         ),
         isTrue,
       );
@@ -105,8 +105,8 @@ void main() {
           displayName: 'parent',
           description: 'three-level chain parent',
         ),
-        Feature.gamification: FeatureManifestEntry.allChannels(
-          feature: Feature.gamification,
+        Feature.hapticEcoCoach: FeatureManifestEntry.allChannels(
+          feature: Feature.hapticEcoCoach,
           defaultOn: false,
           requires: {Feature.priceHistory},
           displayName: 'leaf',
@@ -116,21 +116,21 @@ void main() {
 
       expect(
         isEffectivelyEnabled(
-          Feature.gamification,
+          Feature.hapticEcoCoach,
           chain,
-          <Feature>{Feature.priceHistory, Feature.gamification},
+          <Feature>{Feature.priceHistory, Feature.hapticEcoCoach},
         ),
         isFalse,
         reason: 'Root priceAlerts is off, so the leaf is effectively-off.',
       );
       expect(
         isEffectivelyEnabled(
-          Feature.gamification,
+          Feature.hapticEcoCoach,
           chain,
           <Feature>{
             Feature.priceAlerts,
             Feature.priceHistory,
-            Feature.gamification,
+            Feature.hapticEcoCoach,
           },
         ),
         isTrue,
@@ -140,19 +140,19 @@ void main() {
 
   group('blockingDisable', () {
     test('returns dependents that would break', () {
-      // Disabling obd2TripRecording while gamification + glideCoach are on
+      // Disabling obd2TripRecording while hapticEcoCoach + glideCoach are on
       // must surface BOTH dependents.
       final blockers = blockingDisable(
         Feature.obd2TripRecording,
         manifest,
         <Feature>{
           Feature.obd2TripRecording,
-          Feature.gamification,
+          Feature.hapticEcoCoach,
           Feature.glideCoach,
         },
       );
       expect(blockers, containsAll(<Feature>[
-        Feature.gamification,
+        Feature.hapticEcoCoach,
         Feature.glideCoach,
       ]));
     });
@@ -185,18 +185,18 @@ void main() {
       // a -> b -> a — pick two arbitrary Feature values to wire as a
       // direct two-node cycle.
       const cyclic = FeatureManifest({
-        Feature.gamification: FeatureManifestEntry.allChannels(
-          feature: Feature.gamification,
-          defaultOn: false,
-          requires: {Feature.hapticEcoCoach},
-          displayName: 'gamification',
-          description: 'cycle test',
-        ),
         Feature.hapticEcoCoach: FeatureManifestEntry.allChannels(
           feature: Feature.hapticEcoCoach,
           defaultOn: false,
-          requires: {Feature.gamification},
+          requires: {Feature.glideCoach},
           displayName: 'hapticEcoCoach',
+          description: 'cycle test',
+        ),
+        Feature.glideCoach: FeatureManifestEntry.allChannels(
+          feature: Feature.glideCoach,
+          defaultOn: false,
+          requires: {Feature.hapticEcoCoach},
+          displayName: 'glideCoach',
           description: 'cycle test',
         ),
       });

@@ -59,7 +59,14 @@ void main() {
     await pumpTall(
       tester,
       const DrivingConsumptionScreen(),
-      flags: const {Feature.obd2TripRecording, Feature.showConsumptionTab},
+      // #4252 — the Rewards section now hides entirely when loyalty is
+      // off: the gamification tile was its other occupant, and a
+      // header over nothing is worse than no header.
+      flags: const {
+        Feature.obd2TripRecording,
+        Feature.showConsumptionTab,
+        Feature.loyaltyCards,
+      },
     );
     final l = l10n(tester, DrivingConsumptionScreen);
     expect(find.byKey(const Key('settingsRadarTile')), findsOneWidget);

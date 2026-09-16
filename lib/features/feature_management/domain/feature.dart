@@ -5,19 +5,18 @@
 ///
 /// This enum is the manifest other systems consult — it does NOT yet drive
 /// runtime behaviour for the existing scattered toggles (`autoRecord`,
-/// `gamificationEnabled`, etc.). Phase 3 migrations of issue #1373 will
+/// legacy per-feature booleans). Phase 3 migrations of issue #1373 will
 /// route those legacy paths through this enum one feature at a time.
 ///
 /// Add a one-line dartdoc above each value naming the issue or area it
 /// gates. Persistence keys use [Enum.name], so values may be reordered or
 /// inserted but MUST NOT be renamed without a migration.
 enum Feature {
-  /// OBD2-driven trip capture (foundation for gamification, eco-coach,
+  /// OBD2-driven trip capture (foundation for the eco-coach,
   /// consumption analytics, glide-coach, GPS path).
   obd2TripRecording,
 
   /// Driving scores + badges (#781). Requires [obd2TripRecording].
-  gamification,
 
   /// Real-time haptic eco-coach feedback during recording (#1194).
   /// Requires [obd2TripRecording].

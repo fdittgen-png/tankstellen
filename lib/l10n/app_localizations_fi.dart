@@ -1813,48 +1813,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get vehicleAdapterForget => 'Unohda sovitin';
 
   @override
-  String get achievementsTitle => 'Saavutukset';
-
-  @override
-  String get achievementFirstTrip => 'Ensimmäinen matka';
-
-  @override
-  String get achievementFirstTripDesc => 'Tallenna ensimmäinen OBD2-matkasi.';
-
-  @override
-  String get achievementFirstFillUp => 'Ensimmäinen tankkaus';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Kirjaa ensimmäinen tankkauksesi.';
-
-  @override
-  String get achievementTenTrips => '10 matkaa';
-
-  @override
-  String get achievementTenTripsDesc => 'Tallenna 10 OBD2-matkaa.';
-
-  @override
-  String get achievementZeroHarsh => 'Tasainen kuljettaja';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Suorita vähintään 10 km matka ilman äkillistä jarrutusta tai kiihdytystä.';
-
-  @override
-  String get achievementEcoWeek => 'Eko-viikko';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Aja 7 peräkkäistä päivää vähintään yksi tasainen matka päivässä.';
-
-  @override
-  String get achievementPriceWin => 'Hintavoitto';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Kirjaa tankkaus, joka alittaa aseman 30 päivän keskiarvon 5 % tai enemmän.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Jaa opitut ajoneuvoprofiilit';
 
   @override
@@ -3306,27 +3264,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Tasainen putki';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Aja 5 peräkkäistä matkaa tasaisen ajon pisteet 80 tai enemmän.';
-
-  @override
-  String get achievementColdStartAware => 'Kylmäkäynnistystietoinen';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Pidä koko kuukauden kylmäkäynnistyksen polttoainekustannus alle 2 % kokonaispolttoaineesta — yhdistä lyhyet matkat.';
-
-  @override
-  String get achievementHighwayMaster => 'Moottoritieammattilainen';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Suorita vähintään 30 km matka tasaisella nopeudella ja tasaisen ajon pisteet 90 tai enemmän.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4865,13 +4802,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Tallenna matkat automaattisesti OBD2:n kautta.';
 
   @override
-  String get featureLabel_gamification => 'Pelillistäminen';
-
-  @override
-  String get featureDescription_gamification =>
-      'Ajopisteet ja ansaitut palkinnot.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptinen eko-valmentaja';
 
   @override
@@ -4968,10 +4898,6 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Näytä kulutusanalytiikkavälilehti alanavigaatiossa.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Ota ensin OBD2-matkojen tallennus käyttöön';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5563,13 +5489,6 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Sääntöpohjainen kohdistaa jokaisen ajonäytteen täsmälleen yhteen tilanteeseen. Sumea jakaa sen kaikkiin niiden sopivuuden mukaan — tasaisempi noin 60 km/h tai muuttuvissa gradienteissa, mutta täyttää kaikki ämpärit hitaammin.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Näytä saavutukset ja pisteet';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Kun pois päältä, palkinnot, pisteet ja trofeekuvakkeet piilotetaan koko sovelluksesta.';
 
   @override
   String gdprPolicyLink(int version) {

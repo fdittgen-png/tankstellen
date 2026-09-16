@@ -1822,48 +1822,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get vehicleAdapterForget => 'Aizmirst adapteru';
 
   @override
-  String get achievementsTitle => 'Sasniegumi';
-
-  @override
-  String get achievementFirstTrip => 'Pirmais brauciens';
-
-  @override
-  String get achievementFirstTripDesc => 'Ierakstiet pirmo OBD2 braucienu.';
-
-  @override
-  String get achievementFirstFillUp => 'Pirmā uzpilde';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Reģistrējiet pirmo uzpildi.';
-
-  @override
-  String get achievementTenTrips => '10 braucieni';
-
-  @override
-  String get achievementTenTripsDesc => 'Ierakstiet 10 OBD2 braucienus.';
-
-  @override
-  String get achievementZeroHarsh => 'Maigs braucējs';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Pabeidziet braucienu vismaz 10 km bez asas bremzēšanas vai paātrinājuma.';
-
-  @override
-  String get achievementEcoWeek => 'Eko nedēļa';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Brauciet 7 dienas pēc kārtas ar vismaz vienu maigo braucienu katru dienu.';
-
-  @override
-  String get achievementPriceWin => 'Cenas uzvara';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Reģistrējiet uzpildi, kas ir par 5 % vai vairāk lētāka nekā stacijas 30 dienu vidējā cena.';
-
-  @override
   String get syncBaselinesToggleTitle =>
       'Kopīgot apgūtos transportlīdzekļu profilus';
 
@@ -3324,27 +3282,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Maigā braukšana sērijā';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Brauciet 5 braucienus pēc kārtas ar maigās braukšanas novērtējumu 80 vai augstāku.';
-
-  @override
-  String get achievementColdStartAware => 'Aukstās starta apzinātājs';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Uzturiet vesela mēneša aukstās starta degvielas izmaksas zem 2 % no kopējās degvielas — apvienojiet īsos braucienus.';
-
-  @override
-  String get achievementHighwayMaster => 'Šosejas meistars';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Pabeidziet 30 km+ braucienu ar nemainīgu ātrumu un maigās braukšanas novērtējumu 90 vai augstāku.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4888,13 +4825,6 @@ class AppLocalizationsLv extends AppLocalizations {
       'Automātiski ierakstīt braucienus caur OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Spēlifikācija';
-
-  @override
-  String get featureDescription_gamification =>
-      'Braukšanas novērtējumi un nopelnītās zīmotnes.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptiskais eko treneris';
 
   @override
@@ -4991,10 +4921,6 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Rādīt patēriņa analītikas cilni apakšējā navigācijā.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Vispirms iespējojiet OBD2 braucienu ierakstīšanu';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5594,13 +5520,6 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Uz noteikumiem balstīts piešķir katru braukšanas paraugu tieši vienai situācijai. Fuzzy to izplata starp visām pēc atbilstības — gludāk ap 60 km/h vai mainīgiem slīpumiem, bet lēnāk aizpilda visus grozus.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Rādīt sasniegumus un punktus';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Kad izslēgts, visā lietotnē tiek paslēptas zīmotnes, novērtējumi un trofeju ikonas.';
 
   @override
   String gdprPolicyLink(int version) {

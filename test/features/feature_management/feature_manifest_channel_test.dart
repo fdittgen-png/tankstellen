@@ -47,7 +47,7 @@ void main() {
   group('per-channel availability + defaults', () {
     test('a beta-only feature is unavailable in production', () {
       const entry = FeatureManifestEntry(
-        feature: Feature.gamification,
+        feature: Feature.hapticEcoCoach,
         availableChannels: {BuildChannel.beta},
         defaultEnabledChannels: {BuildChannel.beta},
         displayName: 'x',
@@ -61,7 +61,7 @@ void main() {
 
     test('a feature can be opt-out in beta and opt-in in production', () {
       const entry = FeatureManifestEntry(
-        feature: Feature.gamification,
+        feature: Feature.hapticEcoCoach,
         availableChannels: {BuildChannel.production, BuildChannel.beta},
         defaultEnabledChannels: {BuildChannel.beta},
         displayName: 'x',
@@ -81,8 +81,8 @@ void main() {
         displayName: 'always',
         description: 'on in both',
       ),
-      Feature.gamification: FeatureManifestEntry(
-        feature: Feature.gamification,
+      Feature.hapticEcoCoach: FeatureManifestEntry(
+        feature: Feature.hapticEcoCoach,
         availableChannels: {BuildChannel.production, BuildChannel.beta},
         defaultEnabledChannels: {BuildChannel.beta},
         displayName: 'beta-only-default',
@@ -94,7 +94,7 @@ void main() {
       expect(manifest.defaultEnabledSet(BuildChannel.production),
           {Feature.priceAlerts});
       expect(manifest.defaultEnabledSet(BuildChannel.beta),
-          {Feature.priceAlerts, Feature.gamification});
+          {Feature.priceAlerts, Feature.hapticEcoCoach});
     });
 
     test('no-arg defaults to the production channel', () {

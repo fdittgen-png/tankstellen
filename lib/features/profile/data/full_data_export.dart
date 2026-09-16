@@ -35,7 +35,6 @@ class FullDataExportInput {
     required this.chargingLogs,
     required this.serviceReminders,
     required this.baselines,
-    required this.achievements,
     required this.obd2Caches,
     required this.inProgressTrips,
     required this.consent,
@@ -57,7 +56,6 @@ class FullDataExportInput {
 
   /// Raw box contents (JSON strings decoded where possible).
   final Map<String, dynamic> baselines;
-  final Map<String, dynamic> achievements;
   final Map<String, dynamic> obd2Caches;
   final Map<String, dynamic> inProgressTrips;
 
@@ -78,7 +76,6 @@ const Map<String, String?> kBoxExportCoverage = {
   HiveBoxes.alerts: 'local/app_data.json',
   HiveBoxes.obd2TripHistory: 'local/trips.json',
   HiveBoxes.obd2Baselines: 'local/obd2_baselines.json',
-  HiveBoxes.achievements: 'local/achievements.json',
   HiveBoxes.serviceReminders: 'local/service_reminders.json',
   HiveBoxes.obd2SupportedPids: 'local/obd2_caches.json',
   HiveBoxes.obd2NegotiatedProtocol: 'local/obd2_caches.json',
@@ -125,7 +122,6 @@ Uint8List buildFullDataExportZip(FullDataExportInput input) {
   add('local/service_reminders.json',
       enc.convert(input.serviceReminders.map((r) => r.toJson()).toList()));
   add('local/obd2_baselines.json', enc.convert(input.baselines));
-  add('local/achievements.json', enc.convert(input.achievements));
   add('local/obd2_caches.json', enc.convert(input.obd2Caches));
   add('local/trips_in_progress.json', enc.convert(input.inProgressTrips));
   add('local/consent.json', enc.convert(input.consent));
@@ -147,7 +143,8 @@ Uint8List buildFullDataExportZip(FullDataExportInput input) {
 
 /// Number of entries [buildFullDataExportZip] writes for [input].
 int fullDataExportEntryCount(FullDataExportInput input) =>
-    12 +
+    // #4252 — was 12; `local/achievements.json` went with gamification.
+    11 +
     input.trips.length +
     (input.server?.values.whereType<List<dynamic>>().length ?? 0) +
     (input.server?['error'] != null ? 1 : 0);

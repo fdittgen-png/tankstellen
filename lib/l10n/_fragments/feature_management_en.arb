@@ -15,14 +15,6 @@
   "@featureDescription_obd2TripRecording": {
     "description": "One-line description for the OBD2 trip recording feature."
   },
-  "featureLabel_gamification": "Gamification",
-  "@featureLabel_gamification": {
-    "description": "Display name for the gamification feature in the Feature management list."
-  },
-  "featureDescription_gamification": "Driving scores and earned badges.",
-  "@featureDescription_gamification": {
-    "description": "One-line description for the gamification feature."
-  },
   "featureLabel_hapticEcoCoach": "Haptic eco-coach",
   "@featureLabel_hapticEcoCoach": {
     "description": "Display name for the haptic eco-coach feature in the Feature management list."
@@ -134,10 +126,6 @@
   "featureDescription_showConsumptionTab": "Show the consumption analytics tab in the bottom navigation.",
   "@featureDescription_showConsumptionTab": {
     "description": "One-line description for the consumption-tab visibility feature gate."
-  },
-  "featureBlockedEnable_gamification": "Enable OBD2 trip recording first",
-  "@featureBlockedEnable_gamification": {
-    "description": "Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off."
   },
   "featureBlockedEnable_hapticEcoCoach": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_hapticEcoCoach": {

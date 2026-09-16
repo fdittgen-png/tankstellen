@@ -35,7 +35,6 @@ void main() {
       baselines: const <String, dynamic>{
         'veh-1': <String, dynamic>{'idle': 0.7},
       },
-      achievements: const <String, dynamic>{},
       obd2Caches: const <String, dynamic>{'pids': <String, dynamic>{}},
       inProgressTrips: const <String, dynamic>{},
       consent: const <String, dynamic>{'cloudSync': false, 'policyVersion': 3},

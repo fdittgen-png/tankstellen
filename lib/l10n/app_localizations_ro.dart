@@ -1820,48 +1820,6 @@ class AppLocalizationsRo extends AppLocalizations {
   String get vehicleAdapterForget => 'Uitați adaptorul';
 
   @override
-  String get achievementsTitle => 'Realizări';
-
-  @override
-  String get achievementFirstTrip => 'Prima călătorie';
-
-  @override
-  String get achievementFirstTripDesc => 'Înregistrați prima călătorie OBD2.';
-
-  @override
-  String get achievementFirstFillUp => 'Prima alimentare';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Înregistrați prima alimentare.';
-
-  @override
-  String get achievementTenTrips => '10 călătorii';
-
-  @override
-  String get achievementTenTripsDesc => 'Înregistrați 10 călătorii OBD2.';
-
-  @override
-  String get achievementZeroHarsh => 'Șofer lin';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Finalizați o călătorie de 10 km sau mai mult fără frânări sau accelerări bruște.';
-
-  @override
-  String get achievementEcoWeek => 'Săptămână eco';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Conduceți 7 zile consecutive cu cel puțin o călătorie lină în fiecare zi.';
-
-  @override
-  String get achievementPriceWin => 'Câștig la preț';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Înregistrați o alimentare cu 5% sau mai mult sub media de 30 de zile a stației.';
-
-  @override
   String get syncBaselinesToggleTitle =>
       'Partajați profilurile vehiculelor învățate';
 
@@ -3326,27 +3284,6 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Serie de condus lin';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Conduceți 5 călătorii consecutive cu un scor de condus lin de 80 sau mai mult.';
-
-  @override
-  String get achievementColdStartAware => 'Conștient de pornire la rece';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Mențineți costul combustibilului de pornire la rece dintr-o lună întreagă sub 2% din total — combinați călătoriile scurte.';
-
-  @override
-  String get achievementHighwayMaster => 'Maestru de autostradă';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Finalizați o călătorie de 30+ km la viteză constantă cu un scor de condus lin de 90 sau mai mult.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4895,13 +4832,6 @@ class AppLocalizationsRo extends AppLocalizations {
       'Capturați călătorii automat prin OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamificare';
-
-  @override
-  String get featureDescription_gamification =>
-      'Scoruri de condus și insigne câștigate.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Eco-coach haptic';
 
   @override
@@ -4998,10 +4928,6 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Afișați fila de analitica consumului în navigarea inferioară.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Activați mai întâi înregistrarea călătoriilor OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5600,13 +5526,6 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Bazat pe reguli atribuie fiecare eșantion de condus exact unei situații. Fuzzy îl distribuie pe toate în funcție de cât de bine se potrivește fiecare — mai fluid în jurul a 60 km/h sau la gradienți în schimbare, dar mai lent la umplerea tuturor categoriilor.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Afișați realizări și scoruri';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Când e dezactivat, insignele, scorurile și icoanele trofeu sunt ascunse în toată aplicația.';
 
   @override
   String gdprPolicyLink(int version) {

@@ -22,13 +22,6 @@ import '../../../core/logging/app_log.dart';
 const String hapticEcoCoachMigratedKey = 'hapticEcoCoachMigrated';
 
 /// Settings-box key written once after the legacy
-/// `UserProfile.gamificationEnabled` value has been promoted into the
-/// central feature-flag set (#1373 phase 3b). Persisted in the same
-/// `settings` Hive box as the haptic-eco-coach gate so a single read
-/// tells us whether the gamification migration has already run.
-const String gamificationMigratedKey = 'gamificationMigrated';
-
-/// Settings-box key written once after the legacy
 /// `syncBaselinesEnabled` value has been promoted into the central
 /// feature-flag set (#1373 phase 3e). Persisted in the same
 /// `settings` Hive box as the legacy toggle itself so a single read
@@ -149,25 +142,16 @@ Future<void> migrateLegacyToggles({
 }
 
 /// One-shot migrator for UserProfile-backed legacy toggles (#1373
-/// phase 3b).
+/// phase 3c/3e).
 ///
-/// Reads the legacy `UserProfile.gamificationEnabled` value from the
-/// passed-in [activeProfile]. The migrator is a no-op when [activeProfile]
-/// is null — the next launch will retry; idempotency is preserved by
-/// NOT writing the migrated-key flag in that case.
-///
-/// When a profile is present and the [gamificationMigratedKey] flag has
-/// not yet been written, the migrator promotes the legacy value into
-/// the central feature-flag set:
-///   - legacy true  → cascade-enable [Feature.obd2TripRecording]
-///                    (the manifest prerequisite) and [Feature.gamification]
-///   - legacy false → persist a state that EXCLUDES [Feature.gamification]
-///                    so the user's explicit opt-out survives. Without
-///                    this branch the manifest default (gamification=true)
-///                    would silently restore the surfaces the user
-///                    deliberately turned off.
-/// In both cases the [gamificationMigratedKey] gate is then set so
-/// subsequent runs are no-ops.
+/// #4252 removed the gamification migration this function opened with;
+/// the remaining promotions (`showFuel`, `showElectric`,
+/// `showConsumptionTab`, `syncBaselines`) follow the same contract: read
+/// the legacy `UserProfile` bool, promote it into the central
+/// feature-flag set, then write a per-toggle gate key so later launches
+/// are no-ops. A null [activeProfile] is a no-op WITHOUT writing the
+/// gate, so the next launch retries rather than locking in a manifest
+/// default over an explicit opt-out.
 ///
 /// Safe to call alongside [migrateLegacyToggles] from the same provider
 /// (see `legacyToggleMigrationProvider`). The two functions touch
@@ -178,12 +162,6 @@ Future<void> migrateUserProfileToggles({
   required FeatureManifest manifest,
   required UserProfile? activeProfile,
 }) async {
-  await _migrateGamification(
-    settings: settings,
-    featureFlags: featureFlags,
-    manifest: manifest,
-    activeProfile: activeProfile,
-  );
   await _migrateShowFuel(
     settings: settings,
     featureFlags: featureFlags,
@@ -249,68 +227,6 @@ Future<void> _migrateHapticEcoCoach({
   }
 }
 
-Future<void> _migrateGamification({
-  required Box<dynamic> settings,
-  required FeatureFlagsRepository featureFlags,
-  required FeatureManifest manifest,
-  required UserProfile? activeProfile,
-}) async {
-  // Already migrated → idempotent no-op. The user may have toggled
-  // gamification OFF after a previous migration; we must not re-promote
-  // the legacy `true` value.
-  if (settings.get(gamificationMigratedKey) == true) {
-    return;
-  }
-
-  // No profile loaded yet → try again next launch. We deliberately do
-  // NOT write the gate flag because that would lock in the manifest
-  // default and silently discard any explicit `gamificationEnabled =
-  // false` the user had set.
-  if (activeProfile == null) {
-    return;
-  }
-
-  // ignore: deprecated_member_use_from_same_package
-  final legacyValue = activeProfile.gamificationEnabled;
-
-  try {
-    final current = await featureFlags.loadEnabled();
-    if (legacyValue == true) {
-      // Force-enable the prerequisite first per the manifest's
-      // dependency graph — otherwise the central system would refuse
-      // the gamification enable on its first toggle attempt.
-      final entry = manifest.entryFor(Feature.gamification);
-      final next = <Feature>{
-        ...current,
-        ...entry.requires,
-        Feature.gamification,
-      };
-      await featureFlags.saveEnabled(next);
-    } else {
-      // Legacy explicit-false. Feature.gamification's manifest default
-      // is `true`, so a no-op (no write) would silently RESTORE the
-      // gamification surfaces for users who had explicitly opted out.
-      // Persist the current set with gamification removed so the
-      // user's preference survives the migration.
-      final next = {...current}..remove(Feature.gamification);
-      await featureFlags.saveEnabled(next);
-    }
-  } catch (e, st) {
-    // Don't block startup on a migration failure — the user can
-    // re-toggle from settings if the central state is missing.
-    log.warn('migrateUserProfileToggles: gamification promote failed',
-        error: e, stack: st, layer: ErrorLayer.storage);
-  }
-
-  // Always set the flag (even when the persistence above failed) so we
-  // never re-read the legacy field on subsequent launches.
-  try {
-    await settings.put(gamificationMigratedKey, true);
-  } catch (e, st) {
-    log.warn('migrateUserProfileToggles: writing $gamificationMigratedKey failed',
-        error: e, stack: st, layer: ErrorLayer.storage);
-  }
-}
 
 Future<void> _migrateSyncBaselines({
   required Box<dynamic> settings,
@@ -475,15 +391,15 @@ Future<void> _migrateAutoRecord({
 /// Phase-3c migration for the legacy `UserProfile.showFuel` bool
 /// (#1373 phase 3c).
 ///
-/// Mirrors [_migrateGamification]: the manifest defaults
+/// The manifest defaults
 /// [Feature.showFuel] to `true`, so a no-op (no write) on legacy=true
 /// would land at the same state. The legacy=false branch is the one
 /// that needs an explicit central write — without it the manifest
 /// default would silently restore the fuel-stations surface for users
 /// who had explicitly turned it off. The migration is gated on
 /// [showFuelMigratedKey] and skipped when the active profile is
-/// null (next launch retries), preserving the same idempotency
-/// contract as the gamification precedent.
+/// null (next launch retries), preserving the idempotency contract
+/// every toggle in this file shares.
 Future<void> _migrateShowFuel({
   required Box<dynamic> settings,
   required FeatureFlagsRepository featureFlags,

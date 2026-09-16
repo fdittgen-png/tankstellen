@@ -1821,48 +1821,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get vehicleAdapterForget => 'Adapter vergeten';
 
   @override
-  String get achievementsTitle => 'Prestaties';
-
-  @override
-  String get achievementFirstTrip => 'Eerste rit';
-
-  @override
-  String get achievementFirstTripDesc => 'Neem je eerste OBD2-rit op.';
-
-  @override
-  String get achievementFirstFillUp => 'Eerste tankbeurt';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Registreer je eerste tankbeurt.';
-
-  @override
-  String get achievementTenTrips => '10 ritten';
-
-  @override
-  String get achievementTenTripsDesc => 'Neem 10 OBD2-ritten op.';
-
-  @override
-  String get achievementZeroHarsh => 'Soepele rijder';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Voltooi een rit van 10 km of meer zonder hard remmen of hard optrekken.';
-
-  @override
-  String get achievementEcoWeek => 'Ecoweek';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Rij 7 opeenvolgende dagen met elke dag minstens één soepele rit.';
-
-  @override
-  String get achievementPriceWin => 'Prijsvoordeel';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Registreer een tankbeurt die 5% of meer onder het 30-daags gemiddelde van het station ligt.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Geleerde voertuigprofielen delen';
 
   @override
@@ -3316,27 +3274,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Soepele reeks';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Rij 5 ritten op rij met een soepele rijscore van 80 of hoger.';
-
-  @override
-  String get achievementColdStartAware => 'Koudestartbewust';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Houd de koudestartbrandstofkosten van een hele maand onder 2% van de totale brandstof — combineer korte ritten.';
-
-  @override
-  String get achievementHighwayMaster => 'Snelwegmeester';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Voltooi een rit van 30 km of meer op constante snelheid met een soepele rijscore van 90 of hoger.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4878,13 +4815,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Ritten automatisch vastleggen via OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamificatie';
-
-  @override
-  String get featureDescription_gamification =>
-      'Rijscores en verdiende badges.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptische ecocoach';
 
   @override
@@ -4979,10 +4909,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Het tabblad Verbruiksanalyse tonen in de onderste navigatie.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Schakel eerst OBD2-ritopname in';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5577,13 +5503,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Regelgebaseerd wijst elke rijsteekproef toe aan precies één situatie. Fuzzy verdeelt het over alle situaties op basis van hoe goed elk past — soepeler rond 60 km/h of wisselende hellingen, maar langzamer om alle bakken te vullen.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Prestaties en scores tonen';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Als uitgeschakeld, zijn badges, scores en trofee-iconen overal in de app verborgen.';
 
   @override
   String gdprPolicyLink(int version) {

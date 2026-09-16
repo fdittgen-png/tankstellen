@@ -1824,49 +1824,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get vehicleAdapterForget => 'Αποζεύξη προσαρμογέα';
 
   @override
-  String get achievementsTitle => 'Επιτεύγματα';
-
-  @override
-  String get achievementFirstTrip => 'Πρώτο ταξίδι';
-
-  @override
-  String get achievementFirstTripDesc => 'Καταγράψτε το πρώτο σας ταξίδι OBD2.';
-
-  @override
-  String get achievementFirstFillUp => 'Πρώτος ανεφοδιασμός';
-
-  @override
-  String get achievementFirstFillUpDesc =>
-      'Καταγράψτε τον πρώτο σας ανεφοδιασμό.';
-
-  @override
-  String get achievementTenTrips => '10 ταξίδια';
-
-  @override
-  String get achievementTenTripsDesc => 'Καταγράψτε 10 ταξίδια OBD2.';
-
-  @override
-  String get achievementZeroHarsh => 'Ομαλός οδηγός';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Ολοκληρώστε ένα ταξίδι 10 km ή περισσότερο χωρίς απότομο φρενάρισμα ή επιτάχυνση.';
-
-  @override
-  String get achievementEcoWeek => 'Οικολογική εβδομάδα';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Οδηγήστε 7 συνεχόμενες ημέρες με τουλάχιστον ένα ομαλό ταξίδι κάθε μέρα.';
-
-  @override
-  String get achievementPriceWin => 'Καλή τιμή';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Καταγράψτε ανεφοδιασμό που υπερβαίνει τον μέσο όρο 30 ημερών του σταθμού κατά 5% ή περισσότερο.';
-
-  @override
   String get syncBaselinesToggleTitle =>
       'Κοινοποίηση εκμαθημένων προφίλ οχημάτων';
 
@@ -3327,27 +3284,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Σερί ομαλής οδήγησης';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Οδηγήστε 5 συνεχόμενα ταξίδια με βαθμολογία ομαλής οδήγησης 80 ή παραπάνω.';
-
-  @override
-  String get achievementColdStartAware => 'Συνειδητός ψυχρής εκκίνησης';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Διατηρήστε το κόστος καυσίμου ψυχρής εκκίνησης ενός ολόκληρου μήνα κάτω από 2% του συνολικού καυσίμου — συνδυάστε σύντομα ταξίδια.';
-
-  @override
-  String get achievementHighwayMaster => 'Μάστορας αυτοκινητοδρόμου';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Ολοκληρώστε ένα ταξίδι 30+ km σε σταθερή ταχύτητα με βαθμολογία ομαλής οδήγησης 90 ή παραπάνω.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4898,13 +4834,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αυτόματη καταγραφή ταξιδιών μέσω OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
-
-  @override
-  String get featureDescription_gamification =>
-      'Βαθμολογίες οδήγησης και εξαργυρωμένα σήματα.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Απτικός οδηγός eco';
 
   @override
@@ -5001,10 +4930,6 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Εμφάνιση καρτέλας ανάλυσης κατανάλωσης στην κάτω πλοήγηση.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Ενεργοποιήστε πρώτα την καταγραφή ταξιδιών OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5606,14 +5531,6 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Η βαθμονόμηση βάσει κανόνων αντιστοιχεί κάθε δείγμα οδήγησης σε μία ακριβώς κατάσταση. Η ασαφής το κατανέμει σε όλες ανάλογα με την καταλληλότητα — πιο ομαλό γύρω στα 60 km/h ή σε μεταβαλλόμενες κλίσεις, αλλά πιο αργό να γεμίσει όλα τα κουβάδια.';
-
-  @override
-  String get profileGamificationToggleTitle =>
-      'Εμφάνιση επιτευγμάτων & βαθμολογιών';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Όταν είναι ανενεργό, σήματα, βαθμολογίες και εικονίδια τροπαίων αποκρύπτονται από ολόκληρη την εφαρμογή.';
 
   @override
   String gdprPolicyLink(int version) {

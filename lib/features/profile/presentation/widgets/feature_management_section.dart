@@ -50,7 +50,6 @@ class FeatureManagementSection extends ConsumerWidget {
   // `requires` chain includes obd2TripRecording.
   static const _consoDependents = <Feature>[
     Feature.consumptionAnalytics,
-    Feature.gamification,
     Feature.hapticEcoCoach,
     Feature.glideCoach,
     Feature.gpsTripPath,

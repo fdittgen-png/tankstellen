@@ -8,8 +8,6 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/core/widgets/page_scaffold.dart';
-import 'package:tankstellen/features/achievements/domain/achievement.dart';
-import 'package:tankstellen/features/achievements/providers/achievements_provider.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/consumption_stats.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/tank_level_estimator.dart';
@@ -18,7 +16,6 @@ import 'package:tankstellen/features/fill_ups/presentation/widgets/fuel_tab.dart
 import 'package:tankstellen/features/fill_ups/presentation/widgets/tank_level_card.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/fill_ups/providers/tank_level_provider.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
@@ -165,8 +162,6 @@ void main() {
       totalDistanceKm: 0,
     );
     List<Object> overrides() => [
-          achievementsProvider.overrideWithValue(const <EarnedAchievement>[]),
-          gamificationEnabledProvider.overrideWithValue(false),
           activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
           fillUpListProvider.overrideWith(() => _FixedFillUpList([_fillUp])),
         ];

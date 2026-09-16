@@ -13,7 +13,6 @@ import 'package:tankstellen/features/trips/providers/trip_history_provider.dart'
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
@@ -112,7 +111,6 @@ Future<void> _pump(
       vehicleProfileListProvider.overrideWith(() => _EmptyVehicleList()),
       tripHistoryListProvider.overrideWith(() => _FixedTripHistoryList()),
       featureFlagsProvider.overrideWith(flags),
-      gamificationEnabledProvider.overrideWithValue(true),
     ],
   );
 }

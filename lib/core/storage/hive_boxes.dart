@@ -63,9 +63,7 @@ class HiveBoxes {
   /// L/100 km, harsh events, GPS paths (#1374). Encrypted since #3611.
   static const String obd2TripHistory = 'obd2_trip_history';
 
-  /// Earned gamification badges (#781). One JSON payload per earned
   /// badge keyed by enum name; not PII.
-  static const String achievements = 'achievements';
 
   /// Supported-PID bitmap cache (#811). Keyed by VIN (preferred) or
   /// `make:model:year` (fallback). Sorted `List<int>` of Mode-01 PID
@@ -143,7 +141,7 @@ class HiveBoxes {
   /// one is missing from this set.
   static const Set<String> allBoxes = {
     settings, favorites, cache, profiles, priceHistory, alerts,
-    obd2Baselines, obd2TripHistory, achievements, obd2SupportedPids,
+    obd2Baselines, obd2TripHistory, obd2SupportedPids,
     obd2NegotiatedProtocol, serviceReminders, obd2PausedTrips,
     obd2ActiveTrip, priceSnapshots, isolateErrorSpool, trafficSignalsCache,
     featureFlags, appProfile, boxSchema, errorTraces, datasets,
@@ -198,7 +196,6 @@ class HiveBoxes {
   static const _deferredBoxes = {
     obd2Baselines,
     obd2TripHistory,
-    achievements,
     obd2SupportedPids,
     obd2NegotiatedProtocol,
     serviceReminders,

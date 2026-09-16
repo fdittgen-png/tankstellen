@@ -10,16 +10,17 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/application/feature_toggle_notifier.dart';
 import 'package:tankstellen/features/feature_management/data/feature_flags_repository.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
+import 'package:tankstellen/features/driving/providers/haptic_eco_coach_provider.dart';
+import 'package:tankstellen/features/glide_coach/providers/glide_coach_enabled_provider.dart';
 import 'package:tankstellen/features/sync/providers/baseline_sync_enabled_provider.dart';
 
 /// Coverage for the shared [FeatureToggleNotifier] mixin +
 /// [watchEffectiveFeature] helper (#3175) — the single implementation
-/// behind every per-feature toggle shim (gamification, baseline-sync,
+/// behind every per-feature toggle shim (glide-coach, baseline-sync,
 /// the show-toggles, haptic-eco-coach, …).
 ///
 /// Exercised through representative production shims
-/// ([gamificationEnabledProvider], requires `obd2TripRecording`, default
+/// ([hapticEcoCoachEnabledProvider], requires `obd2TripRecording`, default
 /// ON; [baselineSyncEnabledProvider], requires `tankSync`, default OFF)
 /// so the tests drive the real generated notifier + mixin composition,
 /// not a synthetic stand-in:
@@ -79,34 +80,35 @@ void main() {
       final container = makeContainer();
       await pumpLoad(container);
 
-      container.read(gamificationEnabledProvider);
-      await container.read(gamificationEnabledProvider.notifier).set(true);
+      container.read(hapticEcoCoachEnabledProvider);
+      await container.read(hapticEcoCoachEnabledProvider.notifier).set(true);
 
       expect(
         container.read(enabledFeaturesProvider),
-        contains(Feature.gamification),
+        contains(Feature.hapticEcoCoach),
         reason: 'The mixin setter must delegate to '
             'featureFlagsProvider.enable — the central set is the single '
             'source of truth.',
       );
-      expect(container.read(gamificationEnabledProvider), isTrue);
+      expect(container.read(hapticEcoCoachEnabledProvider), isTrue);
 
-      await container.read(gamificationEnabledProvider.notifier).set(false);
+      await container.read(hapticEcoCoachEnabledProvider.notifier).set(false);
 
       expect(
         container.read(enabledFeaturesProvider),
-        isNot(contains(Feature.gamification)),
+        isNot(contains(Feature.hapticEcoCoach)),
         reason: 'The mixin setter must delegate to '
             'featureFlagsProvider.disable.',
       );
-      expect(container.read(gamificationEnabledProvider), isFalse);
+      expect(container.read(hapticEcoCoachEnabledProvider), isFalse);
     });
 
     test(
         'dependency-violation StateError is swallowed and the toggle '
         'stays at its prior state', () async {
       // Exercised through baselineSyncEnabled (manifest default-OFF,
-      // requires tankSync — unlike gamification, whose default-ON would
+      // requires tankSync — unlike hapticEcoCoach, whose prerequisite is
+      // already on here and would
       // mask the violation). The prerequisite tankSync is OFF, so
       // enable(baselineSync) throws a StateError inside the central
       // provider. The shared setter must swallow it (the safest unified
@@ -130,15 +132,15 @@ void main() {
     test(
         'watchEffectiveFeature gates the stored flag on the requires '
         'chain', () async {
-      // gamification stored ON, but its prerequisite obd2TripRecording
+      // glideCoach stored ON, but its prerequisite obd2TripRecording
       // is OFF — the effective state must surface as false.
-      await repo.saveEnabled(<Feature>{Feature.gamification});
+      await repo.saveEnabled(<Feature>{Feature.glideCoach});
 
       final container = makeContainer();
       await pumpLoad(container);
 
       expect(
-        container.read(gamificationEnabledProvider),
+        container.read(glideCoachEnabledProvider),
         isFalse,
         reason: 'An ancestor on the requires chain is disabled, so the '
             'effective state is false regardless of the stored value '

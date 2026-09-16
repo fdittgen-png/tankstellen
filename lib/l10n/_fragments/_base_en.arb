@@ -260,39 +260,123 @@
   "wrongStatusOpen": "Shown as open, but closed",
   "wrongStatusClosed": "Shown as closed, but open",
   "refuelPlanTab": "Plan",
-  "@refuelPlanTab": {"description": "Third pill on the route results, beside All stations and Best stops (#4146). Names the mode that plans WHERE the trip must stop given the tank, rather than listing stations."},
+  "@refuelPlanTab": {
+    "description": "Third pill on the route results, beside All stations and Best stops (#4146). Names the mode that plans WHERE the trip must stop given the tank, rather than listing stations."
+  },
   "refuelPlanCheapestTitle": "Cheapest trip",
-  "@refuelPlanCheapestTitle": {"description": "The plan that minimises total money — fuel bought plus the driving the detours cost (#4146)."},
+  "@refuelPlanCheapestTitle": {
+    "description": "The plan that minimises total money — fuel bought plus the driving the detours cost (#4146)."
+  },
   "refuelPlanFastestTitle": "Fastest trip",
-  "@refuelPlanFastestTitle": {"description": "The plan that minimises time — fewest stops, smallest detours (#4146)."},
+  "@refuelPlanFastestTitle": {
+    "description": "The plan that minimises time — fewest stops, smallest detours (#4146)."
+  },
   "refuelPlanStopCount": "{count, plural, =0{No stop needed} =1{1 stop} other{{count} stops}}",
-  "@refuelPlanStopCount": {"description": "How many refuelling stops a plan needs (#4146). Zero is a real and good answer — the tank covers the trip.", "placeholders": {"count": {"type": "int"}}},
+  "@refuelPlanStopCount": {
+    "description": "How many refuelling stops a plan needs (#4146). Zero is a real and good answer — the tank covers the trip.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "refuelPlanTotal": "{cost} total · {perKm}/km",
-  "@refuelPlanTotal": {"description": "A plan's total cost and its cost per kilometre (#4146). Both are money, already formatted with the currency.", "placeholders": {"cost": {"type": "String"}, "perKm": {"type": "String"}}},
+  "@refuelPlanTotal": {
+    "description": "A plan's total cost and its cost per kilometre (#4146). Both are money, already formatted with the currency.",
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      },
+      "perKm": {
+        "type": "String"
+      }
+    }
+  },
   "refuelPlanStopLine": "Buy {litres} — {cost}",
-  "@refuelPlanStopLine": {"description": "One stop of a plan: the litres to buy there and what they cost (#4146). 'Just enough to reach a cheaper station' is a real instruction, so this is often not a full tank.", "placeholders": {"litres": {"type": "String"}, "cost": {"type": "String"}}},
+  "@refuelPlanStopLine": {
+    "description": "One stop of a plan: the litres to buy there and what they cost (#4146). 'Just enough to reach a cheaper station' is a real instruction, so this is often not a full tank.",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
   "refuelPlanGap": "No station in range between {from} and {to}",
-  "@refuelPlanGap": {"description": "The route cannot be driven on this tank (#4146). Names the stretch rather than returning a plan that would strand the driver.", "placeholders": {"from": {"type": "String"}, "to": {"type": "String"}}},
+  "@refuelPlanGap": {
+    "description": "The route cannot be driven on this tank (#4146). Names the stretch rather than returning a plan that would strand the driver.",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
   "refuelPlanNeedsConsumption": "Add a few fill-ups and Sparkilo can plan your stops",
-  "@refuelPlanNeedsConsumption": {"description": "Blocker: no measured consumption, so range cannot be computed (#4146). Never defaulted — range is the whole constraint."},
+  "@refuelPlanNeedsConsumption": {
+    "description": "Blocker: no measured consumption, so range cannot be computed (#4146). Never defaulted — range is the whole constraint."
+  },
   "refuelPlanNeedsTank": "Set your tank size to plan refuelling stops",
-  "@refuelPlanNeedsTank": {"description": "Blocker: no tank capacity on the vehicle (#4146)."},
+  "@refuelPlanNeedsTank": {
+    "description": "Blocker: no tank capacity on the vehicle (#4146)."
+  },
   "refuelPlanNeedsPrices": "No station on this route has a price for your fuel",
-  "@refuelPlanNeedsPrices": {"description": "Blocker: candidates exist but none is priced for the selected fuel (#4146)."},
+  "@refuelPlanNeedsPrices": {
+    "description": "Blocker: candidates exist but none is priced for the selected fuel (#4146)."
+  },
   "decisionConfidentLead": "Best stop for you",
-  "@decisionConfidentLead": {"description": "Heading above the decision rows when Best Value is confident enough to LEAD (spec §3.1, #4139) — measured consumption, station open now, price under 24 h old. Absent when any gate fails, and the three rankings then speak for themselves."},
+  "@decisionConfidentLead": {
+    "description": "Heading above the decision rows when Best Value is confident enough to LEAD (spec §3.1, #4139) — measured consumption, station open now, price under 24 h old. Absent when any gate fails, and the three rankings then speak for themselves."
+  },
   "decisionConfidentWhy": "Open now, price from the last day, and measured on your own consumption",
-  "@decisionConfidentWhy": {"description": "The one line that makes the #4139 lead explainable: the three gates that let it be stated as an answer rather than one ranking of three."},
+  "@decisionConfidentWhy": {
+    "description": "The one line that makes the #4139 lead explainable: the three gates that let it be stated as an answer rather than one ranking of three."
+  },
   "savingsTitle": "Against your usual price",
-  "@savingsTitle": {"description": "Heading of the savings card (#4136). Names the REFERENCE, because a saving with no stated reference is not reproducible (economics spec trust rule 4)."},
+  "@savingsTitle": {
+    "description": "Heading of the savings card (#4136). Names the REFERENCE, because a saving with no stated reference is not reproducible (economics spec trust rule 4)."
+  },
   "savingsNet": "{amount} net over {count, plural, =1{1 fill} other{{count} fills}}",
-  "@savingsNet": {"description": "The savings card's headline: the NET across every counted fill, wins and misses alike. Signed on purpose — a wins-only total would be a lie of omission.", "placeholders": {"amount": {"type": "String"}, "count": {"type": "int"}}},
+  "@savingsNet": {
+    "description": "The savings card's headline: the NET across every counted fill, wins and misses alike. Signed on purpose — a wins-only total would be a lie of omission.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "savingsReference": "Your usual: {price} per litre, {litres} per fill",
-  "@savingsReference": {"description": "The baseline the savings are measured against (#4150) — the median over the last 90 days, stated so the arithmetic can be checked.", "placeholders": {"price": {"type": "String"}, "litres": {"type": "String"}}},
+  "@savingsReference": {
+    "description": "The baseline the savings are measured against (#4150) — the median over the last 90 days, stated so the arithmetic can be checked.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
   "savingsNeedsHistory": "A few more fill-ups and Sparkilo can tell you what you are saving",
-  "@savingsNeedsHistory": {"description": "Empty state for the savings card (#4136): below the minimum sample count there is no honest baseline, so no number is shown rather than a computed-looking zero."},
+  "@savingsNeedsHistory": {
+    "description": "Empty state for the savings card (#4136): below the minimum sample count there is no honest baseline, so no number is shown rather than a computed-looking zero."
+  },
   "criteriaMoreFilters": "{count, plural, =0{More filters} other{More filters ({count})}}",
-  "@criteriaMoreFilters": {"description": "The collapsed refinements section of the search form (#4166). The COUNT is the point: a user whose results are narrow can see why without expanding, so collapsing never hides an active filter.", "placeholders": {"count": {"type": "int"}}},
+  "@criteriaMoreFilters": {
+    "description": "The collapsed refinements section of the search form (#4166). The COUNT is the point: a user whose results are narrow can see why without expanding, so collapsing never hides an active filter.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "allStations": "All stations",
   "bestStops": "Best stops",
   "openInMaps": "Open in Maps",
@@ -985,19 +1069,6 @@
   "vehicleAdapterUnnamed": "Unknown adapter",
   "vehicleAdapterPair": "Pair adapter",
   "vehicleAdapterForget": "Forget adapter",
-  "achievementsTitle": "Achievements",
-  "achievementFirstTrip": "First trip",
-  "achievementFirstTripDesc": "Record your first OBD2 trip.",
-  "achievementFirstFillUp": "First fill-up",
-  "achievementFirstFillUpDesc": "Log your first fill-up.",
-  "achievementTenTrips": "10 trips",
-  "achievementTenTripsDesc": "Record 10 OBD2 trips.",
-  "achievementZeroHarsh": "Smooth driver",
-  "achievementZeroHarshDesc": "Complete a trip of 10 km or more with no harsh braking or acceleration.",
-  "achievementEcoWeek": "Eco week",
-  "achievementEcoWeekDesc": "Drive 7 consecutive days with at least one smooth trip each day.",
-  "achievementPriceWin": "Price win",
-  "achievementPriceWinDesc": "Log a fill-up that beats the station's 30-day average by 5 % or more.",
   "syncBaselinesToggleTitle": "Share learned vehicle profiles",
   "syncBaselinesToggleSubtitle": "Upload per-vehicle consumption baselines so a second device can reuse them.",
   "obd2StatusConnected": "OBD2 adapter: connected",
@@ -1828,13 +1899,26 @@
     "description": "The way on from the map's station sheet to the full detail screen (#4093). The sheet answers the decision; the detail screen answers everything else."
   },
   "startupFailureTitle": "Sparkilo couldn't start",
-  "@startupFailureTitle": {"description": "Title of the startup-failure screen (#4116) shown when the storage phase fails for a reason that is NOT established corruption — a cipher fault, or a bug in the app itself."},
+  "@startupFailureTitle": {
+    "description": "Title of the startup-failure screen (#4116) shown when the storage phase fails for a reason that is NOT established corruption — a cipher fault, or a bug in the app itself."
+  },
   "startupFailureMessage": "Sparkilo could not finish starting up. Your saved data has not been touched.",
-  "@startupFailureMessage": {"description": "Body of the startup-failure screen (#4116). It states what is known — startup failed — and explicitly reassures that the data is intact, because the corruption screen this replaces claimed damage that had not been established."},
+  "@startupFailureMessage": {
+    "description": "Body of the startup-failure screen (#4116). It states what is known — startup failed — and explicitly reassures that the data is intact, because the corruption screen this replaces claimed damage that had not been established."
+  },
   "startupFailureGuidance": "Close the app and open it again. If it keeps happening, check for an update: this is almost always a fault in the app rather than in your data. Do not clear the app's storage — that would delete your favourites and history without fixing anything.",
-  "@startupFailureGuidance": {"description": "Guidance on the startup-failure screen (#4116). It actively COUNTERMANDS the clear-storage advice: for a non-corruption fault that destroys the user's favourites and history and fixes nothing."},
+  "@startupFailureGuidance": {
+    "description": "Guidance on the startup-failure screen (#4116). It actively COUNTERMANDS the clear-storage advice: for a non-corruption fault that destroys the user's favourites and history and fixes nothing."
+  },
   "priceIsForFuel": "This price is for {fuel} — not the fuel you selected, which this station does not sell",
-  "@priceIsForFuel": {"description": "Tooltip and screen-reader label on the pump code beside a substituted price (#4124). A cross-border route prices each station by its own country's fuel (#2631), so the number may be a different product from the row above it; this says which.", "placeholders": {"fuel": {"type": "String"}}},
+  "@priceIsForFuel": {
+    "description": "Tooltip and screen-reader label on the pump code beside a substituted price (#4124). A cross-border route prices each station by its own country's fuel (#2631), so the number may be a different product from the row above it; this says which.",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
   "shellSwipeCoachMark": "Swipe down — or double-tap the bar — to use the whole screen",
   "@shellSwipeCoachMark": {
     "description": "One-time coach mark teaching the swipe-away gesture (#4106/#4107). Names BOTH gestures and what they gain; shown once ever, retires itself after 7s, dismissed by performing it, tapping it, or its Dismiss button."

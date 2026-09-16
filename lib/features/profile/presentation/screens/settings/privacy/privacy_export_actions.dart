@@ -82,7 +82,6 @@ mixin PrivacyExportActions<T extends ConsumerStatefulWidget>
       chargingLogs: ref.read(chargingLogsProvider).asData?.value ?? const [],
       serviceReminders: ref.read(serviceReminderRepositoryProvider).getAll(),
       baselines: box(HiveBoxes.obd2Baselines),
-      achievements: box(HiveBoxes.achievements),
       obd2Caches: {
         HiveBoxes.obd2SupportedPids: box(HiveBoxes.obd2SupportedPids),
         HiveBoxes.obd2NegotiatedProtocol:

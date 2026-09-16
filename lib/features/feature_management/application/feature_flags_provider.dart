@@ -57,7 +57,7 @@ BuildChannel buildChannel(Ref ref) {
 ///
 /// This phase ships the system in PARALLEL with the existing scattered
 /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
-/// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
+/// `autoRecord`, `hapticEcoCoachEnabled`, etc.
 /// through this provider one feature at a time.
 ///
 /// ## AsyncNotifier (#1681)

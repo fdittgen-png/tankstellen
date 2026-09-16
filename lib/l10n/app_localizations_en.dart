@@ -1810,48 +1810,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vehicleAdapterForget => 'Forget adapter';
 
   @override
-  String get achievementsTitle => 'Achievements';
-
-  @override
-  String get achievementFirstTrip => 'First trip';
-
-  @override
-  String get achievementFirstTripDesc => 'Record your first OBD2 trip.';
-
-  @override
-  String get achievementFirstFillUp => 'First fill-up';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Log your first fill-up.';
-
-  @override
-  String get achievementTenTrips => '10 trips';
-
-  @override
-  String get achievementTenTripsDesc => 'Record 10 OBD2 trips.';
-
-  @override
-  String get achievementZeroHarsh => 'Smooth driver';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Complete a trip of 10 km or more with no harsh braking or acceleration.';
-
-  @override
-  String get achievementEcoWeek => 'Eco week';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Drive 7 consecutive days with at least one smooth trip each day.';
-
-  @override
-  String get achievementPriceWin => 'Price win';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Log a fill-up that beats the station\'s 30-day average by 5 % or more.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Share learned vehicle profiles';
 
   @override
@@ -3294,27 +3252,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Smooth streak';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Drive 5 trips in a row with a smooth-driving score of 80 or higher.';
-
-  @override
-  String get achievementColdStartAware => 'Cold-start aware';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.';
-
-  @override
-  String get achievementHighwayMaster => 'Highway master';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4842,13 +4779,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Capture trips automatically over OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
-
-  @override
-  String get featureDescription_gamification =>
-      'Driving scores and earned badges.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptic eco-coach';
 
   @override
@@ -4944,10 +4874,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Show the consumption analytics tab in the bottom navigation.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Enable OBD2 trip recording first';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5535,13 +5461,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Show achievements & scores';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'When off, badges, scores and trophy icons are hidden across the app.';
 
   @override
   String gdprPolicyLink(int version) {
@@ -11516,49 +11435,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get vehicleAdapterForget => '⟦Ƒóřǧéŧ áđáƥŧéř ······⟧';
 
   @override
-  String get achievementsTitle => '⟦Áçĥîéṽéɱéñŧš ·····⟧';
-
-  @override
-  String get achievementFirstTrip => '⟦Ƒîřšŧ ŧřîƥ ····⟧';
-
-  @override
-  String get achievementFirstTripDesc =>
-      '⟦Řéçóřđ ýóúř ƒîřšŧ ÓƁĐ2 ŧřîƥ. ··········⟧';
-
-  @override
-  String get achievementFirstFillUp => '⟦Ƒîřšŧ ƒîłł-úƥ ·····⟧';
-
-  @override
-  String get achievementFirstFillUpDesc => '⟦Łóǧ ýóúř ƒîřšŧ ƒîłł-úƥ. ········⟧';
-
-  @override
-  String get achievementTenTrips => '⟦10 ŧřîƥš ··⟧';
-
-  @override
-  String get achievementTenTripsDesc => '⟦Řéçóřđ 10 ÓƁĐ2 ŧřîƥš. ······⟧';
-
-  @override
-  String get achievementZeroHarsh => '⟦Šɱóóŧĥ đřîṽéř ·····⟧';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      '⟦Çóɱƥłéŧé á ŧřîƥ óƒ 10 ķɱ óř ɱóřé ŵîŧĥ ñó ĥářšĥ ƀřáķîñǧ óř áççéłéřáŧîóñ. ·························⟧';
-
-  @override
-  String get achievementEcoWeek => '⟦Éçó ŵééķ ···⟧';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      '⟦Đřîṽé 7 çóñšéçúŧîṽé đáýš ŵîŧĥ áŧ łéášŧ óñé šɱóóŧĥ ŧřîƥ éáçĥ đáý. ·······················⟧';
-
-  @override
-  String get achievementPriceWin => '⟦Ƥřîçé ŵîñ ····⟧';
-
-  @override
-  String get achievementPriceWinDesc =>
-      '⟦Łóǧ á ƒîłł-úƥ ŧĥáŧ ƀéáŧš ŧĥé šŧáŧîóñ\'š 30-đáý áṽéřáǧé ƀý 5 % óř ɱóřé. ······················⟧';
-
-  @override
   String get syncBaselinesToggleTitle =>
       '⟦Šĥářé łéářñéđ ṽéĥîçłé ƥřóƒîłéš ············⟧';
 
@@ -13042,27 +12918,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get showFewerFuelTypes => '⟦Šĥóŵ ƒéŵéř ƒúéł ŧýƥéš ········⟧';
-
-  @override
-  String get achievementSmoothDriver => '⟦Šɱóóŧĥ šŧřéáķ ·····⟧';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      '⟦Đřîṽé 5 ŧřîƥš îñ á řóŵ ŵîŧĥ á šɱóóŧĥ-đřîṽîñǧ šçóřé óƒ 80 óř ĥîǧĥéř. ······················⟧';
-
-  @override
-  String get achievementColdStartAware => '⟦Çółđ-šŧářŧ áŵářé ······⟧';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      '⟦Ķééƥ á ŵĥółé ɱóñŧĥ\'š çółđ-šŧářŧ ƒúéł çóšŧ úñđéř 2 % óƒ ŧóŧáł ƒúéł — çóɱƀîñé šĥóřŧ ŧřîƥš. ······························⟧';
-
-  @override
-  String get achievementHighwayMaster => '⟦Ĥîǧĥŵáý ɱášŧéř ······⟧';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      '⟦Çóɱƥłéŧé á 30 ķɱ+ ŧřîƥ áŧ çóñšîšŧéñŧ šƥééđ ŵîŧĥ á šɱóóŧĥ-đřîṽîñǧ šçóřé óƒ 90 óř ĥîǧĥéř. ·····························⟧';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -14633,13 +14488,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Çáƥŧúřé ŧřîƥš áúŧóɱáŧîçáłłý óṽéř ÓƁĐ2. ··············⟧';
 
   @override
-  String get featureLabel_gamification => '⟦Ǧáɱîƒîçáŧîóñ ·····⟧';
-
-  @override
-  String get featureDescription_gamification =>
-      '⟦Đřîṽîñǧ šçóřéš áñđ éářñéđ ƀáđǧéš. ·············⟧';
-
-  @override
   String get featureLabel_hapticEcoCoach => '⟦Ĥáƥŧîç éçó-çóáçĥ ······⟧';
 
   @override
@@ -14737,10 +14585,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureDescription_showConsumptionTab =>
       '⟦Šĥóŵ ŧĥé çóñšúɱƥŧîóñ áñáłýŧîçš ŧáƀ îñ ŧĥé ƀóŧŧóɱ ñáṽîǧáŧîóñ. ·······················⟧';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      '⟦Éñáƀłé ÓƁĐ2 ŧřîƥ řéçóřđîñǧ ƒîřšŧ ············⟧';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -15349,14 +15193,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get calibrationModeTooltip =>
       '⟦Řúłé-ƀášéđ áššîǧñš éáçĥ đřîṽîñǧ šáɱƥłé ŧó éẋáçŧłý óñé šîŧúáŧîóñ. Ƒúžžý šƥřéáđš îŧ áçřóšš áłł óƒ ŧĥéɱ ƀý ĥóŵ ŵéłł éáçĥ ƒîŧš — šɱóóŧĥéř ářóúñđ 60 ķɱ/ĥ óř çĥáñǧîñǧ ǧřáđîéñŧš, ƀúŧ šłóŵéř ŧó ƒîłł áłł ƀúçķéŧš. ········································································⟧';
-
-  @override
-  String get profileGamificationToggleTitle =>
-      '⟦Šĥóŵ áçĥîéṽéɱéñŧš & šçóřéš ··········⟧';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      '⟦Ŵĥéñ óƒƒ, ƀáđǧéš, šçóřéš áñđ ŧřóƥĥý îçóñš ářé ĥîđđéñ áçřóšš ŧĥé áƥƥ. ························⟧';
 
   @override
   String gdprPolicyLink(int version) {

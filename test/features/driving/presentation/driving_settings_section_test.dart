@@ -12,7 +12,6 @@ import 'package:tankstellen/features/driving/presentation/widgets/driving_settin
 import 'package:tankstellen/features/feature_management/application/feature_flags_provider.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/glide_coach/providers/glide_coach_enabled_provider.dart';
-import 'package:tankstellen/features/profile/presentation/widgets/gamification_settings_tile.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../fakes/fake_storage_repository.dart';
@@ -232,7 +231,6 @@ void main() {
       expect(find.byKey(const Key('hapticEcoCoachToggle')), findsOneWidget);
       expect(find.byKey(const Key('glideCoachToggle')), findsOneWidget);
       expect(find.byKey(const Key('consoleFuelClubCardsTile')), findsOneWidget);
-      expect(find.byType(GamificationSettingsTile), findsOneWidget);
       expect(
         find.byKey(const Key('obd2DebugLoggingToggle')),
         findsOneWidget,
@@ -318,31 +316,6 @@ void main() {
     },
   );
 
-  testWidgets('nests the gamification opt-out tile inside the Conso section '
-      '(#1249 — moved out of the standalone settings card)', (tester) async {
-    await pumpApp(
-      tester,
-      const DrivingSettingsSection(),
-      overrides: [
-        settingsStorageProvider.overrideWithValue(_FakeSettingsStorage()),
-        storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
-        featureFlagsProvider.overrideWith(() => _TestFeatureFlags()),
-      ],
-    );
-
-    // The gamification toggle now lives as the last child of the
-    // Consumption foldable instead of as a sibling Card on the
-    // Settings page. Asserting it is present here pins that
-    // placement so a future rewrite can't silently move it back.
-    expect(
-      find.byType(GamificationSettingsTile),
-      findsOneWidget,
-      reason:
-          'Exactly one GamificationSettingsTile must render inside '
-          'DrivingSettingsSection — duplication or absence indicates '
-          'the #1249 placement regressed.',
-    );
-  });
 }
 
 /// Synthetic in-memory [FeatureFlags] notifier for widget tests.

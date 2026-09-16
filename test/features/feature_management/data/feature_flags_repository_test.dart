@@ -39,7 +39,7 @@ void main() {
   group('isEmpty', () {
     test('true for a fresh box, false once written', () async {
       expect(repo.isEmpty, isTrue);
-      await repo.saveEnabled({Feature.gamification});
+      await repo.saveEnabled({Feature.hapticEcoCoach});
       expect(repo.isEmpty, isFalse);
     });
   });
@@ -51,7 +51,7 @@ void main() {
     });
 
     test('populated box returns exactly the persisted set', () async {
-      final chosen = {Feature.gamification, Feature.tankSync};
+      final chosen = {Feature.hapticEcoCoach, Feature.tankSync};
       await repo.saveEnabled(chosen);
       expect(await repo.loadEnabled(), chosen);
     });
@@ -80,12 +80,12 @@ void main() {
 
   group('saveEnabled', () {
     test('writes every Feature explicitly (true or false)', () async {
-      await repo.saveEnabled({Feature.gamification});
+      await repo.saveEnabled({Feature.hapticEcoCoach});
       // One key per Feature — so a later read can tell "disabled" from
       // "first launch".
       expect(box.keys.toSet(),
           {for (final f in Feature.values) f.name});
-      expect(box.get(Feature.gamification.name), isTrue);
+      expect(box.get(Feature.hapticEcoCoach.name), isTrue);
       expect(box.get(Feature.tankSync.name), isFalse);
     });
   });

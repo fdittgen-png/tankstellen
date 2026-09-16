@@ -1820,48 +1820,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get vehicleAdapterForget => 'Zabudnúť adaptér';
 
   @override
-  String get achievementsTitle => 'Úspechy';
-
-  @override
-  String get achievementFirstTrip => 'Prvá jazda';
-
-  @override
-  String get achievementFirstTripDesc => 'Zaznamenajte svoju prvú OBD2 jazdu.';
-
-  @override
-  String get achievementFirstFillUp => 'Prvé tankovanie';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Zaznamenajte prvé tankovanie.';
-
-  @override
-  String get achievementTenTrips => '10 jázd';
-
-  @override
-  String get achievementTenTripsDesc => 'Zaznamenajte 10 OBD2 jázd.';
-
-  @override
-  String get achievementZeroHarsh => 'Plynulý vodič';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Dokončite jazdu 10 km alebo viac bez prudkého brzdenia alebo zrýchľovania.';
-
-  @override
-  String get achievementEcoWeek => 'Eko týždeň';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Jazdite 7 po sebe idúcich dní s aspoň jednou plynulou jazdou každý deň.';
-
-  @override
-  String get achievementPriceWin => 'Výhodná cena';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Zaznamenajte tankovanie, ktoré je o 5 % alebo viac nižšie ako 30-dňový priemer stanice.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Zdieľať naučené profily vozidiel';
 
   @override
@@ -3318,27 +3276,6 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Séria plynulej jazdy';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Jazdite 5 jázd za sebou so skóre plynulej jazdy 80 alebo vyšším.';
-
-  @override
-  String get achievementColdStartAware => 'Vedomý studeného štartu';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Udržujte náklady na palivo pri studenom štarte počas celého mesiaca pod 2 % z celkového paliva — kombinujte krátke jazdy.';
-
-  @override
-  String get achievementHighwayMaster => 'Majster diaľnic';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Dokončite jazdu 30+ km pri konštantnej rýchlosti so skóre plynulej jazdy 90 alebo vyšším.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4881,13 +4818,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Automaticky zachytávať jazdy cez OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamifikácia';
-
-  @override
-  String get featureDescription_gamification =>
-      'Jazdné skóre a získané odznaky.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptický eko-koučing';
 
   @override
@@ -4984,10 +4914,6 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Zobraziť kartu analýzy spotreby v dolnej navigácii.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Najprv zapnite záznam jázd OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5585,13 +5511,6 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Pravidlami riadený priradí každú jazdnú vzorku presne jednej situácii. Fuzzy ju rozdelí medzi všetky podľa toho, ako dobre každá vyhovuje — plynulejšie okolo 60 km/h alebo pri meniacich sa skrátkach, ale pomalšie na naplnenie všetkých skupín.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Zobrazovať úspechy a skóre';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Keď je vypnuté, odznaky, skóre a trofejové ikony sú skryté v celej aplikácii.';
 
   @override
   String gdprPolicyLink(int version) {

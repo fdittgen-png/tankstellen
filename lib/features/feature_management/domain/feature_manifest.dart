@@ -55,13 +55,6 @@ class FeatureManifest {
       displayName: 'OBD2 trip recording',
       description: 'Capture trips automatically over OBD2.',
     ),
-    Feature.gamification: FeatureManifestEntry.allChannels(
-      feature: Feature.gamification,
-      defaultOn: true,
-      requires: {Feature.obd2TripRecording},
-      displayName: 'Gamification',
-      description: 'Driving scores and earned badges.',
-    ),
     Feature.hapticEcoCoach: FeatureManifestEntry.allChannels(
       feature: Feature.hapticEcoCoach,
       defaultOn: false,

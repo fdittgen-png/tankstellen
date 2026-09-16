@@ -17,7 +17,6 @@ import '../../../feature_management/domain/feature.dart';
 import '../../../feature_management/domain/feature_dependency_graph.dart';
 import '../../../glide_coach/providers/glide_coach_enabled_provider.dart';
 import '../../../glide_coach/providers/glide_coach_settings_provider.dart';
-import '../../../profile/presentation/widgets/gamification_settings_tile.dart';
 import '../../providers/haptic_eco_coach_provider.dart';
 import '../../providers/voice_coaching_enabled_provider.dart';
 
@@ -40,7 +39,7 @@ import '../../providers/voice_coaching_enabled_provider.dart';
 ///      `obd2TripRecording` dependency via [canEnable]) followed by the
 ///      glide-coach beta (visible only when [Feature.glideCoach] is on).
 ///   3. **Rewards & savings** — the fuel-club entry-point (when
-///      [Feature.loyaltyCards] is on) and the gamification opt-out.
+///      [Feature.loyaltyCards] is on).
 ///   4. **Troubleshooting** — only when the OBD2 stack is on
 ///      ([ConsoMode.fuelAndTrips]). Houses the OBD2 debug-logging
 ///      diagnostic, clearly separated from the user-facing features.
@@ -128,15 +127,18 @@ class DrivingSettingsSection extends ConsumerWidget {
         // `VoiceAnnouncementsSettingsTile`. They are price guidance, not
         // driving coaching, and sat four levels deep here.
 
-        // 3. Rewards & savings — the fuel-club entry-point (when
-        //    [Feature.loyaltyCards] is on) and the gamification opt-out.
-        const SizedBox(height: Spacing.md),
-        SectionHeader(
-          title: l.consoGroupRewards,
-          leadingIcon: Icons.emoji_events_outlined,
-          padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
-        ),
-        if (loyaltyOn)
+        // 3. Rewards & savings — the fuel-club entry-point, when
+        //    [Feature.loyaltyCards] is on. #4252 removed the
+        //    gamification opt-out that used to sit beside it, so the
+        //    whole section hides with the flag rather than rendering a
+        //    header over nothing.
+        if (loyaltyOn) ...[
+          const SizedBox(height: Spacing.md),
+          SectionHeader(
+            title: l.consoGroupRewards,
+            leadingIcon: Icons.emoji_events_outlined,
+            padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
+          ),
           SettingsMenuTile(
             key: const Key('consoleFuelClubCardsTile'),
             icon: Icons.card_membership,
@@ -144,7 +146,7 @@ class DrivingSettingsSection extends ConsumerWidget {
             subtitle: l.loyaltyMenuSubtitle,
             onTap: () => context.push(RoutePaths.loyaltySettings),
           ),
-        const GamificationSettingsTile(),
+        ],
 
         // 4. Troubleshooting — only when the OBD2 stack is on
         //    (consoMode == fuelAndTrips). The OBD2 debug-logging toggle

@@ -22,8 +22,6 @@ String featureLabel(AppLocalizations l, Feature f) {
   switch (f) {
     case Feature.obd2TripRecording:
       return l.featureLabel_obd2TripRecording;
-    case Feature.gamification:
-      return l.featureLabel_gamification;
     case Feature.hapticEcoCoach:
       return l.featureLabel_hapticEcoCoach;
     case Feature.tankSync:
@@ -95,8 +93,6 @@ String featureDescription(AppLocalizations l, Feature f) {
   switch (f) {
     case Feature.obd2TripRecording:
       return l.featureDescription_obd2TripRecording;
-    case Feature.gamification:
-      return l.featureDescription_gamification;
     case Feature.hapticEcoCoach:
       return l.featureDescription_hapticEcoCoach;
     case Feature.tankSync:
@@ -172,8 +168,6 @@ String featureDescription(AppLocalizations l, Feature f) {
 
 String blockedEnableMessage(AppLocalizations l, Feature f) {
   switch (f) {
-    case Feature.gamification:
-      return l.featureBlockedEnable_gamification;
     case Feature.hapticEcoCoach:
       return l.featureBlockedEnable_hapticEcoCoach;
     case Feature.consumptionAnalytics:

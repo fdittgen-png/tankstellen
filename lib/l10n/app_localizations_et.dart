@@ -1809,48 +1809,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get vehicleAdapterForget => 'Unusta adapter';
 
   @override
-  String get achievementsTitle => 'Saavutused';
-
-  @override
-  String get achievementFirstTrip => 'Esimene reis';
-
-  @override
-  String get achievementFirstTripDesc => 'Salvesta oma esimene OBD2 reis.';
-
-  @override
-  String get achievementFirstFillUp => 'Esimene tankimine';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Lisa oma esimene tankimine.';
-
-  @override
-  String get achievementTenTrips => '10 reisi';
-
-  @override
-  String get achievementTenTripsDesc => 'Salvesta 10 OBD2 reisi.';
-
-  @override
-  String get achievementZeroHarsh => 'Sujuv sõitja';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Lõpeta 10 km või pikem reis ilma järsu pidurduse või kiirenduseta.';
-
-  @override
-  String get achievementEcoWeek => 'Ökonädal';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Sõida 7 järjestikusel päeval vähemalt ühe sujuva reisiga päevas.';
-
-  @override
-  String get achievementPriceWin => 'Hinnavõit';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Lisa tankimine, mis ületab jaama 30-päeva keskmist 5% või rohkem.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Jaga õpitud sõidukiprofiile';
 
   @override
@@ -3302,27 +3260,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Sujuv seeria';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Sõida 5 reisi järjest sujuva sõiduga 80 või kõrgema tulemusega.';
-
-  @override
-  String get achievementColdStartAware => 'Külmkäivituse teadlik';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Hoia terve kuu külmkäivituse kütusekulud alla 2% kogu kütusest — ühenda lühireisid.';
-
-  @override
-  String get achievementHighwayMaster => 'Kiirtee meister';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Lõpeta 30 km+ reis ühtlase kiirusega ja sujuva sõidu tulemusega 90 või rohkem.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4859,13 +4796,6 @@ class AppLocalizationsEt extends AppLocalizations {
       'Salvesta reisid automaatselt OBD2 kaudu.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
-
-  @override
-  String get featureDescription_gamification =>
-      'Sõiduhinded ja teenitud märgid.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptilise ökokoach';
 
   @override
@@ -4962,10 +4892,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Kuva kuluanalüütika kaart põhinavigatsioonis.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Luba esmalt OBD2 reisi salvestamine';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5558,13 +5484,6 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Reeglipõhine määrab iga sõitmisnäidise täpselt ühele olukorrale. Hämar jagab selle kõigi vahel vastavalt sobivusele — sujuvam 60 km/h lähedal või muutuvatel kallakutel, kuid täidab kõik ämrid aeglasemalt.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Kuva saavutused ja hinded';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Kui väljas, on märgid, hinded ja trofee ikoonid kogu rakenduses peidetud.';
 
   @override
   String gdprPolicyLink(int version) {
