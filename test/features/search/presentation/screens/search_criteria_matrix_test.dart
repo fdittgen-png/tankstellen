@@ -250,6 +250,36 @@ void main() {
       expect(c.read(selectedAmenitiesProvider), {StationAmenity.shop});
     });
 
+    testWidgets('#4199 — open-now ALONE is counted, though its switch sits '
+        'above the collapsible', (tester) async {
+      // The header used to count `amenities.length`, so a user with
+      // open-now on and no amenities saw a bare "More filters" while
+      // their results were quietly narrowed — the exact failure #4166
+      // introduced the counter to prevent. #4166 deliberately keeps the
+      // switch ABOVE the section (it is part of the decision, not a
+      // bulky refinement); counting it here does not move it.
+      final c = await _pumpCriteria(tester);
+      c.read(selectedAmenitiesProvider.notifier).clear();
+      c.read(openOnlyFilterProvider.notifier).set(true);
+      await tester.pumpAndSettle();
+
+      expect(find.text(_l.criteriaMoreFilters(1)), findsOneWidget,
+          reason: 'open-now narrows the results, so the collapsed header '
+              'must say one filter is active');
+    });
+
+    testWidgets('#4199 — open-now and an amenity sum into one count',
+        (tester) async {
+      final c = await _pumpCriteria(tester);
+      c.read(selectedAmenitiesProvider.notifier).clear();
+      c.read(openOnlyFilterProvider.notifier).set(true);
+      c.read(selectedAmenitiesProvider.notifier).toggle(StationAmenity.shop);
+      await tester.pumpAndSettle();
+
+      expect(find.text(_l.criteriaMoreFilters(2)), findsOneWidget,
+          reason: 'every constraint that narrows the results counts once');
+    });
+
     testWidgets('reduced motion: the custom radius control appears without '
         'animating', (tester) async {
       await _pumpCriteria(tester, reduceMotion: true);
