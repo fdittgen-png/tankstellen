@@ -129,7 +129,10 @@ class _DefaultVehicleSection extends ConsumerWidget {
           child: Text(l10n.hybridFuelChoiceVehicleDefault),
         ),
         for (final f in fuels)
-          DropdownMenuItem<FuelType?>(value: f, child: Text(f.displayName)),
+          DropdownMenuItem<FuelType?>(
+            value: f,
+            child: Text(localizedFuelName(l10n, f)),
+          ),
       ],
       onChanged: ctrl.setHybridFuelChoice,
     );
