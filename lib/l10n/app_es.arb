@@ -7275,5 +7275,15 @@
   "landingScreenNearest": "Estaciones más cercanas",
   "@landingScreenNearest": {
     "description": "MT — needs native review"
+  },
+  "activeCountryChangedTo": "El país activo ahora es {country}",
+  "@activeCountryChangedTo": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "country": {
+        "type": "String",
+        "example": "France"
+      }
+    }
   }
 }

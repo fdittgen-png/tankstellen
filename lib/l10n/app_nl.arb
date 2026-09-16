@@ -7767,5 +7767,15 @@
   "landingScreenNearest": "Dichtstbijzijnde tankstations",
   "@landingScreenNearest": {
     "description": "MT — needs native review"
+  },
+  "activeCountryChangedTo": "Actief land is nu {country}",
+  "@activeCountryChangedTo": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "country": {
+        "type": "String",
+        "example": "France"
+      }
+    }
   }
 }

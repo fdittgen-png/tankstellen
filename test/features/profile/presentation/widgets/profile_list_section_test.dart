@@ -592,5 +592,88 @@ void main() {
         expect(find.text('Profile Weekend created'), findsOneWidget);
       },
     );
+
+    // #4280/#4267 — deleting the ACTIVE profile hands the active country to
+    // a deterministically chosen survivor. The choice was the easy half; the
+    // part that surprised users is that it happened silently, so the notice
+    // names the country that took over.
+    //
+    // Driven end to end against the real providers rather than scanned out
+    // of the source: a `contains('SnackBarHelper.show')` check would pass
+    // whether or not the snackbar fires, names the right country, or stays
+    // quiet for an inactive profile.
+    testWidgets(
+      'deleting the ACTIVE profile announces the country that took over',
+      (tester) async {
+        await pumpWithFakeStorage(
+          tester,
+          seed: const [_activeProfile, fr],
+          activeId: _activeProfile.id,
+        );
+
+        // Open the edit sheet for "Home" (DE, active) — scope the edit
+        // button to that card, since both cards carry one.
+        await tester.tap(
+          find.descendant(
+            of: find.ancestor(
+              of: find.text('Home'),
+              matching: find.byType(Card),
+            ),
+            matching: find.byIcon(Icons.edit),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // The sheet's delete trigger is an OutlinedButton labelled
+        // `l10n.delete` (profile_edit_sheet_parts.dart); the dialog's
+        // TextButton is Cancel.
+        await tester.tap(find.widgetWithText(OutlinedButton, 'Delete'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(FilledButton, 'Delete profile'));
+        await tester.pumpAndSettle();
+
+        // France is the only survivor, so it holds the active context now.
+        expect(find.text('Active country is now France'), findsOneWidget,
+            reason: 'the user must be told which country they landed in — '
+                'the active profile is the country context for every '
+                'country-scoped feature');
+      },
+    );
+
+    testWidgets(
+      'deleting an INACTIVE profile says nothing — the active country did '
+      'not move',
+      (tester) async {
+        await pumpWithFakeStorage(
+          tester,
+          seed: const [_activeProfile, fr],
+          activeId: _activeProfile.id,
+        );
+
+        // "France" is the inactive one here.
+        await tester.tap(
+          find.descendant(
+            of: find.ancestor(
+              of: find.text('France'),
+              matching: find.byType(Card),
+            ),
+            matching: find.byIcon(Icons.edit),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // The sheet's delete trigger is an OutlinedButton labelled
+        // `l10n.delete` (profile_edit_sheet_parts.dart); the dialog's
+        // TextButton is Cancel.
+        await tester.tap(find.widgetWithText(OutlinedButton, 'Delete'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(FilledButton, 'Delete profile'));
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('Active country is now'), findsNothing,
+            reason: 'nothing moved, so there is nothing to announce — a '
+                'notice here would be noise');
+      },
+    );
   });
 }

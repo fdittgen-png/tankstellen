@@ -7767,5 +7767,15 @@
   "landingScreenNearest": "Najbliższe stacje paliw",
   "@landingScreenNearest": {
     "description": "MT — needs native review"
+  },
+  "activeCountryChangedTo": "Aktywny kraj to teraz {country}",
+  "@activeCountryChangedTo": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "country": {
+        "type": "String",
+        "example": "France"
+      }
+    }
   }
 }

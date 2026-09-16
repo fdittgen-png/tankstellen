@@ -7767,5 +7767,15 @@
   "landingScreenNearest": "Lähimmät huoltoasemat",
   "@landingScreenNearest": {
     "description": "MT — needs native review"
+  },
+  "activeCountryChangedTo": "Aktiivinen maa on nyt {country}",
+  "@activeCountryChangedTo": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "country": {
+        "type": "String",
+        "example": "France"
+      }
+    }
   }
 }

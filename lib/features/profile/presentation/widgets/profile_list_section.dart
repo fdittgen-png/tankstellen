@@ -147,6 +147,13 @@ class ProfileListSection extends ConsumerWidget {
     // section could have unmounted underneath the modal sheet.
     final profileNotifier = ref.read(activeProfileProvider.notifier);
     final repo = ref.read(profileRepositoryProvider);
+    // #4280 — deleting the ACTIVE profile hands the active country to a
+    // survivor (#4267 made that choice deterministic). Silently moving the
+    // user to another country is the part that still surprised them, so
+    // capture what was active BEFORE the delete and the localized string
+    // now: the callback below runs after an await, inside a modal sheet.
+    final wasActive = ref.read(activeProfileProvider)?.id == profile.id;
+    final l10n = AppLocalizations.of(context);
 
     await showModalBottomSheet<void>(
       context: context,
@@ -168,7 +175,19 @@ class ProfileListSection extends ConsumerWidget {
             ? () async {
                 await repo.deleteProfile(profile.id);
                 profileNotifier.refresh();
-                if (context.mounted) ref.invalidate(allProfilesProvider);
+                if (!context.mounted) return;
+                ref.invalidate(allProfilesProvider);
+                // Only when the active context actually moved: deleting an
+                // inactive profile changes nothing the user needs telling,
+                // and a profile with no country names no country.
+                if (!wasActive) return;
+                final code = repo.getActiveProfile()?.countryCode;
+                if (code == null) return;
+                final country = Countries.byCode(code.toUpperCase());
+                SnackBarHelper.show(
+                  context,
+                  l10n.activeCountryChangedTo(country?.name ?? code),
+                );
               }
             : null,
       ),
