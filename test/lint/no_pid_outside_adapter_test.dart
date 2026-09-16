@@ -53,7 +53,6 @@ import 'package:flutter_test/flutter_test.dart';
 /// the normalized layer takes its entries with it.
 const Map<String, int> _baseline = {
   'lib/features/obd2/data/session/obd2_fuel_rate_reader.dart': 18,
-  'lib/features/obd2/data/session/live_sample_snapshot_subscriptions.dart': 14,
 };
 
 const _skipPrefixes = [
