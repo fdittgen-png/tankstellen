@@ -32,7 +32,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics, (r) {
       final v = Elm327Protocol.parseEngineRpm(r);
       if (v != null) {
-        _latestRpm = v;
+        _signals.write(VehicleSignal.engineRpm, v);
         // #3856 — the recording loop's parses bypass the typed read
         // helpers, so the power model is stamped here: rpm is the
         // authoritative running/awake reading.
@@ -44,7 +44,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics, (r) {
       final v = Elm327Protocol.parseVehicleSpeed(r);
       if (v != null) {
-        _latestSpeedKmh = v.toDouble();
+        _signals.write(VehicleSignal.vehicleSpeed, v.toDouble());
         _onSpeedSample(v.toDouble());
         Obd2VehiclePower.instance.noteBusAnswered(); // #3856 — awake
       }
@@ -53,14 +53,14 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, VehicleSignal.throttle,
         hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics, (r) {
       final v = Elm327Protocol.parseThrottlePercent(r);
-      if (v != null) _latestThrottlePercent = v;
+      if (v != null) _signals.write(VehicleSignal.throttle, v);
       _onHighPriorityParse(v);
     });
     // #2458 — accelerator-pedal (0149/014A/014B) — driver intent, 5 Hz.
     // Three channels track the same physical pedal; subscribe whichever
     // the car exposes and keep the running max (the least-damped reading).
-    // All optionalPid-gated, so a car with none subscribes none and
-    // _latestPedalPercent stays null. Pedal is acquired + persisted here;
+    // All optional, so a car with none subscribes none and
+    // latestPedalPercent stays null. Pedal is acquired + persisted here;
     // the driving-style consumption is #2460.
     _sub(scheduler, VehicleSignal.pedalD,
         hz: 5.0,
@@ -68,7 +68,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         tier: PidTier.dynamics,
         optional: true, (r) {
       final v = Elm327Protocol.parseAcceleratorPedalD(r);
-      if (v != null) _latestPedalD = v;
+      if (v != null) _signals.write(VehicleSignal.pedalD, v);
     });
     _sub(scheduler, VehicleSignal.pedalE,
         hz: 5.0,
@@ -76,7 +76,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         tier: PidTier.dynamics,
         optional: true, (r) {
       final v = Elm327Protocol.parseAcceleratorPedalE(r);
-      if (v != null) _latestPedalE = v;
+      if (v != null) _signals.write(VehicleSignal.pedalE, v);
     });
     _sub(scheduler, VehicleSignal.pedalF,
         hz: 5.0,
@@ -84,7 +84,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         tier: PidTier.dynamics,
         optional: true, (r) {
       final v = Elm327Protocol.parseAcceleratorPedalF(r);
-      if (v != null) _latestPedalF = v;
+      if (v != null) _signals.write(VehicleSignal.pedalF, v);
     });
     //
     // The fuel-rate driver: subscribe whichever the car exposes (015E
@@ -96,7 +96,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         tier: PidTier.dynamics,
         optional: true, (r) {
       final v = Elm327Protocol.parseFuelRateLPerHour(r);
-      if (v != null) _latestDirectFuelRate = v;
+      if (v != null) _signals.write(VehicleSignal.fuelRate, v);
       _onHighPriorityParse(v);
     });
     _sub(scheduler, VehicleSignal.maf,
@@ -105,7 +105,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         tier: PidTier.dynamics,
         optional: true, (r) {
       final v = Elm327Protocol.parseMafGramsPerSecond(r);
-      if (v != null) _latestMaf = v;
+      if (v != null) _signals.write(VehicleSignal.maf, v);
       _onHighPriorityParse(v);
     });
     _sub(scheduler, VehicleSignal.manifoldPressure,
@@ -114,7 +114,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         tier: PidTier.dynamics,
         optional: true, (r) {
       final v = Elm327Protocol.parseManifoldPressureKpa(r);
-      if (v != null) _latestMapKpa = v;
+      if (v != null) _signals.write(VehicleSignal.manifoldPressure, v);
       _onHighPriorityParse(v);
     });
 
@@ -126,19 +126,19 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, VehicleSignal.commandedPhi,
         hz: 2.0, tier: PidTier.mixture, optional: true, (r) {
       final v = Elm327Protocol.parseCommandedEquivalenceRatio(r);
-      if (v != null) _latestCommandedPhi = v;
+      if (v != null) _signals.write(VehicleSignal.commandedPhi, v);
     });
     _sub(scheduler, VehicleSignal.engineLoad,
         hz: 2.0, tier: PidTier.mixture, (r) {
       final v = Elm327Protocol.parseEngineLoad(r);
-      if (v != null) _latestEngineLoadPercent = v;
+      if (v != null) _signals.write(VehicleSignal.engineLoad, v);
     });
     // #2458 — absolute load (0143). High-load proxy (>100 % on boosted
     // engines); optionalPid-gated, acquired + persisted. Mixture tier.
     _sub(scheduler, VehicleSignal.absoluteLoad,
         hz: 2.0, tier: PidTier.mixture, optional: true, (r) {
       final v = Elm327Protocol.parseAbsoluteLoad(r);
-      if (v != null) _latestAbsLoadPercent = v;
+      if (v != null) _signals.write(VehicleSignal.absoluteLoad, v);
     });
 
     // ---- SLOW-CORRECTION tier (~0.5 Hz, medium priority) -----------
@@ -147,12 +147,12 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, VehicleSignal.stftBank1,
         hz: 0.5, tier: PidTier.slowCorrection, (r) {
       final v = Elm327Protocol.parseShortTermFuelTrim(r);
-      if (v != null) _latestStft = v;
+      if (v != null) _signals.write(VehicleSignal.stftBank1, v);
     });
     _sub(scheduler, VehicleSignal.ltftBank1,
         hz: 0.5, tier: PidTier.slowCorrection, (r) {
       final v = Elm327Protocol.parseLongTermFuelTrim(r);
-      if (v != null) _latestLtft = v;
+      if (v != null) _signals.write(VehicleSignal.ltftBank1, v);
     });
     // #2458 — bank-2 fuel trims (0108/0109). Only dual-bank (V / boxer)
     // engines expose them; optionalPid-gated, so inline engines never
@@ -160,12 +160,12 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, VehicleSignal.stftBank2,
         hz: 0.5, tier: PidTier.slowCorrection, optional: true, (r) {
       final v = Elm327Protocol.parseShortTermFuelTrimBank2(r);
-      if (v != null) _latestStftBank2 = v;
+      if (v != null) _signals.write(VehicleSignal.stftBank2, v);
     });
     _sub(scheduler, VehicleSignal.ltftBank2,
         hz: 0.5, tier: PidTier.slowCorrection, optional: true, (r) {
       final v = Elm327Protocol.parseLongTermFuelTrimBank2(r);
-      if (v != null) _latestLtftBank2 = v;
+      if (v != null) _signals.write(VehicleSignal.ltftBank2, v);
     });
     _sub(scheduler, VehicleSignal.intakeAirTemp,
         hz: 0.5, tier: PidTier.slowCorrection, (r) {
@@ -178,7 +178,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, VehicleSignal.timingAdvance,
         hz: 0.5, tier: PidTier.slowCorrection, optional: true, (r) {
       final v = Elm327Protocol.parseTimingAdvanceDeg(r);
-      if (v != null) _latestTimingAdvanceDeg = v;
+      if (v != null) _signals.write(VehicleSignal.timingAdvance, v);
     });
     // #2456 — absolute baro (0x33). Ambient pressure changes only with
     // altitude / weather, so 0.5 Hz is ample. optionalPid-gated: absent →
@@ -186,7 +186,7 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, VehicleSignal.baroPressure,
         hz: 0.5, tier: PidTier.slowCorrection, optional: true, (r) {
       final v = Elm327Protocol.parseBaroPressureKpa(r);
-      if (v != null) _latestBaroKpa = v;
+      if (v != null) _signals.write(VehicleSignal.baroPressure, v);
     });
 
     // ---- THERMAL/CONTEXT tier (~0.1 Hz, low priority) --------------
@@ -197,13 +197,13 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
         hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext,
         (r) {
       final v = Elm327Protocol.parseCoolantTempCelsius(r);
-      if (v != null) _latestCoolantTempC = v;
+      if (v != null) _signals.write(VehicleSignal.coolantTemp, v);
     });
     _sub(scheduler, VehicleSignal.fuelTankLevel,
         hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext,
         (r) {
       final v = Elm327Protocol.parseFuelLevelPercent(r);
-      if (v != null) _latestFuelLevelPercent = v;
+      if (v != null) _signals.write(VehicleSignal.fuelTankLevel, v);
     });
     // #2459 — oil temp (015C) + ambient air (0146): optional
     // diagnostic-context thermal signals. Both optionalPid-gated and
@@ -211,12 +211,12 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, VehicleSignal.oilTemp,
         hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext, (r) {
       final v = Elm327Protocol.parseEngineOilTempCelsius(r);
-      if (v != null) _latestOilTempC = v;
+      if (v != null) _signals.write(VehicleSignal.oilTemp, v);
     }, optional: true);
     _sub(scheduler, VehicleSignal.ambientAirTemp,
         hz: 0.1, priority: PidPriority.low, tier: PidTier.thermalContext, (r) {
       final v = Elm327Protocol.parseAmbientAirTempCelsius(r);
-      if (v != null) _latestAmbientTempC = v;
+      if (v != null) _signals.write(VehicleSignal.ambientAirTemp, v);
     }, optional: true);
 
     // ---- Epic #3416 precision PIDs -------------------------------------

@@ -14,6 +14,7 @@ import 'obd2_signal_support.dart';
 import '../../domain/pid_scheduler.dart';
 import '../../domain/precision_pid_latches.dart';
 import '../../domain/signal_latch_store.dart';
+import '../../domain/signal_reading.dart';
 import '../../domain/vehicle_signal.dart';
 
 part 'live_sample_snapshot_latches.dart';
@@ -55,8 +56,7 @@ class LiveSampleSnapshot
     required this._onHighPriorityParse,
     required this._onSpeedSample,
     DateTime Function()? clock,
-  })  : _clock = clock ?? DateTime.now,
-        _precision = PrecisionPidLatches(clock: clock);
+  }) : _clock = clock ?? DateTime.now;
 
   /// #3784 — point the snapshot at the freshly-reconnected service after
   /// a mid-trip rebind (`replaceService` swaps only the controller's
@@ -78,6 +78,7 @@ class LiveSampleSnapshot
   @override
   final void Function(double speedKmh) _onSpeedSample;
   // Arrival clock for every latch (#2505 IAT staleness, #4159) — test seam.
+  @override
   final DateTime Function() _clock;
 
   // #4159 — per-signal latest value + arrival time.
@@ -89,5 +90,6 @@ class LiveSampleSnapshot
   // ethanol 0x52 #3429). A collaborator so this grandfathered file grows
   // by a field + one subscribe call, not by twenty latches.
   @override
-  final PrecisionPidLatches _precision;
+  late final PrecisionPidLatches _precision =
+      PrecisionPidLatches(clock: _clock, store: _signals);
 }

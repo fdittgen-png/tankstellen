@@ -4,6 +4,7 @@
 import 'package:meta/meta.dart';
 
 import '../../../core/domain/data_value.dart';
+import 'fuel_mixture_model.dart';
 import 'vehicle_signal.dart';
 
 /// Whether a reading's value sits inside the band its consumer trusts
@@ -72,4 +73,32 @@ final class SignalReading {
   @override
   String toString() => 'SignalReading(${signal.name}, $value, '
       '${plausibility.name})';
+}
+
+/// A derived fuel-rate figure as a [VehicleSignal.fuelRate] reading
+/// (#4159), so a MAP-derived rate and an ECU-reported one are never
+/// indistinguishable downstream: the ECU's own figures (fuel mass rate,
+/// cylinder fuel rate, fuel rate — `kMeasuredFuelSourceTags`) are
+/// `Measured(at)`; air-mass derivations (dual MAF, MAF, speed-density) are
+/// `Estimated(basis: derived)`; no figure is `Unknown(notMeasuredYet)`.
+SignalReading fuelRateReadingOf(
+  double? litresPerHour,
+  FuelRateSourceTag? source, {
+  DateTime? at,
+}) {
+  const unknown = Unknown<double>(reason: DataUnknownReason.notMeasuredYet);
+  final DataValue<double> value = litresPerHour == null
+      ? unknown
+      : switch (source) {
+          FuelRateSourceTag.pid9D ||
+          FuelRateSourceTag.pidA2 ||
+          FuelRateSourceTag.pid5E =>
+            DataValue.measured(litresPerHour, at: at),
+          FuelRateSourceTag.maf66 ||
+          FuelRateSourceTag.maf ||
+          FuelRateSourceTag.speedDensity =>
+            DataValue.estimated(litresPerHour, basis: DataBasis.derived),
+          FuelRateSourceTag.none || null => unknown,
+        };
+  return SignalReading(signal: VehicleSignal.fuelRate, value: value);
 }

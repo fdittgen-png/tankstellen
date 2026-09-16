@@ -44,6 +44,14 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
   double? _lastFuelRateVe;
   double? get lastFuelRateVe => _lastFuelRateVe;
 
+  double? _lastFuelRateLPerHour;
+  DateTime? _lastFuelRateAt;
+
+  /// #4159 — the last [deriveFuelRateLPerHour] figure with provenance (see
+  /// `fuelRateReadingOf`). Reads only: records no breadcrumb.
+  SignalReading fuelRateReading() => fuelRateReadingOf(
+      _lastFuelRateLPerHour, _lastFuelRateSource, at: _lastFuelRateAt);
+
   /// Derive the current fuel rate (L/h) from whatever snapshot
   /// values have landed so far. Mirrors the fallback chain in
   /// [Obd2Service.readFuelRateLPerHour], but over snapshot values
@@ -62,6 +70,13 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
   /// null / unknown stays on the pre-#800 petrol defaults. Diesel skips
   /// the trim + commanded-φ corrections entirely (#3430).
   double? deriveFuelRateLPerHour() {
+    final litresPerHour = _deriveFuelRate();
+    _lastFuelRateLPerHour = litresPerHour;
+    _lastFuelRateAt = _clock();
+    return litresPerHour;
+  }
+
+  double? _deriveFuelRate() {
     // #1858 — provenance defaults; each branch below overrides them.
     _lastFuelRateBranch = Obd2BranchTag.none;
     _lastFuelRateSource = FuelRateSourceTag.none;
@@ -128,8 +143,8 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
         collector?.record(
           branch: Obd2BranchTag.pid5E,
           fuelRateLPerHour: lph,
-          pid5ELPerHour: _latestDirectFuelRate,
-          rpm: _latestRpm,
+          pid5ELPerHour: _latest(VehicleSignal.fuelRate),
+          rpm: _latest(VehicleSignal.engineRpm),
           afr: afr,
           fuelDensityGPerL: density,
           engineDisplacementCc: displacement.toDouble(),
@@ -137,7 +152,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
         );
         // #3428 — 9D-vs-5E cross-check: both are ECU-reported fuel, so a
         // > 50 % divergence flags a mis-scaled 0x9D or a stuck 0x5E.
-        final direct5e = _latestDirectFuelRate;
+        final direct5e = _latest(VehicleSignal.fuelRate);
         if (direct5e != null &&
             direct5e > 0 &&
             (lph - direct5e).abs() / direct5e > 0.5) {
@@ -157,7 +172,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // so the conversion is never guessed (#3428).
     final cylRate = _precision.cylinderFuelRateMgPerStroke;
     final cylinders = _vehicle?.engineCylinders;
-    final rpmForCyl = _latestRpm;
+    final rpmForCyl = _latest(VehicleSignal.engineRpm);
     if (cylRate != null && cylinders != null && rpmForCyl != null) {
       final gPerS = cylinderFuelRateToGramsPerSecond(
         mgPerStroke: cylRate,
@@ -184,7 +199,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     }
 
     // Step 1: direct PID 5E. Already post-trim, no correction.
-    final direct = _latestDirectFuelRate;
+    final direct = _latest(VehicleSignal.fuelRate);
     if (direct != null) {
       // #1395 — sanity bound A: implausibly-low at non-idle RPM.
       // Same threshold as Obd2Service.readFuelRateLPerHour but evaluated
@@ -193,7 +208,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       // rather than the readFuelRate API.
       String? lowFlag;
       String? lowDetail;
-      final rpm = _latestRpm;
+      final rpm = _latest(VehicleSignal.engineRpm);
       if (direct < 0.3 && rpm != null && rpm > 1500) {
         lowFlag = Obd2BreadcrumbCollector.flagSuspiciousLow;
         lowDetail = 'directRate=${direct.toStringAsFixed(2)};'
@@ -214,7 +229,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       // Sanity bound B: 5E vs MAF cross-check on the controller's
       // cached MAF snapshot. Evaluated AFTER the breadcrumb is
       // pushed so [recordFlag] mutates the same row.
-      final mafSnapshot = _latestMaf;
+      final mafSnapshot = _latest(VehicleSignal.maf);
       if (mafSnapshot != null) {
         final mafDerived = mafSnapshot * 3600.0 / (afr * density);
         if (mafDerived > 0 &&
@@ -240,12 +255,12 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // commanded φ (0x44); diesel trusts only the measured value. All
     // null → `effectiveAfr == afr`, i.e. unchanged.
     final maf66 = _precision.mafSensorGPerS;
-    final maf = maf66 ?? _latestMaf;
+    final maf = maf66 ?? _latest(VehicleSignal.maf);
     if (maf != null) {
       final effectiveAfr = effectiveAfrForMixture(
         afr,
         measuredPhi: latestMeasuredPhi,
-        commandedPhi: _latestCommandedPhi,
+        commandedPhi: _latest(VehicleSignal.commandedPhi),
         isDiesel: isDiesel,
       );
       final raw = maf * 3600.0 / (effectiveAfr * density);
@@ -256,7 +271,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
         branch: Obd2BranchTag.maf,
         fuelRateLPerHour: corrected,
         mafGramsPerSecond: maf,
-        rpm: _latestRpm,
+        rpm: _latest(VehicleSignal.engineRpm),
         afr: effectiveAfr,
         fuelDensityGPerL: density,
         engineDisplacementCc: displacement.toDouble(),
@@ -272,9 +287,9 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // estimator with the active vehicle's displacement + VE (#812).
     // #2505 — MAP + RPM must be same-tick current, but IAT is reused
     // inside its freshness window (the #2457 governor reads it slowly).
-    final mapKpa = _latestMapKpa;
+    final mapKpa = _latest(VehicleSignal.manifoldPressure);
     final iat = _signals.fresh(VehicleSignal.intakeAirTemp);
-    final rpm = _latestRpm;
+    final rpm = _latest(VehicleSignal.engineRpm);
     void recordNone() => collector?.record(
           branch: Obd2BranchTag.none,
           mapKpa: mapKpa,
@@ -299,11 +314,11 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // effective AFR is recorded in the breadcrumb so diagnostics reflect
     // the real denominator; φ is passed pre-resolved (`phi: null`) so the
     // estimator can't double-apply it.
-    final baroKpa = _latestBaroKpa;
+    final baroKpa = _latest(VehicleSignal.baroPressure);
     final effectiveAfr = effectiveAfrForMixture(
       afr,
       measuredPhi: latestMeasuredPhi,
-      commandedPhi: _latestCommandedPhi,
+      commandedPhi: _latest(VehicleSignal.commandedPhi),
       isDiesel: isDiesel,
     );
     final raw = Obd2Service.estimateFuelRateLPerHourFromMap(
@@ -373,15 +388,15 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
   /// engines get the bank-averaged correction; null bank-2 trims fall
   /// back to bank-1-only (byte-for-byte the pre-#2458 result).
   double _applyTrim(double raw) {
-    final stft = _latestStft;
-    final ltft = _latestLtft;
+    final stft = _latest(VehicleSignal.stftBank1);
+    final ltft = _latest(VehicleSignal.ltftBank1);
     if (stft == null || ltft == null) return raw;
     return Obd2Service.applyFuelTrimCorrection(
       raw,
       stft: stft,
       ltft: ltft,
-      stftBank2: _latestStftBank2,
-      ltftBank2: _latestLtftBank2,
+      stftBank2: _latest(VehicleSignal.stftBank2),
+      ltftBank2: _latest(VehicleSignal.ltftBank2),
     );
   }
 }
