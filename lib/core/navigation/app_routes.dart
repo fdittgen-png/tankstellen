@@ -78,6 +78,7 @@ abstract final class RoutePaths {
   static const consumption = '/consumption';
   static const carbon = '/carbon';
   static const consumptionStats = '/consumption-stats';
+  static const fuelAndTank = '/fuel-and-tank';
   static const pickStationForFillUp = '/consumption/pick-station';
   static const tripRecording = '/trip-recording';
   static const addFillUp = '/consumption/add';

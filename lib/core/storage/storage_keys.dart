@@ -170,6 +170,11 @@ class StorageKeys {
   /// screen title. Defaults to `false`.
   static const String obd2DebugOverlayEnabled = 'obd2_debug_overlay_enabled';
 
+  /// #4278 — what the next fill should optimise on the Fuel & Tank
+  /// surface: a `FillObjective` name. Absent means the default,
+  /// lowest cost per kilometre.
+  static const String fillObjective = 'fill_objective';
+
   /// #1925 — opt-in OBD2 debug-session logging. When on, each OBD2
   /// connection is recorded (init handshake, data gaps, reconnects)
   /// as an exportable XML session log. Toggled by a checkbox in the

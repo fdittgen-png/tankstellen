@@ -29,6 +29,7 @@ export 'domain/services/fuel_consumption_estimator.dart';
 export 'domain/services/monthly_insights_aggregator.dart';
 export 'presentation/screens/add_fill_up_screen.dart';
 export 'presentation/screens/consumption_statistics_screen.dart';
+export 'presentation/screens/fuel_and_tank_screen.dart';
 export 'presentation/screens/pick_station_for_fill_up_screen.dart';
 export 'presentation/widgets/backup_export_flow.dart';
 export 'presentation/widgets/backup_progress_dialog.dart';

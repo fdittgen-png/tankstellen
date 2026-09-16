@@ -51,6 +51,13 @@ List<RouteBase> get consumptionRoutes => [
     path: RoutePaths.consumptionStats,
     builder: (_, _) => const ConsumptionStatisticsPage(),
   ),
+  // #4278 — the Fuel & Tank explanation surface: tank mix, approved
+  // fuels, learned behaviour and next-fill guidance for the active
+  // vehicle. Opened from the tank level card; no feature gate.
+  GoRoute(
+    path: RoutePaths.fuelAndTank,
+    builder: (_, _) => const FuelAndTankScreen(),
+  ),
   GoRoute(
     path: RoutePaths.pickStationForFillUp,
     builder: (_, _) => const PickStationForFillUpScreen(),

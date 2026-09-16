@@ -7,13 +7,14 @@ import 'package:tankstellen/app/routes/consumption_routes.dart';
 
 void main() {
   group('consumptionRoutes', () {
-    test('returns exactly 7 routes', () {
+    test('returns exactly 8 routes', () {
       // Guards against accidental insert/delete — `/consumption-tab`
       // lives in shellBranches, but every other consumption route is
       // owned here. `/trip-history` was removed in #1313 — the Trajets
       // sub-tab covers the same content inline. `/consumption-stats`
-      // was added in #2698 (monthly fuel-cost statistics page).
-      expect(consumptionRoutes.length, 7);
+      // was added in #2698 (monthly fuel-cost statistics page),
+      // `/fuel-and-tank` in #4278 (the Fuel & Tank surface).
+      expect(consumptionRoutes.length, 8);
     });
 
     test('route 0 path is "/consumption"', () {
@@ -33,29 +34,36 @@ void main() {
       expect(route.path, '/consumption-stats');
     });
 
-    test('route 3 path is "/consumption/pick-station"', () {
+    test('route 3 path is "/fuel-and-tank" (#4278)', () {
+      // #4278 — the Fuel & Tank explanation surface, opened from the
+      // tank level card on the Cost tab.
       final route = consumptionRoutes[3] as GoRoute;
+      expect(route.path, '/fuel-and-tank');
+    });
+
+    test('route 4 path is "/consumption/pick-station"', () {
+      final route = consumptionRoutes[4] as GoRoute;
       expect(route.path, '/consumption/pick-station');
     });
 
-    test('route 4 path is "/trip-recording" (#726)', () {
+    test('route 5 path is "/trip-recording" (#726)', () {
       // #726 — global trip recording view, opened from AddFillUpScreen
       // after OBD2 connect, re-entered via the active-trip banner.
-      final route = consumptionRoutes[4] as GoRoute;
+      final route = consumptionRoutes[5] as GoRoute;
       expect(route.path, '/trip-recording');
     });
 
-    test('route 5 path is "/trip/:id" with id path parameter (#889)', () {
+    test('route 6 path is "/trip/:id" with id path parameter (#889)', () {
       // #889 — trip-detail route uses `:id` so it can be deep-linked
       // from the Trajets tab. The exact pattern is load-bearing — the
       // builder reads `state.pathParameters['id']`.
-      final route = consumptionRoutes[5] as GoRoute;
+      final route = consumptionRoutes[6] as GoRoute;
       expect(route.path, '/trip/:id');
       expect(route.path, contains(':id'));
     });
 
-    test('route 6 path is "/consumption/add"', () {
-      final route = consumptionRoutes[6] as GoRoute;
+    test('route 7 path is "/consumption/add"', () {
+      final route = consumptionRoutes[7] as GoRoute;
       expect(route.path, '/consumption/add');
     });
 

@@ -9265,6 +9265,742 @@ abstract class AppLocalizations {
   /// **'Region'**
   String get profileSectionRegion;
 
+  /// App bar title of the Fuel & Tank explanation surface (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel & Tank'**
+  String get fuelAndTankTitle;
+
+  /// Button on the tank level card that opens the Fuel & Tank surface (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s in my tank?'**
+  String get fuelAndTankOpenAction;
+
+  /// Fuel & Tank empty state when there is no active vehicle or it does not burn liquid fuel (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Select a vehicle that runs on liquid fuel to see its tank and how it behaves on each fuel.'**
+  String get fuelAndTankNoVehicle;
+
+  /// Heading of the tank mix card (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'In your tank now'**
+  String get fuelAndTankMixTitle;
+
+  /// Focal number of the tank mix card: the guaranteed minimum share of the leading fuel. The fuel name is shown beside it (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'≥ {percent} %'**
+  String fuelAndTankMixFocalAtLeast(String percent);
+
+  /// Focal number of the tank mix card when the mix is fully known (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} %'**
+  String fuelAndTankMixFocalExact(String percent);
+
+  /// One fuel's guaranteed minimum share in the tank mix line, e.g. '≥ 62 % E85' (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'≥ {percent} % {fuel}'**
+  String fuelAndTankMixShareAtLeast(String percent, String fuel);
+
+  /// One fuel's exact share in a fully known tank mix (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} % {fuel}'**
+  String fuelAndTankMixShareExact(String percent, String fuel);
+
+  /// The share of the tank no fuel can be credited with (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{percent} % unknown'**
+  String fuelAndTankMixUnknownShare(String percent);
+
+  /// Explains a partly unknown tank mix (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The shares are guaranteed minimums. The unknown part could be any of these fuels — it grows with fill-ups logged without a tank level.'**
+  String get fuelAndTankMixExplainPartial;
+
+  /// Explains a fully known tank mix (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Every litre is accounted for by your fill-up history.'**
+  String get fuelAndTankMixExplainExact;
+
+  /// Tank mix card title when nothing about the tank's content can be attributed (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Mix unknown'**
+  String get fuelAndTankMixUnknownTitle;
+
+  /// Tank mix card body in the unknown state (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Your fill-up history can\'t tell what is in the tank yet. A fill-up to a full tank makes the mix known again.'**
+  String get fuelAndTankMixUnknownBody;
+
+  /// Tank volume when it is known exactly; litres is a formatted volume like '32.0 L' (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{litres} in the tank'**
+  String fuelAndTankMixVolumeExact(String litres);
+
+  /// Tank volume as an interval of formatted volumes (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Between {min} and {max} in the tank'**
+  String fuelAndTankMixVolumeRange(String min, String max);
+
+  /// Tank volume when only a lower bound is known (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'At least {min} in the tank'**
+  String fuelAndTankMixVolumeAtLeast(String min);
+
+  /// Screen-reader label of the tank mix bar; summary is the mix line (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Tank mix: {summary}'**
+  String fuelAndTankMixBarSemantics(String summary);
+
+  /// Heading of the compatible fuels card (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuels for this vehicle'**
+  String get fuelAndTankCompatTitle;
+
+  /// Label above the fuels the vehicle settings approve (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Approved in your vehicle settings'**
+  String get fuelAndTankCompatApproved;
+
+  /// Label above fuels that physically fit but no setting approves (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Fit, but not confirmed for this vehicle'**
+  String get fuelAndTankCompatUnconfirmed;
+
+  /// Compatible fuels card when the capability is unknown (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle has no fuel set, so its approved fuels are unknown. Set its fuel in the vehicle settings.'**
+  String get fuelAndTankCompatUnknown;
+
+  /// Caption under the compatible fuels (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Only your vehicle settings count as approval — a fuel that fits the filler neck is not necessarily approved.'**
+  String get fuelAndTankCompatHint;
+
+  /// Heading of the vehicle-specific behaviour card (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'How your car behaves'**
+  String get fuelAndTankBehaviourTitle;
+
+  /// Badge marking figures observed on this vehicle, as opposed to general facts (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Your car'**
+  String get fuelAndTankObservedBadge;
+
+  /// Metric label (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption'**
+  String get fuelAndTankMetricConsumption;
+
+  /// Metric label (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per km'**
+  String get fuelAndTankMetricCostPerKm;
+
+  /// Metric label (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Range per tank'**
+  String get fuelAndTankMetricRange;
+
+  /// Metric label (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'CO2e per km'**
+  String get fuelAndTankMetricCo2e;
+
+  /// A cost per kilometre, amount already locale-formatted (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} {currency}/km'**
+  String fuelAndTankCostPerKmValue(String amount, String currency);
+
+  /// CO2e in grams per kilometre, already locale-formatted (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{grams} g/km'**
+  String fuelAndTankCo2eValue(String grams);
+
+  /// Shown instead of a number when a figure has insufficient evidence (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough evidence yet'**
+  String get fuelAndTankNotEnoughEvidence;
+
+  /// Provenance label of a figure based on measurements (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Measured'**
+  String get fuelAndTankProvenanceMeasured;
+
+  /// Provenance label of a figure based on estimates (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated'**
+  String get fuelAndTankProvenanceEstimated;
+
+  /// Provenance label of general technical facts, not measured on this car (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'General information'**
+  String get fuelAndTankProvenanceGeneral;
+
+  /// Number of trips or fill windows a figure rests on (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 sample} other{{count} samples}}'**
+  String fuelAndTankSampleCount(int count);
+
+  /// Confidence of a figure or decision (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'low confidence'**
+  String get fuelAndTankConfidenceLow;
+
+  /// Confidence of a figure or decision (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'medium confidence'**
+  String get fuelAndTankConfidenceMedium;
+
+  /// Confidence of a figure or decision (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'high confidence'**
+  String get fuelAndTankConfidenceHigh;
+
+  /// The 95 % interval of a figure, both ends formatted with units (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'95 % range {low} – {high}'**
+  String fuelAndTankInterval(String low, String high);
+
+  /// Why a figure is missing (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'No data on this fuel yet'**
+  String get fuelAndTankInsufficientNoEvidence;
+
+  /// Why a figure is missing (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Too few samples so far'**
+  String get fuelAndTankInsufficientTooFewSamples;
+
+  /// Why a figure is missing (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough distance driven yet'**
+  String get fuelAndTankInsufficientTooLittleDistance;
+
+  /// Why a figure is missing (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Needs the tank capacity in your vehicle settings'**
+  String get fuelAndTankInsufficientCapacityUnknown;
+
+  /// Why a figure is missing (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'No CO2e factor on record for this fuel'**
+  String get fuelAndTankInsufficientNoCo2eFactor;
+
+  /// Why a figure is missing (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not available for a mixed tank'**
+  String get fuelAndTankInsufficientContextNotPure;
+
+  /// Why a figure is missing (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Too uncertain to show'**
+  String get fuelAndTankInsufficientTooUncertain;
+
+  /// Disclosure when a figure is not condition-controlled (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not adjusted for driving conditions yet — hills, cold starts and traffic are still in these figures.'**
+  String get fuelAndTankUncontrolled;
+
+  /// Where a figure comes from (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'From full-tank to full-tank fill-ups'**
+  String get fuelAndTankBasisReferenceWindows;
+
+  /// Where a figure comes from (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'From engine readings on your trips'**
+  String get fuelAndTankBasisMeasuredTrips;
+
+  /// Where a figure comes from (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated from your trips'**
+  String get fuelAndTankBasisEstimatedTrips;
+
+  /// Where a figure comes from (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'From engine readings, adjusted for driving conditions'**
+  String get fuelAndTankBasisMeasuredResiduals;
+
+  /// Where a figure comes from (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated, adjusted for driving conditions'**
+  String get fuelAndTankBasisEstimatedResiduals;
+
+  /// Where a figure comes from (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated from your other figures'**
+  String get fuelAndTankBasisDerived;
+
+  /// Name of a mixed-fuel tank context (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed {first} + {second}'**
+  String fuelAndTankMixedContext(String first, String second);
+
+  /// Compact behaviour row for an approved fuel with no evidence (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not driven on this fuel yet'**
+  String get fuelAndTankNoEvidenceRow;
+
+  /// Expandable technical details (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'How these figures are made'**
+  String get fuelAndTankDetailsToggle;
+
+  /// Model versions in the technical details (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Behaviour model v{profile} · blend model v{blend}'**
+  String fuelAndTankModelVersions(String profile, String blend);
+
+  /// Vehicle-specific consumption comparison (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} uses {percent} % more than {other}'**
+  String fuelAndTankCompareMore(String fuel, String percent, String other);
+
+  /// Vehicle-specific consumption comparison (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} uses {percent} % less than {other}'**
+  String fuelAndTankCompareLess(String fuel, String percent, String other);
+
+  /// Vehicle-specific consumption comparison (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} and {other} use about the same'**
+  String fuelAndTankCompareSame(String fuel, String other);
+
+  /// Vehicle-specific consumption comparison without a ratio (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough evidence yet to compare {fuel} with {other}'**
+  String fuelAndTankCompareInsufficient(String fuel, String other);
+
+  /// Caption when a comparison is not significant (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The difference is still within the uncertainty.'**
+  String get fuelAndTankCompareWithinUncertainty;
+
+  /// Caption when a comparison is condition-controlled (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Adjusted for driving conditions.'**
+  String get fuelAndTankCompareAdjusted;
+
+  /// Shown when fewer than two fuels have evidence (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Drive on two different fuels to compare them.'**
+  String get fuelAndTankCompareNeedsTwo;
+
+  /// Heading of the general technical facts card (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'General fuel facts'**
+  String get fuelAndTankFactsTitle;
+
+  /// Subtitle of the general facts card (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'From the fuel standards — not measured on your car.'**
+  String get fuelAndTankFactsSubtitle;
+
+  /// General fact about a petrol grade (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel}: at least {petrol} % petrol; up to {open} % can be ethanol.'**
+  String fuelAndTankFactPetrol(String fuel, String petrol, String open);
+
+  /// General fact about E85 (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel}: at least {ethanol} % ethanol; the rest varies with the season.'**
+  String fuelAndTankFactEthanol(String fuel, String ethanol);
+
+  /// General fact about a diesel grade (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel}: at least {diesel} % diesel; up to {open} % can be biodiesel.'**
+  String fuelAndTankFactDiesel(String fuel, String diesel, String open);
+
+  /// General fact about LPG (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel}: liquefied petroleum gas, a fuel of its own.'**
+  String fuelAndTankFactLpg(String fuel);
+
+  /// General fact: E98 is an octane rating (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} names the octane rating, not the ethanol content.'**
+  String fuelAndTankFactOctane(String fuel);
+
+  /// Heading of the objective selector (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Optimise the next fill for'**
+  String get fuelAndTankObjectiveTitle;
+
+  /// Fill objective (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest cost per km'**
+  String get fuelAndTankObjectiveCost;
+
+  /// Fill objective (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest consumption'**
+  String get fuelAndTankObjectiveConsumption;
+
+  /// Fill objective (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest CO2e'**
+  String get fuelAndTankObjectiveCo2e;
+
+  /// Fill objective: cost and CO2e side by side (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Cost and CO2e'**
+  String get fuelAndTankObjectiveBalanced;
+
+  /// Fill objective (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Longest range'**
+  String get fuelAndTankObjectiveRange;
+
+  /// Heading of the next-fill guidance card (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Next fill'**
+  String get fuelAndTankNextFillTitle;
+
+  /// Next-fill outcome: one fuel is materially better (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Fill {fuel} next'**
+  String fuelAndTankOutcomeRecommend(String fuel);
+
+  /// Next-fill outcome (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'No fuel is clearly better right now'**
+  String get fuelAndTankOutcomeNoAdvantage;
+
+  /// Next-fill outcome (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough evidence to recommend a fuel yet'**
+  String get fuelAndTankOutcomeInsufficient;
+
+  /// Next-fill outcome for the balanced objective (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'A trade-off: one fuel is cheaper, another emits less'**
+  String get fuelAndTankOutcomeTradeOff;
+
+  /// Next-fill outcome (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'No priced fuel is confirmed for this vehicle'**
+  String get fuelAndTankOutcomeNoCompatible;
+
+  /// Next-fill outcome (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Approved fuels unknown — no recommendation'**
+  String get fuelAndTankOutcomeCompatibilityUnknown;
+
+  /// Caption naming the decision confidence; confidence is e.g. 'low confidence' (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Decision made with {confidence}'**
+  String fuelAndTankDecisionConfidence(String confidence);
+
+  /// Next-fill card when no offers exist (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'No price comparison possible'**
+  String get fuelAndTankNoPricesTitle;
+
+  /// Next-fill card body when no offers exist (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'None of your favourite stations has a current price for a fuel this vehicle can take. Add stations to your favourites to compare.'**
+  String get fuelAndTankNoPricesBody;
+
+  /// Where the next-fill prices come from (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Cheapest price for 1 fuel among your favourite stations} other{Cheapest prices for {count} fuels among your favourite stations}}'**
+  String fuelAndTankPricesSource(int count);
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle\'s approved fuels aren\'t set, so nothing can be recommended.'**
+  String get fuelAndTankReasonCapabilityUnknown;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not confirmed as approved in your vehicle settings.'**
+  String get fuelAndTankReasonGradeNotApproved;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The size of the next fill is unknown — set the tank capacity and log a full-tank fill-up.'**
+  String get fuelAndTankReasonFillVolumeUnknown;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The tank mix after this fill can\'t be determined.'**
+  String get fuelAndTankReasonResultingBlendUnknown;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'No consumption on record for this mix yet.'**
+  String get fuelAndTankReasonNoBehaviourEvidence;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated from how your car burns each fuel on its own.'**
+  String get fuelAndTankReasonInterpolated;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Not adjusted for driving conditions yet.'**
+  String get fuelAndTankReasonConfoundersUncontrolled;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'No CO2e factor on record for this fuel mix.'**
+  String get fuelAndTankReasonNoCo2eFactor;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Range needs the tank capacity in your vehicle settings.'**
+  String get fuelAndTankReasonCapacityUnknown;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The detour to the station isn\'t priced in.'**
+  String get fuelAndTankReasonDetourNotPriced;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The detour to the station is priced in.'**
+  String get fuelAndTankReasonDetourIncluded;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Only one fuel has a price, so there is nothing to compare.'**
+  String get fuelAndTankReasonOnlyOneCandidate;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Some fuels couldn\'t be evaluated yet.'**
+  String get fuelAndTankReasonUnevaluatedAlternatives;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The difference is smaller than the uncertainty in your data.'**
+  String get fuelAndTankReasonUncertaintyDominates;
+
+  /// Decision reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The difference is too small to be worth switching.'**
+  String get fuelAndTankReasonBelowMaterialThreshold;
+
+  /// Expandable candidate details on the next-fill card (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare the fuels'**
+  String get fuelAndTankCandidatesToggle;
+
+  /// A candidate's price per litre, formatted with its unit (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Pump price {price}'**
+  String fuelAndTankCandidatePrice(String price);
+
+  /// The litres a candidate fill assumes, formatted volume (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Filling {litres}'**
+  String fuelAndTankCandidateFill(String litres);
+
+  /// The resulting tank mix of a candidate fill (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Tank after this fill: {mix}'**
+  String fuelAndTankCandidateResultingMix(String mix);
+
+  /// A fuel left out of the decision, with the reason (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} — {reason}'**
+  String fuelAndTankExcludedLine(String fuel, String reason);
+
+  /// Cost per km advantage of the leading fuel (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} {currency}/km cheaper than {other}'**
+  String fuelAndTankTradeOffCheaper(
+    String amount,
+    String currency,
+    String other,
+  );
+
+  /// Cost per km disadvantage of the leading fuel (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} {currency}/km dearer than {other}'**
+  String fuelAndTankTradeOffDearer(
+    String amount,
+    String currency,
+    String other,
+  );
+
+  /// CO2e advantage of the leading fuel (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{grams} g CO2e/km less than {other}'**
+  String fuelAndTankTradeOffCo2eLess(String grams, String other);
+
+  /// CO2e disadvantage of the leading fuel (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{grams} g CO2e/km more than {other}'**
+  String fuelAndTankTradeOffCo2eMore(String grams, String other);
+
+  /// Break-even price of the leading fuel against an alternative (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Break-even: {fuel} at {price} costs the same per km as {other}'**
+  String fuelAndTankBreakEvenPrice(String fuel, String price, String other);
+
+  /// Break-even consumption of the leading fuel (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'At today\'s prices it ties with {other} at {consumption}'**
+  String fuelAndTankBreakEvenConsumption(String other, String consumption);
+
+  /// The price of each kg CO2e the cleaner but dearer fuel avoids, in a trade-off (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} avoids CO2e at {amount} per kg'**
+  String fuelAndTankCostPerKgCo2e(String fuel, String amount);
+
+  /// Convergence status (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'The tank already holds at least {percent} % {fuel}.'**
+  String fuelAndTankConvergenceAlready(String percent, String fuel);
+
+  /// Convergence status (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill of {fuel} brings the tank to at least {percent} %.} other{{count} fills of {fuel} bring the tank to at least {percent} %.}}'**
+  String fuelAndTankConvergenceReachable(
+    int count,
+    String fuel,
+    String percent,
+  );
+
+  /// Convergence status (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} can\'t reach {percent} % within {count} fills.'**
+  String fuelAndTankConvergenceUnreachable(
+    String fuel,
+    String percent,
+    String count,
+  );
+
+  /// Convergence status (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'How quickly the tank changes over can\'t be computed yet.'**
+  String get fuelAndTankConvergenceNotComputable;
+
+  /// Heading of fuels excluded from the decision (#4278).
+  ///
+  /// In en, this message translates to:
+  /// **'Left out'**
+  String get fuelAndTankExcludedTitle;
+
   /// Title of the per-fuel-type efficiency comparison card on the consumption-statistics page, comparing real cost-per-km across the fuels a multi-fuel vehicle has used (#2887, Epic #2881).
   ///
   /// In en, this message translates to:

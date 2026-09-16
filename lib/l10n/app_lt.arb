@@ -7797,5 +7797,912 @@
   "@shellTabDrive": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelAndTankTitle": "Fuel & Tank",
+  "@fuelAndTankTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankOpenAction": "What's in my tank?",
+  "@fuelAndTankOpenAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankNoVehicle": "Select a vehicle that runs on liquid fuel to see its tank and how it behaves on each fuel.",
+  "@fuelAndTankNoVehicle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMixTitle": "In your tank now",
+  "@fuelAndTankMixTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMixFocalAtLeast": "≥ {percent} %",
+  "@fuelAndTankMixFocalAtLeast": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixFocalExact": "{percent} %",
+  "@fuelAndTankMixFocalExact": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixShareAtLeast": "≥ {percent} % {fuel}",
+  "@fuelAndTankMixShareAtLeast": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixShareExact": "{percent} % {fuel}",
+  "@fuelAndTankMixShareExact": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixUnknownShare": "{percent} % unknown",
+  "@fuelAndTankMixUnknownShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixExplainPartial": "The shares are guaranteed minimums. The unknown part could be any of these fuels — it grows with fill-ups logged without a tank level.",
+  "@fuelAndTankMixExplainPartial": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMixExplainExact": "Every litre is accounted for by your fill-up history.",
+  "@fuelAndTankMixExplainExact": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMixUnknownTitle": "Mix unknown",
+  "@fuelAndTankMixUnknownTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMixUnknownBody": "Your fill-up history can't tell what is in the tank yet. A fill-up to a full tank makes the mix known again.",
+  "@fuelAndTankMixUnknownBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMixVolumeExact": "{litres} in the tank",
+  "@fuelAndTankMixVolumeExact": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixVolumeRange": "Between {min} and {max} in the tank",
+  "@fuelAndTankMixVolumeRange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixVolumeAtLeast": "At least {min} in the tank",
+  "@fuelAndTankMixVolumeAtLeast": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixBarSemantics": "Tank mix: {summary}",
+  "@fuelAndTankMixBarSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "summary": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompatTitle": "Fuels for this vehicle",
+  "@fuelAndTankCompatTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCompatApproved": "Approved in your vehicle settings",
+  "@fuelAndTankCompatApproved": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCompatUnconfirmed": "Fit, but not confirmed for this vehicle",
+  "@fuelAndTankCompatUnconfirmed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCompatUnknown": "This vehicle has no fuel set, so its approved fuels are unknown. Set its fuel in the vehicle settings.",
+  "@fuelAndTankCompatUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCompatHint": "Only your vehicle settings count as approval — a fuel that fits the filler neck is not necessarily approved.",
+  "@fuelAndTankCompatHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankBehaviourTitle": "How your car behaves",
+  "@fuelAndTankBehaviourTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankObservedBadge": "Your car",
+  "@fuelAndTankObservedBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMetricConsumption": "Consumption",
+  "@fuelAndTankMetricConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMetricCostPerKm": "Cost per km",
+  "@fuelAndTankMetricCostPerKm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMetricRange": "Range per tank",
+  "@fuelAndTankMetricRange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMetricCo2e": "CO2e per km",
+  "@fuelAndTankMetricCo2e": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCostPerKmValue": "{amount} {currency}/km",
+  "@fuelAndTankCostPerKmValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCo2eValue": "{grams} g/km",
+  "@fuelAndTankCo2eValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankNotEnoughEvidence": "Not enough evidence yet",
+  "@fuelAndTankNotEnoughEvidence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankProvenanceMeasured": "Measured",
+  "@fuelAndTankProvenanceMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankProvenanceEstimated": "Estimated",
+  "@fuelAndTankProvenanceEstimated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankProvenanceGeneral": "General information",
+  "@fuelAndTankProvenanceGeneral": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankSampleCount": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "@fuelAndTankSampleCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fuelAndTankConfidenceLow": "low confidence",
+  "@fuelAndTankConfidenceLow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankConfidenceMedium": "medium confidence",
+  "@fuelAndTankConfidenceMedium": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankConfidenceHigh": "high confidence",
+  "@fuelAndTankConfidenceHigh": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInterval": "95 % range {low} – {high}",
+  "@fuelAndTankInterval": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "low": {
+        "type": "String"
+      },
+      "high": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankInsufficientNoEvidence": "No data on this fuel yet",
+  "@fuelAndTankInsufficientNoEvidence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientTooFewSamples": "Too few samples so far",
+  "@fuelAndTankInsufficientTooFewSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientTooLittleDistance": "Not enough distance driven yet",
+  "@fuelAndTankInsufficientTooLittleDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientCapacityUnknown": "Needs the tank capacity in your vehicle settings",
+  "@fuelAndTankInsufficientCapacityUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientNoCo2eFactor": "No CO2e factor on record for this fuel",
+  "@fuelAndTankInsufficientNoCo2eFactor": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientContextNotPure": "Not available for a mixed tank",
+  "@fuelAndTankInsufficientContextNotPure": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientTooUncertain": "Too uncertain to show",
+  "@fuelAndTankInsufficientTooUncertain": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankUncontrolled": "Not adjusted for driving conditions yet — hills, cold starts and traffic are still in these figures.",
+  "@fuelAndTankUncontrolled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankBasisReferenceWindows": "From full-tank to full-tank fill-ups",
+  "@fuelAndTankBasisReferenceWindows": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankBasisMeasuredTrips": "From engine readings on your trips",
+  "@fuelAndTankBasisMeasuredTrips": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankBasisEstimatedTrips": "Estimated from your trips",
+  "@fuelAndTankBasisEstimatedTrips": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankBasisMeasuredResiduals": "From engine readings, adjusted for driving conditions",
+  "@fuelAndTankBasisMeasuredResiduals": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankBasisEstimatedResiduals": "Estimated, adjusted for driving conditions",
+  "@fuelAndTankBasisEstimatedResiduals": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankBasisDerived": "Calculated from your other figures",
+  "@fuelAndTankBasisDerived": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankMixedContext": "Mixed {first} + {second}",
+  "@fuelAndTankMixedContext": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankNoEvidenceRow": "Not driven on this fuel yet",
+  "@fuelAndTankNoEvidenceRow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankDetailsToggle": "How these figures are made",
+  "@fuelAndTankDetailsToggle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankModelVersions": "Behaviour model v{profile} · blend model v{blend}",
+  "@fuelAndTankModelVersions": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "blend": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareMore": "{fuel} uses {percent} % more than {other}",
+  "@fuelAndTankCompareMore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareLess": "{fuel} uses {percent} % less than {other}",
+  "@fuelAndTankCompareLess": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareSame": "{fuel} and {other} use about the same",
+  "@fuelAndTankCompareSame": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareInsufficient": "Not enough evidence yet to compare {fuel} with {other}",
+  "@fuelAndTankCompareInsufficient": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareWithinUncertainty": "The difference is still within the uncertainty.",
+  "@fuelAndTankCompareWithinUncertainty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCompareAdjusted": "Adjusted for driving conditions.",
+  "@fuelAndTankCompareAdjusted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCompareNeedsTwo": "Drive on two different fuels to compare them.",
+  "@fuelAndTankCompareNeedsTwo": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankFactsTitle": "General fuel facts",
+  "@fuelAndTankFactsTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankFactsSubtitle": "From the fuel standards — not measured on your car.",
+  "@fuelAndTankFactsSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankFactPetrol": "{fuel}: at least {petrol} % petrol; up to {open} % can be ethanol.",
+  "@fuelAndTankFactPetrol": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "petrol": {
+        "type": "String"
+      },
+      "open": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankFactEthanol": "{fuel}: at least {ethanol} % ethanol; the rest varies with the season.",
+  "@fuelAndTankFactEthanol": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "ethanol": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankFactDiesel": "{fuel}: at least {diesel} % diesel; up to {open} % can be biodiesel.",
+  "@fuelAndTankFactDiesel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "diesel": {
+        "type": "String"
+      },
+      "open": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankFactLpg": "{fuel}: liquefied petroleum gas, a fuel of its own.",
+  "@fuelAndTankFactLpg": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankFactOctane": "{fuel} names the octane rating, not the ethanol content.",
+  "@fuelAndTankFactOctane": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankObjectiveTitle": "Optimise the next fill for",
+  "@fuelAndTankObjectiveTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankObjectiveCost": "Lowest cost per km",
+  "@fuelAndTankObjectiveCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankObjectiveConsumption": "Lowest consumption",
+  "@fuelAndTankObjectiveConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankObjectiveCo2e": "Lowest CO2e",
+  "@fuelAndTankObjectiveCo2e": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankObjectiveBalanced": "Cost and CO2e",
+  "@fuelAndTankObjectiveBalanced": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankObjectiveRange": "Longest range",
+  "@fuelAndTankObjectiveRange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankNextFillTitle": "Next fill",
+  "@fuelAndTankNextFillTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankOutcomeRecommend": "Fill {fuel} next",
+  "@fuelAndTankOutcomeRecommend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankOutcomeNoAdvantage": "No fuel is clearly better right now",
+  "@fuelAndTankOutcomeNoAdvantage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankOutcomeInsufficient": "Not enough evidence to recommend a fuel yet",
+  "@fuelAndTankOutcomeInsufficient": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankOutcomeTradeOff": "A trade-off: one fuel is cheaper, another emits less",
+  "@fuelAndTankOutcomeTradeOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankOutcomeNoCompatible": "No priced fuel is confirmed for this vehicle",
+  "@fuelAndTankOutcomeNoCompatible": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankOutcomeCompatibilityUnknown": "Approved fuels unknown — no recommendation",
+  "@fuelAndTankOutcomeCompatibilityUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankDecisionConfidence": "Decision made with {confidence}",
+  "@fuelAndTankDecisionConfidence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "confidence": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankNoPricesTitle": "No price comparison possible",
+  "@fuelAndTankNoPricesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankNoPricesBody": "None of your favourite stations has a current price for a fuel this vehicle can take. Add stations to your favourites to compare.",
+  "@fuelAndTankNoPricesBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankPricesSource": "{count, plural, =1{Cheapest price for 1 fuel among your favourite stations} other{Cheapest prices for {count} fuels among your favourite stations}}",
+  "@fuelAndTankPricesSource": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fuelAndTankReasonCapabilityUnknown": "This vehicle's approved fuels aren't set, so nothing can be recommended.",
+  "@fuelAndTankReasonCapabilityUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonGradeNotApproved": "Not confirmed as approved in your vehicle settings.",
+  "@fuelAndTankReasonGradeNotApproved": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonFillVolumeUnknown": "The size of the next fill is unknown — set the tank capacity and log a full-tank fill-up.",
+  "@fuelAndTankReasonFillVolumeUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonResultingBlendUnknown": "The tank mix after this fill can't be determined.",
+  "@fuelAndTankReasonResultingBlendUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonNoBehaviourEvidence": "No consumption on record for this mix yet.",
+  "@fuelAndTankReasonNoBehaviourEvidence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonInterpolated": "Estimated from how your car burns each fuel on its own.",
+  "@fuelAndTankReasonInterpolated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonConfoundersUncontrolled": "Not adjusted for driving conditions yet.",
+  "@fuelAndTankReasonConfoundersUncontrolled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonNoCo2eFactor": "No CO2e factor on record for this fuel mix.",
+  "@fuelAndTankReasonNoCo2eFactor": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonCapacityUnknown": "Range needs the tank capacity in your vehicle settings.",
+  "@fuelAndTankReasonCapacityUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonDetourNotPriced": "The detour to the station isn't priced in.",
+  "@fuelAndTankReasonDetourNotPriced": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonDetourIncluded": "The detour to the station is priced in.",
+  "@fuelAndTankReasonDetourIncluded": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonOnlyOneCandidate": "Only one fuel has a price, so there is nothing to compare.",
+  "@fuelAndTankReasonOnlyOneCandidate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonUnevaluatedAlternatives": "Some fuels couldn't be evaluated yet.",
+  "@fuelAndTankReasonUnevaluatedAlternatives": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonUncertaintyDominates": "The difference is smaller than the uncertainty in your data.",
+  "@fuelAndTankReasonUncertaintyDominates": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankReasonBelowMaterialThreshold": "The difference is too small to be worth switching.",
+  "@fuelAndTankReasonBelowMaterialThreshold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCandidatesToggle": "Compare the fuels",
+  "@fuelAndTankCandidatesToggle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankCandidatePrice": "Pump price {price}",
+  "@fuelAndTankCandidatePrice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCandidateFill": "Filling {litres}",
+  "@fuelAndTankCandidateFill": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCandidateResultingMix": "Tank after this fill: {mix}",
+  "@fuelAndTankCandidateResultingMix": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "mix": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankExcludedLine": "{fuel} — {reason}",
+  "@fuelAndTankExcludedLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankTradeOffCheaper": "{amount} {currency}/km cheaper than {other}",
+  "@fuelAndTankTradeOffCheaper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankTradeOffDearer": "{amount} {currency}/km dearer than {other}",
+  "@fuelAndTankTradeOffDearer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankTradeOffCo2eLess": "{grams} g CO2e/km less than {other}",
+  "@fuelAndTankTradeOffCo2eLess": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankTradeOffCo2eMore": "{grams} g CO2e/km more than {other}",
+  "@fuelAndTankTradeOffCo2eMore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankBreakEvenPrice": "Break-even: {fuel} at {price} costs the same per km as {other}",
+  "@fuelAndTankBreakEvenPrice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankBreakEvenConsumption": "At today's prices it ties with {other} at {consumption}",
+  "@fuelAndTankBreakEvenConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "other": {
+        "type": "String"
+      },
+      "consumption": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCostPerKgCo2e": "{fuel} avoids CO2e at {amount} per kg",
+  "@fuelAndTankCostPerKgCo2e": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankConvergenceAlready": "The tank already holds at least {percent} % {fuel}.",
+  "@fuelAndTankConvergenceAlready": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankConvergenceReachable": "{count, plural, =1{1 fill of {fuel} brings the tank to at least {percent} %.} other{{count} fills of {fuel} bring the tank to at least {percent} %.}}",
+  "@fuelAndTankConvergenceReachable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "fuel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankConvergenceUnreachable": "{fuel} can't reach {percent} % within {count} fills.",
+  "@fuelAndTankConvergenceUnreachable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankConvergenceNotComputable": "How quickly the tank changes over can't be computed yet.",
+  "@fuelAndTankConvergenceNotComputable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankExcludedTitle": "Left out",
+  "@fuelAndTankExcludedTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
