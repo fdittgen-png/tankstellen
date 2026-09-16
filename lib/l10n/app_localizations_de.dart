@@ -1825,48 +1825,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get vehicleAdapterForget => 'Adapter vergessen';
 
   @override
-  String get achievementsTitle => 'Erfolge';
-
-  @override
-  String get achievementFirstTrip => 'Erste Fahrt';
-
-  @override
-  String get achievementFirstTripDesc => 'Zeichne deine erste OBD2-Fahrt auf.';
-
-  @override
-  String get achievementFirstFillUp => 'Erste Tankung';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Trage deine erste Tankung ein.';
-
-  @override
-  String get achievementTenTrips => '10 Fahrten';
-
-  @override
-  String get achievementTenTripsDesc => 'Zeichne 10 OBD2-Fahrten auf.';
-
-  @override
-  String get achievementZeroHarsh => 'Ruhiger Fahrer';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Schließe eine Fahrt von mindestens 10 km ohne starkes Bremsen oder Beschleunigen ab.';
-
-  @override
-  String get achievementEcoWeek => 'Öko-Woche';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Fahre 7 Tage in Folge mit mindestens einer ruhigen Fahrt pro Tag.';
-
-  @override
-  String get achievementPriceWin => 'Preis-Treffer';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Trage eine Tankung ein, die den 30-Tage-Durchschnitt der Station um mindestens 5 % schlägt.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Gelernte Fahrzeugprofile teilen';
 
   @override
@@ -3323,27 +3281,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Weniger Kraftstoffarten anzeigen';
-
-  @override
-  String get achievementSmoothDriver => 'Ruhige Serie';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Fahre 5 Fahrten in Folge mit einem Fahrstil-Score von 80 oder höher.';
-
-  @override
-  String get achievementColdStartAware => 'Kaltstart-Profi';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Halte den Kaltstart-Mehrverbrauch eines ganzen Monats unter 2 % des Gesamtverbrauchs – fasse kurze Fahrten zusammen.';
-
-  @override
-  String get achievementHighwayMaster => 'Autobahn-Meister';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Fahre eine Tour von mindestens 30 km mit gleichmäßigem Tempo und einem Fahrstil-Score von 90 oder höher.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4891,13 +4828,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Fahrten automatisch über OBD2 aufzeichnen.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
-
-  @override
-  String get featureDescription_gamification =>
-      'Fahrwertungen und Auszeichnungen.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptischer Eco-Coach';
 
   @override
@@ -4993,10 +4923,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Verbrauchsanalyse-Tab in der unteren Navigationsleiste anzeigen.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Aktiviere zuerst die OBD2-Fahrtaufzeichnung';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5594,13 +5520,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Regelbasiert ordnet jede Fahrprobe genau einer Situation zu. Fuzzy verteilt sie auf alle, je nachdem wie gut sie passen — ruhiger rund um 60 km/h oder bei wechselnden Steigungen, aber langsamer beim Befüllen aller Kategorien.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Erfolge & Punkte anzeigen';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Wenn aus, sind Abzeichen, Punkte und Pokal-Symbole überall ausgeblendet.';
 
   @override
   String gdprPolicyLink(int version) {

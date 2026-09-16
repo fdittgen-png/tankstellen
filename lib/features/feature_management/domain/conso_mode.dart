@@ -49,7 +49,7 @@ ConsoMode consoModeFromFlags(Set<Feature> enabled) {
 ///
 /// Other Conso-adjacent flags (`autoRecord`, `gpsTripPath`,
 /// `hapticEcoCoach`, `glideCoach`, `consumptionAnalytics`,
-/// `gamification`, `loyaltyCards`) are NOT touched here — they are
+/// `loyaltyCards`) are NOT touched here — they are
 /// independent opt-ins inside the Trajets-tier. Switching modes only
 /// rewrites the three flags that gate the surface itself.
 ({Set<Feature> toAdd, Set<Feature> toRemove}) consoModeFlagDelta(

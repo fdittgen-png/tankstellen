@@ -204,7 +204,7 @@ String _$buildChannelHash() => r'19d064de2926f0eb9ef2781dd22f3b5801cbb0b0';
 ///
 /// This phase ships the system in PARALLEL with the existing scattered
 /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
-/// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
+/// `autoRecord`, `hapticEcoCoachEnabled`, etc.
 /// through this provider one feature at a time.
 ///
 /// ## AsyncNotifier (#1681)
@@ -233,7 +233,7 @@ final featureFlagsProvider = FeatureFlagsProvider._();
 ///
 /// This phase ships the system in PARALLEL with the existing scattered
 /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
-/// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
+/// `autoRecord`, `hapticEcoCoachEnabled`, etc.
 /// through this provider one feature at a time.
 ///
 /// ## AsyncNotifier (#1681)
@@ -260,7 +260,7 @@ final class FeatureFlagsProvider
   ///
   /// This phase ships the system in PARALLEL with the existing scattered
   /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
-  /// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
+  /// `autoRecord`, `hapticEcoCoachEnabled`, etc.
   /// through this provider one feature at a time.
   ///
   /// ## AsyncNotifier (#1681)
@@ -306,7 +306,7 @@ String _$featureFlagsHash() => r'd2e22b699e96e8400f9bf770c97730f339a299ca';
 ///
 /// This phase ships the system in PARALLEL with the existing scattered
 /// toggles — no consumer is migrated yet. Phase 3 of #1373 will route
-/// `autoRecord`, `gamificationEnabled`, `hapticEcoCoachEnabled`, etc.
+/// `autoRecord`, `hapticEcoCoachEnabled`, etc.
 /// through this provider one feature at a time.
 ///
 /// ## AsyncNotifier (#1681)

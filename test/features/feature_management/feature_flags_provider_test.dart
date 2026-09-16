@@ -94,7 +94,7 @@ void main() {
       final state = c.read(enabledFeaturesProvider);
       expect(state, FeatureManifest.defaultManifest.defaultEnabledSet());
       // Sanity-check a few that should default true / false respectively.
-      expect(state, contains(Feature.gamification));
+      expect(state, contains(Feature.gpsTripPath));
       expect(state, contains(Feature.priceAlerts));
       expect(state, isNot(contains(Feature.obd2TripRecording)));
       expect(state, isNot(contains(Feature.tankSync)));
@@ -102,54 +102,54 @@ void main() {
   });
 
   group('FeatureFlags.enable / disable', () {
-    test('enable(gamification) throws when obd2TripRecording is disabled',
+    test('enable(gpsTripPath) throws when obd2TripRecording is disabled',
         () async {
       final c = makeContainer();
       await pumpLoad(c);
-      // Defaults: gamification is in the set but obd2TripRecording is not.
-      // To trigger the guard we first remove gamification, then attempt to
+      // Defaults: gpsTripPath is in the set but obd2TripRecording is not.
+      // To trigger the guard we first remove gpsTripPath, then attempt to
       // re-enable it without its prerequisite.
-      await c.read(featureFlagsProvider.notifier).disable(Feature.gamification);
+      await c.read(featureFlagsProvider.notifier).disable(Feature.gpsTripPath);
       expect(
-        () => c.read(featureFlagsProvider.notifier).enable(Feature.gamification),
+        () => c.read(featureFlagsProvider.notifier).enable(Feature.gpsTripPath),
         throwsA(isA<StateError>().having(
           (e) => e.message,
           'message',
-          allOf(contains('Cannot enable gamification'),
+          allOf(contains('Cannot enable gpsTripPath'),
               contains('obd2TripRecording')),
         )),
       );
     });
 
-    test('enable(obd2TripRecording) then enable(gamification) succeeds',
+    test('enable(obd2TripRecording) then enable(gpsTripPath) succeeds',
         () async {
       final c = makeContainer();
       await pumpLoad(c);
       await c
           .read(featureFlagsProvider.notifier)
-          .disable(Feature.gamification);
+          .disable(Feature.gpsTripPath);
       await c
           .read(featureFlagsProvider.notifier)
           .enable(Feature.obd2TripRecording);
       await c
           .read(featureFlagsProvider.notifier)
-          .enable(Feature.gamification);
+          .enable(Feature.gpsTripPath);
 
       final state = c.read(enabledFeaturesProvider);
       expect(state, contains(Feature.obd2TripRecording));
-      expect(state, contains(Feature.gamification));
+      expect(state, contains(Feature.gpsTripPath));
     });
 
     test(
-        'disable(obd2TripRecording) succeeds while gamification is enabled — '
-        'gamification stays in stored set but is effectively disabled (#1447)',
+        'disable(obd2TripRecording) succeeds while gpsTripPath is enabled — '
+        'gpsTripPath stays in stored set but is effectively disabled (#1447)',
         () async {
       final c = makeContainer();
       await pumpLoad(c);
       await c
           .read(featureFlagsProvider.notifier)
           .enable(Feature.obd2TripRecording);
-      expect(c.read(enabledFeaturesProvider), contains(Feature.gamification));
+      expect(c.read(enabledFeaturesProvider), contains(Feature.gpsTripPath));
 
       // Cascading-disable: parent comes off, child stays in storage so the
       // user's preference is preserved, but the user-visible "is this
@@ -162,20 +162,20 @@ void main() {
       expect(state, isNot(contains(Feature.obd2TripRecording)));
       expect(
         state,
-        contains(Feature.gamification),
+        contains(Feature.gpsTripPath),
         reason:
             'Child stored state must be preserved on parent-disable so '
             're-enabling the parent restores the prior setup.',
       );
       expect(
         isEffectivelyEnabled(
-          Feature.gamification,
+          Feature.gpsTripPath,
           FeatureManifest.defaultManifest,
           state,
         ),
         isFalse,
         reason:
-            'With obd2TripRecording off, gamification is not effectively '
+            'With obd2TripRecording off, gpsTripPath is not effectively '
             'enabled regardless of its stored value.',
       );
 
@@ -186,7 +186,7 @@ void main() {
           .enable(Feature.obd2TripRecording);
       expect(
         isEffectivelyEnabled(
-          Feature.gamification,
+          Feature.gpsTripPath,
           FeatureManifest.defaultManifest,
           c.read(enabledFeaturesProvider),
         ),
@@ -239,18 +239,18 @@ void main() {
   group('FeatureFlags cycle detection', () {
     test('build throws when the manifest contains a cycle', () async {
       const cyclic = FeatureManifest({
-        Feature.gamification: FeatureManifestEntry.allChannels(
-          feature: Feature.gamification,
-          defaultOn: false,
-          requires: {Feature.hapticEcoCoach},
-          displayName: 'gamification',
-          description: 'cycle test',
-        ),
         Feature.hapticEcoCoach: FeatureManifestEntry.allChannels(
           feature: Feature.hapticEcoCoach,
           defaultOn: false,
-          requires: {Feature.gamification},
+          requires: {Feature.glideCoach},
           displayName: 'hapticEcoCoach',
+          description: 'cycle test',
+        ),
+        Feature.glideCoach: FeatureManifestEntry.allChannels(
+          feature: Feature.glideCoach,
+          defaultOn: false,
+          requires: {Feature.hapticEcoCoach},
+          displayName: 'glideCoach',
           description: 'cycle test',
         ),
       });

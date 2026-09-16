@@ -113,7 +113,6 @@ const _baseline = <String, int>{
     'lib/core/widgets/charts/monthly_bar_chart_base.dart': 1,
     'lib/core/widgets/section_card.dart': 1,
     'lib/core/widgets/station_card_shell.dart': 1,
-    'lib/features/achievements/presentation/widgets/badge_shelf.dart': 1,
     'lib/features/carbon/presentation/widgets/_speed_bars.dart': 2,
     'lib/features/driving/presentation/widgets/driving_bottom_bar.dart': 2,
     'lib/features/driving/presentation/widgets/driving_station_sheet.dart': 1,

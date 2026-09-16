@@ -58,7 +58,7 @@ const List<FeatureCategory> categoryOrder = <FeatureCategory>[
 ///
 /// Note: the Conso-card-internal flags (`obd2TripRecording`,
 /// `manualConsumption`, `showConsumptionTab`) and the Conso dependents
-/// (`consumptionAnalytics`, `gamification`, `hapticEcoCoach`,
+/// (`consumptionAnalytics`, `hapticEcoCoach`,
 /// `glideCoach`, `gpsTripPath`, `autoRecord`, `experimentalOemPids`) all
 /// map to [FeatureCategory.consumption] because the Conso card — pinned
 /// to that section — owns their rendering. `obd2Optional` and
@@ -90,7 +90,6 @@ const Map<Feature, FeatureCategory> featureCategory = <Feature, FeatureCategory>
   Feature.manualConsumption: FeatureCategory.consumption,
   Feature.showConsumptionTab: FeatureCategory.consumption,
   Feature.consumptionAnalytics: FeatureCategory.consumption,
-  Feature.gamification: FeatureCategory.consumption,
   Feature.hapticEcoCoach: FeatureCategory.consumption,
   Feature.glideCoach: FeatureCategory.consumption,
   Feature.gpsTripPath: FeatureCategory.consumption,

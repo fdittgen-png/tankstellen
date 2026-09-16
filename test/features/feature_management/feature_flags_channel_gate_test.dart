@@ -23,7 +23,7 @@ void main() {
   //                         in beta only (opt-out in beta, opt-in in
   //                         production).
   const everywhere = Feature.priceAlerts;
-  const betaOnly = Feature.gamification;
+  const betaOnly = Feature.hapticEcoCoach;
   const perChannelDefault = Feature.priceHistory;
   const manifest = FeatureManifest({
     everywhere: FeatureManifestEntry.allChannels(

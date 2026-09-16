@@ -1069,19 +1069,6 @@
   "vehicleAdapterUnnamed": "Unknown adapter",
   "vehicleAdapterPair": "Pair adapter",
   "vehicleAdapterForget": "Forget adapter",
-  "achievementsTitle": "Achievements",
-  "achievementFirstTrip": "First trip",
-  "achievementFirstTripDesc": "Record your first OBD2 trip.",
-  "achievementFirstFillUp": "First fill-up",
-  "achievementFirstFillUpDesc": "Log your first fill-up.",
-  "achievementTenTrips": "10 trips",
-  "achievementTenTripsDesc": "Record 10 OBD2 trips.",
-  "achievementZeroHarsh": "Smooth driver",
-  "achievementZeroHarshDesc": "Complete a trip of 10 km or more with no harsh braking or acceleration.",
-  "achievementEcoWeek": "Eco week",
-  "achievementEcoWeekDesc": "Drive 7 consecutive days with at least one smooth trip each day.",
-  "achievementPriceWin": "Price win",
-  "achievementPriceWinDesc": "Log a fill-up that beats the station's 30-day average by 5 % or more.",
   "syncBaselinesToggleTitle": "Share learned vehicle profiles",
   "syncBaselinesToggleSubtitle": "Upload per-vehicle consumption baselines so a second device can reuse them.",
   "obd2StatusConnected": "OBD2 adapter: connected",
@@ -2092,30 +2079,6 @@
   "showFewerFuelTypes": "Show fewer fuel types",
   "@showFewerFuelTypes": {
     "description": "Collapses the station-detail price history back to one fuel type; the counterpart of showAllFuelTypes (#3990)."
-  },
-  "achievementSmoothDriver": "Smooth streak",
-  "@achievementSmoothDriver": {
-    "description": "Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5)."
-  },
-  "achievementSmoothDriverDesc": "Drive 5 trips in a row with a smooth-driving score of 80 or higher.",
-  "@achievementSmoothDriverDesc": {
-    "description": "Tooltip for the smoothDriver badge (#1041 phase 5)."
-  },
-  "achievementColdStartAware": "Cold-start aware",
-  "@achievementColdStartAware": {
-    "description": "Title of the coldStartAware badge — whole month with cold-start excess <2% of total fuel (#1041 phase 5)."
-  },
-  "achievementColdStartAwareDesc": "Keep a whole month's cold-start fuel cost under 2 % of total fuel — combine short trips.",
-  "@achievementColdStartAwareDesc": {
-    "description": "Tooltip for the coldStartAware badge (#1041 phase 5)."
-  },
-  "achievementHighwayMaster": "Highway master",
-  "@achievementHighwayMaster": {
-    "description": "Title of the highwayMaster badge — single 30km+ trip at consistent speed with driving-score >= 90 (#1041 phase 5)."
-  },
-  "achievementHighwayMasterDesc": "Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.",
-  "@achievementHighwayMasterDesc": {
-    "description": "Tooltip for the highwayMaster badge (#1041 phase 5)."
   },
   "priceAlertNotificationTitle": "{station} - {fuelType}",
   "@priceAlertNotificationTitle": {
@@ -4317,14 +4280,6 @@
   "@featureDescription_obd2TripRecording": {
     "description": "One-line description for the OBD2 trip recording feature."
   },
-  "featureLabel_gamification": "Gamification",
-  "@featureLabel_gamification": {
-    "description": "Display name for the gamification feature in the Feature management list."
-  },
-  "featureDescription_gamification": "Driving scores and earned badges.",
-  "@featureDescription_gamification": {
-    "description": "One-line description for the gamification feature."
-  },
   "featureLabel_hapticEcoCoach": "Haptic eco-coach",
   "@featureLabel_hapticEcoCoach": {
     "description": "Display name for the haptic eco-coach feature in the Feature management list."
@@ -4436,10 +4391,6 @@
   "featureDescription_showConsumptionTab": "Show the consumption analytics tab in the bottom navigation.",
   "@featureDescription_showConsumptionTab": {
     "description": "One-line description for the consumption-tab visibility feature gate."
-  },
-  "featureBlockedEnable_gamification": "Enable OBD2 trip recording first",
-  "@featureBlockedEnable_gamification": {
-    "description": "Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off."
   },
   "featureBlockedEnable_hapticEcoCoach": "Enable OBD2 trip recording first",
   "@featureBlockedEnable_hapticEcoCoach": {
@@ -5210,14 +5161,6 @@
     "description": "Fuzzy calibration option (#894) — each sample contributes to all situations weighted by membership."
   },
   "calibrationModeTooltip": "Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.",
-  "profileGamificationToggleTitle": "Show achievements & scores",
-  "@profileGamificationToggleTitle": {
-    "description": "Title of the master gamification opt-out switch on the profile / settings screen (#1194)."
-  },
-  "profileGamificationToggleSubtitle": "When off, badges, scores and trophy icons are hidden across the app.",
-  "@profileGamificationToggleSubtitle": {
-    "description": "Subtitle explaining what the gamification opt-out toggle hides (#1194)."
-  },
   "gdprPolicyLink": "Privacy policy (version {version})",
   "@gdprPolicyLink": {
     "description": "Link label on the consent screen and in Settings → Privacy & data; opens the online privacy policy.",

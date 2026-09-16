@@ -14,7 +14,6 @@ import 'package:tankstellen/features/fill_ups/data/exporters/backup/backup_zippe
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/consumption/presentation/screens/consumption_screen.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/backup_restore_flow.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import '../../../../helpers/pump_app.dart';
@@ -84,7 +83,6 @@ Future<void> _pumpScreen(WidgetTester tester) async {
     ),
     overrides: [
       settingsStorageProvider.overrideWithValue(storage),
-      gamificationEnabledProvider.overrideWithValue(true),
     ],
   );
 }

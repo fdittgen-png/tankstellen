@@ -16,8 +16,6 @@ import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/swipe_to_delete.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../achievements/presentation/widgets/badge_shelf.dart';
-import '../../../profile/providers/gamification_enabled_provider.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
 import '../../domain/entities/consumption_stats.dart';
 import '../../domain/entities/fill_up.dart';
@@ -56,7 +54,6 @@ class FuelTab extends ConsumerWidget {
         topBiased: true,
       );
     }
-    final showGamification = ref.watch(gamificationEnabledProvider);
     final activeVehicle = ref.watch(activeVehicleProfileProvider);
     // #2494 — clears the floating add-fill-up FAB hosted by PageScaffold.
     // The Scaffold lifts the FAB clear of the system inset, so we must NOT
@@ -76,7 +73,6 @@ class FuelTab extends ConsumerWidget {
         icon: Icons.tips_and_updates_outlined,
         message: l.helpBannerConsumption,
       ),
-      if (showGamification) const BadgeShelf(),
       // #3917 — the last fill's "Bilan du plein" stays pinned until the
       // next fill replaces it (self-hides without one).
       const FillInventoryCard(),

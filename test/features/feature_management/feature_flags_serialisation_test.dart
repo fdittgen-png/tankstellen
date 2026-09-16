@@ -67,12 +67,12 @@ void main() {
 
     // Fire both before either persists — the race window.
     await Future.wait([
-      flags.enable(Feature.gamification),
+      flags.enable(Feature.hapticEcoCoach),
       flags.enable(Feature.glideCoach),
     ]);
 
     final result = await container.read(featureFlagsProvider.future);
-    expect(result, contains(Feature.gamification));
+    expect(result, contains(Feature.hapticEcoCoach));
     expect(result, contains(Feature.glideCoach),
         reason: 'the second mutation must read the first one\'s result, '
             'not the set from before it');
@@ -83,16 +83,16 @@ void main() {
       () async {
     final flags = container.read(featureFlagsProvider.notifier);
     await container.read(featureFlagsProvider.future);
-    await flags.enable(Feature.gamification);
+    await flags.enable(Feature.hapticEcoCoach);
 
     await Future.wait([
       flags.enable(Feature.glideCoach),
-      flags.disable(Feature.gamification),
+      flags.disable(Feature.hapticEcoCoach),
     ]);
 
     final result = await container.read(featureFlagsProvider.future);
     expect(result, contains(Feature.glideCoach));
-    expect(result, isNot(contains(Feature.gamification)));
+    expect(result, isNot(contains(Feature.hapticEcoCoach)));
   });
 
   test('a failed mutation does not poison the queue', () async {
@@ -105,9 +105,9 @@ void main() {
       flags.enable(Feature.voiceAnnouncements),
       throwsStateError,
     );
-    await flags.enable(Feature.gamification);
+    await flags.enable(Feature.hapticEcoCoach);
 
     expect(await container.read(featureFlagsProvider.future),
-        contains(Feature.gamification));
+        contains(Feature.hapticEcoCoach));
   });
 }

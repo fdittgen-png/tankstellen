@@ -1818,48 +1818,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get vehicleAdapterForget => 'Pašalinti adapterį';
 
   @override
-  String get achievementsTitle => 'Pasiekimai';
-
-  @override
-  String get achievementFirstTrip => 'Pirmoji kelionė';
-
-  @override
-  String get achievementFirstTripDesc => 'Įrašykite pirmą OBD2 kelionę.';
-
-  @override
-  String get achievementFirstFillUp => 'Pirmasis tankavimas';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Įveskite pirmą tankavimą.';
-
-  @override
-  String get achievementTenTrips => '10 kelionių';
-
-  @override
-  String get achievementTenTripsDesc => 'Įrašykite 10 OBD2 kelionių.';
-
-  @override
-  String get achievementZeroHarsh => 'Sklandus vairuotojas';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Įveikite 10 km ar ilgesnę kelionę be staigaus stabdymo ar greitinimo.';
-
-  @override
-  String get achievementEcoWeek => 'Eko savaitė';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Vairuokite 7 dienas iš eilės, kiekvieną dieną turint bent vieną sklandų reisą.';
-
-  @override
-  String get achievementPriceWin => 'Kainų laimėjimas';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Įveskite tankavimą, kuris yra 5% ar daugiau žemiau stotelės 30 dienų vidurkio.';
-
-  @override
   String get syncBaselinesToggleTitle =>
       'Bendrinti išmokytus transporto priemonių profilius';
 
@@ -3326,27 +3284,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Sklandaus vairavimo serija';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Vairuokite 5 keliones iš eilės su sklandaus vairavimo balu 80 ar daugiau.';
-
-  @override
-  String get achievementColdStartAware => 'Šaltojo paleidimo sąmoningumas';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Išlaikykite visą mėnesio šaltojo paleidimo kuro kainą žemiau 2% viso kuro — sujunkite trumpas keliones.';
-
-  @override
-  String get achievementHighwayMaster => 'Greitkelio meistras';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Įvykdykite 30 km+ kelionę pastoviu greičiu su sklandaus vairavimo balu 90 ar daugiau.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4886,13 +4823,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Automatiškai fiksuoti keliones per OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Žaidybinimas';
-
-  @override
-  String get featureDescription_gamification =>
-      'Vairavimo balai ir uždirbti ženkleliai.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptinis eko treneris';
 
   @override
@@ -4989,10 +4919,6 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Rodyti suvartojimo analizės skirtuką apatinėje naršymo juostoje.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Pirmiausia įjunkite OBD2 kelionių įrašymą';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5591,13 +5517,6 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Taisyklėmis pagrįstas kiekvieną vairavimo pavyzdį priskiria lygiai vienai situacijai. Neapibrėžtas paskirsto jį po visas pagal tai, kiek kiekviena tinka — sklandžiau ties 60 km/h ar kintančiais nuolydžiais, bet lėčiau užpildo visus segmentus.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Rodyti pasiekimus ir balus';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Kai išjungta, ženkleliai, balai ir trofėjaus piktogramos slepiamos visoje programoje.';
 
   @override
   String gdprPolicyLink(int version) {

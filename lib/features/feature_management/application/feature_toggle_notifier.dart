@@ -11,7 +11,7 @@ import 'feature_flags_provider.dart';
 /// feature-flag set (#3175).
 ///
 /// THE single shared `build` body behind every per-feature toggle shim
-/// (`gamificationEnabledProvider`, `showFuelEnabledProvider`,
+/// (`showFuelEnabledProvider`,
 /// `glideCoachEnabledProvider`, …). Gates on the **effective** state
 /// (#1447): if any ancestor on the manifest's `requires` chain is
 /// disabled, this surfaces as `false` regardless of the stored value —
@@ -27,7 +27,7 @@ bool watchEffectiveFeature(Ref ref, Feature feature) {
 /// Shared implementation for the per-feature toggle notifiers (#3175).
 ///
 /// Nine near-identical ~80-line shims (the profile show-toggles,
-/// gamification, baseline-sync, haptic-eco-coach, …) carried copies of
+/// baseline-sync, haptic-eco-coach, …) carried copies of
 /// the same `build` + `set` logic; this mixin is now the single home
 /// for both. Each shim keeps its public provider name (so no call site,
 /// override, or fake changes) and shrinks to a `feature` getter plus a
@@ -38,7 +38,7 @@ bool watchEffectiveFeature(Ref ref, Feature feature) {
 /// [featureFlagsProvider]'s `enable` / `disable` throw [StateError] when
 /// a prerequisite is missing or a dependent blocks disabling. The shims
 /// historically disagreed on what to do with it: most swallowed it
-/// (gamification, baseline-sync, the show-toggles), while the
+/// (baseline-sync, the show-toggles), while the
 /// haptic-eco-coach shim let it surface (#1608). Unified here on the
 /// **swallow** variant as the safest: every settings UI already
 /// pre-checks `canEnable` / `blockingDisable` before invoking the

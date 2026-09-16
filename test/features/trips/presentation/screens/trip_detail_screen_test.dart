@@ -14,7 +14,6 @@ import 'package:tankstellen/features/trips/presentation/screens/trip_detail_scre
 import 'package:tankstellen/features/trips/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/trips/providers/trip_fuel_cost_provider.dart';
 import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import '../../../../helpers/silence_error_logger.dart';
@@ -159,7 +158,6 @@ Future<({_FixedTripHistoryList tripsNotifier})> _pumpDetail(
       // #1194 — TripDetailBody now reads gamificationEnabledProvider;
       // override here so it doesn't fall through to the central
       // featureFlagsProvider chain that these tests don't seed.
-      gamificationEnabledProvider.overrideWithValue(true),
       // #1209 — TripSummaryCard now watches tripFuelCostProvider, which
       // composes fillUpListProvider (Hive-backed). These tests don't
       // seed Hive; return null so the cost row hides cleanly.

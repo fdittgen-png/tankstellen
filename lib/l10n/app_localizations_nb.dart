@@ -1814,48 +1814,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get vehicleAdapterForget => 'Glem adapter';
 
   @override
-  String get achievementsTitle => 'Prestasjoner';
-
-  @override
-  String get achievementFirstTrip => 'Første tur';
-
-  @override
-  String get achievementFirstTripDesc => 'Registrer din første OBD2-tur.';
-
-  @override
-  String get achievementFirstFillUp => 'Første tanking';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Logg din første tanking.';
-
-  @override
-  String get achievementTenTrips => '10 turer';
-
-  @override
-  String get achievementTenTripsDesc => 'Registrer 10 OBD2-turer.';
-
-  @override
-  String get achievementZeroHarsh => 'Jevn sjåfør';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Fullfør en tur på 10 km eller mer uten hard bremsing eller akselerasjon.';
-
-  @override
-  String get achievementEcoWeek => 'Økouke';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Kjør 7 påfølgende dager med minst én jevn tur hver dag.';
-
-  @override
-  String get achievementPriceWin => 'Prisgevinst';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Logg en tanking som slår stasjonens 30-dagers gjennomsnitt med 5 % eller mer.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Del innlærte kjøretøyprofiler';
 
   @override
@@ -3303,27 +3261,6 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Jevn kjørerekke';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Kjør 5 turer på rad med kjørescore på 80 eller høyere.';
-
-  @override
-  String get achievementColdStartAware => 'Kaldstartbevisst';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Hold en hel måneds kaldstartdrivstoffkostnad under 2 % av totalt drivstoff – kombiner korte turer.';
-
-  @override
-  String get achievementHighwayMaster => 'Motorveimester';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Fullfør en tur på 30+ km med konstant hastighet og kjørescore på 90 eller høyere.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4861,13 +4798,6 @@ class AppLocalizationsNb extends AppLocalizations {
       'Ta opp turer automatisk via OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamifisering';
-
-  @override
-  String get featureDescription_gamification =>
-      'Kjørepoeng og opptjente merker.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptisk øko-coach';
 
   @override
@@ -4964,10 +4894,6 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Vis forbruksanalyse-fanen i bunnnavigasjonen.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Aktiver OBD2-turregistrering først';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5562,13 +5488,6 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Regelbasert tildeler hver kjøreprøve til nøyaktig én situasjon. Fuzzy fordeler den på tvers av alle basert på hvor godt hver passer – jevnere rundt 60 km/h eller skiftende stigning, men tregere til å fylle alle bøtter.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Vis prestasjoner og poeng';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Når av, er merker, poeng og trofé-ikoner skjult i hele appen.';
 
   @override
   String gdprPolicyLink(int version) {

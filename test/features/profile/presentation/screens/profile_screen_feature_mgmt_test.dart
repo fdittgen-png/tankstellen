@@ -141,7 +141,7 @@ void main() {
         }
         expect(
           Feature.values.length,
-          33,
+          32,
           reason:
               '#1373 phase 1 shipped 13 features; phase 3d added '
               'autoRecord (14); phase 3c bundled showFuel + showElectric + '
@@ -214,22 +214,22 @@ void main() {
     );
 
     testWidgets(
-      'enabling gamification while obd2TripRecording is OFF is blocked '
+      'enabling gpsTripPath while obd2TripRecording is OFF is blocked '
       '(switch disabled + tooltip names the prerequisite)',
       (tester) async {
         final container = ProviderContainer(overrides: baseOverrides.cast());
         addTearDown(container.dispose);
 
-        // Defaults: gamification is ON, obd2TripRecording is OFF. To set
-        // up the blocked-enable scenario we first turn gamification off
+        // Defaults: gpsTripPath is ON, obd2TripRecording is OFF. To set
+        // up the blocked-enable scenario we first turn gpsTripPath off
         // (which is allowed because no other dependent is enabled).
         await container
             .read(featureFlagsProvider.notifier)
-            .disable(Feature.gamification);
+            .disable(Feature.gpsTripPath);
         // Sanity: we are now in the state we want to test against.
         expect(
           container.read(enabledFeaturesProvider),
-          isNot(contains(Feature.gamification)),
+          isNot(contains(Feature.gpsTripPath)),
         );
         expect(
           container.read(enabledFeaturesProvider),
@@ -251,14 +251,14 @@ void main() {
         await tester.pumpAndSettle();
 
         // Switch must be disabled — `onChanged: null`.
-        final gamificationSwitch = tester.widget<SwitchListTile>(
-          find.byKey(const Key('featureToggle_gamification')),
+        final gpsTripPathSwitch = tester.widget<SwitchListTile>(
+          find.byKey(const Key('featureToggle_gpsTripPath')),
         );
         expect(
-          gamificationSwitch.onChanged,
+          gpsTripPathSwitch.onChanged,
           isNull,
           reason:
-              'gamification switch must be disabled when '
+              'gpsTripPath switch must be disabled when '
               'obd2TripRecording is OFF',
         );
 
@@ -267,7 +267,7 @@ void main() {
         // recording".
         final tooltip = tester.widget<Tooltip>(
           find.ancestor(
-            of: find.byKey(const Key('featureToggle_gamification')),
+            of: find.byKey(const Key('featureToggle_gpsTripPath')),
             matching: find.byType(Tooltip),
           ),
         );
@@ -281,8 +281,8 @@ void main() {
     );
 
     testWidgets(
-      'disabling obd2TripRecording via the provider while gamification is '
-      'ON succeeds — gamification switch then renders disabled-with-'
+      'disabling obd2TripRecording via the provider while gpsTripPath is '
+      'ON succeeds — gpsTripPath switch then renders disabled-with-'
       'tooltip (#1447 cascading-disable, #1571 segmented control)',
       (tester) async {
         final container = ProviderContainer(overrides: baseOverrides.cast());
@@ -295,7 +295,7 @@ void main() {
           container.read(enabledFeaturesProvider),
           containsAll(<Feature>[
             Feature.obd2TripRecording,
-            Feature.gamification,
+            Feature.gpsTripPath,
           ]),
         );
 
@@ -330,17 +330,17 @@ void main() {
         );
         expect(
           container.read(enabledFeaturesProvider),
-          contains(Feature.gamification),
+          contains(Feature.gpsTripPath),
           reason:
               'Stored child state must survive parent-disable so the '
               'user does not lose their preference.',
         );
 
-        final gamificationSwitchAfter = tester.widget<SwitchListTile>(
-          find.byKey(const Key('featureToggle_gamification')),
+        final gpsTripPathSwitchAfter = tester.widget<SwitchListTile>(
+          find.byKey(const Key('featureToggle_gpsTripPath')),
         );
         expect(
-          gamificationSwitchAfter.onChanged,
+          gpsTripPathSwitchAfter.onChanged,
           isNull,
           reason:
               'With parent off, the child switch must be '
@@ -350,7 +350,7 @@ void main() {
 
         final tooltip = tester.widget<Tooltip>(
           find.ancestor(
-            of: find.byKey(const Key('featureToggle_gamification')),
+            of: find.byKey(const Key('featureToggle_gpsTripPath')),
             matching: find.byType(Tooltip),
           ),
         );

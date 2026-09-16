@@ -1824,48 +1824,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get vehicleAdapterForget => 'Забрави адаптера';
 
   @override
-  String get achievementsTitle => 'Постижения';
-
-  @override
-  String get achievementFirstTrip => 'Първо пътуване';
-
-  @override
-  String get achievementFirstTripDesc => 'Запишете първото си OBD2 пътуване.';
-
-  @override
-  String get achievementFirstFillUp => 'Първо зареждане';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Запишете първото си зареждане.';
-
-  @override
-  String get achievementTenTrips => '10 пътувания';
-
-  @override
-  String get achievementTenTripsDesc => 'Запишете 10 OBD2 пътувания.';
-
-  @override
-  String get achievementZeroHarsh => 'Плавен шофьор';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Завършете пътуване от 10 км или повече без рязко спиране или ускоряване.';
-
-  @override
-  String get achievementEcoWeek => 'Еко седмица';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Карайте 7 последователни дни с поне едно плавно пътуване всеки ден.';
-
-  @override
-  String get achievementPriceWin => 'Ценова победа';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Запишете зареждане, което е с 5% или повече под 30-дневната средна цена на станцията.';
-
-  @override
   String get syncBaselinesToggleTitle =>
       'Споделяй научени профили на превозни средства';
 
@@ -3328,27 +3286,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Серия от плавно шофиране';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Карайте 5 пътувания подред с резултат за плавно шофиране 80 или повече.';
-
-  @override
-  String get achievementColdStartAware => 'Осъзнат студен старт';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Поддържайте разхода за студен старт за целия месец под 2% от общото гориво — комбинирайте кратките пътувания.';
-
-  @override
-  String get achievementHighwayMaster => 'Магистрален майстор';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Завършете пътуване от 30+ км с постоянна скорост и резултат за плавно шофиране 90 или повече.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4900,13 +4837,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Автоматично записване на пътувания чрез OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Геймификация';
-
-  @override
-  String get featureDescription_gamification =>
-      'Резултати за шофиране и спечелени значки.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Хаптичен еко-коуч';
 
   @override
@@ -5003,10 +4933,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Показване на раздела за анализ на разхода в долната навигация.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Първо активирайте записа на OBD2 пътувания';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5605,14 +5531,6 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Режимът на база правила приписва всеки пример за шофиране точно на една ситуация. Нечеткият го разпределя между всички ситуации според степента на съответствие — по-плавен около 60 км/ч или при промяна на наклони, но по-бавно попълва всички кофи.';
-
-  @override
-  String get profileGamificationToggleTitle =>
-      'Показвай постижения и резултати';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'При изключване, значките, резултатите и иконите за трофеи са скрити навсякъде в приложението.';
 
   @override
   String gdprPolicyLink(int version) {

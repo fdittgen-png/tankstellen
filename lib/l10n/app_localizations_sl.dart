@@ -1813,48 +1813,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get vehicleAdapterForget => 'Pozabi adapter';
 
   @override
-  String get achievementsTitle => 'Dosežki';
-
-  @override
-  String get achievementFirstTrip => 'Prva vožnja';
-
-  @override
-  String get achievementFirstTripDesc => 'Posnemite svojo prvo vožnjo OBD2.';
-
-  @override
-  String get achievementFirstFillUp => 'Prvo polnjenje';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Zabeležite svoje prvo polnjenje.';
-
-  @override
-  String get achievementTenTrips => '10 voženj';
-
-  @override
-  String get achievementTenTripsDesc => 'Posnemite 10 voženj OBD2.';
-
-  @override
-  String get achievementZeroHarsh => 'Miren voznik';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Opravite vožnjo 10 km ali več brez nenadnega zaviranja ali pospeševanja.';
-
-  @override
-  String get achievementEcoWeek => 'Eko teden';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Vozite 7 zaporednih dni z vsaj eno mirno vožnjo vsak dan.';
-
-  @override
-  String get achievementPriceWin => 'Cenovna zmaga';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Zabeležite polnjenje, ki je za 5 % ali več nižje od 30-dnevnega povprečja postaje.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Deli naučene profile vozil';
 
   @override
@@ -3305,27 +3263,6 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Mirna serija';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Zapored opravite 5 voženj z oceno mirne vožnje 80 ali višjo.';
-
-  @override
-  String get achievementColdStartAware => 'Zavedanje hladnega zagona';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Ohranite strošek goriva za hladni zagon pod 2 % celotnega goriva cel mesec — kombinirajte kratke vožnje.';
-
-  @override
-  String get achievementHighwayMaster => 'Mojster avtoceste';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Opravite vožnjo 30 km+ z enakomerno hitrostjo in oceno mirne vožnje 90 ali višjo.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4865,13 +4802,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Samodejno zajemanje voženj prek OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamifikacija';
-
-  @override
-  String get featureDescription_gamification =>
-      'Ocene vožnje in pridobljene značke.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptični eko-trener';
 
   @override
@@ -4968,10 +4898,6 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Prikaži zavihek za analitiko porabe v spodnji navigaciji.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Najprej omogočite snemanje voženj OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5572,13 +5498,6 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Umerjanje na podlagi pravil dodeluje vsak vzorec vožnje natančno eni situaciji. Mehka logika ga razporedi čez vse glede na ujemanje — bolj gladko pri 60 km/h ali pri spremembi naklona, a počasneje napolni vse razrede.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Prikaži dosežke in ocene';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Ko je izklopljeno, so značke, ocene in ikone trofej skrite po celotni aplikaciji.';
 
   @override
   String gdprPolicyLink(int version) {

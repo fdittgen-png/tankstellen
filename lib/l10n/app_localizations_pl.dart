@@ -1817,48 +1817,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get vehicleAdapterForget => 'Zapomnij adapter';
 
   @override
-  String get achievementsTitle => 'Osiągnięcia';
-
-  @override
-  String get achievementFirstTrip => 'Pierwsza trasa';
-
-  @override
-  String get achievementFirstTripDesc => 'Nagraj swoją pierwszą trasę OBD2.';
-
-  @override
-  String get achievementFirstFillUp => 'Pierwsze tankowanie';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Zapisz swoje pierwsze tankowanie.';
-
-  @override
-  String get achievementTenTrips => '10 tras';
-
-  @override
-  String get achievementTenTripsDesc => 'Nagraj 10 tras OBD2.';
-
-  @override
-  String get achievementZeroHarsh => 'Płynna jazda';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Przejedź trasę 10 km lub więcej bez gwałtownego hamowania ani przyspieszania.';
-
-  @override
-  String get achievementEcoWeek => 'Eco tydzień';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Jedź 7 kolejnych dni z co najmniej jedną płynną trasą każdego dnia.';
-
-  @override
-  String get achievementPriceWin => 'Trafna cena';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Zapisz tankowanie o co najmniej 5% poniżej 30-dniowej średniej stacji.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Udostępnij nauczone profile pojazdu';
 
   @override
@@ -3313,27 +3271,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Seria płynnej jazdy';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Jedź 5 tras z rzędu z wynikiem płynnej jazdy 80 lub więcej.';
-
-  @override
-  String get achievementColdStartAware => 'Świadomość zimnego startu';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Utrzymaj koszt paliwa podczas zimnego startu poniżej 2% całkowitego paliwa przez cały miesiąc — łącz krótkie trasy.';
-
-  @override
-  String get achievementHighwayMaster => 'Mistrz autostrady';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Przejedź trasę 30 km+ ze stałą prędkością z wynikiem płynnej jazdy 90 lub więcej.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4880,13 +4817,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Automatyczne rejestrowanie tras przez OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Grywalizacja';
-
-  @override
-  String get featureDescription_gamification =>
-      'Wyniki jazdy i zdobyte odznaki.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptyczny eco-coach';
 
   @override
@@ -4983,10 +4913,6 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Pokaż kartę analityki zużycia w dolnej nawigacji.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Najpierw włącz nagrywanie tras OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5585,13 +5511,6 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Oparty na regułach przypisuje każdą próbkę jazdy dokładnie do jednej sytuacji. Rozmyty rozkłada ją na wszystkie proporcjonalnie do dopasowania — płynniej przy 60 km/h lub zmiennych gradientach, ale wolniej wypełnia wszystkie segmenty.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Pokaż osiągnięcia i wyniki';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Gdy wyłączone, odznaki, wyniki i ikony pucharów są ukryte w całej aplikacji.';
 
   @override
   String gdprPolicyLink(int version) {

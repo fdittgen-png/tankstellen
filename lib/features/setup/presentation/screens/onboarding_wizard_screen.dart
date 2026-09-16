@@ -49,7 +49,7 @@ import '../../../../core/widgets/page_scaffold.dart';
 ///
 /// Vehicle is shown for Medium because manual fill-up logging needs a
 /// vehicle to attach to. OBD2 is Full only because the rest of the
-/// OBD2 stack (auto-record, gamification, consumption analytics) is
+/// OBD2 stack (auto-record, consumption analytics) is
 /// also Full-only.
 ///
 /// Wizard progress and loading flag live in

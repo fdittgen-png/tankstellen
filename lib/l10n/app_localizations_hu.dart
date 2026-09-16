@@ -1823,48 +1823,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get vehicleAdapterForget => 'Adapter elfelejtése';
 
   @override
-  String get achievementsTitle => 'Eredmények';
-
-  @override
-  String get achievementFirstTrip => 'Első út';
-
-  @override
-  String get achievementFirstTripDesc => 'Rögzítse az első OBD2-útját.';
-
-  @override
-  String get achievementFirstFillUp => 'Első tankolás';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Rögzítse az első tankolását.';
-
-  @override
-  String get achievementTenTrips => '10 út';
-
-  @override
-  String get achievementTenTripsDesc => 'Rögzítsen 10 OBD2-utat.';
-
-  @override
-  String get achievementZeroHarsh => 'Sima vezető';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Teljesítsen egy legalább 10 km-es utat erős fékezés és gyorsítás nélkül.';
-
-  @override
-  String get achievementEcoWeek => 'Öko-hét';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Vezessen 7 egymást követő napon, minden nap legalább egy sima úttal.';
-
-  @override
-  String get achievementPriceWin => 'Ár-győzelem';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Rögzítsen olyan tankolást, amely legalább 5%-kal alacsonyabb az állomás 30 napos átlagánál.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Tanult járműprofilok megosztása';
 
   @override
@@ -3325,27 +3283,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Sima sorozat';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Vezessen egymás után 5 utat legalább 80-as sima-vezetési pontszámmal.';
-
-  @override
-  String get achievementColdStartAware => 'Hidegindítás-tudatos';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Tartsa egy egész hónapban a hidegindítás üzemanyagköltségét a teljes üzemanyag 2%-a alatt — kombinálja a rövid utakat.';
-
-  @override
-  String get achievementHighwayMaster => 'Autópálya-mester';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Teljesítsen egy 30 km-nél hosszabb utat egyenletes sebességgel, legalább 90-es sima-vezetési pontszámmal.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4889,13 +4826,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Utak automatikus rögzítése OBD2-n keresztül.';
 
   @override
-  String get featureLabel_gamification => 'Gamifikáció';
-
-  @override
-  String get featureDescription_gamification =>
-      'Vezetési pontszámok és szerzett jelvények.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptikus öko-edző';
 
   @override
@@ -4992,10 +4922,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Fogyasztáselemzés fül megjelenítése az alsó navigációban.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Először engedélyezze az OBD2-útfelvételt';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5594,14 +5520,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'A szabályalapú mód minden vezetési mintát pontosan egy helyzethez rendel. A fuzzy mód az összes helyzetre elosztja, attól függően, mennyire illik mindegyik — simább 60 km/h körül vagy változó lejtőknél, de lassabban tölti fel az összes rekeszt.';
-
-  @override
-  String get profileGamificationToggleTitle =>
-      'Eredmények és pontszámok megjelenítése';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Ha ki van kapcsolva, a jelvények, pontszámok és trófeaikonok el vannak rejtve az egész alkalmazásban.';
 
   @override
   String gdprPolicyLink(int version) {

@@ -10,7 +10,6 @@ import 'package:tankstellen/features/trips/presentation/widgets/throttle_rpm_his
 import 'package:tankstellen/features/trips/presentation/widgets/trip_detail_body.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_detail_charts.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_summary_card.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
 import '../../../../helpers/pump_app.dart';
@@ -92,7 +91,6 @@ TripDetailSample _sampleWithEstimatedFuelRate(
 /// value so the underlying active-profile chain isn't traversed (those
 /// tests don't set up Hive).
 final List<Object> _defaultOverrides = [
-  gamificationEnabledProvider.overrideWithValue(true),
 ];
 
 Future<void> _pump(WidgetTester tester, Widget body) =>

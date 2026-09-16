@@ -1814,48 +1814,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get vehicleAdapterForget => 'Glöm adapter';
 
   @override
-  String get achievementsTitle => 'Prestationer';
-
-  @override
-  String get achievementFirstTrip => 'Första resan';
-
-  @override
-  String get achievementFirstTripDesc => 'Spela in din första OBD2-resa.';
-
-  @override
-  String get achievementFirstFillUp => 'Första tankningen';
-
-  @override
-  String get achievementFirstFillUpDesc => 'Logga din första tankning.';
-
-  @override
-  String get achievementTenTrips => '10 resor';
-
-  @override
-  String get achievementTenTripsDesc => 'Spela in 10 OBD2-resor.';
-
-  @override
-  String get achievementZeroHarsh => 'Mjuk förare';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Genomför en resa på 10 km eller mer utan hård inbromsning eller acceleration.';
-
-  @override
-  String get achievementEcoWeek => 'Ekovecka';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Kör 7 dagar i rad med minst en mjuk resa varje dag.';
-
-  @override
-  String get achievementPriceWin => 'Prisvinst';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Logga en tankning som slår stationens 30-dagarssnitt med 5 % eller mer.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Dela inlärda fordonsprofiler';
 
   @override
@@ -3301,27 +3259,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Mjukserie';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Kör 5 resor i rad med ett mjukkörningspoäng på 80 eller högre.';
-
-  @override
-  String get achievementColdStartAware => 'Kallstartmedveten';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Håll hela en månads kallstartsbränslekostnad under 2 % av totalt bränsle – kombinera korta resor.';
-
-  @override
-  String get achievementHighwayMaster => 'Motorvägsmästare';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Genomför en resa på 30 km+ i jämn hastighet med ett mjukkörningspoäng på 90 eller högre.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4859,12 +4796,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Registrera resor automatiskt via OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Spelifiering';
-
-  @override
-  String get featureDescription_gamification => 'Körpoäng och uppnådda märken.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Haptisk ecocoach';
 
   @override
@@ -4961,10 +4892,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Visa förbrukningsanalysfliken i bottennavigeringen.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Aktivera OBD2-reseinspelning först';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5554,13 +5481,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'Regelbaserat tilldelar varje körprov exakt en situation. Fuzzy sprider det över alla efter hur väl var och en passar – jämnare runt 60 km/h eller vid varierande lutningar, men långsammare att fylla alla hinkar.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Visa prestationer och poäng';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'När av döljs märken, poäng och troféikoner i hela appen.';
 
   @override
   String gdprPolicyLink(int version) {

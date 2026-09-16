@@ -141,14 +141,17 @@ abstract class UserProfile with _$UserProfile {
       'Migrated to Feature.showConsumptionTab in #1373 phase 3c; kept for one-shot migration read.',
     )
     @Default(false) bool showConsumptionTab,
-    /// Master toggle for gamification surfaces (#1194). Defaults to
+    /// REMOVED (#4252) — gamification is gone from the app. The field
+    /// stays declared so existing persisted profiles still decode; it is
+    /// read by nothing. Master toggle for gamification surfaces (#1194).
+    /// Defaults to
     /// true so existing users see no behaviour change. When flipped
     /// off, badges, scores, achievement tabs, and trophy iconography
     /// are hidden across the app — the underlying achievement
     /// evaluation continues to run so toggling back on instantly
     /// restores any earned badges.
     @Deprecated(
-      'Migrated to Feature.gamification in #1373 phase 3b; kept for one-shot migration read.',
+      'Gamification was removed in #4252. Kept only so stored profiles decode; nothing reads it.',
     )
     @Default(true) bool gamificationEnabled,
     /// Radius (in km) within which the in-trip approach overlay

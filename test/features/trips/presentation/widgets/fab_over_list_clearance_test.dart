@@ -12,9 +12,6 @@ import 'package:tankstellen/features/fill_ups/presentation/widgets/fuel_tab.dart
 import 'package:tankstellen/features/trips/presentation/widgets/trajets_tab.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
-import 'package:tankstellen/features/profile/providers/gamification_enabled_provider.dart';
-import 'package:tankstellen/features/achievements/domain/achievement.dart';
-import 'package:tankstellen/features/achievements/providers/achievements_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
@@ -70,8 +67,6 @@ void main() {
           tester,
           FuelTab(fillUps: fillUps, stats: stats, l: l10nEn),
           overrides: [
-            achievementsProvider.overrideWithValue(const <EarnedAchievement>[]),
-            gamificationEnabledProvider.overrideWithValue(false),
             activeVehicleProfileProvider.overrideWith(() => _NoActiveVehicle()),
             fillUpListProvider.overrideWith(() => _FixedFillUpList(fillUps)),
           ],

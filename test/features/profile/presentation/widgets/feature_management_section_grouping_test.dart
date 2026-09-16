@@ -83,7 +83,7 @@ void main() {
       // which is now derived from the segmented control).
       const dependents = <Feature>[
         Feature.consumptionAnalytics,
-        Feature.gamification,
+        Feature.hapticEcoCoach,
         Feature.hapticEcoCoach,
         Feature.glideCoach,
         Feature.gpsTripPath,
@@ -130,7 +130,7 @@ void main() {
       // top of the Conso card; the Trajets-tier toggles render beneath.
       final segmented = tester.getRect(find.byType(SegmentedButton<ConsoMode>));
       final childRect = tester.getRect(
-        find.byKey(const Key('featureToggle_gamification')),
+        find.byKey(const Key('featureToggle_hapticEcoCoach')),
       );
       expect(segmented.top, lessThan(childRect.top),
           reason: 'segmented control must render above its dependent toggles');
@@ -142,7 +142,7 @@ void main() {
 
       final segmented = tester.getRect(find.byType(SegmentedButton<ConsoMode>));
       final childRect = tester.getRect(
-        find.byKey(const Key('featureToggle_gamification')),
+        find.byKey(const Key('featureToggle_hapticEcoCoach')),
       );
       expect(childRect.left, greaterThan(segmented.left),
           reason: 'dependent rows must be indented right of the segmented '
@@ -152,7 +152,7 @@ void main() {
 
   group('FeatureManagementSection — snackbar on blocked tap (#1440)', () {
     testWidgets(
-        'tapping gamification while obd2TripRecording is OFF surfaces a '
+        'tapping hapticEcoCoach while obd2TripRecording is OFF surfaces a '
         'snackbar with the localised "Enable OBD2 trip recording first" '
         'message', (tester) async {
       final container = ProviderContainer(
@@ -162,14 +162,14 @@ void main() {
       );
       addTearDown(container.dispose);
 
-      // Gamification defaults ON; turn it off first so we can simulate
+      // HapticEcoCoach defaults ON; turn it off first so we can simulate
       // a user trying to re-enable it while the prerequisite is missing.
       await container
           .read(featureFlagsProvider.notifier)
-          .disable(Feature.gamification);
+          .disable(Feature.hapticEcoCoach);
       expect(
         container.read(enabledFeaturesProvider),
-        isNot(contains(Feature.gamification)),
+        isNot(contains(Feature.hapticEcoCoach)),
       );
       expect(
         container.read(enabledFeaturesProvider),
@@ -196,7 +196,7 @@ void main() {
       // GestureDetector must intercept the tap and fire a SnackBar.
       // Scroll the row into view before tapping so the hit test lands
       // on the wrapper.
-      final toggleFinder = find.byKey(const Key('featureToggle_gamification'));
+      final toggleFinder = find.byKey(const Key('featureToggle_hapticEcoCoach'));
       await tester.scrollUntilVisible(
         toggleFinder,
         100,

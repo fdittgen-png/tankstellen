@@ -156,7 +156,7 @@ void main() {
       await c.read(activeAppProfileProvider.notifier).select(AppProfile.full);
       final flags = c.read(enabledFeaturesProvider);
       expect(flags, contains(Feature.obd2TripRecording));
-      expect(flags, contains(Feature.gamification));
+      expect(flags, contains(Feature.hapticEcoCoach));
       expect(flags, contains(Feature.loyaltyCards));
       expect(flags, contains(Feature.consumptionAnalytics));
       expect(flags, contains(Feature.showConsumptionTab));
@@ -172,7 +172,7 @@ void main() {
       await c.read(activeAppProfileProvider.notifier).select(AppProfile.basic);
       final flags = c.read(enabledFeaturesProvider);
       expect(flags, isNot(contains(Feature.obd2TripRecording)));
-      expect(flags, isNot(contains(Feature.gamification)));
+      expect(flags, isNot(contains(Feature.hapticEcoCoach)));
       expect(flags, isNot(contains(Feature.loyaltyCards)));
       expect(flags, isNot(contains(Feature.manualConsumption)));
       // Re-applying basic should be a no-op.

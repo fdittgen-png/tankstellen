@@ -3327,84 +3327,6 @@ abstract class AppLocalizations {
   /// **'Forget adapter'**
   String get vehicleAdapterForget;
 
-  /// No description provided for @achievementsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Achievements'**
-  String get achievementsTitle;
-
-  /// No description provided for @achievementFirstTrip.
-  ///
-  /// In en, this message translates to:
-  /// **'First trip'**
-  String get achievementFirstTrip;
-
-  /// No description provided for @achievementFirstTripDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Record your first OBD2 trip.'**
-  String get achievementFirstTripDesc;
-
-  /// No description provided for @achievementFirstFillUp.
-  ///
-  /// In en, this message translates to:
-  /// **'First fill-up'**
-  String get achievementFirstFillUp;
-
-  /// No description provided for @achievementFirstFillUpDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Log your first fill-up.'**
-  String get achievementFirstFillUpDesc;
-
-  /// No description provided for @achievementTenTrips.
-  ///
-  /// In en, this message translates to:
-  /// **'10 trips'**
-  String get achievementTenTrips;
-
-  /// No description provided for @achievementTenTripsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Record 10 OBD2 trips.'**
-  String get achievementTenTripsDesc;
-
-  /// No description provided for @achievementZeroHarsh.
-  ///
-  /// In en, this message translates to:
-  /// **'Smooth driver'**
-  String get achievementZeroHarsh;
-
-  /// No description provided for @achievementZeroHarshDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Complete a trip of 10 km or more with no harsh braking or acceleration.'**
-  String get achievementZeroHarshDesc;
-
-  /// No description provided for @achievementEcoWeek.
-  ///
-  /// In en, this message translates to:
-  /// **'Eco week'**
-  String get achievementEcoWeek;
-
-  /// No description provided for @achievementEcoWeekDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Drive 7 consecutive days with at least one smooth trip each day.'**
-  String get achievementEcoWeekDesc;
-
-  /// No description provided for @achievementPriceWin.
-  ///
-  /// In en, this message translates to:
-  /// **'Price win'**
-  String get achievementPriceWin;
-
-  /// No description provided for @achievementPriceWinDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Log a fill-up that beats the station\'s 30-day average by 5 % or more.'**
-  String get achievementPriceWinDesc;
-
   /// No description provided for @syncBaselinesToggleTitle.
   ///
   /// In en, this message translates to:
@@ -5948,42 +5870,6 @@ abstract class AppLocalizations {
   /// **'Show fewer fuel types'**
   String get showFewerFuelTypes;
 
-  /// Title of the smoothDriver badge — five consecutive trips with driving-score >= 80 (#1041 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'Smooth streak'**
-  String get achievementSmoothDriver;
-
-  /// Tooltip for the smoothDriver badge (#1041 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'Drive 5 trips in a row with a smooth-driving score of 80 or higher.'**
-  String get achievementSmoothDriverDesc;
-
-  /// Title of the coldStartAware badge — whole month with cold-start excess <2% of total fuel (#1041 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'Cold-start aware'**
-  String get achievementColdStartAware;
-
-  /// Tooltip for the coldStartAware badge (#1041 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'Keep a whole month\'s cold-start fuel cost under 2 % of total fuel — combine short trips.'**
-  String get achievementColdStartAwareDesc;
-
-  /// Title of the highwayMaster badge — single 30km+ trip at consistent speed with driving-score >= 90 (#1041 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'Highway master'**
-  String get achievementHighwayMaster;
-
-  /// Tooltip for the highwayMaster badge (#1041 phase 5).
-  ///
-  /// In en, this message translates to:
-  /// **'Complete a 30 km+ trip at consistent speed with a smooth-driving score of 90 or higher.'**
-  String get achievementHighwayMasterDesc;
-
   /// Title of the background price-alert push notification: station name and fuel grade (#2306). Resolved in the main isolate at task-registration time and read back by the WorkManager isolate via Hive settings.
   ///
   /// In en, this message translates to:
@@ -8377,18 +8263,6 @@ abstract class AppLocalizations {
   /// **'Capture trips automatically over OBD2.'**
   String get featureDescription_obd2TripRecording;
 
-  /// Display name for the gamification feature in the Feature management list.
-  ///
-  /// In en, this message translates to:
-  /// **'Gamification'**
-  String get featureLabel_gamification;
-
-  /// One-line description for the gamification feature.
-  ///
-  /// In en, this message translates to:
-  /// **'Driving scores and earned badges.'**
-  String get featureDescription_gamification;
-
   /// Display name for the haptic eco-coach feature in the Feature management list.
   ///
   /// In en, this message translates to:
@@ -8556,12 +8430,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show the consumption analytics tab in the bottom navigation.'**
   String get featureDescription_showConsumptionTab;
-
-  /// Tooltip shown on the disabled gamification toggle when its prerequisite (OBD2 trip recording) is off.
-  ///
-  /// In en, this message translates to:
-  /// **'Enable OBD2 trip recording first'**
-  String get featureBlockedEnable_gamification;
 
   /// Tooltip shown on the disabled haptic eco-coach toggle when its prerequisite (OBD2 trip recording) is off.
   ///
@@ -9540,18 +9408,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rule-based assigns each driving sample to exactly one situation. Fuzzy spreads it across all of them by how well each fits — smoother around 60 km/h or changing gradients, but slower to fill all buckets.'**
   String get calibrationModeTooltip;
-
-  /// Title of the master gamification opt-out switch on the profile / settings screen (#1194).
-  ///
-  /// In en, this message translates to:
-  /// **'Show achievements & scores'**
-  String get profileGamificationToggleTitle;
-
-  /// Subtitle explaining what the gamification opt-out toggle hides (#1194).
-  ///
-  /// In en, this message translates to:
-  /// **'When off, badges, scores and trophy icons are hidden across the app.'**
-  String get profileGamificationToggleSubtitle;
 
   /// Link label on the consent screen and in Settings → Privacy & data; opens the online privacy policy.
   ///

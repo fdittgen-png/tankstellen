@@ -32,7 +32,7 @@ const String _settingsBoxName = 'settings';
 ///   1. [migrateLegacyToggles] — settings-box-backed legacy keys
 ///      (currently `hapticEcoCoachEnabled`).
 ///   2. [migrateUserProfileToggles] — UserProfile-backed legacy fields
-///      (currently `gamificationEnabled`). This migrator is a no-op
+///      (the legacy per-feature booleans). This migrator is a no-op
 ///      when the active profile has not loaded yet; it re-runs on
 ///      subsequent launches until a profile is available, and only
 ///      then writes the per-feature `*Migrated` gate flag.

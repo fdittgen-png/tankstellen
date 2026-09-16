@@ -1819,49 +1819,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get vehicleAdapterForget => 'Dimentica adattatore';
 
   @override
-  String get achievementsTitle => 'Obiettivi';
-
-  @override
-  String get achievementFirstTrip => 'Primo percorso';
-
-  @override
-  String get achievementFirstTripDesc => 'Registra il tuo primo percorso OBD2.';
-
-  @override
-  String get achievementFirstFillUp => 'Primo rifornimento';
-
-  @override
-  String get achievementFirstFillUpDesc =>
-      'Registra il tuo primo rifornimento.';
-
-  @override
-  String get achievementTenTrips => '10 percorsi';
-
-  @override
-  String get achievementTenTripsDesc => 'Registra 10 percorsi OBD2.';
-
-  @override
-  String get achievementZeroHarsh => 'Guida fluida';
-
-  @override
-  String get achievementZeroHarshDesc =>
-      'Completa un percorso di 10 km o più senza frenate o accelerazioni brusche.';
-
-  @override
-  String get achievementEcoWeek => 'Settimana eco';
-
-  @override
-  String get achievementEcoWeekDesc =>
-      'Guida per 7 giorni consecutivi con almeno un percorso fluido al giorno.';
-
-  @override
-  String get achievementPriceWin => 'Affare carburante';
-
-  @override
-  String get achievementPriceWinDesc =>
-      'Registra un rifornimento che batte la media dei 30 giorni della stazione di almeno il 5%.';
-
-  @override
   String get syncBaselinesToggleTitle => 'Condividi profili veicolo appresi';
 
   @override
@@ -3318,27 +3275,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get showFewerFuelTypes => 'Show fewer fuel types';
-
-  @override
-  String get achievementSmoothDriver => 'Serie di guida fluida';
-
-  @override
-  String get achievementSmoothDriverDesc =>
-      'Effettua 5 percorsi di fila con un punteggio di guida fluida di 80 o superiore.';
-
-  @override
-  String get achievementColdStartAware => 'Esperto di avviamento a freddo';
-
-  @override
-  String get achievementColdStartAwareDesc =>
-      'Mantieni il costo del carburante di avviamento a freddo di un intero mese sotto il 2% del totale — combina i tragitti brevi.';
-
-  @override
-  String get achievementHighwayMaster => 'Re dell\'autostrada';
-
-  @override
-  String get achievementHighwayMasterDesc =>
-      'Completa un percorso di 30 km o più a velocità costante con un punteggio di guida fluida di 90 o superiore.';
 
   @override
   String priceAlertNotificationTitle(String station, String fuelType) {
@@ -4884,13 +4820,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Cattura i percorsi automaticamente tramite OBD2.';
 
   @override
-  String get featureLabel_gamification => 'Gamification';
-
-  @override
-  String get featureDescription_gamification =>
-      'Punteggi di guida e badge guadagnati.';
-
-  @override
   String get featureLabel_hapticEcoCoach => 'Coach eco aptico';
 
   @override
@@ -4987,10 +4916,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get featureDescription_showConsumptionTab =>
       'Mostra la scheda analisi consumi nella barra di navigazione inferiore.';
-
-  @override
-  String get featureBlockedEnable_gamification =>
-      'Prima abilita la registrazione percorsi OBD2';
 
   @override
   String get featureBlockedEnable_hapticEcoCoach =>
@@ -5587,13 +5512,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get calibrationModeTooltip =>
       'La modalità basata su regole assegna ogni campione di guida esattamente a una situazione. La modalità fuzzy lo distribuisce su tutte in base all\'adattabilità — più fluida intorno ai 60 km/h o con gradienti variabili, ma più lenta a riempire tutti i bucket.';
-
-  @override
-  String get profileGamificationToggleTitle => 'Mostra obiettivi e punteggi';
-
-  @override
-  String get profileGamificationToggleSubtitle =>
-      'Quando disattivato, badge, punteggi e icone trofeo sono nascosti nell\'app.';
 
   @override
   String gdprPolicyLink(int version) {

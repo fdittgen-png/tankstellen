@@ -28,7 +28,7 @@ void main() {
       // Basic must NOT include the consumption / OBD2 / loyalty stack.
       expect(basic, isNot(contains(Feature.manualConsumption)));
       expect(basic, isNot(contains(Feature.obd2TripRecording)));
-      expect(basic, isNot(contains(Feature.gamification)));
+      expect(basic, isNot(contains(Feature.hapticEcoCoach)));
       expect(basic, isNot(contains(Feature.loyaltyCards)));
       expect(basic, isNot(contains(Feature.consumptionAnalytics)));
       // #2382 — the approach overlay is a driving-tier feature; Basic
@@ -62,10 +62,10 @@ void main() {
       // #2382 — the in-trip approach overlay is default-ON for Medium
       // (needs no OBD2; the live detector geofences off GPS).
       expect(medium, contains(Feature.approachOverlay));
-      // Auto-record / gamification / loyalty stay Full-tier — they
+      // Auto-record / hapticEcoCoach / loyalty stay Full-tier — they
       // assume a paired OBD2 dongle.
       expect(medium, isNot(contains(Feature.autoRecord)));
-      expect(medium, isNot(contains(Feature.gamification)));
+      expect(medium, isNot(contains(Feature.hapticEcoCoach)));
       expect(medium, isNot(contains(Feature.loyaltyCards)));
     });
 
@@ -80,7 +80,7 @@ void main() {
       // Full adds OBD2 + loyalty + ergonomic opt-ins.
       expect(full, contains(Feature.obd2TripRecording));
       expect(full, contains(Feature.autoRecord));
-      expect(full, contains(Feature.gamification));
+      expect(full, contains(Feature.hapticEcoCoach));
       expect(full, contains(Feature.consumptionAnalytics));
       expect(full, contains(Feature.showConsumptionTab));
       expect(full, contains(Feature.loyaltyCards));

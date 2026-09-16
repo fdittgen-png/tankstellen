@@ -87,7 +87,7 @@ void main() {
         FeatureCategory.finding: Feature.showFuel,
         FeatureCategory.prices: Feature.priceAlerts,
         FeatureCategory.radar: Feature.approachOverlay,
-        FeatureCategory.consumption: Feature.gamification,
+        FeatureCategory.consumption: Feature.hapticEcoCoach,
         FeatureCategory.sync: Feature.tankSync,
         FeatureCategory.input: Feature.addFillUpOcrReceipt,
         FeatureCategory.developer: Feature.debugMode,
@@ -172,18 +172,18 @@ void main() {
 
   group('FeatureManagementSection — gating preserved (#2681)', () {
     testWidgets(
-        'tapping gamification while obd2TripRecording is OFF still surfaces '
+        'tapping hapticEcoCoach while obd2TripRecording is OFF still surfaces '
         'the blocked snackbar', (tester) async {
       final container = await pumpSection(tester);
 
-      // Defaults: gamification ON, obd2TripRecording OFF. Disable
-      // gamification first so the re-enable path is the blocked one.
+      // Defaults: hapticEcoCoach ON, obd2TripRecording OFF. Disable
+      // hapticEcoCoach first so the re-enable path is the blocked one.
       await container
           .read(featureFlagsProvider.notifier)
-          .disable(Feature.gamification);
+          .disable(Feature.hapticEcoCoach);
       await tester.pumpAndSettle();
 
-      final toggleFinder = find.byKey(const Key('featureToggle_gamification'));
+      final toggleFinder = find.byKey(const Key('featureToggle_hapticEcoCoach'));
       await tester.scrollUntilVisible(
         toggleFinder,
         100,
@@ -265,9 +265,8 @@ void main() {
         Feature.obd2TripRecording,
         Feature.autoRecord,
         Feature.consumptionAnalytics,
-        Feature.gamification,
-        Feature.showConsumptionTab,
         Feature.hapticEcoCoach,
+        Feature.showConsumptionTab,
         Feature.glideCoach,
         Feature.gpsTripPath,
         Feature.obd2Optional,

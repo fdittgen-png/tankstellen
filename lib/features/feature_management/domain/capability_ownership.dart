@@ -16,7 +16,7 @@ import 'process_taxonomy.dart';
 ///
 /// `featureCategory` maps the same features to render headers. This maps
 /// them to what the user is trying to DO. They disagree on purpose — the
-/// Conso card owns the rendering of `gamification` and `glideCoach`, but
+/// Conso card owns the rendering of `glideCoach`, but
 /// the user turning those on is improving efficiency, not "tracking
 /// consumption". Keeping both means #4226 can move to process language
 /// without breaking the settings screen mid-flight.
@@ -44,7 +44,6 @@ const Map<Feature, SparkiloSubprocess> capabilityOwner =
   // ── 3. Improve efficiency and cost ──────────────────────────────
   // Rendered under the Conso card, but the user enabling these is
   // chasing efficiency — see the class doc on why the two maps differ.
-  Feature.gamification: SparkiloSubprocess.identifyEcoOpportunities,
   Feature.hapticEcoCoach: SparkiloSubprocess.identifyEcoOpportunities,
   Feature.glideCoach: SparkiloSubprocess.identifyEcoOpportunities,
   Feature.carbonDashboard: SparkiloSubprocess.trackCostPerKmAndSavings,
