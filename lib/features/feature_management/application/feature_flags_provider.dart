@@ -117,10 +117,47 @@ class FeatureFlags extends _$FeatureFlags {
           .where((f) => manifest.entries[f]?.isAvailableIn(channel) ?? false)
           .toSet();
 
+  /// Serialises mutations (#4225).
+  ///
+  /// Every mutation is read-modify-persist: `await future` to get the
+  /// resolved set, build the next set, persist, publish. Two toggles
+  /// started before either persisted both read the SAME `current`, so
+  /// the second write silently dropped the first one's change — a lost
+  /// update, and exactly what "concurrent changes cannot leave partial
+  /// activation" forbids.
+  ///
+  /// Chaining onto the previous mutation makes each one read state the
+  /// prior write already published.
+  ///
+  /// A failed mutation must not poison the chain — the NEXT toggle has
+  /// to run whether or not this one threw. The caller still gets the
+  /// raw error, because [next] is what is returned; the tail gets a
+  /// continuation that names and logs it. An anonymous
+  /// `.catchError((_) {})` would be the #3981 swallow: a toggle that
+  /// failed would vanish with no trace, which is the same invisibility
+  /// as the lost update this method exists to prevent.
+  Future<void> _serialised(Future<void> Function() mutation) {
+    final previous = _tail;
+    final next = previous.then((_) => mutation());
+    _tail = next.catchError(
+      (Object e, StackTrace st) => errorLogger.log(
+        ErrorLayer.providers,
+        e,
+        st,
+        context: const {'op': 'FeatureFlags mutation'},
+      ),
+    );
+    return next;
+  }
+
+  Future<void> _tail = Future<void>.value();
+
   /// Enables [feature], throwing [StateError] when a prerequisite is
   /// disabled. The error message names the missing prerequisites so the
   /// Phase 2 UI can surface a tooltip without a second lookup.
-  Future<void> enable(Feature feature) async {
+  Future<void> enable(Feature feature) => _serialised(() => _enable(feature));
+
+  Future<void> _enable(Feature feature) async {
     final manifest = ref.read(featureManifestProvider);
     final channel = ref.read(buildChannelProvider);
     // Await the in-flight (or resolved) build so a flip during the
@@ -158,7 +195,10 @@ class FeatureFlags extends _$FeatureFlags {
   ///
   /// Re-enabling [feature] later restores those children to their previous
   /// user-visible state, no manual re-toggling required.
-  Future<void> disable(Feature feature) async {
+  Future<void> disable(Feature feature) =>
+      _serialised(() => _disable(feature));
+
+  Future<void> _disable(Feature feature) async {
     final current = await future;
     if (!current.contains(feature)) return;
     final next = {...current}..remove(feature);
@@ -180,7 +220,10 @@ class FeatureFlags extends _$FeatureFlags {
   /// Channel-unavailable features are dropped (#1674); the result is
   /// exactly [bundle] minus those, so no stale-on flags survive a
   /// profile switch.
-  Future<void> applyBundle(Set<Feature> bundle) async {
+  Future<void> applyBundle(Set<Feature> bundle) =>
+      _serialised(() => _applyBundle(bundle));
+
+  Future<void> _applyBundle(Set<Feature> bundle) async {
     final manifest = ref.read(featureManifestProvider);
     final channel = ref.read(buildChannelProvider);
     // Await the in-flight build so the apply replaces the resolved set.
