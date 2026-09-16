@@ -31,5 +31,13 @@
     }
   },
   "criteriaSwapEndpoints": "Start und Ziel tauschen",
-  "criteriaRadiusCustom": "Individuell"
+  "criteriaRadiusCustom": "Individuell",
+  "criteriaIntentHeader": "Wonach suchst du?",
+  "criteriaIntentCheapestNearby": "Am g\u00fcnstigsten in der N\u00e4he",
+  "criteriaIntentBestStop": "Bester Stopp",
+  "criteriaIntentOnMyRoute": "Auf meiner Route",
+  "criteriaIntentFastest": "Am schnellsten",
+  "criteriaIntentFavourite": "Ein Favorit",
+  "criteriaIntentCustom": "Eigene",
+  "criteriaIntentNeedsConsumption": "Erfasse zuerst eine Tankf\u00fcllung, damit wir deinen Verbrauch kennen"
 }

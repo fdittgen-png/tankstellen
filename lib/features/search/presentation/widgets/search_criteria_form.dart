@@ -21,6 +21,7 @@ import 'brand_filter_chips.dart';
 import '../../../../core/help/help_anchors.dart';
 import '../../../../core/help/help_dot.dart';
 import 'criteria/criteria_section_header.dart';
+import 'criteria/intent_row.dart';
 import 'fuel_type_selector.dart';
 import 'location_input.dart' show LocationInput, LocationInputWidgetState;
 import 'route_planning_controls.dart';
@@ -127,6 +128,12 @@ class SearchCriteriaForm extends ConsumerWidget {
             offstage: mode != SearchMode.route,
             child: RouteInput(key: routeInputKey, onSearch: onRouteSearch),
           ),
+          const SizedBox(height: 8),
+          // #4138 — the question the user actually arrived with, above
+          // the knobs the engine needs. Each chip applies a preset over
+          // the controls below, which stay authoritative: touching any
+          // of them re-derives the selection to "Custom".
+          IntentRow(routeMode: mode == SearchMode.route),
           const SizedBox(height: 8),
           CriteriaSectionHeader(l10n.fuelType,
               anchor: HelpAnchor.searchFuelType),

@@ -14933,6 +14933,54 @@ abstract class AppLocalizations {
   /// **'Custom'**
   String get criteriaRadiusCustom;
 
+  /// Section header above the intent chips at the top of the search-criteria sheet (#4138). Each chip applies a named preset over the existing controls, which stay below and authoritative.
+  ///
+  /// In en, this message translates to:
+  /// **'What are you looking for?'**
+  String get criteriaIntentHeader;
+
+  /// Intent chip (#4138): sorts by price and limits to stations open now.
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest nearby'**
+  String get criteriaIntentCheapestNearby;
+
+  /// Intent chip (#4138): ranks by effective price per litre — the pump price plus what the drive there costs (#4088). Needs a known consumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Best stop'**
+  String get criteriaIntentBestStop;
+
+  /// Intent chip (#4138): stations along the planned route, cheapest-first.
+  ///
+  /// In en, this message translates to:
+  /// **'On my route'**
+  String get criteriaIntentOnMyRoute;
+
+  /// Intent chip (#4138): nearest first, cost second.
+  ///
+  /// In en, this message translates to:
+  /// **'Fastest'**
+  String get criteriaIntentFastest;
+
+  /// Intent chip (#4138): go straight to a station the user already saved.
+  ///
+  /// In en, this message translates to:
+  /// **'A favourite'**
+  String get criteriaIntentFavourite;
+
+  /// Shown as the selected intent once the user changes any control, so the sheet never displays a label that no longer matches the state (#4138).
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get criteriaIntentCustom;
+
+  /// One-line reason under the disabled “Best stop” chip (#4138). Its ranking needs the drive cost, which needs a known consumption — trust rule 1 says say so rather than silently fall back to a price sort.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a fill-up first so we know your consumption'**
+  String get criteriaIntentNeedsConsumption;
+
   /// Helper text under the odometer field of the Add fill-up form when the value was pre-filled from the vehicle's most recent fill-up (#3899).
   ///
   /// In en, this message translates to:

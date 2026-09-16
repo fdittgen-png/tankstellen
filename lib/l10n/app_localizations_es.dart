@@ -8938,6 +8938,31 @@ class AppLocalizationsEs extends AppLocalizations {
   String get criteriaRadiusCustom => 'Custom';
 
   @override
+  String get criteriaIntentHeader => 'What are you looking for?';
+
+  @override
+  String get criteriaIntentCheapestNearby => 'Cheapest nearby';
+
+  @override
+  String get criteriaIntentBestStop => 'Best stop';
+
+  @override
+  String get criteriaIntentOnMyRoute => 'On my route';
+
+  @override
+  String get criteriaIntentFastest => 'Fastest';
+
+  @override
+  String get criteriaIntentFavourite => 'A favourite';
+
+  @override
+  String get criteriaIntentCustom => 'Custom';
+
+  @override
+  String get criteriaIntentNeedsConsumption =>
+      'Add a fill-up first so we know your consumption';
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Rellenado con tu último repostaje';
 
