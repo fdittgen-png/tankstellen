@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../domain/fuel_type.dart';
 import '../domain/station.dart';
 import 'voice_announcement_service.dart';
 import '../../core/logging/error_logger.dart';
@@ -84,7 +85,7 @@ class AnnouncementEngine {
   /// Returns the list of stations that were actually announced.
   Future<List<AnnouncementCandidate>> evaluateAndAnnounce({
     required List<Station> nearbyStations,
-    required String fuelType,
+    required FuelType fuelType,
     required double Function(Station) priceExtractor,
     required double Function(Station) distanceExtractor,
   }) async {

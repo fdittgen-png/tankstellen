@@ -95,7 +95,7 @@ final class VoiceAnnouncementListenerProvider
 }
 
 String _$voiceAnnouncementListenerHash() =>
-    r'ff5052c37b2d87644165c775fe15a5b631e23266';
+    r'9ed654be63189d2b6898740a3c907755bb56db5d';
 
 /// Live call site that wires the dormant [AnnouncementEngine] into the
 /// real driving flow (#2569).

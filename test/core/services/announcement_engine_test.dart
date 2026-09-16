@@ -4,6 +4,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/services/announcement_engine.dart';
 import 'package:tankstellen/core/services/voice_announcement_service.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import '../../helpers/silence_error_logger.dart';
 
@@ -84,7 +85,7 @@ void main() {
     test('announces closest station within radius', () async {
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -92,7 +93,7 @@ void main() {
       expect(results, hasLength(1));
       // station-cheap is 0.8 km (closest within 2 km radius)
       expect(results.first.station.id, 'station-cheap');
-      expect(results.first.fuelType, 'Diesel');
+      expect(results.first.fuelType, FuelType.diesel);
       expect(results.first.price, 1.599);
       expect(results.first.distanceKm, 0.8);
       expect(fakeTts.announced, hasLength(1));
@@ -103,7 +104,7 @@ void main() {
 
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -121,7 +122,7 @@ void main() {
 
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -139,7 +140,7 @@ void main() {
 
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -154,7 +155,7 @@ void main() {
       // First announcement succeeds
       await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -165,7 +166,7 @@ void main() {
 
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -179,7 +180,7 @@ void main() {
     test('announces again after cooldown expires', () async {
       await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -189,7 +190,7 @@ void main() {
 
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -202,7 +203,7 @@ void main() {
     test('clearCooldowns allows immediate re-announcement', () async {
       await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -212,7 +213,7 @@ void main() {
 
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -240,7 +241,7 @@ void main() {
 
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: stationsWithNullPrice,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -253,7 +254,7 @@ void main() {
 
       final results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -265,7 +266,7 @@ void main() {
     test('purges expired cooldowns automatically', () async {
       await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -277,7 +278,7 @@ void main() {
       // Trigger purge via another evaluate call
       await engine.evaluateAndAnnounce(
         nearbyStations: [],
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -289,7 +290,7 @@ void main() {
       engine.updateConfig(const AnnouncementConfig(enabled: false));
       var results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -299,7 +300,7 @@ void main() {
       engine.updateConfig(const AnnouncementConfig(enabled: true));
       results = await engine.evaluateAndAnnounce(
         nearbyStations: testStationList,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         priceExtractor: _dieselPrice,
         distanceExtractor: _distKm,
       );
@@ -335,13 +336,13 @@ void main() {
     test('stores all fields', () {
       const candidate = AnnouncementCandidate(
         station: testStation,
-        fuelType: 'Diesel',
+        fuelType: FuelType.diesel,
         price: 1.659,
         distanceKm: 1.5,
       );
 
       expect(candidate.station.id, testStation.id);
-      expect(candidate.fuelType, 'Diesel');
+      expect(candidate.fuelType, FuelType.diesel);
       expect(candidate.price, 1.659);
       expect(candidate.distanceKm, 1.5);
     });

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/services/voice_announcement_service.dart';
 
 import '../../fixtures/stations.dart';
@@ -11,12 +12,12 @@ void main() {
     test('stores station, fuelType, price, and distance', () {
       const candidate = AnnouncementCandidate(
         station: testStation,
-        fuelType: 'e10',
+        fuelType: FuelType.e10,
         price: 1.799,
         distanceKm: 2.3,
       );
       expect(candidate.station, testStation);
-      expect(candidate.fuelType, 'e10');
+      expect(candidate.fuelType, FuelType.e10);
       expect(candidate.price, 1.799);
       expect(candidate.distanceKm, 2.3);
     });
@@ -26,11 +27,11 @@ void main() {
       // const-ness keeps each broadcast cheap when nothing changed.
       const candidate = AnnouncementCandidate(
         station: testStation,
-        fuelType: 'diesel',
+        fuelType: FuelType.diesel,
         price: 1.659,
         distanceKm: 0.8,
       );
-      expect(candidate.fuelType, 'diesel');
+      expect(candidate.fuelType, FuelType.diesel);
       expect(candidate.station.id, testStation.id);
     });
 
@@ -41,7 +42,7 @@ void main() {
       // repeat announcements that should fire again after a cooldown.
       const candidate = AnnouncementCandidate(
         station: testStation,
-        fuelType: 'e10',
+        fuelType: FuelType.e10,
         price: 1.799,
         distanceKm: 2.0,
       );
@@ -57,7 +58,7 @@ void main() {
       // pin that the full Station is retained, not just a label.
       const candidate = AnnouncementCandidate(
         station: testStation,
-        fuelType: 'e10',
+        fuelType: FuelType.e10,
         price: 1.799,
         distanceKm: 2.0,
       );
