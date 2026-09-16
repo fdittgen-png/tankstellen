@@ -56,6 +56,11 @@ class Elm327PrecisionPids {
     ...widebandCurrentPids,
   ];
 
+  /// Sensor 1 of each family — bank-1-sensor-1, the primary fuel-control
+  /// sensor — voltage family first. A fresh reading from either beats
+  /// every other sensor in the measured-φ priority rule (#3427).
+  static const List<int> primaryWidebandPids = [0x24, 0x34];
+
   /// Build the Mode 01 request for one wideband O2 PID (#3427), e.g.
   /// `0x24` → `"0124\r"`.
   static String widebandCommand(int pid) =>

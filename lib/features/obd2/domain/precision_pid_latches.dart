@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 import '../data/protocol/elm327_precision_pids.dart';
+import '../data/protocol/obd2_signal_pids.dart';
 import 'pid_scheduler.dart';
+import 'vehicle_signal.dart';
 
 /// Latest-value latches + scheduler subscriptions for the
 /// consumption-precision PID families (Epic #3416): measured wideband φ
@@ -68,7 +70,7 @@ class PrecisionPidLatches {
       return at != null && now.difference(at) <= measuredPhiStaleness;
     }
 
-    for (final pid in const [0x24, 0x34]) {
+    for (final pid in Elm327PrecisionPids.primaryWidebandPids) {
       if (fresh(pid)) return _phiByPid[pid];
     }
     int? bestPid;
@@ -97,6 +99,8 @@ class PrecisionPidLatches {
     PidScheduler scheduler, {
     required bool Function(int pid) isPidSupported,
   }) {
+    bool supports(VehicleSignal signal) =>
+        isPidSupported(Obd2SignalPids.pidOf(signal));
     for (final pid in Elm327PrecisionPids.allWidebandPids) {
       if (!isPidSupported(pid)) continue;
       scheduler.subscribe(
@@ -111,7 +115,7 @@ class PrecisionPidLatches {
         },
       );
     }
-    if (isPidSupported(0x66)) {
+    if (supports(VehicleSignal.mafDual)) {
       scheduler.subscribe(
         Elm327PrecisionPids.mafSensorCommand,
         ScheduledPid(
@@ -122,7 +126,7 @@ class PrecisionPidLatches {
         },
       );
     }
-    if (isPidSupported(0x9D)) {
+    if (supports(VehicleSignal.fuelMassRate)) {
       scheduler.subscribe(
         Elm327PrecisionPids.engineFuelRateGramsCommand,
         ScheduledPid(
@@ -133,7 +137,7 @@ class PrecisionPidLatches {
         },
       );
     }
-    if (isPidSupported(0xA2)) {
+    if (supports(VehicleSignal.cylinderFuelRate)) {
       scheduler.subscribe(
         Elm327PrecisionPids.cylinderFuelRateCommand,
         ScheduledPid(
@@ -144,7 +148,7 @@ class PrecisionPidLatches {
         },
       );
     }
-    if (isPidSupported(0x52)) {
+    if (supports(VehicleSignal.ethanolPercent)) {
       scheduler.subscribe(
         Elm327PrecisionPids.ethanolPercentCommand,
         ScheduledPid(hz: 0.5, tier: PidTier.slowCorrection),

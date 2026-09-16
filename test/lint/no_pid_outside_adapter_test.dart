@@ -18,19 +18,19 @@
 /// ```
 ///
 /// `PID 0C`, `PID 04`, `PID 10` should be meaningless outside
-/// `data/protocol/`. Today they are not: the session layer wires
-/// subscriptions with bare hex, and `domain/precision_pid_latches.dart`
-/// asks `isPidSupported(0x66)` — a PID number in the DOMAIN layer, which
-/// is the clearest form of the leak this issue is about.
+/// `data/protocol/`. Above it, code names a `VehicleSignal`
+/// (`domain/vehicle_signal.dart`) and the adapter's table
+/// (`data/protocol/obd2_signal_pids.dart`) turns the name into a PID, a
+/// request and a support gate.
 ///
-/// This is a **ratchet, not a ban**: the count is frozen and may only
-/// fall. #4159's migration is explicitly incremental ("introduce the
-/// layer, move consumers one at a time, keep the recorded-session
-/// fixtures passing"), and moving a consumer is device-validated work —
-/// `obd2_rewrite_epic_3527` and the OBD2 memories are unambiguous that
-/// changes on this path need a real adapter before they are trusted.
-/// The ratchet is what makes that migration actually happen instead of
-/// stalling after the layer exists.
+/// This is a **ratchet**: the count is frozen and may only fall. The
+/// migration moves one consumer at a time, and what makes each move safe
+/// is not a device drive but the pins that landed before it — the exact
+/// resolved schedule and gate calls
+/// (`live_sample_snapshot_schedule_pin_test`), the measured-φ priority
+/// rule (`precision_pid_latches_test`), the fuel-rate reader's gate/read
+/// call log and the snapshot's read facade. A move that changes what a
+/// session subscribes, asks or derives turns one of those red.
 ///
 /// ## What is deliberately NOT counted
 ///
@@ -54,7 +54,6 @@ import 'package:flutter_test/flutter_test.dart';
 const Map<String, int> _baseline = {
   'lib/features/obd2/data/session/obd2_fuel_rate_reader.dart': 18,
   'lib/features/obd2/data/session/live_sample_snapshot_subscriptions.dart': 14,
-  'lib/features/obd2/domain/precision_pid_latches.dart': 6,
 };
 
 const _skipPrefixes = [
