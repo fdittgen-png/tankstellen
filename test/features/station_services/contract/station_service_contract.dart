@@ -29,6 +29,7 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/services/country_service_registry.dart';
@@ -55,10 +56,41 @@ enum ContractExemption {
 }
 
 /// The lowest price per litre any real fuel has ever had, and the
-/// highest. A value outside this is a unit or decimal-separator bug, not
-/// a cheap forecourt — the #3308 class of defect lives exactly here.
+/// highest, in EUR. A value outside this is a unit or decimal-separator
+/// bug, not a cheap forecourt — the #3308 class of defect lives exactly
+/// here.
 const double kMinSanePricePerLitre = 0.10;
 const double kMaxSanePricePerLitre = 10.0;
+
+/// The plausible price-per-litre range in each currency a registered
+/// country prices in (#4180).
+///
+/// Services store prices in the country's OWN currency, so one EUR bound
+/// rejected every correct DKK or MXN price. Each non-EUR row is the EUR
+/// range scaled by a rounded 2026 exchange rate, so a factor-100 unit bug
+/// (pence, øre, centavos) or a thousands-separator misread still lands
+/// outside it. ARS is widened for inflation. A currency missing here fails
+/// the contract rather than passing unchecked.
+const Map<String, ({double min, double max})> kSanePricePerLitreByCurrency = {
+  // Unchanged from the original EUR-only contract.
+  'EUR': (min: kMinSanePricePerLitre, max: kMaxSanePricePerLitre),
+  // ~0.85 GBP/EUR; pump prices ~1.3–1.9 GBP. A pence value (152.7) fails.
+  'GBP': (min: 0.10, max: 10.0),
+  // Pegged at ~7.46 DKK/EUR (ERM II); recorded OK/Shell 15.59–18.29 DKK.
+  'DKK': (min: 0.75, max: 75.0),
+  // ~5 RON/EUR; recorded Monitorul prices ~8–9 RON.
+  'RON': (min: 0.50, max: 50.0),
+  // ~20 MXN/EUR; recorded CRE prices 22.77–29.69 MXN.
+  'MXN': (min: 2.0, max: 200.0),
+  // ~1.65 AUD/EUR; NSW FuelCheck published ~1.8–2.3 AUD (cents would fail).
+  'AUD': (min: 0.15, max: 20.0),
+  // ~1000 CLP/EUR; CNE prices ~1200–1500 CLP.
+  'CLP': (min: 100.0, max: 10000.0),
+  // ~1500 KRW/EUR; OPINET prices ~1600–1900 KRW.
+  'KRW': (min: 150.0, max: 15000.0),
+  // ~1000+ ARS/EUR and high inflation; widened in both directions.
+  'ARS': (min: 10.0, max: 100000.0),
+};
 
 /// Run the contract for [countryCode] over the stations [stationsOf]
 /// returns, which must have come from the REAL service driven against a
@@ -81,7 +113,7 @@ void runStationServiceContract({
   final entry = CountryServiceRegistry.entryFor(countryCode);
   final capability = entry?.capability;
 
-  group('\$countryCode — provider contract (#4157)', () {
+  group('$countryCode — provider contract (#4157)', () {
     test('the country is registered and declares a capability', () {
       expect(entry, isNotNull,
           reason: 'a contract case for an unregistered country tests '
@@ -144,15 +176,20 @@ void runStationServiceContract({
 
     test('prices are in a sane range — a separator bug is not a bargain',
         () {
+      final currency = Countries.byCode(countryCode)?.currency;
+      final range = kSanePricePerLitreByCurrency[currency];
+      expect(range, isNotNull,
+          reason: '$countryCode prices in "$currency", which has no row in '
+              'kSanePricePerLitreByCurrency — add one with its rationale '
+              'rather than letting the price check pass unchecked');
       for (final s in stationsOf()) {
         for (final fuel in FuelType.values) {
           if (fuel == FuelType.all || fuel == FuelType.electric) continue;
           final p = s.priceFor(fuel);
           if (p == null) continue;
-          expect(p, inInclusiveRange(kMinSanePricePerLitre,
-              kMaxSanePricePerLitre),
-              reason: '"${s.id}" ${fuel.apiValue} = $p — off by a factor of '
-                  '100 or a comma read as a thousands separator');
+          expect(p, inInclusiveRange(range!.min, range.max),
+              reason: '"${s.id}" ${fuel.apiValue} = $p $currency — off by a '
+                  'factor of 100 or a comma read as a thousands separator');
         }
       }
     });
@@ -173,16 +210,26 @@ void runStationServiceContract({
     test('timestamps parse, and none is in the future', () {
       // A stamp in the future is a broken feed, and every staleness
       // decision downstream inherits it.
+      //
+      // #4180 — reads `priceUpdatedAt`, the machine-readable stamp, not
+      // `updatedAt`. Since #4189 `updatedAt` is the DISPLAY label
+      // (`dd/MM HH:mm`) and is documented "never parse this"; parsing it
+      // here failed every country that follows that rule, and would have
+      // passed a country that stamps a parseable label but drops the
+      // instant the freshness gate actually reads — the #4189 defect.
       if (capability?.priceTimestamp != true) return;
-      final stamped = stationsOf().where((s) => s.updatedAt != null).toList();
+      final stamped =
+          stationsOf().where((s) => s.priceUpdatedAt != null).toList();
       expect(stamped, isNotEmpty,
           reason: 'the country declares priceTimestamp: true and the '
-              'recording stamps nothing');
+              'recording stamps nothing (updatedAt labels: '
+              '${stationsOf().map((s) => s.updatedAt).toSet()})');
       for (final s in stamped) {
-        final parsed = DateTime.tryParse(s.updatedAt!);
-        expect(parsed, isNotNull, reason: '"${s.id}": ${s.updatedAt}');
-        expect(parsed!.isAfter(now.add(const Duration(days: 1))), isFalse,
-            reason: '"${s.id}" is stamped in the future: ${s.updatedAt}');
+        expect(
+            s.priceUpdatedAt!.isAfter(now.add(const Duration(days: 1))),
+            isFalse,
+            reason: '"${s.id}" is stamped in the future: '
+                '${s.priceUpdatedAt}');
       }
     });
 

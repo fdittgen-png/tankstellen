@@ -19,13 +19,25 @@ library;
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/services/country_service_registry.dart';
+
+import 'station_service_contract.dart';
 
 /// Countries driven by a recorded real response through the real
 /// service, with the file that does it.
 const Map<String, String> kContractCovered = {
   'AT': 'austria/econtrol_contract_test.dart',
+  'DE': 'germany/tankerkoenig_contract_test.dart',
+  'DK': 'denmark/denmark_contract_test.dart',
   'ES': 'spain/miteco_contract_test.dart',
+  'FR': 'france/prix_carburants_contract_test.dart',
+  'GB': 'uk/uk_cma_contract_test.dart',
+  'GR': 'greece/greece_contract_test.dart',
+  'LU': 'luxembourg/lustat_contract_test.dart',
+  'MX': 'mexico/cre_contract_test.dart',
+  'PT': 'portugal/dgeg_contract_test.dart',
+  'SI': 'slovenia/goriva_contract_test.dart',
 };
 
 /// Countries not yet driven by the contract, each with the reason and
@@ -35,20 +47,23 @@ const Map<String, String> kContractCovered = {
 /// deliberate act that a reviewer can see.
 const Map<String, String> kContractExempt = {
   'AU': 'provider retired, capability declares price:false — #804',
-  'AR': 'no recorded response checked in yet — #4180',
-  'CL': 'no recorded response checked in yet — #4180',
-  'DE': 'no recorded response checked in yet — #4180',
-  'DK': 'no recorded response checked in yet — #4180',
-  'FR': 'no recorded response checked in yet — #4180',
-  'GB': 'no recorded response checked in yet — #4180',
-  'GR': 'no recorded response checked in yet — #4180',
-  'IT': 'no recorded response checked in yet — #4180',
-  'KR': 'no recorded response checked in yet — #4180',
-  'LU': 'no recorded response checked in yet — #4180',
-  'MX': 'no recorded response checked in yet — #4180',
-  'PT': 'no recorded response checked in yet — #4180',
-  'RO': 'no recorded response checked in yet — #4180',
-  'SI': 'no recorded response checked in yet — #4180',
+  'AR': 'no recorded response checked in, and datos.energia.gob.ar is '
+      'unreachable so none can be captured — #4171',
+  // #4180 — no usable recording. Driving the service over something that
+  // is not a live capture would be the false-green the contract forbids.
+  'CL': 'the only CNE v4 recording is the auth-error body '
+      '(cl_cne_v4_auth_error.json) — no station response to drive — #4180',
+  'KR': 'kr_opinet_around_all_slice.json is evidence-based, NOT a live '
+      'capture (no OPINET key to record with) — #4180',
+  // #4180 — the recording drives the real service (helpers ready in
+  // support/recorded_country_search.dart) and the CONTRACT FAILS: a bug in
+  // the adapter, tracked by #4309, not a gap in the test.
+  'IT': 'fails "timestamps parse": priceUpdatedAt is DateTime.tryParse of '
+      'the dd/MM HH:mm label, so no station is ever stamped although IT '
+      'declares priceTimestamp:true (the #4189 defect) — #4309',
+  'RO': 'fails "timestamps parse": priceUpdatedAt is DateTime.tryParse of '
+      'the raw dd/MM/yyyy HH:mm updatedate, always null although RO '
+      'declares priceTimestamp:true (the #4189 defect) — #4309',
 };
 
 void main() {
@@ -80,6 +95,21 @@ void main() {
     }
   });
 
+  test('every registered country prices in a currency with a sane range',
+      () {
+    // #4180 — the price check is per currency. A country registered in a
+    // currency the table lacks would fail its contract case, but an
+    // EXEMPT country never runs one, so check the table here too.
+    final missing = {
+      for (final code in registered)
+        if (!kSanePricePerLitreByCurrency
+            .containsKey(Countries.byCode(code)?.currency))
+          code: Countries.byCode(code)?.currency,
+    };
+    expect(missing, isEmpty,
+        reason: 'add a kSanePricePerLitreByCurrency row for: $missing');
+  });
+
   test('every covered country names a file that exists', () {
     for (final entry in kContractCovered.entries) {
       final f = File('test/features/station_services/${entry.value}');
@@ -92,7 +122,7 @@ void main() {
     // The ratchet, applied to the contract itself: a country may move
     // from exempt to covered, never back. Lowering this number means
     // someone deleted a contract case.
-    const baseline = 2;
+    const baseline = 11;
     expect(kContractCovered.length, greaterThanOrEqualTo(baseline),
         reason: 'contract coverage went DOWN — a country lost its case');
   });
