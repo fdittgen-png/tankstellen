@@ -4,10 +4,12 @@
 import 'dart:async';
 
 import '../cache/cache_manager.dart';
+import '../domain/station.dart';
 import '../background/provider_request_budget.dart';
 import '../error/exceptions.dart';
 import 'diagnostics/data_access_event.dart';
 import 'diagnostics/data_access_recorder.dart';
+import 'provider_freshness_monitor.dart';
 import 'service_result.dart';
 import 'station_api_failure_log.dart';
 import 'station_failure_classifier.dart';
@@ -40,6 +42,7 @@ class ChainExecutor {
     required this.errorSource,
     this.recorder,
     this.budget,
+    this.freshness,
   });
 
   final CacheStrategy cache;
@@ -47,6 +50,11 @@ class ChainExecutor {
   final ServiceSource errorSource;
   final DataAccessRecorder? recorder;
   final ProviderRequestBudget? budget;
+
+  /// Provider liveness watcher (#4171). Sees the same successful upstream
+  /// responses the budget stamp does — cache hits say nothing about
+  /// whether a provider is still publishing.
+  final ProviderFreshnessMonitor? freshness;
 
   Future<ServiceResult<T>> execute<T>({
     required String cacheKey,
@@ -122,6 +130,13 @@ class ChainExecutor {
       // isolate) sees this hit and won't re-poll the provider within its
       // minInterval. Fire-and-forget; null in legacy/test call sites.
       budget?.recordRequest(countryCode);
+      // #4171 — the same success path, asked a different question: is this
+      // provider still publishing? `execute` is generic, so only a station
+      // payload carries the price stamps there is anything to age.
+      final data = result.data;
+      if (data is List<Station>) {
+        freshness?.recordResponse(countryCode, data);
+      }
       return result;
     }
 
