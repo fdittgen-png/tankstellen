@@ -271,6 +271,13 @@ void main() {
         'lib/features/profile/presentation/widgets/profile_edit_sheet_parts.dart',
         'lib/features/profile/presentation/widgets/profile_edit_sheet_parts2.dart',
         'lib/features/profile/presentation/widgets/profile_edit_sheet_route_section.dart',
+        // #4297 — the two leaf sections that need nothing from the sheet's
+        // private scope became public widgets in their own file, so the
+        // library ratchet had room for the localized fuel label. They are
+        // still the sheet's source as far as these greps are concerned;
+        // omitting the path would silently blind every assertion below to
+        // whatever moves out next.
+        'lib/features/profile/presentation/widgets/profile_edit_sheet_sections.dart',
       ];
       return files.map((f) => File(f).readAsStringSync()).join('\n');
     }

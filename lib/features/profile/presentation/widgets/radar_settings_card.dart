@@ -21,7 +21,7 @@ import '../../domain/entities/user_profile.dart';
 ///   but never tighter than this.
 ///
 /// #3884 — extracted (move-only, behaviour preserved) from the private
-/// `_ApproachOverlaySection` of the profile edit sheet so the same card
+/// `ApproachOverlaySection` of the profile edit sheet so the same card
 /// serves two hosts: the edit sheet (bound to `ProfileEditState`) and
 /// Settings → Driving & consumption → Fuel Station Radar (bound to the
 /// ACTIVE profile). Plain values in, callbacks out — no state coupling.

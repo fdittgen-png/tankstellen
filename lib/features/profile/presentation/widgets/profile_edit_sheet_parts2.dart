@@ -83,45 +83,8 @@ class _CountrySection extends ConsumerWidget {
 /// so Settings → Driving & consumption → Fuel Station Radar can host the
 /// same card for the ACTIVE profile; this thin adapter keeps the edit
 /// sheet's `ProfileEditState` / `ProfileEditController` wiring.
-class _ApproachOverlaySection extends StatelessWidget {
-  final ProfileEditState state;
-  final ProfileEditController ctrl;
-
-  const _ApproachOverlaySection({required this.state, required this.ctrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return RadarSettingsCard(
-      radiusKm: state.approachRadiusKm,
-      priceMode: state.approachPriceMode,
-      minPollSeconds: state.approachMinPollSeconds,
-      onRadiusChanged: ctrl.setApproachRadiusKm,
-      onPriceModeChanged: ctrl.setApproachPriceMode,
-      onMinPollSecondsChanged: ctrl.setApproachMinPollSeconds,
-    );
-  }
-}
-
-/// Language selector rendered as a wrap of ChoiceChips with native names.
-class _LanguageSection extends StatelessWidget {
-  final ProfileEditState state;
-  final ProfileEditController ctrl;
-
-  const _LanguageSection({required this.state, required this.ctrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      children: AppLanguages.all.map((l) {
-        return ChoiceChip(
-          label: Text(l.nativeName),
-          selected: l.code == state.languageCode,
-          onSelected: (_) => ctrl.setLanguageCode(l.code),
-          visualDensity: VisualDensity.compact,
-        );
-      }).toList(),
-    );
-  }
-}
+// #4297 — `_ApproachOverlaySection` and `_LanguageSection` moved to
+// `profile_edit_sheet_sections.dart` as public widgets. Neither touched
+// this library's private scope, and the library sat exactly on its
+// 889-line baseline, leaving no room for the localized fuel label
+// #4295 deferred here.

@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/country/country_config.dart';
-import '../../../../core/language/language_provider.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
@@ -28,8 +27,9 @@ import 'country_change_dialog.dart';
 import 'profile_fuel_type_dropdown.dart';
 import 'profile_landing_screen_dropdown.dart';
 import 'profile_radius_slider.dart';
-import 'radar_settings_card.dart';
+import 'profile_edit_sheet_sections.dart';
 import 'rating_mode_section.dart';
+import '../../../../core/utils/localized_fuel_name.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 part 'profile_edit_sheet_parts.dart';
@@ -223,7 +223,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
       SectionCard(
         title: l10n.approachOverlaySection,
         leadingIcon: Icons.radar,
-        child: _ApproachOverlaySection(state: editState, ctrl: editCtrl),
+        child: ApproachOverlaySection(state: editState, ctrl: editCtrl),
       ),
       // 8 — Vehicle (only when a vehicle exists).
       if (hasVehicles)
@@ -249,7 +249,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
             const SizedBox(height: Spacing.xl),
             Text(l10n.profileLanguage, style: theme.textTheme.bodyMedium),
             const SizedBox(height: Spacing.md),
-            _LanguageSection(state: editState, ctrl: editCtrl),
+            LanguageSection(state: editState, ctrl: editCtrl),
           ],
         ),
       ),
