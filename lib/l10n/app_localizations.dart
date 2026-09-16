@@ -12059,6 +12059,60 @@ abstract class AppLocalizations {
   /// **'It stopped being true before we could send it'**
   String get opportunityRefusalIneligible;
 
+  /// Reason for BudgetRefusal.notWatched (#4154) — the user turned this kind of finding off as an interruption. It stays in the feed: they switched off the push, not the engine.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not watching for this'**
+  String get opportunityRefusalNotWatched;
+
+  /// Title of the screen that was called Price Alerts (#4154). It shows everything the engine found, pushed or not — the configured alerts are one source among several.
+  ///
+  /// In en, this message translates to:
+  /// **'Opportunities'**
+  String get opportunitiesScreenTitle;
+
+  /// Settings group header (#4154) above the per-kind switches. Leads with the question the user cares about; the station/radius/threshold editors stay reachable below.
+  ///
+  /// In en, this message translates to:
+  /// **'What to watch for'**
+  String get opportunitiesWatchHeader;
+
+  /// Explains the difference between the feed and a notification (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Everything the engine finds appears in Opportunities. These switches decide what may interrupt you.'**
+  String get opportunitiesWatchHint;
+
+  /// Settings tile title (#4154) for the station the user actually fills up at, derived from fill-up history and confirmed by them.
+  ///
+  /// In en, this message translates to:
+  /// **'Your usual station'**
+  String get usualStationTitle;
+
+  /// Subtitle offering a derived candidate (#4154): the station name and how many fill-ups support it. Never applied without confirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'{station} — {fills} fill-ups'**
+  String usualStationCandidate(Object fills, Object station);
+
+  /// Confirms the derived usual-station candidate (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Set as usual'**
+  String get usualStationConfirm;
+
+  /// Clears the confirmed usual station (#4154).
+  ///
+  /// In en, this message translates to:
+  /// **'Not my usual'**
+  String get usualStationClear;
+
+  /// Shown when fill-up history is too thin to suggest a usual station (#4154) — honest, not a fabricated example.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a few fill-ups and SparKilo can suggest one'**
+  String get usualStationNone;
+
   /// Title of the background notification for OpportunityKind.bestStopNow — the best stop available right now, near where the user is (#4183, epic #4148). Resolved in the main isolate at task-registration time and read back by the WorkManager isolate via Hive settings, like every other background notification template.
   ///
   /// In en, this message translates to:

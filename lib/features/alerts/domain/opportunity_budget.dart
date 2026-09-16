@@ -90,6 +90,10 @@ enum BudgetRefusal {
   /// is still worth having when they asked for it.
   confidenceTooLow,
 
+  /// #4154 — the user is not watching this kind of finding. It stays in
+  /// the feed: they turned off the interruption, not the engine.
+  notWatched,
+
   /// The scorer refused it outright — expired, untrustworthy provider,
   /// or a saving that does not reconcile.
   ineligible,
@@ -220,17 +224,27 @@ class BudgetOutcome {
 /// notification.
 abstract final class OpportunityBudget {
   /// Decide one scan cycle's worth of [candidates] together.
+  /// #4154 — [watched] answers "did the user ask to hear about this kind".
+  /// Null means every kind (the default), so callers that do not read the
+  /// setting behave exactly as before. An unwatched kind is REFUSED, not
+  /// dropped: it still reaches the feed with its reason, because the
+  /// engine found it and the user can still come looking.
   static BudgetOutcome decide({
     required Iterable<Opportunity> candidates,
     required BudgetState state,
     required DateTime now,
     BudgetPolicy policy = const BudgetPolicy(),
     ConfidenceInputs Function(Opportunity)? confidenceInputs,
+    bool Function(OpportunityKind)? watched,
   }) {
     final demoted = <DemotedOpportunity>[];
     final eligible = <Opportunity>[];
 
     for (final o in candidates) {
+      if (watched != null && !watched(o.kind)) {
+        demoted.add(DemotedOpportunity(o, BudgetRefusal.notWatched));
+        continue;
+      }
       final refusal = _refuse(o, state, now, policy, confidenceInputs);
       if (refusal != null) {
         demoted.add(DemotedOpportunity(o, refusal));

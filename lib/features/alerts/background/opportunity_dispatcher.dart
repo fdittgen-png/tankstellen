@@ -58,6 +58,7 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../data/budget_state_store.dart';
 import '../data/opportunity_feed_store.dart';
+import '../data/opportunity_watch_store.dart';
 import '../domain/opportunity.dart';
 import '../domain/opportunity_budget.dart';
 import '../domain/opportunity_confidence.dart';
@@ -118,11 +119,16 @@ class OpportunityDispatcher {
     this.feed = const OpportunityFeedStore(),
     this.budgetState = const BudgetStateStore(),
     this.policy = const BudgetPolicy(),
+    this.watch = const OpportunityWatchStore(),
   });
 
   final OpportunityFeedStore feed;
   final BudgetStateStore budgetState;
   final BudgetPolicy policy;
+
+  /// #4154 — which kinds the user asked to hear about. Read here rather
+  /// than through a provider: this runs in a background isolate.
+  final OpportunityWatchStore watch;
 
   /// Three decimals, matching what the per-station runner has always
   /// shown. Not a locale format: this runs where there is no locale, and
@@ -160,12 +166,15 @@ class OpportunityDispatcher {
     };
 
     final state = budgetState.read();
+    final watched = watch.read();
     var outcome = OpportunityBudget.decide(
       candidates: [for (final c in candidates) c.opportunity],
       state: state,
       now: now,
       policy: policy,
       confidenceInputs: confidenceInputs,
+      // #4154 — an unwatched kind is refused, and still recorded.
+      watched: watched.contains,
     );
 
     var notified = false;

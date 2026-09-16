@@ -7164,5 +7164,50 @@
   "@fillInventorySkipMixedFuel": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "opportunityRefusalNotWatched": "You are not watching for this",
+  "@opportunityRefusalNotWatched": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunitiesScreenTitle": "Opportunities",
+  "@opportunitiesScreenTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunitiesWatchHeader": "What to watch for",
+  "@opportunitiesWatchHeader": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "opportunitiesWatchHint": "Everything the engine finds appears in Opportunities. These switches decide what may interrupt you.",
+  "@opportunitiesWatchHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "usualStationTitle": "Your usual station",
+  "@usualStationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "usualStationCandidate": "{station} — {fills} fill-ups",
+  "@usualStationCandidate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "usualStationConfirm": "Set as usual",
+  "@usualStationConfirm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "usualStationClear": "Not my usual",
+  "@usualStationClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "usualStationNone": "Add a few fill-ups and SparKilo can suggest one",
+  "@usualStationNone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -21,7 +21,7 @@ class AlertsScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return PageScaffold(
-      title: l10n.priceAlerts,
+      title: l10n.opportunitiesScreenTitle,
       bodyPadding: EdgeInsets.zero,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),

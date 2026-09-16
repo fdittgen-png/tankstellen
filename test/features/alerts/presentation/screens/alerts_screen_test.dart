@@ -11,6 +11,7 @@ import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/screens/alerts_screen.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/alerts_list_tiles.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/station_alert_create_sheet.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
 import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
@@ -38,7 +39,7 @@ void main() {
       );
 
       expect(find.byType(Scaffold), findsAtLeast(1));
-      expect(find.text('Price Alerts'), findsOneWidget);
+      expect(find.text('Opportunities'), findsOneWidget);
     });
 
     testWidgets('shows empty state when no alerts exist', (tester) async {
@@ -90,7 +91,16 @@ void main() {
       );
 
       expect(find.text('Shell Berlin'), findsOneWidget);
-      expect(find.byType(Switch), findsOneWidget);
+      // Scoped to the alert row: the assertion is about THIS alert's
+      // enable toggle, and #4154 put the per-kind watch switches on the
+      // same screen.
+      expect(
+        find.descendant(
+          of: find.byType(AlertListTile),
+          matching: find.byType(Switch),
+        ),
+        findsOneWidget,
+      );
     });
 
     // #858: the alerts screen now surfaces load failures via

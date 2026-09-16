@@ -7164,6 +7164,37 @@ class AppLocalizationsDe extends AppLocalizations {
       'Es stimmte nicht mehr, bevor wir senden konnten';
 
   @override
+  String get opportunityRefusalNotWatched => 'Darauf achtest du nicht';
+
+  @override
+  String get opportunitiesScreenTitle => 'Gelegenheiten';
+
+  @override
+  String get opportunitiesWatchHeader => 'Worauf geachtet wird';
+
+  @override
+  String get opportunitiesWatchHint =>
+      'Alles, was die Erkennung findet, erscheint unter Gelegenheiten. Diese Schalter entscheiden, was dich unterbrechen darf.';
+
+  @override
+  String get usualStationTitle => 'Deine Stammtankstelle';
+
+  @override
+  String usualStationCandidate(Object fills, Object station) {
+    return '$station — $fills Tankvorgänge';
+  }
+
+  @override
+  String get usualStationConfirm => 'Als Stamm festlegen';
+
+  @override
+  String get usualStationClear => 'Nicht meine Stammtankstelle';
+
+  @override
+  String get usualStationNone =>
+      'Erfasse ein paar Tankvorgänge, dann kann SparKilo eine vorschlagen';
+
+  @override
   String opportunityBestStopNowTitle(String fuelType) {
     return 'Günstigstes $fuelType in der Nähe';
   }
