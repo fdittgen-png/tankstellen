@@ -49,7 +49,9 @@ void main() {
         value: LandingScreen.cheapest,
         locale: const Locale('de'),
       );
-      expect(find.text('Günstigste'), findsOneWidget);
+      // #4271 replaced the clipped legacy label with the fuller
+      // phrasing from the maintainer's translation baseline.
+      expect(find.text('Günstigste in der Nähe'), findsOneWidget);
     });
 
     testWidgets(
