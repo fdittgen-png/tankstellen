@@ -55,3 +55,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0019 | Settings information architecture — two-level topic tree, one home per parameter, scope labels (#3884) | Accepted |
 | 0020 | The pump is the truth — a learned fuel gain anchors OBD2 consumption on full-tank fills (#3887) | Accepted |
 | 0021 | One logging façade, one context-map contract — every trace through `log.*` (#3976) | Accepted |
+| 0022 | One consumption contract — provenance, versions and the pump-gain rule travel with the number (#4230) | Accepted |
