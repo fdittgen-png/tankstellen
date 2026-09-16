@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../core/logging/app_log.dart';
+import '../../../core/logging/error_logger.dart';
 import '../../obd2/api.dart';
 import '../domain/trip_summary.dart';
 
@@ -43,4 +45,29 @@ bool shouldDiscardAsNoMovement({
       gpsFixCount == 0 &&
       summary.distanceSource == kDistanceSourceVirtual;
   return (summary.distanceKm < 0.01 && hasNoSignal) || virtualGhost;
+}
+
+/// Record a [shouldDiscardAsNoMovement] discard (moved out of the recording
+/// notifier by #4162). No silent discard (#2509): WHY is recorded so a
+/// regression of the silent-data-loss bug surfaces in the error log, while
+/// the caller surfaces the "no movement detected" notice to the user.
+///
+/// #2787 — but only when captured SIGNAL is actually being dropped (the
+/// silent-data-loss regression the guard exists to catch). A genuinely empty
+/// stop — no samples AND no GPS fixes, e.g. the user stopped without moving,
+/// or the foreground GPS stream never started (the #2766 FGS-permission
+/// case, error log #17) — has no data to lose, so an error trace for it is
+/// pure noise.
+void noteNoMovementDiscard(TripSummary summary, int sampleCount, int gpsFixCount) {
+  if (sampleCount == 0 && gpsFixCount == 0) return;
+  log.error(StateError('trip discarded — no movement detected'),
+      StackTrace.current, layer: ErrorLayer.providers, context: {
+    'where': 'TripRecording._saveToHistory discard',
+    'reason': 'no-movement',
+    'distanceKm': summary.distanceKm.toStringAsFixed(4),
+    'distanceSource': summary.distanceSource,
+    'sampleCount': sampleCount.toString(),
+    'gpsFixCount': gpsFixCount.toString(),
+    'hadStartedAt': (summary.startedAt != null).toString(),
+  });
 }

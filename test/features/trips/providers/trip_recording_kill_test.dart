@@ -1,0 +1,168 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: MIT
+
+/// #4162 — KILL: the OS ends the process mid-recording.
+///
+/// A kill runs no teardown, so each test captures the disk at the instant
+/// the kill lands, winds the old process down, and relaunches from the
+/// captured image through the production launch recovery passes. The
+/// assertion is always about what the relaunched app hands the user.
+library;
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
+import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
+
+import '../../../helpers/silence_error_logger.dart';
+import '../support/phase_trace.dart';
+import '../support/recording_disk_image.dart';
+import '../support/recording_session_driver.dart';
+
+void main() {
+  silenceErrorLoggerSpool();
+
+  late RecordingDisk disk;
+  late RecordingSessionDriver driver;
+
+  setUp(() async {
+    disk = await RecordingDisk.open();
+    driver = RecordingSessionDriver();
+  });
+
+  tearDown(() async {
+    await driver.dispose();
+    await disk.close();
+  });
+
+  /// Wind the killed process down so none of its later writes reach the
+  /// disk the relaunch restores.
+  Future<void> windDown(ProviderContainer old) async {
+    final notifier = old.read(tripRecordingProvider.notifier);
+    await notifier.stop();
+    await RecordingDisk.settle();
+    old.dispose();
+  }
+
+  /// Relaunch on [image] and End the recovered trip the way the pause
+  /// banner does, returning the relaunched container.
+  Future<ProviderContainer> relaunchAndEnd(
+    RecordingDiskImage image, {
+    required int expectedSamples,
+  }) async {
+    final next = await disk.relaunch(image, overrides: driver.overrides);
+    addTearDown(next.dispose);
+    final trace = PhaseTrace(next);
+    addTearDown(trace.close);
+    expect(next.read(tripRecordingProvider).phase,
+        TripRecordingPhase.pausedDueToDrop,
+        reason: 'a trip whose process died comes back as a pause to end');
+    await next.read(tripRecordingProvider.notifier).stop();
+    final saved = disk.historyRepo.loadAll();
+    expect(saved, hasLength(1));
+    expect(saved.single.samples, hasLength(expectedSamples),
+        reason: 'every sample the dead process captured reaches history');
+    expect(saved.single.termination?.reason,
+        TripTerminationReason.recoveredAfterProcessDeath);
+    expect(disk.activeRepo.loadSnapshot(), isNull,
+        reason: 'the finalised trip must not be recovered a second time');
+    trace.expectLawful();
+    return next;
+  }
+
+  group('an OBD2 trip killed mid-recording is recovered whole', () {
+    Future<void> killIn(
+      Future<void> Function(TripRecording notifier) enterPhase,
+      TripRecordingPhase expected,
+    ) async {
+      final old = driver.container();
+      final trace = PhaseTrace(old);
+      final notifier = await RecordingSessionDriver.startObd2(old);
+      RecordingSessionDriver.captureObd2Samples(notifier, 12);
+      await enterPhase(notifier);
+      await notifier.onAppBackgrounded();
+      expect(old.read(tripRecordingProvider).phase, expected);
+      trace
+        ..expectLawful()
+        ..close();
+
+      final image = await disk.capture();
+      expect(image.active, isNotEmpty, reason: 'the WAL row is on disk');
+      expect(image.walBytes, isNotNull,
+          reason: 'the samples live in the append-only WAL, not the row');
+      await windDown(old);
+
+      await relaunchAndEnd(image, expectedSamples: 12);
+    }
+
+    test('while recording', () async {
+      await killIn((_) async {}, TripRecordingPhase.recording);
+    });
+
+    test('while paused by the user', () async {
+      await killIn((n) async {
+        n.pause();
+        await RecordingDisk.settle();
+      }, TripRecordingPhase.paused);
+    });
+
+    test('while paused by a link drop (GPS gone too)', () async {
+      await killIn((n) async {
+        n.debugController!
+            .debugTriggerDrop(reason: TripDropReason.silentFailure);
+        await RecordingDisk.settle();
+      }, TripRecordingPhase.pausedDueToDrop);
+    });
+
+    test('while degraded onto GPS (#2565)', () async {
+      await killIn((n) async {
+        n.debugController!
+          ..updateGpsFix(latitude: 48, longitude: 7, speedKmh: 50)
+          ..debugTriggerDrop(reason: TripDropReason.silentFailure);
+        await RecordingDisk.settle();
+      }, TripRecordingPhase.degradedGpsOnly);
+    });
+
+    test('while paused by the user AND degraded (reachable: 10101)',
+        () async {
+      await killIn((n) async {
+        n.debugController!
+          ..updateGpsFix(latitude: 48, longitude: 7, speedKmh: 50)
+          ..debugTriggerDrop(reason: TripDropReason.silentFailure);
+        await RecordingDisk.settle();
+        n.pause();
+        await RecordingDisk.settle();
+      }, TripRecordingPhase.paused);
+    });
+  });
+
+  test('a GPS-only trip killed mid-recording is recovered whole', () async {
+    final old = driver.container();
+    final notifier = await RecordingSessionDriver.startGpsOnly(old);
+    for (var i = 0; i < 5; i++) {
+      driver.emitFix(index: i);
+    }
+    await RecordingDisk.settle();
+    await notifier.onAppBackgrounded();
+
+    final image = await disk.capture();
+    await windDown(old);
+
+    await relaunchAndEnd(image, expectedSamples: 5);
+  });
+
+  test('a kill while still connecting leaves nothing to recover', () async {
+    final old = driver.container();
+    old.read(tripRecordingProvider.notifier).enterConnecting();
+
+    final image = await disk.capture();
+    old.dispose();
+
+    final next = await disk.relaunch(image, overrides: driver.overrides);
+    addTearDown(next.dispose);
+    expect(next.read(tripRecordingProvider).phase, TripRecordingPhase.idle,
+        reason: 'no trip existed yet, so there is nothing to hand back');
+    expect(disk.activeRepo.loadSnapshot(), isNull);
+    expect(disk.historyRepo.loadAll(), isEmpty);
+  });
+}

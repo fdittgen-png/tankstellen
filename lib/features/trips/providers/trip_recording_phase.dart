@@ -39,6 +39,9 @@
 /// paused" surface is swapped for a lightweight "GPS — OBD2 reconnecting"
 /// notice. It resolves back into [recording] the instant the dongle
 /// re-attaches, or escalates to [pausedDueToDrop] only if GPS ALSO dies.
+///
+/// The transitions between these phases are written down in
+/// [kTripRecordingTransitions] (#4162).
 enum TripRecordingPhase {
   idle,
   connecting,
@@ -49,3 +52,102 @@ enum TripRecordingPhase {
   saving,
   finished
 }
+
+/// Every phase change the recording is allowed to make (#4162).
+///
+/// #3527 ended the OBD2 link's two-authority bugs by writing its state
+/// machine down; this is the same discipline for the recording above
+/// the link. Eight phases admit 56 changes; the ones below are the
+/// changes some writer legitimately performs, and each is here because
+/// of a named writer:
+///
+/// * `idle → connecting` — the recording screen opens before the adapter
+///   answers (#2274). `idle → recording` — a start without that screen
+///   (auto-record, GPS-only). `idle → pausedDueToDrop` — ONLY the
+///   cold-start restore of a trip whose process died (#1303).
+/// * `connecting → recording | idle` — the connect succeeded, or failed /
+///   was abandoned.
+/// * `recording → paused` (the user), `→ pausedDueToDrop` (the link died
+///   and GPS with it), `→ degradedGpsOnly` (the link died, GPS lives,
+///   #2565), `→ saving` (Stop), `→ finished` (a trip the controller ended
+///   on its own).
+/// * `paused → recording` (resume), `→ pausedDueToDrop` (the link died
+///   under a user pause, #1904), `→ saving` (Stop).
+/// * `pausedDueToDrop → recording` (the link returned, or Resume),
+///   `→ saving` (Stop), `→ finished` (the #797 grace window expired, or
+///   End on a restored trip), `→ idle` (a restored trip discarded).
+/// * `degradedGpsOnly → recording` (the engine data came back, #4196),
+///   `→ paused` (the user), `→ pausedDueToDrop` (GPS died too), `→ saving`
+///   (Stop), `→ finished` (the parked auto-finalise, #3862).
+/// * `saving → finished | idle` — the OBD2 and the GPS-only stop resolve
+///   differently (#2548).
+/// * `finished → idle | connecting | recording` — the summary was
+///   consumed, or the next trip began without consuming it.
+///
+/// A write that keeps the phase is not a transition and is always
+/// allowed: the live loop republishes `recording` on every reading.
+///
+/// ## Hidden sub-states (deliberately not phases)
+///
+/// Four situations share a phase with a healthier one, because the UI
+/// must not tell them apart — but a reader of this table must:
+///
+/// * the #1904 silent reconnect window reads `recording` while the
+///   scanner quietly redials (`DroppedSessionManager.silentlyReconnecting`);
+/// * the #3859 engine-off wait reads `degradedGpsOnly`
+///   (`TripRecordingState.awaitingEngine`);
+/// * the #4196 recovery verification reads `degradedGpsOnly` while a
+///   re-adopted link has not yet produced engine data;
+/// * a trip recovered after its process died reads `pausedDueToDrop`
+///   with no pipeline at all — the WAL snapshot is its only state.
+const Map<TripRecordingPhase, Set<TripRecordingPhase>>
+    kTripRecordingTransitions = {
+  TripRecordingPhase.idle: {
+    TripRecordingPhase.connecting,
+    TripRecordingPhase.recording,
+    TripRecordingPhase.pausedDueToDrop,
+  },
+  TripRecordingPhase.connecting: {
+    TripRecordingPhase.recording,
+    TripRecordingPhase.idle,
+  },
+  TripRecordingPhase.recording: {
+    TripRecordingPhase.paused,
+    TripRecordingPhase.pausedDueToDrop,
+    TripRecordingPhase.degradedGpsOnly,
+    TripRecordingPhase.saving,
+    TripRecordingPhase.finished,
+  },
+  TripRecordingPhase.paused: {
+    TripRecordingPhase.recording,
+    TripRecordingPhase.pausedDueToDrop,
+    TripRecordingPhase.saving,
+  },
+  TripRecordingPhase.pausedDueToDrop: {
+    TripRecordingPhase.recording,
+    TripRecordingPhase.saving,
+    TripRecordingPhase.finished,
+    TripRecordingPhase.idle,
+  },
+  TripRecordingPhase.degradedGpsOnly: {
+    TripRecordingPhase.recording,
+    TripRecordingPhase.paused,
+    TripRecordingPhase.pausedDueToDrop,
+    TripRecordingPhase.saving,
+    TripRecordingPhase.finished,
+  },
+  TripRecordingPhase.saving: {
+    TripRecordingPhase.finished,
+    TripRecordingPhase.idle,
+  },
+  TripRecordingPhase.finished: {
+    TripRecordingPhase.idle,
+    TripRecordingPhase.connecting,
+    TripRecordingPhase.recording,
+  },
+};
+
+/// Whether moving from [from] to [to] is a documented transition — or no
+/// transition at all.
+bool isTripRecordingTransition(TripRecordingPhase from, TripRecordingPhase to) =>
+    from == to || (kTripRecordingTransitions[from]?.contains(to) ?? false);

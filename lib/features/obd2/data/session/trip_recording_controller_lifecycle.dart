@@ -25,22 +25,17 @@ mixin _TripRecordingLifecycle
 
   /// Current logical state. Mirrors [stateChanges] for callers that
   /// want a pull-style read (widget tests, initial value).
-  TripRecordingControllerState get currentState {
-    // Check stopped first: an auto-finalised drop sets both
-    // `_stopped = true` AND `_started = false`, so the order matters.
-    if (_run.stopped) return TripRecordingControllerState.stopped;
-    if (!_run.started) return TripRecordingControllerState.idle;
-    if (_run.pausedDueToDrop) {
-      return TripRecordingControllerState.pausedDueToDrop;
-    }
-    if (_run.paused) return TripRecordingControllerState.paused;
-    // #2565 — degraded GPS-only: checked after the true-pause states but
-    // is still an ACTIVE, recording state.
-    if (_run.degradedGpsOnly) {
-      return TripRecordingControllerState.degradedGpsOnly;
-    }
-    return TripRecordingControllerState.recording;
-  }
+  /// #4162 — ONE precedence: this is a projection of [TripRunState.phase],
+  /// which documents why the pauses outrank the #2565 degrade.
+  TripRecordingControllerState get currentState => switch (_run.phase) {
+        TripRunPhase.finished => TripRecordingControllerState.stopped,
+        TripRunPhase.idle => TripRecordingControllerState.idle,
+        TripRunPhase.pausedByDrop => TripRecordingControllerState.pausedDueToDrop,
+        TripRunPhase.pausedByUser => TripRecordingControllerState.paused,
+        TripRunPhase.degradedGpsOnly =>
+          TripRecordingControllerState.degradedGpsOnly,
+        TripRunPhase.running => TripRecordingControllerState.recording,
+      };
 
   bool get isRecording => _run.isRecording;
   bool get isPaused => _run.isPaused;
