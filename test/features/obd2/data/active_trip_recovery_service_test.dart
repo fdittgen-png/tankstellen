@@ -137,8 +137,11 @@ void main() {
 
     test(
         '#3250 — a fresh snapshot whose phase is already terminal '
-        '(stopped/saved) is DISCARDED + cleared, not resurrected', () async {
-      for (final phase in ['stopped', 'saved']) {
+        'is DISCARDED + cleared, not resurrected', () async {
+      // #4243 — 'stopped' is the only terminal wire value any version
+      // ever wrote; the loop used to include 'saved', which no producer
+      // has ever emitted.
+      for (final phase in ['stopped']) {
         await activeRepo.clearSnapshot();
         // Fresh by timestamp, but the trip was already finalised to history —
         // recovering it would re-surface a saved trip + overwrite it on End.
@@ -169,6 +172,37 @@ void main() {
         expect(activeRepo.loadSnapshot(), isNull,
             reason: 'the zombie WAL must be cleared (phase=$phase)');
       }
+    });
+
+    test('#4243 — an UNRECOGNISED phase is not treated as finalised: it '
+        'reaches the staleness check instead of being discarded', () async {
+      await activeRepo.clearSnapshot();
+      await activeRepo.saveSnapshot(
+        ActiveTripSnapshot(
+          id: 'session-future',
+          vehicleId: 'veh-1',
+          vin: 'VIN',
+          automatic: false,
+          // A value a future version might write, or a corrupt row.
+          phase: 'someFuturePhase',
+          summary: summary(),
+          samples: const [],
+          odometerStartKm: 100.0,
+          odometerLatestKm: 105.0,
+          startedAt: fakeNow.subtract(const Duration(minutes: 30)),
+          lastFlushedAt: fakeNow.subtract(const Duration(minutes: 2)),
+        ),
+      );
+      final svc = ActiveTripRecoveryService(
+        activeRepo: activeRepo,
+        historyRepo: historyRepo,
+        now: () => fakeNow,
+      );
+      // Fresh by timestamp, so it is RECOVERED — losing somebody's live
+      // drive because this build cannot name its phase is the worse of
+      // the two failures.
+      expect(await svc.recover(), ActiveTripRecoveryOutcome.recovered);
+      expect(svc.recoveredSnapshot?.id, 'session-future');
     });
 
     test('stale snapshot is discarded and cleared from disk', () async {

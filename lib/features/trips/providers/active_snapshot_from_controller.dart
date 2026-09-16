@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../obd2/api.dart';
+import '../domain/recording_phase_codec.dart';
 import '../domain/trip_recorder.dart';
 
 // The two pure reads the WAL snapshot takes off a live recording
@@ -11,25 +12,9 @@ import '../domain/trip_recorder.dart';
 // notifier state — they are functions of the controller alone, so they are
 // a library of their own and testable without building a notifier.
 
-String phaseStringForController(TripRecordingController ctl) {
-  switch (ctl.currentState) {
-    case TripRecordingControllerState.idle:
-      return 'idle';
-    case TripRecordingControllerState.recording:
-      return 'recording';
-    case TripRecordingControllerState.paused:
-      return 'paused';
-    case TripRecordingControllerState.pausedDueToDrop:
-      return 'pausedDueToDrop';
-    // #2565 — a GPS-only degraded trip is still actively recording, so
-    // the WAL snapshot persists it as 'recording' (it rehydrates as a
-    // live trip on relaunch, never as a pause that needs resuming).
-    case TripRecordingControllerState.degradedGpsOnly:
-      return 'recording';
-    case TripRecordingControllerState.stopped:
-      return 'stopped';
-  }
-}
+String phaseStringForController(TripRecordingController ctl) =>
+    // #4243 — one vocabulary, shared with the reader.
+    recordingPhaseToWire(ctl.currentState);
 
 /// Pull the recorder's running summary; lets the snapshot carry
 /// the latest distance / fuel / harsh counts without forcing the

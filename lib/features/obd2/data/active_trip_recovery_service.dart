@@ -122,7 +122,9 @@ class ActiveTripRecoveryService {
     // trip as a `pausedDueToDrop` banner, and End/Resume re-puts the SAME Hive
     // id — overwriting the good saved entry with a gutted recovery summary.
     // Drop it: it is NOT a live trip to resume.
-    if (snapshot.phase == 'stopped' || snapshot.phase == 'saved') {
+    // #4243 — one shared vocabulary: 'saved' was never emitted by any
+    // version, and an unrecognised phase is deliberately NOT terminal.
+    if (isTerminalRecordingPhase(snapshot.phase)) {
       try {
         await _activeRepo.clearSnapshot();
       } catch (e, st) {
