@@ -176,7 +176,7 @@ Future<Obd2SelfTestStepResult> _supportedPidsStep(
       Obd2BusProbeResult.transient => Obd2SelfTestStepStatus.garbage,
       Obd2BusProbeResult.notProbed => Obd2SelfTestStepStatus.noResponse,
     };
-    diag.recordSupportedTriState('0100',
+    diag.recordSupportedTriState(selfTestSupportedPidsKey,
         status == Obd2SelfTestStepStatus.ok ? 'supported' : 'unsupported');
     return _step(
         Obd2SelfTestStepId.supportedPids, status, sw.elapsedMilliseconds,
@@ -185,7 +185,7 @@ Future<Obd2SelfTestStepResult> _supportedPidsStep(
         detail: '${pids.length} PIDs \u00b7 bus ${service.busProbe.name}');
   } on TimeoutException {
     sw.stop();
-    diag.recordSupportedTriState('0100', 'unknown');
+    diag.recordSupportedTriState(selfTestSupportedPidsKey, 'unknown');
     return _step(Obd2SelfTestStepId.supportedPids,
         Obd2SelfTestStepStatus.timeout, sw.elapsedMilliseconds);
   } catch (_) {
@@ -204,22 +204,22 @@ Future<Obd2SelfTestStepResult> _sampleReadsStep(
   Obd2CommDiagnostics diag,
   Duration deadline,
 ) async {
-  const pids = ['010C', '010D', '0105'];
   var worst = Obd2SelfTestStepStatus.ok;
   final values = <String>[];
   final sw = Stopwatch()..start();
-  for (final pid in pids) {
+  for (final command in kSelfTestSampleCommands) {
+    final pid = command.trim();
     diag.noteDispatch(pid);
     final pidSw = Stopwatch()..start();
     try {
-      final raw = await service.sendCommand('$pid\r').timeout(deadline);
+      final raw = await service.sendCommand(command).timeout(deadline);
       pidSw.stop();
       final cls = classifyObd2Response(raw);
       diag.noteResult(pid, cls, rttMs: pidSw.elapsedMilliseconds);
       worst = _worse(worst, statusForResponseClass(cls));
       // #3555 — surface the PARSED live values, not just pass/fail: the
       // report should read like the dashboard the ECU actually painted.
-      final parsed = _describeSampleValue(pid, raw);
+      final parsed = describeSelfTestSample(command, raw);
       if (parsed != null) values.add(parsed);
     } on TimeoutException {
       pidSw.stop();
@@ -318,25 +318,6 @@ Future<({Obd2SelfTestStepResult result, Obd2Service? service})> _reconnectStep(
       service: null,
     );
   }
-}
-
-/// #3555 — parse one sample-read reply into a locale-neutral value token
-/// for the step detail (`RPM 850` / `13 km/h` / `88\u00b0C`). Null when the
-/// reply didn't parse — the status classification already covers that.
-// i18n-ignore: locale-neutral units on raw protocol data, not UI copy.
-String? _describeSampleValue(String pid, String raw) {
-  switch (pid) {
-    case '010C':
-      final rpm = Elm327Protocol.parseEngineRpm(raw);
-      return rpm == null ? null : 'RPM ${rpm.round()}';
-    case '010D':
-      final kmh = Elm327Protocol.parseVehicleSpeed(raw);
-      return kmh == null ? null : '$kmh km/h';
-    case '0105':
-      final c = Elm327Protocol.parseCoolantTempCelsius(raw);
-      return c == null ? null : '${c.round()}\u00b0C';
-  }
-  return null;
 }
 
 /// Severity ordering for the worst-status fold in [_sampleReadsStep]:

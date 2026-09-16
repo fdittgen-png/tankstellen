@@ -120,17 +120,17 @@ Future<Obd2SelfTestStepResult> _soakStep(
   Obd2CommDiagnostics diag,
   Duration deadline,
 ) async {
-  const pids = ['010C', '010D'];
   var ok = 0;
   var noData = 0;
   final rtts = <int>[];
   final sw = Stopwatch()..start();
   for (var i = 0; i < _kSoakReads; i++) {
-    final pid = pids[i % pids.length];
+    final command = kSelfTestSoakCommands[i % kSelfTestSoakCommands.length];
+    final pid = command.trim();
     diag.noteDispatch(pid);
     final pidSw = Stopwatch()..start();
     try {
-      final raw = await service.sendCommand('$pid\r').timeout(deadline);
+      final raw = await service.sendCommand(command).timeout(deadline);
       pidSw.stop();
       rtts.add(pidSw.elapsedMilliseconds);
       final cls = classifyObd2Response(raw);

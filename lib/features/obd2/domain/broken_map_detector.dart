@@ -5,7 +5,9 @@ import '../../../core/logging/error_logger.dart';
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import 'broken_map_belief.dart';
 import 'broken_map_belief_updater.dart';
+import 'vehicle_signal.dart';
 import '../data/protocol/elm327_parsers.dart';
+import '../data/protocol/obd2_signal_pids.dart';
 import '../data/protocol/oem_pid_table.dart';
 
 /// Idle-probe detector for broken-MAP adapters (#1423 phase 2).
@@ -52,16 +54,18 @@ import '../data/protocol/oem_pid_table.dart';
 class BrokenMapDetector {
   const BrokenMapDetector();
 
-  /// Mode 01 PID 0B request (intake manifold absolute pressure, kPa).
-  static const String _mapCommand = '010B\r';
+  /// Intake manifold absolute pressure request (kPa).
+  static final String _mapCommand =
+      Obd2SignalPids.commandOf(VehicleSignal.manifoldPressure);
 
-  /// Mode 01 PID 33 request (absolute barometric pressure, kPa). Single
-  /// byte, 0-255 kPa scaling (raw).
-  static const String _baroCommand = '0133\r';
+  /// Absolute barometric pressure request (kPa, single raw byte).
+  static final String _baroCommand =
+      Obd2SignalPids.commandOf(VehicleSignal.baroPressure);
 
-  /// Mode 01 PID 11 request (absolute throttle position, percent of
-  /// 100/255). Used to gate the probe on a confirmed-closed throttle.
-  static const String _tpsCommand = '0111\r';
+  /// Absolute throttle position request (percent of 100/255). Used to
+  /// gate the probe on a confirmed-closed throttle.
+  static final String _tpsCommand =
+      Obd2SignalPids.commandOf(VehicleSignal.throttle);
 
   /// Closed-throttle threshold in percent. The SAE-J1979 idle stop is
   /// usually ≤ 12 %; we set 5 % to require a clearly released pedal so
