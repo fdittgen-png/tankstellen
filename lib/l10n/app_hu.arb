@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Ország, nyelv, üzemanyag, keresési sugár, útvonaltervezés",
   "settingsTopicProfilesKeywords": "profil, ország, nyelv, üzemanyag, sugár, irányítószám, útvonal, otthon, értékelés, kezdőképernyő, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Járművek és OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Autóid, tankméret, OBD2-adapter párosítása",
   "settingsTopicVehiclesKeywords": "jármű, autó, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrálás, vehicle, car, engine, calibration",
   "settingsTopicDrivingTitle": "Vezetés és fogyasztás",

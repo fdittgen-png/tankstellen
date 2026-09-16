@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Riik, keel, kütus, otsinguraadius, marsruudi planeerimine",
   "settingsTopicProfilesKeywords": "profiil, riik, keel, kütus, raadius, postiindeks, marsruut, kodu, hinnang, avakuva, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Sõidukid ja OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Sinu autod, paagi maht, OBD2-adapteri sidumine",
   "settingsTopicVehiclesKeywords": "sõiduk, auto, obd, obd2, adapter, bluetooth, paak, mootor, vin, kalibreerimine, vehicle, car, tank, engine, calibration",
   "settingsTopicDrivingTitle": "Sõitmine ja kulu",

@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Država, jezik, gorivo, radijus pretrage, planiranje rute",
   "settingsTopicProfilesKeywords": "profil, država, jezik, gorivo, radijus, poštanski broj, ruta, dom, ocjena, početni zaslon, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Vozila i OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Vaši automobili, veličina spremnika, uparivanje OBD2 adaptera",
   "settingsTopicVehiclesKeywords": "vozilo, auto, obd, obd2, adapter, bluetooth, spremnik, motor, vin, kalibracija, vehicle, car, tank, engine, calibration",
   "settingsTopicDrivingTitle": "Vožnja i potrošnja",

@@ -7562,7 +7562,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'profil, land, sprache, kraftstoff, radius, postleitzahl, route, zuhause, bewertung, startseite';
 
   @override
-  String get settingsTopicVehiclesTitle => 'Fahrzeuge & OBD2';
+  String get settingsTopicVehiclesTitle => 'Dein Auto';
 
   @override
   String get settingsTopicVehiclesSubtitle =>

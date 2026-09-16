@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Maa, kieli, polttoaine, hakusäde, reittisuunnittelu",
   "settingsTopicProfilesKeywords": "profiili, maa, kieli, polttoaine, säde, postinumero, reitti, koti, arvio, aloitusnäyttö, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Ajoneuvot ja OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Autosi, tankin koko, OBD2-sovittimen pariliitos",
   "settingsTopicVehiclesKeywords": "ajoneuvo, auto, obd, obd2, sovitin, bluetooth, tankki, moottori, vin, kalibrointi, vehicle, car, adapter, tank, engine, calibration",
   "settingsTopicDrivingTitle": "Ajaminen ja kulutus",

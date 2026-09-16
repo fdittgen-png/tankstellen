@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Land, språk, bränsle, sökradie, ruttplanering",
   "settingsTopicProfilesKeywords": "profil, land, språk, bränsle, radie, postnummer, rutt, hem, betyg, startskärm, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Fordon & OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Dina bilar, tankstorlek, parkoppling av OBD2-adapter",
   "settingsTopicVehiclesKeywords": "fordon, bil, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrering, vehicle, car, engine, calibration",
   "settingsTopicDrivingTitle": "Körning & förbrukning",

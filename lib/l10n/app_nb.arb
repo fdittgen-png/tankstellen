@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Land, språk, drivstoff, søkeradius, ruteplanlegging",
   "settingsTopicProfilesKeywords": "profil, land, språk, drivstoff, radius, postnummer, rute, hjem, vurdering, startskjerm, profile, country, language, fuel, route, home, rating",
   "settingsTopicVehiclesTitle": "Kjøretøy og OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Bilene dine, tankstørrelse, paring av OBD2-adapter",
   "settingsTopicVehiclesKeywords": "kjøretøy, bil, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibrering, vehicle, car, engine, calibration",
   "settingsTopicDrivingTitle": "Kjøring og forbruk",

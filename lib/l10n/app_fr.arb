@@ -4637,6 +4637,10 @@
   "settingsTopicProfilesSubtitle": "Pays, langue, carburant, rayon de recherche, itinéraires",
   "settingsTopicProfilesKeywords": "profil, pays, langue, carburant, rayon, code postal, itinéraire, domicile, note, écran de départ, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Véhicules et OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Vos voitures, capacité du réservoir, appairage de l'adaptateur OBD2",
   "settingsTopicVehiclesKeywords": "véhicule, voiture, obd, obd2, adaptateur, bluetooth, réservoir, moteur, vin, calibration, vehicle, car, adapter, tank, engine",
   "settingsTopicDrivingTitle": "Conduite et consommation",

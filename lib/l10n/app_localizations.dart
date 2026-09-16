@@ -12682,10 +12682,10 @@ abstract class AppLocalizations {
   /// **'profile, country, language, fuel, radius, postal code, route, home, rating, start screen'**
   String get settingsTopicProfilesKeywords;
 
-  /// Settings root tile title (#3884): the vehicle list and OBD2 adapter pairing.
+  /// Settings root tile title (#4142): what the user gets, not the protocol behind it. The vehicle list and adapter pairing live here; OBD2 stays in the tile KEYWORDS because that is what people type when searching settings, so renaming the label costs no discoverability.
   ///
   /// In en, this message translates to:
-  /// **'Vehicles & OBD2'**
+  /// **'Your car'**
   String get settingsTopicVehiclesTitle;
 
   /// One-line subtitle of the Vehicles & OBD2 tile (#3884).

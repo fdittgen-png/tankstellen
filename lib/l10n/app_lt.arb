@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Šalis, kalba, degalai, paieškos spindulys, maršruto planavimas",
   "settingsTopicProfilesKeywords": "profilis, šalis, kalba, degalai, spindulys, pašto kodas, maršrutas, namai, įvertinimas, pradžios ekranas, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Transporto priemonės ir OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Jūsų automobiliai, bako talpa, OBD2 adapterio susiejimas",
   "settingsTopicVehiclesKeywords": "transporto priemonė, automobilis, obd, obd2, adapteris, bluetooth, bakas, variklis, vin, kalibravimas, vehicle, car, adapter, tank, engine, calibration",
   "settingsTopicDrivingTitle": "Vairavimas ir sąnaudos",

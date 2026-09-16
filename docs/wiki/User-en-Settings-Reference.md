@@ -64,7 +64,7 @@ Three design rules make the tree predictable:
 
 ---
 
-## Vehicles & OBD2
+## Your car
 
 *Your cars, tank size, adapter pairing · scope: this vehicle*
 
