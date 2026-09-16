@@ -42,6 +42,7 @@ export 'domain/entities/gps_sample_diagnostic.dart';
 // records them) and by the export/UI surfaces.
 export 'domain/entities/recording_session_event.dart';
 export 'domain/entities/trip_termination.dart';
+export 'domain/recording_phase_codec.dart';
 export 'domain/recording_session_journal.dart';
 export 'domain/road_load_track.dart';
 export 'domain/entities/trip_save_stage.dart';

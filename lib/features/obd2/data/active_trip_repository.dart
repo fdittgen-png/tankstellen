@@ -153,7 +153,8 @@ class ActiveTripSnapshot {
         vehicleId: json['vehicleId'] as String?,
         vin: json['vin'] as String?,
         automatic: (json['automatic'] as bool?) ?? false,
-        phase: (json['phase'] as String?) ?? 'recording',
+        // #4243 — named, not an accidental fallback (see the codec).
+        phase: (json['phase'] as String?) ?? kUnknownRecordingPhaseWire,
         summary: tripSummaryFromJson(
           (json['summary'] as Map).cast<String, dynamic>(),
         ),
