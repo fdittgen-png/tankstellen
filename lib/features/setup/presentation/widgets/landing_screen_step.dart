@@ -4,8 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../profile/domain/entities/user_profile.dart';
-import '../../../profile/presentation/landing_screen_l10n.dart';
+import '../../../profile/api.dart';
 import '../../providers/onboarding_wizard_provider.dart';
 
 /// Onboarding step for choosing the default landing screen.

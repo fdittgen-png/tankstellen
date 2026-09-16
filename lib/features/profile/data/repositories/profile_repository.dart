@@ -3,6 +3,8 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/logging/app_log.dart';
+import '../../../../core/logging/error_logger.dart';
 import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -309,7 +311,16 @@ class ProfileRepository {
         );
         await updateProfile(profile);
         created.add(profile);
-      } catch (e) {
+      } catch (e, st) {
+        // #1103 — a failure reported to the user as "Retry Italy" is
+        // useless if it cannot be diagnosed, so the stack trace goes to
+        // the error log (through the ADR 0021 facade) while the error
+        // itself goes back to the caller for the retry UI. The context is
+        // deliberately non-const: which country failed is the whole point.
+        log.error(e, st, layer: ErrorLayer.storage, context: {
+          'where': 'ProfileRepository.createMissingCountryProfiles',
+          'country': code,
+        });
         failed[code] = e;
       }
     }
