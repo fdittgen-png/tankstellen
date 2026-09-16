@@ -12,10 +12,8 @@
 // A request with no recorded route FAILS loudly rather than being answered
 // with an invented body — a hand-written stand-in is exactly the
 // `feedback_fake_services_false_green` trap the contract exists to avoid.
-//
-// The IT / RO helpers drive their real services cleanly, but those countries
-// FAIL the timestamp check today (#4309), so they have no contract case yet —
-// see `kContractExempt`. The helper is the seam the case will use.
+// The one hand-written body is RO's labelled no-rows envelope (see
+// [monitorulNoRowsEnvelope]), which carries no station and no price.
 
 import 'package:dio/dio.dart';
 import 'package:tankstellen/core/constants/api_constants.dart';
@@ -126,17 +124,34 @@ Future<List<Station>> searchItalyStations({
   return _search(MiseStationService(dio: dio), params);
 }
 
+/// The observatory's answer for a catalog product with no rows in the
+/// search buffer: an envelope with empty arrays.
+///
+/// **HAND-WRITTEN, NOT RECORDED.** It mirrors the empty body the existing
+/// `romania_station_service_test.dart` documents for the same case. It
+/// exists only because [RomaniaStationService] fails the whole search when
+/// any of its five product calls fails, and only products 11 and 21 were
+/// recorded. It adds no station and no price, so nothing the contract
+/// inspects comes from it.
+const String monitorulNoRowsEnvelope = '{"Stations":[],"Products":[]}';
+
 /// RO — Monitorul Prețurilor, one call per catalog product id.
 ///
-/// [bodyByProductId] maps a `CSVGasCatalogProductIds` value to its recorded
-/// body; a product the caller has no recording for fails the search.
+/// [recordedBodyByProductId] maps a `CSVGasCatalogProductIds` value to its
+/// recorded body. Every id in [emptyProductIds] is answered with the
+/// hand-written [monitorulNoRowsEnvelope]; any other product fails the
+/// search.
 Future<List<Station>> searchRomaniaStations({
-  required Map<String, String> bodyByProductId,
+  required Map<String, String> recordedBodyByProductId,
+  Set<String> emptyProductIds = const {},
   required SearchParams params,
 }) {
   final dio = Dio()
-    ..httpClientAdapter = RecordedRouteAdapter((o) =>
-        bodyByProductId[o.uri.queryParameters['CSVGasCatalogProductIds']]);
+    ..httpClientAdapter = RecordedRouteAdapter((o) {
+      final id = o.uri.queryParameters['CSVGasCatalogProductIds'];
+      if (emptyProductIds.contains(id)) return monitorulNoRowsEnvelope;
+      return recordedBodyByProductId[id];
+    });
   return _search(RomaniaStationService(dio: dio), params);
 }
 

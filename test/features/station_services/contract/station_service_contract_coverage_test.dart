@@ -34,9 +34,11 @@ const Map<String, String> kContractCovered = {
   'FR': 'france/prix_carburants_contract_test.dart',
   'GB': 'uk/uk_cma_contract_test.dart',
   'GR': 'greece/greece_contract_test.dart',
+  'IT': 'italy/mise_contract_test.dart',
   'LU': 'luxembourg/lustat_contract_test.dart',
   'MX': 'mexico/cre_contract_test.dart',
   'PT': 'portugal/dgeg_contract_test.dart',
+  'RO': 'romania/monitorul_contract_test.dart',
   'SI': 'slovenia/goriva_contract_test.dart',
 };
 
@@ -55,15 +57,6 @@ const Map<String, String> kContractExempt = {
       '(cl_cne_v4_auth_error.json) — no station response to drive — #4180',
   'KR': 'kr_opinet_around_all_slice.json is evidence-based, NOT a live '
       'capture (no OPINET key to record with) — #4180',
-  // #4180 — the recording drives the real service (helpers ready in
-  // support/recorded_country_search.dart) and the CONTRACT FAILS: a bug in
-  // the adapter, tracked by #4309, not a gap in the test.
-  'IT': 'fails "timestamps parse": priceUpdatedAt is DateTime.tryParse of '
-      'the dd/MM HH:mm label, so no station is ever stamped although IT '
-      'declares priceTimestamp:true (the #4189 defect) — #4309',
-  'RO': 'fails "timestamps parse": priceUpdatedAt is DateTime.tryParse of '
-      'the raw dd/MM/yyyy HH:mm updatedate, always null although RO '
-      'declares priceTimestamp:true (the #4189 defect) — #4309',
 };
 
 void main() {
@@ -122,7 +115,7 @@ void main() {
     // The ratchet, applied to the contract itself: a country may move
     // from exempt to covered, never back. Lowering this number means
     // someone deleted a contract case.
-    const baseline = 11;
+    const baseline = 13;
     expect(kContractCovered.length, greaterThanOrEqualTo(baseline),
         reason: 'contract coverage went DOWN — a country lost its case');
   });

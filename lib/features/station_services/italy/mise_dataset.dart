@@ -79,6 +79,36 @@ class MiseStationData {
       );
 }
 
+/// A MIMIT `dtComu` stamp ("04/06/2026 07:44:20") as a real instant
+/// (#4309). Null when [raw] is missing or is not a valid day-first
+/// `dd/MM/yyyy HH:mm[:ss]` stamp — an absent age, never a guessed one.
+///
+/// Wall-clock convention, the one PT and FR already follow (#4189): the
+/// provider's own fields are kept as-is, with no timezone conversion. FR's
+/// `*_maj` stamps carry an explicit offset, which `DateTime.tryParse`
+/// honours; PT's `DataAtualizacao` ("2026-06-08 13:15") carries none and
+/// `DateTime.tryParse` yields a local DateTime holding those wall-clock
+/// fields (`portugal_merged_row.dart`). MIMIT stamps carry no offset
+/// either, so they get exactly PT's treatment.
+DateTime? parseMiseDtComu(String? raw) {
+  final m = _dtComu.firstMatch(raw?.trim() ?? '');
+  if (m == null) return null;
+  int g(int i) => int.parse(m.group(i) ?? '0');
+  final value = DateTime(g(3), g(2), g(1), g(4), g(5), g(6));
+  // `DateTime` rolls an out-of-range field over (31/02 → 03/03); a stamp
+  // that does not survive the round trip is malformed, not a date.
+  final valid = value.year == g(3) &&
+      value.month == g(2) &&
+      value.day == g(1) &&
+      value.hour == g(4) &&
+      value.minute == g(5) &&
+      value.second == g(6);
+  return valid ? value : null;
+}
+
+final RegExp _dtComu =
+    RegExp(r'^(\d{2})/(\d{2})/(\d{4}) (\d{2}):(\d{2})(?::(\d{2}))?$');
+
 class MisePriceData {
   double? benzinaSelf;
   double? benzinaServed;
@@ -93,7 +123,18 @@ class MisePriceData {
   double? gasolioPremiumServed;
   double? gpl;
   double? metano;
+
+  /// The freshest `dtComu` as the user reads it: `dd/MM HH:mm`.
+  /// **Display only** — the freshness gate reads [priceUpdatedAt] (#4189).
   String? updatedAt;
+
+  /// The freshest raw `dtComu` stamp, as MIMIT sent it (#4309). Persisted
+  /// under its own key; a dataset written before #4309 lacks it and reads
+  /// back as null, so [priceUpdatedAt] is null until the next download.
+  String? updatedAtRaw;
+
+  /// [updatedAtRaw] as a real instant — see [parseMiseDtComu].
+  DateTime? get priceUpdatedAt => parseMiseDtComu(updatedAtRaw);
 
   MisePriceData();
 
@@ -109,6 +150,7 @@ class MisePriceData {
         if (gpl != null) 'gp': gpl,
         if (metano != null) 'me': metano,
         if (updatedAt != null) 'u': updatedAt,
+        if (updatedAtRaw != null) 'ur': updatedAtRaw,
       };
 
   factory MisePriceData.fromJson(Map<String, dynamic> j) => MisePriceData()
@@ -122,5 +164,6 @@ class MisePriceData {
     ..gasolioPremiumServed = (j['gpv'] as num?)?.toDouble()
     ..gpl = (j['gp'] as num?)?.toDouble()
     ..metano = (j['me'] as num?)?.toDouble()
-    ..updatedAt = j['u'] as String?;
+    ..updatedAt = j['u'] as String?
+    ..updatedAtRaw = j['ur'] as String?;
 }
