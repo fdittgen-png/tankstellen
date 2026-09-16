@@ -6738,24 +6738,20 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenFavorites": "Favorites",
+  "landingScreenFavorites": "Favoris",
   "@landingScreenFavorites": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenMap": "Map",
+  "landingScreenMap": "Carte",
   "@landingScreenMap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenCheapest": "Cheapest nearby",
+  "landingScreenCheapest": "Moins cher à proximité",
   "@landingScreenCheapest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenNearest": "Nearest stations",
+  "landingScreenNearest": "Stations les plus proches",
   "@landingScreenNearest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
 }

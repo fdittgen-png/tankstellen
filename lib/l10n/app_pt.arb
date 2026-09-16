@@ -7260,24 +7260,20 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenFavorites": "Favorites",
+  "landingScreenFavorites": "Favoritos",
   "@landingScreenFavorites": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenMap": "Map",
+  "landingScreenMap": "Mapa",
   "@landingScreenMap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenCheapest": "Cheapest nearby",
+  "landingScreenCheapest": "Mais barato perto",
   "@landingScreenCheapest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenNearest": "Nearest stations",
+  "landingScreenNearest": "Postos mais próximos",
   "@landingScreenNearest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
 }

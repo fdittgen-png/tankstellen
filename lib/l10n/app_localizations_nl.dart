@@ -128,16 +128,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get landingScreen => 'Startscherm';
 
   @override
-  String get landingScreenFavorites => 'Favorites';
+  String get landingScreenFavorites => 'Favorieten';
 
   @override
-  String get landingScreenMap => 'Map';
+  String get landingScreenMap => 'Kaart';
 
   @override
-  String get landingScreenCheapest => 'Cheapest nearby';
+  String get landingScreenCheapest => 'Goedkoopste in de buurt';
 
   @override
-  String get landingScreenNearest => 'Nearest stations';
+  String get landingScreenNearest => 'Dichtstbijzijnde tankstations';
 
   @override
   String get homeZip => 'Postcode thuis';

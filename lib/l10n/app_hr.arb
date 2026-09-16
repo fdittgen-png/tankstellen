@@ -7752,24 +7752,20 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenFavorites": "Favorites",
+  "landingScreenFavorites": "Favoriti",
   "@landingScreenFavorites": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenMap": "Map",
+  "landingScreenMap": "Karta",
   "@landingScreenMap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenCheapest": "Cheapest nearby",
+  "landingScreenCheapest": "Najjeftinije u blizini",
   "@landingScreenCheapest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenNearest": "Nearest stations",
+  "landingScreenNearest": "Najbliže benzinske postaje",
   "@landingScreenNearest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
 }

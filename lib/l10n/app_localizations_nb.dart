@@ -127,16 +127,16 @@ class AppLocalizationsNb extends AppLocalizations {
   String get landingScreen => 'Startskjerm';
 
   @override
-  String get landingScreenFavorites => 'Favorites';
+  String get landingScreenFavorites => 'Favoritter';
 
   @override
-  String get landingScreenMap => 'Map';
+  String get landingScreenMap => 'Kart';
 
   @override
-  String get landingScreenCheapest => 'Cheapest nearby';
+  String get landingScreenCheapest => 'Billigst i nærheten';
 
   @override
-  String get landingScreenNearest => 'Nearest stations';
+  String get landingScreenNearest => 'Nærmeste bensinstasjoner';
 
   @override
   String get homeZip => 'Hjemmepostnummer';

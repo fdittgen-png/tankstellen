@@ -7752,24 +7752,20 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenFavorites": "Favorites",
+  "landingScreenFavorites": "Favoriter",
   "@landingScreenFavorites": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenMap": "Map",
+  "landingScreenMap": "Karta",
   "@landingScreenMap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenCheapest": "Cheapest nearby",
+  "landingScreenCheapest": "Billigast i närheten",
   "@landingScreenCheapest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenNearest": "Nearest stations",
+  "landingScreenNearest": "Närmaste bensinstationer",
   "@landingScreenNearest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
 }

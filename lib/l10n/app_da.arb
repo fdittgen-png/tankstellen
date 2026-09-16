@@ -7260,24 +7260,20 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenFavorites": "Favorites",
+  "landingScreenFavorites": "Favoritter",
   "@landingScreenFavorites": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenMap": "Map",
+  "landingScreenMap": "Kort",
   "@landingScreenMap": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenCheapest": "Cheapest nearby",
+  "landingScreenCheapest": "Billigste i nærheden",
   "@landingScreenCheapest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "landingScreenNearest": "Nearest stations",
+  "landingScreenNearest": "Nærmeste tankstationer",
   "@landingScreenNearest": {
-    "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }
 }

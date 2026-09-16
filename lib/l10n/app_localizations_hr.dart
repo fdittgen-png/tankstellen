@@ -127,16 +127,16 @@ class AppLocalizationsHr extends AppLocalizations {
   String get landingScreen => 'Početni zaslon';
 
   @override
-  String get landingScreenFavorites => 'Favorites';
+  String get landingScreenFavorites => 'Favoriti';
 
   @override
-  String get landingScreenMap => 'Map';
+  String get landingScreenMap => 'Karta';
 
   @override
-  String get landingScreenCheapest => 'Cheapest nearby';
+  String get landingScreenCheapest => 'Najjeftinije u blizini';
 
   @override
-  String get landingScreenNearest => 'Nearest stations';
+  String get landingScreenNearest => 'Najbliže benzinske postaje';
 
   @override
   String get homeZip => 'Kućni poštanski broj';

@@ -128,16 +128,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get landingScreen => 'Écran d\'accueil';
 
   @override
-  String get landingScreenFavorites => 'Favorites';
+  String get landingScreenFavorites => 'Favoris';
 
   @override
-  String get landingScreenMap => 'Map';
+  String get landingScreenMap => 'Carte';
 
   @override
-  String get landingScreenCheapest => 'Cheapest nearby';
+  String get landingScreenCheapest => 'Moins cher à proximité';
 
   @override
-  String get landingScreenNearest => 'Nearest stations';
+  String get landingScreenNearest => 'Stations les plus proches';
 
   @override
   String get homeZip => 'Code postal domicile';

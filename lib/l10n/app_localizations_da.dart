@@ -127,16 +127,16 @@ class AppLocalizationsDa extends AppLocalizations {
   String get landingScreen => 'Startskærm';
 
   @override
-  String get landingScreenFavorites => 'Favorites';
+  String get landingScreenFavorites => 'Favoritter';
 
   @override
-  String get landingScreenMap => 'Map';
+  String get landingScreenMap => 'Kort';
 
   @override
-  String get landingScreenCheapest => 'Cheapest nearby';
+  String get landingScreenCheapest => 'Billigste i nærheden';
 
   @override
-  String get landingScreenNearest => 'Nearest stations';
+  String get landingScreenNearest => 'Nærmeste tankstationer';
 
   @override
   String get homeZip => 'Hjemmepostnummer';

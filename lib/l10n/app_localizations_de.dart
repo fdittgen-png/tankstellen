@@ -134,7 +134,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get landingScreenMap => 'Karte';
 
   @override
-  String get landingScreenCheapest => 'Günstigste';
+  String get landingScreenCheapest => 'Günstigste in der Nähe';
 
   @override
   String get landingScreenNearest => 'Nächste Tankstellen';

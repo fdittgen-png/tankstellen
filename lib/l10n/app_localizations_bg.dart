@@ -127,16 +127,16 @@ class AppLocalizationsBg extends AppLocalizations {
   String get landingScreen => 'Начален екран';
 
   @override
-  String get landingScreenFavorites => 'Favorites';
+  String get landingScreenFavorites => 'Любими';
 
   @override
-  String get landingScreenMap => 'Map';
+  String get landingScreenMap => 'Карта';
 
   @override
-  String get landingScreenCheapest => 'Cheapest nearby';
+  String get landingScreenCheapest => 'Най-евтините наблизо';
 
   @override
-  String get landingScreenNearest => 'Nearest stations';
+  String get landingScreenNearest => 'Най-близките бензиностанции';
 
   @override
   String get homeZip => 'Домашен пощенски код';
