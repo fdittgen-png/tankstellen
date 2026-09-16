@@ -148,3 +148,17 @@ dart run tool/replay_consumption.dart --corpus path/to/other/corpus
 Read-only. Writes nothing, touches no network, needs no UI — and is
 tested in-process by `test/tool/replay_consumption_test.dart` (never
 spawned, #3752).
+
+### Current vs fuzzy (#4232)
+
+Every eligible trace is also replayed through `FuzzyConsumptionEngine`
+and reported in a second per-source-class table beside the shipped figure
+(`tool/replay_consumption_fuzzy.dart`). The engine reads each tick's `f`
+(native for `pid9D` / `pidA2` / `pid5E`, air-mass physics for `maf66` /
+`maf` / `speedDensity` — the recorded, already pump-gain-applied rate),
+or `fe` as GPS road-load physics. Grade, yaw rate, stop count and mass are
+not in `sampleToJson`, so they replay as missing inputs. A trace with any
+interval lacking a figure is listed as not replayable rather than
+integrated partially. The shipped rule base is neutral until it is fitted
+on real native-fuel-rate traces — see
+`docs/decisions/0023-fuzzy-consumption-engine.md`.

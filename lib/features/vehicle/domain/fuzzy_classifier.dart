@@ -3,6 +3,8 @@
 
 import 'dart:math' as math;
 
+import '../../../core/domain/fuzzy_membership.dart';
+
 /// Seven mutually-overlapping driving situations the fuzzy
 /// classifier (#894) can split a single sample across. Mirrors the
 /// six steady-state `DrivingSituation` values the #779 baseline
@@ -215,20 +217,12 @@ class FuzzyClassifier {
       math.max(_gradeRamp(grade), grade >= 2 ? _loadRamp(loadPct) : 0.0);
 
   /// Linear ramp in road grade: 0 % → 0, 8 % → 1, saturates at 1.
-  double _gradeRamp(double grade) {
-    if (grade <= 0) return 0;
-    if (grade >= 8) return 1;
-    return grade / 8;
-  }
+  double _gradeRamp(double grade) => FuzzyMembership.rampUp(grade, 0, 8);
 
   /// Linear ramp in engine / absolute load: 45 % → 0, 70 % → 1,
   /// saturates at 1. Below 45 % the engine is loafing — not a climb /
   /// load situation.
-  double _loadRamp(double loadPct) {
-    if (loadPct <= 45) return 0;
-    if (loadPct >= 70) return 1;
-    return (loadPct - 45) / (70 - 45);
-  }
+  double _loadRamp(double loadPct) => FuzzyMembership.rampUp(loadPct, 45, 70);
 
   /// Hard threshold: 1.0 when the driver is decelerating AND off the
   /// pedal, 0 otherwise.
@@ -255,11 +249,8 @@ class FuzzyClassifier {
 
   /// Descending ramp: 1.0 at or below [cold], 0 at or above [warm],
   /// linear between. Used for the temperature-based cold-start signal.
-  double _coolingRamp(double tempC, double cold, double warm) {
-    if (tempC <= cold) return 1;
-    if (tempC >= warm) return 0;
-    return (warm - tempC) / (warm - cold);
-  }
+  double _coolingRamp(double tempC, double cold, double warm) =>
+      FuzzyMembership.rampDown(tempC, cold, warm);
 
   /// Sustained-load / towing membership (#2515). High load held steady
   /// on a FLAT road — distinct from a hill. Non-zero only when the road
@@ -294,12 +285,9 @@ class FuzzyClassifier {
 
   /// Trapezoidal membership: rises 0→1 across [a, b], stays at 1 across
   /// [b, c], falls 1→0 across [c, d]. Returns 0 outside [a, d].
-  double _trapezoid(double x, double a, double b, double c, double d) {
-    assert(a <= b && b <= c && c <= d,
-        'trapezoid parameters must satisfy a ≤ b ≤ c ≤ d');
-    if (x <= a || x >= d) return 0;
-    if (x >= b && x <= c) return 1;
-    if (x < b) return (x - a) / math.max(b - a, 1e-9);
-    return (d - x) / math.max(d - c, 1e-9);
-  }
+  ///
+  /// #4232 — the primitives live in `core/domain/fuzzy_membership.dart`
+  /// so the fuzzy consumption engine reuses the same shapes.
+  double _trapezoid(double x, double a, double b, double c, double d) =>
+      FuzzyMembership.trapezoid(x, a, b, c, d);
 }

@@ -31,6 +31,13 @@
 // starts advisory or post-merge. A replay threshold becomes a gate only
 // once the corpus is real and #4234's retirement gate needs it.
 //
+// ## Current vs fuzzy (#4232)
+//
+// Every eligible trace is also replayed through `FuzzyConsumptionEngine`
+// (`replay_consumption_fuzzy.dart`) and reported in a second table beside
+// the shipped figure, against the same truth — the side-by-side the epic's
+// validation gate will read. Still reporting only.
+//
 // Usage:
 //   dart run tool/replay_consumption.dart
 //   dart run tool/replay_consumption.dart --corpus path/to/corpus
@@ -40,6 +47,10 @@
 
 import 'dart:convert';
 import 'dart:io';
+
+import 'package:tankstellen/features/trips/domain/fuzzy_consumption/fuzzy_consumption_engine.dart';
+
+import 'replay_consumption_fuzzy.dart';
 
 /// Where traces live by default, relative to the repo root.
 const String kDefaultCorpusDir = 'test/fixtures/consumption_corpus';
@@ -300,6 +311,11 @@ String buildReplayReport({String root = '.', String? corpusDir}) {
     for (final c in ReplaySourceClass.values) c: ReplayBucket(c),
   };
   final skipped = <String>[];
+  // #4232 — the fuzzy engine over the SAME eligible traces, side by side.
+  final fuzzyBuckets = {
+    for (final c in ReplaySourceClass.values) c: ReplayBucket(c),
+  };
+  final fuzzySkipped = <String>[];
 
   for (final trace in traces) {
     final bucket = buckets[trace.sourceClass]!;
@@ -308,6 +324,16 @@ String buildReplayReport({String root = '.', String? corpusDir}) {
       bucket.ineligible++;
       skipped.add('`${trace.name}` (${trace.sourceClass.name}) — $reason');
       continue;
+    }
+    final fuzzy = replayFuzzy(trace.samples);
+    final fuzzyReason = fuzzy.incompleteReason;
+    if (fuzzyReason == null) {
+      fuzzyBuckets[trace.sourceClass]!
+          .add(truth: trace.truthLitres!, predicted: fuzzy.litres);
+    } else {
+      fuzzyBuckets[trace.sourceClass]!.ineligible++;
+      fuzzySkipped
+          .add('`${trace.name}` (${trace.sourceClass.name}) — $fuzzyReason');
     }
     final shipped = trace.shippedLitres;
     if (shipped == null) {
@@ -333,6 +359,8 @@ String buildReplayReport({String root = '.', String? corpusDir}) {
   }
   out.writeln();
 
+  _writeFuzzySection(out, fuzzyBuckets, fuzzySkipped);
+
   if (skipped.isNotEmpty) {
     out
       ..writeln('## Traces excluded from error, and why')
@@ -344,6 +372,43 @@ String buildReplayReport({String root = '.', String? corpusDir}) {
   }
 
   return out.toString();
+}
+
+/// The fuzzy engine's table (#4232). Read-only reporting like the rest:
+/// it never gates anything.
+void _writeFuzzySection(
+  StringBuffer out,
+  Map<ReplaySourceClass, ReplayBucket> buckets,
+  List<String> skipped,
+) {
+  final version = const FuzzyConsumptionEngine().version;
+  out
+    ..writeln('## Fuzzy engine (#4232), same eligible traces')
+    ..writeln()
+    ..writeln('Model ${version.model}, rules ${version.rules}. The shipped')
+    ..writeln('rule base is neutral (multiplier 1, residual 0) until it is')
+    ..writeln('fitted on real native-fuel-rate traces, so this integrates the')
+    ..writeln('per-tick native / physics rates the engine passes through.')
+    ..writeln()
+    ..writeln('| source class | traces | not replayable | MAE (L) | MAPE '
+        '| bias |')
+    ..writeln('|---|---:|---:|---:|---:|---:|');
+  for (final c in ReplaySourceClass.values) {
+    final b = buckets[c]!;
+    if (b.traces == 0 && b.ineligible == 0) continue;
+    out.writeln('| ${c.name} | ${b.traces} | ${b.ineligible} '
+        '| ${_fmt(b.maeLitres)} | ${_pct(b.mapePercent)} '
+        '| ${_pct(b.biasPercent)} |');
+  }
+  out.writeln();
+  if (skipped.isEmpty) return;
+  out
+    ..writeln('Not replayable through the engine:')
+    ..writeln();
+  for (final s in skipped) {
+    out.writeln('- $s');
+  }
+  out.writeln();
 }
 
 String _fmt(double? v) => v == null ? '—' : v.toStringAsFixed(3);
