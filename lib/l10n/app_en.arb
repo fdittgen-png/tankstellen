@@ -9677,6 +9677,38 @@
   "@criteriaRadiusCustom": {
     "description": "Chip after the radius presets (5 / 10 / 25 km) on the search-criteria sheet; selecting it reveals a slider for any other radius (#4199). Keep it one short word."
   },
+  "criteriaIntentHeader": "What are you looking for?",
+  "@criteriaIntentHeader": {
+    "description": "Section header above the intent chips at the top of the search-criteria sheet (#4138). Each chip applies a named preset over the existing controls, which stay below and authoritative."
+  },
+  "criteriaIntentCheapestNearby": "Cheapest nearby",
+  "@criteriaIntentCheapestNearby": {
+    "description": "Intent chip (#4138): sorts by price and limits to stations open now."
+  },
+  "criteriaIntentBestStop": "Best stop",
+  "@criteriaIntentBestStop": {
+    "description": "Intent chip (#4138): ranks by effective price per litre — the pump price plus what the drive there costs (#4088). Needs a known consumption."
+  },
+  "criteriaIntentOnMyRoute": "On my route",
+  "@criteriaIntentOnMyRoute": {
+    "description": "Intent chip (#4138): stations along the planned route, cheapest-first."
+  },
+  "criteriaIntentFastest": "Fastest",
+  "@criteriaIntentFastest": {
+    "description": "Intent chip (#4138): nearest first, cost second."
+  },
+  "criteriaIntentFavourite": "A favourite",
+  "@criteriaIntentFavourite": {
+    "description": "Intent chip (#4138): go straight to a station the user already saved."
+  },
+  "criteriaIntentCustom": "Custom",
+  "@criteriaIntentCustom": {
+    "description": "Shown as the selected intent once the user changes any control, so the sheet never displays a label that no longer matches the state (#4138)."
+  },
+  "criteriaIntentNeedsConsumption": "Add a fill-up first so we know your consumption",
+  "@criteriaIntentNeedsConsumption": {
+    "description": "One-line reason under the disabled “Best stop” chip (#4138). Its ranking needs the drive cost, which needs a known consumption — trust rule 1 says say so rather than silently fall back to a price sort."
+  },
   "fillUpOdometerFromLastFillUp": "Pre-filled from your last fill-up",
   "@fillUpOdometerFromLastFillUp": {
     "description": "Helper text under the odometer field of the Add fill-up form when the value was pre-filled from the vehicle's most recent fill-up (#3899)."

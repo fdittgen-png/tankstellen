@@ -8931,6 +8931,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String get criteriaRadiusCustom => 'Individuell';
 
   @override
+  String get criteriaIntentHeader => 'Wonach suchst du?';
+
+  @override
+  String get criteriaIntentCheapestNearby => 'Am günstigsten in der Nähe';
+
+  @override
+  String get criteriaIntentBestStop => 'Bester Stopp';
+
+  @override
+  String get criteriaIntentOnMyRoute => 'Auf meiner Route';
+
+  @override
+  String get criteriaIntentFastest => 'Am schnellsten';
+
+  @override
+  String get criteriaIntentFavourite => 'Ein Favorit';
+
+  @override
+  String get criteriaIntentCustom => 'Eigene';
+
+  @override
+  String get criteriaIntentNeedsConsumption =>
+      'Erfasse zuerst eine Tankfüllung, damit wir deinen Verbrauch kennen';
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Aus Ihrer letzten Tankfüllung vorausgefüllt';
 

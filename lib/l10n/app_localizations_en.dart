@@ -8841,6 +8841,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get criteriaRadiusCustom => 'Custom';
 
   @override
+  String get criteriaIntentHeader => 'What are you looking for?';
+
+  @override
+  String get criteriaIntentCheapestNearby => 'Cheapest nearby';
+
+  @override
+  String get criteriaIntentBestStop => 'Best stop';
+
+  @override
+  String get criteriaIntentOnMyRoute => 'On my route';
+
+  @override
+  String get criteriaIntentFastest => 'Fastest';
+
+  @override
+  String get criteriaIntentFavourite => 'A favourite';
+
+  @override
+  String get criteriaIntentCustom => 'Custom';
+
+  @override
+  String get criteriaIntentNeedsConsumption =>
+      'Add a fill-up first so we know your consumption';
+
+  @override
   String get fillUpOdometerFromLastFillUp =>
       'Pre-filled from your last fill-up';
 
@@ -18713,6 +18738,31 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get criteriaRadiusCustom => '⟦Çúšŧóɱ ···⟧';
+
+  @override
+  String get criteriaIntentHeader => '⟦Ŵĥáŧ ářé ýóú łóóķîñǧ ƒóř? ·········⟧';
+
+  @override
+  String get criteriaIntentCheapestNearby => '⟦Çĥéáƥéšŧ ñéářƀý ······⟧';
+
+  @override
+  String get criteriaIntentBestStop => '⟦Ɓéšŧ šŧóƥ ····⟧';
+
+  @override
+  String get criteriaIntentOnMyRoute => '⟦Óñ ɱý řóúŧé ····⟧';
+
+  @override
+  String get criteriaIntentFastest => '⟦Ƒášŧéšŧ ···⟧';
+
+  @override
+  String get criteriaIntentFavourite => '⟦Á ƒáṽóúřîŧé ·····⟧';
+
+  @override
+  String get criteriaIntentCustom => '⟦Çúšŧóɱ ···⟧';
+
+  @override
+  String get criteriaIntentNeedsConsumption =>
+      '⟦Áđđ á ƒîłł-úƥ ƒîřšŧ šó ŵé ķñóŵ ýóúř çóñšúɱƥŧîóñ ·················⟧';
 
   @override
   String get fillUpOdometerFromLastFillUp =>

@@ -7209,5 +7209,45 @@
   "@usualStationNone": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "criteriaIntentHeader": "What are you looking for?",
+  "@criteriaIntentHeader": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaIntentCheapestNearby": "Cheapest nearby",
+  "@criteriaIntentCheapestNearby": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaIntentBestStop": "Best stop",
+  "@criteriaIntentBestStop": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaIntentOnMyRoute": "On my route",
+  "@criteriaIntentOnMyRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaIntentFastest": "Fastest",
+  "@criteriaIntentFastest": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaIntentFavourite": "A favourite",
+  "@criteriaIntentFavourite": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaIntentCustom": "Custom",
+  "@criteriaIntentCustom": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "criteriaIntentNeedsConsumption": "Add a fill-up first so we know your consumption",
+  "@criteriaIntentNeedsConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
