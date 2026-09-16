@@ -7488,7 +7488,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'profile, country, language, fuel, radius, postal code, route, home, rating, start screen';
 
   @override
-  String get settingsTopicVehiclesTitle => 'Vehicles & OBD2';
+  String get settingsTopicVehiclesTitle => 'Your car';
 
   @override
   String get settingsTopicVehiclesSubtitle =>
@@ -17347,7 +17347,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦ƥřóƒîłé, çóúñŧřý, łáñǧúáǧé, ƒúéł, řáđîúš, ƥóšŧáł çóđé, řóúŧé, ĥóɱé, řáŧîñǧ, šŧářŧ šçřééñ ·······························⟧';
 
   @override
-  String get settingsTopicVehiclesTitle => '⟦Ṽéĥîçłéš & ÓƁĐ2 ·····⟧';
+  String get settingsTopicVehiclesTitle => '⟦Ýóúř çář ···⟧';
 
   @override
   String get settingsTopicVehiclesSubtitle =>

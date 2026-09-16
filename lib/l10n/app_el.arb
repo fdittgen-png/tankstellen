@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Χώρα, γλώσσα, καύσιμο, ακτίνα αναζήτησης, σχεδιασμός διαδρομής",
   "settingsTopicProfilesKeywords": "προφίλ, χώρα, γλώσσα, καύσιμο, ακτίνα, ταχυδρομικός κώδικας, διαδρομή, σπίτι, αξιολόγηση, αρχική οθόνη, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Οχήματα & OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Τα αυτοκίνητά σας, χωρητικότητα ρεζερβουάρ, σύζευξη προσαρμογέα OBD2",
   "settingsTopicVehiclesKeywords": "όχημα, αυτοκίνητο, obd, obd2, προσαρμογέας, bluetooth, ρεζερβουάρ, κινητήρας, vin, βαθμονόμηση, vehicle, car, adapter, tank, engine, calibration",
   "settingsTopicDrivingTitle": "Οδήγηση & κατανάλωση",

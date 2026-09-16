@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Land, taal, brandstof, zoekstraal, routeplanning",
   "settingsTopicProfilesKeywords": "profiel, land, taal, brandstof, straal, postcode, route, thuis, beoordeling, startscherm, profile, country, language, fuel, radius, home, rating",
   "settingsTopicVehiclesTitle": "Voertuigen & OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Je auto's, tankinhoud, OBD2-adapter koppelen",
   "settingsTopicVehiclesKeywords": "voertuig, auto, obd, obd2, adapter, bluetooth, tank, motor, vin, kalibratie, vehicle, car, engine, calibration",
   "settingsTopicDrivingTitle": "Rijden & verbruik",

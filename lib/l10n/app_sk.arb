@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Krajina, jazyk, palivo, okruh hľadania, plánovanie trasy",
   "settingsTopicProfilesKeywords": "profil, krajina, jazyk, palivo, okruh, psč, trasa, domov, hodnotenie, úvodná obrazovka, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Vozidlá a OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Vaše autá, objem nádrže, párovanie adaptéra OBD2",
   "settingsTopicVehiclesKeywords": "vozidlo, auto, obd, obd2, adaptér, bluetooth, nádrž, motor, vin, kalibrácia, vehicle, car, adapter, tank, engine, calibration",
   "settingsTopicDrivingTitle": "Jazda a spotreba",

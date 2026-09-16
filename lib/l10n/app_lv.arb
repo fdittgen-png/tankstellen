@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Valsts, valoda, degviela, meklēšanas rādiuss, maršruta plānošana",
   "settingsTopicProfilesKeywords": "profils, valsts, valoda, degviela, rādiuss, pasta indekss, maršruts, mājas, vērtējums, sākuma ekrāns, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Transportlīdzekļi un OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Tavas automašīnas, tvertnes tilpums, OBD2 adaptera savienošana pārī",
   "settingsTopicVehiclesKeywords": "transportlīdzeklis, auto, obd, obd2, adapteris, bluetooth, tvertne, dzinējs, vin, kalibrēšana, vehicle, car, adapter, tank, engine, calibration",
   "settingsTopicDrivingTitle": "Braukšana un patēriņš",

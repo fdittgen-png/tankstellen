@@ -4632,6 +4632,10 @@
   "settingsTopicProfilesSubtitle": "Kraj, język, paliwo, promień wyszukiwania, planowanie trasy",
   "settingsTopicProfilesKeywords": "profil, kraj, język, paliwo, promień, kod pocztowy, trasa, dom, ocena, ekran startowy, profile, country, language, fuel, radius, route, home, rating",
   "settingsTopicVehiclesTitle": "Pojazdy i OBD2",
+  "@settingsTopicVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "STALE (#4142): the English value changed to \"Your car\" — this locale still carries the old \"Vehicles & OBD2\" wording. Autofill never overwrites an existing translation, so this needs a native string. Replace the value and delete this block."
+  },
   "settingsTopicVehiclesSubtitle": "Twoje samochody, pojemność baku, parowanie adaptera OBD2",
   "settingsTopicVehiclesKeywords": "pojazd, samochód, auto, obd, obd2, adapter, bluetooth, bak, silnik, vin, kalibracja, vehicle, car, tank, engine, calibration",
   "settingsTopicDrivingTitle": "Jazda i zużycie paliwa",
