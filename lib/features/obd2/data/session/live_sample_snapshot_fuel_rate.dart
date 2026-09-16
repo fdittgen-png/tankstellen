@@ -270,10 +270,10 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
 
     // Step 3: speed-density from MAP+IAT+RPM. Feeds the pre-#810
     // estimator with the active vehicle's displacement + VE (#812).
-    // #2505 — MAP + RPM must be same-tick current, but IAT is reused up
-    // to [_iatStaleness] old (the #2457 governor reads it slowly).
+    // #2505 — MAP + RPM must be same-tick current, but IAT is reused
+    // inside its freshness window (the #2457 governor reads it slowly).
     final mapKpa = _latestMapKpa;
-    final iat = _freshIatCelsius();
+    final iat = _signals.fresh(VehicleSignal.intakeAirTemp);
     final rpm = _latestRpm;
     void recordNone() => collector?.record(
           branch: Obd2BranchTag.none,
@@ -383,21 +383,5 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       stftBank2: _latestStftBank2,
       ltftBank2: _latestLtftBank2,
     );
-  }
-
-  /// How long a latched IAT (#2505) stays usable for speed-density fuel.
-  /// The #2457 governor reads IAT (0x0F) on the demotable ~0.5 Hz tier, so
-  /// it is rarely fresh on the tick MAP + RPM land; intake-air temperature
-  /// drifts on a minutes scale, so a few-seconds-old value is physically
-  /// fine. 12 s spans a few throttled IAT periods yet rejects a dead link.
-  static const Duration _iatStaleness = Duration(seconds: 12);
-
-  /// The last-known IAT (°C) if it landed within [_iatStaleness], else
-  /// null (#2505) — keeps speed-density fuel flowing between sparse reads.
-  double? _freshIatCelsius() {
-    final iat = _latestIatCelsius;
-    final at = _latestIatAt;
-    if (iat == null || at == null) return null;
-    return _clock().difference(at) > _iatStaleness ? null : iat;
   }
 }

@@ -13,6 +13,7 @@ import 'obd2_service.dart';
 import 'obd2_signal_support.dart';
 import '../../domain/pid_scheduler.dart';
 import '../../domain/precision_pid_latches.dart';
+import '../../domain/signal_latch_store.dart';
 import '../../domain/vehicle_signal.dart';
 
 part 'live_sample_snapshot_latches.dart';
@@ -76,9 +77,12 @@ class LiveSampleSnapshot
   final void Function(Object? parsedValue) _onHighPriorityParse;
   @override
   final void Function(double speedKmh) _onSpeedSample;
-  // #2505 — IAT-staleness clock (test seam).
-  @override
+  // Arrival clock for every latch (#2505 IAT staleness, #4159) — test seam.
   final DateTime Function() _clock;
+
+  // #4159 — per-signal latest value + arrival time.
+  @override
+  late final SignalLatchStore _signals = SignalLatchStore(clock: _clock);
 
   // Epic #3416 — latches + subscriptions for the precision PID families
   // (measured wideband φ #3427, MAF 0x66 / fuel-rate 0x9D / 0xA2 #3428,

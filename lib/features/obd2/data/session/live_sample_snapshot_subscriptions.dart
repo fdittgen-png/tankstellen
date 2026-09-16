@@ -170,10 +170,8 @@ mixin _LiveSampleSnapshotSubscriptions on _LiveSampleSnapshotLatches {
     _sub(scheduler, VehicleSignal.intakeAirTemp,
         hz: 0.5, tier: PidTier.slowCorrection, (r) {
       final v = Elm327Protocol.parseIntakeAirTempCelsius(r);
-      if (v != null) {
-        _latestIatCelsius = v;
-        _latestIatAt = _clock(); // #2505 — latch for the staleness window.
-      }
+      // #2505 — the store stamps arrival for the staleness window.
+      if (v != null) _signals.write(VehicleSignal.intakeAirTemp, v);
     });
     // #3692 — timing advance (0x0E): knock retard under boost is a
     // consumption signal. Slow tier; optionalPid-gated, absent → null.

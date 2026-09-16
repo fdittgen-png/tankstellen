@@ -372,7 +372,7 @@ void main() {
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,
     'lib/features/fill_ups/providers/consumption_providers.dart': 973,
     'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': 948,
-    'lib/features/obd2/data/session/live_sample_snapshot.dart': 941,
+    'lib/features/obd2/data/session/live_sample_snapshot.dart': 924,
     'lib/features/profile/presentation/widgets/profile_edit_sheet.dart': 855,
     'lib/features/obd2/data/session/obd2_self_test_driver.dart': 828,
     'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 824,

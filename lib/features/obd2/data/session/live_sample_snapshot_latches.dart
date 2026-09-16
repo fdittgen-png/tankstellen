@@ -18,8 +18,8 @@ mixin _LiveSampleSnapshotLatches {
   Obd2BreadcrumbRecorder? get _breadcrumbCollector;
   void Function(Object? parsedValue) get _onHighPriorityParse;
   void Function(double speedKmh) get _onSpeedSample;
-  DateTime Function() get _clock; // #2505 — IAT-staleness clock (test seam).
   PrecisionPidLatches get _precision;
+  SignalLatchStore get _signals; // #4159 — value + arrival per signal.
 
   /// The ECU's own fuel-type answer (PID 0x51) read ONCE at comm-session
   /// start (#3429) — runtime truth that beats the free-text profile fuel
@@ -37,10 +37,6 @@ mixin _LiveSampleSnapshotLatches {
   double? _latestRpm;
   double? _latestMaf;
   double? _latestMapKpa;
-  double? _latestIatCelsius;
-  // #2505 — when [_latestIatCelsius] last landed. Lets the speed-density
-  // branch reuse a slightly-stale IAT (see [_freshIatCelsius]).
-  DateTime? _latestIatAt;
   double? _latestThrottlePercent;
   double? _latestEngineLoadPercent;
   double? _latestCoolantTempC;
@@ -166,7 +162,8 @@ mixin _LiveSampleSnapshotLatches {
 
   /// #3692 — the persisted-signal getters: IAT was latched since #2505
   /// but never exposed for recording; timing advance is new.
-  double? get latestIatCelsius => _latestIatCelsius;
+  double? get latestIatCelsius =>
+      _signals.latest(VehicleSignal.intakeAirTemp);
   double? get latestTimingAdvanceDeg => _latestTimingAdvanceDeg;
   double? get latestMaf => _latestMaf;
   double? get latestMapKpa => _latestMapKpa;
