@@ -23,9 +23,9 @@
 /// (`data/protocol/obd2_signal_pids.dart`) turns the name into a PID, a
 /// request and a support gate.
 ///
-/// This is a **ratchet**: the count is frozen and may only fall. The
-/// migration moves one consumer at a time, and what makes each move safe
-/// is not a device drive but the pins that landed before it — the exact
+/// Since #4159 this is a **ban**: the baseline is empty. The migration
+/// moved one consumer at a time, and what made each move safe was not a
+/// device drive but the pins that landed before it — the exact
 /// resolved schedule and gate calls
 /// (`live_sample_snapshot_schedule_pin_test`), the measured-φ priority
 /// rule (`precision_pid_latches_test`), the fuel-rate reader's gate/read
@@ -49,11 +49,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Raw PID hex literals outside the adapter layer, per file.
 ///
-/// Frozen 2026-09-14. **Only ever decreases.** A consumer that moves to
-/// the normalized layer takes its entries with it.
-const Map<String, int> _baseline = {
-  'lib/features/obd2/data/session/obd2_fuel_rate_reader.dart': 18,
-};
+/// Frozen 2026-09-14 at 38 across three files; empty since #4159. Never
+/// add an entry — name the signal instead.
+const Map<String, int> _baseline = {};
 
 const _skipPrefixes = [
   'lib/features/obd2/data/protocol/',
