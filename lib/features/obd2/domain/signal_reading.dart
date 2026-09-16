@@ -5,24 +5,10 @@ import 'package:meta/meta.dart';
 
 import '../../../core/domain/data_value.dart';
 import 'fuel_mixture_model.dart';
+import 'signal_plausibility.dart';
 import 'vehicle_signal.dart';
 
-/// Whether a reading's value sits inside the band its consumer trusts
-/// (#4159).
-///
-/// A band check MARKS a value; it never replaces it. The fuel math keeps
-/// its own clamps, but a clamped φ or baro reading is an adapter or sensor
-/// fault worth seeing, so the unclamped value travels with this mark.
-enum SignalPlausibility {
-  /// No band is defined for this signal (most signals).
-  notChecked,
-
-  /// Inside the band.
-  plausible,
-
-  /// Outside the band — the consumer's clamp would have hidden it.
-  implausible,
-}
+export 'signal_plausibility.dart' show SignalPlausibility;
 
 /// One vehicle signal's value with its unit, provenance and freshness
 /// (#4159): the normalized form every consumer above the adapter can read
@@ -73,6 +59,22 @@ final class SignalReading {
   @override
   String toString() => 'SignalReading(${signal.name}, $value, '
       '${plausibility.name})';
+}
+
+/// [reading] marked against the band its consumer clamps to (#4159):
+/// commanded φ and baro always, measured wideband φ by the resolved fuel
+/// ([isDiesel] picks the diesel band). Other signals, and readings with
+/// no value, are returned unchanged.
+SignalReading markPlausibility(SignalReading reading, {required bool isDiesel}) {
+  final v = reading.valueOrNull;
+  if (v == null) return reading;
+  return switch (reading.signal) {
+    VehicleSignal.commandedPhi => reading.marked(classifyCommandedPhi(v)),
+    VehicleSignal.baroPressure => reading.marked(classifyBaroKpa(v)),
+    VehicleSignal.widebandPhi =>
+      reading.marked(classifyMeasuredPhi(v, isDiesel: isDiesel)),
+    _ => reading,
+  };
 }
 
 /// A derived fuel-rate figure as a [VehicleSignal.fuelRate] reading

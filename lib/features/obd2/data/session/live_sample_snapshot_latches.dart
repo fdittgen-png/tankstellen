@@ -29,13 +29,8 @@ mixin _LiveSampleSnapshotLatches {
   /// then falls back to the profile exactly as before.
   String? sessionFuelTypeKey;
 
-  // #4159 — every OBD2 latch lives in [_signals] (value + arrival time
-  // per VehicleSignal). The getters below are a hold-last facade over it,
-  // so TripLiveReading / TripSample see exactly the values they did when
-  // each signal had its own `_latest*` field. Per-signal history (#2456
-  // φ / baro refine the MAF + speed-density math; #2458 bank-2 trims,
-  // absolute load and the three pedal channels; #2459 oil / ambient;
-  // #3692 timing advance) is on the subscription that fills each one.
+  // #4159 — every OBD2 latch lives in [_signals]; the getters below are a
+  // hold-last facade over it (per-signal history is on each subscription).
 
   // #1374 phase 1 — most recent GPS fix, pushed in by the provider when
   // the `Feature.gpsTripPath` flag is enabled (the controller never
@@ -68,16 +63,21 @@ mixin _LiveSampleSnapshotLatches {
   // no read) → null and `_emit` matches pre-#1615 behaviour.
   double? _latestOemFuelLevelLitres;
 
-  /// The hold-last value of [signal] (#4159).
   double? _latest(VehicleSignal signal) => _signals.latest(signal);
 
-  /// [signal]'s latest value with unit, provenance and freshness (#4159):
-  /// `Measured(at)` / `Stale(age)` past its window / `Unknown`. Measured
-  /// wideband φ applies the sensor-priority rule of [latestMeasuredPhi].
-  SignalReading reading(VehicleSignal signal) => switch (signal) {
-        VehicleSignal.widebandPhi => _precision.measuredPhiReading(),
-        _ => _signals.reading(signal),
-      };
+  /// [signal] with unit, provenance and freshness (#4159); wideband φ by
+  /// the [latestMeasuredPhi] sensor rule; φ and baro marked against the
+  /// fuel math's clamp bands (wideband by this session's resolved fuel).
+  SignalReading reading(VehicleSignal signal) => markPlausibility(
+        signal == VehicleSignal.widebandPhi
+            ? _precision.measuredPhiReading()
+            : _signals.reading(signal),
+        isDiesel: resolveMixtureConstants(_vehicle,
+                    sessionFuelTypeKey: sessionFuelTypeKey,
+                    measuredEthanolPercent: _precision.ethanolPercent)
+                .kind ==
+            ResolvedFuelKind.diesel,
+      );
 
   double? get latestSpeedKmh => _latest(VehicleSignal.vehicleSpeed);
   double? get latestRpm => _latest(VehicleSignal.engineRpm);
