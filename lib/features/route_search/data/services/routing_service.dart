@@ -1,25 +1,35 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../../core/domain/travel_estimate.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/services/dio_factory.dart';
 import '../../../../core/services/service_result.dart';
 import '../../../../core/utils/geo_utils.dart';
 import '../../domain/entities/route_info.dart';
+import 'osrm_travel_matrix.dart';
 
 /// OSRM (Open Source Routing Machine) client for driving route calculation.
 ///
 /// Free public demo server, no API key required.
 /// Returns route geometry + distance + duration.
 class RoutingService {
-  final Dio _dio = DioFactory.create(
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 30),
-  );
+  /// [dio] is injectable so a test replays recorded router answers
+  /// through this real client instead of faking the service (#4359).
+  RoutingService({Dio? dio})
+      : _dio = dio ??
+            DioFactory.create(
+              connectTimeout: const Duration(seconds: 10),
+              receiveTimeout: const Duration(seconds: 30),
+            );
+
+  final Dio _dio;
 
   static const _baseUrl = 'https://router.project-osrm.org';
 
@@ -130,6 +140,39 @@ class RoutingService {
         st,
       );
     }
+  }
+
+  /// #4359 — station travel estimates for one [TravelContext], all
+  /// [stops] in ONE `/table` request (distance AND duration, both
+  /// directions, the journey baseline in the same matrix). See
+  /// `osrm_travel_matrix.dart` for the request shape and decoding.
+  ///
+  /// The router's refusal of a requested exclusion (the public server
+  /// answers 400 `InvalidValue` for `exclude`) is decoded as
+  /// [TravelEstimateStatus.constraintsUnsupported] — never retried
+  /// without the exclusion. Network failures propagate to the caller,
+  /// which keeps its explicitly approximate figures.
+  Future<List<StationTravelEstimate>> stationTravelEstimates({
+    required TravelContext context,
+    required List<TravelStop> stops,
+    required DateTime now,
+  }) async {
+    if (stops.isEmpty) return const [];
+    final response = await _dio.get<dynamic>(
+      '$_baseUrl/table/v1/driving/'
+      '${osrmTravelCoordinates(context, stops)}',
+      queryParameters: osrmTravelParams(context, stops.length),
+      // A 4xx carries OSRM's own `code`; decode it rather than throw.
+      options: Options(validateStatus: (s) => s != null && s < 500),
+    );
+    final data = response.data;
+    final json = data is Map<String, dynamic>
+        ? data
+        : data is String
+            ? jsonDecode(data) as Map<String, dynamic>
+            : const <String, dynamic>{};
+    return parseOsrmTravelMatrix(json,
+        context: context, stops: stops, calculatedAt: now);
   }
 
   /// Walk the polyline and emit a point every [intervalKm] kilometers.

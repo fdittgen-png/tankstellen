@@ -45,6 +45,7 @@ import 'package:tankstellen/features/route_search/providers/route_search_provide
 import 'package:tankstellen/features/search/providers/refuel_decision_provider.dart';
 import 'package:tankstellen/features/search/providers/refuel_plan_provider.dart';
 import 'package:tankstellen/features/search/providers/search_filters_provider.dart';
+import 'package:tankstellen/features/search/providers/station_travel_estimates_provider.dart';
 
 import '../../features/station_services/support/recorded_country_search.dart';
 import '../../helpers/silence_error_logger.dart';
@@ -290,6 +291,8 @@ void main() {
         tankStateProvider.overrideWithValue(
             const TankState(capacityL: 60, currentL: 12)),
         selectedFuelTypeProvider.overrideWith(_FixedFuel.new),
+        travelEstimateFetcherProvider
+            .overrideWithValue((context, stops) async => const []),
       ]);
       addTearDown(c.dispose);
 

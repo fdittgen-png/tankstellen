@@ -27,10 +27,12 @@ library;
 import 'package:meta/meta.dart';
 
 import 'data_value.dart';
+import 'refuel_candidate.dart';
 import 'refuel_decision.dart';
 
 // Re-exported so every existing caller keeps one import: the split
 // (#4139) is an internal seam, not a change to this layer's contract.
+export 'refuel_candidate.dart';
 export 'refuel_decision.dart';
 
 /// The default litres a refuel is assumed to buy when the user has no
@@ -97,96 +99,6 @@ const Duration kConfidentPickMaxPriceAge = Duration(hours: 24);
 /// only the deviation counts. The route layer supplies the real
 /// deviation as a road distance.
 const double kEnRouteTripFactor = 1;
-
-/// One station, reduced to what the economics needs.
-@immutable
-class RefuelCandidate {
-  const RefuelCandidate({
-    required this.stationId,
-    required this.oneWayKm,
-    this.pricePerLitre,
-    this.isRoadDistance = false,
-    this.isPhysicalStation = true,
-    this.coverageComplete = true,
-    this.openState = const DataValue.unknown(
-      reason: DataUnknownReason.notPublishedForThisItem,
-    ),
-    this.priceAge = const DataValue.unknown(
-      reason: DataUnknownReason.notPublishedForThisItem,
-    ),
-  });
-
-  final String stationId;
-
-  /// Distance to the station, one way. Crow-flies unless
-  /// [isRoadDistance]; see [kCrowFliesRoadFactor].
-  final double oneWayKm;
-
-  /// Price of the SELECTED fuel, or null when this station does not
-  /// publish one. A candidate without a price can still be the closest;
-  /// it can never hold an economic ranking (spec §4.3).
-  final double? pricePerLitre;
-
-  /// True when [oneWayKm] is a real road distance, so no correction
-  /// factor applies.
-  final bool isRoadDistance;
-
-  /// False for a reference price stood in at a synthetic point — LU's
-  /// decree at a city centroid, GR's prefecture average (#4348,
-  /// `ProviderCapability.coordinates`).
-  ///
-  /// Such a candidate stays in [RefuelDecision.quotes] (its price is
-  /// real) but has no cost — nobody drives to a town square to buy fuel
-  /// — and holds no ranking, so no saving can be claimed against it.
-  final bool isPhysicalStation;
-
-  /// False when this candidate's source covers only part of its
-  /// country's stations (#4348, DK's three brand feeds). A pick drawn
-  /// from such a set is the best among the stations listed, and
-  /// [RefuelDecision.coverageIncomplete] makes the UI say so.
-  final bool coverageComplete;
-
-  /// Whether the station is open right now (#4139), as far as the
-  /// country's provider can say (#4156).
-  ///
-  /// Never used in the ARITHMETIC — it gates whether Best Value may LEAD
-  /// (spec §3.1). A confident recommendation at a closed forecourt is the
-  /// failure §5 named as costing more trust than the optimisation buys.
-  ///
-  /// Was a `bool?`, which conflated two different absences and read both
-  /// as "closed": eleven of the seventeen registered countries publish no
-  /// opening hours for anyone, so the conditional lead could not fire in
-  /// any of them and nothing said why.
-  /// `ProviderCapability.openState` produces this, and the difference
-  /// between the two unknowns is what the gate now reads.
-  final DataValue<bool> openState;
-
-  /// How old the price is (#4139), as far as the country's provider can
-  /// say (#4156). Gates the lead for the same reason; never enters the
-  /// cost.
-  ///
-  /// [DataUnknownReason.notPublishedByProvider] means the source stamps
-  /// no prices at all — the age we could compute would be our own
-  /// download clock. See `ProviderCapability.priceAge`.
-  final DataValue<Duration> priceAge;
-
-  @override
-  bool operator ==(Object other) =>
-      other is RefuelCandidate &&
-      other.stationId == stationId &&
-      other.oneWayKm == oneWayKm &&
-      other.pricePerLitre == pricePerLitre &&
-      other.isRoadDistance == isRoadDistance &&
-      other.isPhysicalStation == isPhysicalStation &&
-      other.coverageComplete == coverageComplete &&
-      other.openState == openState &&
-      other.priceAge == priceAge;
-
-  @override
-  int get hashCode =>
-      Object.hash(stationId, oneWayKm, pricePerLitre, isRoadDistance,
-          isPhysicalStation, coverageComplete, openState, priceAge);
-}
 
 /// The vehicle and intent side of the calculation.
 ///
@@ -316,9 +228,7 @@ abstract final class RefuelEconomics {
     if (consumption == null || consumption <= 0) return null;
     if (profile.litresIntended <= 0) return null;
 
-    final travelKm = candidate.oneWayKm *
-        profile.tripFactor *
-        (candidate.isRoadDistance ? 1 : profile.roadFactor);
+    final travelKm = RefuelEconomics.travelKm(candidate, profile);
     final detourLitres = travelKm * consumption / 100;
     return RefuelCost(
       travelKm: travelKm,
@@ -326,6 +236,24 @@ abstract final class RefuelEconomics {
       detourCost: detourLitres * price,
       purchaseCost: profile.litresIntended * price,
     );
+  }
+
+  /// Kilometres driven for this refuel (#4359).
+  ///
+  /// The routed itinerary when the candidate carries an actionable road
+  /// estimate — both real legs, from the driver's own origin — else the
+  /// approximate `tripFactor × oneWayKm × roadFactor`. The same figure
+  /// costs the detour and ranks "closest", so the two can never disagree
+  /// about which station is nearer.
+  static double travelKm(RefuelCandidate candidate, RefuelProfile profile) {
+    final road = candidate.roadTravel;
+    final routed = road != null && road.isActionable
+        ? road.itinerary.distanceKm
+        : null;
+    if (routed != null) return routed;
+    return candidate.oneWayKm *
+        profile.tripFactor *
+        (candidate.isRoadDistance ? 1 : profile.roadFactor);
   }
 
   /// Rank [candidates] three ways under [profile].
@@ -369,7 +297,7 @@ abstract final class RefuelEconomics {
       profile: profile,
       quotes: quotes,
       cheapest: best((q) => q.candidate.pricePerLitre),
-      closest: best((q) => q.candidate.oneWayKm),
+      closest: best((q) => travelKm(q.candidate, profile)),
       bestValue:
           profile.canRankByValue ? best((q) => q.effectivePricePerLitre) : null,
     );
