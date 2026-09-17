@@ -7774,6 +7774,54 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'proteklo';
 
   @override
+  String get processWorkflowsDriving => 'Record and understand driving';
+
+  @override
+  String get processWorkflowsRecordDescription =>
+      'Record journeys and review them in your driving history.';
+
+  @override
+  String get processWorkflowsEnabled => 'Workflow enabled';
+
+  @override
+  String get processWorkflowsNotEnabled => 'Workflow not enabled';
+
+  @override
+  String get processWorkflowsDetails => 'Why is this enabled?';
+
+  @override
+  String get processWorkflowsEnable => 'Enable workflow';
+
+  @override
+  String get processWorkflowsRequired =>
+      'Required capabilities — enabled together';
+
+  @override
+  String get processWorkflowsNeeds =>
+      'Before recording, choose a vehicle and configure its recording mode and required permissions. Enabling this workflow may resume automatic recording if you previously enabled it for a vehicle.';
+
+  @override
+  String get processWorkflowsImpact =>
+      'Capabilities that will become active (including saved preferences)';
+
+  @override
+  String get processWorkflowsUsedBy => 'Used by these optional capabilities';
+
+  @override
+  String get processWorkflowsConfirm => 'Confirm activation';
+
+  @override
+  String get processWorkflowsActivated => 'Workflow enabled.';
+
+  @override
+  String get processWorkflowsChanged =>
+      'Your settings changed during review. Open the preview again.';
+
+  @override
+  String get processWorkflowsFailed =>
+      'Could not finish updating the workflow. Check its current state and try again.';
+
+  @override
   String pumpGainCalibratedTitle(String vehicleName, String percent) {
     return '$vehicleName: procjene potrošnje ponovno usidrene na pumpu ($percent %)';
   }

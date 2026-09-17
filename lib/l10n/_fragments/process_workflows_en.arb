@@ -1,0 +1,16 @@
+{
+  "processWorkflowsDriving": "Record and understand driving",
+  "processWorkflowsRecordDescription": "Record journeys and review them in your driving history.",
+  "processWorkflowsEnabled": "Workflow enabled",
+  "processWorkflowsNotEnabled": "Workflow not enabled",
+  "processWorkflowsDetails": "Why is this enabled?",
+  "processWorkflowsEnable": "Enable workflow",
+  "processWorkflowsRequired": "Required capabilities — enabled together",
+  "processWorkflowsNeeds": "Before recording, choose a vehicle and configure its recording mode and required permissions. Enabling this workflow may resume automatic recording if you previously enabled it for a vehicle.",
+  "processWorkflowsImpact": "Capabilities that will become active (including saved preferences)",
+  "processWorkflowsUsedBy": "Used by these optional capabilities",
+  "processWorkflowsConfirm": "Confirm activation",
+  "processWorkflowsActivated": "Workflow enabled.",
+  "processWorkflowsChanged": "Your settings changed during review. Open the preview again.",
+  "processWorkflowsFailed": "Could not finish updating the workflow. Check its current state and try again."
+}

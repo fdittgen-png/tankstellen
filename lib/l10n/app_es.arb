@@ -8207,5 +8207,75 @@
   "@fuelAndTankExcludedTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "processWorkflowsDriving": "Record and understand driving",
+  "@processWorkflowsDriving": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsRecordDescription": "Record journeys and review them in your driving history.",
+  "@processWorkflowsRecordDescription": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsEnabled": "Workflow enabled",
+  "@processWorkflowsEnabled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsNotEnabled": "Workflow not enabled",
+  "@processWorkflowsNotEnabled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsDetails": "Why is this enabled?",
+  "@processWorkflowsDetails": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsEnable": "Enable workflow",
+  "@processWorkflowsEnable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsRequired": "Required capabilities — enabled together",
+  "@processWorkflowsRequired": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsImpact": "Capabilities that will become active (including saved preferences)",
+  "@processWorkflowsImpact": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsUsedBy": "Used by these optional capabilities",
+  "@processWorkflowsUsedBy": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsConfirm": "Confirm activation",
+  "@processWorkflowsConfirm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsActivated": "Workflow enabled.",
+  "@processWorkflowsActivated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsChanged": "Your settings changed during review. Open the preview again.",
+  "@processWorkflowsChanged": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsFailed": "Could not finish updating the workflow. Check its current state and try again.",
+  "@processWorkflowsFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "processWorkflowsNeeds": "Before recording, choose a vehicle and configure its recording mode and required permissions. Enabling this workflow may resume automatic recording if you previously enabled it for a vehicle.",
+  "@processWorkflowsNeeds": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -7829,6 +7829,55 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'écoulé';
 
   @override
+  String get processWorkflowsDriving => 'Enregistrer et comprendre les trajets';
+
+  @override
+  String get processWorkflowsRecordDescription =>
+      'Enregistrez vos trajets et consultez votre historique de conduite.';
+
+  @override
+  String get processWorkflowsEnabled => 'Parcours activé';
+
+  @override
+  String get processWorkflowsNotEnabled => 'Parcours non activé';
+
+  @override
+  String get processWorkflowsDetails => 'Pourquoi est-ce activé ?';
+
+  @override
+  String get processWorkflowsEnable => 'Activer le parcours';
+
+  @override
+  String get processWorkflowsRequired =>
+      'Fonctionnalités requises — activées ensemble';
+
+  @override
+  String get processWorkflowsNeeds =>
+      'Avant d’enregistrer, choisissez un véhicule et configurez son mode d’enregistrement et les autorisations requises. L’activation peut relancer l’enregistrement automatique si vous l’aviez activé pour un véhicule.';
+
+  @override
+  String get processWorkflowsImpact =>
+      'Fonctionnalités qui seront activées (préférences enregistrées incluses)';
+
+  @override
+  String get processWorkflowsUsedBy =>
+      'Utilisé par ces fonctionnalités facultatives';
+
+  @override
+  String get processWorkflowsConfirm => 'Confirmer l’activation';
+
+  @override
+  String get processWorkflowsActivated => 'Parcours activé.';
+
+  @override
+  String get processWorkflowsChanged =>
+      'Vos paramètres ont changé pendant la vérification. Ouvrez à nouveau l’aperçu.';
+
+  @override
+  String get processWorkflowsFailed =>
+      'La mise à jour du parcours n’a pas pu être terminée. Vérifiez son état actuel et réessayez.';
+
+  @override
   String pumpGainCalibratedTitle(String vehicleName, String percent) {
     return '$vehicleName : estimations de consommation recalées sur la pompe ($percent %)';
   }
