@@ -92,21 +92,49 @@ void main() {
       expect(schedule.debugViolations, isEmpty);
     });
 
-    test('B1 — a boot re-arm with no alerts registers anyway: reproduces '
-        'only the filed defect', () async {
+    test('B1 (#4331) — a boot re-arm with no alerts registers nothing and '
+        'cancels', () async {
       final schedule = reconciler();
 
       expect(await runBackgroundTask(BackgroundService.bootReregisterTask,
               schedule: schedule),
           isTrue);
 
-      final violations = [for (final v in schedule.debugViolations) v.$1];
-      expectOnlyKnownScheduleViolations(violations);
-      expect(violations, contains(ScheduleViolation.bootRearmWithoutGate),
-          reason: 'B1 still reproduces — delete the known entry with the fix');
-      expect(fetcher.calls, ['init'],
-          reason: 'pinned: the boot path registers the 12 h scan with no '
-              'alert to consent to it');
+      expect(fetcher.calls, ['cancelAll'],
+          reason: 'no alert consents to the 12 h scan');
+      final apply = schedule.debugApplies.single;
+      expect(apply.gate, ScheduleGateReading.inactive);
+      expect(apply.result, AlertSchedulePhase.cancelled);
+      expect(apply.cause, 'boot');
+      expectOnlyKnownScheduleViolations(
+          [for (final v in schedule.debugViolations) v.$1]);
+      expect(schedule.debugViolations, isEmpty);
+    });
+
+    test('a boot re-arm with an active alert registers (#2413 kept)',
+        () async {
+      final schedule = AlertScheduleReconciler(
+        gate: () async => true,
+        fetcher: () => fetcher,
+        slc: () => slc,
+        persistTemplates: () async => fail('boot runs in a background '
+            'isolate that has no settings box to write templates to'),
+      );
+      await runBackgroundTask(BackgroundService.bootReregisterTask,
+          schedule: schedule);
+      expect(fetcher.calls, ['init']);
+      expect(slc.calls, isEmpty, reason: 'SLC is iOS; boot is Android');
+    });
+
+    test('a boot re-arm whose gate is unreadable leaves the schedule alone',
+        () async {
+      await Hive.box<dynamic>(HiveBoxes.alerts).close();
+      final schedule = reconciler();
+      await runBackgroundTask(BackgroundService.bootReregisterTask,
+          schedule: schedule);
+      expect(fetcher.calls, isEmpty);
+      expect(schedule.debugApplies.single.gate,
+          ScheduleGateReading.unreadable);
     });
   });
 

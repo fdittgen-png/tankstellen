@@ -64,20 +64,15 @@ enum ScheduleGateReading {
 
   /// The gate threw (e.g. the alerts box is not open) — nothing applied.
   unreadable,
-
-  /// The gate was never consulted.
-  unread,
 }
 
 /// An apply the reconciler's invariant says must not happen (#4162).
 ///
 /// The invariant: **every apply acts on the newest gate reading.** An
-/// apply acting on no reading, or on a reading a later apply has already
-/// superseded, leaves the schedule contradicting the user's alerts.
+/// apply acting on a reading a later apply has already superseded leaves
+/// the schedule contradicting the user's alerts. (#4331 made "an apply
+/// acting on no reading at all" unrepresentable: every apply reads.)
 enum ScheduleViolation {
-  /// The schedule was armed without consulting the alerts gate at all.
-  bootRearmWithoutGate,
-
   /// An arm landed after a cancel that read the gate LATER had already
   /// landed — the schedule ends armed although the newest reading said
   /// cancel.
@@ -95,8 +90,8 @@ typedef ScheduleApply = ({
 /// The one owner of the background schedule (#4162).
 ///
 /// Before this, "arm or cancel" was decided in `BackgroundService.reconcile`
-/// AND, without the gate, in the boot branch of `callbackDispatcher`, and
-/// nothing recorded which reading an apply acted on. Every caller now goes
+/// AND, without the gate, in the boot branch of `callbackDispatcher` (B1,
+/// fixed in #4331), and nothing recorded which reading an apply acted on. Every caller now goes
 /// through here: the alert providers and the post-frame startup reconcile
 /// via `BackgroundService.reconcile`, the Android boot re-arm via
 /// [bootRearm].
@@ -117,9 +112,14 @@ class AlertScheduleReconciler {
     required this._fetcher,
     required this._slc,
     required this._persistTemplates,
+    this._bootGate,
   });
 
   final Future<bool> Function() _gate;
+
+  /// The gate [bootRearm] reads — a background isolate has to open the
+  /// alerts box under the Hive lock first. Defaults to [_gate].
+  final Future<bool> Function()? _bootGate;
   final BackgroundPriceFetcher Function() _fetcher;
   final SlcWakeMonitor Function() _slc;
   final Future<void> Function() _persistTemplates;
@@ -184,20 +184,40 @@ class AlertScheduleReconciler {
     }
   }
 
-  /// The Android boot re-arm (#2413): re-register the periodic work after
-  /// a reboot. Registers WITHOUT reading the gate — recorded as
-  /// [ScheduleViolation.bootRearmWithoutGate].
+  /// The Android boot re-arm (#2413): after a reboot, apply the alerts
+  /// gate again — register when an alert is active, cancel when none is.
+  ///
+  /// #4331 B1 — this used to register WITHOUT reading the gate, so a user
+  /// who once had alerts and deleted them all got the 12 h scan back at
+  /// every boot. It reads the gate now like every apply. It still does not
+  /// persist templates or touch the SLC wake: it runs in a background
+  /// isolate with no settings box, and SLC is iOS while the boot receiver
+  /// is Android.
   Future<void> bootRearm() async {
     final generation = ++_generation;
+    bool? active;
     try {
-      await _fetcher().init();
+      active = await (_bootGate ?? _gate)();
+      if (active) {
+        await _fetcher().init();
+      } else {
+        await _fetcher().cancelAll();
+      }
       _landed((
         generation: generation,
-        gate: ScheduleGateReading.unread,
-        result: AlertSchedulePhase.armed,
+        gate: active ? ScheduleGateReading.active : ScheduleGateReading.inactive,
+        result: active ? AlertSchedulePhase.armed : AlertSchedulePhase.cancelled,
         cause: 'boot',
       ));
     } catch (e, st) {
+      if (active == null) {
+        _record((
+          generation: generation,
+          gate: ScheduleGateReading.unreadable,
+          result: _phase,
+          cause: 'boot',
+        ));
+      }
       log.error(e, st, layer: ErrorLayer.background, context: const {
         'where': 'BackgroundService.bootRearm',
       });
@@ -205,9 +225,6 @@ class AlertScheduleReconciler {
   }
 
   void _landed(ScheduleApply apply) {
-    if (apply.gate == ScheduleGateReading.unread) {
-      _violation(ScheduleViolation.bootRearmWithoutGate, apply);
-    }
     if (apply.result == AlertSchedulePhase.armed &&
         _newestCancelLanded > apply.generation) {
       _violation(ScheduleViolation.staleArmAfterCancel, apply);

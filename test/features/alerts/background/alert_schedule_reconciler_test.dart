@@ -112,15 +112,36 @@ void main() {
     expect(schedule.debugViolations, isEmpty);
   });
 
-  test('boot re-arm is recorded against the invariant, observe-only',
+  test('boot re-arm reads the gate like every other apply (#4331)',
       () async {
-    final schedule = build(gate: () async => false);
+    var active = false;
+    final schedule = build(gate: () async => active);
     await schedule.bootRearm();
-    expect(fetcher.calls, ['init'], reason: 'still performed, as before');
-    final violations = [for (final v in schedule.debugViolations) v.$1];
-    expectOnlyKnownScheduleViolations(violations);
-    expect(BreadcrumbCollector.snapshot().single.action,
-        'schedule: ${ScheduleViolation.bootRearmWithoutGate.name}');
+    active = true;
+    await schedule.bootRearm();
+    expect(fetcher.calls, ['cancelAll', 'init']);
+    expect(order, ['gate', 'gate'],
+        reason: 'no templates: the boot isolate has no settings box open');
+    expect(slc.calls, isEmpty);
+    expect(schedule.debugViolations, isEmpty);
+    expect(BreadcrumbCollector.snapshot(), isEmpty);
+  });
+
+  test('boot re-arm prefers the isolate gate when one is given', () async {
+    final seen = <String>[];
+    final schedule = AlertScheduleReconciler(
+      gate: () async => fail('the foreground gate needs open boxes'),
+      bootGate: () async {
+        seen.add('boot gate');
+        return false;
+      },
+      fetcher: () => fetcher,
+      slc: () => slc,
+      persistTemplates: () async {},
+    );
+    await schedule.bootRearm();
+    expect(seen, ['boot gate']);
+    expect(fetcher.calls, ['cancelAll']);
   });
 
   test('the known-violation set stays within its ceiling', () {

@@ -37,12 +37,11 @@ const int kKnownScanAnomaliesCeiling = 2;
 /// Schedule applies that break the reconciler's invariant today, each a
 /// filed issue (#4162). The fix removes its entry.
 const Set<ScheduleViolation> kKnownScheduleViolations = {
-  ScheduleViolation.bootRearmWithoutGate, // #4331 B1
   ScheduleViolation.staleArmAfterCancel, // #4332 B2
 };
 
 /// The size [kKnownScheduleViolations] may never exceed.
-const int kKnownScheduleViolationsCeiling = 2;
+const int kKnownScheduleViolationsCeiling = 1;
 
 /// Records every phase change and outcome of the runs it is the sink of,
 /// and lets a test act at an exact edge.

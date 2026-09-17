@@ -5,6 +5,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../../core/background/hive_isolate_lock.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
 import '../data/radius_alert_store.dart';
@@ -157,10 +158,35 @@ class BackgroundService {
   /// record which alerts-gate reading each apply acted on.
   static AlertScheduleReconciler schedule = AlertScheduleReconciler(
     gate: hasActiveAlerts,
+    bootGate: _hasActiveAlertsInIsolate,
     fetcher: createBackgroundPriceFetcher,
     slc: createSlcWakeMonitor,
     persistTemplates: _persistNotificationTemplates,
   );
+
+  /// [hasActiveAlerts] from a background isolate (#4331): the boot task's
+  /// isolate has no box open, so it takes the Hive lock and opens them the
+  /// way a scan does. Throws when the lock stays busy — an unreadable gate,
+  /// which leaves the schedule as it is.
+  static Future<bool> _hasActiveAlertsInIsolate() async {
+    final lock = await HiveIsolateLock.create();
+    if (!await lock.acquire()) {
+      throw StateError('Hive lock busy: alerts gate unreadable at boot');
+    }
+    try {
+      await HiveStorage.initInIsolate();
+      return await hasActiveAlerts();
+    } finally {
+      try {
+        await HiveStorage.closeIsolateBoxes();
+      } catch (e, st) {
+        log.error(e, st, layer: ErrorLayer.background, context: const {
+          'where': 'BackgroundService: boot gate failed to close boxes',
+        });
+      }
+      lock.release();
+    }
+  }
 
   /// Whether ANY user-consented alert is active — a per-station
   /// [PriceAlert] OR a [RadiusAlert]. The single gate every scheduling

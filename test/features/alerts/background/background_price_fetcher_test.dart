@@ -31,6 +31,13 @@ class _RecordingWorkmanager implements Workmanager {
   }
 }
 
+/// A [Workmanager] whose cancel is refused (#4331).
+class _RefusingWorkmanager implements Workmanager {
+  @override
+  dynamic noSuchMethod(Invocation invocation) =>
+      throw StateError('workmanager refused');
+}
+
 void main() {
   group('BackgroundPriceFetcher interface', () {
     test('AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher', () {
@@ -307,6 +314,57 @@ void main() {
         isTrue,
         reason: 'the stamp lives in the shared_preferences XML file',
       );
+    });
+
+    // #4331 B5 — cancelling the schedule must close the NATIVE enqueue
+    // gate too. `BackgroundScanEnqueuer` enqueues widget and boot scans
+    // whenever a fresh stamp exists; before this, a user who deleted every
+    // alert kept a fresh stamp, and so kept the widget-triggered scans.
+    test('cancelAll closes the native enqueue gate: the handle stamp is '
+        'removed (#4331)', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues(
+          {AndroidBackgroundPriceFetcher.handleBuildKey: '51383'});
+      final wm = _RecordingWorkmanager();
+
+      await AndroidBackgroundPriceFetcher(workmanager: wm).cancelAll();
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString(AndroidBackgroundPriceFetcher.handleBuildKey),
+          isNull,
+          reason: 'no stamp = the enqueuer refuses (handleIsFresh is false)');
+      expect(wm.named(#cancelAll), hasLength(1));
+    });
+
+    test('the stamp is removed even when WorkManager refuses the cancel '
+        '(#4331)', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues(
+          {AndroidBackgroundPriceFetcher.handleBuildKey: '51383'});
+
+      await expectLater(
+          AndroidBackgroundPriceFetcher(workmanager: _RefusingWorkmanager())
+              .cancelAll(),
+          throwsA(isA<StateError>()),
+          reason: 'the failure still reaches reconcile, which logs it');
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString(AndroidBackgroundPriceFetcher.handleBuildKey),
+          isNull,
+          reason: 'fail toward unconsented: the gate closes first');
+    });
+
+    test('native half of the gate contract: no stamp means no enqueue '
+        '(lint — the Kotlin runs only on a device, #4331)', () {
+      // A source check, not a test of the Kotlin: it pins the one line the
+      // Dart half relies on. The behaviour itself is device-validated.
+      final kotlin = File(
+        'android/app/src/main/kotlin/de/tankstellen/tankstellen/'
+        'BackgroundScanEnqueuer.kt',
+      ).readAsStringSync();
+      expect(kotlin, contains('.getString(HANDLE_BUILD_KEY, null)'));
+      expect(kotlin, contains('?: return false'));
+      expect(kotlin, contains('if (!handleIsFresh(context))'));
     });
 
     test('the widget periodic wake respects the native cooldown; the '
