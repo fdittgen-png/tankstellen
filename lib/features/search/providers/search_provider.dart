@@ -244,6 +244,7 @@ class SearchState extends _$SearchState {
         publishPreview: (preview) => state = preview,
       );
       if (!ref.mounted) return;
+      publishTravelOrigin(ref, params);
       _publishCarSearch(result.data, resolved.fuelType);
       final finalState = await finalizeUnifiedResult(ref, result, evFuture);
       if (!ref.mounted) return;
@@ -317,7 +318,7 @@ class SearchState extends _$SearchState {
       if (!ref.mounted) return;
 
       final adjustedStations =
-          recalcDistancesFrom(result.data, ref.read(userPositionProvider));
+          distancesFromTravelOrigin(ref, result.data, params);
       _publishCarSearch(adjustedStations, resolved.fuelType);
 
       final fuelResult = mergeGeocodingIntoStationResult(
@@ -387,7 +388,7 @@ class SearchState extends _$SearchState {
           .searchStations(params, cancelToken: cancelToken);
       if (!ref.mounted) return;
       final adjustedStations =
-          recalcDistancesFrom(result.data, ref.read(userPositionProvider));
+          distancesFromTravelOrigin(ref, result.data, params);
       _publishCarSearch(adjustedStations, resolved.fuelType);
 
       final fuelResult = withStations(result, adjustedStations);

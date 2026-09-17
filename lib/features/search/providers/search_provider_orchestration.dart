@@ -21,7 +21,9 @@ import '../../../core/country/country_provider.dart';
 import '../../../core/domain/search_params.dart';
 import '../../profile/providers/effective_fuel_type_provider.dart';
 import '../../profile/providers/profile_provider.dart';
+import '../../../core/domain/travel_estimate.dart';
 import 'ev_search_provider.dart';
+import 'refuel_travel_origin_provider.dart';
 import 'search_result_helpers.dart';
 
 /// Orchestration helpers extracted from `search_provider.dart` (#563)
@@ -29,6 +31,27 @@ import 'search_result_helpers.dart';
 /// [Ref] explicitly so they remain pure functions of riverpod state
 /// and can be reused by any notifier (or test) that needs the same
 /// dispatch logic.
+
+/// Recalculate [stations]' distances from the user's known position and
+/// publish that same origin for road travel estimates (#4359) — the
+/// search centre in [params] when no position is known, which is also
+/// what the distances are then measured from.
+List<Station> distancesFromTravelOrigin(
+  Ref ref,
+  List<Station> stations,
+  SearchParams params,
+) {
+  final user = ref.read(userPositionProvider);
+  ref.read(refuelTravelOriginProvider.notifier).set(user == null
+      ? TravelPoint(params.lat, params.lng)
+      : TravelPoint(user.lat, user.lng));
+  return recalcDistancesFrom(stations, user);
+}
+
+/// #4359 — a GPS search measures distances from the fix itself.
+void publishTravelOrigin(Ref ref, SearchParams params) => ref
+    .read(refuelTravelOriginProvider.notifier)
+    .set(TravelPoint(params.lat, params.lng));
 
 /// Auto-update user position from GPS if the active profile has
 /// `autoUpdatePosition` enabled. Failures are logged but never

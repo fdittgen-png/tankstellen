@@ -37,6 +37,8 @@ class PlanCandidate {
     required this.alongRouteKm,
     required this.pricePerLitre,
     this.detourKm = 0,
+    this.roadExtraKm,
+    this.roadExtraMinutes,
   });
 
   final String stationId;
@@ -52,6 +54,21 @@ class PlanCandidate {
   /// deviation — the caller doubles it if the station is an errand rather
   /// than en route, exactly as `RefuelProfile.tripFactor` does.
   final double detourKm;
+
+  /// The routed extra of leaving the journey for this station and
+  /// rejoining it (#4359): origin → station → destination minus origin →
+  /// destination, both under the same constraints. When present it
+  /// replaces the approximate `2 × detourKm` (a distance to the nearest
+  /// sampled route vertex, not an exit/rejoin itinerary).
+  final double? roadExtraKm;
+
+  /// The routed extra DRIVING minutes, stop overhead excluded. Null when
+  /// unknown — the plan then states its detour time as approximate.
+  final double? roadExtraMinutes;
+
+  /// Extra kilometres a stop here adds: routed when known, else the
+  /// approximate out-and-back deviation.
+  double get extraKm => roadExtraKm ?? detourKm * 2;
 }
 
 /// One stop in a finished plan.
@@ -99,6 +116,8 @@ class RefuelPlan {
     required this.drivingMinutes,
     required this.consumptionLPer100km,
     this.gap,
+    this.roadDetourMinutes = 0,
+    this.approximateDetourKm = 0,
   });
 
   /// Infeasible: the driver cannot cross [gap] on a full tank.
@@ -108,7 +127,9 @@ class RefuelPlan {
         detourKm = 0,
         routeKm = 0,
         drivingMinutes = 0,
-        consumptionLPer100km = 0;
+        consumptionLPer100km = 0,
+        roadDetourMinutes = 0,
+        approximateDetourKm = 0;
 
   final List<PlannedStop> stops;
 
@@ -127,6 +148,16 @@ class RefuelPlan {
   final RefuelPlanGap? gap;
 
   bool get isFeasible => gap == null;
+
+  /// Routed extra driving minutes of the stops that have them (#4359).
+  final double roadDetourMinutes;
+
+  /// Detour kilometres with NO routed duration — timed at the route's
+  /// average speed, an approximation the UI must present as one.
+  final double approximateDetourKm;
+
+  /// Whether any stop's detour time is approximate rather than routed.
+  bool get detourTimeIsApproximate => approximateDetourKm > 0;
 
   /// Fuel burned covering the detours, valued at what it cost to buy.
   ///
@@ -148,12 +179,12 @@ class RefuelPlan {
       _detourDrivingMinutes + stops.length * kStopOverheadMinutes;
 
   double get _detourDrivingMinutes {
-    if (routeKm <= 0 || detourKm <= 0) return 0;
-    // Detour kilometres are assumed to run at the route's own average
-    // speed. Off-motorway they are usually slower, which makes this an
-    // UNDER-estimate — the honest direction for a number that talks
-    // someone into a detour.
-    return detourKm * (drivingMinutes / routeKm);
+    // #4359 — routed stops contribute their own routed minutes. Only the
+    // remainder is timed at the route's average speed, which off the
+    // motorway UNDER-estimates a local-road detour; it is flagged by
+    // [detourTimeIsApproximate] rather than passed off as routed.
+    if (routeKm <= 0 || approximateDetourKm <= 0) return roadDetourMinutes;
+    return roadDetourMinutes + approximateDetourKm * (drivingMinutes / routeKm);
   }
 
   double get totalMinutes => drivingMinutes + detourMinutes;

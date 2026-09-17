@@ -81,6 +81,8 @@ abstract final class RefuelPlanner {
     var litres = r.startLitres;
     var cost = 0.0;
     var detour = 0.0;
+    var roadMinutes = 0.0;
+    var approxKm = 0.0;
 
     while (true) {
       final remaining = r.routeKm - position;
@@ -144,7 +146,13 @@ abstract final class RefuelPlanner {
         arrivalLitres: arrival,
       ));
       cost += buy * stop.pricePerLitre;
-      detour += stop.detourKm * 2; // off the route and back on
+      detour += stop.extraKm; // off the route and back on
+      final routed = stop.roadExtraMinutes;
+      if (routed != null) {
+        roadMinutes += routed;
+      } else {
+        approxKm += stop.extraKm;
+      }
       litres = arrival + buy;
       position = stop.alongRouteKm;
     }
@@ -153,6 +161,8 @@ abstract final class RefuelPlanner {
       stops: stops,
       fuelCost: cost,
       detourKm: detour,
+      roadDetourMinutes: roadMinutes,
+      approximateDetourKm: approxKm,
       routeKm: r.routeKm,
       drivingMinutes: r.drivingMinutes,
       consumptionLPer100km: r.consumptionLPer100km,
@@ -170,6 +180,8 @@ abstract final class RefuelPlanner {
     var litres = r.startLitres;
     var cost = 0.0;
     var detour = 0.0;
+    var roadMinutes = 0.0;
+    var approxKm = 0.0;
 
     while (true) {
       final remaining = r.routeKm - position;
@@ -190,7 +202,7 @@ abstract final class RefuelPlanner {
         // Within the last 10 % of reachable distance, a shorter detour
         // wins: arriving 20 km earlier is not worth 8 km off the road.
         if (c.alongRouteKm >= farthest - r.fullRangeKm * 0.1 &&
-            c.detourKm < stop.detourKm) {
+            c.extraKm < stop.extraKm) {
           stop = c;
         }
       }
@@ -206,7 +218,13 @@ abstract final class RefuelPlanner {
         arrivalLitres: arrival,
       ));
       cost += buy * stop.pricePerLitre;
-      detour += stop.detourKm * 2;
+      detour += stop.extraKm;
+      final routed = stop.roadExtraMinutes;
+      if (routed != null) {
+        roadMinutes += routed;
+      } else {
+        approxKm += stop.extraKm;
+      }
       litres = arrival + buy;
       position = stop.alongRouteKm;
     }
@@ -215,6 +233,8 @@ abstract final class RefuelPlanner {
       stops: stops,
       fuelCost: cost,
       detourKm: detour,
+      roadDetourMinutes: roadMinutes,
+      approximateDetourKm: approxKm,
       routeKm: r.routeKm,
       drivingMinutes: r.drivingMinutes,
       consumptionLPer100km: r.consumptionLPer100km,
