@@ -243,9 +243,11 @@ class RadarCard extends StatelessWidget {
       child: Tooltip(
         message: navigateLabel,
         child: ListTile(
-          onTap: () => NavigationUtils.openInMaps(
-            station.lat,
-            station.lng,
+          // #4348 — gated: a reference price launches nothing.
+          onTap: () => NavigationUtils.openStation(
+            stationId: station.id,
+            lat: station.lat,
+            lng: station.lng,
             label: station.displayName,
           ),
           // Leading icon doubles as the (colour-only) scan signal: an

@@ -3,8 +3,18 @@
 
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/logging/error_logger.dart';
+import '../services/station_offer.dart';
+
+/// The platform launch, as a seam (#4348) — so a behavioural test can
+/// prove WHICH destination a station action hands the OS, and that a
+/// reference-price location hands it none.
+typedef MapsLauncher = Future<bool> Function(Uri uri, LaunchMode mode);
+
+Future<bool> _platformLaunch(Uri uri, LaunchMode mode) =>
+    launchUrl(uri, mode: mode);
 
 /// Centralized navigation utility for opening stations in external maps apps.
 ///
@@ -16,6 +26,34 @@ import '../../core/logging/error_logger.dart';
 /// This avoids duplicating the same navigation logic across 4+ screens.
 class NavigationUtils {
   NavigationUtils._();
+
+  /// Every launch goes through this. Production leaves it alone; a test
+  /// swaps in a recorder and restores [resetLauncher] in `tearDown`.
+  @visibleForTesting
+  static MapsLauncher launcher = _platformLaunch;
+
+  @visibleForTesting
+  static void resetLauncher() => launcher = _platformLaunch;
+
+  /// Open a SEARCH RESULT in the maps app — gated on what it is (#4348).
+  ///
+  /// The one entry point every station surface uses. A reference price
+  /// stood in at a city centroid or a prefecture seat (LU, GR) is not a
+  /// place anyone can buy fuel, so it launches nothing and answers false;
+  /// the surface should not have offered the action in the first place
+  /// ([StationOffer.canNavigate]), and this is the backstop if it did.
+  static Future<bool> openStation({
+    required String stationId,
+    required double lat,
+    required double lng,
+    String? label,
+  }) async {
+    final offer =
+        StationOffer.forStation(stationId: stationId, lat: lat, lng: lng);
+    if (!offer.canNavigate) return false;
+    await openInMaps(lat, lng, label: label);
+    return true;
+  }
 
   /// Open a single location in the user's preferred maps/navigation app.
   ///
@@ -30,7 +68,7 @@ class NavigationUtils {
     final geoUri = Uri.parse('geo:$lat,$lng$query');
 
     try {
-      final launched = await launchUrl(geoUri, mode: LaunchMode.externalApplication);
+      final launched = await launcher(geoUri, LaunchMode.externalApplication);
       if (launched) return;
     } on Exception catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'Navigation geo: URI failed'}));
@@ -40,7 +78,7 @@ class NavigationUtils {
     final webUri = Uri.parse(
       'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
     );
-    await launchUrl(webUri, mode: LaunchMode.externalApplication);
+    await launcher(webUri, LaunchMode.externalApplication);
   }
 
   /// Open a route through multiple stations in the user's preferred
@@ -68,7 +106,7 @@ class NavigationUtils {
     if (geoUri != null) {
       try {
         final launched =
-            await launchUrl(geoUri, mode: LaunchMode.externalApplication);
+            await launcher(geoUri, LaunchMode.externalApplication);
         if (launched) return;
       } on Exception catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.other, e, st,
@@ -86,7 +124,7 @@ class NavigationUtils {
       url += '&waypoints=${waypoints.join('|')}';
     }
 
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    await launcher(Uri.parse(url), LaunchMode.externalApplication);
   }
 
   /// Build a `geo:lat,lng?q=lat,lng` URI from a `"lat,lng"` string, or `null`

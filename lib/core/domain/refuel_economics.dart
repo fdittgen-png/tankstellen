@@ -106,6 +106,8 @@ class RefuelCandidate {
     required this.oneWayKm,
     this.pricePerLitre,
     this.isRoadDistance = false,
+    this.isPhysicalStation = true,
+    this.coverageComplete = true,
     this.openState = const DataValue.unknown(
       reason: DataUnknownReason.notPublishedForThisItem,
     ),
@@ -128,6 +130,21 @@ class RefuelCandidate {
   /// True when [oneWayKm] is a real road distance, so no correction
   /// factor applies.
   final bool isRoadDistance;
+
+  /// False for a reference price stood in at a synthetic point — LU's
+  /// decree at a city centroid, GR's prefecture average (#4348,
+  /// `ProviderCapability.coordinates`).
+  ///
+  /// Such a candidate stays in [RefuelDecision.quotes] (its price is
+  /// real) but has no cost — nobody drives to a town square to buy fuel
+  /// — and holds no ranking, so no saving can be claimed against it.
+  final bool isPhysicalStation;
+
+  /// False when this candidate's source covers only part of its
+  /// country's stations (#4348, DK's three brand feeds). A pick drawn
+  /// from such a set is the best among the stations listed, and
+  /// [RefuelDecision.coverageIncomplete] makes the UI say so.
+  final bool coverageComplete;
 
   /// Whether the station is open right now (#4139), as far as the
   /// country's provider can say (#4156).
@@ -160,13 +177,15 @@ class RefuelCandidate {
       other.oneWayKm == oneWayKm &&
       other.pricePerLitre == pricePerLitre &&
       other.isRoadDistance == isRoadDistance &&
+      other.isPhysicalStation == isPhysicalStation &&
+      other.coverageComplete == coverageComplete &&
       other.openState == openState &&
       other.priceAge == priceAge;
 
   @override
   int get hashCode =>
       Object.hash(stationId, oneWayKm, pricePerLitre, isRoadDistance,
-          openState, priceAge);
+          isPhysicalStation, coverageComplete, openState, priceAge);
 }
 
 /// The vehicle and intent side of the calculation.
@@ -291,6 +310,8 @@ abstract final class RefuelEconomics {
   static RefuelCost? cost(RefuelCandidate candidate, RefuelProfile profile) {
     final price = candidate.pricePerLitre;
     final consumption = profile.consumptionLPer100km;
+    // #4348 — no drive to a reference point, so no detour to cost.
+    if (!candidate.isPhysicalStation) return null;
     if (price == null || price <= 0) return null;
     if (consumption == null || consumption <= 0) return null;
     if (profile.litresIntended <= 0) return null;
@@ -326,6 +347,9 @@ abstract final class RefuelEconomics {
       RefuelQuote? winner;
       double? winning;
       for (final q in quotes) {
+        // #4348 — a reference price never poses as the cheapest or
+        // closest STATION.
+        if (!q.candidate.isPhysicalStation) continue;
         final v = key(q);
         if (v == null) continue;
         if (winning == null ||

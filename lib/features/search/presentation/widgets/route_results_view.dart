@@ -7,6 +7,7 @@ import '../../../../core/utils/best_stops.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/services/station_offer.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/geo_utils.dart';
@@ -166,17 +167,27 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     FuelType fuelType,
     RouteSearchResult result,
   ) {
+    // #4348 — no navigate swipe towards a reference-price stand-in point.
+    final canNavigate = StationOffer.forStation(
+      stationId: item.station.id,
+      lat: item.station.lat,
+      lng: item.station.lng,
+    ).canNavigate;
     return Dismissible(
       key: ValueKey('swipe-${item.id}'),
+      direction: canNavigate
+          ? DismissDirection.horizontal
+          : DismissDirection.endToStart,
       confirmDismiss: (direction) async {
         // #3159 — capture before any await: the snackbar's onUndo can fire
         // after this view unmounted (root messenger outlives the route),
         // and a post-await ref use would throw on the dead WidgetRef.
         final ignored = ref.read(ignoredStationsProvider.notifier);
         if (direction == DismissDirection.startToEnd) {
-          await NavigationUtils.openInMaps(
-            item.station.lat,
-            item.station.lng,
+          await NavigationUtils.openStation(
+            stationId: item.station.id,
+            lat: item.station.lat,
+            lng: item.station.lng,
             label: item.station.displayName,
           );
           return false;

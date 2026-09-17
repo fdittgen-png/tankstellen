@@ -229,6 +229,8 @@ class CountryServiceRegistry {
       // provider that stopped publishing. Leaving each caller to remember
       // is how a detector ends up never firing.
       freshness: freshness ?? ProviderFreshnessMonitor(storage),
+      // #4348 — so a provider declared dead is refused, not retried.
+      capability: entry.capability,
     );
   }
 

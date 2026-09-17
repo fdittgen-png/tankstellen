@@ -159,7 +159,10 @@ class ErrorReportPayload {
       Object error) {
     final msg = _primaryMessage(error);
     final transient = _looksTransientNetwork(error, msg);
-    final known = isKnownTrackedIssue(msg);
+    // #4348 — a provider its capability declares dead is a known,
+    // structural state, not a bug the user should file.
+    final known =
+        error is ProviderUnavailableException || isKnownTrackedIssue(msg);
     return (reportable: !transient && !known, transient: transient);
   }
 
