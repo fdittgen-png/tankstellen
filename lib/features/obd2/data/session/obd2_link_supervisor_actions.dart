@@ -25,9 +25,7 @@ extension Obd2LinkSupervisorActions on Obd2LinkSupervisor {
     final live = _service;
     if (live != null) {
       try {
-        await live
-            .sendCommand('ATZ')
-            .timeout(const Duration(seconds: 4));
+        await live.sendCommand('ATZ').timeout(const Duration(seconds: 4));
         BreadcrumbCollector.add('obd2: adapter chip reset (ATZ) sent');
       } catch (e, st) {
         // Best-effort by contract — the recycle below is the real reset;

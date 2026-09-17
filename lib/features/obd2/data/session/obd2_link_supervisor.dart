@@ -95,6 +95,8 @@ class Obd2LinkSupervisor {
   StreamSubscription<Obd2LinkDropEvent>? _dropSubscription;
   Obd2Service? _service;
   Future<Obd2Service?>? _attemptInFlight;
+  // #4343 — bumped only by [disconnect]; older work never adopts or dials.
+  int _intent = 0, _attemptInFlightIntent = 0;
   Timer? _backoffTimer;
   bool _userRequestedDisconnect = false;
   bool _disposed = false;
@@ -190,6 +192,7 @@ class Obd2LinkSupervisor {
   /// automatic dial happens until the next [connect].
   Future<void> disconnect() async {
     _userRequestedDisconnect = true;
+    _intent++; // #4343 — fences every pending attempt out
     _cancelBackoffTimer();
     _attemptCount = 0;
     _standDown.reset(); // #3603
@@ -198,8 +201,6 @@ class Obd2LinkSupervisor {
     _setState(Obd2LinkState.userDisconnected);
     await _release(dead, 'disconnect');
   }
-
-
 
   /// The single intent gate (research rule 7): auto-dialing is allowed
   /// unless the user parked the link or the bus is classified off.
@@ -219,17 +220,21 @@ class Obd2LinkSupervisor {
   /// for the result first (a live link satisfies everyone — one link
   /// only), and chains its own attempt strictly AFTER a missed in-flight
   /// completes. Still never two concurrent dials.
+  /// #4343 — nobody joins a user-cancelled attempt: callers queue after
+  /// it, and one whose own intent is cancelled meanwhile never dials.
   Future<Obd2Service?> _attempt(
       {required bool userInitiated, Obd2LinkDialer? dialer}) {
     final inFlight = _attemptInFlight;
+    final intent = _intent;
     if (inFlight != null) {
-      if (dialer == null) return inFlight;
-      return inFlight.then((svc) => svc != null || _disposed
-          ? svc
-          : _attempt(userInitiated: userInitiated, dialer: dialer));
+      if (dialer == null && _attemptInFlightIntent == intent) return inFlight;
+      return inFlight.then((svc) => _disposed || intent != _intent
+          ? null
+          : svc ?? _attempt(userInitiated: userInitiated, dialer: dialer));
     }
     final future = _attemptOnce(userInitiated: userInitiated, dialer: dialer);
     _attemptInFlight = future;
+    _attemptInFlightIntent = intent;
     return future.whenComplete(() {
       if (identical(_attemptInFlight, future)) _attemptInFlight = null;
     });
@@ -237,6 +242,7 @@ class Obd2LinkSupervisor {
 
   Future<Obd2Service?> _attemptOnce(
       {required bool userInitiated, Obd2LinkDialer? dialer}) async {
+    final intent = _intent; // #4343 — re-checked after each await
     _cancelBackoffTimer();
     // Tear down whatever half-dead service is still around so the
     // adapter's single RFCOMM channel is free before the fresh dial
@@ -244,9 +250,9 @@ class Obd2LinkSupervisor {
     final dead = _service;
     _service = null;
     await _release(dead, 'recycle');
-    _setState(userInitiated
-        ? Obd2LinkState.connecting
-        : Obd2LinkState.reconnecting);
+    if (intent != _intent) return null;
+    _setState(
+        userInitiated ? Obd2LinkState.connecting : Obd2LinkState.reconnecting);
     Obd2Service? fresh;
     Object? failure;
     try {
@@ -263,14 +269,11 @@ class Obd2LinkSupervisor {
         detail: '${e.runtimeType} backoff=${_backoff.currentMs}ms',
       );
     }
-    if (_disposed) {
-      await _release(fresh, 'disposedDial');
-      return null;
-    }
-    // The user may have hit disconnect while the dial was in flight —
-    // intent wins over the race (checked at the ONE gate).
-    if (fresh != null && !_mayAutoDial && !userInitiated) {
-      await _release(fresh, 'parkedMidDial');
+    // Disposed, or the user disconnected mid-dial: intent wins the race —
+    // #4343 even over the user's OWN earlier connect (the latest wins).
+    if (_disposed || intent != _intent ||
+        (fresh != null && !_mayAutoDial && !userInitiated)) {
+      await _release(fresh, _disposed ? 'disposedDial' : 'parkedMidDial');
       return null;
     }
     if (fresh != null) {
@@ -327,8 +330,7 @@ class Obd2LinkSupervisor {
       // ACTUAL hold (the escalation lengthens it 5 → 15 → 60 min).
       BreadcrumbCollector.add(
         'OBD2 reconnect stand-down',
-        detail: '${_standDown.detail} — '
-            'holding ${wait.inSeconds}s',
+        detail: '${_standDown.detail} — holding ${wait.inSeconds}s',
       );
     }
     _backoffTimer = Timer(wait, () {
