@@ -28,6 +28,7 @@ import '../domain/services/recovered_summary_rebuild.dart';
 import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
 import 'active_vehicle_read.dart';
+import 'finished_trip_entry.dart';
 import 'gps_only_recording_pipeline.dart';
 import 'recording_battery_exemption.dart';
 import 'recording_companion_association.dart';

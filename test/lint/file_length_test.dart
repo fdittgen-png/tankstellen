@@ -376,7 +376,10 @@ void main() {
     // #4314 — 1381 → 1379: clearing the WAL row drops its paused row too
     // (a standalone helper), and the catch around a repository call that
     // already swallows its own failures went.
-    'lib/features/trips/providers/trip_recording_provider.dart': 1379,
+    // #4328 — 1379 → 1347: the history row a stop saves (and the one a
+    // recovered trip saves) is built in standalone finished_trip_entry.dart,
+    // beside the one-trip-one-id rule it now carries.
+    'lib/features/trips/providers/trip_recording_provider.dart': 1347,
     // #4037 — 1 032 across 5 files → 756 across 3: the pin/wake-lock
     // state became an owned collaborator and the body a plain widget.
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,

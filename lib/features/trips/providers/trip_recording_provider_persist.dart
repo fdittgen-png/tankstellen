@@ -86,49 +86,33 @@ mixin _TripRecordingPersist
       samples: snapshot.samples,
     );
 
-    final result = StoppedTripResult(
-      summary: summary,
-      odometerStartKm: snapshot.odometerStartKm,
-      odometerLatestKm: snapshot.odometerLatestKm,
-    );
     // Transition state synchronously so the recording screen flips to
     // the summary view immediately — even if the Hive writes below
     // race against provider disposal in a test harness.
     _publish(state.copyWith(phase: TripRecordingPhase.finished),
         'finalise recovered');
 
-    if (historyRepo != null) {
-      try {
-        await historyRepo.save(TripHistoryEntry(
-          id: snapshot.id,
-          vehicleId: snapshot.vehicleId,
-          summary: summary,
-          automatic: snapshot.automatic,
-          samples: snapshot.samples,
-          // #3796 — the honest label. A WAL row whose writing process is
-          // not this one was left behind by a process that died: an
-          // orderly stop always clears it. Until now this trip was saved
-          // indistinguishable from a normal one, after being surfaced to
-          // the user as a Bluetooth drop.
-          termination: ProcessDeathContext.diedWhileRecording(
-                  snapshot.processInstanceId)
-              ? TripTermination(
-                  TripTerminationReason.recoveredAfterProcessDeath,
-                  detail: ProcessDeathContext.terminationDetail(),
-                )
-              : const TripTermination(TripTerminationReason.userStopped,
-                  detail: 'finalised from a recovered snapshot'),
-        ));
-      } catch (e, st) {
-        log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: save failed'});
-      }
+    var saved = false;
+    try {
+      saved = await historyRepo?.save(recoveredTripEntry(snapshot, summary)) ??
+          false;
+    } catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: save failed'});
     }
+    final result = StoppedTripResult(
+      summary: summary,
+      odometerStartKm: snapshot.odometerStartKm,
+      odometerLatestKm: snapshot.odometerLatestKm,
+      entryId: saved ? snapshot.id : null,
+    );
 
     // Clear the snapshot BEFORE the best-effort observer-refresh and
     // badge bump below — the recovery service must not resurrect a
     // finalised trip on next launch even if those follow-up steps
     // throw or race against provider disposal in a test harness.
-    await _clearActiveSnapshot();
+    // #4328 — and ONLY once the trip is in history: after a failed
+    // write the WAL row is the trip, for the next launch to hand back.
+    if (saved) await _clearActiveSnapshot();
 
     try {
       historyList?.refresh();
@@ -158,9 +142,11 @@ mixin _TripRecordingPersist
   ///
   /// Returns the [TripPersistOutcome] so the caller can surface a
   /// "no movement detected" notice on a genuine stationary discard and
-  /// stay silent on a save (#2509).
+  /// stay silent on a save (#2509) — and, #4328, retire the trip's
+  /// recovery rows only when it is not [TripPersistOutcome.failed].
   Future<TripPersistOutcome> _saveToHistory(
     TripSummary summary, {
+    String? tripId, // #4328 — the id the trip's WAL row carries
     bool automatic = false,
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
@@ -186,57 +172,35 @@ mixin _TripRecordingPersist
       noteNoMovementDiscard(summary, samples.length, gpsFixCount);
       return TripPersistOutcome.discardedNoMovement;
     }
+    // #3878 — ONE entry: saved, then reused for the upload (no re-decode
+    // of the row just written).
+    final TripHistoryEntry entry;
     try {
+      // #4328 — a write that did not land is not a save. Say so, and the
+      // caller keeps the WAL row the next launch recovers the trip from.
       final repo = ref.read(tripHistoryRepositoryProvider);
-      if (repo == null) return TripPersistOutcome.saved;
-      final id = summary.startedAt?.toIso8601String() ??
-          DateTime.now().toIso8601String();
-      // #2912 — per-trip OBD2 comm-health diagnostic (never-throws capture).
-      // #3573 — only for trips that actually bound an OBD2 service
-      // (adapter identity is stamped by the OBD2 pipeline alone): the
-      // capture reads a PROCESS-WIDE singleton session, so a GPS-only
-      // trip used to inherit whatever idle link the supervisor happened
-      // to hold and render a misleading "0% complete · 0% utilization ·
-      // no dropouts" card for a link the trip never touched.
-      final obd2Diagnostic = adapterMac == null
-          ? null
-          : Obd2CommDiagnostics.instance.captureForTrip();
-      // #3878 — ONE entry: saved, then reused for the upload (no re-decode
-      // of the row just written).
-      final entry = TripHistoryEntry(
-        id: id,
-        vehicleId: vehicleId,
-        summary: summary,
+      if (repo == null) throw StateError('trip history box is not open');
+      entry = finishedTripEntry(
+        summary,
+        tripId: tripId,
+        now: ref.read(appClockProvider).now(),
+        lifecycleMarks: _lifecycleMarks,
         automatic: automatic,
         samples: samples,
-        // #1312 — adapter identity snapshotted at [start] time. Null
-        // for legacy / fake-service code paths; the detail card hides
-        // the row entirely in that case.
+        gpsSampleDiagnostics: gpsSampleDiagnostics,
+        vehicleId: vehicleId,
         adapterMac: adapterMac,
         adapterName: adapterName,
         adapterFirmware: adapterFirmware,
-        // #1458 phase 2 — GPS cadence diagnostics captured during
-        // recording. Empty when the GPS feature flag was off for this
-        // trip; the entry's JSON serialiser elides the key in that case.
-        gpsSampleDiagnostics: gpsSampleDiagnostics,
-        // #3465 — background/resume marks windowed to this trip, so the
-        // GPS coverage report can attribute track gaps post-hoc.
-        lifecycleMarks: summary.startedAt == null
-            ? const []
-            : _lifecycleMarks.marksForWindow(
-                summary.startedAt!, summary.endedAt ?? DateTime.now()),
-        obd2Diagnostic: obd2Diagnostic, // #2912 — per-trip comm-health
-        // #3795/#3797 — WHY the session ended + its lifecycle timeline.
-        // Defaulted to userStopped only when the caller attributed
-        // nothing: an unattributed manual save IS a user stop, whereas
-        // guessing on the automatic path would mislabel a grace expiry.
-        termination: termination ??
-            (automatic
-                ? null
-                : const TripTermination(TripTerminationReason.userStopped)),
+        termination: termination,
         sessionJournal: sessionJournal,
       );
-      await repo.save(entry);
+      if (!await repo.save(entry)) return TripPersistOutcome.failed;
+    } catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording._saveToHistory'});
+      return TripPersistOutcome.failed;
+    }
+    try {
       ref.read(tripHistoryListProvider.notifier).refresh();
       // #2392 — calibrate the vehicle's physicsScale from this trip's
       // OBD2 ground truth (no-op for GPS-only / suspect / too-short
@@ -276,11 +240,10 @@ mixin _TripRecordingPersist
         log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording trip-sync hook'});
       }
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording._saveToHistory'});
+      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording._saveToHistory: after the write'});
     }
-    // #2509 — the trip reached the history write (or a best-effort
-    // sub-step failed and was logged above); either way it was not a
-    // stationary discard, so the stop UI shows no "no movement" notice.
+    // #2509 — the trip is in history (a best-effort follow-up that failed
+    // was logged above), so the stop UI shows no "no movement" notice.
     return TripPersistOutcome.saved;
   }
 

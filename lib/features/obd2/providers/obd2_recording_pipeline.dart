@@ -330,6 +330,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       _host.setSaveStage(TripSaveStage.savingToHistory);
       outcome = await _host.saveToHistory(
         summary,
+        tripId: ctl.sessionId, // #4328 — the id its WAL row carries
         samples: filled.samples,
         gpsSampleDiagnostics: capturedGpsDiagnostics,
         automatic: automatic,
@@ -343,9 +344,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         sessionJournal: sessionJournal,
       );
     }
-    // #1303 / #4311 — the trip is in history NOW, so its WAL row goes now:
-    // a row exists exactly while the trip is not yet saved.
-    await _host.clearActiveSnapshot();
+    // #1303 / #4311 / #4328 — the WAL row exists exactly while the trip is
+    // not in history: it goes once the write landed, never after a failed
+    // one, and a self-finalised trip's own save already retired it.
+    if (!finalised && outcome.isSettled) await _host.clearActiveSnapshot();
     // #2548 — third beat, shown ONLY when cloud sync is on (the upload
     // saveToHistory kicked off is fire-and-forget, so it is worded
     // "Syncing in background…" and never blocks the resolve; sync-off
@@ -384,6 +386,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       distanceKmAtOdometerLatest: ctl.distanceKmAtOdometerLatest,
       // #2509 — surface "no movement detected" only on a stationary discard.
       discardedNoMovement: outcome.isStationaryDiscard,
+      entryId: outcome == TripPersistOutcome.saved ? ctl.sessionId : null,
     );
   }
 }

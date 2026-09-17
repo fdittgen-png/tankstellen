@@ -35,6 +35,9 @@ class GpsOnlyTripWal {
   static const int _flushEveryNSamples = 10;
 
   String? _id;
+
+  /// #4328 — the running trip's id, which its history row is saved under.
+  String? get id => _id;
   DateTime? _startedAt;
   bool _automatic = false;
   String? _vehicleId;

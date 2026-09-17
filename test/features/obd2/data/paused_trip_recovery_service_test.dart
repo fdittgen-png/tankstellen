@@ -150,6 +150,33 @@ void main() {
           reason: 'the active recovery ends that trip — and its paused row');
     });
 
+    test('#4328 — retires a stale entry whose trip is already in history, '
+        'never saving its sample-less summary over the good row', () async {
+      final stale = entryOlderThanThreshold(id: 'saved-then-killed');
+      await pausedRepo.save(stale);
+      await historyRepo.save(TripHistoryEntry(
+        id: stale.id,
+        vehicleId: 'veh-1',
+        summary: summary(distance: 30),
+        samples: [
+          TripSample(timestamp: DateTime.utc(2026, 4, 27, 8), speedKmh: 50),
+        ],
+      ));
+
+      final svc = PausedTripRecoveryService(
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        now: () => fakeNow,
+      );
+
+      expect(await svc.recoverStale(), 0);
+      expect(pausedRepo.load(stale.id), isNull);
+      final history = historyRepo.loadAll();
+      expect(history.single.summary.distanceKm, 30,
+          reason: 'the saved row stays, untouched');
+      expect(history.single.samples, hasLength(1));
+    });
+
     test('skips an entry younger than the threshold', () async {
       final fresh = entryYoungerThanThreshold(now: fakeNow);
       await pausedRepo.save(fresh);

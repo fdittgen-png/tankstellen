@@ -138,9 +138,14 @@ class TripRecoveryPhase {
         box: Hive.box<String>(HiveBoxes.obd2TripHistory),
       );
     }
+    final pausedOpen = Hive.isBoxOpen(HiveBoxes.obd2PausedTrips);
     final service = ActiveTripRecoveryService(
       activeRepo: activeRepo,
       historyRepo: historyRepo,
+      pausedRepo: pausedOpen
+          ? PausedTripRepository(
+              box: Hive.box<String>(HiveBoxes.obd2PausedTrips))
+          : null,
       now: now,
       onAutomaticRecovered: () async {
         try {
@@ -158,6 +163,7 @@ class TripRecoveryPhase {
       case ActiveTripRecoveryOutcome.none:
       case ActiveTripRecoveryOutcome.failed:
       case ActiveTripRecoveryOutcome.discarded:
+      case ActiveTripRecoveryOutcome.alreadySaved: // #4328
         return false;
       case ActiveTripRecoveryOutcome.recovered:
         final snapshot = service.recoveredSnapshot;

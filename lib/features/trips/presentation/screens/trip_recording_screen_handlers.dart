@@ -70,7 +70,7 @@ mixin _TripRecordingEventHandlers on ConsumerState<TripRecordingScreen> {
     final messenger = ScaffoldMessenger.maybeOf(context);
     final notifier = ref.read(tripRecordingProvider.notifier);
     final repo = ref.read(tripHistoryRepositoryProvider);
-    final entryId = result.summary.startedAt?.toIso8601String();
+    final entryId = result.entryId; // #4328 — null when nothing was saved
 
     setState(() {
       _stopping = false;

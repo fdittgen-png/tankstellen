@@ -296,8 +296,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
-    // #3878 — the whole trip comes back from the WAL (the ring only held
-    // the live window); #4313 — the WAL is dropped only once it is saved.
+    // #3878 — the whole trip comes back from the WAL, not the live ring.
     final samples = List<TripSample>.unmodifiable(await _wal.readAll());
     // #2548 — staged save-progress: flip into the transient `saving` phase
     // so the recording screen shows the inline TripSaveProgress card
@@ -350,15 +349,17 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     // GPS-fix count equals the captured-sample count here. Threaded so the
     // guard treats a genuinely-stationary GPS-only stop consistently and
     // the outcome can surface the "no movement" notice.
+    final tripId = _wal.id; // #4328 — the id its WAL row carries
     final outcome = await _host.saveToHistory(
       summary,
+      tripId: tripId,
       samples: samples,
       automatic: automatic,
       // #3253 — #1458 cadence diagnostics, OBD2 parity.
       gpsSampleDiagnostics: _gpsDiagnostics.snapshot,
       gpsFixCount: samples.length,
     );
-    _wal.clear(); // #3248 / #4313 — in history now: a kill no longer loses it
+    if (outcome.isSettled) _wal.clear(); // #4328 — kept after a failed write
     _recorder = null;
     _samples.clear();
     _gpsDiagnostics.clear();
@@ -372,6 +373,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       // #2509 — surface a "no movement detected" notice when the
       // dongle-less trip was discarded as genuinely stationary.
       discardedNoMovement: outcome.isStationaryDiscard,
+      entryId: outcome == TripPersistOutcome.saved ? tripId : null,
     );
   }
 
