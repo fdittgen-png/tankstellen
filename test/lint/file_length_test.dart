@@ -5,6 +5,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../tool/architecture_graph.dart';
+
 /// Static-scan guard (#1680 / #2351): no *new* handwritten Dart file in
 /// `lib/` may exceed [_lineLimit] lines, and no *grandfathered* file may
 /// **grow** beyond its snapshot line count.
@@ -182,29 +184,12 @@ void main() {
     ),
   };
 
-  bool isScanned(String path) {
-    if (!path.endsWith('.dart')) return false;
-    if (path.endsWith('.g.dart') || path.endsWith('.freezed.dart')) {
-      return false;
-    }
-    // `flutter gen-l10n` output — generated, not handwritten.
-    if (path.startsWith('lib/l10n/')) return false;
-    return true;
-  }
+  // #4346 — the scope filter and the SPDX-discounted line count live in
+  // tool/architecture_graph.dart, shared with the architecture inventory
+  // so both measure the same libraries the same way.
+  bool isScanned(String path) => isHandwrittenDart(path);
 
-  int effectiveLines(File file) {
-    final rawLines = file.readAsLinesSync();
-    // The standard MIT SPDX header (#2053) adds 3 lines at the top of
-    // every file (copyright, SPDX-License-Identifier, blank). Discount
-    // it so the 400-line norm measures actual content, not boilerplate.
-    final headerOffset =
-        rawLines.length >= 2 &&
-            rawLines[0].contains('Copyright (c) 2026 Florian DITTGEN') &&
-            rawLines[1].contains('SPDX-License-Identifier')
-        ? 3
-        : 0;
-    return rawLines.length - headerOffset;
-  }
+  int effectiveLinesOf(File file) => effectiveLines(file.readAsLinesSync());
 
   test('no new Dart file in lib/ exceeds $lineLimit lines (#1680)', () {
     final offenders = <String>[];
@@ -218,7 +203,7 @@ void main() {
       if (entity is! File) continue;
       final path = entity.path;
       if (!isScanned(path)) continue;
-      final lines = effectiveLines(entity);
+      final lines = effectiveLinesOf(entity);
 
       if (grandfatheredSnapshot.containsKey(path)) {
         if (lines > lineLimit) {
@@ -337,6 +322,16 @@ void main() {
     );
   });
 
+  /// The libraries of every scanned lib/ file, read once and shared by
+  /// the library-budget and part-mixin tests below.
+  List<SharedStateLibrary>? cachedLibraries;
+  List<SharedStateLibrary> scannedLibraries() =>
+      cachedLibraries ??= sharedStateLibraries({
+        for (final entity in Directory('lib').listSync(recursive: true))
+          if (entity is File && isScanned(entity.path.replaceAll(r'\', '/')))
+            entity.path.replaceAll(r'\', '/'): entity.readAsStringSync(),
+      });
+
   // ---------------------------------------------------------------
   // Second axis (#4033): the library — declaring file + hand-written
   // parts — measured against an exact, decrease-only baseline.
@@ -407,69 +402,19 @@ void main() {
     'lib/core/sync/sync_provider.dart': 413,
   };
 
-  /// `part 'foo.dart';` — single- or double-quoted.
-  final partDirective = RegExp('^\\s*part\\s+[\'"]([^\'"]+)[\'"]\\s*;');
-
-  /// Resolves a `part` URI against its declaring file's directory,
-  /// collapsing `.`/`..` segments so the result is a repo-relative path
-  /// comparable with [libraryBaseline]'s keys.
-  String resolveAgainst(String dirPath, String uri) {
-    final segments = <String>[];
-    for (final segment in '$dirPath/$uri'.split('/')) {
-      if (segment.isEmpty || segment == '.') continue;
-      if (segment == '..') {
-        if (segments.isNotEmpty) segments.removeLast();
-        continue;
-      }
-      segments.add(segment);
-    }
-    return segments.join('/');
-  }
-
-  /// The hand-written `part` files of [file] (generated parts skipped by
-  /// [isScanned], which is the same scope filter the per-file gate uses).
-  List<String> handwrittenParts(File file) {
-    final dirPath = file.parent.path.replaceAll(r'\', '/');
-    final parts = <String>[];
-    for (final line in file.readAsLinesSync()) {
-      final match = partDirective.firstMatch(line);
-      if (match == null) continue;
-      final uri = match.group(1)!;
-      if (!isScanned(uri)) continue;
-      parts.add(resolveAgainst(dirPath, uri));
-    }
-    return parts;
-  }
-
   test('no library in lib/ (declaring file + its hand-written parts) '
       'exceeds $lineLimit lines or its pinned baseline (#4033)', () {
-    // Declaring path → its hand-written parts.
-    final libraries = <String, List<String>>{};
-    for (final entity in Directory('lib').listSync(recursive: true)) {
-      if (entity is! File) continue;
-      final path = entity.path.replaceAll(r'\', '/');
-      if (!isScanned(path)) continue;
-      final parts = handwrittenParts(entity);
-      if (parts.isNotEmpty) libraries[path] = parts;
-    }
-    // A `part` file carries no `part` directives of its own, so anything
-    // listed as someone's part is never itself a declaring library.
-    final allParts = libraries.values.expand((p) => p).toSet();
-    libraries.removeWhere((path, _) => allParts.contains(path));
-
+    // #4346 — root/part aggregation is tool/architecture_graph.dart's
+    // sharedStateLibraries: a library is a declaring file with hand-written
+    // parts (generated parts excluded), never itself someone's part, and
+    // its total is the effective lines of the root plus the parts that
+    // exist. The exact baselines below pin that it measures what the
+    // in-test aggregation measured before.
     final totals = <String, int>{};
     final composition = <String, List<String>>{};
-    for (final MapEntry(key: path, value: parts) in libraries.entries) {
-      var total = effectiveLines(File(path));
-      final present = <String>[];
-      for (final part in parts) {
-        final partFile = File(part);
-        if (!partFile.existsSync()) continue;
-        total += effectiveLines(partFile);
-        present.add(part);
-      }
-      totals[path] = total;
-      composition[path] = present;
+    for (final library in scannedLibraries()) {
+      totals[library.root] = library.lines;
+      composition[library.root] = library.parts;
     }
 
     String describe(String path) =>
@@ -546,4 +491,80 @@ void main() {
           '${stale.join("\n")}',
     );
   });
+
+  // ---------------------------------------------------------------
+  // #4346 — shared private state, not lines. A mixin declared in a part
+  // file reaches the whole library's private scope: it is a slice of one
+  // owner's state, not a collaborator. Moving code between parts leaves
+  // this count unchanged; extracting a collaborator with its own private
+  // state lowers it — which is the reduction that matters.
+  // ---------------------------------------------------------------
+
+  /// Declaring library -> number of mixins declared in its hand-written
+  /// part files (`mixin Name` at the start of a line, comments ignored),
+  /// as tool/architecture_graph.dart's sharedStateLibraries counts them.
+  /// Libraries without part mixins have no entry. Measured with that
+  /// scanner by pinning this map empty and copying back what the test
+  /// reported. Exact in both directions like [libraryBaseline]: NEVER
+  /// raise or add an entry; lower or delete it in the PR that extracts a
+  /// collaborator.
+  const partMixinBaseline = <String, int>{
+    'lib/core/services/station_service_chain.dart': 1,
+    'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 3,
+    'lib/features/fill_ups/providers/consumption_providers.dart': 4,
+    'lib/features/obd2/data/session/live_sample_snapshot.dart': 3,
+    'lib/features/obd2/data/session/obd2_service.dart': 4,
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 9,
+    'lib/features/obd2/presentation/widgets/obd2_adapter_picker.dart': 2,
+    'lib/features/search/presentation/screens/search_criteria_screen.dart': 1,
+    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 3,
+    'lib/features/trips/providers/trip_recording_provider.dart': 4,
+    'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 3,
+  };
+
+  test('mixins sharing a library\'s private scope match the baseline, and '
+      'each has a named state owner (#4346)', () {
+    final libraries = scannedLibraries();
+    final actual = {
+      for (final library in libraries)
+        if (library.partMixins.isNotEmpty)
+          library.root: library.partMixins.length,
+    };
+    final drift = <String>[];
+    for (final root in {...actual.keys, ...partMixinBaseline.keys}) {
+      final now = actual[root] ?? 0;
+      final pinned = partMixinBaseline[root] ?? 0;
+      if (now > pinned) {
+        drift.add('$root: $now part mixins (baseline $pinned) — extract a '
+            'collaborator with its own state instead');
+      } else if (now < pinned) {
+        drift.add('$root: $now part mixins (baseline $pinned) — stale, '
+            'lower the entry');
+      }
+    }
+    drift.sort();
+    final literal = (actual.keys.toList()..sort())
+        .map((k) => "    '$k': ${actual[k]},")
+        .join('\n');
+    expect(
+      drift,
+      isEmpty,
+      reason: 'Part-file mixins drifted from partMixinBaseline (#4346).\n'
+          '${drift.join('\n')}\n\nUp-to-date baseline literal:\n$literal',
+    );
+
+    final ownerless = [
+      for (final library in libraries)
+        if (library.partMixins.isNotEmpty && library.owners.isEmpty)
+          '${library.root} (${library.partMixins.join(', ')})',
+    ];
+    expect(
+      ownerless,
+      isEmpty,
+      reason: 'These libraries declare part mixins that no class in the '
+          'library mixes in, so their shared state has no explicit owner '
+          '(#4346):\n${ownerless.join('\n')}',
+    );
+  });
+
 }
