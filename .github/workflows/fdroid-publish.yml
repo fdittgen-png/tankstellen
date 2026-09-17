@@ -122,7 +122,11 @@ jobs:
         # F-Droid, so the fdroid flavor ships the GPS foreground service
         # unconditionally (src/fdroid/AndroidManifestFgsApproved.xml overlay:
         # FGS + FGS_LOCATION + battery-exemption only — no play-only services).
-        run: flutter build apk --release --flavor fdroid --build-number=${{ steps.bn.outputs.build_number }} --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
+        # #4369 — the defines come from tool/fdroid_dart_defines.json, the ONE
+        # list scripts/fdroid_publish.sh and fdroid.yml read too. This build
+        # used to spell them inline and lacked FDROID_LIBRE=true, so the
+        # self-hosted APK kept the developer tile proxy and TankSync defaults.
+        run: flutter build apk --release --flavor fdroid --build-number=${{ steps.bn.outputs.build_number }} --dart-define-from-file=tool/fdroid_dart_defines.json
       # #3661 — size visible on every build; fails on an implausibly
       # small artifact (llmwiki page 25).
       - name: Artifact size -> job summary

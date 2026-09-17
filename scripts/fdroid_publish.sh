@@ -70,13 +70,13 @@ dart run build_runner clean
 dart run build_runner build --delete-conflicting-outputs
 
 # --- 4. Build the signed, GMS-free release APK -------------------------------
-# #3435 — FGS define parity with fdroid-publish.yml: F-Droid ships the GPS
-# foreground service unconditionally (no Play declaration applies).
+# #3435 — F-Droid ships the GPS foreground service unconditionally (no Play
+# declaration applies). #4369 — every define (location manager, FGS and
+# FDROID_LIBRE) comes from tool/fdroid_dart_defines.json, the one list
+# fdroid-publish.yml reads too, so the two builds cannot drift apart again.
 echo "==> Building signed fdroid release APK"
 flutter build apk --release --flavor fdroid \
-  --dart-define=FORCE_LOCATION_MANAGER=true \
-  --dart-define=FGS_FORM_APPROVED=true \
-  --dart-define=FDROID_LIBRE=true
+  --dart-define-from-file=tool/fdroid_dart_defines.json
 [[ -f "${APK_OUT}" ]] || fail "expected APK not found at ${APK_OUT}"
 
 # --- 5. Audit the release APK — abort on any GMS/MLKit hit -------------------

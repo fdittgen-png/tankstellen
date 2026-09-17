@@ -61,11 +61,17 @@ void main() {
               "developer's Supabase");
     });
 
+    // #4369 — the self-hosted builds (scripts/fdroid_publish.sh AND
+    // fdroid-publish.yml, which once lacked the flag) read one define list;
+    // fdroid_build_defines_test.dart scans every F-Droid build for it.
     test('the self-hosted publish script passes FDROID_LIBRE too', () {
       final sh = File('scripts/fdroid_publish.sh').readAsStringSync();
-      expect(sh, contains('--dart-define=FDROID_LIBRE=true'),
+      expect(sh,
+          contains('--dart-define-from-file=tool/fdroid_dart_defines.json'),
           reason: 'the self-hosted repo ships a prebuilt APK from this '
               'script — it must be libre by the same rule');
+      expect(File('tool/fdroid_dart_defines.json').readAsStringSync(),
+          contains('"FDROID_LIBRE": "true"'));
     });
 
     // #3968 — the assertion that MATTERS, and the one whose absence let a

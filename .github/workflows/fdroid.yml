@@ -144,8 +144,11 @@ jobs:
       # required `test` shards, which is what actually blocks a merge — a
       # recipe violation must not be mergeable just because someone read a
       # green tick on an advisory job.
+      # #4369 — under the shared F-Droid defines, so the libre branch of
+      # libre_build_endpoints_test EXECUTES here (the required shards run the
+      # default branch): proof the file really flips kLibreBuild.
       - name: Recipe lint — the fdroiddata review rules, as errors
-        run: flutter test test/features/fdroid
+        run: flutter test test/features/fdroid --dart-define-from-file=tool/fdroid_dart_defines.json
       # Build the keyless-unsigned RELEASE fdroid APK with the GMS-free
       # runtime config (#3480 — release, not debug: only R8 strips the dead
       # Play-Core deferred-components refs, #3479, so only the release dex can
@@ -153,8 +156,10 @@ jobs:
       # define matches fdroid-publish.yml so the audit runs against the same
       # artifact shape F-Droid actually ships. #3471 sanctions the
       # keystore-less fdroid-only release (unsigned; F-Droid signs downstream).
+      # #4369 — same shared define list as fdroid-publish.yml, FDROID_LIBRE
+      # included, so the audited APK is the libre one.
       - name: Build fdroid release APK (unsigned)
-        run: flutter build apk --release --flavor fdroid --dart-define=FORCE_LOCATION_MANAGER=true --dart-define=FGS_FORM_APPROVED=true
+        run: flutter build apk --release --flavor fdroid --dart-define-from-file=tool/fdroid_dart_defines.json
       # #3661 — size visible on every build; fails on an implausibly
       # small artifact (llmwiki page 25).
       - name: Artifact size -> job summary
