@@ -71,22 +71,16 @@ mixin _FillUpListCalibration on _$FillUpList {
     }
   }
 
-  /// #3918 — write the tank's dominant grade (the mix estimate on a
-  /// multi-fuel vehicle, else the last physical fill's fuel) so the
-  /// fuel-rate readers resolve `pumpGainByFuel` by what the tank holds.
+  /// #3918 — write the tank's grade ([tankFuelKeyOf]) so the fuel-rate
+  /// readers resolve `pumpGainByFuel` by what the tank holds.
   Future<void> _stampTankFuelKey(String vehicleId, List<FillUp> fills) async {
     final repo = ref.read(vehicleProfileRepositoryProvider);
     final vehicle = repo.getById(vehicleId);
     if (vehicle == null) return;
-    final physical = fills.where((f) => !f.isCorrection).toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
-    if (physical.isEmpty) return;
-    String key = physical.first.fuelType.apiValue;
-    if (vehicle.multiFuelCapable) {
-      final mix = estimateTankMix(vehicle: vehicle, fillUps: fills);
-      final dominant = mix?.shares.firstOrNull;
-      if (dominant != null) key = dominant.fuel.apiValue;
-    }
+    final key = tankFuelKeyOf(vehicle: vehicle, fillUps: fills, trips: [
+      for (final t in ref.read(tripHistoryListProvider))
+        if (t.vehicleId == vehicleId) t,
+    ]);
     if (vehicle.tankFuelKey == key) return;
     await repo.save(vehicle.copyWith(tankFuelKey: key));
   }

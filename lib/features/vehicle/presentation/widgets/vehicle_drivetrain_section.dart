@@ -40,6 +40,7 @@ class VehicleDrivetrainSection extends StatelessWidget {
   // forwarded to the combustion sub-section.
   final bool multiFuelCapable;
   final ValueChanged<bool> onMultiFuelCapableChanged;
+  final ValueNotifier<bool> flexFuelApproved; // #4324
   final ValueChanged<FuelType?> onFuelTypeChanged;
 
   final String? Function(String?) numberValidator;
@@ -60,6 +61,7 @@ class VehicleDrivetrainSection extends StatelessWidget {
     required this.powerKwController,
     required this.multiFuelCapable,
     required this.onMultiFuelCapableChanged,
+    required this.flexFuelApproved,
     required this.onFuelTypeChanged,
     required this.numberValidator,
   });
@@ -96,6 +98,7 @@ class VehicleDrivetrainSection extends StatelessWidget {
             powerKwController: powerKwController,
             multiFuelCapable: multiFuelCapable,
             onMultiFuelCapableChanged: onMultiFuelCapableChanged,
+            flexFuelApproved: flexFuelApproved,
             onFuelTypeChanged: onFuelTypeChanged,
             numberValidator: numberValidator,
           ),

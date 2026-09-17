@@ -5882,6 +5882,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fuelAndTankExcludedTitle => 'Left out';
 
   @override
+  String fuelAndTankPricesSourceNearby(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Cheapest prices for $count fuels among the stations of your last search, detour included',
+      one:
+          'Cheapest price for 1 fuel among the stations of your last search, detour included',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelAndTankConvergenceTolerance(String tolerance, String target) {
+    return 'Counted as reached within $tolerance points of the $target % target.';
+  }
+
+  @override
+  String fuelAndTankMaterialThreshold(String percent) {
+    return 'A fuel is only suggested when it is at least $percent % better.';
+  }
+
+  @override
+  String get vehicleFlexFuelApprovedLabel => 'Approved for E85 (flex-fuel)';
+
+  @override
+  String get vehicleFlexFuelApprovedHelper =>
+      'Only if the manufacturer approves E85. Fuel & Tank then compares E85 even when you usually fill another fuel.';
+
+  @override
   String get fuelEfficiencyCardTitle => 'Cost per kilometre by fuel';
 
   @override
@@ -16184,6 +16214,37 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fuelAndTankExcludedTitle => '⟦Łéƒŧ óúŧ ···⟧';
+
+  @override
+  String fuelAndTankPricesSourceNearby(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Cheapest prices for $count fuels among the stations of your last search, detour included',
+      one:
+          'Cheapest price for 1 fuel among the stations of your last search, detour included',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String fuelAndTankConvergenceTolerance(String tolerance, String target) {
+    return '⟦Çóúñŧéđ áš řéáçĥéđ ŵîŧĥîñ $tolerance ƥóîñŧš óƒ ŧĥé $target % ŧářǧéŧ. ··················⟧';
+  }
+
+  @override
+  String fuelAndTankMaterialThreshold(String percent) {
+    return '⟦Á ƒúéł îš óñłý šúǧǧéšŧéđ ŵĥéñ îŧ îš áŧ łéášŧ $percent % ƀéŧŧéř. ··················⟧';
+  }
+
+  @override
+  String get vehicleFlexFuelApprovedLabel =>
+      '⟦Áƥƥřóṽéđ ƒóř É85 (ƒłéẋ-ƒúéł) ·········⟧';
+
+  @override
+  String get vehicleFlexFuelApprovedHelper =>
+      '⟦Óñłý îƒ ŧĥé ɱáñúƒáçŧúřéř áƥƥřóṽéš É85. Ƒúéł & Ŧáñķ ŧĥéñ çóɱƥářéš É85 éṽéñ ŵĥéñ ýóú úšúáłłý ƒîłł áñóŧĥéř ƒúéł. ······································⟧';
 
   @override
   String get fuelEfficiencyCardTitle =>

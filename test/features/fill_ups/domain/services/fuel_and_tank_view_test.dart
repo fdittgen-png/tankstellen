@@ -56,6 +56,45 @@ void main() {
       expect(mix.isUnknown, isTrue);
       expect(mix.leading, isNull);
       expect(mix.unknownPercent, 100);
+      expect(mix.plausibleMaxEthanolShare, isNull,
+          reason: 'no fuel evidence at all: no ethanol figure');
+    });
+
+    // #4322 — the lessons' ethanol share is the PLAUSIBLE MAXIMUM: it
+    // excuses lean trims (#3701), so it asks what could explain them.
+    test('a pure E85 tank may hold up to 85 % ethanol (EN 15293 upper)', () {
+      final mix = TankMixView.of(
+          snapshot({FuelGrade.e85: 1.0}, min: 40, max: 40));
+      expect(mix.plausibleMaxEthanolShare, closeTo(0.85, 1e-9));
+    });
+
+    test('the unknown share takes the highest grade in the evidence', () {
+      final tank = snapshot(
+          {FuelGrade.e85: 0.6, FuelGrade.e10: 0.3, FuelGrade.unknown: 0.1});
+      // 0.6 × 0.85 + 0.3 × 0.10 + 0.1 × 0.85 (E85 is in the evidence).
+      expect(TankMixView.of(tank).plausibleMaxEthanolShare,
+          closeTo(0.625, 1e-9));
+    });
+
+    test('never E85 for unknown litres when no E85 was filled or approved',
+        () {
+      final tank = snapshot({FuelGrade.e10: 0.4, FuelGrade.unknown: 0.6});
+      // 0.4 × 0.10 + 0.6 × 0.10 — E10 is the richest grade in evidence.
+      expect(
+          TankMixView.of(tank, ethanolEvidence: const [FuelGrade.e5])
+              .plausibleMaxEthanolShare,
+          closeTo(0.10, 1e-9));
+      // An approved E85 does widen it.
+      expect(
+          TankMixView.of(tank, ethanolEvidence: const [FuelGrade.e85])
+              .plausibleMaxEthanolShare,
+          closeTo(0.04 + 0.6 * 0.85, 1e-9));
+    });
+
+    test('a diesel tank holds no ethanol, not null', () {
+      final mix = TankMixView.of(
+          snapshot({FuelGrade.diesel: 1.0}, min: 30, max: 30));
+      expect(mix.plausibleMaxEthanolShare, 0);
     });
   });
 

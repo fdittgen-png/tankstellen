@@ -15,8 +15,8 @@ import '../../domain/services/tank_level_estimator.dart';
 import '../../providers/tank_level_provider.dart';
 import '../../providers/tank_mix_provider.dart';
 import '../../../trips/api.dart';
-import '../../../../core/utils/localized_fuel_name.dart';
 import 'fuel_and_tank/fuel_and_tank_entry_button.dart';
+import 'fuel_and_tank/fuel_and_tank_labels.dart';
 
 /// Tank-level card on the Fuel tab (#1195) — the Carburant tab's
 /// **primary card** since #3950 (Epic #3947).
@@ -213,8 +213,8 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
           // #3652 — the current tank's fuel mix for multi-fuel
           // vehicles (E10 topped onto E85 → a blend of both; the
           // consumption depends on it). The provider returns null
-          // for single-fuel vehicles; a pure tank stays silent via
-          // isBlend. Shell-safe (#2163) like the report card.
+          // for single-fuel vehicles; an established pure tank stays
+          // silent. Shell-safe (#2163) like the report card.
           if (_mixLine(ref, l) case final mixText?) ...[
             const SizedBox(height: Spacing.sm),
             Text(
@@ -231,24 +231,20 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
     );
   }
 
-  /// #3652 — "Tank mix: Super E10 57 % · E85 / Bioéthanol 43 %", or
-  /// null when there is nothing to say (single-fuel vehicle, pure tank,
-  /// unwired provider graph in an isolated test harness). Grade names
-  /// come from [FuelType.displayName] — the same product-name labels
-  /// the fuel pickers render (#713).
+  /// #3652 — "Tank mix: ≥ 62 % E85 · 38 % unknown", or null when there is
+  /// nothing to say (single-fuel vehicle, an established pure tank, a tank
+  /// nothing is attributed to, unwired provider graph in an isolated test
+  /// harness). #4322 — the SAME line, from the same evidence-only blend,
+  /// as the Fuel & Tank surface's mix card: the two can never disagree.
   String? _mixLine(WidgetRef ref, AppLocalizations l) {
     final mix = guard(
       () => ref.watch(tankMixProvider(vehicleId)),
       where: 'TankLevelCard: tank mix watch failed',
       fallback: null,
     );
-    if (mix == null || !mix.isBlend()) return null;
-    final parts = [
-      for (final s in mix.shares)
-        if (s.share >= 0.01)
-          '${localizedFuelName(l, s.fuel)} ${(s.share * 100).round()} %',
-    ].join(' · ');
-    return l.tankMixCaption(parts);
+    if (mix == null || mix.isUnknown) return null;
+    if (mix.isExact && mix.shares.length < 2) return null;
+    return l.tankMixCaption(FuelAndTankLabels.mixLine(l, mix));
   }
 
   /// #3647 tank level v2 — the caption names the level's SOURCE: the

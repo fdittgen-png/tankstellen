@@ -10,34 +10,53 @@ part of 'tank_mix_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Fuel mix of the current tank content for [vehicleId] (#3652).
+/// Fuel mix of the current tank content for [vehicleId] (#3652), read from
+/// the one mix model the app has: the evidence-only tank blend (#4322).
 ///
-/// Null when the vehicle is unknown, has no physical fills, or is not
-/// flagged multi-fuel capable (#2885) — a single-fuel vehicle's tank is
-/// trivially 100 % of its grade and surfacing that would be noise.
+/// It is [tankBlendProvider] reduced to the [TankMixView] the Fuel & Tank
+/// surface renders, so a mix line anywhere else (the tank level card) can
+/// never disagree with that surface — guaranteed minimums, the unknown
+/// share said out loud. The grades this vehicle was filled with or is
+/// approved for bound [TankMixView.plausibleMaxEthanolShare], the upper
+/// ethanol bound the trip lessons excuse lean trims with (#3701).
+///
+/// Null when the vehicle is unknown or not flagged multi-fuel capable
+/// (#2885) — a single-fuel vehicle's tank is trivially 100 % of its grade
+/// and surfacing that would be noise.
 
 @ProviderFor(tankMix)
 final tankMixProvider = TankMixFamily._();
 
-/// Fuel mix of the current tank content for [vehicleId] (#3652).
+/// Fuel mix of the current tank content for [vehicleId] (#3652), read from
+/// the one mix model the app has: the evidence-only tank blend (#4322).
 ///
-/// Null when the vehicle is unknown, has no physical fills, or is not
-/// flagged multi-fuel capable (#2885) — a single-fuel vehicle's tank is
-/// trivially 100 % of its grade and surfacing that would be noise.
+/// It is [tankBlendProvider] reduced to the [TankMixView] the Fuel & Tank
+/// surface renders, so a mix line anywhere else (the tank level card) can
+/// never disagree with that surface — guaranteed minimums, the unknown
+/// share said out loud. The grades this vehicle was filled with or is
+/// approved for bound [TankMixView.plausibleMaxEthanolShare], the upper
+/// ethanol bound the trip lessons excuse lean trims with (#3701).
+///
+/// Null when the vehicle is unknown or not flagged multi-fuel capable
+/// (#2885) — a single-fuel vehicle's tank is trivially 100 % of its grade
+/// and surfacing that would be noise.
 
 final class TankMixProvider
-    extends
-        $FunctionalProvider<
-          TankMixEstimate?,
-          TankMixEstimate?,
-          TankMixEstimate?
-        >
-    with $Provider<TankMixEstimate?> {
-  /// Fuel mix of the current tank content for [vehicleId] (#3652).
+    extends $FunctionalProvider<TankMixView?, TankMixView?, TankMixView?>
+    with $Provider<TankMixView?> {
+  /// Fuel mix of the current tank content for [vehicleId] (#3652), read from
+  /// the one mix model the app has: the evidence-only tank blend (#4322).
   ///
-  /// Null when the vehicle is unknown, has no physical fills, or is not
-  /// flagged multi-fuel capable (#2885) — a single-fuel vehicle's tank is
-  /// trivially 100 % of its grade and surfacing that would be noise.
+  /// It is [tankBlendProvider] reduced to the [TankMixView] the Fuel & Tank
+  /// surface renders, so a mix line anywhere else (the tank level card) can
+  /// never disagree with that surface — guaranteed minimums, the unknown
+  /// share said out loud. The grades this vehicle was filled with or is
+  /// approved for bound [TankMixView.plausibleMaxEthanolShare], the upper
+  /// ethanol bound the trip lessons excuse lean trims with (#3701).
+  ///
+  /// Null when the vehicle is unknown or not flagged multi-fuel capable
+  /// (#2885) — a single-fuel vehicle's tank is trivially 100 % of its grade
+  /// and surfacing that would be noise.
   TankMixProvider._({
     required TankMixFamily super.from,
     required String super.argument,
@@ -61,20 +80,20 @@ final class TankMixProvider
 
   @$internal
   @override
-  $ProviderElement<TankMixEstimate?> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<TankMixView?> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  TankMixEstimate? create(Ref ref) {
+  TankMixView? create(Ref ref) {
     final argument = this.argument as String;
     return tankMix(ref, argument);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(TankMixEstimate? value) {
+  Override overrideWithValue(TankMixView? value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<TankMixEstimate?>(value),
+      providerOverride: $SyncValueProvider<TankMixView?>(value),
     );
   }
 
@@ -89,16 +108,24 @@ final class TankMixProvider
   }
 }
 
-String _$tankMixHash() => r'41debfda129284296b5cba7e1faa08ba8cec571d';
+String _$tankMixHash() => r'bc4247bddbde8b2fc2ddbbc95aa00551558b0807';
 
-/// Fuel mix of the current tank content for [vehicleId] (#3652).
+/// Fuel mix of the current tank content for [vehicleId] (#3652), read from
+/// the one mix model the app has: the evidence-only tank blend (#4322).
 ///
-/// Null when the vehicle is unknown, has no physical fills, or is not
-/// flagged multi-fuel capable (#2885) — a single-fuel vehicle's tank is
-/// trivially 100 % of its grade and surfacing that would be noise.
+/// It is [tankBlendProvider] reduced to the [TankMixView] the Fuel & Tank
+/// surface renders, so a mix line anywhere else (the tank level card) can
+/// never disagree with that surface — guaranteed minimums, the unknown
+/// share said out loud. The grades this vehicle was filled with or is
+/// approved for bound [TankMixView.plausibleMaxEthanolShare], the upper
+/// ethanol bound the trip lessons excuse lean trims with (#3701).
+///
+/// Null when the vehicle is unknown or not flagged multi-fuel capable
+/// (#2885) — a single-fuel vehicle's tank is trivially 100 % of its grade
+/// and surfacing that would be noise.
 
 final class TankMixFamily extends $Family
-    with $FunctionalFamilyOverride<TankMixEstimate?, String> {
+    with $FunctionalFamilyOverride<TankMixView?, String> {
   TankMixFamily._()
     : super(
         retry: null,
@@ -108,11 +135,19 @@ final class TankMixFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// Fuel mix of the current tank content for [vehicleId] (#3652).
+  /// Fuel mix of the current tank content for [vehicleId] (#3652), read from
+  /// the one mix model the app has: the evidence-only tank blend (#4322).
   ///
-  /// Null when the vehicle is unknown, has no physical fills, or is not
-  /// flagged multi-fuel capable (#2885) — a single-fuel vehicle's tank is
-  /// trivially 100 % of its grade and surfacing that would be noise.
+  /// It is [tankBlendProvider] reduced to the [TankMixView] the Fuel & Tank
+  /// surface renders, so a mix line anywhere else (the tank level card) can
+  /// never disagree with that surface — guaranteed minimums, the unknown
+  /// share said out loud. The grades this vehicle was filled with or is
+  /// approved for bound [TankMixView.plausibleMaxEthanolShare], the upper
+  /// ethanol bound the trip lessons excuse lean trims with (#3701).
+  ///
+  /// Null when the vehicle is unknown or not flagged multi-fuel capable
+  /// (#2885) — a single-fuel vehicle's tank is trivially 100 % of its grade
+  /// and surfacing that would be noise.
 
   TankMixProvider call(String vehicleId) =>
       TankMixProvider._(argument: vehicleId, from: this);

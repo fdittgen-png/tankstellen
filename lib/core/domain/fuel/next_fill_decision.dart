@@ -189,11 +189,22 @@ final class FillTradeOff {
   final double? breakEvenLPer100Km;
 
   /// Money per kg CO2e avoided when [chosen] is dearer but cleaner (or the
-  /// reverse) — the honest statement of a trade-off, not a score.
+  /// reverse) — the honest statement of a trade-off, not a score. The side
+  /// that avoids the CO2e is [cleaner].
   double? get costPerKgCo2e {
     final c = costPerKmDelta, e = co2eKgPerKmDelta;
     if (c == null || e == null || e == 0) return null;
     return -c / e;
+  }
+
+  /// The grade with the lower CO2e per km (#4324): [chosen] when its delta
+  /// is negative, [alternative] when positive, null when the delta is
+  /// unknown or zero — so no caller has to read a sign to know which side
+  /// is cleaner.
+  FuelGrade? get cleaner {
+    final e = co2eKgPerKmDelta;
+    if (e == null || e == 0) return null;
+    return e < 0 ? chosen : alternative;
   }
 
   Map<String, Object?> toJson() => {
@@ -204,6 +215,7 @@ final class FillTradeOff {
         'lPer100KmDelta': lPer100KmDelta,
         'breakEvenPricePerLitre': breakEvenPricePerLitre,
         'breakEvenLPer100Km': breakEvenLPer100Km,
+        'cleaner': cleaner?.key,
       };
 }
 
@@ -221,6 +233,7 @@ enum ConvergenceStatus {
 final class ConvergencePlan {
   ConvergencePlan({
     required this.target,
+    required this.tolerance,
     required this.status,
     required Iterable<double> minimumShareAfterFill,
     this.fillsNeeded,
@@ -228,6 +241,13 @@ final class ConvergencePlan {
   }) : minimumShareAfterFill = List.unmodifiable(minimumShareAfterFill);
 
   final TargetBlend target;
+
+  /// How far below [TargetBlend.minimumShare] still counts as reached
+  /// (#4324): a plan is [ConvergenceStatus.alreadyAtTarget] or
+  /// [ConvergenceStatus.reachable] from `minimumShare − tolerance` up, so a
+  /// surface can say "within N points of the target" instead of implying
+  /// the target itself was met.
+  final double tolerance;
   final ConvergenceStatus status;
   final List<double> minimumShareAfterFill;
 
@@ -238,6 +258,7 @@ final class ConvergencePlan {
   Map<String, Object?> toJson() => {
         'grade': target.grade.key,
         'minimumShare': target.minimumShare,
+        'tolerance': tolerance,
         'status': status.name,
         'minimumShareAfterFill': minimumShareAfterFill,
         'fillsNeeded': fillsNeeded,
@@ -259,6 +280,7 @@ final class NextFillDecision {
     required this.confidence,
     required this.profileModelVersion,
     required this.blendModelVersion,
+    required this.minMaterialAdvantage,
     this.recommended,
     this.convergence,
   })  : candidates = List.unmodifiable(candidates),
@@ -288,8 +310,14 @@ final class NextFillDecision {
   final int profileModelVersion;
   final int blendModelVersion;
 
+  /// The smallest relative advantage (0.02 = 2 %) this decision treated as
+  /// worth a change of fuel (#4324) — what "the difference is too small"
+  /// was measured against, so a surface can quote it.
+  final double minMaterialAdvantage;
+
   Map<String, Object?> toJson() => {
         'modelVersion': modelVersion,
+        'minMaterialAdvantage': minMaterialAdvantage,
         'profileModelVersion': profileModelVersion,
         'blendModelVersion': blendModelVersion,
         'objective': objective.name,

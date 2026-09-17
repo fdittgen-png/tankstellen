@@ -7,6 +7,7 @@ import '../../../../core/widgets/fuel_type_dropdown.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/fuel_type.dart';
 import 'engine_power_field.dart';
+import 'vehicle_form_controllers.dart' show offersFlexFuelApproval;
 
 /// Combustion-engine portion of the [EditVehicleScreen] form. Owns the tank
 /// capacity and preferred fuel inputs.
@@ -39,6 +40,10 @@ class VehicleCombustionSection extends StatelessWidget {
   final bool multiFuelCapable;
   final ValueChanged<bool> onMultiFuelCapableChanged;
 
+  /// #4324 — the declared E85 approval, offered for E5 / E10 / E98 cars
+  /// ([offersFlexFuelApproval]): a flex-fuel car usually filled with E10.
+  final ValueNotifier<bool> flexFuelApproved;
+
   /// #2885 — fired when the user changes the preferred-fuel dropdown.
   /// The owning screen `setState`s on this so the multi-fuel switch
   /// shows / hides as the fuel moves in and out of the E10 / E85 set.
@@ -52,6 +57,7 @@ class VehicleCombustionSection extends StatelessWidget {
     required this.numberValidator,
     required this.multiFuelCapable,
     required this.onMultiFuelCapableChanged,
+    required this.flexFuelApproved,
     required this.onFuelTypeChanged,
   });
 
@@ -129,6 +135,20 @@ class VehicleCombustionSection extends StatelessWidget {
             subtitle: Text(l.vehicleMultiFuelCapableHelper),
             value: multiFuelCapable,
             onChanged: onMultiFuelCapableChanged,
+          ),
+        ],
+        if (offersFlexFuelApproval(currentValue)) ...[
+          const SizedBox(height: 8),
+          ValueListenableBuilder<bool>(
+            valueListenable: flexFuelApproved,
+            builder: (context, approved, _) => SwitchListTile(
+              key: const Key('vehicle_flex_fuel_approved_switch'),
+              contentPadding: EdgeInsets.zero,
+              title: Text(l.vehicleFlexFuelApprovedLabel),
+              subtitle: Text(l.vehicleFlexFuelApprovedHelper),
+              value: approved,
+              onChanged: (v) => flexFuelApproved.value = v,
+            ),
           ),
         ],
       ],

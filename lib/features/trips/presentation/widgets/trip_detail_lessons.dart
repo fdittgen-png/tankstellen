@@ -17,10 +17,13 @@ import '../../../fill_ups/api.dart';
 /// stored summary) so the O(n) analyzer / score passes don't re-run on a
 /// theme / locale rebuild.
 ///
-/// #3701 — the tank-mix ethanol share (from the #3652 mix model) rides
-/// into [LessonContext] so the combustion-health rule can tell "the ECU
-/// is trimming for E85" from "the ECU is fighting a fault". Null
-/// (unknown vehicle / single-fuel) keeps every rule stock.
+/// #3701 — the tank-mix ethanol share rides into [LessonContext] so the
+/// combustion-health rule can tell "the ECU is trimming for E85" from "the
+/// ECU is fighting a fault". #4322 — it is the PLAUSIBLE MAXIMUM ethanol
+/// of the evidence-only blend: excusing a symptom needs the ethanol that
+/// could explain it, bounded by the grades this car was actually filled
+/// with or approved for. Null (unknown vehicle / single-fuel / no fuel
+/// evidence) keeps every rule stock.
 List<DrivingLesson> buildTripDetailLessons({
   required WidgetRef ref,
   required DrivingLessonRegistry registry,
@@ -39,7 +42,7 @@ List<DrivingLesson> buildTripDetailLessons({
       insights: insights,
       expectedEthanolShare: vehicleId == null
           ? null
-          : ref.watch(tankMixProvider(vehicleId))?.ethanolVolumeFraction,
+          : ref.watch(tankMixProvider(vehicleId))?.plausibleMaxEthanolShare,
     ),
     l,
   );

@@ -7,14 +7,19 @@ import '../../../../core/domain/vehicle_profile.dart';
 
 /// The approvals a [VehicleProfile] can honestly vouch for (#4278).
 ///
-/// Nothing persists a `VehicleFuelCapability` yet, so this reads the only
-/// facts the profile holds — the configured fuel, the multi-fuel
-/// declaration and the powertrain — and never widens them by the
-/// "physically fits the filler neck" family (#713), which is exactly the
-/// mapping #4274 forbids as an approval basis:
+/// #4324 — grades the user DECLARED approved
+/// ([VehicleProfile.approvedFuelGrades]) extend what is derived below, so
+/// a flex-fuel car usually filled with E10 is still offered E85. A profile
+/// that declares nothing (every profile saved before #4324) resolves
+/// exactly as it always did.
+///
+/// The derivation reads the facts the profile holds — the configured fuel,
+/// the multi-fuel declaration and the powertrain — and never widens them
+/// by the "physically fits the filler neck" family (#713), which is
+/// exactly the mapping #4274 forbids as an approval basis:
 ///
 ///  * no vehicle, an EV, or no / unparseable configured fuel →
-///    [VehicleFuelCapability.unknown];
+///    [VehicleFuelCapability.unknown] (declared grades alone, if any);
 ///  * E85 configured AND declared multi-fuel → the flex-fuel petrol grades
 ///    (a flex-fuel car is built for E0–E85; the declaration says it
 ///    alternates);
@@ -29,18 +34,29 @@ VehicleFuelCapability vehicleFuelCapabilityOf(VehicleProfile? vehicle) {
   if (vehicle == null || vehicle.type == VehicleType.ev) {
     return const VehicleFuelCapability.unknown();
   }
+  final derived = _derivedCapabilityOf(vehicle);
+  final declared = declaredApprovedGradesOf(vehicle);
+  if (declared.isEmpty) return derived;
+  return VehicleFuelCapability(
+    approvedGrades: {...derived.approvedGrades, ...declared},
+    provenance: kCapabilityProvenanceDeclared,
+  );
+}
+
+/// The liquid grades [vehicle] declares approved; unknown keys are dropped.
+Set<FuelGrade> declaredApprovedGradesOf(VehicleProfile vehicle) => {
+      for (final key in vehicle.approvedFuelGrades)
+        if (FuelGrade.fromKey(key) case final g when g.isLiquid) g,
+    };
+
+VehicleFuelCapability _derivedCapabilityOf(VehicleProfile vehicle) {
   final preferred = configuredGradeOf(vehicle);
   if (preferred == null || !preferred.isLiquid) {
     return const VehicleFuelCapability.unknown();
   }
   if (vehicle.multiFuelCapable && preferred == FuelGrade.e85) {
     return VehicleFuelCapability(
-      approvedGrades: const [
-        FuelGrade.e5,
-        FuelGrade.e10,
-        FuelGrade.e98,
-        FuelGrade.e85,
-      ],
+      approvedGrades: kFlexFuelGrades,
       provenance: kCapabilityProvenanceFlexFuel,
     );
   }
@@ -58,6 +74,10 @@ VehicleFuelCapability vehicleFuelCapabilityOf(VehicleProfile? vehicle) {
 
 /// Provenance of a capability read from the configured fuel alone.
 const String kCapabilityProvenanceConfiguredFuel = 'vehicle-profile:fuel';
+
+/// Provenance of a capability that includes grades the user declared
+/// approved in the vehicle editor (#4324).
+const String kCapabilityProvenanceDeclared = 'vehicle-profile:approved-fuels';
 
 /// Provenance of an E85 vehicle declared multi-fuel.
 const String kCapabilityProvenanceFlexFuel = 'vehicle-profile:flex-fuel';

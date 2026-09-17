@@ -29,6 +29,7 @@ abstract final class NextFillConvergence {
   }) {
     ConvergencePlan notComputable(DecisionReason why) => ConvergencePlan(
         target: target,
+        tolerance: tolerance,
         status: ConvergenceStatus.notComputable,
         minimumShareAfterFill: const [],
         reason: why);
@@ -37,6 +38,7 @@ abstract final class NextFillConvergence {
     if (tank.minimumShare(target.grade) >= goal) {
       return ConvergencePlan(
           target: target,
+          tolerance: tolerance,
           status: ConvergenceStatus.alreadyAtTarget,
           minimumShareAfterFill: const [],
           fillsNeeded: 0);
@@ -66,6 +68,7 @@ abstract final class NextFillConvergence {
       if (share >= goal) {
         return ConvergencePlan(
             target: target,
+            tolerance: tolerance,
             status: ConvergenceStatus.reachable,
             minimumShareAfterFill: shares,
             fillsNeeded: k);
@@ -73,6 +76,7 @@ abstract final class NextFillConvergence {
     }
     return ConvergencePlan(
         target: target,
+        tolerance: tolerance,
         status: ConvergenceStatus.unreachableWithinHorizon,
         minimumShareAfterFill: shares);
   }

@@ -5964,6 +5964,36 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fuelAndTankExcludedTitle => 'Écartés';
 
   @override
+  String fuelAndTankPricesSourceNearby(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Prix les plus bas pour $count carburants parmi les stations de votre dernière recherche, détour compris',
+      one:
+          'Prix le plus bas pour 1 carburant parmi les stations de votre dernière recherche, détour compris',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelAndTankConvergenceTolerance(String tolerance, String target) {
+    return 'Considéré comme atteint à $tolerance points près de l\'objectif de $target %.';
+  }
+
+  @override
+  String fuelAndTankMaterialThreshold(String percent) {
+    return 'Un carburant n\'est suggéré que s\'il est meilleur d\'au moins $percent %.';
+  }
+
+  @override
+  String get vehicleFlexFuelApprovedLabel => 'Homologué E85 (flexfuel)';
+
+  @override
+  String get vehicleFlexFuelApprovedHelper =>
+      'Seulement si le constructeur homologue l\'E85. Carburant & réservoir compare alors l\'E85 même si vous faites le plein d\'un autre carburant.';
+
+  @override
   String get fuelEfficiencyCardTitle => 'Coût au kilomètre par carburant';
 
   @override

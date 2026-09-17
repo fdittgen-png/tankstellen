@@ -27,7 +27,7 @@ const double kPureGradeMinShare = 0.85;
 const double kMaxUnknownShareForContext = 0.15;
 
 /// Share below which a grade is a trace, not a constituent of a mixed
-/// bucket. Same 1 % floor `TankMixEstimate.isBlend` uses.
+/// bucket. The same 1 % floor the #3652 blend line always used.
 const double kMinConstituentShare = 0.01;
 
 /// What a tank held, reduced to the unit behaviour is learned per (#4276).

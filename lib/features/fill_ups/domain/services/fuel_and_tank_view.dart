@@ -10,9 +10,11 @@ import '../../../../core/domain/fuel/next_fill_decision.dart';
 import '../../../../core/domain/fuel/next_fill_request.dart';
 import '../../../../core/domain/fuel/tank_blend_snapshot.dart';
 import 'fuel_behaviour_view.dart';
+import 'next_fill_offers.dart';
 import 'tank_mix_view.dart';
 
 export 'fuel_behaviour_view.dart';
+export 'next_fill_offers.dart' show NextFillOfferSource;
 export 'tank_mix_view.dart';
 
 /// What the vehicle's settings approve, and what merely fits (#4278).
@@ -85,6 +87,19 @@ final class ConvergenceView {
 
   /// Fills the plan needs (reachable) or looked ahead (unreachable).
   final int fills;
+
+  /// The target share, in whole percent.
+  int get targetPercent => (plan.target.minimumShare * 100).round();
+
+  /// The plan's tolerance below the target, in whole points (#4324).
+  int get tolerancePoints => (plan.tolerance * 100).round();
+
+  /// Counted as reached although [percent] stays under the target — the
+  /// sentence must then say "within [tolerancePoints] points" (#4324).
+  bool get withinTolerance =>
+      (plan.status == ConvergenceStatus.alreadyAtTarget ||
+          plan.status == ConvergenceStatus.reachable) &&
+      percent < targetPercent;
 }
 
 /// The next-fill guidance, ready to format (#4278).
@@ -94,6 +109,7 @@ final class NextFillView {
     required this.decision,
     required this.offerCount,
     required TankBlendSnapshot tank,
+    this.offerSource = NextFillOfferSource.favourites,
   })  : candidates = List.unmodifiable(
             decision.candidates.map(CandidateView._)),
         convergence = decision.convergence == null
@@ -105,9 +121,17 @@ final class NextFillView {
 
   /// Distinct offers the decision was given; 0 = no prices to compare.
   final int offerCount;
+
+  /// Where the prices came from (#4324): the last search's stations (with
+  /// the detour priced) or the favourites' cache.
+  final NextFillOfferSource offerSource;
   final List<CandidateView> candidates;
 
   FillObjective get objective => decision.objective;
+
+  /// The decision's material-advantage threshold in whole percent (#4324).
+  int get materialAdvantagePercent =>
+      (decision.minMaterialAdvantage * 100).round();
 
   /// Whether the decision itself is the message. An unknown capability
   /// is said even without prices — it is the more fundamental gap; any
@@ -185,6 +209,7 @@ FuelAndTankView buildFuelAndTankView({
     nextFill: NextFillView(
       decision: decision,
       offerCount: request.offers.map((o) => o.grade).toSet().length,
+      offerSource: offerSourceOf(request.offers),
       tank: tank,
     ),
     profileModelVersion: profile.modelVersion,

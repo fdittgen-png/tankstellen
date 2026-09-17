@@ -1,11 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/fuel/tank_blend_snapshot.dart';
 import '../entities/fill_up.dart';
 import '../entities/fuel_type_efficiency_stats.dart';
 import 'fuel_type_efficiency_internals.dart';
-import 'tank_mix_estimator.dart';
+import 'tank_blend_event_log.dart';
 
 /// Minimum attributed closed intervals a bucket must have before the
 /// "cheapest per km" verdict may crown a winner (Epic #2881).
@@ -54,13 +54,16 @@ const double kMaxMinorityShareForPure = 0.15;
 ///                 enters the NEXT interval's tank, via the mix chain)
 ///
 /// where the opening content, knowable only at a physical opening PLEIN
-/// with a known [tankCapacityL], is `capacity × the tank-mix shares as of
-/// that fill` ([estimateTankMixForCapacity] over the history prefix up to
-/// and including the opening fill — the #3652 prior-content chain, reused
-/// verbatim). When the opening content is NOT knowable (capacity unknown,
-/// or the interval opens on a non-plein first fill / a synthetic
-/// correction), the interval falls back to the v2 contributing-fills tally
-/// EXACTLY and is counted in `legacyAttributedIntervalCount`.
+/// with a known [tankCapacityL], is `capacity × the tank blend right after
+/// that fill` — the evidence-only `TankBlendEngine` (#4322), the one mix
+/// model the Fuel & Tank surface shows. Litres the blend attributes to no
+/// grade stay unknown: the interval takes a bucket only when no
+/// attribution of them could change it ([classifyComposition]). When the
+/// opening content is NOT knowable (capacity unknown, the interval opens
+/// on a non-plein first fill / a synthetic correction, or the unknown
+/// litres leave the bucket open), the interval falls back to the v2
+/// contributing-fills tally EXACTLY and is counted in
+/// `legacyAttributedIntervalCount`.
 ///
 /// Metric FOLDING is unchanged from v2: Σlitres/Σcost/Σdistance still come
 /// from the contributing fills (pumped litres ≈ burned litres) — only the
@@ -106,6 +109,14 @@ class FuelTypeEfficiencyAggregator {
     // fills are those strictly AFTER the opening up to + including the close.
     var openingIndex = 0;
     final pending = <FillUp>[]; // contributing fills of the current interval
+    // #4322 — the evidence-only blend after every fill, folded once. Only
+    // the fill log feeds it: without recorded trips every drive between
+    // fills is unmeasured, the widest honest volume interval, so no share
+    // is ever credited beyond what the fills alone prove.
+    final usableCapacity = tankCapacityL != null && tankCapacityL > 0;
+    final blendAfter = usableCapacity
+        ? tankBlendAfterEachFill(tankCapacityL: tankCapacityL, fillUps: sorted)
+        : const <String, TankBlendSnapshot>{};
 
     for (var i = 1; i < sorted.length; i++) {
       final fill = sorted[i];
@@ -122,7 +133,8 @@ class FuelTypeEfficiencyAggregator {
         pending,
         distance,
         accFor,
-        openingContent: _openingContentAt(sorted, openingIndex, tankCapacityL),
+        openingContent:
+            _openingContentAt(sorted[openingIndex], blendAfter, tankCapacityL),
         pricePerLitre: pricePerLitre,
       );
 
@@ -176,45 +188,26 @@ class FuelTypeEfficiencyAggregator {
     return best?.bucket;
   }
 
-  /// The estimated per-fuel litres in the tank right AFTER the fill at
-  /// [openingIndex] — the interval's carried-over opening content (v3,
-  /// #3764). Knowable only when the opening fill is a physical PLEIN and
-  /// [tankCapacityL] is known: the content is then the full tank, at the
-  /// mix the #3652 prior-content chain estimates as of that fill
-  /// ([estimateTankMixForCapacity] over the history prefix up to and
-  /// including it). Returns null — the caller falls back to the v2
-  /// contributing-fills tally and marks the interval legacy-attributed —
-  /// when the capacity is unknown/non-positive, the opening fill is not a
-  /// full tank (only possible for the very first fill), or it is a
-  /// synthetic correction (#1361 — never a physical visit to a pump).
+  /// The per-fuel litres in the tank right AFTER the [opening] fill — the
+  /// interval's carried-over opening content (v3, #3764). Knowable only
+  /// when the opening fill is a physical PLEIN and [tankCapacityL] is
+  /// known: the content is then the full tank, as the evidence-only blend
+  /// after that fill describes it (#4322), unknown litres included.
+  /// Returns null — the caller falls back to the v2 contributing-fills
+  /// tally and marks the interval legacy-attributed — when the capacity is
+  /// unknown/non-positive, the opening fill is not a full tank (only
+  /// possible for the very first fill), it is a synthetic correction
+  /// (#1361 — never a physical visit to a pump), or the blend guarantees
+  /// no grade at all.
   static OpeningContent? _openingContentAt(
-    List<FillUp> sorted,
-    int openingIndex,
+    FillUp opening,
+    Map<String, TankBlendSnapshot> blendAfter,
     double? tankCapacityL,
   ) {
     if (tankCapacityL == null || tankCapacityL <= 0) return null;
-    final opening = sorted[openingIndex];
     if (!opening.isFullTank || opening.isCorrection) return null;
-
-    final mix = estimateTankMixForCapacity(
-      tankCapacityL: tankCapacityL,
-      fillUps: sorted.sublist(0, openingIndex + 1),
-    );
-    if (mix == null) return null;
-
-    final litresByFuel = <String, double>{};
-    final fuelByApiValue = <String, FuelType>{};
-    for (final s in mix.shares) {
-      if (s.share <= 0) continue;
-      litresByFuel.update(
-        s.fuel.apiValue,
-        (v) => v + s.share * tankCapacityL,
-        ifAbsent: () => s.share * tankCapacityL,
-      );
-      fuelByApiValue[s.fuel.apiValue] = s.fuel;
-    }
-    if (litresByFuel.isEmpty) return null;
-    return OpeningContent(litresByFuel, fuelByApiValue);
+    final after = blendAfter[opening.id];
+    return after == null ? null : OpeningContent.ofBlend(after, tankCapacityL);
   }
 
   /// Classify the interval into a PURE or MIX [FuelEfficiencyBucket] by its
@@ -226,7 +219,8 @@ class FuelTypeEfficiencyAggregator {
   /// INSIDE the interval (the closing plein excluded — its fuel enters the
   /// next interval's tank). Otherwise the v2 legacy tally over ALL the
   /// [contributing] non-correction fills (closing plein included), and the
-  /// interval is counted legacy-attributed.
+  /// interval is counted legacy-attributed — also when the opening
+  /// content's unknown litres leave the v3 bucket open (#4322).
   static void _attributeInterval(
     List<FillUp> contributing,
     double distance,
@@ -241,33 +235,26 @@ class FuelTypeEfficiencyAggregator {
     // known (a full-tank correction never was a visit to a pump, #1361).
     if (contributing.every((f) => f.isCorrection)) return;
 
-    final litresByFuel = <String, double>{};
-    final fuelByApiValue = <String, FuelType>{};
-    if (openingContent != null) {
-      litresByFuel.addAll(openingContent.litresByFuel);
-      fuelByApiValue.addAll(openingContent.fuelByApiValue);
-    }
     // v3: only the fills strictly inside the interval join the burned-tank
     // tally; the closing plein (always the last contributing entry) refuels
-    // the NEXT tank. Legacy/v2: every contributing fill, close included.
-    final tallied = openingContent != null
-        ? contributing.sublist(0, contributing.length - 1)
-        : contributing;
-    for (final f in tallied) {
-      if (f.isCorrection) continue; // never enters the composition tally
-      litresByFuel.update(
-        f.fuelType.apiValue,
-        (v) => v + f.liters,
-        ifAbsent: () => f.liters,
-      );
-      fuelByApiValue[f.fuelType.apiValue] = f.fuelType;
-    }
+    // the NEXT tank.
+    var tally = openingContent == null
+        ? null
+        : _tally(contributing.sublist(0, contributing.length - 1),
+            from: openingContent);
+    var bucket = tally == null
+        ? null
+        : classifyComposition(tally.litresByFuel, tally.fuelByApiValue,
+            unknownLitres: openingContent!.unknownLitres);
+    // Legacy/v2: every contributing fill, close included.
+    final legacy = bucket == null;
+    if (legacy) tally = _tally(contributing);
+    final litresByFuel = tally!.litresByFuel;
 
     // No composition at all (legacy corrections-only interval) — attribute
     // nothing (its litres/distance/cost have no real fuel to credit).
     if (litresByFuel.isEmpty) return;
-
-    final bucket = _classify(litresByFuel, fuelByApiValue);
+    bucket ??= classifyComposition(litresByFuel, tally.fuelByApiValue)!;
 
     // Litres + cost include corrections (they inherit the bucket); distance
     // is the whole interval's odometer delta. fillCount counts only the
@@ -294,7 +281,9 @@ class FuelTypeEfficiencyAggregator {
     // the interval's composition and price each share at what that fuel
     // actually cost, instead of charging the interval whatever was paid at
     // the pump that closed it (which bought the NEXT tank, often a
-    // different fuel).
+    // different fuel). Only litres a grade is guaranteed to hold are priced
+    // (#4322): the burned volume is split over the characterised part of
+    // the tank, never charged at a price guessed for its unknown litres.
     final compositionLitres =
         litresByFuel.values.fold<double>(0, (a, b) => a + b);
     var intervalCost = 0.0;
@@ -312,53 +301,22 @@ class FuelTypeEfficiencyAggregator {
     a.intervalDistance += distance;
     a.intervalCost += intervalCost;
     a.attributedIntervalCount += 1;
-    if (openingContent == null) a.legacyAttributedIntervalCount += 1;
+    if (legacy) a.legacyAttributedIntervalCount += 1;
     a.fillCount += intervalFills;
     a.totalSpent += intervalCost;
   }
 
-  /// Classify an interval's litres-by-fuel composition into a PURE or MIX
-  /// bucket. The dominant fuel is the largest volume share; the secondary the
-  /// next largest. Dominant share ≥ (1 − [kMaxMinorityShareForPure]) ⇒ PURE
-  /// (secondary dropped). Otherwise MIX (dominant/secondary). Ties on share
-  /// break by lowest `apiValue` alphabetically for determinism.
-  static FuelEfficiencyBucket _classify(
-    Map<String, double> litresByFuel,
-    Map<String, FuelType> fuelByApiValue,
-  ) {
-    // Total volume — known non-empty (caller guards litresByFuel.isEmpty).
-    var total = 0.0;
-    for (final l in litresByFuel.values) {
-      total += l;
+  /// Litres per fuel of [fills] (corrections never enter a composition
+  /// tally), on top of the known part of [from] when given.
+  static OpeningContent _tally(List<FillUp> fills, {OpeningContent? from}) {
+    final litres = {...?from?.litresByFuel};
+    final fuels = {...?from?.fuelByApiValue};
+    for (final f in fills) {
+      if (f.isCorrection) continue;
+      litres.update(f.fuelType.apiValue, (v) => v + f.liters,
+          ifAbsent: () => f.liters);
+      fuels[f.fuelType.apiValue] = f.fuelType;
     }
-
-    // Order fuels by descending litres, tie-break ascending apiValue.
-    final ordered = litresByFuel.keys.toList()
-      ..sort((a, b) {
-        final byLitres = litresByFuel[b]!.compareTo(litresByFuel[a]!);
-        if (byLitres != 0) return byLitres;
-        return a.compareTo(b);
-      });
-
-    final dominant = fuelByApiValue[ordered.first]!;
-
-    // Single-fuel interval, or a total of 0 (defensive): always pure.
-    if (ordered.length == 1 || total <= 0) {
-      return FuelEfficiencyBucket(dominant: dominant);
-    }
-
-    final dominantShare = litresByFuel[ordered.first]! / total;
-    // Minority share = 1 − dominantShare. Pure when minority ≤ threshold,
-    // i.e. dominantShare ≥ 1 − threshold (inclusive). A tiny epsilon keeps
-    // the exact-boundary case (e.g. exactly 15 % minority) on the pure side
-    // despite float rounding.
-    const eps = 1e-9;
-    if (dominantShare >= (1 - kMaxMinorityShareForPure) - eps) {
-      return FuelEfficiencyBucket(dominant: dominant);
-    }
-
-    // MIX: dominant + the next-largest (the two largest for a 3-way blend).
-    final secondary = fuelByApiValue[ordered[1]]!;
-    return FuelEfficiencyBucket(dominant: dominant, secondary: secondary);
+    return OpeningContent(litres, fuels);
   }
 }

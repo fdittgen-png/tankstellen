@@ -370,7 +370,9 @@ void main() {
     // #4037 — 1 032 across 5 files → 756 across 3: the pin/wake-lock
     // state became an owned collaborator and the body a plain widget.
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,
-    'lib/features/fill_ups/providers/consumption_providers.dart': 973,
+    // #4322 — 973 → 967: the tankFuelKey rule left for the domain
+    // `tankFuelKeyOf`, read from the evidence-only tank blend.
+    'lib/features/fill_ups/providers/consumption_providers.dart': 967,
     'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': 948,
     'lib/features/obd2/data/session/live_sample_snapshot.dart': 910,
     'lib/features/profile/presentation/widgets/profile_edit_sheet.dart': 855,

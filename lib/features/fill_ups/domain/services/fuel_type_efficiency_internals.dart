@@ -1,9 +1,12 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../../core/domain/fuel/fuel_grade.dart';
+import '../../../../core/domain/fuel/tank_blend_snapshot.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../entities/fill_up.dart';
 import '../entities/fuel_type_efficiency_stats.dart';
+import 'fuel_type_efficiency_aggregator.dart' show kMaxMinorityShareForPure;
 
 // Internals of `fuel_type_efficiency_aggregator.dart`, split out to keep
 // that file under the #1680 400-line cap (move-only, behaviour
@@ -36,11 +39,110 @@ Map<String, double> weightedPricePerLitre(List<FillUp> sorted) {
 
 /// An interval's carried-over opening tank content (v3, #3764): litres per
 /// `FuelType.apiValue` plus the fuel objects for label resolution.
+///
+/// #4322 — read from the evidence-only tank blend, so part of the tank may
+/// be attributable to no grade: [unknownLitres]. Those litres are never
+/// handed to a grade; [classifyComposition] only crowns a bucket they
+/// could not change.
 class OpeningContent {
-  const OpeningContent(this.litresByFuel, this.fuelByApiValue);
+  const OpeningContent(this.litresByFuel, this.fuelByApiValue,
+      {this.unknownLitres = 0});
 
+  /// The litres the blend guarantees to each grade.
   final Map<String, double> litresByFuel;
   final Map<String, FuelType> fuelByApiValue;
+
+  /// The litres of the full tank no evidence attributes to any grade.
+  final double unknownLitres;
+
+  /// The full tank of [capacityL] after a plein, as the blend [after]
+  /// that fill describes it — or null when the blend guarantees no grade
+  /// at all (nothing to classify by).
+  static OpeningContent? ofBlend(TankBlendSnapshot after, double capacityL) {
+    final litres = <String, double>{};
+    final fuels = <String, FuelType>{};
+    for (final entry in after.gradeShares.entries) {
+      if (entry.key == FuelGrade.unknown || entry.value <= 0) continue;
+      final fuel = FuelType.fromString(entry.key.key);
+      litres[fuel.apiValue] = entry.value * capacityL;
+      fuels[fuel.apiValue] = fuel;
+    }
+    if (litres.isEmpty) return null;
+    return OpeningContent(litres, fuels,
+        unknownLitres: after.unknownShare * capacityL);
+  }
+}
+
+/// The ADR 0015 bucket of a composition tally in which [unknownLitres]
+/// belong to no known grade — or null when the evidence does not settle it
+/// (#4322).
+///
+/// The bucket is settled only when EVERY possible attribution of the
+/// unknown litres yields the same one. Each bucket region (a dominant
+/// grade, its secondary, pure vs mix) is an intersection of half-spaces
+/// over the per-grade litres, hence convex; the attributions form a
+/// simplex whose corners are "all of it to one grade". So it suffices to
+/// test the corners: all to each known grade, and all to a grade the tally
+/// has not seen. A corner that names the unseen grade, or any two corners
+/// that disagree, leaves the bucket unsettled — the caller then falls back
+/// to the ADR's legacy tally rather than guess.
+FuelEfficiencyBucket? classifyComposition(
+  Map<String, double> litresByFuel,
+  Map<String, FuelType> fuelByApiValue, {
+  double unknownLitres = 0,
+}) {
+  if (litresByFuel.isEmpty) return null;
+  final known = litresByFuel.values.fold<double>(0, (a, b) => a + b);
+  if (unknownLitres <= 1e-9 * (known + 1)) {
+    return _bucketOf(_rank(litresByFuel), fuelByApiValue);
+  }
+  // The unseen grade sorts first on ties, so a tie resolves AGAINST the
+  // settled reading — the conservative side.
+  const unseen = '';
+  final corners = [
+    for (final key in [...litresByFuel.keys, unseen])
+      _rank({...litresByFuel, key: (litresByFuel[key] ?? 0) + unknownLitres}),
+  ];
+  final first = corners.first;
+  for (final c in corners) {
+    if (c.dominant == unseen || c.secondary == unseen) return null;
+    if (c.dominant != first.dominant || c.secondary != first.secondary) {
+      return null;
+    }
+  }
+  return _bucketOf(first, fuelByApiValue);
+}
+
+FuelEfficiencyBucket _bucketOf(
+        ({String dominant, String? secondary}) ranked,
+        Map<String, FuelType> fuelByApiValue) =>
+    FuelEfficiencyBucket(
+      dominant: fuelByApiValue[ranked.dominant]!,
+      secondary: ranked.secondary == null
+          ? null
+          : fuelByApiValue[ranked.secondary]!,
+    );
+
+/// Dominant fuel = largest volume share; secondary = the next largest, or
+/// null when the tally is PURE (a single fuel, or a dominant share ≥
+/// 1 − [kMaxMinorityShareForPure], inclusive). Ties on litres break by
+/// lowest `apiValue` alphabetically for determinism (ADR 0015).
+({String dominant, String? secondary}) _rank(Map<String, double> litres) {
+  final total = litres.values.fold<double>(0, (a, b) => a + b);
+  final ordered = litres.keys.toList()
+    ..sort((a, b) {
+      final byLitres = litres[b]!.compareTo(litres[a]!);
+      return byLitres != 0 ? byLitres : a.compareTo(b);
+    });
+  final dominant = ordered.first;
+  if (ordered.length == 1 || total <= 0) return (dominant: dominant, secondary: null);
+  // A tiny epsilon keeps the exact-boundary case (e.g. exactly 15 %
+  // minority) on the pure side despite float rounding.
+  const eps = 1e-9;
+  if (litres[dominant]! / total >= (1 - kMaxMinorityShareForPure) - eps) {
+    return (dominant: dominant, secondary: null);
+  }
+  return (dominant: dominant, secondary: ordered[1]);
 }
 
 /// Mutable per-bucket accumulator used only inside `FuelTypeEfficiencyAggregator.byFuelType`.

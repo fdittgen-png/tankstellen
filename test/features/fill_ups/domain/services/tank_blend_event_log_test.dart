@@ -307,4 +307,107 @@ void main() {
       expect(events.map((e) => e.id), isNot(contains('trip:other')));
     });
   });
+
+  // #4322 — the pre-scoped entry points the migrated TankMixEstimator
+  // consumers read.
+  group('pre-scoped records (#4322)', () {
+    test('tankBlendEventsOf keeps an unassigned fill that the vehicle '
+        'filter would drop', () {
+      final unassigned = FillUp(
+        id: 'u',
+        date: day(0),
+        liters: 50,
+        totalCost: 75,
+        odometerKm: 0,
+        fuelType: FuelType.e85,
+        isFullTank: true,
+      );
+      expect(
+          tankBlendEventsFor(
+                  vehicleId: 'v1', fillUps: [unassigned], trips: const [])
+              .whereType<TankFillEvent>(),
+          isEmpty);
+      expect(
+          tankBlendEventsOf(fillUps: [unassigned], trips: const [])
+              .whereType<TankFillEvent>()
+              .map((e) => e.id),
+          ['fill:u']);
+    });
+
+    test('tankBlendAfterEachFill is the blend as of each fill, in one fold',
+        () {
+      final fills = [
+        fill('a', 0, FuelType.e10, 50),
+        fill('b', 5, FuelType.e85, 30),
+        fill('c', 9, FuelType.e10, 10, full: false),
+      ];
+      final after =
+          tankBlendAfterEachFill(tankCapacityL: 50, fillUps: fills);
+
+      expect(after.keys, ['a', 'b', 'c']);
+      expect(after['a']!.exactShare(FuelGrade.e10), 1);
+      expect(after['b']!.exactShare(FuelGrade.e85), closeTo(0.6, 1e-12));
+      // Each entry equals a replay of the history up to that fill.
+      expect(after['b']!.gradeShares,
+          derive(fills.take(2).toList()).gradeShares);
+      expect(after['c']!.gradeShares, derive(fills).gradeShares);
+    });
+
+    group('tankFuelKeyOf', () {
+      const flex = VehicleProfile(
+          id: 'v1', name: 'Flex', tankCapacityL: 50, multiFuelCapable: true);
+
+      test('a single-fuel vehicle holds its last physical fill', () {
+        expect(
+            tankFuelKeyOf(
+                vehicle: vehicle,
+                fillUps: [
+                  fill('a', 0, FuelType.e85, 50),
+                  fill('b', 5, FuelType.e10, 5, full: false),
+                ],
+                trips: const []),
+            'e10');
+      });
+
+      test('a multi-fuel tank names the grade whose lead is established',
+          () {
+        // 20 L E10 onto 30 L E85 to full: exactly 60 % E85.
+        expect(
+            tankFuelKeyOf(
+                vehicle: flex,
+                fillUps: [
+                  fill('a', 0, FuelType.e85, 50),
+                  fill('b', 5, FuelType.e10, 20),
+                ],
+                trips: const []),
+            'e85');
+      });
+
+      test('an open lead is null — never the last pump label, never the '
+          'old best guess', () {
+        // 10 L E10 splashed onto an E85 tank after unrecorded driving: the
+        // residual is anywhere in [0, 40] L, so E10 ≥ 20 %, E85 ≥ 0 and
+        // 80 % unknown. The deleted estimator's midpoint guess (20 L E85
+        // left) called this tank E85; the evidence settles nothing.
+        expect(
+            tankFuelKeyOf(
+                vehicle: flex,
+                fillUps: [
+                  fill('a', 0, FuelType.e85, 50),
+                  fill('b', 5, FuelType.e10, 10, full: false),
+                ],
+                trips: const []),
+            isNull);
+      });
+
+      test('no physical fill keeps the stamped key', () {
+        expect(
+            tankFuelKeyOf(
+                vehicle: flex.copyWith(tankFuelKey: 'e85'),
+                fillUps: const [],
+                trips: const []),
+            'e85');
+      });
+    });
+  });
 }

@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/domain/fuel/fuel_grade.dart';
 import '../../../../../core/domain/fuel/next_fill_decision.dart';
 import '../../../../../core/domain/fuel/next_fill_request.dart';
 import '../../../../../core/providers/consumption_display_provider.dart';
@@ -57,7 +58,12 @@ class NextFillSection extends ConsumerWidget {
                 style: AppText.label(context),
               ),
             if (view.offerCount > 0)
-              Text(l.fuelAndTankPricesSource(view.offerCount),
+              Text(
+                  view.offerSource == NextFillOfferSource.nearbySearch
+                      ? l.fuelAndTankPricesSourceNearby(view.offerCount)
+                      : l.fuelAndTankPricesSource(view.offerCount),
+                  key: ValueKey(
+                      'fuel_and_tank_prices_source_${view.offerSource.name}'),
                   style: AppText.label(context)),
             for (final r in decision.reasons.toSet())
               Padding(
@@ -66,6 +72,14 @@ class NextFillSection extends ConsumerWidget {
                     key: ValueKey('fuel_and_tank_reason_${r.name}'),
                     style: AppText.body(context)),
               ),
+            // #4324 — "too small" quotes the threshold it was measured by.
+            if (decision.reasons
+                .contains(DecisionReason.belowMaterialThreshold))
+              Text(
+                  l.fuelAndTankMaterialThreshold(
+                      view.materialAdvantagePercent.toString()),
+                  key: const Key('fuel_and_tank_material_threshold'),
+                  style: AppText.label(context)),
             if (_recommended(decision) case final CandidateView c) ...[
               const SizedBox(height: Spacing.md),
               Text(
@@ -182,11 +196,12 @@ class _TradeOffLines extends ConsumerWidget {
       if (t.breakEvenLPer100Km case final double b)
         l.fuelAndTankBreakEvenConsumption(other,
             FuelAndTankFormat.value(l, FuelMetricKind.consumption, b, display)),
-      // The cleaner of the two is the one that "avoids" the CO2e.
-      if ((t.costPerKgCo2e, t.co2eKgPerKmDelta)
-          case (final double c, final double e) when c > 0)
-        l.fuelAndTankCostPerKgCo2e(
-            e < 0 ? chosen : other, PriceFormatter.formatTotal(c)),
+      // The cleaner of the two — as the domain states it (#4324) — is the
+      // one that "avoids" the CO2e.
+      if ((t.costPerKgCo2e, t.cleaner)
+          case (final double c, final FuelGrade cleaner) when c > 0)
+        l.fuelAndTankCostPerKgCo2e(FuelAndTankLabels.grade(l, cleaner),
+            PriceFormatter.formatTotal(c)),
     ];
     if (lines.isEmpty) return const SizedBox.shrink();
     return Padding(
@@ -224,9 +239,22 @@ class _ConvergenceLine extends StatelessWidget {
     };
     return Padding(
       padding: const EdgeInsets.only(top: Spacing.md),
-      child: Text(text,
-          key: ValueKey('fuel_and_tank_convergence_${c.plan.status.name}'),
-          style: AppText.body(context)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(text,
+              key: ValueKey('fuel_and_tank_convergence_${c.plan.status.name}'),
+              style: AppText.body(context)),
+          // #4324 — a share under the target was counted as reached: say
+          // by how much the plan's tolerance allowed.
+          if (c.withinTolerance)
+            Text(
+                l.fuelAndTankConvergenceTolerance(
+                    c.tolerancePoints.toString(), c.targetPercent.toString()),
+                key: const Key('fuel_and_tank_convergence_tolerance'),
+                style: AppText.label(context)),
+        ],
+      ),
     );
   }
 }

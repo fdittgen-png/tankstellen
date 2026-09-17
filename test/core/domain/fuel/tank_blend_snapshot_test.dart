@@ -182,6 +182,51 @@ void main() {
     });
   });
 
+  // #4322 — the grade `tankFuelKey` may name: only a lead the unknown
+  // share cannot overturn.
+  group('establishedLeadingGrade', () {
+    TankBlendSnapshot of(Map<FuelGrade, double> shares) => TankBlendSnapshot(
+          gradeShares: shares,
+          minLitres: 10,
+          maxLitres: 40,
+          tankCapacityLitres: 50,
+          appliedEventIds: const [],
+          logFingerprint: 0,
+        );
+
+    test('a lead larger than the runner-up plus ALL the unknown share', () {
+      expect(
+          of({FuelGrade.e10: 0.57, FuelGrade.unknown: 0.43})
+              .establishedLeadingGrade,
+          FuelGrade.e10,
+          reason: '0.57 > 0 + 0.43: no attribution of the rest can win');
+      expect(
+          of({FuelGrade.e85: 0.6, FuelGrade.e10: 0.3, FuelGrade.unknown: 0.1})
+              .establishedLeadingGrade,
+          FuelGrade.e85);
+    });
+
+    test('an unknown share that could overturn the lead leaves it open', () {
+      // 0.5 vs 0.3 + 0.2 = 0.5: the unknown could make it a tie.
+      expect(
+          of({FuelGrade.e85: 0.5, FuelGrade.e10: 0.3, FuelGrade.unknown: 0.2})
+              .establishedLeadingGrade,
+          isNull);
+      // A best guess would have said E85 here; the evidence does not.
+      expect(
+          of({FuelGrade.e85: 0.4, FuelGrade.unknown: 0.6})
+              .establishedLeadingGrade,
+          isNull);
+    });
+
+    test('an exact tie, and a tank nothing is attributed to, have no lead',
+        () {
+      expect(of({FuelGrade.e85: 0.5, FuelGrade.e10: 0.5})
+          .establishedLeadingGrade, isNull);
+      expect(of({FuelGrade.unknown: 1}).establishedLeadingGrade, isNull);
+    });
+  });
+
   group('event contracts', () {
     test('a fill must add a positive, finite amount of a liquid grade', () {
       TankFillEvent make({FuelGrade g = FuelGrade.e10, double l = 1}) =>

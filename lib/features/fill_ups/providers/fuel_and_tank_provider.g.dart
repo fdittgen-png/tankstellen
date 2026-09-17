@@ -78,13 +78,15 @@ abstract class _$FillObjectiveSetting extends $Notifier<FillObjective> {
 }
 
 /// The approvals [vehicleId]'s profile vouches for (#4278) — see
-/// [vehicleFuelCapabilityOf]; nothing persists a capability yet.
+/// [vehicleFuelCapabilityOf], which reads the persisted declared grades
+/// (#4324).
 
 @ProviderFor(vehicleFuelCapability)
 final vehicleFuelCapabilityProvider = VehicleFuelCapabilityFamily._();
 
 /// The approvals [vehicleId]'s profile vouches for (#4278) — see
-/// [vehicleFuelCapabilityOf]; nothing persists a capability yet.
+/// [vehicleFuelCapabilityOf], which reads the persisted declared grades
+/// (#4324).
 
 final class VehicleFuelCapabilityProvider
     extends
@@ -95,7 +97,8 @@ final class VehicleFuelCapabilityProvider
         >
     with $Provider<VehicleFuelCapability> {
   /// The approvals [vehicleId]'s profile vouches for (#4278) — see
-  /// [vehicleFuelCapabilityOf]; nothing persists a capability yet.
+  /// [vehicleFuelCapabilityOf], which reads the persisted declared grades
+  /// (#4324).
   VehicleFuelCapabilityProvider._({
     required VehicleFuelCapabilityFamily super.from,
     required String super.argument,
@@ -152,7 +155,8 @@ String _$vehicleFuelCapabilityHash() =>
     r'f4012aa9bf41635a40e768d632195d19ad162e53';
 
 /// The approvals [vehicleId]'s profile vouches for (#4278) — see
-/// [vehicleFuelCapabilityOf]; nothing persists a capability yet.
+/// [vehicleFuelCapabilityOf], which reads the persisted declared grades
+/// (#4324).
 
 final class VehicleFuelCapabilityFamily extends $Family
     with $FunctionalFamilyOverride<VehicleFuelCapability, String> {
@@ -166,7 +170,8 @@ final class VehicleFuelCapabilityFamily extends $Family
       );
 
   /// The approvals [vehicleId]'s profile vouches for (#4278) — see
-  /// [vehicleFuelCapabilityOf]; nothing persists a capability yet.
+  /// [vehicleFuelCapabilityOf], which reads the persisted declared grades
+  /// (#4324).
 
   VehicleFuelCapabilityProvider call(String vehicleId) =>
       VehicleFuelCapabilityProvider._(argument: vehicleId, from: this);
@@ -175,30 +180,42 @@ final class VehicleFuelCapabilityFamily extends $Family
   String toString() => r'vehicleFuelCapabilityProvider';
 }
 
-/// One offer per priceable grade (#4278): the cheapest current price
-/// among the user's favourite stations — the price cache the app already
-/// holds, so opening the surface costs no network call. No station is
-/// attached: favourites carry no distance, so no detour is priced. Empty
-/// when no favourite has a price for any grade the vehicle can take.
+/// The offers for the priceable grades, from prices the app ALREADY holds
+/// — opening the surface never costs a network call.
+///
+/// #4324 — the last search's results come first: each station carries its
+/// distance, so the decision prices the detour (`RefuelEconomics`).
+/// Reading [searchStateProvider] never searches; with no search this
+/// session it is empty. Only then the favourite stations' cached prices
+/// (#4278), which carry no distance, so no detour is priced. The two are
+/// never mixed: a detour-free favourite would undercut every priced one.
 
 @ProviderFor(nextFillOffers)
 final nextFillOffersProvider = NextFillOffersFamily._();
 
-/// One offer per priceable grade (#4278): the cheapest current price
-/// among the user's favourite stations — the price cache the app already
-/// holds, so opening the surface costs no network call. No station is
-/// attached: favourites carry no distance, so no detour is priced. Empty
-/// when no favourite has a price for any grade the vehicle can take.
+/// The offers for the priceable grades, from prices the app ALREADY holds
+/// — opening the surface never costs a network call.
+///
+/// #4324 — the last search's results come first: each station carries its
+/// distance, so the decision prices the detour (`RefuelEconomics`).
+/// Reading [searchStateProvider] never searches; with no search this
+/// session it is empty. Only then the favourite stations' cached prices
+/// (#4278), which carry no distance, so no detour is priced. The two are
+/// never mixed: a detour-free favourite would undercut every priced one.
 
 final class NextFillOffersProvider
     extends
         $FunctionalProvider<List<FuelOffer>, List<FuelOffer>, List<FuelOffer>>
     with $Provider<List<FuelOffer>> {
-  /// One offer per priceable grade (#4278): the cheapest current price
-  /// among the user's favourite stations — the price cache the app already
-  /// holds, so opening the surface costs no network call. No station is
-  /// attached: favourites carry no distance, so no detour is priced. Empty
-  /// when no favourite has a price for any grade the vehicle can take.
+  /// The offers for the priceable grades, from prices the app ALREADY holds
+  /// — opening the surface never costs a network call.
+  ///
+  /// #4324 — the last search's results come first: each station carries its
+  /// distance, so the decision prices the detour (`RefuelEconomics`).
+  /// Reading [searchStateProvider] never searches; with no search this
+  /// session it is empty. Only then the favourite stations' cached prices
+  /// (#4278), which carry no distance, so no detour is priced. The two are
+  /// never mixed: a detour-free favourite would undercut every priced one.
   NextFillOffersProvider._({
     required NextFillOffersFamily super.from,
     required String super.argument,
@@ -250,13 +267,17 @@ final class NextFillOffersProvider
   }
 }
 
-String _$nextFillOffersHash() => r'5303eb71f4a995cdb84d5665789986e57eb3da64';
+String _$nextFillOffersHash() => r'65c783f5b974c0977b12df812f033f4130639d20';
 
-/// One offer per priceable grade (#4278): the cheapest current price
-/// among the user's favourite stations — the price cache the app already
-/// holds, so opening the surface costs no network call. No station is
-/// attached: favourites carry no distance, so no detour is priced. Empty
-/// when no favourite has a price for any grade the vehicle can take.
+/// The offers for the priceable grades, from prices the app ALREADY holds
+/// — opening the surface never costs a network call.
+///
+/// #4324 — the last search's results come first: each station carries its
+/// distance, so the decision prices the detour (`RefuelEconomics`).
+/// Reading [searchStateProvider] never searches; with no search this
+/// session it is empty. Only then the favourite stations' cached prices
+/// (#4278), which carry no distance, so no detour is priced. The two are
+/// never mixed: a detour-free favourite would undercut every priced one.
 
 final class NextFillOffersFamily extends $Family
     with $FunctionalFamilyOverride<List<FuelOffer>, String> {
@@ -269,11 +290,15 @@ final class NextFillOffersFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// One offer per priceable grade (#4278): the cheapest current price
-  /// among the user's favourite stations — the price cache the app already
-  /// holds, so opening the surface costs no network call. No station is
-  /// attached: favourites carry no distance, so no detour is priced. Empty
-  /// when no favourite has a price for any grade the vehicle can take.
+  /// The offers for the priceable grades, from prices the app ALREADY holds
+  /// — opening the surface never costs a network call.
+  ///
+  /// #4324 — the last search's results come first: each station carries its
+  /// distance, so the decision prices the detour (`RefuelEconomics`).
+  /// Reading [searchStateProvider] never searches; with no search this
+  /// session it is empty. Only then the favourite stations' cached prices
+  /// (#4278), which carry no distance, so no detour is priced. The two are
+  /// never mixed: a detour-free favourite would undercut every priced one.
 
   NextFillOffersProvider call(String vehicleId) =>
       NextFillOffersProvider._(argument: vehicleId, from: this);

@@ -69,6 +69,31 @@ Map<String, PumpGainEntry> readPumpGainByFuel(XmlElement vehicle) {
   return out;
 }
 
+/// #4324 — `VehicleProfile.approvedFuelGrades` under `<Vehicle>`:
+/// `<ApprovedFuelGrades><Grade>e85</Grade>…</ApprovedFuelGrades>`,
+/// omitted when empty so an undeclared profile serialises byte-identically.
+const String kApprovedFuelGradesElement = 'ApprovedFuelGrades';
+
+void writeApprovedFuelGrades(XmlBuilder builder, List<String> grades) {
+  if (grades.isEmpty) return;
+  builder.element(kApprovedFuelGradesElement, nest: () {
+    for (final g in grades) {
+      builder.element('Grade', nest: g);
+    }
+  });
+}
+
+/// Missing element (every pre-#4324 backup) → empty: nothing declared, so
+/// the capability is derived exactly as before. Blank entries are skipped.
+List<String> readApprovedFuelGrades(XmlElement vehicle) => [
+      for (final g in vehicle
+              .findElements(kApprovedFuelGradesElement)
+              .firstOrNull
+              ?.findElements('Grade') ??
+          const <XmlElement>[])
+        if (g.innerText.trim().isNotEmpty) g.innerText.trim(),
+    ];
+
 String? readTankFuelKey(XmlElement vehicle) {
   final text = vehicle.findElements(kTankFuelKeyElement).firstOrNull?.innerText.trim();
   return (text == null || text.isEmpty) ? null : text;

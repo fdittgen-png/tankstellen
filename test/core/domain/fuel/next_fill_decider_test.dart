@@ -136,6 +136,29 @@ void main() {
       expect(d.outcome, NextFillOutcome.noMaterialAdvantage);
       expect(d.recommended, isNull);
       expect(d.reasons, contains(DecisionReason.belowMaterialThreshold));
+      // #4324 — the decision states the threshold it measured against.
+      expect(d.minMaterialAdvantage, 0.02);
+      expect(d.toJson()['minMaterialAdvantage'], 0.02);
+    });
+
+    test('#4324 — a request threshold is the one the decision exposes', () {
+      final d = NextFillDecider.decide(
+        tank: mixed,
+        profile: p,
+        request: NextFillRequest(
+          objective: FillObjective.lowestCostPerKm,
+          capability: flex,
+          offers: [
+            FuelOffer(grade: FuelGrade.e10, pricePerLitre: 1.80),
+            FuelOffer(grade: FuelGrade.e85, pricePerLitre: 1.10),
+          ],
+          expectedFillLitres: 30,
+          minMaterialAdvantage: 0.5,
+        ),
+      );
+      expect(d.minMaterialAdvantage, 0.5);
+      expect(d.outcome, NextFillOutcome.noMaterialAdvantage,
+          reason: 'E85 is cheaper, but not 50 % cheaper');
     });
 
     test('never on price alone: without E85 evidence nothing is recommended',
@@ -188,6 +211,33 @@ void main() {
       expect(d.convergence!.status, ConvergenceStatus.alreadyAtTarget);
       expect(d.convergence!.fillsNeeded, 0);
       expect(d.convergence!.minimumShareAfterFill, isEmpty);
+      // #4324 — the plan carries the tolerance that let 82 % count as 85 %.
+      expect(d.convergence!.tolerance, kTargetShareTolerance);
+      expect(d.convergence!.tolerance, 0.05);
+      expect(d.convergence!.toJson()['tolerance'], 0.05);
+    });
+
+    test('#4324 — a request tolerance reaches the plan and decides it', () {
+      final near = engine.replay([
+        fill('a', 0, FuelGrade.e85, 50),
+        TankConsumptionEvent.exact(id: 'burn', at: day(1), litres: 9),
+        fill('b', 2, FuelGrade.e10, 9),
+      ]);
+      final d = NextFillDecider.decide(
+        tank: near,
+        profile: p,
+        request: NextFillRequest(
+          objective: FillObjective.lowestCostPerKm,
+          capability: flex,
+          offers: [FuelOffer(grade: FuelGrade.e85, pricePerLitre: 1.1)],
+          expectedFillLitres: 30,
+          target: TargetBlend(grade: FuelGrade.e85),
+          targetTolerance: 0.02,
+        ),
+      );
+      expect(d.convergence!.tolerance, 0.02);
+      expect(d.convergence!.status, isNot(ConvergenceStatus.alreadyAtTarget),
+          reason: '82 % is not within 2 points of 85 %');
     });
 
     test('one fill cannot reach the target; the plan says how many can', () {
@@ -309,6 +359,26 @@ void main() {
       final t = d.tradeOffs.single;
       expect(t.costPerKmDelta! * t.co2eKgPerKmDelta!, isNegative);
       expect(t.costPerKgCo2e, isNotNull);
+      // #4324 — the domain names the cleaner side: E85 (1.40 kg/L even at
+      // 1.3× the litres beats E10's 2.27 kg/L).
+      expect(t.cleaner, FuelGrade.e85);
+      expect(t.toJson()['cleaner'], 'e85');
+    });
+
+    test('#4324 — cleaner follows the CO2e delta, whichever side leads', () {
+      FillTradeOff trade(double? co2e) => FillTradeOff(
+            chosen: FuelGrade.e10,
+            alternative: FuelGrade.e85,
+            costPerKmDelta: -0.01,
+            co2eKgPerKmDelta: co2e,
+            lPer100KmDelta: null,
+            breakEvenPricePerLitre: null,
+            breakEvenLPer100Km: null,
+          );
+      expect(trade(-0.02).cleaner, FuelGrade.e10);
+      expect(trade(0.02).cleaner, FuelGrade.e85);
+      expect(trade(0).cleaner, isNull);
+      expect(trade(null).cleaner, isNull);
     });
   });
 
