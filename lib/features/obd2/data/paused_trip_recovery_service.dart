@@ -110,6 +110,13 @@ class PausedTripRecoveryService {
       try {
         if (now.difference(entry.pausedAt) <= olderThan) continue;
         if (excludeIds.contains(entry.id)) continue;
+        // #4328 — the same trip is already in history (a finalise saved it
+        // and the process died before this row was deleted): retire the
+        // row. Saving its sample-less summary would overwrite the good one.
+        if (_historyRepo.storedIds.contains(entry.id)) {
+          await _pausedRepo.delete(entry.id);
+          continue;
+        }
         final historyEntry = TripHistoryEntry(
           id: entry.id,
           vehicleId: entry.vehicleId,

@@ -48,9 +48,9 @@ part 'trip_recording_screen_handlers.dart';
 /// list / scroll to the new row, but the save action itself NEVER
 /// creates a fill-up. Null means the user cancelled or discarded.
 class TripSaveResult {
-  /// Id of the persisted [TripHistoryEntry] for this trip. Matches
-  /// the id used by [TripHistoryRepository.save] (ISO start timestamp
-  /// when available, otherwise the save-time fallback).
+  /// Id of the persisted [TripHistoryEntry] for this trip — the id the
+  /// stop saved it under ([StoppedTripResult.entryId], #4328: the trip's
+  /// recording id, the one its recovery rows carry).
   final String entryId;
   final TripSummary summary;
 

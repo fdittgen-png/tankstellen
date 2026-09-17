@@ -89,7 +89,9 @@ class _StoppingFakeTripRecording extends TripRecording {
 }
 
 /// Builds a deterministic [StoppedTripResult] with a known
-/// `startedAt` so the assertion on [TripSaveResult.entryId] is stable.
+/// `startedAt` — and, as a recording names its saved trip (#4328), an
+/// [StoppedTripResult.entryId] derived from it — so the assertion on
+/// [TripSaveResult.entryId] is stable.
 StoppedTripResult _stoppedAt(
   DateTime startedAt, {
   bool discardedNoMovement = false,
@@ -110,6 +112,7 @@ StoppedTripResult _stoppedAt(
     odometerStartKm: 12000,
     odometerLatestKm: 12003,
     discardedNoMovement: discardedNoMovement,
+    entryId: discardedNoMovement ? null : startedAt.toIso8601String(),
   );
 }
 
@@ -207,8 +210,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(captured, isNotNull);
-      // Id derivation mirrors `TripRecording._saveToHistory` so the popped
-      // result resolves to the persisted entry.
+      // The popped id is the one the stop saved the trip under (#4328).
       expect(captured!.entryId, startedAt.toIso8601String());
       expect(captured!.summary.distanceKm, 2.95);
       expect(captured!.summary.fuelLitersConsumed, 0.27);

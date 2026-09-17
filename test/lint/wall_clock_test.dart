@@ -134,7 +134,8 @@ void main() {
     // mixins — a move, not a widening (total unchanged).
     'lib/features/trips/providers/trip_recording_provider.dart': 2,
     'lib/features/trips/providers/trip_recording_provider_lifecycle.dart': 1,
-    'lib/features/trips/providers/trip_recording_provider_persist.dart': 2,
+    // #4328 — trip_recording_provider_persist.dart: 2 → 0; the history
+    // row's fallback id and lifecycle window end read the AppClock seam.
     'lib/features/trips/providers/trip_recording_provider_snapshot.dart': 5,
     'lib/features/ev/data/services/fr_irve_price_service.dart': 2,
     'lib/features/ev/data/services/open_charge_map_service.dart': 1,

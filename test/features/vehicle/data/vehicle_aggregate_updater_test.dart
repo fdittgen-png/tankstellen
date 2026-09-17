@@ -506,8 +506,9 @@ class _FakeTripHistory implements TripHistoryRepository {
   }
 
   @override
-  Future<void> save(TripHistoryEntry entry) async {
+  Future<bool> save(TripHistoryEntry entry) async {
     entries.add(entry);
+    return true;
   }
 
   @override

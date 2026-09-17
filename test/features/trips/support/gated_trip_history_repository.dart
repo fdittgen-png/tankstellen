@@ -8,8 +8,19 @@ import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 /// A history repository whose [save] parks at a gate (#4162) — "the
 /// process is killed at this await". A test waits for [reached], captures
 /// the disk, then [release]s the gate so the old process can wind down.
+///
+/// #4328 — [afterWrite] parks AFTER the row is on disk instead of before
+/// it (the kill lands between the history write and the WAL clear), and
+/// [fault] makes the gated write throw instead of landing.
 class GatedTripHistoryRepository extends TripHistoryRepository {
-  GatedTripHistoryRepository({required super.box});
+  GatedTripHistoryRepository({
+    required super.box,
+    this.afterWrite = false,
+    this.fault,
+  });
+
+  final bool afterWrite;
+  final Exception? fault;
 
   final Completer<void> _reached = Completer<void>();
   final Completer<void> _release = Completer<void>();
@@ -23,9 +34,12 @@ class GatedTripHistoryRepository extends TripHistoryRepository {
   }
 
   @override
-  Future<void> save(TripHistoryEntry entry) async {
+  Future<bool> save(TripHistoryEntry entry) async {
+    final written = afterWrite ? await super.save(entry) : null;
     if (!_reached.isCompleted) _reached.complete();
     await _release.future;
-    return super.save(entry);
+    final f = fault;
+    if (f != null) throw f;
+    return written ?? super.save(entry);
   }
 }

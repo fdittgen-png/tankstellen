@@ -184,12 +184,14 @@ mixin _TripRecordingLifecycle
   /// subsequent fill-up save path can still resolve the link-window
   /// (#888) after the user lands back on the fill-up screen.
   void reset() {
+    // #1303 — discarding a trip (a running one, or one handed back after a
+    // process death) drops its WAL row, or the next launch hands it back.
+    // #4328 — a STOPPED trip's rows are its save's: gone once the write
+    // landed, KEPT after a failed one (the screen resets after every stop).
+    final discards = _pipelineSlot.pipeline != null ||
+        state.phase == TripRecordingPhase.pausedDueToDrop;
     _publish(const TripRecordingState(), 'reset');
-    // #1303 — also drop any stale snapshot. `reset` runs when the
-    // user discards a stopped trip from the summary screen; without
-    // this call the recovery service would re-surface the discarded
-    // trip on next cold start.
-    unawaited(_clearActiveSnapshot());
+    if (discards) unawaited(_clearActiveSnapshot());
   }
 
   /// Lifecycle hook entry point — called by the wiring layer's

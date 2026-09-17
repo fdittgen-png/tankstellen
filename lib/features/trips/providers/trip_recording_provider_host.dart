@@ -40,6 +40,7 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
   @override
   Future<TripPersistOutcome> saveToHistory(
     TripSummary summary, {
+    String? tripId,
     bool automatic = false,
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
@@ -53,6 +54,7 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
   }) =>
       _n._saveToHistory(
         summary,
+        tripId: tripId, // #4328
         automatic: automatic,
         samples: samples,
         gpsSampleDiagnostics: gpsSampleDiagnostics,

@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_recovery_service.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
+import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import '../../../helpers/silence_error_logger.dart';
@@ -113,6 +114,39 @@ void main() {
       final outcome = await svc.recover();
       expect(outcome, ActiveTripRecoveryOutcome.none);
       expect(svc.recoveredSnapshot, isNull);
+    });
+
+    test('#4328 — a snapshot whose trip is already in history is retired '
+        'with its paused row, not recovered', () async {
+      final snap = freshSnapshot();
+      await activeRepo.saveSnapshot(snap);
+      await historyRepo.save(
+          TripHistoryEntry(id: snap.id, vehicleId: 'veh-1', summary: summary()));
+      final pausedBox = await Hive.openBox<String>('paused_4328');
+      addTearDown(pausedBox.deleteFromDisk);
+      final pausedRepo = PausedTripRepository(box: pausedBox);
+      await pausedRepo.save(PausedTripEntry(
+        id: snap.id,
+        vehicleId: 'veh-1',
+        vin: null,
+        summary: summary(),
+        odometerStartKm: null,
+        odometerLatestKm: null,
+        pausedAt: fakeNow.subtract(const Duration(minutes: 3)),
+      ));
+
+      final svc = ActiveTripRecoveryService(
+        activeRepo: activeRepo,
+        historyRepo: historyRepo,
+        pausedRepo: pausedRepo,
+        now: () => fakeNow,
+      );
+
+      expect(await svc.recover(), ActiveTripRecoveryOutcome.alreadySaved);
+      expect(svc.recoveredSnapshot, isNull);
+      expect(activeRepo.loadSnapshot(), isNull);
+      expect(pausedRepo.load(snap.id), isNull);
+      expect(historyRepo.loadAll(), hasLength(1));
     });
 
     test('fresh snapshot is recovered, not cleared from disk', () async {
