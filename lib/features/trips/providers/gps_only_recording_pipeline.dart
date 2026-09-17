@@ -297,9 +297,8 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       return const StoppedTripResult.empty();
     }
     // #3878 — the whole trip comes back from the WAL (the ring only held
-    // the live window), THEN the WAL is dropped (saved below).
+    // the live window); #4313 — the WAL is dropped only once it is saved.
     final samples = List<TripSample>.unmodifiable(await _wal.readAll());
-    _wal.clear(); // #3248 — trip is ending; drop the WAL (saved below).
     // #2548 — staged save-progress: flip into the transient `saving` phase
     // so the recording screen shows the inline TripSaveProgress card
     // while the dongle-less trip is wrapped up. Building the summary
@@ -359,6 +358,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       gpsSampleDiagnostics: _gpsDiagnostics.snapshot,
       gpsFixCount: samples.length,
     );
+    _wal.clear(); // #3248 / #4313 — in history now: a kill no longer loses it
     _recorder = null;
     _samples.clear();
     _gpsDiagnostics.clear();
