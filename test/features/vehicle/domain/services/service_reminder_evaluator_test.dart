@@ -7,6 +7,7 @@ import 'dart:ui' show Locale;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:tankstellen/core/notifications/notification_delivery.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/vehicle/data/repositories/service_reminder_repository.dart';
@@ -17,7 +18,22 @@ import 'package:tankstellen/l10n/app_localizations.dart';
 /// Local fake that mirrors `test/core/notifications/notification_service_test.dart`.
 /// Duplicated on purpose so this test file stays self-contained and
 /// doesn't reach into another test file at import time.
-class _FakeNotificationService implements NotificationService {
+class _FakeNotificationService
+    implements NotificationService, NotificationDeliveryProbe {
+  /// #4335 — what the OS would say before a post; null is "clear".
+  NotificationDelivery? blocked;
+
+  /// #4335 — the post itself throws.
+  bool throwOnShow = false;
+
+  @override
+  Future<NotificationDelivery?> blockedDelivery(
+          NotificationChannelKind channel) async =>
+      blocked;
+
+  @override
+  Future<bool> openNotificationSettings() async => true;
+
   @override
   Future<bool> requestPermission() async => true;
 
@@ -43,6 +59,7 @@ class _FakeNotificationService implements NotificationService {
     required String title,
     required String body,
   }) async {
+    if (throwOnShow) throw StateError('channel refused the post');
     serviceReminders.add((id: id, title: title, body: body));
   }
 
@@ -106,6 +123,53 @@ void main() {
       expect(notifications.serviceReminders.first.body, contains('Oil change'));
       expect(notifications.serviceReminders.first.body, contains('200'));
     });
+
+    // #4335 — the flag used to be set before the post and never cleared,
+    // so a reminder the user was never shown stayed pending forever and
+    // never fired again.
+    for (final (label, arrange) in [
+      (
+        'notifications turned off',
+        (_FakeNotificationService n) =>
+            n.blocked = NotificationDelivery.suppressedPermission,
+      ),
+      (
+        'the reminder channel disabled',
+        (_FakeNotificationService n) =>
+            n.blocked = NotificationDelivery.suppressedChannel,
+      ),
+      ('the post refused', (_FakeNotificationService n) => n.throwOnShow = true),
+    ]) {
+      test('$label: not fired, and not left pending (#4335)', () async {
+        await repo.save(const ServiceReminder(
+          id: 'r-1',
+          vehicleId: 'v-1',
+          label: 'Oil change',
+          intervalKm: 15000,
+        ));
+        arrange(notifications);
+
+        final fired = await evaluator.evaluate(
+            vehicleId: 'v-1', currentOdometerKm: 15200);
+
+        expect(fired, isEmpty);
+        expect(notifications.serviceReminders, isEmpty);
+        expect(repo.getForVehicle('v-1').single.pendingAcknowledgment,
+            isFalse,
+            reason: 'the next odometer update must be able to fire it');
+
+        // Notifications back on: the next evaluation tells the user.
+        notifications
+          ..blocked = null
+          ..throwOnShow = false;
+        expect(
+            await evaluator.evaluate(
+                vehicleId: 'v-1', currentOdometerKm: 15300),
+            hasLength(1));
+        expect(repo.getForVehicle('v-1').single.pendingAcknowledgment,
+            isTrue);
+      });
+    }
 
     test('does not fire before the threshold', () async {
       await repo.save(

@@ -42,3 +42,33 @@ extension NotificationDeliveryReading on NotificationDelivery {
       this == NotificationDelivery.suppressedPermission ||
       this == NotificationDelivery.suppressedChannel;
 }
+
+/// The notification channels a delivery can be refused on (#4335).
+enum NotificationChannelKind {
+  /// Price alerts — `price_alerts` on Android.
+  priceAlerts,
+
+  /// Service reminders — `service_reminders` on Android.
+  serviceReminders,
+}
+
+/// Asks the OS whether a notification can reach the user right now
+/// (#4335).
+///
+/// A separate interface rather than more members on `NotificationService`,
+/// which a dozen test doubles implement: a notifier that cannot answer is
+/// simply not a probe, and callers treat it as clear to post. The
+/// production notifier, `LocalNotificationService`, always is one.
+abstract interface class NotificationDeliveryProbe {
+  /// Null when a post on [channel] can reach the user; otherwise the
+  /// delivery it would be — [NotificationDelivery.suppressedPermission],
+  /// [NotificationDelivery.suppressedChannel], or
+  /// [NotificationDelivery.failed] when the platform cannot say.
+  ///
+  /// Fails closed: an unreadable answer is not "enabled".
+  Future<NotificationDelivery?> blockedDelivery(NotificationChannelKind channel);
+
+  /// Open the OS notification settings for this app. Returns whether a
+  /// settings screen could be opened.
+  Future<bool> openNotificationSettings();
+}

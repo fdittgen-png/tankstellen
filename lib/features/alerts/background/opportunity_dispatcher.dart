@@ -236,6 +236,16 @@ class OpportunityDispatcher {
           DemotedOpportunity(winner, BudgetRefusal.ineligible),
           ...outcome.demoted,
         ]);
+      } else if (await _blocked(notifier) case final blocked?) {
+        // #4335 — the OS would show nothing: a revoked permission or a
+        // disabled channel, where `show` returns normally anyway. No slot
+        // is reserved, no detector cooldown written, and `lastTriggeredAt`
+        // is not told — but the finding stays in the feed.
+        delivery = blocked;
+        outcome = BudgetOutcome(demoted: [
+          DemotedOpportunity(winner, BudgetRefusal.ineligible),
+          ...outcome.demoted,
+        ]);
       } else {
         // #4333 — the slot is on disk BEFORE the post, with a marker that
         // says so. A process killed after the post can no longer leave the
@@ -285,6 +295,22 @@ class OpportunityDispatcher {
   /// than stacked.
   static int notificationIdFor(Opportunity o) =>
       (o.stationId ?? o.kind.name).hashCode;
+
+  /// Ask the notifier's OS whether a price alert would reach the user
+  /// (#4335). A notifier that cannot answer is not a probe and is treated
+  /// as clear; a probe that throws is [NotificationDelivery.failed].
+  Future<NotificationDelivery?> _blocked(NotificationService notifier) async {
+    if (notifier is! NotificationDeliveryProbe) return null;
+    final NotificationDeliveryProbe probe = notifier as NotificationDeliveryProbe;
+    try {
+      return await probe.blockedDelivery(NotificationChannelKind.priceAlerts);
+    } on Object catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
+        'where': 'OpportunityDispatcher._blocked',
+      });
+      return NotificationDelivery.failed;
+    }
+  }
 
   /// Show one notification and say what became of it — the one producer of
   /// [NotificationDelivery] for price alerts (#4162).

@@ -4,11 +4,13 @@
 import 'dart:async';
 
 import 'package:tankstellen/core/domain/data_value.dart';
+import 'package:tankstellen/core/notifications/notification_delivery.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/services/provider_capability.dart';
 import 'package:tankstellen/features/alerts/background/background_scan_body.dart';
 import 'package:tankstellen/features/alerts/background/notification_templates.dart';
 import 'package:tankstellen/features/alerts/background/opportunity_dispatcher.dart';
+import 'package:tankstellen/features/alerts/background/scan_opportunity_dispatch.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity.dart';
 
 /// The pinned instant every lifecycle suite starts at — a mid-month
@@ -86,7 +88,8 @@ class ScriptedScanBody implements ScanBody {
   int get stationsScanned => stations;
 
   @override
-  Future<int> dispatch(Future<NotificationService> Function() notifier) async {
+  Future<ScanDispatchResult> dispatch(
+      Future<NotificationService> Function() notifier) async {
     stages.add('dispatch');
     if (throwIn == 'dispatch') throw StateError('dispatch failed');
     final outcome = await const OpportunityDispatcher().dispatch(
@@ -95,7 +98,11 @@ class ScriptedScanBody implements ScanBody {
       notifier: await notifier(),
       templates: BackgroundNotificationTemplates.resolveForLanguage('en'),
     );
-    return outcome.notified ? 1 : 0;
+    final delivery = outcome.delivery;
+    return (
+      alertsFired: outcome.notified ? 1 : 0,
+      undelivered: delivery == null || delivery.wasPosted ? null : delivery,
+    );
   }
 
   @override

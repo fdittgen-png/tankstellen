@@ -167,7 +167,7 @@ class _ScanRun {
   Future<void> _end(
     ScanOutcome outcome, {
     int? stationsScanned,
-    int? alertsFired,
+    ScanDispatchResult? dispatched,
     String? error,
   }) async {
     _gate.end(outcome, _phase);
@@ -176,7 +176,8 @@ class _ScanRun {
       at: at,
       trigger: trigger.tag,
       stationsScanned: stationsScanned,
-      alertsFired: alertsFired,
+      alertsFired: dispatched?.alertsFired,
+      undelivered: dispatched?.undelivered,
       error: error,
     );
   }
@@ -223,10 +224,10 @@ class _ScanRun {
       final body = _c._bodyFactory(HiveStorage(), at);
       _advance(ScanRunPhase.collecting);
       await body.collect();
-      var alertsFired = 0;
+      ScanDispatchResult dispatched = (alertsFired: 0, undelivered: null);
       if (!body.isEmpty) {
         _advance(ScanRunPhase.dispatching);
-        alertsFired = await body.dispatch(_c._notifierFactory);
+        dispatched = await body.dispatch(_c._notifierFactory);
       }
       _advance(ScanRunPhase.refreshingWidgets);
       await body.refreshWidgets();
@@ -239,7 +240,7 @@ class _ScanRun {
       // were fetched, how many notifications fired. Rides in the export so
       // "why didn't I get an alert?" is answerable in the field.
       await _end(ScanOutcome.completed,
-          stationsScanned: body.stationsScanned, alertsFired: alertsFired);
+          stationsScanned: body.stationsScanned, dispatched: dispatched);
       return true;
     } catch (e, st) {
       // #3150 — single log call. `errorLogger.log` already routes to the

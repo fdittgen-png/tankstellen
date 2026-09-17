@@ -3310,6 +3310,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get alertsNotificationsOffTitle => 'Notifications are off';
+
+  @override
+  String get alertsNotificationsOffPermissionBody =>
+      'Your price alerts are still checked, but they can\'t notify you: notifications for this app are turned off in your phone\'s settings.';
+
+  @override
+  String get alertsNotificationsOffChannelBody =>
+      'Your price alerts are still checked, but they can\'t notify you: price alert notifications are turned off in your phone\'s settings.';
+
+  @override
+  String get alertsNotificationsOffOpenSettings => 'Open settings';
+
+  @override
   String alertReasonNetSaving(String amount) {
     return 'About $amount on your usual fill';
   }
@@ -13570,6 +13584,20 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String radiusAlertGroupedMore(String count) {
     return '⟦+ $count ɱóřé ··⟧';
   }
+
+  @override
+  String get alertsNotificationsOffTitle => '⟦Ñóŧîƒîçáŧîóñš ářé óƒƒ ·········⟧';
+
+  @override
+  String get alertsNotificationsOffPermissionBody =>
+      '⟦Ýóúř ƥřîçé áłéřŧš ářé šŧîłł çĥéçķéđ, ƀúŧ ŧĥéý çáñ\'ŧ ñóŧîƒý ýóú: ñóŧîƒîçáŧîóñš ƒóř ŧĥîš áƥƥ ářé ŧúřñéđ óƒƒ îñ ýóúř ƥĥóñé\'š šéŧŧîñǧš. ···············································⟧';
+
+  @override
+  String get alertsNotificationsOffChannelBody =>
+      '⟦Ýóúř ƥřîçé áłéřŧš ářé šŧîłł çĥéçķéđ, ƀúŧ ŧĥéý çáñ\'ŧ ñóŧîƒý ýóú: ƥřîçé áłéřŧ ñóŧîƒîçáŧîóñš ářé ŧúřñéđ óƒƒ îñ ýóúř ƥĥóñé\'š šéŧŧîñǧš. ···············································⟧';
+
+  @override
+  String get alertsNotificationsOffOpenSettings => '⟦Óƥéñ šéŧŧîñǧš ·····⟧';
 
   @override
   String alertReasonNetSaving(String amount) {

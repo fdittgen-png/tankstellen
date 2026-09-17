@@ -114,13 +114,10 @@ enum DeliveryMisreport {
 }
 
 /// Misreports that reproduce today, each a filed issue.
-const Set<DeliveryMisreport> kKnownMisreportedDeliveries = {
-  DeliveryMisreport.revokedPermissionCountedPosted, // #4335 N2
-  DeliveryMisreport.disabledChannelCountedPosted, // #4335 N2
-};
+const Set<DeliveryMisreport> kKnownMisreportedDeliveries = {};
 
 /// The size [kKnownMisreportedDeliveries] may never exceed.
-const int kKnownMisreportedDeliveriesCeiling = 2;
+const int kKnownMisreportedDeliveriesCeiling = 0;
 
 /// Something the radius notification lost on its way through the budget.
 enum EnvelopeDefect {

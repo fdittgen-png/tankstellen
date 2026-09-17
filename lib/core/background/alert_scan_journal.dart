@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../logging/error_logger.dart';
+import '../notifications/notification_delivery.dart';
 import '../storage/hive_boxes.dart';
 import 'scan_run_phase.dart';
 
@@ -61,6 +62,11 @@ class AlertScanJournal {
   ///
   /// A row for the run whose [markInFlight] marker is the newest row
   /// REPLACES that marker (#4333): a finished run is one row, not two.
+  ///
+  /// [undelivered] names what became of a notification the scan decided
+  /// to send but that was not posted — `suppressedPermission`,
+  /// `suppressedChannel` or `failed` (#4335) — so "why didn't I get an
+  /// alert?" reads "notifications are off" instead of "no alert fired".
   /// Never throws — a journalling fault must never fail the scan.
   Future<void> append({
     required DateTime at,
@@ -68,6 +74,7 @@ class AlertScanJournal {
     String? skippedReason,
     int? stationsScanned,
     int? alertsFired,
+    String? undelivered,
     String? error,
   }) =>
       _write(<String, Object?>{
@@ -76,6 +83,7 @@ class AlertScanJournal {
         'skipped': ?skippedReason,
         'stations': ?stationsScanned,
         'alertsFired': ?alertsFired,
+        'undelivered': ?undelivered,
         'error': ?error,
       });
 
@@ -168,6 +176,7 @@ class AlertScanJournal {
     required String trigger,
     int? stationsScanned,
     int? alertsFired,
+    NotificationDelivery? undelivered,
     String? error,
   }) =>
       switch (outcome) {
@@ -176,6 +185,7 @@ class AlertScanJournal {
             trigger: trigger,
             stationsScanned: stationsScanned,
             alertsFired: alertsFired,
+            undelivered: undelivered?.name,
           ),
         ScanOutcome.skippedLock =>
           append(at: at, trigger: trigger, skippedReason: skippedHiveLock),

@@ -54,8 +54,10 @@ abstract interface class ScanBody {
   int get stationsScanned;
 
   /// [ScanRunPhase.dispatching] — detect, budget, notify, record. Returns
-  /// how many notifications went out (at most one, #4183).
-  Future<int> dispatch(Future<NotificationService> Function() notifier);
+  /// how many notifications went out (at most one, #4183) and, when the
+  /// winner's was not posted, why (#4335).
+  Future<ScanDispatchResult> dispatch(
+      Future<NotificationService> Function() notifier);
 
   /// [ScanRunPhase.refreshingWidgets] — the home widgets.
   Future<void> refreshWidgets();
@@ -197,7 +199,8 @@ class BackgroundScanBody implements ScanBody {
   }
 
   @override
-  Future<int> dispatch(Future<NotificationService> Function() notifier) =>
+  Future<ScanDispatchResult> dispatch(
+          Future<NotificationService> Function() notifier) =>
       // #4183 — the three paths DETECT; one dispatcher decides. See
       // `scan_opportunity_dispatch.dart` for what that replaced.
       detectAndDispatch(

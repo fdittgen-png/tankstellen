@@ -3,6 +3,7 @@
 
 import 'dart:async';
 
+import '../../../../core/notifications/notification_delivery.dart';
 import '../../../../core/notifications/notification_service.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/service_reminder_repository.dart';
@@ -72,7 +73,8 @@ class ServiceReminderEvaluator {
   /// [currentOdometerKm]. For each triggered reminder, persists the
   /// `pendingAcknowledgment = true` flag and fires a local
   /// notification. Returns the list of reminders that fired (useful
-  /// for callers that want to show a snackbar).
+  /// for callers that want to show a snackbar) — only those actually
+  /// posted: an undelivered one gets its flag back (#4335).
   Future<List<ServiceReminder>> evaluate({
     required String vehicleId,
     required double currentOdometerKm,
@@ -103,25 +105,58 @@ class ServiceReminderEvaluator {
         );
         continue;
       }
+      final delivery = await _deliver(reminder, copy, currentOdometerKm);
+      if (delivery.wasPosted) {
+        fired.add(updated);
+        continue;
+      }
+      // #4335 — the user was never shown it (notifications off, the
+      // channel disabled, or the post refused). A pending flag would keep
+      // it from ever firing again, so it goes back.
       try {
-        await notifications.showServiceReminder(
-          id: notificationIdFor(reminder.id),
-          title: copy.title,
-          body: copy.bodyFor(
-            label: reminder.label,
-            kmOver: reminder.kmOverdue(currentOdometerKm).round(),
-          ),
-        );
+        await repository.save(reminder);
       } catch (e, st) {
         logFailure(
           e,
           st,
-          where: 'ServiceReminderEvaluator: notification failed',
+          where: 'ServiceReminderEvaluator: failed to clear an undelivered flag',
           layer: ErrorLayer.other,
         );
       }
-      fired.add(updated);
     }
     return fired;
+  }
+
+  /// Post one reminder and say what became of it (#4335): the OS probe
+  /// first, when the notifier is one, then the post itself.
+  Future<NotificationDelivery> _deliver(
+    ServiceReminder reminder,
+    ServiceReminderMessages copy,
+    double currentOdometerKm,
+  ) async {
+    if (notifications case final NotificationDeliveryProbe probe) {
+      final blocked =
+          await probe.blockedDelivery(NotificationChannelKind.serviceReminders);
+      if (blocked != null) return blocked;
+    }
+    try {
+      await notifications.showServiceReminder(
+        id: notificationIdFor(reminder.id),
+        title: copy.title,
+        body: copy.bodyFor(
+          label: reminder.label,
+          kmOver: reminder.kmOverdue(currentOdometerKm).round(),
+        ),
+      );
+      return NotificationDelivery.posted;
+    } catch (e, st) {
+      logFailure(
+        e,
+        st,
+        where: 'ServiceReminderEvaluator: notification failed',
+        layer: ErrorLayer.other,
+      );
+      return NotificationDelivery.failed;
+    }
   }
 }

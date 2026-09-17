@@ -3339,6 +3339,20 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get alertsNotificationsOffTitle => 'Benachrichtigungen sind aus';
+
+  @override
+  String get alertsNotificationsOffPermissionBody =>
+      'Deine Preisalarme werden weiter geprüft, können dich aber nicht benachrichtigen: Benachrichtigungen für diese App sind in den Einstellungen deines Telefons ausgeschaltet.';
+
+  @override
+  String get alertsNotificationsOffChannelBody =>
+      'Deine Preisalarme werden weiter geprüft, können dich aber nicht benachrichtigen: Benachrichtigungen für Preisalarme sind in den Einstellungen deines Telefons ausgeschaltet.';
+
+  @override
+  String get alertsNotificationsOffOpenSettings => 'Einstellungen öffnen';
+
+  @override
   String alertReasonNetSaving(String amount) {
     return 'Rund $amount bei deiner üblichen Tankfüllung';
   }

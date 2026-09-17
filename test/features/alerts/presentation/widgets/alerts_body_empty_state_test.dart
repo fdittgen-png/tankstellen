@@ -12,6 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/notifications/local_notification_service.dart';
+import 'package:tankstellen/core/notifications/notification_delivery.dart';
+import 'package:tankstellen/core/notifications/notification_providers.dart';
 import 'package:tankstellen/core/widgets/empty_state.dart';
 import 'package:tankstellen/core/widgets/help_banner.dart';
 import 'package:tankstellen/core/widgets/panel_card.dart';
@@ -21,6 +24,7 @@ import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/alert_statistics_card.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/alerts_body.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/alerts_last_checked_footer.dart';
+import 'package:tankstellen/features/alerts/presentation/widgets/alerts_notifications_off_banner.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/radius_alert_create_sheet.dart';
 import 'package:tankstellen/features/alerts/providers/alert_provider.dart';
 import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
@@ -207,6 +211,32 @@ void main() {
       expect(find.text('No price alerts yet'), findsNothing);
     });
 
+    testWidgets('#4335 — with alerts and notifications off, the banner leads '
+        'the page', (tester) async {
+      final test = standardTestOverrides();
+      await pumpApp(
+        tester,
+        const AlertsBody(),
+        overrides: [
+          ..._overrides(
+            test,
+            alerts: [_alert()],
+            radius: _EmptyRadiusAlerts.new,
+          ),
+          notificationServiceProvider
+              .overrideWithValue(_NotificationsOff()),
+        ],
+      );
+
+      final banner = find.byType(AlertsNotificationsOffBanner);
+      expect(banner, findsOneWidget);
+      expect(find.text('Notifications are off'), findsOneWidget);
+      expect(
+        tester.getTopLeft(banner).dy,
+        lessThan(tester.getTopLeft(find.byType(AlertStatisticsCard)).dy),
+      );
+    });
+
     testWidgets('one zone alert only: stats strip + both headers',
         (tester) async {
       final test = standardTestOverrides();
@@ -227,6 +257,14 @@ void main() {
       expect(find.text('No price alerts yet'), findsNothing);
     });
   });
+}
+
+/// A notifier whose OS refuses every post (#4335).
+class _NotificationsOff extends LocalNotificationService {
+  @override
+  Future<NotificationDelivery?> blockedDelivery(
+          NotificationChannelKind channel) async =>
+      NotificationDelivery.suppressedPermission;
 }
 
 class _FixedAlerts extends AlertNotifier {

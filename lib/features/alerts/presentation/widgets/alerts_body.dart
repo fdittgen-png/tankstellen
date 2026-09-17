@@ -13,6 +13,7 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/price_alert.dart';
 import '../../domain/entities/radius_alert.dart';
+import '../../providers/alert_notifications_blocked_provider.dart';
 import '../../providers/alert_provider.dart';
 import '../../providers/opportunity_feed_provider.dart';
 import '../../providers/radius_alerts_provider.dart';
@@ -21,6 +22,7 @@ import 'alert_statistics_card.dart';
 import 'alerts_best_effort_note.dart';
 import 'alerts_last_checked_footer.dart';
 import 'alerts_list_tiles.dart';
+import 'alerts_notifications_off_banner.dart';
 import 'alerts_section_chrome.dart';
 import 'opportunity_feed_section.dart';
 import 'radius_alert_create_sheet.dart';
@@ -116,6 +118,8 @@ class _Refreshable extends StatelessWidget {
         // #4154 — the feed is a plain read of a row the background scan
         // writes, so a pull re-reads what the last scan left.
         ref.invalidate(opportunityFeedProvider);
+        // #4335 — and the OS notification settings may have changed.
+        ref.invalidate(alertNotificationsBlockedProvider);
       },
       child: child,
     );
@@ -194,6 +198,9 @@ class _AlertsSections extends ConsumerWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.only(top: Spacing.md, bottom: Spacing.xxl),
       children: [
+        // #4335 — first, when the OS will not let any of these alerts
+        // reach the user: everything below is moot until that is fixed.
+        const AlertsNotificationsOffBanner(),
         // The one-time swipe/toggle tip the Favorites tab used to show
         // above its list — kept with the list it explains.
         if (alerts.isNotEmpty)
