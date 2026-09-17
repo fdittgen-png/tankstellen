@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/station_offer.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
@@ -53,8 +54,19 @@ class SwipeableStationCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
+    // #4348 — a reference price (LU decree, GR prefecture average) has
+    // nowhere to drive to: it keeps the hide swipe, loses the navigate one.
+    final canNavigate = StationOffer.forStation(
+      stationId: station.id,
+      lat: station.lat,
+      lng: station.lng,
+    ).canNavigate;
+
     return Dismissible(
       key: ValueKey('swipe-${station.id}'),
+      direction: canNavigate
+          ? DismissDirection.horizontal
+          : DismissDirection.endToStart,
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
           onNavigate();

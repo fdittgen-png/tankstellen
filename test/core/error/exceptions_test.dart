@@ -216,6 +216,7 @@ void main() {
         const ServiceChainExhaustedException(errors: []),
         const UpstreamCertificateException(host: 'example.com'),
         const NonFuelStationIdException('ocm-1'),
+        const ProviderUnavailableException('AU'),
       ];
       for (final e in exceptions) {
         // This switch must compile - proves exhaustiveness of sealed class
@@ -228,6 +229,7 @@ void main() {
           ServiceChainExhaustedException() => 'chain',
           UpstreamCertificateException() => 'cert',
           NonFuelStationIdException() => 'nonfuel',
+          ProviderUnavailableException() => 'unavailable',
         };
         expect(result, isNotEmpty);
       }

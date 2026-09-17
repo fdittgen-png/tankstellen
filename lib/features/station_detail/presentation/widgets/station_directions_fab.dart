@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../../../core/domain/station.dart';
+import '../../../../core/services/station_offer.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'station_brand_helpers.dart';
@@ -37,15 +38,29 @@ class StationDirectionsFab extends StatelessWidget {
     this.extended = true,
   });
 
+  /// The FAB, or null when [station] is a reference price with nowhere
+  /// to drive to (#4348). The hosts pass this straight to
+  /// `Scaffold.floatingActionButton`, so a deep-linked LU/GR detail shows
+  /// its price without a Navigate button pointing at a town square.
+  static StationDirectionsFab? forStation(Station station,
+      {bool extended = true}) {
+    final offer = StationOffer.forStation(
+        stationId: station.id, lat: station.lat, lng: station.lng);
+    return offer.canNavigate
+        ? StationDirectionsFab(station: station, extended: extended)
+        : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return FloatingActionButton.extended(
       key: const Key('station_directions_fab'),
       onPressed: () => unawaited(
-        NavigationUtils.openInMaps(
-          station.lat,
-          station.lng,
+        NavigationUtils.openStation(
+          stationId: station.id,
+          lat: station.lat,
+          lng: station.lng,
           label: hasRealBrand(station) ? station.brand : station.street,
         ),
       ),

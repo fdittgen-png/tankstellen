@@ -9,7 +9,7 @@ import '../../../core/domain/refuel_economics.dart';
 import '../../../core/time/app_clock.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
 import '../../../core/domain/search_result_item.dart';
-import '../../../core/services/country_service_registry.dart';
+import '../../../core/services/station_offer.dart';
 import '../../../core/utils/station_extensions.dart';
 import 'search_filters_provider.dart';
 
@@ -71,16 +71,23 @@ RefuelCandidate _candidate(
   // active country instead would have pulled the profile box into a
   // provider whose whole job is arithmetic over a list it was handed —
   // and it is the wrong answer anyway for a station across the border.
-  final code = CountryServiceRegistry.countryForStationId(item.station.id) ??
-      CountryServiceRegistry.countryForLatLng(item.station.lat,
-          item.station.lng);
-  final capability =
-      code == null ? null : CountryServiceRegistry.capabilityFor(code);
+  //
+  // #4348 — the same per-station resolution also answers what the result
+  // IS: a reference price holds no ranking, and a partial source
+  // qualifies every pick drawn from it.
+  final offer = StationOffer.forStation(
+    stationId: item.station.id,
+    lat: item.station.lat,
+    lng: item.station.lng,
+  );
+  final capability = offer.capability;
   final age = _priceAge(item.station.priceUpdatedAt, now);
   return RefuelCandidate(
     stationId: item.station.id,
     oneWayKm: item.dist,
     pricePerLitre: item.station.priceFor(fuelType),
+    isPhysicalStation: offer.canHoldStationRanking,
+    coverageComplete: offer.coverageComplete,
     // An unregistered country gets the candidate's own defaults, which
     // block both gates. That is the honest answer: we do not know what
     // this source publishes, so we cannot stand a gate down over it.

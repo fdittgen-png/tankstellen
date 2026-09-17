@@ -39,6 +39,7 @@ class FavoriteStationDismissible extends ConsumerWidget {
       label: label,
       latitude: station.lat,
       longitude: station.lng,
+      stationId: station.id,
       // #3159 — captured synchronously before any await in the swipe
       // callback; favoritesProvider is keepAlive, so the captured
       // notifier stays valid for the undo.

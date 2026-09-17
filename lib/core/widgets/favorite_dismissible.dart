@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../services/station_offer.dart';
 import '../theme/dark_mode_colors.dart';
 import '../utils/navigation_utils.dart';
 import '../widgets/confirm_delete_dialog.dart';
@@ -34,6 +35,13 @@ class FavoriteDismissible<T> extends StatelessWidget {
   final double latitude;
   final double longitude;
 
+  /// #4348 — the fuel result's id, so the swipe asks the shared
+  /// capability contract whether there is anywhere to drive to. A
+  /// reference price (LU/GR) keeps its remove swipe and loses the
+  /// navigate one. Null (EV chargers: always real points) navigates as
+  /// before.
+  final String? stationId;
+
   /// Returns the keepAlive notifier handle — called synchronously
   /// before any await (#3159).
   final T Function() captureHandle;
@@ -52,6 +60,7 @@ class FavoriteDismissible<T> extends StatelessWidget {
     required this.label,
     required this.latitude,
     required this.longitude,
+    this.stationId,
     required this.captureHandle,
     required this.removeFavorite,
     required this.undoRemove,
@@ -61,14 +70,27 @@ class FavoriteDismissible<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final id = stationId;
+    final canNavigate = id == null ||
+        StationOffer.forStation(stationId: id, lat: latitude, lng: longitude)
+            .canNavigate;
 
     return Dismissible(
       key: ValueKey(dismissKey),
+      direction: canNavigate
+          ? DismissDirection.horizontal
+          : DismissDirection.endToStart,
       confirmDismiss: (direction) async {
         // #3159 — capture before any await (see class doc).
         final handle = captureHandle();
         if (direction == DismissDirection.startToEnd) {
-          await NavigationUtils.openInMaps(latitude, longitude, label: label);
+          if (id == null) {
+            await NavigationUtils.openInMaps(latitude, longitude,
+                label: label);
+          } else {
+            await NavigationUtils.openStation(
+                stationId: id, lat: latitude, lng: longitude, label: label);
+          }
           return false;
         }
         // #3682 — the app-wide delete confirmation before the removal.

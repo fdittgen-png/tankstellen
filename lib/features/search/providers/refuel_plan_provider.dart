@@ -7,6 +7,7 @@ import '../../../core/domain/refuel_plan.dart';
 import '../../../core/domain/refuel_planner.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
 import '../../../core/domain/search_result_item.dart';
+import '../../../core/services/station_offer.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../../../core/domain/tank_state_provider.dart';
 import '../../../core/utils/route_projection.dart';
@@ -72,6 +73,12 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
   for (final item in result.stations) {
     if (item is! FuelStationResult) continue;
     final station = item.station;
+    // #4348 — a reference price is not a stop anyone can make.
+    if (!StationOffer.forStation(
+            stationId: station.id, lat: station.lat, lng: station.lng)
+        .canRouteTo) {
+      continue;
+    }
     // #2631 — each station is priced by its own country's profile fuel
     // on a cross-border route, exactly as the list and the map do.
     final fuel = fuelForStation(station, result.profileFuelByCountry, fuelType);

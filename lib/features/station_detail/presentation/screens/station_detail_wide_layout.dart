@@ -75,7 +75,7 @@ class StationDetailWideLayout extends StatelessWidget {
       ],
       // #3337 — directions is now the prominent labelled FAB (was a small,
       // hard-to-find AppBar icon).
-      floatingActionButton: StationDirectionsFab(station: station),
+      floatingActionButton: StationDirectionsFab.forStation(station),
       bodyPadding: EdgeInsets.zero,
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
