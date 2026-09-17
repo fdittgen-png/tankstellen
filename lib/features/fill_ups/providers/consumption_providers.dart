@@ -30,7 +30,7 @@ import '../domain/entities/pending_reconciliation.dart';
 import '../domain/services/eco_score_calculator.dart';
 import '../domain/services/fill_up_trip_linker.dart';
 import '../domain/services/reconciler.dart';
-import '../domain/services/tank_mix_estimator.dart';
+import '../domain/services/tank_blend_event_log.dart';
 import 'fill_inventory_provider.dart';
 import 'pending_reconciliation_provider.dart';
 

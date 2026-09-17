@@ -132,6 +132,27 @@ final class TankBlendSnapshot {
   /// The guaranteed minimum share of [grade].
   double minimumShare(FuelGrade grade) => gradeShares[grade] ?? 0;
 
+  /// The grade holding the largest share of the tank however the unknown
+  /// share turns out (#4322): its guaranteed minimum exceeds every other
+  /// grade's minimum plus ALL of the unknown share. Null when the evidence
+  /// leaves the lead open — including a tie, or nothing attributed.
+  FuelGrade? get establishedLeadingGrade {
+    FuelGrade? lead;
+    var first = 0.0;
+    var second = 0.0;
+    for (final entry in gradeShares.entries) {
+      if (entry.key == FuelGrade.unknown) continue;
+      if (entry.value > first) {
+        second = first;
+        first = entry.value;
+        lead = entry.key;
+      } else if (entry.value > second) {
+        second = entry.value;
+      }
+    }
+    return first > second + unknownShare + 1e-9 ? lead : null;
+  }
+
   /// The exact share of [grade], or null while any share is unattributed.
   double? exactShare(FuelGrade grade) =>
       unknownShare > 1e-9 ? null : gradeShares[grade] ?? 0;

@@ -5,9 +5,9 @@
 
 # ADR 0015: Per-fuel efficiency comparison v2 — pure-vs-mix composition buckets
 
-**Status:** Accepted (amended 2026-08-22 by the v3 carried-content section, #3764)
+**Status:** Accepted (amended 2026-08-22 by the v3 carried-content section, #3764; 2026-09-16 by the one-mix-model section, #4322)
 **Date:** 2026-06-05
-**Issue:** #2928 (v2) · #3764 (v3 amendment)
+**Issue:** #2928 (v2) · #3764 (v3 amendment) · #4322 (one mix model)
 **Parent Epic:** #2881
 **Supersedes:** ADR 0014 (dominant-fuel collapse)
 
@@ -181,11 +181,9 @@ composition = opening content
    **physical plein** and the **tank capacity is known** (user-set
    `tankCapacityL`, or backfilled from the reference catalog by the vehicle
    editor): the content is the full tank —
-   `capacity × the mix shares as of that fill`, where the shares come from
-   `estimateTankMixForCapacity` (the #3652 prior-content chain, reused
-   verbatim) replayed over the fill-history **prefix up to and including the
-   opening fill**. For the very first fill the chain attributes the unknown
-   residual to that fill's own grade (its documented convergence rule).
+   `capacity × the mix shares as of that fill`. (Originally the #3652
+   `TankMixEstimator` prior-content chain; since #4322 the evidence-only
+   tank blend — see the amendment below.)
 2. **The closing plein is EXCLUDED from the composition tally.** Its fuel
    enters the tank *after* the interval's burn — it belongs to the **next**
    interval's opening content, where the mix chain delivers it. (Including
@@ -314,3 +312,64 @@ is.
   (`kMinAttributedIntervalsForVerdict`) is untouched — estimates never
   crown anything on the consumption screen.
 - Retuning a heating value changes every estimate; the values are pinned.
+
+## Amendment (2026-09-16, #4322) — one mix model: the carried content is read from the evidence-only tank blend
+
+### Problem
+
+v3 read the opening content from `TankMixEstimator` (#3652), a **best
+guess**: an unknown pre-fill residual was half the previous level, and the
+very first fill's residual was credited to its own grade. The fuel/blend
+epic (#4294) then shipped `TankBlendEngine` (#4275/#4279), an
+**evidence-only** model — guaranteed minimum shares per grade, the rest
+explicitly `unknown` — and the Fuel & Tank surface, the next-fill decision
+and the behaviour profile all read it. Two models answering "what is in the
+tank" would, sooner or later, show a driver two different answers.
+
+### Decision
+
+`TankMixEstimator` is deleted. Every consumer reads the blend engine:
+
+| Consumer | Now reads | When the evidence gives less than the old guess |
+|---|---|---|
+| ADR 0015 opening content (this ADR) | the blend right after the opening plein, fills only | the bucket is taken only if **no** attribution of the unknown litres could change it; otherwise the v2 legacy fallback, counted in `legacyAttributedIntervalCount` |
+| Tank level card mix line | the same `TankMixView` the Fuel & Tank card renders | "≥ 62 % E85 · 38 % unknown" — minimums floored, the unknown share said |
+| Trip lessons' ethanol share (#3701) | the **plausible maximum** ethanol of the blend (`TankMixView.plausibleMaxEthanolShare`): each known grade at its standard's upper limit (E85 0.85, E10 0.10, E5/E98 0.05) | the unknown share at the highest limit among grades this vehicle was filled with or is approved for — never E85 for a car with neither; no such evidence → no figure, the stock rule |
+| `tankFuelKey` (#3918) | the grade whose lead no unknown share could overturn | `null`: the readers fall back to the ECU session key, then the configured fuel |
+
+No consumer keeps the deleted best guess. The bound each reads follows its
+purpose: **claims** (the mix shown, the bucket, the price split,
+`tankFuelKey`) read guaranteed minimums; **excusing a symptom** (the
+lean-trim lesson) reads the plausible maximum, because the question there is
+whether the fuel *could* explain the trims — a guaranteed minimum (E85 ≥ 50 %)
+would re-fire the #3701 "lean +25 %" false alarm on every E85 trip.
+
+1. **Opening content.** `capacity × gradeShares` of the blend after the
+   opening plein, with `capacity × unknownShare` held as **unknown litres**
+   that no grade is credited with. The blend is folded once over the fill
+   log alone: without recorded trips every drive between fills is
+   unmeasured — the widest honest volume interval — so no share is credited
+   beyond what the fills prove.
+2. **Settled buckets only.** Each bucket region (a dominant fuel, its
+   secondary, pure vs mix) is an intersection of half-spaces over the
+   per-fuel litres, hence convex, and the possible attributions of the
+   unknown litres form a simplex. The bucket is therefore settled exactly
+   when every corner — all unknown litres to one known fuel, or all to a
+   fuel the tally has not seen — lands in the same bucket and none names
+   the unseen fuel. A tie resolves against settling.
+3. **Unsettled → legacy.** The interval falls back to the v2
+   contributing-fills tally, as rule 3 of the v3 section already does for
+   an unknowable opening content, and is disclosed the same way.
+4. **Pricing.** The #3846 money split runs over the litres a fuel is
+   guaranteed to hold; unknown litres are never priced at a guessed fuel's
+   rate. The burned volume is spread over the characterised part.
+
+### Consequences
+
+- The canonical cases are unchanged: a run-dry switch, a full plein onto a
+  known tank, and the 14 L E5 + 21 L E85 case all settle exactly as before.
+- A first fill below capacity no longer pretends its residual was its own
+  grade. Its interval settles only if the unknown litres cannot move the
+  bucket; otherwise it is legacy-attributed. The unknown share decays with
+  every later full plein, so the effect is confined to early history.
+- A vehicle whose capacity is unknown is unchanged: bit-for-bit v2.

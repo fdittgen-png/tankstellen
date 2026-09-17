@@ -22,15 +22,19 @@ TankBlendSnapshot deriveTankBlend({
   required VehicleProfile? vehicle,
   required Iterable<FillUp> fillUps,
   required Iterable<TripHistoryEntry> trips,
-}) {
-  final capacity = vehicle?.tankCapacityL;
-  final usable = capacity != null && capacity.isFinite && capacity > 0;
-  final engine = TankBlendEngine(tankCapacityLitres: usable ? capacity : null);
-  return engine.replay(tankBlendEventsFor(
-    vehicleId: vehicleId,
-    fillUps: fillUps,
-    trips: trips,
-  ));
+}) =>
+    tankBlendEngineFor(vehicle?.tankCapacityL).replay(tankBlendEventsFor(
+      vehicleId: vehicleId,
+      fillUps: fillUps,
+      trips: trips,
+    ));
+
+/// The engine for a tank of [tankCapacityL] litres — unbounded when that
+/// capacity is unknown, non-finite or non-positive.
+TankBlendEngine tankBlendEngineFor(double? tankCapacityL) {
+  final usable =
+      tankCapacityL != null && tankCapacityL.isFinite && tankCapacityL > 0;
+  return TankBlendEngine(tankCapacityLitres: usable ? tankCapacityL : null);
 }
 
 /// Translates [vehicleId]'s records into blend events (#4279).
@@ -71,12 +75,27 @@ List<TankBlendEvent> tankBlendEventsFor({
   required String vehicleId,
   required Iterable<FillUp> fillUps,
   required Iterable<TripHistoryEntry> trips,
-}) {
+}) =>
+    _eventsOf(vehicleId, fillUps, trips);
+
+/// [tankBlendEventsFor] over records the caller has ALREADY scoped to one
+/// vehicle (#4322) — the ADR 0015 per-fuel comparison, whose fill list
+/// also carries a single-vehicle user's unassigned fills (#3945).
+List<TankBlendEvent> tankBlendEventsOf({
+  required Iterable<FillUp> fillUps,
+  required Iterable<TripHistoryEntry> trips,
+}) =>
+    _eventsOf(null, fillUps, trips);
+
+/// A null [vehicleId] takes every record as the vehicle's own.
+List<TankBlendEvent> _eventsOf(String? vehicleId, Iterable<FillUp> fillUps,
+    Iterable<TripHistoryEntry> trips) {
+  bool foreign(String? id) => vehicleId != null && id != vehicleId;
   final events = <TankBlendEvent>[];
   final seenFills = <String>{};
   final physical = <FillUp>[];
   for (final f in fillUps) {
-    if (f.vehicleId != vehicleId || !seenFills.add(f.id)) continue;
+    if (foreign(f.vehicleId) || !seenFills.add(f.id)) continue;
     if (isReconciliationCorrection(f)) {
       events.add(TankConsumptionEvent.unmeasured(
           id: 'correction:${f.id}', at: f.date));
@@ -91,7 +110,7 @@ List<TankBlendEvent> tankBlendEventsFor({
   final seenTrips = <String>{};
   final dated = <({DateTime at, String id, double km})>[];
   for (final trip in trips) {
-    if (trip.vehicleId != vehicleId || !seenTrips.add(trip.id)) continue;
+    if (foreign(trip.vehicleId) || !seenTrips.add(trip.id)) continue;
     final summary = trip.summary;
     final at = summary.startedAt ?? summary.endedAt;
     if (at == null) continue;
@@ -143,6 +162,68 @@ List<TankBlendEvent> tankBlendEventsFor({
   return events;
 }
 
+/// The blend right AFTER each physical fill of [fillUps], keyed by fill-up
+/// id (#4322) — the records already scoped to one vehicle, as for
+/// [tankBlendEventsOf]. One fold serves every "the tank as of fill N"
+/// question, so a caller asking it per fill pays O(n), not a replay each.
+/// A fill the blend leaves out (non-liquid, no litres, a correction) has
+/// no entry.
+Map<String, TankBlendSnapshot> tankBlendAfterEachFill({
+  required double? tankCapacityL,
+  required Iterable<FillUp> fillUps,
+  Iterable<TripHistoryEntry> trips = const [],
+}) {
+  final engine = tankBlendEngineFor(tankCapacityL);
+  var state = engine.initial();
+  final after = <String, TankBlendSnapshot>{};
+  for (final event in TankBlendEngine.canonicalLog(
+      tankBlendEventsOf(fillUps: fillUps, trips: trips))) {
+    state = engine.apply(state, event);
+    if (event is TankFillEvent) {
+      after[event.id.substring(_fillPrefix.length)] = state;
+    }
+  }
+  return after;
+}
+
+const String _fillPrefix = 'fill:';
+
+/// The fuel key stamped on [vehicle] as `tankFuelKey` (#3918): the grade
+/// the tank holds, for the fuel-rate readers' per-fuel pump gain.
+///
+/// A single-fuel vehicle holds what it was last filled with. A multi-fuel
+/// vehicle's tank is read from the evidence-only blend (#4322) — the grade
+/// whose lead no unknown share could overturn. When the evidence leaves the
+/// lead open the answer is null, never the last pump's label: the readers
+/// then fall back to the ECU session key and the configured fuel, the
+/// documented `pumpGainFuelKeyFor` chain. [fillUps] and [trips] are
+/// already scoped to the vehicle. With no physical fill at all there is
+/// nothing to say, and the current key is kept.
+String? tankFuelKeyOf({
+  required VehicleProfile vehicle,
+  required Iterable<FillUp> fillUps,
+  required Iterable<TripHistoryEntry> trips,
+}) {
+  final physical = fillUps.where((f) => !f.isCorrection).toList()
+    ..sort((a, b) => b.date.compareTo(a.date));
+  if (physical.isEmpty) return vehicle.tankFuelKey;
+  if (!vehicle.multiFuelCapable) return physical.first.fuelType.apiValue;
+  return deriveTankBlendOf(
+    tankCapacityL: vehicle.tankCapacityL,
+    fillUps: fillUps,
+    trips: trips,
+  ).establishedLeadingGrade?.key;
+}
+
+/// [deriveTankBlend] over records already scoped to one vehicle.
+TankBlendSnapshot deriveTankBlendOf({
+  required double? tankCapacityL,
+  required Iterable<FillUp> fillUps,
+  required Iterable<TripHistoryEntry> trips,
+}) =>
+    tankBlendEngineFor(tankCapacityL)
+        .replay(tankBlendEventsOf(fillUps: fillUps, trips: trips));
+
 TankFillEvent? _fillEvent(FillUp f) {
   final parsed = FuelGrade.fromKey(f.fuelType.apiValue);
   final grade = parsed == FuelGrade.wildcard ? FuelGrade.unknown : parsed;
@@ -157,7 +238,7 @@ TankFillEvent? _fillEvent(FillUp f) {
     level = after - f.liters;
   }
   return TankFillEvent(
-    id: 'fill:${f.id}',
+    id: '$_fillPrefix${f.id}',
     at: f.date,
     grade: grade,
     litres: f.liters,

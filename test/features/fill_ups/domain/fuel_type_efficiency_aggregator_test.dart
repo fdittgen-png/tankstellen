@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fuel_type_efficiency_stats.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/fuel_type_efficiency_aggregator.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/fuel_type_efficiency_internals.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
 /// Coverage for [FuelTypeEfficiencyAggregator] under the v2 COMPOSITION-BUCKET
@@ -557,12 +558,18 @@ void main() {
       // E5 itself was bought at 78.03 / 39.2 = 1.99 EUR/L. The bucket lands
       // slightly under that on purpose: the tank it burned was 39.2 L of
       // fresh E5 on top of 5.8 L of E85 carried over, so 12.9 % of the
-      // litres are honestly priced at E85's rate:
-      //   39.2/45 * 1.9906 + 5.8/45 * 0.8512 = 1.844
-      // Pinning 1.99 here would mean pricing carried-over E85 as if it were
-      // E5 — the same class of lie as the bug, pointing the other way.
+      // litres are honestly priced at E85's rate. #4322: the carried 5.8 L
+      // is read from the evidence-only blend, which cannot vouch for the
+      // grade of 1.05 % of the tank (the first fill's residual). Those
+      // litres are priced at neither grade — the burned volume is split
+      // over the part the blend guarantees (87.11 % E5, 11.84 % E85):
+      //   0.88032 * 1.99056 + 0.11968 * 0.85116 = 1.8542
+      // (the deleted best-guess chain, crediting that residual to E85,
+      // said 1.8437). Pinning 1.99 here would mean pricing carried-over
+      // E85 as if it were E5 — the same class of lie as the bug, pointing
+      // the other way.
       expect(e5!.avgPricePerLitre, isNotNull);
-      expect(e5.avgPricePerLitre!, closeTo(1.844, 0.02),
+      expect(e5.avgPricePerLitre!, closeTo(1.8542, 0.0005),
           reason: 'showing 0.90 here means the closing E85 fill is still '
               'paying for the E5 tank');
       // Whatever the blend arithmetic, it can never land in E85 territory.
@@ -604,6 +611,100 @@ void main() {
       expect(e5.totalDistanceKm, closeTo(559, 0.5));
       expect(e5.avgL100km, isNotNull);
       expect(e5.avgL100km!, closeTo(6.4, 0.2));
+    });
+  });
+
+  // #4322 — the carried content comes from the evidence-only tank blend:
+  // litres no evidence attributes stay unknown, and a bucket is taken only
+  // when no attribution of them could change it.
+  group('#4322 one mix model — unknown litres never pick a bucket', () {
+    const capacity = 50.0;
+
+    test('a first fill below capacity leaves a residual the bucket cannot '
+        'ignore → legacy, never the old "residual was its own grade" guess',
+        () {
+      final fills = [
+        // 30 L E85 to full on a 50 L tank: 20 L of unknown residual.
+        _f(id: 'f0', date: _d(1), liters: 30, cost: 30, odo: 0,
+            fuelType: FuelType.e85),
+        _f(id: 'f1', date: _d(2), liters: 40, cost: 72, odo: 500),
+        _f(id: 'f2', date: _d(3), liters: 40, cost: 72, odo: 1000),
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills,
+          tankCapacityL: capacity);
+
+      // Interval A burned 30 L E85 + 20 L unknown: pure E85 if the rest is
+      // E85, an E85/? blend if it is not — unsettled. Interval B burned
+      // 80 % E10, ≥ 12 % E85, 8 % unknown: pure E10 or E10/E85 — unsettled.
+      // Both fall back to their contributing fills (E10) and say so.
+      expect(result.map((s) => s.label), ['E10']);
+      expect(result.single.attributedIntervalCount, 2);
+      expect(result.single.legacyAttributedIntervalCount, 2);
+      // The deleted estimator called A pure E85 and B an E10/E85 blend.
+      expect(_has(result, 'E85'), isFalse);
+      expect(_has(result, 'E10/E85'), isFalse);
+    });
+
+    test('unknown litres that cannot move the bucket leave it settled, and '
+        'are priced at no guessed grade', () {
+      final fills = [
+        // 45 L E85 to full: 5 L (10 %) unknown residual.
+        _f(id: 'f0', date: _d(1), liters: 45, cost: 45, odo: 0,
+            fuelType: FuelType.e85),
+        // A 2 L E10 splash inside the interval.
+        _f(id: 'f1', date: _d(2), liters: 2, cost: 4, odo: 100,
+            isFullTank: false),
+        _f(id: 'f2', date: _d(3), liters: 30, cost: 30, odo: 500,
+            fuelType: FuelType.e85),
+      ];
+      final result = FuelTypeEfficiencyAggregator.byFuelType(fills,
+          tankCapacityL: capacity);
+
+      // Burned: 45 E85 + 2 E10 + 5 unknown. E85 is ≥ 45/52 = 86.5 % in
+      // every attribution of the 5 L → pure E85 whatever they were.
+      final e85 = _byLabel(result, 'E85');
+      expect(e85.legacyAttributedIntervalCount, 0);
+      expect(e85.attributedIntervalCount, 1);
+      // 32 L burned, split over the guaranteed 45 E85 (1.00/L) + 2 E10
+      // (2.00/L); the old chain priced 50 E85 + 2 E10 (0.06646 EUR/km).
+      expect(e85.avgCostPerKm,
+          closeTo(32 * (45 / 47 * 1.0 + 2 / 47 * 2.0) / 500, 1e-12));
+    });
+  });
+
+  group('classifyComposition (#4322)', () {
+    const fuels = {'e85': FuelType.e85, 'e10': FuelType.e10};
+
+    test('no unknown litres: the plain ADR 0015 rule', () {
+      expect(classifyComposition({'e85': 70, 'e10': 30}, fuels)!.key,
+          const FuelEfficiencyBucket(
+                  dominant: FuelType.e85, secondary: FuelType.e10)
+              .key);
+    });
+
+    test('settled when every corner agrees', () {
+      // 90 E85, 5 unknown: ≥ 85.7 % E85 wherever the 5 go.
+      expect(
+          classifyComposition({'e85': 90}, fuels, unknownLitres: 5)!.label,
+          'E85');
+      // 60 E85 / 35 E10 / 5 unknown: E85/E10 in every corner.
+      expect(
+          classifyComposition({'e85': 60, 'e10': 35}, fuels,
+                  unknownLitres: 5)!
+              .label,
+          'E85/E10');
+    });
+
+    test('open when a corner disagrees or names an unseen grade', () {
+      // Pure E85 if the 20 are E85, a blend if not.
+      expect(classifyComposition({'e85': 80}, fuels, unknownLitres: 20),
+          isNull);
+      // 60 E85 / 20 E10 / 25 unknown: E85/E10 if the 25 are either known
+      // grade — but 25 L of a grade nobody logged would be the secondary.
+      expect(
+          classifyComposition({'e85': 60, 'e10': 20}, fuels,
+              unknownLitres: 25),
+          isNull);
     });
   });
 }

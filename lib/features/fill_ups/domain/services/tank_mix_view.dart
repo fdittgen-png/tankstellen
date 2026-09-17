@@ -43,9 +43,13 @@ final class TankMixView {
     required this.maxLitres,
     required this.exactLitres,
     required this.capacityLitres,
+    required this.plausibleMaxEthanolShare,
   });
 
-  factory TankMixView.of(TankBlendSnapshot snapshot) {
+  /// [ethanolEvidence] — the grades this vehicle was filled with or is
+  /// approved for — bounds [plausibleMaxEthanolShare]'s unknown share.
+  factory TankMixView.of(TankBlendSnapshot snapshot,
+      {Iterable<FuelGrade> ethanolEvidence = const []}) {
     final exact = snapshot.unknownShare <= 1e-9;
     final grades = [
       for (final g in FuelGrade.values)
@@ -73,7 +77,35 @@ final class TankMixView {
       maxLitres: snapshot.maxLitres,
       exactLitres: snapshot.totalLitres,
       capacityLitres: snapshot.tankCapacityLitres,
+      plausibleMaxEthanolShare:
+          _plausibleMaxEthanolShare(snapshot, ethanolEvidence),
     );
+  }
+
+  /// The most ethanol each grade may legally hold (EN 15293 / EN 228
+  /// upper limits): E85 85 %, E10 10 %, E5 and E98 5 %, everything else 0.
+  static double _maxEthanolContent(FuelGrade grade) => switch (grade) {
+        FuelGrade.e85 => 0.85,
+        FuelGrade.e10 => 0.10,
+        FuelGrade.e5 || FuelGrade.e98 => 0.05,
+        _ => 0.0,
+      };
+
+  static double? _plausibleMaxEthanolShare(
+      TankBlendSnapshot snapshot, Iterable<FuelGrade> evidence) {
+    final known = [
+      for (final e in snapshot.gradeShares.entries)
+        if (e.key != FuelGrade.unknown && e.value > 0) e,
+    ];
+    final grades = {...evidence, for (final e in known) e.key};
+    if (grades.isEmpty) return null;
+    var share = 0.0;
+    for (final e in known) {
+      share += e.value * _maxEthanolContent(e.key);
+    }
+    final unknownCeiling =
+        grades.map(_maxEthanolContent).reduce((a, b) => a > b ? a : b);
+    return (share + snapshot.unknownShare * unknownCeiling).clamp(0.0, 1.0);
   }
 
   /// Whole percentages of exact shares that still sum to 100: floor each,
@@ -106,6 +138,19 @@ final class TankMixView {
   /// The litres in the tank when the volume interval has collapsed.
   final double? exactLitres;
   final double? capacityLitres;
+
+  /// The MOST ethanol (0..1) this tank can plausibly hold (#4322): each
+  /// attributed grade at its standard's upper limit (E85 0.85), and the
+  /// unknown share at the highest limit among the grades this vehicle has
+  /// actually been filled with or is approved for — never E85 for a car
+  /// with no E85 in either. Null when there is no such evidence at all.
+  ///
+  /// An UPPER bound on purpose, and only for excusing a symptom: the
+  /// combustion-health lesson (#3701) asks "could the fuel explain these
+  /// lean trims?", and answering with the guaranteed minimum re-fires the
+  /// "lean +25 %" false alarm on every E85 trip. Claims — the mix shown,
+  /// pricing, `tankFuelKey` — keep reading the guaranteed minimums.
+  final double? plausibleMaxEthanolShare;
 
   /// Nothing about the tank's content can be attributed.
   bool get isUnknown => shares.isEmpty;
