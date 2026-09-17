@@ -20,56 +20,52 @@ WebSite: https://github.com/fdittgen-png/tankstellen
 SourceCode: https://github.com/fdittgen-png/tankstellen
 IssueTracker: https://github.com/fdittgen-png/tankstellen/issues
 Name: Sparkilo
-Summary: Find the cheapest fuel and EV charging nearby and cut driving costs
+Summary: Compare fuel prices, find EV chargers and track what driving costs you
 Description: |-
-  Sparkilo compares real-time fuel and EV-charging prices and helps you spend
-  less to run your car: pay less per litre, burn less per kilometre, and keep a
-  clear record of what you actually spend. It is free, ad-free, needs no account
-  and is privacy-first: API keys go only to the service they belong to, search
-  coordinates only to the official price source of the country you are in, and
-  recorded GPS trips leave the device only if you switch on the optional
-  TankSync trip sync. The interface is available in 23 languages.
+  Sparkilo compares fuel prices near you or along your route and helps you spend
+  less to run your car: pay less per litre, see what every kilometre costs, and
+  keep a clear record of what you actually spend. It is free, ad-free, open
+  source and needs no account. The interface is available in 23 languages.
 
-  Prices come from each country's official open-data source, not from
-  crowdsourcing, covering Austria, Argentina, Australia, Chile, Denmark, France,
-  Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South
-  Korea, Spain and the United Kingdom, plus EV charging worldwide via Open Charge
-  Map.
+  Prices come from government open data, or from retailer feeds where no
+  national source exists, and every result names its source:
+
+  * Station prices: Austria, France, Germany (free Tankerkönig API key required), Italy, Mexico, Portugal, Slovenia, Spain and the United Kingdom.
+  * Denmark: OK, Shell and Q8 stations only.
+  * Luxembourg: the national regulated price, shown by city.
+  * Greece: regional average prices from official bulletins.
+
+  EV charging locations worldwide come from Open Charge Map, with the connector,
+  power and status information it reports.
 
   '''Find cheaper fuel'''
 
-  * Search nearby or along a route, filtered by fuel type, radius, open-now and amenities.
-  * Petrol, diesel, LPG, CNG, E85 and electric in one unified search and map.
-  * Price pins coloured cheapest-to-priciest; along a route the best-value stops are flagged.
-  * Per-station and radius price alerts, evaluated on the device and only when you are nearby.
-  * Favourites with full price rows, and EV chargers showing power, connectors and availability.
+  * Search nearby or along a route, filtered by fuel type, radius and, where the source provides them, opening hours and amenities.
+  * Route mode finds good stops inside your travel corridor, including across a border into another supported country.
+  * Per-station and radius price alerts, checked in the background on your device.
+  * Favourites with full price rows, and EV chargers showing power and connectors.
 
-  '''Burn less per kilometre'''
+  '''Understand your running costs'''
 
-  * Connect any ELM327-compatible OBD-II adapter for live eco-coaching.
-  * Per-trip driving score, throttle and RPM histograms, and hard-acceleration insights.
-  * Hands-free trip logbook over OBD-II or GPS only, with each route coloured by efficiency.
-
-  '''See what you spend'''
-
-  * Consumption tracker: average L/100 km, cost per kilometre, total spent and fill-up history.
-  * Built-in fuel-cost calculator and a CO2 dashboard broken down by trip length and speed band.
-  * Approach overlay, a home-screen widget, and spoken price announcements while you drive.
+  * Consumption tracking: tank level and range, average L/100 km, cost per kilometre, total spent and fill-up history.
+  * Record trips with GPS alone or with a compatible OBD-II (ELM327) adapter; GPS-only figures are estimates calibrated against your fill-ups.
+  * Fuel-cost calculator and a CO2 dashboard broken down by trip length and speed band.
+  * Closest-station view while recording a trip, a home-screen widget, and spoken price announcements.
 
   '''Privacy'''
 
-  GDPR-compliant: export everything as one ZIP and delete everything in-app, no
-  trackers, EU-hosted optional sync. A Privacy Dashboard lets you view, export
-  or delete all of your data at any time, and every consent can be revoked
-  under Settings. Optional TankSync synchronises favourites, vehicles, fill-ups
-  and alerts to a server you control, or to the Sparkilo Community database
-  hosted in the EU. Privacy policy (v3):
+  Your records are stored on the device. A search sends its location to the
+  price source for that country, and address, routing, charging and map
+  services receive what they need to answer; your Tankerkönig key goes only to
+  Tankerkönig. Recorded GPS trips leave the device only if you turn on the
+  optional TankSync trip sync. A Privacy Dashboard lets you export everything as
+  one ZIP, delete your data, and revoke every consent. Privacy policy (v3):
   https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
   '''About this F-Droid build'''
 
-  This is the fully free build, with no Google Play Services and no other
-  proprietary Google libraries. Maps use OpenStreetMap and positioning uses
-  Android's location manager. Because the pump-display, receipt and barcode
-  scanners rely on Google ML Kit, scanning is not available in this build — add
-  fill-ups by hand instead. Every other feature works as described.
+  This build leaves out Google Play Services, ML Kit and the Sentry SDK. Maps use
+  OpenStreetMap and positioning uses Android's location manager. Because
+  receipt and pump-display text recognition relies on Google ML Kit, it is not
+  available in this build — add fill-ups by hand instead. QR-code scanning uses
+  the open-source ZXing library.

@@ -1,40 +1,44 @@
 10 cêntimos de diferença por litro parecem pouco. Multiplique-os por um depósito cheio e depois por cada abastecimento do ano: é isso que vale mesmo escolher a bomba certa.
 
-O Sparkilo mostra-lhe qual a estação perto de si mais barata neste momento, a partir dos dados oficiais de preços de cada país. E depois ajuda-o a gastar menos do que abasteceu.
+O Sparkilo mostra-lhe qual a estação perto de si ou no seu percurso mais barata, a partir dos dados de preços de cada país. E depois ajuda-o a ver quanto custa realmente cada quilómetro.
 
-Grátis. Sem anúncios, sem conta, sem rastreio, código aberto.
+Grátis e de código aberto. Sem anúncios, sem rastreio, sem necessidade de conta.
 
-PORQUE PODE CONFIAR
-• Preços oficiais em dados abertos, país a país — não estimativas da comunidade que o mandam dar uma volta em vão.
-• Gasolina, gasóleo, GPL, GNC, E85 e carregamento elétrico num só mapa, numa só pesquisa.
-• Mais barato primeiro: os marcadores vão do mais barato ao mais caro e o vencedor tem um emblema Mais barato.
-• As chaves de API são enviadas apenas ao serviço a que pertencem, as coordenadas de pesquisa apenas à fonte oficial de preços do país onde está, e as viagens GPS gravadas só saem do seu dispositivo se ativar a sincronização de viagens do TankSync. Sem anúncios, sem conta, sem rastreio — e o código é público.
+DE ONDE VÊM OS PREÇOS
+• Dados abertos públicos na maioria dos países e dados das cadeias onde não existe fonte nacional — cada resultado indica a sua fonte.
+• Gasolina, gasóleo, GPL, GNC e E85 quando a fonte do país os publica, além de pontos de carregamento do Open Charge Map.
 
 POUPE NO PREÇO
-• Procure perto de si ou ao longo de todo o seu percurso. Filtre por combustível, raio, aberto agora, serviços e apenas autoestrada.
-• O modo percurso encontra a melhor paragem no seu corredor de viagem, para que o desvio compense sempre.
-• Alertas de preço, por estação ou por raio, calculados no seu dispositivo e disparados só quando o negócio está mesmo perto.
-• Os favoritos mostram todos os preços num relance; os carregadores indicam kW, conectores e disponibilidade em direto.
+• Procure perto de si ou ao longo do seu percurso. Filtre por combustível, raio e, quando a fonte os fornece, horários e serviços.
+• O modo percurso encontra boas paragens no seu corredor de viagem, também do outro lado da fronteira noutro país suportado.
+• Alertas de preço por estação ou dentro de um raio, verificados em segundo plano no seu dispositivo.
+• Os favoritos mostram todos os preços num relance; os carregadores indicam potência, conectores e o estado reportado pelo Open Charge Map.
 
 E DEPOIS NOS LITROS
-• Registo de consumo: nível e autonomia, média de L/100 km, custo por km, gasto total e histórico de abastecimentos com diferenças.
-• Registe os abastecimentos à mão ou digitalize o visor da bomba ou o talão com OCR.
-• O diário de bordo grava em mãos-livres através de um adaptador OBD2 ELM327, ou apenas por GPS, e colore o percurso conforme a eficiência.
-• O eco-coaching transforma os histogramas de acelerador e rotações em hábitos que consegue mesmo mudar, mês após mês.
+• Registo de consumo: nível e autonomia, média de L/100 km, custo por km, gasto total e histórico de abastecimentos.
+• Registe os abastecimentos à mão; a versão Google Play também lê o visor da bomba ou o talão com OCR no dispositivo.
+• Grave viagens só com GPS ou com um adaptador OBD2 compatível (ELM327) e veja o percurso colorido conforme a eficiência.
+• Com um adaptador, a análise do acelerador e das rotações mostra que hábitos de condução lhe custam combustível.
 • Painel de CO2: custo e CO2 discriminados por duração da viagem e escalão de velocidade.
+• Os valores só com GPS são estimativas, calibradas com os seus abastecimentos.
 
 AO VOLANTE
-• Sobreposição com o preço em direto da estação para onde se dirige.
-• Widget no ecrã principal, Android Auto e anúncios de voz com os preços.
-• As predefinições Básico, Médio e Completo mantêm a app tão simples ou tão completa quanto quiser. Suporta vários perfis de condutor.
+• Enquanto uma viagem está a ser gravada, a estação mais próxima e o seu preço ficam à vista à medida que se aproxima.
+• Widget no ecrã principal, anúncios de voz com os preços e, na versão Google Play, Android Auto.
+• As predefinições Básico, Médio e Completo mantêm a app tão simples ou tão completa quanto quiser.
 
-OS SEUS DADOS CONTINUAM SEUS
-• Painel de privacidade: ver, exportar ou apagar tudo, a qualquer momento.
-• O TankSync, opcional, sincroniza favoritos, veículos, abastecimentos e alertas para um servidor que controla — ou, se preferir, para a base de dados Sparkilo Community alojada na UE.
-• RGPD: sem rastreadores nem SDK de publicidade. Exporte tudo num único ZIP e apague tudo, no dispositivo e no servidor, diretamente na app. Cada consentimento pode ser revogado a qualquer momento. Política de privacidade: https://fdittgen-png.github.io/tankstellen/privacy-policy/
+PRIVACIDADE
+• Os seus registos são guardados no seu dispositivo. Uma pesquisa envia a sua localização à fonte de preços desse país, e os serviços de moradas, percursos, carregamento e mapas recebem o que precisam para responder. A sua chave Tankerkönig só é enviada à Tankerkönig.
+• As viagens GPS gravadas só saem do seu dispositivo se ativar a sincronização de viagens do TankSync.
+• O TankSync, opcional, sincroniza favoritos, veículos, abastecimentos e alertas para o seu próprio servidor ou para a base de dados Sparkilo Community alojada na UE.
+• Painel de privacidade: exporte tudo num único ZIP, apague os seus dados no dispositivo e no servidor e revogue qualquer consentimento a qualquer momento. Política de privacidade: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
-PAÍSES COM PREÇOS OFICIAIS EM DIRETO
-Áustria, Argentina, Austrália, Chile, Dinamarca, França, Alemanha, Grécia, Itália, Luxemburgo, México, Portugal, Roménia, Eslovénia, Coreia do Sul, Espanha e Reino Unido. Carregamento elétrico em todo o mundo através do Open Charge Map.
+PAÍSES
+• Preços por estação: Alemanha (requer uma chave API gratuita da Tankerkönig), Áustria, Eslovénia, Espanha, França, Itália, México, Portugal e Reino Unido.
+• Dinamarca: apenas estações OK, Shell e Q8.
+• Luxemburgo: o preço nacional regulado, mostrado por cidade.
+• Grécia: preços médios regionais dos boletins oficiais.
+Os combustíveis, os detalhes das estações e a frequência de atualização variam consoante o país. Carregamento elétrico em todo o mundo através do Open Charge Map.
 
 23 idiomas. Código aberto (MIT):
 https://github.com/fdittgen-png/tankstellen
