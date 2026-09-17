@@ -50,6 +50,18 @@ abstract class SyncTransport {
   Future<void> deleteWhere(String table, Map<String, Object> filters);
 }
 
+/// Thrown by [SupabaseSyncTransport] when the client it was opened on is
+/// no longer the live one (#4337): the Cloud Sync consent was withdrawn,
+/// or sync was disconnected or pointed elsewhere, while a pass held the
+/// transport. Nothing may reach the backend through it any more.
+class SyncFencedException implements Exception {
+  const SyncFencedException();
+
+  @override
+  String toString() => 'SyncFencedException: the sync client this pass '
+      'opened is no longer live';
+}
+
 /// The production [SyncTransport] over the live [TankSyncClient].
 class SupabaseSyncTransport implements SyncTransport {
   final SupabaseClient _client;
@@ -78,6 +90,7 @@ class SupabaseSyncTransport implements SyncTransport {
     String columns, {
     Map<String, Object> filters = const {},
   }) async {
+    _fence();
     var query = _client.from(table).select(columns).eq('user_id', userId);
     for (final filter in filters.entries) {
       query = query.eq(filter.key, filter.value);
@@ -91,15 +104,25 @@ class SupabaseSyncTransport implements SyncTransport {
     String table,
     List<JsonRow> rows, {
     required String onConflict,
-  }) =>
-      _client.from(table).upsert(rows, onConflict: onConflict);
+  }) async {
+    _fence();
+    await _client.from(table).upsert(rows, onConflict: onConflict);
+  }
 
   @override
-  Future<void> deleteWhere(String table, Map<String, Object> filters) {
+  Future<void> deleteWhere(String table, Map<String, Object> filters) async {
+    _fence();
     var query = _client.from(table).delete().eq('user_id', userId);
     for (final filter in filters.entries) {
       query = query.eq(filter.key, filter.value);
     }
-    return query;
+    await query;
+  }
+
+  /// #4337 — refuse to touch a client that is no longer the live one.
+  void _fence() {
+    if (!identical(TankSyncClient.client, _client)) {
+      throw const SyncFencedException();
+    }
   }
 }

@@ -5,7 +5,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../logging/app_log.dart';
-import '../storage/hive_storage.dart';
+import '../data/storage_repository.dart';
 import 'supabase_client.dart';
 import 'tanksync_session_gate.dart';
 
@@ -66,7 +66,7 @@ class TankSyncInit {
   /// working. All collaborators are injectable seams for the unit tests
   /// (`TankSyncClient` is a static global).
   static Future<TankSyncInitOutcome> run(
-    HiveStorage storage, {
+    StorageRepository storage, {
     Future<void> Function({required String url, required String anonKey})?
         init,
     String? Function()? sessionUserId,
@@ -93,7 +93,7 @@ class TankSyncInit {
   }
 
   static Future<TankSyncInitOutcome> _run(
-    HiveStorage storage, {
+    StorageRepository storage, {
     required Future<void> Function(
             {required String url, required String anonKey})
         init,

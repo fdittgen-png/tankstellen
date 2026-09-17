@@ -275,6 +275,17 @@ class TankSyncClient {
     );
   }
 
+  /// #4337 — the Cloud Sync consent was withdrawn: stop talking to the
+  /// backend now, locally. Auto-refresh stops and the client is released.
+  /// Nothing is signed out server-side and nothing is deleted; the
+  /// persisted session stays on the device, so granting the consent again
+  /// resumes the same identity instead of minting a new one.
+  static Future<void> releaseForConsentWithdrawal() async {
+    client?.auth.stopAutoRefresh();
+    await _release();
+    TankSyncSessionGate.instance.observe('client.consentWithdrawn');
+  }
+
   /// Get the current user's email (null for anonymous users).
   static String? get currentEmail => client?.auth.currentUser?.email;
 

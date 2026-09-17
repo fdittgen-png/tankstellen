@@ -48,11 +48,11 @@ class SyncState extends _$SyncState {
     final storage = ref.watch(storageRepositoryProvider);
     final modeStr = storage.getSetting('sync_mode') as String?;
     return SyncConfig(
-      // #3866 (Epic #3865) — the Cloud Sync CONSENT gates the whole sync
-      // path (coordinator, writers, helper): withdrawing it stops every
-      // upload, not only trips. `sync_enabled` alone is the wizard state.
-      enabled: (storage.getSetting('sync_enabled') as bool? ?? false) &&
-          ref.watch(gdprConsentProvider).cloudSync,
+      // #3866 — the Cloud Sync CONSENT gates the whole sync path. Watched
+      // FIRST (#4337): behind `sync_enabled &&` a launch with sync off never
+      // subscribed, so a withdrawal after an in-session setup changed nothing.
+      enabled: ref.watch(gdprConsentProvider).cloudSync &&
+          (storage.getSetting('sync_enabled') as bool? ?? false),
       supabaseUrl: storage.getSetting('supabase_url') as String?,
       supabaseAnonKey: storage.getSupabaseAnonKey(),
       userId: storage.getSetting('sync_user_id') as String?,
@@ -80,8 +80,8 @@ class SyncState extends _$SyncState {
 
     final storage = ref.read(storageRepositoryProvider);
     try {
-      await TankSyncClient.init(url: cleanUrl, anonKey: cleanKey);
-      final userId = await TankSyncClient.signInAnonymously();
+      final userId = await openConnectSession(storage, cleanUrl, cleanKey,
+          consented: ref.read(gdprConsentProvider).cloudSync);
 
       await storage.putSetting('sync_enabled', true);
       await storage.putSetting('supabase_url', cleanUrl);

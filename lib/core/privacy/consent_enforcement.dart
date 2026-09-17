@@ -23,6 +23,26 @@ class ConsentEnforcement {
   /// `true` starts it (when a DSN is configured). Null in tests / libre.
   static Future<void> Function(bool enabled)? errorReportingHook;
 
+  /// #4337 — installed by the launch sync wiring: `false` releases the
+  /// TankSync client locally (called BEFORE the withdrawal is written, so
+  /// no sync work sees the new consent with a live client), `true` resumes
+  /// the stored identity (called after the grant is written). Null in
+  /// tests that do not wire sync.
+  static Future<void> Function(bool enabled)? cloudSyncHook;
+
+  /// Fire the cloud-sync hook. Never throws — a failing client teardown
+  /// must not block the consent save.
+  static Future<void> notifyCloudSync(bool enabled) async {
+    final hook = cloudSyncHook;
+    if (hook == null) return;
+    try {
+      await hook(enabled);
+    } catch (e, st) {
+      log.warn('ConsentEnforcement: cloud-sync hook failed',
+          error: e, stack: st, layer: ErrorLayer.sync);
+    }
+  }
+
   /// Fire the error-reporting hook. Never throws — a failing SDK
   /// teardown must not block the consent save.
   static Future<void> notifyErrorReporting(bool enabled) async {

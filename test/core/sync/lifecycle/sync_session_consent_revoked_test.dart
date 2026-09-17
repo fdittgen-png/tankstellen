@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 /// #4162 — consent revoked: the Cloud Sync consent is withdrawn while a
-/// session is live, mid-pass, or before a setup (GDPR Art. 7(3), #3866).
+/// session is live, mid-pass, or before a setup (GDPR Art. 7(3), #3866),
+/// and granted again (#4337).
 library;
 
 import 'package:flutter_test/flutter_test.dart';
@@ -21,55 +22,62 @@ void main() {
   late SyncSession s;
   tearDown(() => s.dispose());
 
-  test('withdrawing consent after an in-session setup: pinned (#4337), '
-      '`enabled` stays true — the setup published its config by hand and '
-      'the provider never subscribed to the consent', () async {
+  /// Withdrawing must take the client down locally: no live client, no SDK
+  /// client, no refresh reaching the server — and the persisted session
+  /// kept, so granting again resumes the same identity.
+  Future<void> expectReleasedLocally() async {
+    expect(TankSyncClient.isInitialized, isFalse);
+    expect(TankSyncClient.sdkInitialized, isFalse);
+    expect(TankSyncClient.sessionUserId, isNull);
+    expect(s.backend.keychain, isNotEmpty,
+        reason: 'the session is released, not signed out');
+    s.backend.requests.clear();
+    await s.backend.autoRefreshTick();
+    expect(s.backend.requests, isEmpty,
+        reason: 'nothing may refresh against the backend after withdrawal');
+  }
+
+  test('withdrawing consent after an in-session setup: sync turns off and '
+      'the client is released locally (#4337)', () async {
     s = await SyncSession.start();
     await s.connectConsented();
     await s.setConsent(false);
 
-    // `SyncState.build` reads `sync_enabled && consent` — with sync still
-    // off at launch the `&&` short-circuits, the consent is never watched,
-    // and `connect` then sets its state without a rebuild.
-    expect(s.container.read(syncStateProvider).enabled, isTrue);
-    expect(TankSyncClient.sessionUserId, isNotNull);
-    s.backend.requests.clear();
-    await s.backend.autoRefreshTick();
-    expect(s.backend.requests.map((u) => u.path), contains('/auth/v1/token'));
-    expect(s.trace.saw(SessionInvariant.noCloudWithoutConsent), isTrue);
-    s.trace.expectLawful();
+    expect(s.container.read(syncStateProvider).enabled, isFalse,
+        reason: 'SyncState must follow the consent even when it was first '
+            'built with sync off');
+    await expectReleasedLocally();
+    expect(s.trace.last, TankSyncSessionPhase.consentWithdrawn);
+    s.trace.expectClean();
   });
 
-  test('withdrawing consent while ready after a launch: sync turns off for '
-      'the app, but pinned (#4337) the client stays signed in and '
-      'refreshing', () async {
+  test('withdrawing consent while ready after a launch: sync turns off and '
+      'the client is released locally (#4337)', () async {
     s = await SyncSession.start();
     await s.connectConsented();
     s = await s.relaunch(await s.capture());
     expect(s.trace.last, TankSyncSessionPhase.ready);
+    final project = s.backend.project(kHostA);
+    final writes = project.writes.length;
 
     await s.setConsent(false);
 
     expect(s.container.read(syncStateProvider).enabled, isFalse);
-    expect(TankSyncClient.sessionUserId, isNotNull);
-    expect(s.trace.saw(SessionInvariant.noCloudWithoutConsent), isTrue);
-    s.backend.requests.clear();
-    await s.backend.autoRefreshTick();
-    expect(s.backend.requests.map((u) => u.path), contains('/auth/v1/token'));
-    s.trace.expectLawful();
+    await expectReleasedLocally();
+    expect(project.writes.length, writes,
+        reason: 'withdrawal deletes nothing and uploads nothing');
+    s.trace.expectClean();
   });
 
-  test('withdrawing consent mid-pass: pinned (#4337), the pass goes on '
-      'writing and stamps completion', () async {
+  test('withdrawing consent mid-pass fences the pass: its upload is refused '
+      'and it does not stamp completion (#4337)', () async {
     final pull = GatedPull();
     s = await SyncSession.start(entries: [pull.entry()]);
     await s.connectConsented();
-    pull.body = () async {
-      final transport = SupabaseSyncTransport.currentOrNull();
-      await transport?.upsert('favorites', [
-        {'id': 'x', 'user_id': transport.userId},
-      ], onConflict: 'id');
-    };
+    final transport = SupabaseSyncTransport.currentOrNull()!;
+    pull.body = () => transport.upsert('favorites', [
+          {'id': 'x', 'user_id': transport.userId},
+        ], onConflict: 'id');
     final pass = SyncPullCoordinator.instance
         .pullAll(now: () => DateTime.utc(2026, 9, 16, 12));
     await pull.started.future;
@@ -80,29 +88,74 @@ void main() {
     pull.release.complete();
     await pass;
 
-    expect(project.writes.length, writesBefore + 1,
-        reason: 'the upload after the withdrawal reached the server');
-    expect(SyncPullCoordinator.instance.lastCompletedAt, isNotNull);
-    s.trace.expectLawful();
+    expect(project.writes.length, writesBefore,
+        reason: 'no upload may reach the server after the withdrawal');
+    expect(SyncPullCoordinator.instance.lastOutcome, SyncPassOutcome.fenced);
+    expect(SyncPullCoordinator.instance.lastCompletedAt, isNull);
+    s.trace.expectClean();
   });
 
-  test('"Set up cloud sync" with consent withdrawn: pinned (#4337), setup '
-      'mints a new identity over the stored one and uploads', () async {
+  test('"Set up cloud sync" with consent withdrawn is refused before any '
+      'network call, and the stored identity stays (#4337)', () async {
     s = await SyncSession.start();
     await s.connectConsented();
     final storedId = s.storage.getSetting('sync_user_id');
     await s.setConsent(false);
     s = await s.relaunch(await s.capture());
-    // The section offers setup: `enabled` folds the consent in.
     expect(s.container.read(syncStateProvider).isConfigured, isFalse);
 
-    await s.sync.connect(urlOf(kHostA), 'anon-key-$kHostA');
+    await expectLater(
+      s.sync.connect(urlOf(kHostA), 'anon-key-$kHostA'),
+      throwsA(isA<CloudSyncConsentRequired>()),
+    );
     await SyncSession.settle();
 
-    expect(s.storage.getSetting('sync_user_id'), isNot(storedId));
+    expect(s.backend.requests, isEmpty);
+    expect(s.storage.getSetting('sync_user_id'), storedId);
+    expect(s.container.read(syncStateProvider).enabled, isFalse);
+    s.trace.expectClean();
+  });
+
+  test('setup never mints a new identity over a stored one that has no '
+      'session (#4337)', () async {
+    s = await SyncSession.start();
+    await s.connectConsented();
+    final storedId = s.storage.getSetting('sync_user_id');
+    s = await s.relaunch((await s.capture()).withoutKeychain());
+    final accounts = s.backend.project(kHostA).refreshTokens.length;
+
+    await expectLater(
+      s.sync.connect(urlOf(kHostA), 'anon-key-$kHostA'),
+      throwsA(isA<StateError>()),
+    );
+    await SyncSession.settle();
+
+    expect(s.storage.getSetting('sync_user_id'), storedId);
+    expect(s.backend.project(kHostA).refreshTokens.length, accounts,
+        reason: 'no anonymous account was minted');
+  });
+
+  test('granting consent again in the same session resumes the stored '
+      'identity (#4337)', () async {
+    var pulls = 0;
+    s = await SyncSession.start(entries: [
+      SyncPullEntry(tables: const ['favorites'], pull: () async => ++pulls),
+    ]);
+    await s.connectConsented();
+    final storedId = s.storage.getSetting('sync_user_id');
+    await s.setConsent(false);
+    pulls = 0;
+
+    await s.setConsent(true);
+
+    expect(TankSyncClient.sessionUserId, storedId);
+    expect(s.storage.getSetting('sync_user_id'), storedId);
+    expect(s.backend.project(kHostA).refreshTokens.values.toSet(), {storedId},
+        reason: 'one identity, never a second one');
     expect(s.container.read(syncStateProvider).enabled, isTrue);
-    expect(s.trace.saw(SessionInvariant.noCloudWithoutConsent), isTrue);
-    s.trace.expectLawful();
+    expect(pulls, 1, reason: 'the resumed session pulls');
+    expect(s.trace.last, TankSyncSessionPhase.ready);
+    s.trace.expectClean();
   });
 
   test('a launch without consent builds no client', () async {
@@ -118,17 +171,19 @@ void main() {
     s.trace.expectClean();
   });
 
-  test('granting consent again after a consent-less launch: pinned, nothing '
-      'resumes until the next launch', () async {
+  test('granting consent again after a consent-less launch resumes the '
+      'stored identity without waiting for the next launch (#4337)',
+      () async {
     s = await SyncSession.start();
     await s.connectConsented();
+    final storedId = s.storage.getSetting('sync_user_id');
     await s.setConsent(false);
     s = await s.relaunch(await s.capture());
 
     await s.setConsent(true);
 
-    expect(TankSyncClient.isInitialized, isFalse);
-    expect(s.trace.last, TankSyncSessionPhase.configured);
+    expect(TankSyncClient.sessionUserId, storedId);
+    expect(s.trace.last, TankSyncSessionPhase.ready);
     s.trace.expectClean();
   });
 }

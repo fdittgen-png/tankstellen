@@ -35,6 +35,10 @@ enum SyncPassOutcome {
   /// Nothing is registered yet.
   skippedNothingRegistered,
 
+  /// The gate closed while the pass ran — consent withdrawn or sync
+  /// disconnected mid-pass (#4337). Not a completed pass.
+  fenced,
+
   /// The pass itself threw (a torn-down container behind the gate).
   failed,
 }
@@ -178,6 +182,12 @@ class SyncPullCoordinator {
       final authenticatedAtStart = _authenticated();
       final timedOut =
           await Future.wait(_entries.map((e) => _pullOne(e, trace)));
+      // #4337 — a gate that closed under the pass (consent withdrawn,
+      // disconnected) fenced it: not a completed pass, no stamp.
+      if (!_enabled()) {
+        _pass(SyncPassOutcome.fenced);
+        return;
+      }
       _lastCompletedAt = now();
       _pass(!authenticatedAtStart || !_authenticated()
           ? SyncPassOutcome.completedUnauthenticated

@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../sync/presentation/widgets/qr_share_widget.dart';
+import 'cloud_sync_consent_request.dart';
 import 'tank_sync_delete_data_tile.dart';
 import 'tank_sync_relink_tile.dart';
 import 'tank_sync_schema_outdated_tile.dart';
@@ -37,7 +38,7 @@ class TankSyncSection extends ConsumerWidget {
         child: Column(
           children: syncConfig.isConfigured
               ? _buildConnected(context, ref, syncConfig, theme)
-              : _buildDisconnected(context, AppLocalizations.of(context)),
+              : _buildDisconnected(context, ref, AppLocalizations.of(context)),
         ),
       ),
     );
@@ -133,7 +134,11 @@ class TankSyncSection extends ConsumerWidget {
     ];
   }
 
-  List<Widget> _buildDisconnected(BuildContext context, AppLocalizations l) {
+  List<Widget> _buildDisconnected(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l,
+  ) {
     return [
       ListTile(
         leading: const Icon(Icons.cloud_off),
@@ -143,12 +148,23 @@ class TankSyncSection extends ConsumerWidget {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: FilledButton.icon(
-          onPressed: () => context.push(RoutePaths.syncSetup),
+          onPressed: () => _startSetup(context, ref),
           icon: const Icon(Icons.cloud_upload),
           label: Text(l.setupCloudSync),
         ),
       ),
     ];
+  }
+
+  /// #4337 — the Cloud Sync consent comes first. Granting it back to a
+  /// configuration the withdrawal kept resumes that configuration (the
+  /// section switches to it); only a device with nothing set up goes on to
+  /// the setup screen.
+  Future<void> _startSetup(BuildContext context, WidgetRef ref) async {
+    if (!await requestCloudSyncConsent(context, ref)) return;
+    if (!context.mounted) return;
+    if (ref.read(syncStateProvider).isConfigured) return;
+    unawaited(context.push(RoutePaths.syncSetup));
   }
 
   Future<void> _confirmDisconnect(BuildContext context, WidgetRef ref) async {

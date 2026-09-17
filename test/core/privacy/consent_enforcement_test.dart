@@ -111,4 +111,26 @@ void main() {
           ConsentEnforcement.notifyErrorReporting(true), completes);
     });
   });
+
+  group('ConsentEnforcement.notifyCloudSync (#4337)', () {
+    tearDown(() => ConsentEnforcement.cloudSyncHook = null);
+
+    test('forwards the new value to the installed hook', () async {
+      final seen = <bool>[];
+      ConsentEnforcement.cloudSyncHook = (v) async => seen.add(v);
+      await ConsentEnforcement.notifyCloudSync(false);
+      await ConsentEnforcement.notifyCloudSync(true);
+      expect(seen, [false, true]);
+    });
+
+    test('never throws — a failing client teardown must not block the save',
+        () async {
+      ConsentEnforcement.cloudSyncHook = (_) async => throw StateError('sdk');
+      await expectLater(ConsentEnforcement.notifyCloudSync(false), completes);
+    });
+
+    test('no hook installed is a no-op', () async {
+      await expectLater(ConsentEnforcement.notifyCloudSync(true), completes);
+    });
+  });
 }

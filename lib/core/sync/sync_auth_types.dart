@@ -7,6 +7,8 @@
 /// re-exports this file, so existing imports keep resolving.
 library;
 
+export 'tanksync_connect.dart';
+
 /// Signature for a sync-merge that takes the device's local ids and
 /// returns the union (server ∪ local) — exactly the shape of
 /// `FavoritesSync.merge` / `IgnoredStationsSync.merge`. Injected as a

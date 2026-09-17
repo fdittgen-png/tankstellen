@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/data/storage_repository.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/perf/launch_sync_trace.dart';
-import '../../core/storage/hive_storage.dart';
+import '../../core/privacy/consent_enforcement.dart';
 import '../../core/sync/app_resume_sync.dart';
 import '../../core/sync/supabase_client.dart';
 import '../../core/sync/sync_config.dart';
@@ -98,6 +98,32 @@ class LaunchSyncPhase {
     );
     // #4162 — the session gate reads its facts from the same settings.
     TankSyncSessionGate.instance.bind(storage);
+    // #4337 — a consent change takes effect in-session: a withdrawal
+    // releases the client locally, a grant resumes the stored identity.
+    ConsentEnforcement.cloudSyncHook = (enabled) async {
+      if (!enabled) return TankSyncClient.releaseForConsentWithdrawal();
+      unawaited(_resumeAfterConsent(container, storage));
+    };
+  }
+
+  /// #4337 — the Cloud Sync consent was granted again: run the init now
+  /// instead of at the next launch. The stored identity resumes from the
+  /// session the withdrawal left on the device (or #3449 relink is raised),
+  /// and a ready client pulls. Fire-and-forget from the consent save.
+  static Future<void> _resumeAfterConsent(
+    ProviderContainer container,
+    StorageRepository storage,
+  ) async {
+    try {
+      await TankSyncInit.run(storage).timeout(const Duration(seconds: 8));
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'LaunchSyncPhase: resume after consent'}));
+    }
+    handleInitOutcome(container, storage);
+    if (TankSyncInit.lastOutcome != TankSyncInitOutcome.ready) return;
+    SyncRunTrace.begin('consent-granted');
+    await runLaunchPulls(container);
   }
 
   /// Replay the registered pull matrix (#3450: parallel, per-table
@@ -121,7 +147,7 @@ class LaunchSyncPhase {
   ///  * `ready` / `notConfigured` → nothing to do.
   static void handleInitOutcome(
     ProviderContainer container,
-    HiveStorage storage,
+    StorageRepository storage,
   ) {
     _observeSyncState(container);
     final outcome = TankSyncInit.lastOutcome;
