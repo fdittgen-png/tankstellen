@@ -14,6 +14,10 @@ import 'package:tankstellen/features/route_search/domain/entities/route_info.dar
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
 import 'package:tankstellen/features/search/providers/refuel_plan_provider.dart';
 import 'package:tankstellen/features/search/providers/search_filters_provider.dart';
+import 'package:tankstellen/features/search/providers/station_travel_estimates_provider.dart';
+import 'package:tankstellen/core/domain/travel_estimate.dart';
+import 'package:tankstellen/core/domain/refuel_plan.dart';
+import 'package:tankstellen/core/time/app_clock.dart';
 
 /// #4146 — the provider's job is assembly, and saying what is missing.
 ///
@@ -22,6 +26,8 @@ import 'package:tankstellen/features/search/providers/search_filters_provider.da
 /// range is the entire constraint the feature exists to respect, so a
 /// default capacity or an assumed tank level would invent the answer
 /// (economics spec §4.1).
+final _now = DateTime.utc(2026, 9, 16, 12);
+
 void main() {
   // Roughly 1° of latitude ≈ 111 km, so this route is ~444 km.
   final geometry = [
@@ -56,8 +62,10 @@ void main() {
     double? consumption = 10,
     double? capacity = 50,
     double? level = 50,
+    TravelEstimateFetcher? fetcher,
   }) =>
       ProviderContainer(overrides: [
+        appClockProvider.overrideWithValue(FixedClock(_now)),
         routeSearchStateProvider.overrideWith(() => _FixedRoute(route)),
         refuelProfileProvider.overrideWithValue(
           RefuelProfile(consumptionLPer100km: consumption),
@@ -68,6 +76,10 @@ void main() {
         // The real one reads the profile out of Hive; the fuel choice is
         // not what these tests are about.
         selectedFuelTypeProvider.overrideWith(() => _FixedFuel()),
+        // #4359 — no router in a unit test: every stop stays on its
+        // explicitly approximate projection unless a case says otherwise.
+        travelEstimateFetcherProvider
+            .overrideWithValue(fetcher ?? (context, stops) async => const []),
       ]);
 
   group('it names what is missing', () {
@@ -144,6 +156,49 @@ void main() {
           .toList();
       final sorted = [...positions]..sort();
       expect(positions, sorted);
+    });
+
+    test('#4359 — a routed exit/rejoin replaces the vertex projection, and '
+        'its routed minutes replace the average-speed guess', () async {
+      TravelContext? asked;
+      final c = container(
+        route: result(stations: [station('middle', 45.5, 1.60)]),
+        level: 20,
+        fetcher: (context, stops) async {
+          asked = context;
+          return [
+            for (final s in stops)
+              StationTravelEstimate.routed(
+                stationId: s.id,
+                context: context,
+                toStation: const TravelLeg(distanceKm: 170, durationMinutes: 120),
+                fromStation:
+                    const TravelLeg(distanceKm: 286, durationMinutes: 200),
+                // 444 km / 300 min direct → +12 km / +20 min via the stop.
+                baseline: const TravelLeg(distanceKm: 444, durationMinutes: 300),
+                calculatedAt: _now,
+              ),
+          ];
+        },
+      );
+      addTearDown(c.dispose);
+      final sub = c.listen(refuelPlanProvider, (_, _) {});
+      addTearDown(sub.close);
+
+      expect(c.read(refuelPlanProvider).plans!.cheapest!.detourTimeIsApproximate,
+          isTrue,
+          reason: 'before the router answers the detour is approximate');
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
+
+      expect(asked!.purpose, TravelPurpose.stopOnJourney);
+      final plan = c.read(refuelPlanProvider).plans!.cheapest!;
+      final stop = plan.stops.single.candidate;
+      expect(stop.roadExtraKm, closeTo(12, 1e-9));
+      expect(plan.detourKm, closeTo(12, 1e-9),
+          reason: 'the routed extra, not 2 × the vertex gap');
+      expect(plan.detourTimeIsApproximate, isFalse);
+      expect(plan.detourMinutes, closeTo(20 + kStopOverheadMinutes, 1e-9));
     });
 
     test('a tank that covers the route plans no stop at all', () {
