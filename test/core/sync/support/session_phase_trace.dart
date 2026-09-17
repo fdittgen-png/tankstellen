@@ -13,8 +13,6 @@ typedef SessionEdge = (TankSyncSessionPhase from, TankSyncSessionPhase to);
 /// [SessionEdge] or a [SessionInvariant], and each is a filed defect the
 /// fix removes:
 ///
-/// * [SessionInvariant.clientMatchesBackend] — #4336 (S1): after a
-///   disconnect, setting up a different backend keeps the old client;
 /// * [SessionInvariant.noCloudWithoutConsent] — #4337 (S2, S5): setup
 ///   without consent mints and uploads, and a withdrawal leaves the client
 ///   signed in and refreshing;
@@ -25,14 +23,13 @@ typedef SessionEdge = (TankSyncSessionPhase from, TankSyncSessionPhase to);
 /// size. Adding an entry to make a trace pass is exactly what the ceiling
 /// exists to refuse: fix the writer.
 const Set<Object> kKnownSessionAnomalies = {
-  SessionInvariant.clientMatchesBackend,
   SessionInvariant.noCloudWithoutConsent,
   (TankSyncSessionPhase.ready, TankSyncSessionPhase.sessionLost),
 };
 
 /// The size [kKnownSessionAnomalies] may never exceed. Lower it with every
 /// fix.
-const int kKnownSessionAnomaliesCeiling = 3;
+const int kKnownSessionAnomaliesCeiling = 2;
 
 /// Records every observation [TankSyncSessionGate.instance] makes.
 class SessionPhaseTrace {

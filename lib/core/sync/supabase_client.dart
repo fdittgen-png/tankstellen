@@ -63,8 +63,13 @@ class TankSyncClient {
   /// Base delay for exponential backoff between upsert retries.
   static const upsertRetryBaseDelay = Duration(milliseconds: 500);
 
-  /// Initialize the Supabase client. Safe to call multiple times — subsequent
-  /// calls are no-ops.
+  /// Initialize the Supabase client. Safe to call multiple times — a call
+  /// for the backend already live is a no-op.
+  ///
+  /// #4336 — a call for a DIFFERENT backend replaces the client. The SDK
+  /// skips a second `initialize` while its first client is live, so
+  /// without the release the app would keep talking to the old backend
+  /// while settings (and #4047's per-backend scoping) name the new one.
   static Future<void> init({
     required String url,
     required String anonKey,
@@ -76,17 +81,14 @@ class TankSyncClient {
     // Validate URL format + https enforcement (#3740).
     final uri = validateUrl(cleanUrl);
 
-    if (_initialized) {
-      // Already initialized — check if URL changed
-      // If same URL, skip. If different, we need to re-init.
-      // Supabase SDK doesn't support re-init, so just return
-      // (the existing client is still valid).
-      return;
-    }
+    final host = uri.host.toLowerCase();
+    if (_initialized && _sdk.host == host) return;
     // #3740 — the session key mirrors the SDK default
     // (`sb-<host-first-label>-auth-token`) so SecureSessionLocalStorage
     // can find — and wipe — a legacy plaintext session on first run.
-    _backendHost = uri.host.toLowerCase();
+    // A live SDK client for another backend would be kept by the SDK.
+    if (_sdk.isInitialized && _sdk.host != host) await _release();
+    _backendHost = host;
     await _sdk.initialize(
       url: cleanUrl,
       publishableKey: cleanKey,
@@ -109,7 +111,23 @@ class TankSyncClient {
   static String? get backendHost => _backendHost;
 
   /// The underlying Supabase client, or `null` if [init] has not been called.
-  static SupabaseClient? get client => _initialized ? _sdk.client : null;
+  ///
+  /// #4336 — also `null` when the SDK's live client is not the one for
+  /// [backendHost]: every write path treats that as "not connected"
+  /// rather than sending the user's data to a backend they did not pick.
+  static SupabaseClient? get client =>
+      _initialized && _sdk.isInitialized && _sdk.host == _backendHost
+          ? _sdk.client
+          : null;
+
+  /// #4336 — drop the client: the app flag, the backend and the SDK's own
+  /// client, so the next [init] builds one for whatever backend it names.
+  /// The persisted session stays where it is.
+  static Future<void> _release() async {
+    _initialized = false;
+    _backendHost = null;
+    await _sdk.dispose();
+  }
 
   /// #4162 — this client's own initialised flag (the SDK's can differ).
   static bool get isInitialized => _initialized;
@@ -248,7 +266,7 @@ class TankSyncClient {
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TankSync: sign-out after upsert failure also failed'});
     }
-    _initialized = false;
+    await _release();
     TankSyncSessionGate.instance.observe('client.publicUserFailed');
     throw StateError(
       'Failed to create public.users row after $maxUpsertRetries attempts. '
@@ -266,7 +284,8 @@ class TankSyncClient {
     return email != null && email.isNotEmpty;
   }
 
-  /// Sign out and reset the initialisation flag so [init] can be called again.
+  /// Sign out and release the client so [init] can be called again — for
+  /// this backend or another one (#4336).
   ///
   /// #3449 — safe to call while ALREADY signed out (the relink-required
   /// "start fresh" path runs `switchToAnonymous` on a sessionless client):
@@ -278,7 +297,7 @@ class TankSyncClient {
     if (c.auth.currentSession != null) {
       await c.auth.signOut();
     }
-    _initialized = false;
+    await _release();
     TankSyncSessionGate.instance.observe('client.signOut');
   }
 }
