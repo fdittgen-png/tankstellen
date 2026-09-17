@@ -124,6 +124,24 @@ void main() {
       );
     });
 
+    test('an unversioned figure says so instead of claiming model 1 (#4233)',
+        () {
+      // Legacy trips and the batch GPS estimator carry no version (ADR 0024
+      // §6): the contract must be able to state that.
+      const legacy = ConsumptionEstimate(
+        litresPer100Km:
+            DataValue<double>.estimated(5.5, basis: DataBasis.derived),
+        sourceClass: ConsumptionSourceClass.gpsOnly,
+      );
+      expect(legacy.version, isNull);
+      expect(
+        ConsumptionEstimate.unavailable(
+                reason: DataUnknownReason.notMeasuredYet)
+            .version,
+        isNull,
+      );
+    });
+
     test('mapping an unknown cannot launder it into a value', () {
       final gone = ConsumptionEstimate.unavailable(
         reason: DataUnknownReason.missingVehicleData,
