@@ -46,17 +46,6 @@ FuzzyConsumptionInput obd2LiveFuzzyContext(
   );
 }
 
-/// The pull-mode reader's context: only what that call itself read (RPM on
-/// the speed-density branch, at age 0) plus the static curb weight.
-FuzzyConsumptionInput obd2PullFuzzyContext(
-  VehicleProfile? vehicle, {
-  double? rpm,
-}) =>
-    FuzzyConsumptionInput(
-      rpm: rpm == null ? null : FuzzyReading(rpm),
-      vehicleMassKg: fuzzyVehicleMassOf(vehicle),
-    );
-
 /// The vehicle's curb weight as a static fuzzy reading, or null when the
 /// profile has none.
 FuzzyReading? fuzzyVehicleMassOf(VehicleProfile? vehicle) {
@@ -65,8 +54,8 @@ FuzzyReading? fuzzyVehicleMassOf(VehicleProfile? vehicle) {
 }
 
 /// The user profile's η_v when it should beat the engine-tech default, or
-/// null when the default should apply (#1422 phase 1). Shared by the live
-/// snapshot and the pull reader so the two can never disagree.
+/// null when the default should apply (#1422 phase 1). Read by the live
+/// snapshot, the only speed-density implementation since #4315.
 ///
 /// * No profile → null.
 /// * No reference catalog row to derive a better default from → the stored

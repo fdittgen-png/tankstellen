@@ -60,8 +60,11 @@ pass another.
 | `live_sample_snapshot_fuel_rate.dart` | MAF 0x66 / 0x10 | `estimatedFuelRateLPerHour(…, maf)` | speed, rpm, load, throttle, coolant, oil with their **real latch ages** (#4159 `SignalLatchStore.arrivedAt`); curb weight as mass |
 | same | speed-density | `…(…, speedDensity)` | same |
 | same | 9D / A2 / 5E | **never** — returned before the stage | — |
-| `obd2_fuel_rate_reader.dart` (pull mode) | MAF, speed-density | same functions | rpm read this call (age 0) on speed-density; curb weight |
 | `gps_live_fuel_estimator.dart` | road-load | `refinedFuelRateLPerHour(ṁ·3600, gpsRoadLoad)` | speed and the low-passed accel of this tick (age 0), grade only when confident, mass only when the vehicle supplied it |
+
+A pull-mode `obd2_fuel_rate_reader.dart` was wired the same way in #4233.
+It had no caller in `lib/` and was deleted in #4315 (see the amendment
+below).
 
 The GPS seam feeds everything built on `GpsLiveFuelEstimator`: the live
 folder, the no-fuel-PID OBD2 fallback and the `PhysicsScaleCalibrator`
@@ -89,10 +92,11 @@ The rules are neutral, so the fuzzy output **is** the shipped figure, bit
 for bit, for every sample: in range the engine returns its input, out of
 range the stage keeps the input. `consumption_identity_goldens_test.dart`
 captured float64 bit patterns of every stream **before** the wiring. That
-covers the live snapshot and the pull reader over an 18-case × 4-vehicle
-raw-frame matrix, the GPS estimator, folder, backfill, fallback and
-calibrator, and the recorder summary. The test stays green and unedited
-across every #4233 commit.
+covers the live snapshot over an 18-case × 4-vehicle raw-frame matrix, the
+GPS estimator, folder, backfill, fallback and calibrator, and the recorder
+summary. The test stays green and unedited across every #4233 commit. The
+pull reader's 72 entries were removed later, deliberately, with the reader
+itself (#4315); no other entry changed.
 
 This is why no legacy path is retired here. The gate is met because nothing
 moved, not because the fuzzy path was shown better. A fitted rule base must
@@ -208,6 +212,33 @@ memory:
   than refine `f` twice.
 - **Retirement** of the batch GPS estimator, the matrix and the physics
   scale is #4234, behind the gate.
+
+## Amendment (2026-09-16, #4315) — the live snapshot is the only speed-density implementation
+
+`Obd2FuelRateReader` / `Obd2Service.readFuelRateLPerHour` had no caller in
+`lib/` since #863. Its tests stayed green on behalf of a path no recorded
+trip ever took. It was also the only user of the #1625 η_v(rpm) curve and
+of the catalog displacement fallback. The live chain passes a flat η_v and
+falls back to 1000 cc.
+
+The maintainer chose deletion over porting the curve into the live branch:
+porting would change fuel figures for speed-density-only cars, and that
+belongs behind Epic #4222's validation gate. So:
+
+- `LiveSampleSnapshot.deriveFuelRateLPerHour` is the only fuel-rate and
+  speed-density implementation. Its figures did not change: every
+  `live/`, GPS and summary identity golden is byte-identical, and only the
+  72 `pull/` entries left the goldens.
+- The reader, its diagnostics collaborator, its fuzzy context, its read
+  port and the precision / mixture read primitives only it called were
+  deleted. The older typed reads (`readRpm`, `readMafGramsPerSecond`, …)
+  stay as the service's read API. The #1625 curve
+  (`etaVCurveFor`, `interpolateEtaV`, the estimator's `etaVCurve` parameter)
+  went with them.
+- The #1625 η_v curve may return later as an input to the fuzzy engine,
+  once #4231's replay corpus can show it improves the figure.
+- The chain assertions that ran through the reader now run through the live
+  snapshot (`live_sample_snapshot_fuel_chain_test.dart`).
 
 ## Alternatives Considered
 

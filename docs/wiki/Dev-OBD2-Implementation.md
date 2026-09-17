@@ -126,7 +126,7 @@ Each with a 100 ms gap (the profile can override via `initDelay`). Any non-OK re
 | `01 04` | Engine load % | `readEngineLoad()` |
 | `01 11` | Throttle position % | `readThrottlePercent()` |
 | `01 10` | MAF (g/s) | `readMafGramsPerSecond()` |
-| `01 5E` | Fuel rate (L/h) | `readFuelRateLPerHour()` (falls back to MAF-derived if unavailable) |
+| `01 5E` | Fuel rate (L/h) | subscribed by `LiveSampleSnapshot`; `deriveFuelRateLPerHour()` falls back to MAF, then speed-density (the only fuel-rate implementation since #4315) |
 | `01 2F` | Fuel tank level % | `readFuelLevelPercent()` |
 | `01 A6` | Odometer (km) | `readOdometerKm()` — primary |
 | `01 31` | Distance since DTC clear | fallback |

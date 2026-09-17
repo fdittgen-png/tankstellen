@@ -28,7 +28,7 @@ void main() {
 
   for (final stream in const [
     'live/', // LiveSampleSnapshot.deriveFuelRateLPerHour
-    'pull/', // Obd2FuelRateReader.read
+    // 'pull/' (Obd2FuelRateReader.read) left with the dead reader, #4315.
     'gps/', // GpsLiveFuelEstimator.onSample
     'folder/', // GpsLiveEstimateFolder.fold
     'backfill/', // backfillGpsTripFuel

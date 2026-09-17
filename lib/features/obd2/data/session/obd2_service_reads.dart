@@ -9,10 +9,6 @@ part of 'obd2_service.dart';
 /// decomposition — move-only, behaviour preserved): every `read*`
 /// method plus the shared `_readDouble` parse/probation funnel.
 mixin _Obd2ServiceReads on _Obd2ServiceLink {
-  /// Optional fuel-rate diagnostic breadcrumb collector (#1395) — the
-  /// class owns the field; the mixin reaches it through this getter.
-  Obd2BreadcrumbRecorder? get breadcrumbCollector;
-
   /// Read the odometer value in km.
   ///
   /// #3540 — the fallback chain (standard A6 → PID 31 proxy →
@@ -53,7 +49,6 @@ mixin _Obd2ServiceReads on _Obd2ServiceLink {
   }
 
   /// Read current engine RPM.
-  @override
   Future<double?> readRpm() async {
     if (!_transport.isConnected) return null;
 
@@ -114,31 +109,7 @@ mixin _Obd2ServiceReads on _Obd2ServiceLink {
         label: 'throttle',
       );
 
-  /// Read engine fuel rate in L/h (#717, #800, #3428).
-  ///
-  /// #3540 — the full fallback chain (mass PIDs 9D/A2 → direct 5E → MAF →
-  /// speed-density) plus the mixture/trim refinements live in
-  /// [Obd2FuelRateReader]; this stays the public API and hands the reader
-  /// the narrow [Obd2FuelRateReads] port this service implements. See the
-  /// reader's class doc for the precedence rules and error bars.
-  Future<double?> readFuelRateLPerHour({
-    VehicleProfile? vehicle,
-    ReferenceVehicle? referenceVehicle,
-  }) =>
-      Obd2FuelRateReader(reads: this, collector: breadcrumbCollector)
-          .read(vehicle: vehicle, referenceVehicle: referenceVehicle);
-
-  /// One direct PID 0x5E read (#3540 — the [Obd2FuelRateReads] port's
-  /// step-1 primitive; already post-trim on the ECU side).
-  @override
-  Future<double?> readDirectFuelRatePid5E() => _readDouble(
-        Elm327Protocol.engineFuelRateCommand,
-        Elm327Protocol.parseFuelRateLPerHour,
-        label: 'fuelRate',
-      );
-
   /// Read mass air flow in g/s. (#717)
-  @override
   Future<double?> readMafGramsPerSecond() => _readDouble(
         Elm327Protocol.mafCommand,
         Elm327Protocol.parseMafGramsPerSecond,
@@ -146,7 +117,6 @@ mixin _Obd2ServiceReads on _Obd2ServiceLink {
       );
 
   /// Read intake manifold absolute pressure (kPa). (#800)
-  @override
   Future<double?> readManifoldPressureKpa() => _readDouble(
         Elm327Protocol.intakeManifoldPressureCommand,
         Elm327Protocol.parseManifoldPressureKpa,
@@ -154,94 +124,14 @@ mixin _Obd2ServiceReads on _Obd2ServiceLink {
       );
 
   /// Read intake air temperature (°C). (#800)
-  @override
   Future<double?> readIntakeAirTempCelsius() => _readDouble(
         Elm327Protocol.intakeAirTempCommand,
         Elm327Protocol.parseIntakeAirTempCelsius,
         label: 'intakeAirTemp',
       );
 
-  /// Read absolute barometric pressure (kPa) via Mode 01 PID 0x33
-  /// (#2456). Feeds the speed-density air-density correction so altitude
-  /// / weather scale the air charge. Returns null when unsupported.
-  @override
-  Future<double?> readBaroPressureKpa() => _readDouble(
-        Elm327Protocol.baroPressureCommand,
-        Elm327Protocol.parseBaroPressureKpa,
-        label: 'baroPressure',
-      );
-
-  /// Read the commanded fuel–air equivalence ratio φ via Mode 01 PID
-  /// 0x44 (#2456; SAE convention verified #3426: φ > 1 rich, φ < 1
-  /// lean). φ ≈ 1.0 at stoich; replaces the assumed stoich AFR in the
-  /// MAF / speed-density fuel math via `effectiveAfrForPhi`. Returns
-  /// null when unsupported.
-  @override
-  Future<double?> readCommandedEquivalenceRatio() => _readDouble(
-        Elm327Protocol.commandedEquivalenceRatioCommand,
-        Elm327Protocol.parseCommandedEquivalenceRatio,
-        label: 'commandedEquivalenceRatio',
-      );
-
-  /// Read total MAF from the dual-sensor Mode 01 PID 0x66 (#3428).
-  /// Preferred over the legacy PID 0x10 when supported. Null when
-  /// unsupported / NO DATA.
-  @override
-  Future<double?> readMafSensorGramsPerSecond() => _readDouble(
-        Elm327PrecisionPids.mafSensorCommand,
-        Elm327PrecisionPids.parseMafSensorGramsPerSecond,
-        label: 'mafSensor',
-      );
-
-  /// Read the direct engine fuel rate in g/s via Mode 01 PID 0x9D
-  /// (#3428) — the top-precision mass-based branch (engine channel A/B
-  /// only; the C/D vehicle channel is ignored, see the parser).
-  @override
-  Future<double?> readEngineFuelRateGramsPerSecond() => _readDouble(
-        Elm327PrecisionPids.engineFuelRateGramsCommand,
-        Elm327PrecisionPids.parseEngineFuelRateGramsPerSecond,
-        label: 'engineFuelRateGrams',
-      );
-
-  /// Read the cylinder fuel rate in mg/stroke via Mode 01 PID 0xA2
-  /// (#3428). Needs RPM + cylinder count to become a mass flow.
-  @override
-  Future<double?> readCylinderFuelRateMgPerStroke() => _readDouble(
-        Elm327PrecisionPids.cylinderFuelRateCommand,
-        Elm327PrecisionPids.parseCylinderFuelRateMgPerStroke,
-        label: 'cylinderFuelRate',
-      );
-
-  /// Read the measured ethanol fuel percentage via Mode 01 PID 0x52
-  /// (#3429). Drives the dynamic petrol↔E85 AFR/density blend.
-  @override
-  Future<double?> readEthanolPercent() => _readDouble(
-        Elm327PrecisionPids.ethanolPercentCommand,
-        Elm327PrecisionPids.parseEthanolPercent,
-        label: 'ethanolPercent',
-      );
-
-  /// Read one MEASURED wideband equivalence ratio φ (#3427): the first
-  /// SUPPORTED sensor in bank-1-sensor-1-first order (0x24 / 0x34 lead
-  /// their families). At most one Bluetooth round-trip — only the first
-  /// supported PID is read; null when no wideband PID is supported or
-  /// the read returned NO DATA.
-  @override
-  Future<double?> readMeasuredPhi() async {
-    for (final pid in Elm327PrecisionPids.allWidebandPids) {
-      if (!isPidKnownSupported(pid)) continue;
-      return _readDouble(
-        Elm327PrecisionPids.widebandCommand(pid),
-        (raw) => Elm327PrecisionPids.parseEquivalenceRatioPhi(raw, pid),
-        label: 'measuredPhi',
-      );
-    }
-    return null;
-  }
-
   /// Read short-term fuel trim bank 1 (%) (#813). Fast-feedback loop
   /// correction; the ECU adjusts this constantly to hit stoich.
-  @override
   Future<double?> readShortTermFuelTrimPercent() => _readDouble(
         Elm327Protocol.shortTermFuelTrimCommand,
         Elm327Protocol.parseShortTermFuelTrim,
@@ -251,30 +141,10 @@ mixin _Obd2ServiceReads on _Obd2ServiceLink {
   /// Read long-term fuel trim bank 1 (%) (#813). Slow-drifting
   /// correction that captures persistent offsets — altitude, air
   /// filter state, injector wear.
-  @override
   Future<double?> readLongTermFuelTrimPercent() => _readDouble(
         Elm327Protocol.longTermFuelTrimCommand,
         Elm327Protocol.parseLongTermFuelTrim,
         label: 'longTermFuelTrim',
-      );
-
-  /// Read short-term fuel trim bank 2 (%) via Mode 01 PID 0x08 (#2458).
-  /// Only dual-bank (V / boxer) engines answer; inline engines return
-  /// null and the correction stays on bank 1 alone.
-  @override
-  Future<double?> readShortTermFuelTrimBank2Percent() => _readDouble(
-        Elm327Protocol.shortTermFuelTrimBank2Command,
-        Elm327Protocol.parseShortTermFuelTrimBank2,
-        label: 'shortTermFuelTrimBank2',
-      );
-
-  /// Read long-term fuel trim bank 2 (%) via Mode 01 PID 0x09 (#2458).
-  /// Same dual-bank semantics as [readShortTermFuelTrimBank2Percent].
-  @override
-  Future<double?> readLongTermFuelTrimBank2Percent() => _readDouble(
-        Elm327Protocol.longTermFuelTrimBank2Command,
-        Elm327Protocol.parseLongTermFuelTrimBank2,
-        label: 'longTermFuelTrimBank2',
       );
 
   /// Read absolute load value (%) via Mode 01 PID 0x43 (#2458). Exceeds

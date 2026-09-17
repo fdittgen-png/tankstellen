@@ -15,7 +15,7 @@ const Duration kObd2LivenessProbeTimeout = Duration(milliseconds: 1500);
 /// behaviour preserved): the protocol-session send funnel, the adapter
 /// identity/capability fields, the supported-PID surface, and the BLE
 /// link tuning hooks.
-mixin _Obd2ServiceLink implements Obd2RawCommandPort, Obd2FuelRateReads {
+mixin _Obd2ServiceLink implements Obd2RawCommandPort, Obd2PidSupport {
   /// The transport backing this service — the class owns the field; the
   /// mixin chain reaches it through this library-private getter.
   Obd2Transport get _transport;

@@ -4,10 +4,9 @@
 /// Fuel-mixture policy for the consumption-precision Epic #3416: the
 /// fuel-kind resolution + ethanol blend (#3429), the diesel-aware
 /// effective-AFR rule (#3430), the measured-φ preference (#3427) and the
-/// mass-based rate conversions (#3428). Pure math / policy — no I/O — so
-/// both fuel derivation paths ([LiveSampleSnapshot.deriveFuelRateLPerHour]
-/// and [Obd2Service.readFuelRateLPerHour]) call the SAME functions and can
-/// never disagree on a scalar.
+/// mass-based rate conversions (#3428). Pure math / policy — no I/O —
+/// called by [LiveSampleSnapshot.deriveFuelRateLPerHour], the only fuel
+/// derivation path since #4315.
 ///
 /// ## Diesel accuracy limits (#3430)
 ///

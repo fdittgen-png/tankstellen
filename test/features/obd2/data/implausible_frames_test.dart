@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tankstellen/features/obd2/data/obd2_breadcrumb_collector.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
 import 'package:tankstellen/features/obd2/data/obd2_session_diagnostic.dart';
 import 'package:tankstellen/features/obd2/data/protocol/elm327_mode22_parsers.dart';
@@ -213,12 +212,11 @@ void main() {
         ..enabled = false;
     });
 
-    test('service reads count into diagnostics, never into the breadcrumbs',
-        () async {
-      // A baseline sample, so a flag routed through `recordFlag` (which is a
-      // no-op on an empty buffer) WOULD raise the suspicious tally.
-      final breadcrumbs = Obd2BreadcrumbCollector()
-        ..record(branch: Obd2BranchTag.pid5E, fuelRateLPerHour: 4.2);
+    test('service reads count into diagnostics', () async {
+      // #4315 — this also proved the frames never reached the service's
+      // breadcrumb collector. The service no longer has one: its only
+      // reader was the deleted pull fuel-rate chain, so no breadcrumb sink
+      // is left for a service read to route a frame into.
       final service = Obd2Service(
         FakeObd2Transport({
           'ATZ': 'ELM327 v1.5>',
@@ -230,7 +228,6 @@ void main() {
           '01A6': '${_a6(0)}>',
           '0131': 'NO DATA>',
         }),
-        breadcrumbCollector: breadcrumbs,
       );
       await service.connect();
 
@@ -240,10 +237,6 @@ void main() {
       final snap = diag.snapshot();
       expect(snap.implausibleFrames, {'batteryVoltage': 1, 'odometer': 1});
       expect(snap.fuelDowngrade, const Obd2FuelDowngradeStats());
-      expect(breadcrumbs.entries.single.flag, isNull);
-      expect(breadcrumbs.snapshotAndResetCounters(),
-          (total: 1, suspicious: 0),
-          reason: 'the fuelRateSuspect ratio has nothing new to count');
     });
   });
 }

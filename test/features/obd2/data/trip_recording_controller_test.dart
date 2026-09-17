@@ -139,54 +139,26 @@ void main() {
 
     group('engine-param plumbing — #812 phase 3', () {
       test(
-          'accepts a VehicleProfile and feeds its engine fields into '
-          'readFuelRateLPerHour on every poll', () async {
-        // On a Peugeot 107-class setup (no PID 5E, no MAF; only
-        // MAP+IAT+RPM), the resulting fuel rate is directly
-        // proportional to displacement × η_v. Doubling displacement
-        // doubles the rate. Test the wire-up by running the chain
-        // with two different engine-size configurations and
-        // asserting the ratio matches the math.
-        Future<Obd2Service> peugeot107() async {
-          final t = FakeObd2Transport({
-            'ATZ': 'ELM327 v1.5>',
-            'ATE0': 'OK>',
-            'ATL0': 'OK>',
-            'ATH0': 'OK>',
-            'ATSP0': 'OK>',
-            '015E': 'NO DATA>',
-            '0110': 'NO DATA>',
-            '010B': '41 0B 50>', // MAP 80 kPa
-            '010F': '41 0F 41>', // IAT 25 °C
-            '010C': '41 0C 0E A6>', // RPM 939.5
-          });
-          final s = Obd2Service(t);
-          await s.connect();
-          return s;
-        }
-
-        // Service-level sanity: 2.0 L yields twice the fuel rate of
-        // 1.0 L at the same VE and operating point — passing two
-        // profiles that differ only in displacement.
-        final svc1 = await peugeot107();
-        final rate1L = await svc1.readFuelRateLPerHour(
-          vehicle: const VehicleProfile(
-            id: 'a',
-            name: '1.0L',
-            engineDisplacementCc: 1000,
-          ),
-        );
-        final svc2 = await peugeot107();
-        final rate2L = await svc2.readFuelRateLPerHour(
-          vehicle: const VehicleProfile(
-            id: 'b',
-            name: '2.0L',
-            engineDisplacementCc: 2000,
-          ),
-        );
-        expect(rate1L, isNotNull);
-        expect(rate2L, isNotNull);
-        expect(rate2L! / rate1L!, closeTo(2.0, 0.01));
+          'accepts a VehicleProfile — the constructor param is plumbed '
+          'through', () async {
+        // #4315 — this test also asserted, through the deleted pull
+        // reader, that 2.0 L yields twice the 1.0 L rate. That ratio now
+        // runs through the live snapshot the controller actually feeds:
+        // `live_sample_snapshot_fuel_chain_test.dart`.
+        final t = FakeObd2Transport({
+          'ATZ': 'ELM327 v1.5>',
+          'ATE0': 'OK>',
+          'ATL0': 'OK>',
+          'ATH0': 'OK>',
+          'ATSP0': 'OK>',
+          '015E': 'NO DATA>',
+          '0110': 'NO DATA>',
+          '010B': '41 0B 50>', // MAP 80 kPa
+          '010F': '41 0F 41>', // IAT 25 °C
+          '010C': '41 0C 0E A6>', // RPM 939.5
+        });
+        final svc1 = Obd2Service(t);
+        await svc1.connect();
 
         // Controller wire-up: the constructor param is plumbed
         // through. Not validated by running the poll loop (that

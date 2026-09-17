@@ -28,9 +28,10 @@
 /// device drive but the pins that landed before it — the exact
 /// resolved schedule and gate calls
 /// (`live_sample_snapshot_schedule_pin_test`), the measured-φ priority
-/// rule (`precision_pid_latches_test`), the fuel-rate reader's gate/read
-/// call log and the snapshot's read facade. A move that changes what a
-/// session subscribes, asks or derives turns one of those red.
+/// rule (`precision_pid_latches_test`) and the snapshot's read facade. A
+/// move that changes what a session subscribes, asks or derives turns one
+/// of those red. (The pull fuel-rate reader's gate/read call log pinned a
+/// reader with no caller; both were deleted in #4315.)
 ///
 /// ## What is deliberately NOT counted
 ///

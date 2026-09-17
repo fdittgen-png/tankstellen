@@ -53,10 +53,9 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       _lastFuelRateLPerHour, _lastFuelRateSource, at: _lastFuelRateAt);
 
   /// Derive the current fuel rate (L/h) from whatever snapshot
-  /// values have landed so far. Mirrors the fallback chain in
-  /// [Obd2Service.readFuelRateLPerHour], but over snapshot values
-  /// instead of live I/O — the scheduler has already done the
-  /// reads. Returns null when not enough inputs have arrived yet
+  /// values have landed so far — the scheduler has already done the
+  /// reads; since #4315 the only fuel-rate and speed-density
+  /// implementation. Returns null when not enough inputs have arrived yet
   /// (e.g. first 200 ms of a trip before MAP/IAT both land).
   ///
   /// Branch order (#3428): mass-based 0x9D / 0xA2 (density-only) →
@@ -83,10 +82,8 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     _lastFuelRateVe = null;
     // #1397 / #2432 / #3429 / #3430 — single fuel-type lookup (manual
     // override → measured-ethanol blend → session 0x51 key → fuel-key
-    // AFR/density → petrol default), mirroring
-    // [Obd2Service.readFuelRateLPerHour] so the live integrator and the
-    // pull-mode estimator agree on every scalar. With no 0x51 / 0x52
-    // signal this is byte-for-byte the old `resolveAfrDensity` result.
+    // AFR/density → petrol default). With no 0x51 / 0x52 signal this is
+    // byte-for-byte the old `resolveAfrDensity` result.
     final mixture = resolveMixtureConstants(
       _vehicle,
       sessionFuelTypeKey: sessionFuelTypeKey,
@@ -117,10 +114,9 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
             ?.round() ??
         _vehicle?.engineDisplacementCc ??
         1000;
-    // #1422 phase 1 — same precedence as Obd2Service.readFuelRateLPerHour:
-    // manual override → stored profile (when learned or non-default) →
-    // engine-tech helper on the reference catalog row → hard 0.85 fallback.
-    // Both paths must agree so live + pull-mode produce identical numbers.
+    // #1422 phase 1 — manual override → stored profile (when learned or
+    // non-default) → engine-tech helper on the reference catalog row →
+    // hard 0.85 fallback.
     final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
         profileVolumetricEfficiency(_vehicle,
             hasReferenceVehicle: _referenceVehicle != null) ??
@@ -202,11 +198,8 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // Step 1: direct PID 5E. Already post-trim, no correction.
     final direct = _latest(VehicleSignal.fuelRate);
     if (direct != null) {
-      // #1395 — sanity bound A: implausibly-low at non-idle RPM.
-      // Same threshold as Obd2Service.readFuelRateLPerHour but evaluated
-      // on the controller's most-recent RPM snapshot so this works
-      // even when the trip is being driven by raw scheduler callbacks
-      // rather than the readFuelRate API.
+      // #1395 — sanity bound A: implausibly-low at non-idle RPM,
+      // evaluated on the controller's most-recent RPM snapshot.
       String? lowFlag;
       String? lowDetail;
       final rpm = _latest(VehicleSignal.engineRpm);

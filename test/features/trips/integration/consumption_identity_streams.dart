@@ -7,7 +7,6 @@ import 'package:tankstellen/core/domain/gps_calibration_matrix.dart';
 import 'package:tankstellen/core/domain/pump_gain_entry.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/obd2/data/session/live_sample_snapshot.dart';
-import 'package:tankstellen/features/obd2/data/session/obd2_fuel_rate_reader.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
@@ -22,7 +21,7 @@ import 'package:tankstellen/features/trips/providers/gps_trip_fuel_backfill.dart
 /// The consumption streams the #4233 identity goldens pin (Epic #4222).
 ///
 /// Every figure a production producer emits today — the live OBD2
-/// snapshot, the pull-mode reader, the GPS road-load estimator and every
+/// snapshot, the GPS road-load estimator and every
 /// consumer of it (live folder, no-fuel-PID fallback, physics-scale
 /// replay, stop-time backfill) and the trip recorder's summary — driven
 /// by fixed, clock-free inputs and flattened to `label → value`, doubles
@@ -31,10 +30,12 @@ import 'package:tankstellen/features/trips/providers/gps_trip_fuel_backfill.dart
 ///
 /// Summary JSON drops the `cmv` key (#4233's version stamp): the stamp is
 /// new provenance, not a figure.
+///
+/// #4315 — the pull-mode reader's `pull/` stream left with the reader: it
+/// had no production caller, so it pinned a figure no trip ever recorded.
 Future<Map<String, String>> collectConsumptionFigures() async {
   final out = <String, String>{};
   _collectLiveSnapshot(out);
-  await _collectPullReader(out);
   _collectGpsEstimator(out);
   _collectGpsConsumers(out);
   _collectRecorder(out);
@@ -94,15 +95,12 @@ const _vehicles = {
 
 class _Case {
   const _Case(this.supported, this.frames,
-      {this.values = const {}, this.sessionFuelKey, this.iatAgeSeconds = 0});
+      {this.sessionFuelKey, this.iatAgeSeconds = 0});
 
   final Set<int> supported;
 
   /// Live path: request (trimmed) → response frame.
   final Map<String, String> frames;
-
-  /// Pull path: the reader's read name → decoded value.
-  final Map<String, double?> values;
   final String? sessionFuelKey;
   final int iatAgeSeconds;
 }
@@ -117,59 +115,40 @@ const _ctx = {
 };
 const _trims = {'0106': '41 06 8D', '0107': '41 07 70'}; // +10.2 %, −12.5 %
 const _sd = {'010B': '41 0B 64', '010F': '41 0F 3C'}; // 100 kPa, 20 °C
-const _trimValues = {'stft': 10.15625, 'ltft': -12.5};
-const _sdValues = {'map': 100.0, 'iat': 20.0, 'rpm': 2500.0};
 
 const _cases = <String, _Case>{
-  'pid9D': _Case({0x9D, 0x0C}, {..._rpm, '019D': '41 9D 01 F4 00 00'},
-      values: {'rate9d': 10.0}),
-  'pidA2': _Case({0xA2, 0x0C}, {..._rpm, '01A2': '41 A2 02 80'},
-      values: {'cylRate': 20.0, 'rpm': 2500.0}),
-  'pid5E': _Case({0x5E, 0x0C}, {..._rpm, '015E': '41 5E 00 C8'},
-      values: {'pid5e': 10.0}),
-  'maf10': _Case({0x10, 0x0C}, {..._rpm, '0110': '41 10 04 00'},
-      values: {'maf': 10.24}),
+  'pid9D': _Case({0x9D, 0x0C}, {..._rpm, '019D': '41 9D 01 F4 00 00'}),
+  'pidA2': _Case({0xA2, 0x0C}, {..._rpm, '01A2': '41 A2 02 80'}),
+  'pid5E': _Case({0x5E, 0x0C}, {..._rpm, '015E': '41 5E 00 C8'}),
+  'maf10': _Case({0x10, 0x0C}, {..._rpm, '0110': '41 10 04 00'}),
   'maf66': _Case({0x66, 0x10, 0x0C},
-      {..._rpm, '0166': '41 66 01 05 40', '0110': '41 10 04 00'},
-      values: {'maf66': 42.0, 'maf': 10.24}),
+      {..._rpm, '0166': '41 66 01 05 40', '0110': '41 10 04 00'}),
   'maf10Trims': _Case({0x10, 0x0C, 0x06, 0x07},
-      {..._rpm, '0110': '41 10 04 00', ..._trims},
-      values: {'maf': 10.24, ..._trimValues}),
+      {..._rpm, '0110': '41 10 04 00', ..._trims}),
   'maf10MeasuredPhi': _Case({0x10, 0x0C, 0x06, 0x07, 0x24},
-      {..._rpm, '0110': '41 10 04 00', ..._trims, '0124': '41 24 66 66 32 DD'},
-      values: {'maf': 10.24, ..._trimValues, 'measuredPhi': 0.8}),
+      {..._rpm, '0110': '41 10 04 00', ..._trims, '0124': '41 24 66 66 32 DD'}),
   'maf10CommandedPhi': _Case({0x10, 0x0C, 0x44},
-      {..._rpm, '0110': '41 10 04 00', '0144': '41 44 99 9A'},
-      values: {'maf': 10.24, 'commandedPhi': 1.2}),
-  'mafImplausible': _Case({0x10, 0x0C}, {..._rpm, '0110': '41 10 FF FF'},
-      values: {'maf': 655.35}),
-  'mafZero': _Case({0x10, 0x0C}, {..._rpm, '0110': '41 10 00 00'},
-      values: {'maf': 0.0}),
-  'speedDensity': _Case({0x0B, 0x0F, 0x0C}, {..._rpm, ..._sd},
-      values: _sdValues),
+      {..._rpm, '0110': '41 10 04 00', '0144': '41 44 99 9A'}),
+  'mafImplausible': _Case({0x10, 0x0C}, {..._rpm, '0110': '41 10 FF FF'}),
+  'mafZero': _Case({0x10, 0x0C}, {..._rpm, '0110': '41 10 00 00'}),
+  'speedDensity': _Case({0x0B, 0x0F, 0x0C}, {..._rpm, ..._sd}),
   'speedDensityFull': _Case(
       {0x0B, 0x0F, 0x0C, 0x06, 0x07, 0x33, 0x44, 0x0D, 0x04, 0x11, 0x05, 0x5C},
       {..._rpm, ..._sd, ..._trims, ..._ctx, '0133': '41 33 62',
-        '0144': '41 44 99 9A'},
-      values: {..._sdValues, ..._trimValues, 'baro': 98.0,
-        'commandedPhi': 1.2}),
+        '0144': '41 44 99 9A'}),
   'speedDensityIat5s': _Case({0x0B, 0x0F, 0x0C}, {..._rpm, ..._sd},
-      values: _sdValues, iatAgeSeconds: 5),
+      iatAgeSeconds: 5),
   'speedDensityIat20s': _Case({0x0B, 0x0F, 0x0C}, {..._rpm, ..._sd},
-      values: _sdValues, iatAgeSeconds: 20),
+      iatAgeSeconds: 20),
   'ethanol85': _Case({0x52, 0x10, 0x0C, 0x06, 0x07},
-      {..._rpm, '0152': '41 52 D9', '0110': '41 10 04 00', ..._trims},
-      values: {'ethanol': 85.1, 'maf': 10.24, ..._trimValues}),
+      {..._rpm, '0152': '41 52 D9', '0110': '41 10 04 00', ..._trims}),
   'ethanol20': _Case({0x52, 0x10, 0x0C, 0x06, 0x07},
-      {..._rpm, '0152': '41 52 33', '0110': '41 10 04 00', ..._trims},
-      values: {'ethanol': 20.0, 'maf': 10.24, ..._trimValues}),
+      {..._rpm, '0152': '41 52 33', '0110': '41 10 04 00', ..._trims}),
   'sessionDiesel': _Case({0x10, 0x0C, 0x06, 0x07, 0x44},
       {..._rpm, '0110': '41 10 04 00', ..._trims, '0144': '41 44 99 9A'},
-      values: {'maf': 10.24, ..._trimValues, 'commandedPhi': 1.2},
       sessionFuelKey: 'diesel'),
   'sessionE85SpeedDensity': _Case({0x0B, 0x0F, 0x0C, 0x06, 0x07},
-      {..._rpm, ..._sd, ..._trims},
-      values: {..._sdValues, ..._trimValues}, sessionFuelKey: 'e85'),
+      {..._rpm, ..._sd, ..._trims}, sessionFuelKey: 'e85'),
 };
 
 class _StubTransport implements Obd2Transport {
@@ -237,64 +216,6 @@ void _collectLiveSnapshot(Map<String, String> out) {
       out['$key/source'] = '${snapshot.lastFuelRateSource?.name}';
       out['$key/gain'] = bitsOf(snapshot.lastPumpGainResolution?.gain);
       out['$key/ve'] = bitsOf(snapshot.lastFuelRateVe);
-    }
-  }
-}
-
-class _ValueReads implements Obd2FuelRateReads {
-  _ValueReads(this.supported, this.values);
-
-  final Set<int> supported;
-  final Map<String, double?> values;
-
-  @override
-  bool isPidSupported(int pid) => supported.contains(pid);
-  @override
-  bool isPidKnownSupported(int pid) => supported.contains(pid);
-
-  Future<double?> _read(String name) async => values[name];
-
-  @override
-  Future<double?> readEthanolPercent() => _read('ethanol');
-  @override
-  Future<double?> readEngineFuelRateGramsPerSecond() => _read('rate9d');
-  @override
-  Future<double?> readCylinderFuelRateMgPerStroke() => _read('cylRate');
-  @override
-  Future<double?> readRpm() => _read('rpm');
-  @override
-  Future<double?> readMafSensorGramsPerSecond() => _read('maf66');
-  @override
-  Future<double?> readMafGramsPerSecond() => _read('maf');
-  @override
-  Future<double?> readMeasuredPhi() => _read('measuredPhi');
-  @override
-  Future<double?> readCommandedEquivalenceRatio() => _read('commandedPhi');
-  @override
-  Future<double?> readManifoldPressureKpa() => _read('map');
-  @override
-  Future<double?> readIntakeAirTempCelsius() => _read('iat');
-  @override
-  Future<double?> readBaroPressureKpa() => _read('baro');
-  @override
-  Future<double?> readShortTermFuelTrimPercent() => _read('stft');
-  @override
-  Future<double?> readLongTermFuelTrimPercent() => _read('ltft');
-  @override
-  Future<double?> readShortTermFuelTrimBank2Percent() => _read('stft2');
-  @override
-  Future<double?> readLongTermFuelTrimBank2Percent() => _read('ltft2');
-  @override
-  Future<double?> readDirectFuelRatePid5E() => _read('pid5e');
-}
-
-Future<void> _collectPullReader(Map<String, String> out) async {
-  for (final v in _vehicles.entries) {
-    for (final c in _cases.entries) {
-      final rate = await Obd2FuelRateReader(
-              reads: _ValueReads(c.value.supported, c.value.values))
-          .read(vehicle: v.value);
-      out['pull/${v.key}/${c.key}/rate'] = bitsOf(rate);
     }
   }
 }

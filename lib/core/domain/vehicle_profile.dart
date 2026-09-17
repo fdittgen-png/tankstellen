@@ -86,7 +86,7 @@ abstract class VehicleProfile with _$VehicleProfile {
 
     // Engine parameters for the speed-density fuel-rate fallback
     // (#812). Only populated when the VIN decoder or the user's
-    // manual onboarding entry provides them. `readFuelRateLPerHour`
+    // manual onboarding entry provides them. The live fuel-rate derivation
     // on a vehicle without these falls back to its generic 1.0 L /
     // η_v 0.85 defaults — still better than the NO DATA blanks the
     // Peugeot 107 class was producing before #810.

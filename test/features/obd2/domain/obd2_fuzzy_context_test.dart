@@ -10,9 +10,9 @@ import 'package:tankstellen/features/obd2/domain/signal_latch_store.dart';
 import 'package:tankstellen/features/obd2/domain/vehicle_signal.dart';
 
 /// #4233 — the OBD2 side of the fuzzy wiring: the context handed to the
-/// stage carries each latch's REAL age (#4159), the η_v profile rule both
-/// fuel-rate chains share, and — as a structural guard beside the identity
-/// goldens — that only the estimated branches call the stage.
+/// stage carries each latch's REAL age (#4159), the η_v profile rule, and —
+/// as a structural guard beside the identity goldens — that only the
+/// estimated branches call the stage.
 class _Clock {
   _Clock(this.now);
   DateTime now;
@@ -62,17 +62,7 @@ void main() {
     });
   });
 
-  test('obd2PullFuzzyContext: this call\'s rpm at age 0, plus the mass', () {
-    final ctx = obd2PullFuzzyContext(
-        const VehicleProfile(id: 'v', name: 'v', curbWeightKg: 900),
-        rpm: 1900);
-    expect(ctx.rpm?.value, 1900);
-    expect(ctx.rpm?.ageSeconds, 0);
-    expect(ctx.vehicleMassKg?.value, 900);
-    expect(obd2PullFuzzyContext(null).rpm, isNull);
-  });
-
-  group('profileVolumetricEfficiency (#1422, shared by both chains)', () {
+  group('profileVolumetricEfficiency (#1422)', () {
     const cold = VehicleProfile(id: 'v', name: 'v');
     test('no profile → null', () {
       expect(profileVolumetricEfficiency(null, hasReferenceVehicle: true),
@@ -103,7 +93,6 @@ void main() {
   group('only the estimated branches reach the stage (structural)', () {
     const snapshot =
         'lib/features/obd2/data/session/live_sample_snapshot_fuel_rate.dart';
-    const reader = 'lib/features/obd2/data/session/obd2_fuel_rate_reader.dart';
 
     /// Violations in [source]: the stage must be called exactly for MAF and
     /// speed-density, and never before the last measured-branch return.
@@ -125,9 +114,10 @@ void main() {
       return problems;
     }
 
+    // #4315 — the pull reader was the second case; it was deleted, so the
+    // live snapshot is the only producer to check.
     final cases = {
       snapshot: 'FuelRateSourceTag.pid5E;',
-      reader: 'return directRate;',
     };
 
     for (final c in cases.entries) {
