@@ -47,14 +47,21 @@ void main() {
   String? storedKey;
   PlatformException? readFault;
   PlatformException? writeFault;
+  // #4373 — every call, with the Android options it carried.
+  final calls = <(String, Map<Object?, Object?>)>[];
 
   void installKeystore({String? initial}) {
     storedKey = initial;
     keyWrites = 0;
     readFault = null;
     writeFault = null;
+    calls.clear();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
+      calls.add((
+        call.method,
+        (call.arguments as Map)['options'] as Map<Object?, Object?>
+      ));
       switch (call.method) {
         case 'read':
           if (readFault case final fault?) throw fault;
@@ -284,6 +291,34 @@ void main() {
         expect(snapshot(), before, reason: 'launch $n');
       }
       expect(keyWrites, 0);
+    });
+
+    test('a keystore read that fails ONCE deletes nothing and the next '
+        'launch opens the boxes (#4373)', () async {
+      // The plugin's Android default, resetOnError: true, answers a failed
+      // read by deleting the entry — the Hive key — and reporting "absent".
+      final key = Hive.generateSecureKey();
+      final box = await Hive.openBox<dynamic>(HiveBoxes.settings,
+          encryptionCipher: HiveAesCipher(key));
+      await box.put('theme', 'dark');
+      await box.close();
+      installKeystore(initial: base64UrlEncode(key));
+      readFault = PlatformException(code: 'keystore_busy');
+
+      await expectLater(launch(), throwsA(isA<StorageInitException>()),
+          reason: 'retryable, not "key lost" and not a minted key');
+      readFault = null;
+      await launch();
+
+      expect(Hive.box<dynamic>(HiveBoxes.settings).get('theme'), 'dark');
+      expect(keyWrites, 0);
+      expect(calls.map((c) => c.$1), isNot(anyOf(contains('delete'),
+          contains('deleteAll'))));
+      expect(calls, isNotEmpty);
+      for (final (method, options) in calls) {
+        expect(options['resetOnError'], 'false',
+            reason: '$method must not let the plugin delete on error');
+      }
     });
 
     test('a fresh install shows no key-loss screen: one key, and the next '

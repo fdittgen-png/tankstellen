@@ -9,6 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'github_issue_reporter.dart';
 import '../../core/logging/error_logger.dart';
+import '../storage/secure_storage_options.dart';
 
 part 'github_issue_reporter_provider.g.dart';
 
@@ -51,7 +52,8 @@ http.Client githubFeedbackHttpClient(Ref ref) {
 Future<GithubIssueReporter?> githubIssueReporter(Ref ref) async {
   String? token;
   try {
-    const storage = FlutterSecureStorage();
+    const storage =
+        FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions);
     token = await storage.read(key: kGithubFeedbackTokenKey);
   } catch (e, st) {
     // Secure storage can fail on some Android devices (keystore corruption,

@@ -10,6 +10,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../../core/feedback/github_issue_reporter_provider.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
+import '../../../../core/storage/secure_storage_options.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -27,7 +28,7 @@ import '../../../../l10n/app_localizations.dart';
 class FeedbackTokenSection extends ConsumerStatefulWidget {
   /// Test seam: lets widget tests inject a fake `FlutterSecureStorage`
   /// without touching the platform channel. Production code passes
-  /// `null` and the widget constructs `const FlutterSecureStorage()`.
+  /// `null` and the widget constructs the app-wide secure storage (#4373).
   @visibleForTesting
   final FlutterSecureStorage? storage;
 
@@ -43,7 +44,8 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
   bool _loading = true;
 
   FlutterSecureStorage get _storage =>
-      widget.storage ?? const FlutterSecureStorage();
+      widget.storage ??
+      const FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions);
 
   @override
   void initState() {

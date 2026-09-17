@@ -9,6 +9,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'hive_box_key_probe.dart';
 import 'impl/hive_directory_resolver.dart';
+import 'secure_storage_options.dart';
 
 /// Thrown when storage initialisation fails BEFORE the Hive boxes can
 /// even be opened — e.g. a `PlatformException` out of the
@@ -97,7 +98,8 @@ class HiveCipherLoader {
   /// minted either: that is a retryable [StorageInitException], never a
   /// guess that might authorise the truncating open.
   static Future<HiveAesCipher> _loadCipher() async {
-    const secureStorage = FlutterSecureStorage();
+    const secureStorage =
+        FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions);
     final existing = await secureStorage.read(key: _hiveEncryptionKeyName);
     final stored =
         existing == null ? null : HiveAesCipher(base64Url.decode(existing));
