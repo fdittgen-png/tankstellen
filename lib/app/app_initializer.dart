@@ -33,6 +33,7 @@ import '../core/perf/launch_sync_trace.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
 import '../core/storage/hive_boxes.dart';
+import '../core/storage/hive_deferred_user_boxes.dart';
 import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
@@ -100,17 +101,16 @@ class AppInitializer {
 
     final storage = HiveStorage();
 
-    // #1794/#1768 — post-first-frame storage work: deep-box opens
-    // (idempotent + cached; later post-frame readers await the same
-    // opens), #2264 bounded cache eviction (#3610 records the yield),
-    // the #2317 price-history retention trim, profile migrations.
+    // #1794/#1768 — post-frame storage work: deep-box opens (cached), #2264
+    // cache eviction (#3610), #2317 price-history trim, profile migrations.
     _deferPostFirstFrame(() async {
       unawaited(HiveBoxes.initDeferred());
       final evicted = await CacheManager(storage).evictBounded();
       if (evicted > 0) {
         healthCounters.increment('cache.evicted', by: evicted);
       }
-      await PriceHistoryRepository(storage).evictOldRecords();
+      await HiveDeferredUserBoxes.whenReadable(HiveBoxes.priceHistory,
+          PriceHistoryRepository(storage).evictOldRecords); // #4318
       await _migrateProfilesDeferred(storage);
     });
 

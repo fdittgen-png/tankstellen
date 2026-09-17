@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/services/widgets/service_status_banner.dart';
+import '../../../../core/storage/hive_boxes.dart';
+import '../../../../core/storage/hive_deferred_user_boxes.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/api.dart';
@@ -70,9 +72,13 @@ class StationDetailInline extends ConsumerWidget {
                     // (2026-08-17 review, dead-code finding 6) — mirrors
                     // the PriceHistoryFoldable gate on the standalone
                     // screen. Default-on.
+                    // #4318 — and only while the deferred box is readable,
+                    // as in PriceHistoryFoldable.
                     if (ref
-                        .watch(enabledFeaturesProvider)
-                        .contains(Feature.priceHistory)) ...[
+                            .watch(enabledFeaturesProvider)
+                            .contains(Feature.priceHistory) &&
+                        HiveDeferredUserBoxes.isReadable(
+                            HiveBoxes.priceHistory)) ...[
                       const SizedBox(height: 16),
                       PriceHistorySection(
                         stationId: stationId,

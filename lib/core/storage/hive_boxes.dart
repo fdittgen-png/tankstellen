@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../perf/startup_timer.dart';
 import 'hive_first_frame_boxes.dart';
 import 'hive_cipher_loader.dart';
+import 'hive_deferred_user_boxes.dart';
 import 'impl/hive_directory_resolver.dart';
 import 'hive_isolate_boxes.dart';
 import 'hive_isolate_ownership.dart';
@@ -240,6 +241,7 @@ class HiveBoxes {
     StartupTimer.instance.mark('hive_dir');
     final cipher = await HiveCipherLoader.loadGuarded();
     StartupTimer.instance.mark('hive_cipher');
+    HiveDeferredUserBoxes.arm(cipher); // #4318 — the deferred opens' key
 
     // #4118 — stop before the first open if this install has no key for
     // the boxes already on disk; see the guard for why "before" is the
@@ -302,9 +304,8 @@ class HiveBoxes {
         currentSchemaVersion: currentSchemaVersion,
       );
 
-  /// Test hook for the #2922 stamp + cache-eviction migration: drives the same
-  /// [_ensureSchemaVersions] path `init()` runs, against boxes the test has
-  /// already opened, without FlutterSecureStorage / `initFlutter` (#2922).
+  /// Test hook for the #2922 stamp + cache-eviction migration: drives the
+  /// `init()` path against already-opened boxes, without secure storage.
   @visibleForTesting
   static Future<void> ensureSchemaVersionsForTest() => _ensureSchemaVersions();
 
@@ -316,11 +317,9 @@ class HiveBoxes {
   }
 
   /// Opens the deep-feature boxes ([_deferredBoxes]) that the landing
-  /// screen does not need (#1794).
-  ///
-  /// Idempotent — the result is cached, so every post-first-frame
-  /// reader of a deferred box can `await HiveBoxes.initDeferred()` to
-  /// be sure its box is open without re-running the opens.
+  /// screen does not need (#1794), plus the #4318 deferred user-data boxes.
+  /// Idempotent — the result is cached; post-first-frame readers await
+  /// `HiveBoxes.initDeferred()` without re-running the opens.
   ///
   /// #3611 — the four trip boxes ([_encryptedDeferredBoxes]) open with
   /// the same AES cipher as the first-frame boxes, after a crash-safe
@@ -340,6 +339,7 @@ class HiveBoxes {
                 _encryptedDeferredBoxes.contains(name) ? cipher : null),
       // #4110 — dynamic, not String: it holds the JSON envelopes.
       Hive.openBox<dynamic>(datasets, encryptionCipher: cipher),
+      ...HiveDeferredUserBoxes.names.map(HiveDeferredUserBoxes.settled),
     ]);
     // #3882 — the deferred trip boxes carry a schema stamp too (the trip
     // history box changed its row layout to meta + columnar chunks; the
@@ -355,10 +355,8 @@ class HiveBoxes {
     }
   }
 
-  /// Initialize Hive in a background isolate with proper encryption.
-  /// #3689 — lives in [HiveIsolateBoxes]: background opens pin a
-  /// never-compact strategy so a BG isolate can't rename box files under
-  /// the foreground's open handles.
+  /// Initialize Hive in a background isolate with proper encryption. #3689 —
+  /// [HiveIsolateBoxes] pins never-compact so a BG isolate can't rename files.
   static Future<void> initInIsolate() => HiveIsolateBoxes.initInIsolate();
 
   /// Close the Hive boxes opened by [initInIsolate] (#2670 ownership guard

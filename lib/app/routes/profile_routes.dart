@@ -4,6 +4,7 @@
 import 'package:go_router/go_router.dart';
 
 import '../../core/navigation/app_routes.dart';
+import '../../core/widgets/deferred_user_boxes_gate.dart';
 import '../../features/itinerary/presentation/screens/itineraries_screen.dart';
 import '../../features/loyalty/presentation/loyalty_settings_screen.dart';
 import '../../features/profile/presentation/screens/developer_tools/developer_tools_screen.dart';
@@ -143,7 +144,9 @@ List<RouteBase> get profileRoutes => [
       ),
       GoRoute(
         path: RoutePaths.settingsPrivacy,
-        builder: (context, state) => const PrivacyDataScreen(),
+        // #4318 — its counts, export and erase read the deferred boxes.
+        builder: (context, state) =>
+            const DeferredUserBoxesGate(child: PrivacyDataScreen()),
       ),
       GoRoute(
         path: RoutePaths.settingsBackup,

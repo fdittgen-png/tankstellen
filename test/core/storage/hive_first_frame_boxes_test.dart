@@ -44,18 +44,7 @@ void main() {
     // is under test here is the batch, not the key.
     await HiveFirstFrameBoxes.openAll(null);
 
-    for (final box in [
-      HiveBoxes.settings,
-      HiveBoxes.profiles,
-      HiveBoxes.favorites,
-      HiveBoxes.cache,
-      HiveBoxes.priceHistory,
-      HiveBoxes.alerts,
-      HiveBoxes.isolateErrorSpool,
-      HiveBoxes.featureFlags,
-      HiveBoxes.appProfile,
-      HiveBoxes.boxSchema,
-    ]) {
+    for (final box in HiveFirstFrameBoxes.names) {
       expect(Hive.isBoxOpen(box), isTrue,
           reason: '$box gates the first frame and must be open once '
               'openAll returns');
@@ -67,7 +56,6 @@ void main() {
     // type Box<String>" the next time anyone asks for it, which is how 15
     // traces in one field export were produced.
     await HiveFirstFrameBoxes.openAll(null);
-    expect(() => Hive.box<String>(HiveBoxes.isolateErrorSpool), returnsNormally);
     expect(() => Hive.box<int>(HiveBoxes.boxSchema), returnsNormally);
     expect(() => Hive.box<dynamic>(HiveBoxes.settings), returnsNormally);
   });
@@ -91,5 +79,41 @@ void main() {
     // box must not turn the retry into a crash.
     await HiveFirstFrameBoxes.openAll(null);
     await expectLater(HiveFirstFrameBoxes.openAll(null), completes);
+  });
+
+  group('#4318 — the first-frame contract', () {
+    test('opens exactly the boxes the contract declares, each once', () async {
+      await HiveFirstFrameBoxes.openAll(null);
+      expect(HiveOpenTiming.openedBoxes, unorderedEquals(HiveFirstFrameBoxes.names));
+    });
+
+    test('every box names the initial-route consumer that needs it', () {
+      for (final box in HiveFirstFrameBoxes.contract) {
+        expect(box.consumer.trim(), isNotEmpty, reason: box.name);
+      }
+    });
+
+    test('priceHistory and the isolate error spool are NOT opened before '
+        'launch', () async {
+      await HiveFirstFrameBoxes.openAll(null);
+      expect(Hive.isBoxOpen(HiveBoxes.priceHistory), isFalse);
+      expect(Hive.isBoxOpen(HiveBoxes.isolateErrorSpool), isFalse);
+    });
+
+    test('each open is recorded with its phase, duration and entry count',
+        () async {
+      final seeded = await Hive.openBox<dynamic>(HiveBoxes.favorites);
+      await seeded.putAll({'a': 1, 'b': 2, 'c': 3});
+      await seeded.close();
+
+      await HiveFirstFrameBoxes.openAll(null);
+
+      final favorites = HiveOpenTiming.opens
+          .singleWhere((r) => r.name == HiveBoxes.favorites);
+      expect(favorites.phase, HiveOpenTiming.firstFramePhase);
+      expect(favorites.entries, 3);
+      expect(favorites.ms, greaterThanOrEqualTo(0));
+      expect(HiveOpenTiming.exportRows(), hasLength(HiveFirstFrameBoxes.names.length));
+    });
   });
 }

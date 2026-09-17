@@ -41,7 +41,11 @@ class StartupTraceExport {
   /// reported phases and left the reader to decide which of them the
   /// user felt; this one names the number and carries its budget and its
   /// definition beside it.
-  static const int schemaVersion = 4;
+  ///
+  /// v5 (#4318): adds `boxOpens` — every timed box open, first-frame and
+  /// deferred, with its duration and the number of values it loaded, so a
+  /// growing box shows up before it becomes the next #4110.
+  static const int schemaVersion = 5;
 
   /// The export-section key registered into the error-log export.
   static const String exportSectionKey = 'startupTrace';
@@ -85,6 +89,7 @@ class StartupTraceExport {
     required String appVersion,
     List<StartupSpan> spans = const [],
     (String, int)? slowestBoxOpen,
+    List<Map<String, Object?>> boxOpens = const [],
   }) {
     return {
       'schema': schemaVersion,
@@ -102,6 +107,7 @@ class StartupTraceExport {
       // to do. A phase list without its ceilings asks the reader to
       // remember what "slow" means.
       'budgets': perfBudgetExportRows(),
+      'boxOpens': boxOpens,
       // #4110 — omitted rather than null-filled when init has not run
       // (a test, or an export before storage came up): an absent field
       // is honest, a `{"name": null}` row invites a reader to conclude
@@ -124,6 +130,7 @@ class StartupTraceExport {
       appVersion: AppConstants.appVersion,
       spans: timer.spans,
       slowestBoxOpen: HiveOpenTiming.slowest,
+      boxOpens: HiveOpenTiming.exportRows(),
     );
     return const JsonEncoder.withIndent('  ').convert(doc);
   }
@@ -157,6 +164,7 @@ class StartupTraceExport {
           'phases': phases(StartupTimer.instance.milestones),
           'spans': spanMaps(StartupTimer.instance.spans),
           'kpi': StartupKpi.exportRow(),
+          'boxOpens': HiveOpenTiming.exportRows(),
           if (HiveOpenTiming.slowest case final slowest?)
             'slowestBoxOpen': {
               'box': slowest.$1,

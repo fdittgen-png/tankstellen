@@ -177,10 +177,28 @@ void main() {
     });
 
     test('the schema version moves with the field set', () {
-      expect(StartupTraceExport.schemaVersion, 4,
+      expect(StartupTraceExport.schemaVersion, 5,
           reason: 'a new export field is a schema bump, or a reader cannot '
               'tell an old export without the field from a new one whose '
-              'init never ran. v4 added the #4140 `kpi` section');
+              'init never ran. v4 added the #4140 `kpi` section, v5 the '
+              '#4318 `boxOpens` rows');
+    });
+
+    test('#4318 — every timed open travels with its duration and entries',
+        () {
+      final doc = StartupTraceExport.buildDocument(
+        milestones: const [],
+        totalMs: 900,
+        exportedAt: DateTime.utc(2026, 9, 16),
+        appVersion: '6.0.6',
+        boxOpens: const [
+          {'box': 'settings', 'phase': 'first_frame', 'durationMs': 3, 'entries': 40},
+          {'box': 'price_history', 'phase': 'deferred', 'durationMs': 90, 'entries': 7200},
+        ],
+      );
+      expect(doc['boxOpens'], hasLength(2));
+      expect((doc['boxOpens']! as List).last,
+          containsPair('entries', 7200));
     });
 
     test('it is OMITTED, not null-filled, when init has not run', () {

@@ -50,7 +50,7 @@ void main() {
       tmpDir.deleteSync(recursive: true);
     });
 
-    test('is exactly the ten boxes the budget was measured against',
+    test('is exactly the boxes the budget was measured against',
         () async {
       await HiveFirstFrameBoxes.openAll(null);
 
@@ -59,8 +59,8 @@ void main() {
         _firstFrameBoxBaseline,
         reason: 'The first-frame batch changed.\n\n'
             'Adding a box spends ${kHiveOpenBudget.limit} '
-            '${kHiveOpenBudget.unit} that were measured against the ten '
-            'below, and every millisecond it costs is a millisecond '
+            '${kHiveOpenBudget.unit} that were measured against the '
+            'set below, and every millisecond it costs is a millisecond '
             'before the user can read a price '
             '(${kColdStartBudget.limit} ${kColdStartBudget.unit}).\n\n'
             'If the box genuinely gates the first frame: add it here AND '
@@ -140,9 +140,10 @@ final Set<String> _firstFrameBoxBaseline = {
   HiveBoxes.profiles,
   HiveBoxes.favorites,
   HiveBoxes.cache,
-  HiveBoxes.priceHistory,
+  // #4318 — `priceHistory` left (HiveDeferredUserBoxes) and so did
+  // `isolateErrorSpool` (IsolateErrorSpool opens it lazily): a win, locked
+  // in. Each remaining box names its route consumer in the contract.
   HiveBoxes.alerts,
-  HiveBoxes.isolateErrorSpool,
   HiveBoxes.featureFlags,
   HiveBoxes.appProfile,
   HiveBoxes.boxSchema,

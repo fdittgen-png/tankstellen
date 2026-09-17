@@ -10,6 +10,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../core/navigation/app_routes.dart';
+import '../../../../../core/storage/hive_boxes.dart';
+import '../../../../../core/storage/hive_deferred_user_boxes.dart';
 import '../../../../../core/notifications/notification_providers.dart';
 import '../../../../../core/services/diagnostics/data_access_recorder_provider.dart';
 import '../../../../../core/services/diagnostics/data_access_trace_export.dart';
@@ -274,6 +276,8 @@ class DeveloperToolsScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final storageMgmt = ref.read(storageManagementProvider);
     await storageMgmt.clearCache();
+    // #4318 — the price-history box opens after the first frame.
+    await HiveDeferredUserBoxes.settled(HiveBoxes.priceHistory);
     await storageMgmt.clearPriceHistory();
     if (!context.mounted) return;
     SnackBarHelper.showSuccess(context, l.developerToolsCachesCleared);

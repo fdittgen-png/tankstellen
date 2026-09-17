@@ -6,6 +6,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'hive_boxes.dart';
 import 'hive_open_timing.dart';
 
+/// One box the first frame cannot be painted without: its name, the
+/// initial-route reader that makes it so, and how it is opened.
+typedef FirstFrameBox = ({
+  String name,
+  String consumer,
+  Future<Box<dynamic>> Function(HiveAesCipher? cipher) open,
+});
+
 /// The boxes the FIRST FRAME cannot be painted without, and how they are
 /// opened.
 ///
@@ -15,47 +23,92 @@ import 'hive_open_timing.dart';
 /// main isolate owns) is one concern, and "which subset gates the first
 /// frame, opened in parallel, each one timed" is another. The deferred
 /// set already lives apart for the same reason (#1794).
+///
+/// ## A contract, not a list (#4318)
+///
+/// Every box here names the initial-route consumer that reads it before
+/// or while the first useful screen renders — and
+/// `test/app/startup/first_frame_route_matrix_test.dart` RUNS those routes
+/// with only these boxes open. A box that cannot name one does not belong:
+/// `openBox` deserializes every value on the main isolate before the app
+/// can launch. #4318 moved `priceHistory` (to `HiveDeferredUserBoxes`) and
+/// the isolate error spool (opened lazily by `IsolateErrorSpool`) out.
 abstract final class HiveFirstFrameBoxes {
+  /// The verified first-frame storage contract (#4318).
+  static final List<FirstFrameBox> contract = [
+    (
+      name: HiveBoxes.settings,
+      consumer: 'router redirect — consent + setup gates; tile proxy and '
+          'Sentry consent read before runApp',
+      open: (c) => Hive.openBox(HiveBoxes.settings, encryptionCipher: c),
+    ),
+    (
+      name: HiveBoxes.profiles,
+      consumer: 'landing resolution (active profile landingScreen) and the '
+          '#555 default-profile seed',
+      open: (c) => Hive.openBox(HiveBoxes.profiles, encryptionCipher: c),
+    ),
+    (
+      name: HiveBoxes.favorites,
+      consumer: 'favorites landing — FavoriteStations.build lists the '
+          'stored stations synchronously; a closed box reads as empty',
+      open: (c) => Hive.openBox(HiveBoxes.favorites, encryptionCipher: c),
+    ),
+    (
+      name: HiveBoxes.cache,
+      consumer: 'search/map landing auto-search on the first post-frame '
+          'callback — the chain reads cache-first, a closed box is a silent '
+          'miss that turns cached prices into a network wait',
+      open: (c) => Hive.openBox(HiveBoxes.cache, encryptionCipher: c),
+    ),
+    (
+      name: HiveBoxes.alerts,
+      consumer: 'favorites landing on a wide/landscape screen renders '
+          'AlertsBody beside the list; the sync AlertNotifier reads it',
+      open: (c) => Hive.openBox(HiveBoxes.alerts, encryptionCipher: c),
+    ),
+    (
+      // #1373 — central feature-flag set: read during the first build.
+      name: HiveBoxes.featureFlags,
+      consumer: 'enabledFeaturesProvider during the first build',
+      open: (_) => Hive.openBox<dynamic>(HiveBoxes.featureFlags),
+    ),
+    (
+      // #1517 — active "use mode" profile: gates the first route.
+      name: HiveBoxes.appProfile,
+      consumer: 'use-mode profile that gates the onboarding route',
+      open: (_) => Hive.openBox<dynamic>(HiveBoxes.appProfile),
+    ),
+    (
+      // #1686 — schema-version meta box. Unencrypted: small integers.
+      name: HiveBoxes.boxSchema,
+      consumer: 'schema stamps + migration guard run before launch',
+      open: (_) => Hive.openBox<int>(HiveBoxes.boxSchema),
+    ),
+  ];
+
+  /// The box names in [contract].
+  static Set<String> get names => {for (final box in contract) box.name};
+
   /// Open every first-frame-critical box in one parallel batch.
   ///
   /// Each open is timed by [HiveOpenTiming] so the startup trace can name
   /// the long pole — the opens run concurrently, so the enclosing
   /// `hive_open` phase never could.
+  ///
+  /// #4116 — the timing call MUST name HiveOpenTiming explicitly. A bulk
+  /// rename once turned a local alias into `timed(n, open) => timed(n,
+  /// open)`, which recursed on every cold start inside the boxes the first
+  /// frame cannot be painted without, while 16,626 tests that read the
+  /// SOURCE TEXT passed. The batch is executed by its tests now.
   static Future<void> openAll(HiveAesCipher? cipher) async {
-    // #4110 — a local alias so each open stays on one line: the batch
-    // has to read as a batch, not as twenty lines of plumbing.
-    //
-    // #4116 — it MUST name HiveOpenTiming explicitly. A bulk rename that
-    // introduced this alias also rewrote its own body to `timed(n, open)`,
-    // so it recursed until the stack blew — on every cold start, inside
-    // the boxes the first frame cannot be painted without. The app never
-    // started, and 16,626 tests passed, because every test of this batch
-    // read the SOURCE TEXT instead of running it.
-    Future<Box<T>> timed<T>(String n, Future<Box<T>> Function() open) =>
-        HiveOpenTiming.timed(n, open);
-
-    // Phase 2 — open the first-frame-critical boxes in one parallel
-    // batch. #1686 — a box damaged beyond Hive's crash recovery throws
+    // Phase 2 — #1686: a box damaged beyond Hive's crash recovery throws
     // here; it is re-tagged as a HiveCorruptionException for the startup
     // error path rather than crashing on a raw HiveError.
     try {
       await Future.wait<Box<dynamic>>([
-        timed(HiveBoxes.settings, () => Hive.openBox(HiveBoxes.settings, encryptionCipher: cipher)),
-        timed(HiveBoxes.profiles, () => Hive.openBox(HiveBoxes.profiles, encryptionCipher: cipher)),
-        timed(HiveBoxes.favorites, () => Hive.openBox(HiveBoxes.favorites, encryptionCipher: cipher)),
-        timed(HiveBoxes.cache, () => Hive.openBox(HiveBoxes.cache, encryptionCipher: cipher)),
-        timed(HiveBoxes.priceHistory,
-            () => Hive.openBox(HiveBoxes.priceHistory, encryptionCipher: cipher)),
-        timed(HiveBoxes.alerts, () => Hive.openBox(HiveBoxes.alerts, encryptionCipher: cipher)),
-        // #1105 — isolate error spool: the background isolate writes
-        // here before Riverpod is available, so it must be open now.
-        timed(HiveBoxes.isolateErrorSpool, () => Hive.openBox<String>(HiveBoxes.isolateErrorSpool)),
-        // #1373 — central feature-flag set: read during the first build.
-        timed(HiveBoxes.featureFlags, () => Hive.openBox<dynamic>(HiveBoxes.featureFlags)),
-        // #1517 — active "use mode" profile: gates the first route.
-        timed(HiveBoxes.appProfile, () => Hive.openBox<dynamic>(HiveBoxes.appProfile)),
-        // #1686 — schema-version meta box. Unencrypted: small integers.
-        timed(HiveBoxes.boxSchema, () => Hive.openBox<int>(HiveBoxes.boxSchema)),
+        for (final box in contract)
+          HiveOpenTiming.timed(box.name, () => box.open(cipher)),
       ]);
       // HiveError is Hive's runtime storage-failure type, not a bug.
     } on HiveError catch (e, st) { // ignore: avoid_catching_errors
