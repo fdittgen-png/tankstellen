@@ -3,8 +3,12 @@
 
 import 'dart:math' as math;
 
+import 'package:meta/meta.dart';
+
 import '../../../../core/domain/gps_calibration_matrix.dart';
 import '../../../../core/domain/vehicle_profile.dart';
+import '../fuzzy_consumption/fuzzy_consumption_engine.dart';
+import '../fuzzy_consumption/fuzzy_fuel_rate_stage.dart';
 import '../vehicle_road_load_parameters.dart';
 import 'gps_fuel_estimator.dart';
 
@@ -65,6 +69,7 @@ class GpsLiveFuelEstimator {
     required this._idleLitersPerHour,
     required this._physicsScale,
     required this.parameters,
+    required this._engine,
   });
 
   // ─── Physical constants ───
@@ -97,6 +102,9 @@ class GpsLiveFuelEstimator {
   final double _engineEfficiency;
   final double _idleLitersPerHour;
   final double _physicsScale;
+
+  /// #4233 — always [kProductionFuzzyEngine] outside tests.
+  final FuzzyConsumptionEngine _engine;
 
   /// #4209 — the parameter set behind every figure, with its provenance,
   /// for the debug trace and the calibration.
@@ -148,9 +156,13 @@ class GpsLiveFuelEstimator {
 
   /// #4209 — an estimator over an explicit parameter set (sensitivity
   /// analysis, replay with a candidate parameter version).
+  ///
+  /// [engine] is a test seam only (#4233): production always runs
+  /// [kProductionFuzzyEngine].
   factory GpsLiveFuelEstimator.withParameters(
     VehicleRoadLoadParameters parameters, {
     double physicsScale = 1.0,
+    @visibleForTesting FuzzyConsumptionEngine engine = kProductionFuzzyEngine,
   }) =>
       GpsLiveFuelEstimator._(
         massKg: parameters.massKg,
@@ -162,6 +174,7 @@ class GpsLiveFuelEstimator {
         idleLitersPerHour: parameters.idleLitersPerHour,
         physicsScale: physicsScale,
         parameters: parameters,
+        engine: engine,
       );
 
   /// Fold one GPS sample into the estimate and return the new instant
@@ -205,7 +218,18 @@ class GpsLiveFuelEstimator {
     final tractiveLPerS =
         power / (_engineEfficiency * _lowerHeatingValueMjPerL * 1e6);
     final idleLPerS = _idleLitersPerHour / 3600.0;
-    final mdotLPerS = tractiveLPerS + idleLPerS;
+    final physicsLPerS = tractiveLPerS + idleLPerS;
+    // #4233 — through the fuzzy stage (no pump gain: ADR 0022 §2). Applied
+    // as "unchanged → the physics L/s itself" so the L/s ↔ L/h round trip
+    // can never move a bit.
+    final physicsLPerHour = physicsLPerS * 3600;
+    final refinedLPerHour = refinedFuelRateLPerHour(
+        physicsLPerHour, FuzzyPhysicsBasis.gpsRoadLoad,
+        context: _fuzzyContext(v, accel, gradeFraction, gradeConfident),
+        engine: _engine);
+    final mdotLPerS = refinedLPerHour == physicsLPerHour
+        ? physicsLPerS
+        : refinedLPerHour / 3600;
 
     // Integrate litres + distance.
     _litersSoFar += mdotLPerS * dtSeconds;
@@ -223,6 +247,22 @@ class GpsLiveFuelEstimator {
     }
     return _instantLPer100Km;
   }
+
+  /// #4233 — this tick's inputs as fuzzy context, all at age 0: speed, the
+  /// low-passed accel, the grade only when confident, and the mass only
+  /// when it is this vehicle's (a class-prior mass is not evidence).
+  FuzzyConsumptionInput _fuzzyContext(
+          double v, double accel, double gradeFraction, bool gradeConfident) =>
+      FuzzyConsumptionInput(
+        speedKmh: FuzzyReading(v * 3.6),
+        accelMps2: FuzzyReading(accel),
+        gradePercent:
+            gradeConfident ? FuzzyReading(gradeFraction * 100) : null,
+        vehicleMassKg:
+            parameters.massSource == RoadLoadParameterSource.vehicle
+                ? FuzzyReading(_massKg)
+                : null,
+      );
 
   /// Push [rawAccel] into the moving-average window and return the
   /// smoothed value (mean of the last up-to-[_accelWindow] samples).
