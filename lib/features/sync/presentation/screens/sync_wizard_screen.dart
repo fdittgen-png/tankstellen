@@ -16,6 +16,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/sync/schema_verifier.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/sync/tanksync_session_gate.dart';
 import '../../providers/sync_wizard_provider.dart';
 import '../widgets/anon_key_field.dart';
 import '../widgets/qr_scanner_screen.dart';
@@ -321,6 +322,7 @@ class _SyncWizardScreenState extends ConsumerState<SyncWizardScreen> {
         await settings.putSetting('supabase_url', url);
         await apiKeys.setSupabaseAnonKey(key);
         if (userId != null) await settings.putSetting('sync_user_id', userId);
+        TankSyncSessionGate.instance.observe('wizard.connect');
         if (mounted) ref.invalidate(syncStateProvider);
       } else {
         await syncNotifier.connect(url, key);

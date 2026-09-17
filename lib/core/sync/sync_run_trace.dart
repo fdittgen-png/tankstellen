@@ -72,6 +72,15 @@ class SyncRunTrace {
     debugPrint('SyncRunTrace: $tableName $detail');
   }
 
+  /// Report how a pull pass ended (#4162) — the outcome name of
+  /// `SyncPassOutcome`, under the current run id. A pass that ran without
+  /// a session reads `completedUnauthenticated` here instead of looking
+  /// like a healthy one.
+  static void pass(String outcome) {
+    BreadcrumbCollector.add('sync:pass',
+        detail: 'run=${_runId ?? 'untracked'} outcome=$outcome');
+  }
+
   /// Clear the current run id between tests.
   @visibleForTesting
   static void resetForTest() => _runId = null;

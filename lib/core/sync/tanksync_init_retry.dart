@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../logging/error_logger.dart';
 import '../logging/app_log.dart';
 import 'tanksync_init.dart';
+import 'tanksync_session_gate.dart';
 
 /// #3450 — background retries for a failed / timed-out TankSync launch
 /// init.
@@ -68,6 +69,7 @@ class TankSyncInitRetry {
     _onRelinkRequired = onRelinkRequired;
     _attemptsMade = 0;
     _scheduleNext();
+    TankSyncSessionGate.instance.observe('retry.arm');
   }
 
   /// App-resume hook (#3447/#3450): if a retry is pending, fire it NOW
@@ -130,6 +132,7 @@ class TankSyncInitRetry {
       _scheduleNext();
     } finally {
       _firing = false;
+      TankSyncSessionGate.instance.observe('retry.fire');
     }
   }
 }

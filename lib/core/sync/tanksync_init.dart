@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import '../logging/app_log.dart';
 import '../storage/hive_storage.dart';
 import 'supabase_client.dart';
+import 'tanksync_session_gate.dart';
 
 /// Terminal outcome of one [TankSyncInit.run] pass.
 enum TankSyncInitOutcome {
@@ -72,15 +73,23 @@ class TankSyncInit {
     Future<String?> Function()? signInAnonymously,
   }) async {
     lastOutcome = null;
-    final outcome = await _run(
-      storage,
-      init: init ?? _defaultInit,
-      sessionUserId:
-          sessionUserId ?? () => TankSyncClient.client?.auth.currentUser?.id,
-      signInAnonymously: signInAnonymously ?? TankSyncClient.signInAnonymously,
-    );
-    lastOutcome = outcome;
-    return outcome;
+    // #4162 — the session gate counts passes in flight.
+    TankSyncSessionGate.instance.initRunning(true, 'init.start');
+    try {
+      final outcome = await _run(
+        storage,
+        init: init ?? _defaultInit,
+        sessionUserId:
+            sessionUserId ?? () => TankSyncClient.client?.auth.currentUser?.id,
+        signInAnonymously:
+            signInAnonymously ?? TankSyncClient.signInAnonymously,
+      );
+      lastOutcome = outcome;
+      return outcome;
+    } finally {
+      TankSyncSessionGate.instance
+          .initRunning(false, 'init.${lastOutcome?.name ?? 'abandoned'}');
+    }
   }
 
   static Future<TankSyncInitOutcome> _run(

@@ -207,4 +207,68 @@ void main() {
     });
   });
 
+
+  group('#4162 — every pass records how it ended', () {
+    test('gate closed, nothing registered, already running', () async {
+      await coordinator.pullAll();
+      expect(coordinator.lastOutcome, SyncPassOutcome.skippedNothingRegistered);
+
+      coordinator.register(enabled: () => false, entries: [entry('a')]);
+      await coordinator.pullAll();
+      expect(coordinator.lastOutcome, SyncPassOutcome.skippedGateClosed);
+
+      final release = Completer<void>();
+      coordinator.register(enabled: () => true, entries: [
+        SyncPullEntry(tables: const ['slow'], pull: () async {
+          await release.future;
+          return 0;
+        }),
+      ]);
+      final first = coordinator.pullAll();
+      await coordinator.pullAll();
+      expect(coordinator.lastOutcome, SyncPassOutcome.skippedAlreadyRunning);
+      release.complete();
+      await first;
+      expect(coordinator.lastOutcome, SyncPassOutcome.completed);
+    });
+
+    test('a timed-out entry makes the pass completedWithTimeouts', () async {
+      coordinator.register(enabled: () => true, entries: [
+        entry('a'),
+        SyncPullEntry(
+          tables: const ['hung'],
+          timeout: const Duration(milliseconds: 10),
+          pull: () => Completer<int>().future,
+        ),
+      ]);
+      await coordinator.pullAll();
+      expect(coordinator.lastOutcome, SyncPassOutcome.completedWithTimeouts);
+    });
+
+    test('a pass without a session — at its start or its end — is '
+        'completedUnauthenticated', () async {
+      var session = false;
+      coordinator.register(
+        enabled: () => true,
+        entries: [entry('a', onDone: () => session = false)],
+        authenticated: () => session,
+      );
+      await coordinator.pullAll();
+      expect(coordinator.lastOutcome, SyncPassOutcome.completedUnauthenticated);
+
+      session = true;
+      await coordinator.pullAll();
+      expect(coordinator.lastOutcome, SyncPassOutcome.completedUnauthenticated,
+          reason: 'the session was lost during the pass');
+    });
+
+    test('a gate that throws records failed and still completes', () async {
+      coordinator.register(
+        enabled: () => throw StateError('container disposed'),
+        entries: [entry('a')],
+      );
+      await expectLater(coordinator.pullAll(), completes);
+      expect(coordinator.lastOutcome, SyncPassOutcome.failed);
+    });
+  });
 }

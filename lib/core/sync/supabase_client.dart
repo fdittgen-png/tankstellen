@@ -6,13 +6,29 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/logging/app_log.dart';
-import 'secure_session_storage.dart';
+import 'tanksync_sdk.dart';
+import 'tanksync_session_gate.dart';
 
 /// Thin wrapper around the Supabase Flutter SDK.
 ///
 /// Provides initialisation, anonymous auth, and a singleton accessor.
 class TankSyncClient {
   static bool _initialized = false;
+
+  /// #4162 — the SDK singleton behind this client, as a seam: a test
+  /// installs a fake backend that models it.
+  static TankSyncSdk _sdk = SupabaseFlutterSdk();
+
+  @visibleForTesting
+  static set debugSdk(TankSyncSdk sdk) => _sdk = sdk;
+
+  /// Forget the client and restore the production SDK — test isolation.
+  @visibleForTesting
+  static void resetForTest() {
+    _initialized = false;
+    _backendHost = null;
+    _sdk = SupabaseFlutterSdk();
+  }
 
   /// Hosts that may be reached over plain http — local dev / Android
   /// emulator loopback only (#3740). Everything else must be https so the
@@ -67,22 +83,19 @@ class TankSyncClient {
       // (the existing client is still valid).
       return;
     }
-    // #3740 — keep the persisted session (incl. the refresh token) in the
-    // platform keychain/keystore instead of the SDK's default plaintext
-    // SharedPreferences slot. The key mirrors the SDK default
+    // #3740 — the session key mirrors the SDK default
     // (`sb-<host-first-label>-auth-token`) so SecureSessionLocalStorage
     // can find — and wipe — a legacy plaintext session on first run.
     _backendHost = uri.host.toLowerCase();
-    await Supabase.initialize(
+    await _sdk.initialize(
       url: cleanUrl,
       publishableKey: cleanKey,
-      authOptions: FlutterAuthClientOptions(
-        localStorage: SecureSessionLocalStorage(
-          persistSessionKey: 'sb-${uri.host.split('.').first}-auth-token',
-        ),
-      ),
+      persistSessionKey: 'sb-${uri.host.split('.').first}-auth-token',
     );
     _initialized = true;
+    TankSyncSessionGate.instance
+      ..watchAuth(_sdk.client.auth.onAuthStateChange)
+      ..observe('client.init');
   }
 
   /// #4047 — host of the backend [init] connected to. Local sync state
@@ -96,8 +109,19 @@ class TankSyncClient {
   static String? get backendHost => _backendHost;
 
   /// The underlying Supabase client, or `null` if [init] has not been called.
-  static SupabaseClient? get client =>
-      _initialized ? Supabase.instance.client : null;
+  static SupabaseClient? get client => _initialized ? _sdk.client : null;
+
+  /// #4162 — this client's own initialised flag (the SDK's can differ).
+  static bool get isInitialized => _initialized;
+
+  /// #4162 — whether the SDK singleton holds a client.
+  static bool get sdkInitialized => _sdk.isInitialized;
+
+  /// #4162 — host the SDK's live client talks to, or null.
+  static String? get sdkHost => _sdk.isInitialized ? _sdk.host : null;
+
+  /// #4162 — the SDK's current user id, or null without a live session.
+  static String? get sessionUserId => client?.auth.currentUser?.id;
 
   /// Whether the client is initialised AND a user session exists.
   static bool get isConnected =>
@@ -225,6 +249,7 @@ class TankSyncClient {
       log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TankSync: sign-out after upsert failure also failed'});
     }
     _initialized = false;
+    TankSyncSessionGate.instance.observe('client.publicUserFailed');
     throw StateError(
       'Failed to create public.users row after $maxUpsertRetries attempts. '
       'Signed out to prevent inconsistent state. '
@@ -254,5 +279,6 @@ class TankSyncClient {
       await c.auth.signOut();
     }
     _initialized = false;
+    TankSyncSessionGate.instance.observe('client.signOut');
   }
 }
