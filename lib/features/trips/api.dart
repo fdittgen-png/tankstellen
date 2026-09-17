@@ -69,6 +69,9 @@ export 'domain/trip_summary.dart';
 export 'domain/trip_consumption_source_class.dart'; // #4230 / #4276
 export 'domain/trip_fuel_source.dart'; // #3919
 export 'domain/calibrated_trip_figures.dart'; // #3918
+// #4233 — the per-sample fuzzy stage every estimated fuel rate passes
+// through, and its one production engine (ADR 0024).
+export 'domain/fuzzy_consumption/fuzzy_fuel_rate_stage.dart';
 export 'presentation/screens/trajets_map_screen.dart';
 export 'presentation/screens/trip_detail_screen.dart';
 export 'presentation/screens/trip_recording_screen.dart';
