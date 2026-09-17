@@ -17,12 +17,10 @@ typedef PhaseEdge = (TripRecordingPhase from, TripRecordingPhase to);
 /// test fails if the set outgrows it. Adding an edge here to make a trace
 /// pass is exactly what the ceiling exists to refuse: fix the writer.
 const Set<PhaseEdge> kKnownIllegalEdges = {
-  // #4312 — pausing a drop pause publishes `paused`, hiding the banner.
-  (TripRecordingPhase.pausedDueToDrop, TripRecordingPhase.paused),
 };
 
 /// The size [kKnownIllegalEdges] may never exceed. Lower it with every fix.
-const int kKnownIllegalEdgesCeiling = 1;
+const int kKnownIllegalEdgesCeiling = 0;
 
 /// Records every phase change a [ProviderContainer]'s recording makes.
 class PhaseTrace {

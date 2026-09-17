@@ -371,7 +371,9 @@ void main() {
     // one publish funnel every state write now walks through.
     // #4311 — 1384 → 1382: the WAL's stopped-controller guard is a pure
     // controller read in active_snapshot_from_controller.dart.
-    'lib/features/trips/providers/trip_recording_provider.dart': 1382,
+    // C1 (#4162, fixed in the #4312 commit) — 1382 → 1381: startTrip's two
+    // identical needsPicker returns collapsed, paying for the new guard.
+    'lib/features/trips/providers/trip_recording_provider.dart': 1381,
     // #4037 — 1 032 across 5 files → 756 across 3: the pin/wake-lock
     // state became an owned collaborator and the body a plain widget.
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,

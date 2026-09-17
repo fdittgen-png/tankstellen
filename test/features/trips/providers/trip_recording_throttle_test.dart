@@ -11,6 +11,7 @@ library;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
 import '../../../helpers/silence_error_logger.dart';
@@ -73,6 +74,39 @@ void main() {
   });
 
   group('OBD2', () {
+    test('#4312 — the controller says whether its pause happened', () async {
+      final container = driver.container();
+      addTearDown(container.dispose);
+      final notifier = await RecordingSessionDriver.startObd2(container);
+      addTearDown(notifier.stop);
+      final ctl = notifier.debugController!;
+
+      expect(ctl.pause(), isTrue, reason: 'running → paused');
+      expect(ctl.pause(), isFalse, reason: 'already paused');
+      ctl.resume();
+      ctl.debugTriggerDrop(reason: TripDropReason.silentFailure);
+      expect(ctl.pause(), isFalse, reason: 'a drop pause is not the user\'s');
+    });
+
+    test('C1 — a hands-free start does not take over a manual start that is '
+        'still connecting', () async {
+      final container = driver.container();
+      addTearDown(container.dispose);
+      final notifier = container.read(tripRecordingProvider.notifier)
+        ..enterConnecting();
+      final auto = Obd2Service(SlowOdometerTransport());
+      await auto.connect();
+
+      final outcome =
+          await notifier.startTrip(service: auto, automatic: true);
+      addTearDown(notifier.stop);
+
+      expect(outcome, StartTripOutcome.alreadyActive,
+          reason: 'the user already asked for this recording');
+      expect(container.read(tripRecordingProvider).phase,
+          TripRecordingPhase.connecting);
+    });
+
     test('a silent link degrades onto GPS while GPS lives, pauses when not',
         () async {
       for (final gpsAlive in [true, false]) {
@@ -104,8 +138,8 @@ void main() {
       }
     });
 
-    test('pausing during a drop pause publishes paused (pinned — #4312)',
-        () async {
+    test('#4312 — pausing during a drop pause changes nothing: the banner '
+        'stays and the grace window keeps running', () async {
       final container = driver.container();
       addTearDown(container.dispose);
       final trace = PhaseTrace(container);
@@ -116,13 +150,25 @@ void main() {
           .debugTriggerDrop(reason: TripDropReason.silentFailure);
       await RecordingDisk.settle();
 
+      // The recording screen's toggle and the tile both read "not paused"
+      // off a drop pause and call pause().
       notifier.pause();
+      await RecordingDisk.settle();
 
-      expect(notifier.debugController!.isPausedDueToDrop, isTrue,
-          reason: 'the controller refused the pause');
+      final ctl = notifier.debugController!;
+      expect(ctl.isPausedDueToDrop, isTrue);
       expect(container.read(tripRecordingProvider).phase,
-          TripRecordingPhase.paused,
-          reason: '#4312: the provider published it anyway');
+          TripRecordingPhase.pausedDueToDrop,
+          reason: 'a refused pause must not publish paused — that hides the '
+              'drop banner while the grace timer runs on');
+      expect(trace.saw(TripRecordingPhase.pausedDueToDrop,
+          TripRecordingPhase.paused), isFalse);
+      // The grace window is still armed: expiring it finalises the trip.
+      await ctl.debugExpireGraceWindow();
+      await RecordingDisk.settle();
+      expect(container.read(tripRecordingProvider).phase,
+          TripRecordingPhase.finished);
+      expect(disk.historyRepo.loadAll(), hasLength(1));
       trace.expectLawful();
     });
 
