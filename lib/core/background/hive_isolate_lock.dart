@@ -1,59 +1,74 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-import 'dart:async';
-
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-import '../../core/logging/error_logger.dart';
 
-/// File-based lock to prevent concurrent Hive access from main and background
-/// isolates.
+import '../logging/app_log.dart';
+import '../logging/error_logger.dart';
+
+/// File-based lock that keeps background scans from opening the Hive boxes
+/// concurrently — across isolates of one process AND across processes.
 ///
 /// ## Why?
-/// Hive is not designed for multi-isolate access. When WorkManager runs a
-/// background task in a separate Dart isolate, both isolates may try to open
-/// the same Hive box files simultaneously, causing corruption or crashes.
+/// Hive is not designed for multi-isolate access. WorkManager runs each
+/// task in its own Dart isolate, a widget-refresh one-off can overlap the
+/// periodic run (different unique names), and an iOS BGAppRefresh can
+/// overlap an opportunistic or SLC wake. Two scans at once fetch twice,
+/// both read the notification budget before either writes it, and write
+/// the same boxes concurrently.
 ///
-/// ## How? (two complementary layers — #2300)
-/// 1. **In-process gate** — a static set of currently-held lock-file paths.
-///    POSIX `fcntl` advisory locks are *per process*, so a plain file lock
-///    cannot separate two acquirers inside the same OS process (the main and
-///    WorkManager isolates share one process). The in-memory gate makes
-///    `acquire()` mutually exclusive within an isolate: at most one caller can
-///    hold a given path at a time, the rest spin until the deadline.
-/// 2. **OS-level advisory file lock** — `RandomAccessFile.lockSync(
-///    FileLock.exclusive)` on `hive_bg.lock`. This is atomic across *separate
-///    processes* (e.g. a detached headless task) and survives crashes: the OS
-///    drops the lock when the owning process exits, so no stale lock can wedge
-///    a fresh acquirer.
+/// ## How (#4333)
 ///
-/// ### Why not check-then-create? (the bug this fixes)
-/// The previous implementation did a non-atomic
-/// `!existsSync()` → `writeAsStringSync()` → `existsSync()` dance. Two isolates
-/// firing near-simultaneously (e.g. the `priceRefresh` periodic scan and an
-/// opportunistic widget refresh) could *both* observe the file missing, *both* write it, and
-/// *both* return `true` — then open the same Hive boxes concurrently and
-/// corrupt them. The in-process gate closes that race; the file lock covers
-/// the cross-process case. (Belt-and-braces: WorkManager registration also
-/// serializes the periodic scan + an opportunistic widget refresh under one
-/// unique name — see `AndroidBackgroundPriceFetcher`.)
+/// **The claim is the file's existence.** [acquire] creates `hive_bg.lock`
+/// with `O_EXCL` (`createSync(exclusive: true)`): the kernel lets exactly
+/// one creator win, whichever isolate or process it runs in. The winner
+/// writes who it is — a timestamp, its `pid` and a random token — and
+/// [release] deletes the file only when that token is still its own.
 ///
-/// The main isolate does NOT acquire this lock — it owns the boxes permanently.
-/// Only background isolates use this lock to serialize their short-lived access.
+/// **An OS lock says whether a foreign owner is alive.** The winner also
+/// holds an exclusive `fcntl` lock on the file for as long as it holds the
+/// claim. The OS drops that lock when the owning process dies, so an
+/// acquirer that finds a claim written by ANOTHER pid probes it: a probe
+/// that gets the lock proves the owner process is gone, and the claim is
+/// reaped. A claim written by THIS pid belongs to another isolate of this
+/// process — a probe cannot tell anything there (fcntl locks are
+/// per-process), so it is reaped only past [sameProcessStaleAge], the
+/// window after which WorkManager stops any worker.
+///
+/// ### What this replaced (B3)
+/// A per-isolate static set of held paths plus the fcntl lock. Neither
+/// excludes a second isolate of the same process — the set is per isolate
+/// and fcntl locks are per process — and [release] deleted the file, so
+/// the next acquirer locked a different inode than a holder that was still
+/// running. `hive_isolate_lock_test.dart` proves exclusion with
+/// `Isolate.spawn` and a real foreign process.
+///
+/// ### Residual windows, stated
+/// * Reaping compares the claim's bytes just before deleting it; two
+///   acquirers reaping the same stale claim within those microseconds can
+///   still race. Only a crash leaves a stale claim, so this needs a crash
+///   AND two simultaneous wakes.
+/// * A foreign owner between creating its claim and taking the fcntl lock
+///   (microseconds) probes as dead.
+///
+/// The main isolate does NOT acquire this lock — it owns the boxes
+/// permanently. Background scans (and a foreground-isolate scan) use it to
+/// serialize their short-lived access.
 class HiveIsolateLock {
   static const _lockFileName = 'hive_bg.lock';
 
-  /// Lock-file paths currently held by *this isolate*. Guards against the
-  /// per-process blindness of POSIX advisory locks (see class doc, layer 1).
-  static final Set<String> _heldPaths = <String>{};
-
-  /// How long a lock file can exist before it is considered stale.
-  /// Background tasks typically complete in under 30 seconds. A lock older
-  /// than 2 minutes is almost certainly from a crashed isolate.
+  /// Age past which a claim whose owner cannot even be read (empty, or the
+  /// pre-#4333 format) is considered abandoned.
   static const staleLockAge = Duration(minutes: 2);
+
+  /// Age past which a claim written by THIS process — another isolate — is
+  /// considered abandoned. WorkManager stops a worker after ten minutes; an
+  /// isolate whose engine was destroyed never ran its `finally`.
+  static const sameProcessStaleAge = Duration(minutes: 10);
 
   /// Maximum time to wait for the lock before giving up.
   static const acquireTimeout = Duration(seconds: 30);
@@ -63,14 +78,17 @@ class HiveIsolateLock {
 
   final File _lockFile;
 
-  /// The clock every deadline and age is measured against (#4162). The wall
-  /// clock in production; a test drives it so a contention case does not
-  /// take the real [acquireTimeout].
+  /// The clock every deadline, owner stamp and age is measured against
+  /// (#4162). The wall clock in production; a test drives it so a
+  /// contention case does not take the real [acquireTimeout].
   final DateTime Function() _clock;
 
-  /// Open handle holding the exclusive OS lock while acquired. `null` when the
-  /// lock is not held by this instance.
+  /// Open handle holding the fcntl lock while this instance holds the
+  /// claim; `null` otherwise.
   RandomAccessFile? _handle;
+
+  /// This instance's token in the claim, while held.
+  String? _token;
 
   HiveIsolateLock._(this._lockFile, this._clock);
 
@@ -91,149 +109,169 @@ class HiveIsolateLock {
     return HiveIsolateLock._(lockFile, clock);
   }
 
-  /// Attempt to acquire the lock.
-  ///
-  /// Returns `true` if the lock was acquired, `false` if it timed out.
-  ///
-  /// Atomicity (#2300): opens the lock file and takes an exclusive OS-level
-  /// [FileLock]. The OS guarantees only one holder at a time, so two isolates
-  /// racing through `acquire()` can never both return `true`. A crashed holder
-  /// releases its lock when its process/isolate exits, so there is no stale
-  /// lock to time out — but we still sweep a stale *file* (one left behind by
-  /// the legacy implementation or an abnormal exit that orphaned the handle)
-  /// before opening, to keep the directory tidy.
+  static final Random _random = Random();
+
+  /// Attempt to acquire the lock, retrying every [retryDelay] until
+  /// [acquireTimeout]. Returns `true` if acquired, `false` if it timed out.
+  /// Re-entrant for the instance that already holds it.
   Future<bool> acquire() async {
-    if (_handle != null) {
-      // Already held by this instance — re-entrant acquire is a no-op success.
-      return true;
-    }
+    if (_handle != null) return true;
 
     final deadline = _clock().add(acquireTimeout);
-
     while (true) {
-      _sweepStaleFile();
-
-      final handle = _tryLock();
-      if (handle != null) {
-        _handle = handle;
-        _writeOwnerMetadata(handle);
-        debugPrint('HiveIsolateLock: acquired');
+      if (_tryClaim() || (_reapIfStale() && _tryClaim())) {
+        log.debug('acquired', tag: 'HiveIsolateLock');
         return true;
       }
-
       if (!_clock().isBefore(deadline)) break;
       await Future<void>.delayed(retryDelay);
     }
 
-    debugPrint('HiveIsolateLock: acquire timed out after ${acquireTimeout.inSeconds}s');
+    log.debug('acquire timed out after ${acquireTimeout.inSeconds}s',
+        tag: 'HiveIsolateLock');
     return false;
   }
 
-  /// Claim the in-process gate then open the lock file and attempt a
-  /// non-blocking exclusive OS lock.
-  ///
-  /// Returns the locked handle on success, or `null` when another holder owns
-  /// the path (in-process) or the exclusive lock (cross-process), so the caller
-  /// retries until the deadline. On any failure the in-process claim is
-  /// released so a retry can re-attempt cleanly.
-  RandomAccessFile? _tryLock() {
-    final path = _lockFile.path;
-    // Synchronous claim — Dart isolates are single-threaded, so the
-    // check-and-insert pair cannot interleave with another acquire.
-    if (_heldPaths.contains(path)) return null;
-    _heldPaths.add(path);
-
+  /// Create the claim atomically, take the fcntl lock, write the owner.
+  bool _tryClaim() {
+    try {
+      _lockFile.createSync(exclusive: true);
+    } on FileSystemException {
+      return false; // Claimed by someone — or its directory is missing.
+    }
     RandomAccessFile? handle;
     try {
       handle = _lockFile.openSync(mode: FileMode.write);
       handle.lockSync(FileLock.exclusive);
-      return handle;
-    } on FileSystemException {
-      // Lock contended by another *process* — release the in-process claim and
-      // signal retry.
-      _heldPaths.remove(path);
-      try {
-        handle?.closeSync();
-      } catch (_) {
-        // ignore: silent_catch — Best-effort close; nothing actionable if it fails.
-      }
-      return null;
-    } catch (e, st) {
-      _heldPaths.remove(path);
-      try {
-        handle?.closeSync();
-      } catch (_) {
-        // ignore: silent_catch — Best-effort close.
-      }
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: lock attempt failed, retrying'}));
-      return null;
-    }
-  }
-
-  /// Best-effort write of owner metadata (timestamp + pid) into the locked
-  /// file. Diagnostic only — the lock itself is the [FileLock], not the bytes.
-  void _writeOwnerMetadata(RandomAccessFile handle) {
-    try {
-      handle.setPositionSync(0);
-      handle.truncateSync(0);
-      handle.writeStringSync('${_clock().toIso8601String()}\npid:$pid');
+      final token = '$pid-${_random.nextInt(1 << 32)}-'
+          '${_clock().microsecondsSinceEpoch}';
+      handle.writeStringSync(
+          '${_clock().toUtc().toIso8601String()}\npid:$pid\ntoken:$token');
       handle.flushSync();
+      _handle = handle;
+      _token = token;
+      return true;
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: failed to write owner metadata'}));
+      // A prober of another process held the fcntl lock for an instant, or
+      // the write failed: give the claim back and retry.
+      log.warn('HiveIsolateLock: claim created but not taken, retrying',
+          error: e, stack: st, layer: ErrorLayer.background);
+      _closeQuietly(handle);
+      _deleteQuietly();
+      return false;
     }
   }
 
-  /// Delete a lock *file* that is older than [staleLockAge] and not currently
-  /// locked by anyone. Skips deletion when an exclusive lock attempt fails
-  /// (a live holder), so we never yank the file out from under an active task.
-  void _sweepStaleFile() {
-    if (!_lockFile.existsSync()) return;
+  /// Delete the existing claim when its owner is provably gone. Returns
+  /// whether the path is free to claim again.
+  bool _reapIfStale() {
     try {
-      final age = _clock().difference(_lockFile.lastModifiedSync());
-      if (age <= staleLockAge) return;
-      // Only delete if no one holds the lock — probe with a transient lock.
-      final probe = _tryLock();
-      if (probe == null) return; // Live holder; leave it alone.
-      try {
-        probe.unlockSync();
-        probe.closeSync();
-        _lockFile.deleteSync();
-        debugPrint('HiveIsolateLock: removed stale lock file (age: ${age.inSeconds}s)');
-      } finally {
-        // Drop the transient in-process claim the probe took.
-        _heldPaths.remove(_lockFile.path);
+      final owner = _readOwner();
+      if (owner == null) return true; // Released meanwhile.
+      final bool stale;
+      if (owner.pid == null) {
+        stale = _clock().difference(_lockFile.lastModifiedSync()) >
+            staleLockAge;
+      } else if (owner.pid != pid) {
+        stale = _foreignOwnerGone();
+      } else {
+        final since = owner.stamp ?? _lockFile.lastModifiedSync();
+        stale = _clock().difference(since) > sameProcessStaleAge;
       }
+      if (!stale) return false;
+      // Delete only the claim that was judged — not one created since.
+      if (_readOwner()?.raw != owner.raw) return false;
+      _lockFile.deleteSync();
+      log.debug('reaped an abandoned claim (pid ${owner.pid})',
+          tag: 'HiveIsolateLock');
+      return true;
+    } on FileSystemException {
+      return !_lockFile.existsSync();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: failed to remove stale lock'}));
+      log.warn('HiveIsolateLock: stale-claim check failed',
+          error: e, stack: st, layer: ErrorLayer.background);
+      return false;
     }
   }
 
-  /// Release the lock: unlock the OS lock, close the handle, and delete the
-  /// lock file. Safe to call when the lock is not held.
+  /// Whether the process that owns the claim has exited: its fcntl lock
+  /// would still be held otherwise.
+  bool _foreignOwnerGone() {
+    RandomAccessFile? probe;
+    try {
+      probe = _lockFile.openSync(mode: FileMode.append);
+      probe.lockSync(FileLock.exclusive);
+      probe.unlockSync();
+      return true;
+    } on FileSystemException {
+      return false;
+    } finally {
+      _closeQuietly(probe);
+    }
+  }
+
+  ({int? pid, String? token, DateTime? stamp, String raw})? _readOwner() {
+    if (!_lockFile.existsSync()) return null;
+    final raw = _lockFile.readAsStringSync();
+    final lines = raw.split('\n');
+    String? field(String name) {
+      for (final line in lines) {
+        if (line.startsWith('$name:')) return line.substring(name.length + 1);
+      }
+      return null;
+    }
+
+    return (
+      pid: int.tryParse(field('pid') ?? ''),
+      token: field('token'),
+      stamp: DateTime.tryParse(lines.first),
+      raw: raw,
+    );
+  }
+
+  /// Release the lock: delete the claim if it is still this instance's,
+  /// then drop the fcntl lock. Safe to call when the lock is not held —
+  /// it then touches nothing, least of all a claim someone else holds.
   void release() {
     final handle = _handle;
+    final token = _token;
     _handle = null;
-    if (handle != null) {
-      try {
-        handle.unlockSync();
-      } catch (_) {
-        // ignore: silent_catch — Best-effort unlock; closing the handle releases it anyway.
-      }
-      try {
-        handle.closeSync();
-      } catch (e, st) {
-        unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: failed to close handle'}));
-      }
-      // Release the in-process gate so another acquirer in this isolate can win.
-      _heldPaths.remove(_lockFile.path);
+    _token = null;
+    if (handle == null) return;
+    try {
+      // Deleted BEFORE the fcntl lock drops: a foreign prober can only see
+      // the lock free once the claim is already gone.
+      if (_readOwner()?.token == token) _lockFile.deleteSync();
+      log.debug('released', tag: 'HiveIsolateLock');
+    } catch (e, st) {
+      log.warn('HiveIsolateLock: release failed',
+          error: e, stack: st, layer: ErrorLayer.background);
     }
     try {
-      if (_lockFile.existsSync()) {
-        _lockFile.deleteSync();
-      }
-      debugPrint('HiveIsolateLock: released');
+      handle.unlockSync();
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: release failed'}));
+      // Closing the handle below releases the lock anyway.
+      log.warn('HiveIsolateLock: unlock failed',
+          error: e, stack: st, layer: ErrorLayer.background);
+    }
+    _closeQuietly(handle);
+  }
+
+  void _closeQuietly(RandomAccessFile? handle) {
+    try {
+      handle?.closeSync();
+    } catch (e, st) {
+      log.warn('HiveIsolateLock: failed to close handle',
+          error: e, stack: st, layer: ErrorLayer.background);
+    }
+  }
+
+  void _deleteQuietly() {
+    try {
+      if (_lockFile.existsSync()) _lockFile.deleteSync();
+    } catch (e, st) {
+      log.warn('HiveIsolateLock: failed to give a claim back',
+          error: e, stack: st, layer: ErrorLayer.background);
     }
   }
 

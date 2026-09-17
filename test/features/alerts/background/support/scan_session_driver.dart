@@ -46,7 +46,7 @@ class ScriptedScanBody implements ScanBody {
   ScriptedScanBody(
     this.at, {
     this.candidates = const [],
-    this.parkCollect,
+    this.park,
     this.throwIn,
     this.stations = 1,
   });
@@ -58,7 +58,7 @@ class ScriptedScanBody implements ScanBody {
 
   /// When set, [collect] waits for it — an iOS expiry or a WorkManager stop
   /// is a run that never gets past this.
-  final Future<void>? parkCollect;
+  final Park? park;
 
   /// The stage that throws, if any: 'collect', 'dispatch' or 'widgets'.
   final String? throwIn;
@@ -71,7 +71,11 @@ class ScriptedScanBody implements ScanBody {
   @override
   Future<void> collect() async {
     stages.add('collect');
-    if (parkCollect != null) await parkCollect;
+    final park = this.park;
+    if (park != null) {
+      park._reached.complete();
+      await park.future;
+    }
     if (throwIn == 'collect') throw StateError('collect failed');
   }
 
@@ -104,7 +108,11 @@ class ScriptedScanBody implements ScanBody {
 /// A completer-backed park: [future] until [release].
 class Park {
   final Completer<void> _c = Completer<void>();
+  final Completer<void> _reached = Completer<void>();
   Future<void> get future => _c.future;
+
+  /// Completes when a run has arrived at the park.
+  Future<void> get reached => _reached.future;
   void release() {
     if (!_c.isCompleted) _c.complete();
   }

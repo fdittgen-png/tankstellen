@@ -98,10 +98,10 @@ void main() {
     final park = Park();
     final holder = disk
         .coordinator(
-            body: (_, t) => ScriptedScanBody(t, parkCollect: park.future),
+            body: (_, t) => ScriptedScanBody(t, park: park),
             notifier: notifier)
         .scan(trigger: BackgroundScanTrigger.workManagerPeriodic, now: kScanT0);
-    await pumpEventQueue();
+    await park.reached;
 
     var t = DateTime.utc(2026, 9, 16);
     DateTime fast() => t = t.add(const Duration(seconds: 20));

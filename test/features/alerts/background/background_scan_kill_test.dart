@@ -18,9 +18,14 @@
 ///   export's "did scans run?" must not undercount killed runs.
 library;
 
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:tankstellen/core/background/background_scan_trigger.dart';
 import 'package:tankstellen/core/background/scan_run_phase.dart';
+import 'package:tankstellen/core/storage/hive_boxes.dart';
+import 'package:tankstellen/features/alerts/data/budget_state_store.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 import 'support/delivery_trace.dart';
@@ -28,8 +33,16 @@ import 'support/scan_disk_image.dart';
 import 'support/scan_phase_trace.dart';
 import 'support/scan_session_driver.dart';
 
-/// Where the kill lands: a phase edge, or right after the post.
-typedef KillPoint = ({ScanEdge? edge, bool afterPost});
+/// The reservation marker in the stored budget, read as raw JSON.
+Object? pendingReservationOnDisk() {
+  final raw =
+      Hive.box<dynamic>(HiveBoxes.alerts).get(BudgetStateStore.storageKey);
+  return raw is String ? (jsonDecode(raw) as Map)['pending'] : null;
+}
+
+/// Where the kill lands: a phase edge, right before the post, or right
+/// after it.
+typedef KillPoint = ({ScanEdge? edge, bool afterPost, bool beforePost});
 
 /// What a kill at one point, followed by a relaunch, did.
 typedef KillResult = ({
@@ -54,6 +67,7 @@ const List<ScanEdge> kNotifyingPath = [
 /// Kill points past which the run owes the journal a row.
 bool owesJournalRow(KillPoint k) =>
     k.afterPost ||
+    k.beforePost ||
     const {
       ScanRunPhase.collecting,
       ScanRunPhase.dispatching,
@@ -61,8 +75,11 @@ bool owesJournalRow(KillPoint k) =>
       ScanRunPhase.stamping,
     }.contains(k.edge?.$2);
 
-String describe(KillPoint k) =>
-    k.afterPost ? 'after the post' : '${k.edge!.$1.name}→${k.edge!.$2.name}';
+String describe(KillPoint k) => k.afterPost
+    ? 'after the post'
+    : k.beforePost
+        ? 'before the post'
+        : '${k.edge!.$1.name}→${k.edge!.$2.name}';
 
 void main() {
   silenceErrorLoggerSpool();
@@ -83,6 +100,7 @@ void main() {
     }
 
     if (kill.afterPost) first.onPost = (_) => captureOnce();
+    if (kill.beforePost) first.onBeforePost = captureOnce;
     final trace = ScanPhaseTrace(onEdge: (e) {
       if (e == kill.edge) captureOnce();
     });
@@ -133,8 +151,9 @@ void main() {
   }
 
   final killPoints = <KillPoint>[
-    for (final e in kNotifyingPath) (edge: e, afterPost: false),
-    (edge: null, afterPost: true),
+    for (final e in kNotifyingPath) (edge: e, afterPost: false, beforePost: false),
+    (edge: null, afterPost: false, beforePost: true),
+    (edge: null, afterPost: true, beforePost: false),
   ];
 
   test('without a kill: one notification, one completed row per scan',
@@ -174,35 +193,63 @@ void main() {
 
   for (final kill in killPoints) {
     test('killed ${describe(kill)}: relaunch keeps the delivery and journal '
-        'promises, or reproduces only a filed defect', () async {
+        'promises', () async {
       final result = await killThenRelaunch(kill);
       expectOnlyKnownDeliveryDefects(result.defects);
       expectOnlyKnownAnomalies(result.anomalies);
-      expect(result.deliveries, inInclusiveRange(1, 2),
-          reason: 'a found opportunity is told at least once — a kill must '
-              'not lose it for good');
-      expect(result.journal, isNotEmpty,
-          reason: 'the relaunch journals its own run');
+      expect(result.defects, isEmpty);
+      expect(result.anomalies, isEmpty);
+
+      if (kill.beforePost) {
+        // The reservation was on disk, the post never happened. The
+        // budget cannot tell "about to show" from "shown" once the process
+        // is gone, and it chooses at most once: no notification inside
+        // this window — the next one after it tells the user.
+        expect(result.deliveries, 0);
+      } else {
+        expect(result.deliveries, 1,
+            reason: 'told exactly once, kill or no kill');
+      }
+
+      final killedRun = result.journal
+          .where((r) => r['at'] == kScanT0.toIso8601String())
+          .toList();
+      if (owesJournalRow(kill) &&
+          kill.edge != (ScanRunPhase.stamping, ScanRunPhase.idle)) {
+        expect(killedRun.single, {
+          'at': kScanT0.toIso8601String(),
+          'trigger': 'workmanager_periodic',
+          'interrupted': true,
+        }, reason: 'the in-flight marker, resolved by the relaunch');
+      }
+      expect(result.journal.where((r) => r['inFlight'] == true), isEmpty,
+          reason: 'no marker survives a completed relaunch');
     });
   }
 
-  test('the known defects still reproduce — a fix must delete its entry',
-      () async {
-    final defects = <DeliveryDefect>{};
-    final anomalies = <ScanAnomaly>{};
-    for (final kill in killPoints) {
-      await disk.close();
-      disk = await ScanDisk.open();
-      final r = await killThenRelaunch(kill);
-      defects.addAll(r.defects);
-      anomalies.addAll(r.anomalies);
-    }
-    expect(defects, kKnownDeliveryDefects,
-        reason: 'B4: killed between the post and the budget write, the '
-            'relaunch notifies the same opportunity again');
-    expect(kKnownDeliveryDefects.length,
-        lessThanOrEqualTo(kKnownDeliveryDefectsCeiling));
-    expect(anomalies, contains(ScanAnomaly.unjournaledRun),
-        reason: 'B4: a run killed mid-body leaves no journal row');
+  test('killed before the post: the reservation is resolved, and the '
+      'opportunity is told once the quiet window has passed', () async {
+    await killThenRelaunch((edge: null, afterPost: false, beforePost: true));
+    expect(pendingReservationOnDisk(), isNull,
+        reason: 'the relaunch resolved the reservation it found');
+
+    final late = DeliveryTrace();
+    await disk
+        .coordinator(
+          body: (_, at) =>
+              ScriptedScanBody(at, candidates: [scanOpportunity(at: at)]),
+          notifier: late,
+        )
+        .scan(
+            trigger: BackgroundScanTrigger.workManagerPeriodic,
+            now: kScanT0.add(const Duration(hours: 13)));
+    expect(late.posts, hasLength(1));
+  });
+
+  test('every known-defect set is empty — B4 is fixed', () {
+    expect(kKnownDeliveryDefects, isEmpty);
+    expect(kKnownDeliveryDefectsCeiling, 0);
+    expect(kKnownScanAnomalies, isEmpty);
+    expect(kKnownScanAnomaliesCeiling, 0);
   });
 }

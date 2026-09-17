@@ -26,13 +26,10 @@ const Set<ScanEdge> kKnownIllegalScanEdges = {};
 
 /// Scan-run defects that reproduce today, each a filed issue. The fix
 /// removes its entry, and [kKnownScanAnomaliesCeiling] goes down with it.
-const Set<ScanAnomaly> kKnownScanAnomalies = {
-  ScanAnomaly.concurrentScan, // #4333 B3
-  ScanAnomaly.unjournaledRun, // #4333 B4
-};
+const Set<ScanAnomaly> kKnownScanAnomalies = {};
 
 /// The size [kKnownScanAnomalies] may never exceed. Lower it with every fix.
-const int kKnownScanAnomaliesCeiling = 2;
+const int kKnownScanAnomaliesCeiling = 0;
 
 /// Schedule applies that break the reconciler's invariant today, each a
 /// filed issue (#4162). The fix removes its entry.

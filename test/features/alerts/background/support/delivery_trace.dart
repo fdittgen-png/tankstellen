@@ -23,12 +23,10 @@ enum DeliveryDefect {
 
 /// Delivery defects that reproduce today, each a filed issue. The fix
 /// removes its entry, and [kKnownDeliveryDefectsCeiling] goes down with it.
-const Set<DeliveryDefect> kKnownDeliveryDefects = {
-  DeliveryDefect.duplicateAfterKill, // #4333 B4
-};
+const Set<DeliveryDefect> kKnownDeliveryDefects = {};
 
 /// The size [kKnownDeliveryDefects] may never exceed.
-const int kKnownDeliveryDefectsCeiling = 1;
+const int kKnownDeliveryDefectsCeiling = 0;
 
 /// A [NotificationService] that records every post in order — "at most one
 /// notification per opportunity per window" is checked against it.
@@ -38,6 +36,10 @@ class DeliveryTrace implements NotificationService {
   /// Called right after a post was recorded — where a kill test captures
   /// the "shown, nothing else written yet" instant.
   void Function(PostedNotification post)? onPost;
+
+  /// Called right before a post is recorded — the "about to be shown"
+  /// instant, where only what precedes the post is on disk.
+  void Function()? onBeforePost;
 
   final List<PostedNotification> posts = [];
   int _sequence = 0;
@@ -52,6 +54,7 @@ class DeliveryTrace implements NotificationService {
     required String body,
     String? payload,
   }) async {
+    onBeforePost?.call();
     if (throwOnPost) throw StateError('channel refused the post');
     final post = (
       id: id,

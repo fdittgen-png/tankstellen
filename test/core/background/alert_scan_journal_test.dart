@@ -189,6 +189,59 @@ void main() {
     });
   });
 
+  // #4333 B4 — a run the OS ends mid-body still shows in the export.
+  group('in-flight marker', () {
+    test('the terminal row replaces its own marker — one row per run',
+        () async {
+      final journal = AlertScanJournal();
+      await journal.markInFlight(at: t0, trigger: 'workmanager_periodic');
+      expect(journal.entries().single[AlertScanJournal.inFlightKey], isTrue);
+
+      await journal.record(ScanOutcome.completed,
+          at: t0, trigger: 'workmanager_periodic',
+          stationsScanned: 3, alertsFired: 1);
+
+      expect(journal.entries().single, {
+        'at': t0.toIso8601String(),
+        'trigger': 'workmanager_periodic',
+        'stations': 3,
+        'alertsFired': 1,
+      });
+    });
+
+    test("a different run's row does not replace a marker", () async {
+      final journal = AlertScanJournal();
+      await journal.markInFlight(at: t0, trigger: 'workmanager_periodic');
+      await journal.record(ScanOutcome.skippedLock,
+          at: t0, trigger: 'android_widget');
+      expect(journal.entries(), hasLength(2));
+    });
+
+    test('the next run resolves a leftover marker into an interrupted row',
+        () async {
+      final journal = AlertScanJournal();
+      await journal.markInFlight(at: t0, trigger: 'ios_bg_refresh');
+
+      expect(await journal.resolveInterrupted(), 1);
+      expect(journal.entries().single, {
+        'at': t0.toIso8601String(),
+        'trigger': 'ios_bg_refresh',
+        'interrupted': true,
+      });
+      expect(await journal.resolveInterrupted(), 0,
+          reason: 'resolved once');
+    });
+
+    test('marker and resolve degrade to no-ops on a closed box', () async {
+      await Hive.box<dynamic>(HiveBoxes.alerts).close();
+      final journal = AlertScanJournal();
+      await expectLater(
+          journal.markInFlight(at: t0, trigger: 'slcWake'), completes);
+      expect(await journal.resolveInterrupted(), 0);
+      await Hive.openBox<dynamic>(HiveBoxes.alerts);
+    });
+  });
+
   group('never-throws contract (fault injection)', () {
     test('append/entries degrade to a no-op when the alerts box is closed',
         () async {

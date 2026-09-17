@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -388,6 +389,64 @@ void main() {
     });
   });
 
+  // #4333 B4 — a process killed between the post and the budget write
+  // re-notified on the next wake. The slot is now RESERVED before the
+  // post, with a pending marker, and committed or released after it.
+  group('reservation before the post (#4333)', () {
+    Object? pendingOnDisk() {
+      final raw = Hive.box<dynamic>(HiveBoxes.alerts)
+          .get(BudgetStateStore.storageKey);
+      return raw is String ? (jsonDecode(raw) as Map)['pending'] : null;
+    }
+
+    test('when the notification is posted, the budget already records it',
+        () async {
+      BudgetState? atPost;
+      final spy = _RecordingNotifier()
+        ..onPost = () => atPost = const BudgetStateStore().read();
+      await dispatcher.dispatch(
+        candidates: [OpportunityCandidate(opportunity())],
+        now: now,
+        notifier: spy,
+        templates: templates,
+      );
+      expect(atPost?.recentNotifications, [now],
+          reason: 'recorded no later than the show');
+      expect(pendingOnDisk(), isNull,
+          reason: 'committed once the post returned');
+    });
+
+    test('a refused post releases the reservation', () async {
+      notifier.throwOnSend = true;
+      await dispatch([opportunity()]);
+      expect(const BudgetStateStore().read().recentNotifications, isEmpty);
+      expect(pendingOnDisk(), isNull);
+    });
+
+    test('a reservation a killed run left is resolved, keeping the slot — '
+        'at most once', () async {
+      // Exactly what a run killed between reserving and committing leaves.
+      await Hive.box<dynamic>(HiveBoxes.alerts).put(
+          BudgetStateStore.storageKey,
+          jsonEncode({
+            'sent': [now.toIso8601String()],
+            'told': {'de-a:e10': now.toIso8601String()},
+            'pending': {'id': 7, 'key': 'de-a:e10', 'at': now.toIso8601String()},
+          }));
+
+      final later = now.add(const Duration(minutes: 30));
+      final outcome = await dispatch([opportunity(detectedAt: later)],
+          at: later);
+
+      expect(outcome.notified, isFalse,
+          reason: 'the killed run may have shown it: do not show it twice');
+      expect(notifier.sent, isEmpty);
+      expect(pendingOnDisk(), isNull);
+      expect(const BudgetStateStore().read().recentNotifications, [now],
+          reason: 'the slot stays spent');
+    });
+  });
+
   test("a detector's own copy is used verbatim", () async {
     // The radius case: one grouped notification over five stations,
     // which a single per-station Opportunity cannot reproduce. The
@@ -422,6 +481,7 @@ void main() {
 class _RecordingNotifier implements NotificationService {
   final List<({int id, String title, String body})> sent = [];
   bool throwOnSend = false;
+  void Function()? onPost;
 
   @override
   Future<void> showPriceAlert({
@@ -430,6 +490,7 @@ class _RecordingNotifier implements NotificationService {
     required String body,
     String? payload,
   }) async {
+    onPost?.call();
     if (throwOnSend) throw StateError('channel unavailable');
     sent.add((id: id, title: title, body: body));
   }

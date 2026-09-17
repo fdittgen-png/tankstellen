@@ -152,6 +152,16 @@ class OpportunityDispatcher {
     String? Function(Opportunity)? currencyOf,
     ConfidenceInputs Function(Opportunity)? confidenceInputs,
   }) async {
+    // #4333 — a reservation a killed run never committed. Ambiguous: the
+    // OS may have shown it. Its slot stays spent (at most once).
+    final ambiguous = await budgetState.resolvePending(now);
+    if (ambiguous != null) {
+      log.info(
+          'a delivery reserved at ${ambiguous.at.toIso8601String()} was '
+          'never committed; its slot stays spent',
+          tag: 'OpportunityDispatcher');
+    }
+
     if (candidates.isEmpty) {
       return const DispatchOutcome(
           notified: false, recorded: 0, demotions: []);
@@ -201,16 +211,28 @@ class OpportunityDispatcher {
           ...outcome.demoted,
         ]);
       } else {
+        // #4333 — the slot is on disk BEFORE the post, with a marker that
+        // says so. A process killed after the post can no longer leave the
+        // budget unaware and re-notify on the next wake (B4).
+        final reserved = state.recording(winner, now);
+        await budgetState.write(reserved, now, pending: (
+          id: notificationIdFor(winner),
+          key: BudgetState.keyFor(winner),
+          at: now,
+        ));
         notified = await _notify(winner, copy, notifier);
         if (notified) {
-          await budgetState.write(state.recording(winner, now), now);
+          await budgetState.write(reserved, now); // commit
           // #4185 — the dedup / cooldown write, now that a notification
           // really went out. Never for a refused candidate: that is the
-          // suppression this issue exists to remove.
+          // suppression this issue exists to remove. It stays after the
+          // post: a detector's rows cannot be released, and a kill between
+          // the post and here is covered by the reserved slot above.
           await byOpportunity[winner]?.onNotified?.call();
         } else {
           // The channel refused it. Not a budget decision, so the slot is
-          // not spent — but the finding is still real and still recorded.
+          // released — but the finding is still real and still recorded.
+          await budgetState.write(state, now); // release
           outcome = BudgetOutcome(demoted: [
             DemotedOpportunity(winner, BudgetRefusal.ineligible),
             ...outcome.demoted,
@@ -229,6 +251,12 @@ class OpportunityDispatcher {
     );
   }
 
+  /// The notification id for [o]: the id scheme the per-station runner
+  /// used, so an existing notification for a station is replaced rather
+  /// than stacked.
+  static int notificationIdFor(Opportunity o) =>
+      (o.stationId ?? o.kind.name).hashCode;
+
   /// Show one notification. Returns whether it went out.
   ///
   /// Never throws: a notification channel that rejects a post must not
@@ -240,9 +268,7 @@ class OpportunityDispatcher {
   ) async {
     try {
       await notifier.showPriceAlert(
-        // Same id scheme the per-station runner used, so an existing
-        // notification for a station is replaced rather than stacked.
-        id: (o.stationId ?? o.kind.name).hashCode,
+        id: notificationIdFor(o),
         title: copy.title,
         body: copy.body,
       );

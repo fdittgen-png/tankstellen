@@ -16,6 +16,7 @@ import 'dart:isolate';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/startup/runtime_services_phase.dart';
+import 'package:tankstellen/core/background/alert_scan_journal.dart';
 import 'package:tankstellen/core/background/background_price_fetcher.dart';
 import 'package:tankstellen/core/background/background_scan_trigger.dart';
 import 'package:tankstellen/core/background/hive_isolate_lock.dart';
@@ -92,12 +93,12 @@ void main() {
     final firstTrace = ScanPhaseTrace();
     final first = disk
         .coordinator(
-          body: (_, at) => ScriptedScanBody(at, parkCollect: park.future),
+          body: (_, at) => ScriptedScanBody(at, park: park),
           notifier: DeliveryTrace(),
           sink: firstTrace,
         )
         .scan(trigger: BackgroundScanTrigger.workManagerPeriodic, now: kScanT0);
-    await pumpEventQueue();
+    await park.reached;
     expect(firstTrace.path.last, ScanRunPhase.collecting);
 
     final secondTrace = ScanPhaseTrace();
@@ -114,33 +115,33 @@ void main() {
     expect(secondTrace.outcomes.single,
         (ScanOutcome.skippedLock, ScanRunPhase.locking));
     secondTrace.expectLawful();
-    expect(disk.journal.single,
+    expect(disk.journal.last,
         {'at': kScanT0.toIso8601String(), 'trigger': 'android_widget',
           'skipped': 'hive_lock'});
+    expect(disk.journal.first[AlertScanJournal.inFlightKey], isTrue,
+        reason: 'the holder is mid-body: its marker is on disk (#4333)');
 
     park.release();
     expect(await first, isTrue);
     firstTrace.expectLawful();
   });
 
-  test('a second trigger in ANOTHER isolate of the process must be refused '
-      'too — or reproduce only the filed B3 defect', () async {
+  test('a second trigger in ANOTHER isolate of the process is refused too '
+      '(#4333)', () async {
     final park = Park();
     final running = disk
         .coordinator(
-          body: (_, at) => ScriptedScanBody(at, parkCollect: park.future),
+          body: (_, at) => ScriptedScanBody(at, park: park),
           notifier: DeliveryTrace(),
         )
         .scan(trigger: BackgroundScanTrigger.workManagerPeriodic, now: kScanT0);
-    await pumpEventQueue();
+    await park.reached;
 
     final acquired = await acquiredBySpawnedIsolate(disk.lockFile);
     final anomalies = {if (acquired) ScanAnomaly.concurrentScan};
     expectOnlyKnownAnomalies(anomalies);
-    expect(anomalies, contains(ScanAnomaly.concurrentScan),
-        reason: 'B3 still reproduces: the per-isolate claim cannot see the '
-            'other isolate, and fcntl locks are per process — delete the '
-            'known entry with the fix');
+    expect(acquired, isFalse,
+        reason: 'B3 (#4333): the claim is visible to every isolate');
 
     park.release();
     expect(await running, isTrue);
@@ -156,14 +157,14 @@ void main() {
     unawaited(disk
         .coordinator(
           body: (_, at) => ScriptedScanBody(at,
-              parkCollect: park.future,
+              park: park,
               candidates: [scanOpportunity(at: at)]),
           notifier: DeliveryTrace(),
           sink: trace,
         )
         .scan(
             trigger: BackgroundScanTrigger.iosBackgroundRefresh, now: kScanT0));
-    await pumpEventQueue();
+    await park.reached;
     expect(image, isNotNull);
 
     // The process was suspended and later killed: relaunch on its disk as
@@ -188,6 +189,8 @@ void main() {
       if (expiredRunRows.isEmpty) ScanAnomaly.unjournaledRun,
     };
     expectOnlyKnownAnomalies(anomalies);
+    expect(expiredRunRows.single['interrupted'], isTrue,
+        reason: 'B4 (#4333): the expired run is in the export');
   });
 
   group('schedule', () {

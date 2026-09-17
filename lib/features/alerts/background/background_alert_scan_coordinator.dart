@@ -203,6 +203,9 @@ class _ScanRun {
       // Cross-trigger cooldown — read it *after* the lock + box open so the
       // dedup row is consistent with whatever the previous scan wrote.
       _advance(ScanRunPhase.gated);
+      // #4333 — a run the OS ended left its marker; this run holds the lock,
+      // so no live run can own one. Resolve them into `interrupted` rows.
+      await _c._journal.resolveInterrupted();
       final allowed = await _c._dedup.shouldScan(now: at, cooldown: cooldown);
       if (!allowed) {
         final last = await _c._dedup.lastScanAt();
@@ -214,6 +217,9 @@ class _ScanRun {
         return false;
       }
 
+      // #4333 — from here on the run owes the journal a row even if the OS
+      // ends it: the marker is that row until the outcome replaces it.
+      await _c._journal.markInFlight(at: at, trigger: trigger.tag);
       final body = _c._bodyFactory(HiveStorage(), at);
       _advance(ScanRunPhase.collecting);
       await body.collect();
