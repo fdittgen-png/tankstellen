@@ -295,7 +295,7 @@ final class FeatureFlagsProvider
   FeatureFlags create() => FeatureFlags();
 }
 
-String _$featureFlagsHash() => r'd2e22b699e96e8400f9bf770c97730f339a299ca';
+String _$featureFlagsHash() => r'c3c51307f4e240731369fcb7a3a4cc8f8b1d85cf';
 
 /// Central feature-flag store (#1373 phase 1).
 ///

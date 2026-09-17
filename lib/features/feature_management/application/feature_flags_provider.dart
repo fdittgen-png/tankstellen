@@ -10,6 +10,7 @@ import '../../../core/logging/error_logger.dart';
 import '../data/feature_flags_repository.dart';
 import '../domain/build_channel.dart';
 import '../domain/feature.dart';
+import '../domain/feature_activation_preview.dart';
 import '../domain/feature_dependency_graph.dart';
 import '../domain/feature_manifest.dart';
 
@@ -112,10 +113,9 @@ class FeatureFlags extends _$FeatureFlags {
     Set<Feature> features,
     FeatureManifest manifest,
     BuildChannel channel,
-  ) =>
-      features
-          .where((f) => manifest.entries[f]?.isAvailableIn(channel) ?? false)
-          .toSet();
+  ) => features
+      .where((f) => manifest.entries[f]?.isAvailableIn(channel) ?? false)
+      .toSet();
 
   /// Serialises mutations (#4225).
   ///
@@ -151,6 +151,29 @@ class FeatureFlags extends _$FeatureFlags {
   }
 
   Future<void> _tail = Future<void>.value();
+
+  /// Applies exactly a reviewed dependency impact in one durable write.
+  /// False means the preview became stale; no flags were changed.
+  Future<bool> activateReviewed(FeatureActivationPreview preview) async {
+    var applied = false;
+    await _serialised(() async {
+      final current = await future;
+      final fresh = FeatureActivationPreview.resolve(
+        target: preview.target,
+        manifest: ref.read(featureManifestProvider),
+        channel: ref.read(buildChannelProvider),
+        enabled: current,
+      );
+      if (fresh == null || !preview.matches(fresh)) return;
+      final next = {...current, ...fresh.required};
+      if (next.length != current.length) {
+        await _persist(next);
+        state = AsyncData(next);
+      }
+      applied = true;
+    });
+    return applied;
+  }
 
   /// Enables [feature], throwing [StateError] when a prerequisite is
   /// disabled. The error message names the missing prerequisites so the
@@ -195,8 +218,7 @@ class FeatureFlags extends _$FeatureFlags {
   ///
   /// Re-enabling [feature] later restores those children to their previous
   /// user-visible state, no manual re-toggling required.
-  Future<void> disable(Feature feature) =>
-      _serialised(() => _disable(feature));
+  Future<void> disable(Feature feature) => _serialised(() => _disable(feature));
 
   Future<void> _disable(Feature feature) async {
     final current = await future;
