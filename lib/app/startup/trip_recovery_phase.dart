@@ -235,7 +235,13 @@ class TripRecoveryPhase {
         }
       },
     );
-    final recovered = await service.recoverStale();
+    // #4314 — the active pass that follows owns the trip its WAL row holds.
+    final activeId = Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)
+        ? ActiveTripRepository(box: Hive.box<String>(HiveBoxes.obd2ActiveTrip))
+            .loadSnapshot()
+            ?.id
+        : null;
+    final recovered = await service.recoverStale(excludeIds: {?activeId});
     if (recovered > 0) {
       log.info(
           'AppInitializer: recovered $recovered paused trip(s) into history');

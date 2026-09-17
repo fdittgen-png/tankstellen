@@ -131,6 +131,25 @@ void main() {
       expect(history.single.automatic, isFalse);
     });
 
+    test('#4314 — skips a stale entry whose trip a WAL row still holds',
+        () async {
+      await pausedRepo.save(entryOlderThanThreshold(id: 'held-by-wal'));
+      await pausedRepo.save(entryOlderThanThreshold(id: 'orphan'));
+
+      final svc = PausedTripRecoveryService(
+        pausedRepo: pausedRepo,
+        historyRepo: historyRepo,
+        now: () => fakeNow,
+      );
+
+      final recovered = await svc.recoverStale(excludeIds: {'held-by-wal'});
+
+      expect(recovered, 1);
+      expect(historyRepo.loadAll().single.id, 'orphan');
+      expect(pausedRepo.load('held-by-wal'), isNotNull,
+          reason: 'the active recovery ends that trip — and its paused row');
+    });
+
     test('skips an entry younger than the threshold', () async {
       final fresh = entryYoungerThanThreshold(now: fakeNow);
       await pausedRepo.save(fresh);

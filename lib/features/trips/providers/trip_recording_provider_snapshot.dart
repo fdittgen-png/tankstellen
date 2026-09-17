@@ -222,16 +222,13 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
   /// Drop the persisted snapshot + clear in-memory bookkeeping.
   /// Safe to call when nothing was ever written.
   Future<void> _clearActiveSnapshot() async {
+    final id = _activeSnapshot?.id;
     _activeSnapshot = null;
     _lastSnapshotFlushAt = null;
     _samplesSinceLastFlush = 0;
-    final repo = _resolveActiveRepo();
-    if (repo == null) return;
-    try {
-      await repo.clearSnapshot();
-    } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording clear snapshot failed'});
-    }
+    await deletePausedTripRow(id); // #4314 — its paused row goes with it
+    // The repository logs and swallows its own failures.
+    await _resolveActiveRepo()?.clearSnapshot();
   }
 
   /// Surface the recovered snapshot from a previous cold-start

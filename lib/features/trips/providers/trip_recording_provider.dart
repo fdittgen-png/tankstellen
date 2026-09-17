@@ -36,6 +36,7 @@ import 'active_snapshot_from_controller.dart';
 import 'last_trip_identity.dart';
 import 'recording_pipeline.dart';
 import 'recording_pipeline_slot.dart';
+import 'recording_paused_row.dart';
 import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
