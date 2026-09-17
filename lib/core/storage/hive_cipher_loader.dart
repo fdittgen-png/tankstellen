@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'hive_box_key_probe.dart';
 import 'impl/hive_directory_resolver.dart';
 
 /// Thrown when storage initialisation fails BEFORE the Hive boxes can
@@ -68,34 +69,53 @@ class HiveCipherLoader {
 
   static const _hiveEncryptionKeyName = 'hive_encryption_key';
 
-  /// Whether THIS launch generated a brand-new encryption key (#4118).
+  /// Refuse a key the box files on disk were not written with — decided
+  /// BEFORE a replacement key is persisted and before any `openBox`
+  /// (#4118, #4341).
   ///
-  /// True on a genuine first run — and on a restored install, where the
-  /// old key stayed on the old phone. Those two are indistinguishable
-  /// here, but they are not indistinguishable one step later: a first
-  /// run has no box files, so nothing fails to open. A box that fails to
-  /// open while this is true is therefore the restore case, not
-  /// corruption — which is exactly the discrimination
-  /// `HiveFirstFrameBoxes` makes with it.
-  static bool get keyGeneratedThisLaunch => _keyGeneratedThisLaunch;
-  static bool _keyGeneratedThisLaunch = false;
-
-  /// Set the launch-scoped flag directly. Reset it in `tearDown`; pass
-  /// `true` to stand in for the generate branch when the cipher itself
-  /// is stubbed through [cipherLoader].
-  @visibleForTesting
-  static void setKeyGeneratedForTest({required bool value}) {
-    _keyGeneratedThisLaunch = value;
-  }
-
+  /// Both halves of "before" are load-bearing:
+  ///
+  /// * **Before the open**, because the open does not fail. Hive's crash
+  ///   recovery reads the undecryptable frames, decides the box is
+  ///   corrupt and TRUNCATES the file to zero bytes — measured at 93
+  ///   bytes in, 0 bytes out, with no error and no telemetry.
+  /// * **Before the key write** (#4341), because #4118 decided after it.
+  ///   The stopped launch had already stored a new key, so the next
+  ///   process read that key back, found nothing launch-local telling it
+  ///   the key was new, and truncated the restored boxes anyway. A key
+  ///   that is never written leaves the next launch in exactly the state
+  ///   this one saw, so the verdict repeats until the user resolves it.
+  ///
+  /// The verdict reads the files' own frame checksums
+  /// ([HiveBoxKeyProbe]), not the mere presence of files: a plaintext box
+  /// (the #1686 legacy migration, the spool, the schema stamps) is no
+  /// evidence of a lost key. It also runs when a key IS stored, which is
+  /// what rescues an install #4118 already stopped once — its
+  /// replacement key is on disk, and no box was ever written with it.
+  ///
+  /// With no key and a directory that cannot be inspected, no key is
+  /// minted either: that is a retryable [StorageInitException], never a
+  /// guess that might authorise the truncating open.
   static Future<HiveAesCipher> _loadCipher() async {
     const secureStorage = FlutterSecureStorage();
     final existing = await secureStorage.read(key: _hiveEncryptionKeyName);
-    if (existing != null) {
-      final keyBytes = base64Url.decode(existing);
-      return HiveAesCipher(keyBytes);
+    final stored =
+        existing == null ? null : HiveAesCipher(base64Url.decode(existing));
+    final verdict =
+        HiveBoxKeyProbe.inspect(HiveDirectoryResolver.hivePath, stored);
+    if (verdict == BoxKeyVerdict.keyLost) {
+      throw StorageKeyLostException(stored == null
+          ? 'box files exist but this install has no encryption key — a '
+              'restore without its KeyStore key'
+          : 'box files were written under a different key than the stored '
+              'one — a restore whose replacement key was already written');
     }
-    _keyGeneratedThisLaunch = true;
+    if (stored != null) return stored;
+    if (verdict == BoxKeyVerdict.unknown) {
+      throw const StorageInitException(
+          'the Hive directory could not be inspected, so no encryption key '
+          'was created');
+    }
     final key = Hive.generateSecureKey();
     await secureStorage.write(
       key: _hiveEncryptionKeyName,
@@ -124,30 +144,17 @@ class HiveCipherLoader {
   /// [StorageInitException] (preserving the original stack) so
   /// `AppInitializer.run` routes it to the same `StorageRecoveryHost`
   /// as a corrupted box.
-  /// Refuse to open boxes this install cannot read (#4118).
   ///
-  /// A new key plus box files that predate it has exactly one cause: a
-  /// backup or device-transfer restore brought the encrypted files back
-  /// while their KeyStore-bound master key stayed on the old phone.
-  ///
-  /// It must run BEFORE the first `openBox`, because the open does not
-  /// fail. Hive's crash recovery reads the undecryptable frames, decides
-  /// the box is corrupt and TRUNCATES the file to zero bytes — measured
-  /// at 93 bytes in, 0 bytes out, with no error and no telemetry. The
-  /// app then starts looking perfectly healthy and completely empty,
-  /// having destroyed the only copy of the restored data. A genuine
-  /// first run reaches this too and passes: it has no box files.
-  static void assertKeyMatchesExistingBoxes() {
-    if (!keyGeneratedThisLaunch) return;
-    if (!HiveDirectoryResolver.hasExistingBoxFiles) return;
-    throw const StorageKeyLostException(
-        'box files exist but this install generated a new encryption key '
-        '— a restore without its KeyStore key');
-  }
-
+  /// The two verdicts [_loadCipher] reaches itself pass through untouched:
+  /// a [StorageKeyLostException] must reach the key-loss screen, not the
+  /// cause-unknown one.
   static Future<HiveAesCipher> loadGuarded() async {
     try {
       return await cipherLoader();
+    } on StorageKeyLostException {
+      rethrow;
+    } on StorageInitException {
+      rethrow;
     } catch (e, st) {
       Error.throwWithStackTrace(
         StorageInitException(

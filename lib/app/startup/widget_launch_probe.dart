@@ -34,11 +34,11 @@ import 'runtime_services_phase.dart';
 ///
 /// This starts before storage. An `errorLogger.log` now would take the
 /// pre-bind path and lazily create the isolate spool's box FILE — before
-/// `HiveCipherLoader.assertKeyMatchesExistingBoxes` has looked for box
-/// files. On a fresh install, whose new key is expected, that stray file
-/// would read as "box files exist but the key is new" and stop the launch
-/// with a false #4118 key-loss screen. So failures are HELD and reported
-/// by [reportAfterBind].
+/// `HiveCipherLoader` has inspected the box files. Under #4118 that stray
+/// file read as "box files exist but the key is new" and stopped a fresh
+/// install with a false key-loss screen; #4341 reads frame checksums, so a
+/// plaintext spool is no longer evidence, but storage is still not up. So
+/// failures are HELD and reported by [reportAfterBind].
 class WidgetLaunchProbe {
   WidgetLaunchProbe({
     Future<void> Function()? setGroupId,
