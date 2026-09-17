@@ -31,14 +31,6 @@ class _RecordingWorkmanager implements Workmanager {
   }
 }
 
-/// Fault-injection [Workmanager]: every call throws, to exercise the
-/// never-throws contracts (#3169).
-class _ThrowingWorkmanager implements Workmanager {
-  @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw StateError('workmanager backend unavailable');
-}
-
 void main() {
   group('BackgroundPriceFetcher interface', () {
     test('AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher', () {
@@ -244,13 +236,8 @@ void main() {
       expect(wm.named(#cancelAll), hasLength(1));
     });
 
-    test('scheduleIosProcessingTask never throws (fault injection)',
-        () async {
-      // Never-throws contract: a re-arm failure inside the dispatcher must
-      // not fail the scan that triggered it.
-      final wm = _ThrowingWorkmanager();
-      await expectLater(scheduleIosProcessingTask(wm), completes);
-    });
+    // #4162 — the scheduleIosProcessingTask never-throws case moved with
+    // the function to ios_background_task_ids_test.dart.
 
     test('Android scheduleOpportunisticScan is a deliberate no-op '
         '(SLA already met, provider budget protected)', () async {

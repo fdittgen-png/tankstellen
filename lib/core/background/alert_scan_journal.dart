@@ -8,6 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../logging/error_logger.dart';
 import '../storage/hive_boxes.dart';
+import 'scan_run_phase.dart';
 
 /// Rolling journal of background alert-scan runs (#3147).
 ///
@@ -90,6 +91,41 @@ class AlertScanJournal {
       }));
     }
   }
+
+  /// Append the row for a run that ended with [outcome] (#4162).
+  ///
+  /// The typed door to [append]: each [ScanOutcome] writes exactly the
+  /// optional group its row has always carried — `skipped: hive_lock` /
+  /// `skipped: cooldown`, `error: <type>`, or the counts — so a row reads
+  /// byte for byte as it did before the outcome had a name. Never throws.
+  Future<void> record(
+    ScanOutcome outcome, {
+    required DateTime at,
+    required String trigger,
+    int? stationsScanned,
+    int? alertsFired,
+    String? error,
+  }) =>
+      switch (outcome) {
+        ScanOutcome.completed => append(
+            at: at,
+            trigger: trigger,
+            stationsScanned: stationsScanned,
+            alertsFired: alertsFired,
+          ),
+        ScanOutcome.skippedLock =>
+          append(at: at, trigger: trigger, skippedReason: skippedHiveLock),
+        ScanOutcome.skippedCooldown =>
+          append(at: at, trigger: trigger, skippedReason: skippedCooldown),
+        ScanOutcome.failed =>
+          append(at: at, trigger: trigger, error: error),
+      };
+
+  /// The `skipped` value of a [ScanOutcome.skippedLock] row.
+  static const String skippedHiveLock = 'hive_lock';
+
+  /// The `skipped` value of a [ScanOutcome.skippedCooldown] row.
+  static const String skippedCooldown = 'cooldown';
 
   /// The persisted rows, oldest first. Empty when the box is closed or
   /// the key is missing/malformed. Never throws.

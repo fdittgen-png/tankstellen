@@ -63,23 +63,32 @@ class HiveIsolateLock {
 
   final File _lockFile;
 
+  /// The clock every deadline and age is measured against (#4162). The wall
+  /// clock in production; a test drives it so a contention case does not
+  /// take the real [acquireTimeout].
+  final DateTime Function() _clock;
+
   /// Open handle holding the exclusive OS lock while acquired. `null` when the
   /// lock is not held by this instance.
   RandomAccessFile? _handle;
 
-  HiveIsolateLock._(this._lockFile);
+  HiveIsolateLock._(this._lockFile, this._clock);
 
   /// Create a lock instance pointing to the standard lock file location.
   static Future<HiveIsolateLock> create() async {
     final dir = await getApplicationDocumentsDirectory();
     final lockFile = File('${dir.path}${Platform.pathSeparator}$_lockFileName');
-    return HiveIsolateLock._(lockFile);
+    return HiveIsolateLock._(lockFile, DateTime.now);
   }
 
-  /// Create a lock instance with a custom file path (for testing).
+  /// Create a lock instance with a custom file path (for testing), measured
+  /// against [clock] when given.
   @visibleForTesting
-  static HiveIsolateLock fromFile(File lockFile) {
-    return HiveIsolateLock._(lockFile);
+  static HiveIsolateLock fromFile(
+    File lockFile, {
+    DateTime Function() clock = DateTime.now,
+  }) {
+    return HiveIsolateLock._(lockFile, clock);
   }
 
   /// Attempt to acquire the lock.
@@ -99,7 +108,7 @@ class HiveIsolateLock {
       return true;
     }
 
-    final deadline = DateTime.now().add(acquireTimeout);
+    final deadline = _clock().add(acquireTimeout);
 
     while (true) {
       _sweepStaleFile();
@@ -112,7 +121,7 @@ class HiveIsolateLock {
         return true;
       }
 
-      if (!DateTime.now().isBefore(deadline)) break;
+      if (!_clock().isBefore(deadline)) break;
       await Future<void>.delayed(retryDelay);
     }
 
@@ -167,7 +176,7 @@ class HiveIsolateLock {
     try {
       handle.setPositionSync(0);
       handle.truncateSync(0);
-      handle.writeStringSync('${DateTime.now().toIso8601String()}\npid:$pid');
+      handle.writeStringSync('${_clock().toIso8601String()}\npid:$pid');
       handle.flushSync();
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'HiveIsolateLock: failed to write owner metadata'}));
@@ -180,7 +189,7 @@ class HiveIsolateLock {
   void _sweepStaleFile() {
     if (!_lockFile.existsSync()) return;
     try {
-      final age = DateTime.now().difference(_lockFile.lastModifiedSync());
+      final age = _clock().difference(_lockFile.lastModifiedSync());
       if (age <= staleLockAge) return;
       // Only delete if no one holds the lock — probe with a transient lock.
       final probe = _tryLock();
