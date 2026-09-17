@@ -79,11 +79,13 @@ class AlertNotifier extends _$AlertNotifier {
     // device's union merge can't resurrect the alert. Local-first: the
     // local delete above already happened, and fireAndForget swallows a
     // server failure (the tombstone still filters the id from every
-    // later merge).
-    await SyncHelper.fireAndForget(
+    // later merge). #4345 — with the consent withdrawn, journaled only.
+    await SyncHelper.deleteIfEnabled(
       ref,
       'Alerts.remove',
-      () => ref.read(alertsDeleteFnProvider)(id),
+      table: SyncTables.alerts,
+      recordId: id,
+      syncFn: () => ref.read(alertsDeleteFnProvider)(id),
     );
     // #2246 — keep downloads suppressed on the remove path: the server
     // delete above may not have landed on a flaky link, and the

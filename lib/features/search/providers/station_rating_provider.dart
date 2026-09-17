@@ -58,8 +58,10 @@ class StationRatings extends _$StationRatings {
     state = storage.getRatings();
 
     // Always delete from server when removing (cleanup)
-    await SyncHelper.fireAndForget(ref, 'Ratings.remove',
-      () => RatingsSync.delete(stationId),
+    await SyncHelper.deleteIfEnabled(ref, 'Ratings.remove',
+      table: SyncTables.stationRatings,
+      recordId: stationId,
+      syncFn: () => RatingsSync.delete(stationId),
     );
   }
 }

@@ -13,6 +13,7 @@ import '../../../core/storage/storage_providers.dart';
 import '../data/itineraries_sync.dart';
 import '../../../core/sync/deletions_sync.dart';
 import '../../../core/sync/sync_events.dart';
+import '../../../core/sync/sync_helper.dart';
 import '../../../core/sync/sync_provider.dart';
 import '../../../core/utils/event_loop_yield.dart';
 import '../domain/entities/saved_itinerary.dart';
@@ -232,12 +233,15 @@ class ItineraryNotifier extends _$ItineraryNotifier {
     await storage.deleteItinerary(id);
     state = state.where((i) => i.id != id).toList();
 
-    // 2. Delete from server
-    try {
-      await ItinerariesSync.delete(id);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.sync, e, st, context: const {'where': 'ItineraryNotifier.delete'}));
-    }
+    // 2. Delete from server — #4345: journaled only while the consent is
+    // withdrawn, and nothing at all without a synced identity.
+    await SyncHelper.deleteIfEnabled(
+      ref,
+      'Itineraries.delete',
+      table: SyncTables.itineraries,
+      recordId: id,
+      syncFn: () => ItinerariesSync.delete(id),
+    );
   }
 
   /// Put a deleted itinerary back exactly as it was (#3993).

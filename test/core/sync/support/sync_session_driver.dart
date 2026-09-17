@@ -5,11 +5,14 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:tankstellen/app/startup/launch_sync_phase.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
+import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/core/sync/app_resume_sync.dart';
+import 'package:tankstellen/core/sync/pending_deletions_journal.dart';
 import 'package:tankstellen/core/sync/supabase_client.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/core/sync/sync_pull_coordinator.dart';
@@ -41,11 +44,16 @@ class SyncDiskImage {
     this.settings = const {},
     this.anonKey,
     this.keychain = const {},
+    this.settingsBox = const {},
   });
 
   final Map<String, Object?> settings;
   final String? anonKey;
   final Map<String, String> keychain;
+
+  /// The real Hive `settings` box, when a suite opened one — where the
+  /// #3123 deletion journal and its last sync context live.
+  final Map<dynamic, dynamic> settingsBox;
 
   SyncDiskImage copyWith({
     Map<String, Object?>? settings,
@@ -55,6 +63,7 @@ class SyncDiskImage {
         settings: settings ?? this.settings,
         anonKey: anonKey,
         keychain: keychain ?? this.keychain,
+        settingsBox: settingsBox,
       );
 
   /// The image with no keychain — iOS keeps the keychain across a
@@ -81,7 +90,16 @@ void resetSyncProcess() {
   SyncPullCoordinator.instance.resetForTest();
   AppResumeSync.instance.resetForTest();
   SyncRunTrace.resetForTest();
+  PendingDeletionsJournal.resetForTest();
   LaunchSyncPhase.entriesOverride = null;
+}
+
+/// Put [contents] into the real Hive `settings` box, when one is open.
+Future<void> _restoreSettingsBox(Map<dynamic, dynamic> contents) async {
+  if (!Hive.isBoxOpen(HiveBoxes.settings)) return;
+  final box = Hive.box<dynamic>(HiveBoxes.settings);
+  await box.clear();
+  await box.putAll(contents);
 }
 
 /// One app process with a TankSync session over [FakeTankSyncBackend]
@@ -107,6 +125,7 @@ class SyncSession {
     bool launch = true,
   }) async {
     resetSyncProcess();
+    await _restoreSettingsBox(image.settingsBox);
     final storage = TapHiveStorage();
     for (final e in image.settings.entries) {
       await storage.putSetting(e.key, e.value);
@@ -158,6 +177,9 @@ class SyncSession {
       },
       anonKey: storage.getSupabaseAnonKey(),
       keychain: Map.of(backend.keychain),
+      settingsBox: Hive.isBoxOpen(HiveBoxes.settings)
+          ? Map.of(Hive.box<dynamic>(HiveBoxes.settings).toMap())
+          : const {},
     );
   }
 

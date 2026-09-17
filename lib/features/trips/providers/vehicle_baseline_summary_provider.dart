@@ -9,6 +9,9 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/sync/sync_events.dart';
+import '../../../core/sync/sync_helper.dart';
+import '../data/baselines_sync.dart';
 import '../domain/situation_classifier.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
@@ -76,6 +79,12 @@ Map<DrivingSituation, int> vehicleBaselineSummary(Ref ref, String vehicleId) {
 /// Wipe every baseline entry for [vehicleId] (#779). Invalidates the
 /// summary provider so the UI rebuilds to the zero state.
 ///
+/// #4345 — the synced copy goes too: [BaselinesSync.delete] was written
+/// for exactly this "forget baseline" action but had no caller, so the
+/// next merge brought a reset baseline back. With the consent withdrawn
+/// the intent is journaled only, and nothing happens without a synced
+/// identity.
+///
 /// `keepAlive: true` prevents Riverpod from disposing the provider
 /// mid-await — without it, the `ref.invalidate` call at the tail of
 /// this method lands on a torn-down element.
@@ -85,4 +94,11 @@ Future<void> resetVehicleBaselines(Ref ref, String vehicleId) async {
   final box = Hive.box<String>(HiveBoxes.obd2Baselines);
   await box.delete(_vehicleKey(vehicleId));
   ref.invalidate(vehicleBaselineSummaryProvider(vehicleId));
+  await SyncHelper.deleteIfEnabled(
+    ref,
+    'Baselines.reset',
+    table: SyncTables.obd2Baselines,
+    recordId: vehicleId,
+    syncFn: () => BaselinesSync.delete(vehicleId),
+  );
 }

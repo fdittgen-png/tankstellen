@@ -3,6 +3,7 @@
 
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'pending_deletions_journal.dart';
 import 'sync_provider.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/logging/app_log.dart';
@@ -60,6 +61,38 @@ class SyncHelper {
     } catch (e, st) {
       healthCounters.increment('sync.${context.toLowerCase()}.failures');
       log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'SyncHelper[$context]: sync failed'});
+    }
+  }
+
+  /// Delete-aware [syncIfEnabled] (#4345): run [syncFn] — the server
+  /// delete + tombstone of [recordId] in [table] — when sync is enabled.
+  ///
+  /// When it is NOT (the Cloud Sync consent withdrawn), [syncFn] used to
+  /// be skipped entirely, so the delete left no trace and the row came back
+  /// from the server once sync resumed. Now, when a synced identity is
+  /// known (`sync_user_id` is stored), the intent is journaled against that
+  /// identity's context — nothing is sent, and it replays only once a live
+  /// session of the same backend and account exists again.
+  ///
+  /// With no synced identity (sync never set up, or disconnected — which
+  /// clears the id) the record was never on a server this device knows:
+  /// nothing is journaled, so a later sign-in cannot inherit it.
+  static Future<void> deleteIfEnabled(
+    Ref ref,
+    String context, {
+    required String table,
+    required String recordId,
+    required Future<void> Function() syncFn,
+  }) async {
+    try {
+      final syncState = ref.read(syncStateProvider);
+      if (syncState.enabled) return syncIfEnabled(ref, context, syncFn);
+      if (syncState.userId == null) return;
+      await PendingDeletionsJournal.addAll(table, [recordId]);
+    } catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.sync, context: {
+        'where': 'SyncHelper[$context]: delete intent not recorded'
+      });
     }
   }
 

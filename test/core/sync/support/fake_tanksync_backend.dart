@@ -27,6 +27,13 @@ class FakeSupabaseProject {
   /// Every table write (`users` upserts included), by table name.
   final List<String> writes = [];
 
+  /// The rows each table holds — upserts land here (replacing a row that
+  /// matches the `on_conflict` columns), `eq.` filters select and delete.
+  final Map<String, List<Map<String, dynamic>>> tables = {};
+
+  List<Map<String, dynamic>> rows(String table) =>
+      tables.putIfAbsent(table, () => []);
+
   int _seq = 0;
 
   /// The next anonymous user id [signup] mints.
@@ -223,11 +230,53 @@ class FakeTankSyncBackend implements TankSyncSdk {
       return http.Response('', 204, request: req);
     }
     if (path.contains('/rest/v1/')) {
-      final table = path.split('/rest/v1/').last;
-      if (req.method != 'GET') project.writes.add(table);
-      return _json(req, <Object>[], status: req.method == 'GET' ? 200 : 201);
+      return _rest(req, project, path.split('/rest/v1/').last);
     }
     return _json(req, <String, Object>{});
+  }
+
+  /// A minimal PostgREST: `eq.` filters, upsert on the conflict columns,
+  /// filtered delete.
+  http.Response _rest(
+    http.Request req,
+    FakeSupabaseProject project,
+    String table,
+  ) {
+    const control = {'select', 'on_conflict', 'columns'};
+    final filters = {
+      for (final e in req.url.queryParameters.entries)
+        if (!control.contains(e.key) && e.value.startsWith('eq.'))
+          e.key: e.value.substring(3),
+    };
+    bool matches(Map<String, dynamic> row) =>
+        filters.entries.every((f) => '${row[f.key]}' == f.value);
+    final rows = project.rows(table);
+    switch (req.method) {
+      case 'GET':
+        return _json(req, [for (final r in rows) if (matches(r)) r]);
+      case 'DELETE':
+        project.writes.add(table);
+        rows.removeWhere(matches);
+        return http.Response('', 204, request: req);
+      default:
+        project.writes.add(table);
+        final body = req.body.isEmpty ? null : jsonDecode(req.body);
+        final incoming = [
+          if (body is List)
+            for (final r in body) Map<String, dynamic>.from(r as Map)
+          else if (body is Map)
+            Map<String, dynamic>.from(body),
+        ];
+        final conflict =
+            (req.url.queryParameters['on_conflict'] ?? '').split(',');
+        for (final row in incoming) {
+          rows.removeWhere((r) =>
+              conflict.first.isNotEmpty &&
+              conflict.every((c) => '${r[c]}' == '${row[c]}'));
+          rows.add(row);
+        }
+        return _json(req, <Object>[], status: 201);
+    }
   }
 
   static int _tokenSeq = 0;

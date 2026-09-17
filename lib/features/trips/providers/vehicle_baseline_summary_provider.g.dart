@@ -152,6 +152,12 @@ final class VehicleBaselineSummaryFamily extends $Family
 /// Wipe every baseline entry for [vehicleId] (#779). Invalidates the
 /// summary provider so the UI rebuilds to the zero state.
 ///
+/// #4345 — the synced copy goes too: [BaselinesSync.delete] was written
+/// for exactly this "forget baseline" action but had no caller, so the
+/// next merge brought a reset baseline back. With the consent withdrawn
+/// the intent is journaled only, and nothing happens without a synced
+/// identity.
+///
 /// `keepAlive: true` prevents Riverpod from disposing the provider
 /// mid-await — without it, the `ref.invalidate` call at the tail of
 /// this method lands on a torn-down element.
@@ -162,6 +168,12 @@ final resetVehicleBaselinesProvider = ResetVehicleBaselinesFamily._();
 /// Wipe every baseline entry for [vehicleId] (#779). Invalidates the
 /// summary provider so the UI rebuilds to the zero state.
 ///
+/// #4345 — the synced copy goes too: [BaselinesSync.delete] was written
+/// for exactly this "forget baseline" action but had no caller, so the
+/// next merge brought a reset baseline back. With the consent withdrawn
+/// the intent is journaled only, and nothing happens without a synced
+/// identity.
+///
 /// `keepAlive: true` prevents Riverpod from disposing the provider
 /// mid-await — without it, the `ref.invalidate` call at the tail of
 /// this method lands on a torn-down element.
@@ -171,6 +183,12 @@ final class ResetVehicleBaselinesProvider
     with $FutureModifier<void>, $FutureProvider<void> {
   /// Wipe every baseline entry for [vehicleId] (#779). Invalidates the
   /// summary provider so the UI rebuilds to the zero state.
+  ///
+  /// #4345 — the synced copy goes too: [BaselinesSync.delete] was written
+  /// for exactly this "forget baseline" action but had no caller, so the
+  /// next merge brought a reset baseline back. With the consent withdrawn
+  /// the intent is journaled only, and nothing happens without a synced
+  /// identity.
   ///
   /// `keepAlive: true` prevents Riverpod from disposing the provider
   /// mid-await — without it, the `ref.invalidate` call at the tail of
@@ -219,10 +237,16 @@ final class ResetVehicleBaselinesProvider
 }
 
 String _$resetVehicleBaselinesHash() =>
-    r'2542239c22e9b3bfc7d11de932d5340856813c1e';
+    r'47e32455d99bf82b79d8dbce6ca7ac7d8c03bbdd';
 
 /// Wipe every baseline entry for [vehicleId] (#779). Invalidates the
 /// summary provider so the UI rebuilds to the zero state.
+///
+/// #4345 — the synced copy goes too: [BaselinesSync.delete] was written
+/// for exactly this "forget baseline" action but had no caller, so the
+/// next merge brought a reset baseline back. With the consent withdrawn
+/// the intent is journaled only, and nothing happens without a synced
+/// identity.
 ///
 /// `keepAlive: true` prevents Riverpod from disposing the provider
 /// mid-await — without it, the `ref.invalidate` call at the tail of
@@ -241,6 +265,12 @@ final class ResetVehicleBaselinesFamily extends $Family
 
   /// Wipe every baseline entry for [vehicleId] (#779). Invalidates the
   /// summary provider so the UI rebuilds to the zero state.
+  ///
+  /// #4345 — the synced copy goes too: [BaselinesSync.delete] was written
+  /// for exactly this "forget baseline" action but had no caller, so the
+  /// next merge brought a reset baseline back. With the consent withdrawn
+  /// the intent is journaled only, and nothing happens without a synced
+  /// identity.
   ///
   /// `keepAlive: true` prevents Riverpod from disposing the provider
   /// mid-await — without it, the `ref.invalidate` call at the tail of
