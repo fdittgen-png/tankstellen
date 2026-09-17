@@ -80,3 +80,16 @@ TripFuelSourceKind tripFuelSourceKind(TripSummary summary) {
   }
   return TripFuelSourceKind.none;
 }
+
+/// #4321 — the pump gain [summary]'s stored litres actually CARRY: its
+/// [TripSummary.pumpGainApplied] (null ≡ 1.0) when the trip is
+/// [TripFuelSourceKind.estimated], 1.0 for every other class. The recorder
+/// stamps the resolved gain on every trip, but only the estimated branches
+/// (MAF / speed-density) multiply by it; a measured or GPS trip divided by
+/// its stamp would feed calibration a figure scaled by 1/gain. Readers that
+/// strip the gain back to the raw estimator output divide by THIS, never by
+/// the raw stamp.
+double tripPumpGainCarried(TripSummary summary) =>
+    tripFuelSourceKind(summary) == TripFuelSourceKind.estimated
+        ? (summary.pumpGainApplied ?? 1.0)
+        : 1.0;

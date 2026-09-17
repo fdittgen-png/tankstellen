@@ -5365,6 +5365,523 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileSectionRegion => 'Region';
 
   @override
+  String get fuelAndTankTitle => 'Fuel & Tank';
+
+  @override
+  String get fuelAndTankOpenAction => 'What\'s in my tank?';
+
+  @override
+  String get fuelAndTankNoVehicle =>
+      'Select a vehicle that runs on liquid fuel to see its tank and how it behaves on each fuel.';
+
+  @override
+  String get fuelAndTankMixTitle => 'In your tank now';
+
+  @override
+  String fuelAndTankMixFocalAtLeast(String percent) {
+    return '≥ $percent %';
+  }
+
+  @override
+  String fuelAndTankMixFocalExact(String percent) {
+    return '$percent %';
+  }
+
+  @override
+  String fuelAndTankMixShareAtLeast(String percent, String fuel) {
+    return '≥ $percent % $fuel';
+  }
+
+  @override
+  String fuelAndTankMixShareExact(String percent, String fuel) {
+    return '$percent % $fuel';
+  }
+
+  @override
+  String fuelAndTankMixUnknownShare(String percent) {
+    return '$percent % unknown';
+  }
+
+  @override
+  String get fuelAndTankMixExplainPartial =>
+      'The shares are guaranteed minimums. The unknown part could be any of these fuels — it grows with fill-ups logged without a tank level.';
+
+  @override
+  String get fuelAndTankMixExplainExact =>
+      'Every litre is accounted for by your fill-up history.';
+
+  @override
+  String get fuelAndTankMixUnknownTitle => 'Mix unknown';
+
+  @override
+  String get fuelAndTankMixUnknownBody =>
+      'Your fill-up history can\'t tell what is in the tank yet. A fill-up to a full tank makes the mix known again.';
+
+  @override
+  String fuelAndTankMixVolumeExact(String litres) {
+    return '$litres in the tank';
+  }
+
+  @override
+  String fuelAndTankMixVolumeRange(String min, String max) {
+    return 'Between $min and $max in the tank';
+  }
+
+  @override
+  String fuelAndTankMixVolumeAtLeast(String min) {
+    return 'At least $min in the tank';
+  }
+
+  @override
+  String fuelAndTankMixBarSemantics(String summary) {
+    return 'Tank mix: $summary';
+  }
+
+  @override
+  String get fuelAndTankCompatTitle => 'Fuels for this vehicle';
+
+  @override
+  String get fuelAndTankCompatApproved => 'Approved in your vehicle settings';
+
+  @override
+  String get fuelAndTankCompatUnconfirmed =>
+      'Fit, but not confirmed for this vehicle';
+
+  @override
+  String get fuelAndTankCompatUnknown =>
+      'This vehicle has no fuel set, so its approved fuels are unknown. Set its fuel in the vehicle settings.';
+
+  @override
+  String get fuelAndTankCompatHint =>
+      'Only your vehicle settings count as approval — a fuel that fits the filler neck is not necessarily approved.';
+
+  @override
+  String get fuelAndTankBehaviourTitle => 'How your car behaves';
+
+  @override
+  String get fuelAndTankObservedBadge => 'Your car';
+
+  @override
+  String get fuelAndTankMetricConsumption => 'Consumption';
+
+  @override
+  String get fuelAndTankMetricCostPerKm => 'Cost per km';
+
+  @override
+  String get fuelAndTankMetricRange => 'Range per tank';
+
+  @override
+  String get fuelAndTankMetricCo2e => 'CO2e per km';
+
+  @override
+  String fuelAndTankCostPerKmValue(String amount, String currency) {
+    return '$amount $currency/km';
+  }
+
+  @override
+  String fuelAndTankCo2eValue(String grams) {
+    return '$grams g/km';
+  }
+
+  @override
+  String get fuelAndTankNotEnoughEvidence => 'Not enough evidence yet';
+
+  @override
+  String get fuelAndTankProvenanceMeasured => 'Measured';
+
+  @override
+  String get fuelAndTankProvenanceEstimated => 'Estimated';
+
+  @override
+  String get fuelAndTankProvenanceGeneral => 'General information';
+
+  @override
+  String fuelAndTankSampleCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count samples',
+      one: '1 sample',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fuelAndTankConfidenceLow => 'low confidence';
+
+  @override
+  String get fuelAndTankConfidenceMedium => 'medium confidence';
+
+  @override
+  String get fuelAndTankConfidenceHigh => 'high confidence';
+
+  @override
+  String fuelAndTankInterval(String low, String high) {
+    return '95 % range $low – $high';
+  }
+
+  @override
+  String get fuelAndTankInsufficientNoEvidence => 'No data on this fuel yet';
+
+  @override
+  String get fuelAndTankInsufficientTooFewSamples => 'Too few samples so far';
+
+  @override
+  String get fuelAndTankInsufficientTooLittleDistance =>
+      'Not enough distance driven yet';
+
+  @override
+  String get fuelAndTankInsufficientCapacityUnknown =>
+      'Needs the tank capacity in your vehicle settings';
+
+  @override
+  String get fuelAndTankInsufficientNoCo2eFactor =>
+      'No CO2e factor on record for this fuel';
+
+  @override
+  String get fuelAndTankInsufficientContextNotPure =>
+      'Not available for a mixed tank';
+
+  @override
+  String get fuelAndTankInsufficientTooUncertain => 'Too uncertain to show';
+
+  @override
+  String get fuelAndTankUncontrolled =>
+      'Not adjusted for driving conditions yet — hills, cold starts and traffic are still in these figures.';
+
+  @override
+  String get fuelAndTankBasisReferenceWindows =>
+      'From full-tank to full-tank fill-ups';
+
+  @override
+  String get fuelAndTankBasisMeasuredTrips =>
+      'From engine readings on your trips';
+
+  @override
+  String get fuelAndTankBasisEstimatedTrips => 'Estimated from your trips';
+
+  @override
+  String get fuelAndTankBasisMeasuredResiduals =>
+      'From engine readings, adjusted for driving conditions';
+
+  @override
+  String get fuelAndTankBasisEstimatedResiduals =>
+      'Estimated, adjusted for driving conditions';
+
+  @override
+  String get fuelAndTankBasisDerived => 'Calculated from your other figures';
+
+  @override
+  String fuelAndTankMixedContext(String first, String second) {
+    return 'Mixed $first + $second';
+  }
+
+  @override
+  String get fuelAndTankNoEvidenceRow => 'Not driven on this fuel yet';
+
+  @override
+  String get fuelAndTankDetailsToggle => 'How these figures are made';
+
+  @override
+  String fuelAndTankModelVersions(String profile, String blend) {
+    return 'Behaviour model v$profile · blend model v$blend';
+  }
+
+  @override
+  String fuelAndTankCompareMore(String fuel, String percent, String other) {
+    return '$fuel uses $percent % more than $other';
+  }
+
+  @override
+  String fuelAndTankCompareLess(String fuel, String percent, String other) {
+    return '$fuel uses $percent % less than $other';
+  }
+
+  @override
+  String fuelAndTankCompareSame(String fuel, String other) {
+    return '$fuel and $other use about the same';
+  }
+
+  @override
+  String fuelAndTankCompareInsufficient(String fuel, String other) {
+    return 'Not enough evidence yet to compare $fuel with $other';
+  }
+
+  @override
+  String get fuelAndTankCompareWithinUncertainty =>
+      'The difference is still within the uncertainty.';
+
+  @override
+  String get fuelAndTankCompareAdjusted => 'Adjusted for driving conditions.';
+
+  @override
+  String get fuelAndTankCompareNeedsTwo =>
+      'Drive on two different fuels to compare them.';
+
+  @override
+  String get fuelAndTankFactsTitle => 'General fuel facts';
+
+  @override
+  String get fuelAndTankFactsSubtitle =>
+      'From the fuel standards — not measured on your car.';
+
+  @override
+  String fuelAndTankFactPetrol(String fuel, String petrol, String open) {
+    return '$fuel: at least $petrol % petrol; up to $open % can be ethanol.';
+  }
+
+  @override
+  String fuelAndTankFactEthanol(String fuel, String ethanol) {
+    return '$fuel: at least $ethanol % ethanol; the rest varies with the season.';
+  }
+
+  @override
+  String fuelAndTankFactDiesel(String fuel, String diesel, String open) {
+    return '$fuel: at least $diesel % diesel; up to $open % can be biodiesel.';
+  }
+
+  @override
+  String fuelAndTankFactLpg(String fuel) {
+    return '$fuel: liquefied petroleum gas, a fuel of its own.';
+  }
+
+  @override
+  String fuelAndTankFactOctane(String fuel) {
+    return '$fuel names the octane rating, not the ethanol content.';
+  }
+
+  @override
+  String get fuelAndTankObjectiveTitle => 'Optimise the next fill for';
+
+  @override
+  String get fuelAndTankObjectiveCost => 'Lowest cost per km';
+
+  @override
+  String get fuelAndTankObjectiveConsumption => 'Lowest consumption';
+
+  @override
+  String get fuelAndTankObjectiveCo2e => 'Lowest CO2e';
+
+  @override
+  String get fuelAndTankObjectiveBalanced => 'Cost and CO2e';
+
+  @override
+  String get fuelAndTankObjectiveRange => 'Longest range';
+
+  @override
+  String get fuelAndTankNextFillTitle => 'Next fill';
+
+  @override
+  String fuelAndTankOutcomeRecommend(String fuel) {
+    return 'Fill $fuel next';
+  }
+
+  @override
+  String get fuelAndTankOutcomeNoAdvantage =>
+      'No fuel is clearly better right now';
+
+  @override
+  String get fuelAndTankOutcomeInsufficient =>
+      'Not enough evidence to recommend a fuel yet';
+
+  @override
+  String get fuelAndTankOutcomeTradeOff =>
+      'A trade-off: one fuel is cheaper, another emits less';
+
+  @override
+  String get fuelAndTankOutcomeNoCompatible =>
+      'No priced fuel is confirmed for this vehicle';
+
+  @override
+  String get fuelAndTankOutcomeCompatibilityUnknown =>
+      'Approved fuels unknown — no recommendation';
+
+  @override
+  String fuelAndTankDecisionConfidence(String confidence) {
+    return 'Decision made with $confidence';
+  }
+
+  @override
+  String get fuelAndTankNoPricesTitle => 'No price comparison possible';
+
+  @override
+  String get fuelAndTankNoPricesBody =>
+      'None of your favourite stations has a current price for a fuel this vehicle can take. Add stations to your favourites to compare.';
+
+  @override
+  String fuelAndTankPricesSource(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Cheapest prices for $count fuels among your favourite stations',
+      one: 'Cheapest price for 1 fuel among your favourite stations',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fuelAndTankReasonCapabilityUnknown =>
+      'This vehicle\'s approved fuels aren\'t set, so nothing can be recommended.';
+
+  @override
+  String get fuelAndTankReasonGradeNotApproved =>
+      'Not confirmed as approved in your vehicle settings.';
+
+  @override
+  String get fuelAndTankReasonFillVolumeUnknown =>
+      'The size of the next fill is unknown — set the tank capacity and log a full-tank fill-up.';
+
+  @override
+  String get fuelAndTankReasonResultingBlendUnknown =>
+      'The tank mix after this fill can\'t be determined.';
+
+  @override
+  String get fuelAndTankReasonNoBehaviourEvidence =>
+      'No consumption on record for this mix yet.';
+
+  @override
+  String get fuelAndTankReasonInterpolated =>
+      'Estimated from how your car burns each fuel on its own.';
+
+  @override
+  String get fuelAndTankReasonConfoundersUncontrolled =>
+      'Not adjusted for driving conditions yet.';
+
+  @override
+  String get fuelAndTankReasonNoCo2eFactor =>
+      'No CO2e factor on record for this fuel mix.';
+
+  @override
+  String get fuelAndTankReasonCapacityUnknown =>
+      'Range needs the tank capacity in your vehicle settings.';
+
+  @override
+  String get fuelAndTankReasonDetourNotPriced =>
+      'The detour to the station isn\'t priced in.';
+
+  @override
+  String get fuelAndTankReasonDetourIncluded =>
+      'The detour to the station is priced in.';
+
+  @override
+  String get fuelAndTankReasonOnlyOneCandidate =>
+      'Only one fuel has a price, so there is nothing to compare.';
+
+  @override
+  String get fuelAndTankReasonUnevaluatedAlternatives =>
+      'Some fuels couldn\'t be evaluated yet.';
+
+  @override
+  String get fuelAndTankReasonUncertaintyDominates =>
+      'The difference is smaller than the uncertainty in your data.';
+
+  @override
+  String get fuelAndTankReasonBelowMaterialThreshold =>
+      'The difference is too small to be worth switching.';
+
+  @override
+  String get fuelAndTankCandidatesToggle => 'Compare the fuels';
+
+  @override
+  String fuelAndTankCandidatePrice(String price) {
+    return 'Pump price $price';
+  }
+
+  @override
+  String fuelAndTankCandidateFill(String litres) {
+    return 'Filling $litres';
+  }
+
+  @override
+  String fuelAndTankCandidateResultingMix(String mix) {
+    return 'Tank after this fill: $mix';
+  }
+
+  @override
+  String fuelAndTankExcludedLine(String fuel, String reason) {
+    return '$fuel — $reason';
+  }
+
+  @override
+  String fuelAndTankTradeOffCheaper(
+    String amount,
+    String currency,
+    String other,
+  ) {
+    return '$amount $currency/km cheaper than $other';
+  }
+
+  @override
+  String fuelAndTankTradeOffDearer(
+    String amount,
+    String currency,
+    String other,
+  ) {
+    return '$amount $currency/km dearer than $other';
+  }
+
+  @override
+  String fuelAndTankTradeOffCo2eLess(String grams, String other) {
+    return '$grams g CO2e/km less than $other';
+  }
+
+  @override
+  String fuelAndTankTradeOffCo2eMore(String grams, String other) {
+    return '$grams g CO2e/km more than $other';
+  }
+
+  @override
+  String fuelAndTankBreakEvenPrice(String fuel, String price, String other) {
+    return 'Break-even: $fuel at $price costs the same per km as $other';
+  }
+
+  @override
+  String fuelAndTankBreakEvenConsumption(String other, String consumption) {
+    return 'At today\'s prices it ties with $other at $consumption';
+  }
+
+  @override
+  String fuelAndTankCostPerKgCo2e(String fuel, String amount) {
+    return '$fuel avoids CO2e at $amount per kg';
+  }
+
+  @override
+  String fuelAndTankConvergenceAlready(String percent, String fuel) {
+    return 'The tank already holds at least $percent % $fuel.';
+  }
+
+  @override
+  String fuelAndTankConvergenceReachable(
+    int count,
+    String fuel,
+    String percent,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills of $fuel bring the tank to at least $percent %.',
+      one: '1 fill of $fuel brings the tank to at least $percent %.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelAndTankConvergenceUnreachable(
+    String fuel,
+    String percent,
+    String count,
+  ) {
+    return '$fuel can\'t reach $percent % within $count fills.';
+  }
+
+  @override
+  String get fuelAndTankConvergenceNotComputable =>
+      'How quickly the tank changes over can\'t be computed yet.';
+
+  @override
+  String get fuelAndTankExcludedTitle => 'Left out';
+
+  @override
   String get fuelEfficiencyCardTitle => 'Cost per kilometre by fuel';
 
   @override
@@ -15138,6 +15655,535 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get profileSectionRegion => '⟦Řéǧîóñ ···⟧';
+
+  @override
+  String get fuelAndTankTitle => '⟦Ƒúéł & Ŧáñķ ····⟧';
+
+  @override
+  String get fuelAndTankOpenAction => '⟦Ŵĥáŧ\'š îñ ɱý ŧáñķ? ······⟧';
+
+  @override
+  String get fuelAndTankNoVehicle =>
+      '⟦Šéłéçŧ á ṽéĥîçłé ŧĥáŧ řúñš óñ łîɋúîđ ƒúéł ŧó šéé îŧš ŧáñķ áñđ ĥóŵ îŧ ƀéĥáṽéš óñ éáçĥ ƒúéł. ································⟧';
+
+  @override
+  String get fuelAndTankMixTitle => '⟦Îñ ýóúř ŧáñķ ñóŵ ······⟧';
+
+  @override
+  String fuelAndTankMixFocalAtLeast(String percent) {
+    return '⟦≥ $percent %⟧';
+  }
+
+  @override
+  String fuelAndTankMixFocalExact(String percent) {
+    return '⟦$percent %⟧';
+  }
+
+  @override
+  String fuelAndTankMixShareAtLeast(String percent, String fuel) {
+    return '⟦≥ $percent % $fuel⟧';
+  }
+
+  @override
+  String fuelAndTankMixShareExact(String percent, String fuel) {
+    return '⟦$percent % $fuel⟧';
+  }
+
+  @override
+  String fuelAndTankMixUnknownShare(String percent) {
+    return '⟦$percent % úñķñóŵñ ···⟧';
+  }
+
+  @override
+  String get fuelAndTankMixExplainPartial =>
+      '⟦Ŧĥé šĥářéš ářé ǧúářáñŧééđ ɱîñîɱúɱš. Ŧĥé úñķñóŵñ ƥářŧ çóúłđ ƀé áñý óƒ ŧĥéšé ƒúéłš — îŧ ǧřóŵš ŵîŧĥ ƒîłł-úƥš łóǧǧéđ ŵîŧĥóúŧ á ŧáñķ łéṽéł. ················································⟧';
+
+  @override
+  String get fuelAndTankMixExplainExact =>
+      '⟦Éṽéřý łîŧřé îš áççóúñŧéđ ƒóř ƀý ýóúř ƒîłł-úƥ ĥîšŧóřý. ···················⟧';
+
+  @override
+  String get fuelAndTankMixUnknownTitle => '⟦Ṁîẋ úñķñóŵñ ·····⟧';
+
+  @override
+  String get fuelAndTankMixUnknownBody =>
+      '⟦Ýóúř ƒîłł-úƥ ĥîšŧóřý çáñ\'ŧ ŧéłł ŵĥáŧ îš îñ ŧĥé ŧáñķ ýéŧ. Á ƒîłł-úƥ ŧó á ƒúłł ŧáñķ ɱáķéš ŧĥé ɱîẋ ķñóŵñ áǧáîñ. ·····································⟧';
+
+  @override
+  String fuelAndTankMixVolumeExact(String litres) {
+    return '⟦$litres îñ ŧĥé ŧáñķ ····⟧';
+  }
+
+  @override
+  String fuelAndTankMixVolumeRange(String min, String max) {
+    return '⟦Ɓéŧŵééñ $min áñđ $max îñ ŧĥé ŧáñķ ·········⟧';
+  }
+
+  @override
+  String fuelAndTankMixVolumeAtLeast(String min) {
+    return '⟦Áŧ łéášŧ $min îñ ŧĥé ŧáñķ ·······⟧';
+  }
+
+  @override
+  String fuelAndTankMixBarSemantics(String summary) {
+    return '⟦Ŧáñķ ɱîẋ: $summary ···⟧';
+  }
+
+  @override
+  String get fuelAndTankCompatTitle => '⟦Ƒúéłš ƒóř ŧĥîš ṽéĥîçłé ·········⟧';
+
+  @override
+  String get fuelAndTankCompatApproved =>
+      '⟦Áƥƥřóṽéđ îñ ýóúř ṽéĥîçłé šéŧŧîñǧš ·············⟧';
+
+  @override
+  String get fuelAndTankCompatUnconfirmed =>
+      '⟦Ƒîŧ, ƀúŧ ñóŧ çóñƒîřɱéđ ƒóř ŧĥîš ṽéĥîçłé ··············⟧';
+
+  @override
+  String get fuelAndTankCompatUnknown =>
+      '⟦Ŧĥîš ṽéĥîçłé ĥáš ñó ƒúéł šéŧ, šó îŧš áƥƥřóṽéđ ƒúéłš ářé úñķñóŵñ. Šéŧ îŧš ƒúéł îñ ŧĥé ṽéĥîçłé šéŧŧîñǧš. ····································⟧';
+
+  @override
+  String get fuelAndTankCompatHint =>
+      '⟦Óñłý ýóúř ṽéĥîçłé šéŧŧîñǧš çóúñŧ áš áƥƥřóṽáł — á ƒúéł ŧĥáŧ ƒîŧš ŧĥé ƒîłłéř ñéçķ îš ñóŧ ñéçéššářîłý áƥƥřóṽéđ. ········································⟧';
+
+  @override
+  String get fuelAndTankBehaviourTitle => '⟦Ĥóŵ ýóúř çář ƀéĥáṽéš ········⟧';
+
+  @override
+  String get fuelAndTankObservedBadge => '⟦Ýóúř çář ···⟧';
+
+  @override
+  String get fuelAndTankMetricConsumption => '⟦Çóñšúɱƥŧîóñ ·····⟧';
+
+  @override
+  String get fuelAndTankMetricCostPerKm => '⟦Çóšŧ ƥéř ķɱ ····⟧';
+
+  @override
+  String get fuelAndTankMetricRange => '⟦Řáñǧé ƥéř ŧáñķ ·····⟧';
+
+  @override
+  String get fuelAndTankMetricCo2e => '⟦ÇÓ2é ƥéř ķɱ ····⟧';
+
+  @override
+  String fuelAndTankCostPerKmValue(String amount, String currency) {
+    return '⟦$amount $currency/ķɱ ·⟧';
+  }
+
+  @override
+  String fuelAndTankCo2eValue(String grams) {
+    return '⟦$grams ǧ/ķɱ ·⟧';
+  }
+
+  @override
+  String get fuelAndTankNotEnoughEvidence =>
+      '⟦Ñóŧ éñóúǧĥ éṽîđéñçé ýéŧ ·········⟧';
+
+  @override
+  String get fuelAndTankProvenanceMeasured => '⟦Ṁéášúřéđ ····⟧';
+
+  @override
+  String get fuelAndTankProvenanceEstimated => '⟦Éšŧîɱáŧéđ ····⟧';
+
+  @override
+  String get fuelAndTankProvenanceGeneral => '⟦Ǧéñéřáł îñƒóřɱáŧîóñ ········⟧';
+
+  @override
+  String fuelAndTankSampleCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count samples',
+      one: '1 sample',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get fuelAndTankConfidenceLow => '⟦łóŵ çóñƒîđéñçé ······⟧';
+
+  @override
+  String get fuelAndTankConfidenceMedium => '⟦ɱéđîúɱ çóñƒîđéñçé ·······⟧';
+
+  @override
+  String get fuelAndTankConfidenceHigh => '⟦ĥîǧĥ çóñƒîđéñçé ······⟧';
+
+  @override
+  String fuelAndTankInterval(String low, String high) {
+    return '⟦95 % řáñǧé $low – $high ··⟧';
+  }
+
+  @override
+  String get fuelAndTankInsufficientNoEvidence =>
+      '⟦Ñó đáŧá óñ ŧĥîš ƒúéł ýéŧ ·········⟧';
+
+  @override
+  String get fuelAndTankInsufficientTooFewSamples =>
+      '⟦Ŧóó ƒéŵ šáɱƥłéš šó ƒář ········⟧';
+
+  @override
+  String get fuelAndTankInsufficientTooLittleDistance =>
+      '⟦Ñóŧ éñóúǧĥ đîšŧáñçé đřîṽéñ ýéŧ ············⟧';
+
+  @override
+  String get fuelAndTankInsufficientCapacityUnknown =>
+      '⟦Ñééđš ŧĥé ŧáñķ çáƥáçîŧý îñ ýóúř ṽéĥîçłé šéŧŧîñǧš ··················⟧';
+
+  @override
+  String get fuelAndTankInsufficientNoCo2eFactor =>
+      '⟦Ñó ÇÓ2é ƒáçŧóř óñ řéçóřđ ƒóř ŧĥîš ƒúéł ··············⟧';
+
+  @override
+  String get fuelAndTankInsufficientContextNotPure =>
+      '⟦Ñóŧ áṽáîłáƀłé ƒóř á ɱîẋéđ ŧáñķ ···········⟧';
+
+  @override
+  String get fuelAndTankInsufficientTooUncertain =>
+      '⟦Ŧóó úñçéřŧáîñ ŧó šĥóŵ ········⟧';
+
+  @override
+  String get fuelAndTankUncontrolled =>
+      '⟦Ñóŧ áđĵúšŧéđ ƒóř đřîṽîñǧ çóñđîŧîóñš ýéŧ — ĥîłłš, çółđ šŧářŧš áñđ ŧřáƒƒîç ářé šŧîłł îñ ŧĥéšé ƒîǧúřéš. ····································⟧';
+
+  @override
+  String get fuelAndTankBasisReferenceWindows =>
+      '⟦Ƒřóɱ ƒúłł-ŧáñķ ŧó ƒúłł-ŧáñķ ƒîłł-úƥš ·············⟧';
+
+  @override
+  String get fuelAndTankBasisMeasuredTrips =>
+      '⟦Ƒřóɱ éñǧîñé řéáđîñǧš óñ ýóúř ŧřîƥš ·············⟧';
+
+  @override
+  String get fuelAndTankBasisEstimatedTrips =>
+      '⟦Éšŧîɱáŧéđ ƒřóɱ ýóúř ŧřîƥš ··········⟧';
+
+  @override
+  String get fuelAndTankBasisMeasuredResiduals =>
+      '⟦Ƒřóɱ éñǧîñé řéáđîñǧš, áđĵúšŧéđ ƒóř đřîṽîñǧ çóñđîŧîóñš ·····················⟧';
+
+  @override
+  String get fuelAndTankBasisEstimatedResiduals =>
+      '⟦Éšŧîɱáŧéđ, áđĵúšŧéđ ƒóř đřîṽîñǧ çóñđîŧîóñš ·················⟧';
+
+  @override
+  String get fuelAndTankBasisDerived =>
+      '⟦Çáłçúłáŧéđ ƒřóɱ ýóúř óŧĥéř ƒîǧúřéš ··············⟧';
+
+  @override
+  String fuelAndTankMixedContext(String first, String second) {
+    return '⟦Ṁîẋéđ $first + $second ··⟧';
+  }
+
+  @override
+  String get fuelAndTankNoEvidenceRow =>
+      '⟦Ñóŧ đřîṽéñ óñ ŧĥîš ƒúéł ýéŧ ··········⟧';
+
+  @override
+  String get fuelAndTankDetailsToggle =>
+      '⟦Ĥóŵ ŧĥéšé ƒîǧúřéš ářé ɱáđé ··········⟧';
+
+  @override
+  String fuelAndTankModelVersions(String profile, String blend) {
+    return '⟦Ɓéĥáṽîóúř ɱóđéł ṽ$profile · ƀłéñđ ɱóđéł ṽ$blend ············⟧';
+  }
+
+  @override
+  String fuelAndTankCompareMore(String fuel, String percent, String other) {
+    return '⟦$fuel úšéš $percent % ɱóřé ŧĥáñ $other ·····⟧';
+  }
+
+  @override
+  String fuelAndTankCompareLess(String fuel, String percent, String other) {
+    return '⟦$fuel úšéš $percent % łéšš ŧĥáñ $other ·····⟧';
+  }
+
+  @override
+  String fuelAndTankCompareSame(String fuel, String other) {
+    return '⟦$fuel áñđ $other úšé áƀóúŧ ŧĥé šáɱé ········⟧';
+  }
+
+  @override
+  String fuelAndTankCompareInsufficient(String fuel, String other) {
+    return '⟦Ñóŧ éñóúǧĥ éṽîđéñçé ýéŧ ŧó çóɱƥářé $fuel ŵîŧĥ $other ···············⟧';
+  }
+
+  @override
+  String get fuelAndTankCompareWithinUncertainty =>
+      '⟦Ŧĥé đîƒƒéřéñçé îš šŧîłł ŵîŧĥîñ ŧĥé úñçéřŧáîñŧý. ··················⟧';
+
+  @override
+  String get fuelAndTankCompareAdjusted =>
+      '⟦Áđĵúšŧéđ ƒóř đřîṽîñǧ çóñđîŧîóñš. ·············⟧';
+
+  @override
+  String get fuelAndTankCompareNeedsTwo =>
+      '⟦Đřîṽé óñ ŧŵó đîƒƒéřéñŧ ƒúéłš ŧó çóɱƥářé ŧĥéɱ. ·················⟧';
+
+  @override
+  String get fuelAndTankFactsTitle => '⟦Ǧéñéřáł ƒúéł ƒáçŧš ·······⟧';
+
+  @override
+  String get fuelAndTankFactsSubtitle =>
+      '⟦Ƒřóɱ ŧĥé ƒúéł šŧáñđářđš — ñóŧ ɱéášúřéđ óñ ýóúř çář. ··················⟧';
+
+  @override
+  String fuelAndTankFactPetrol(String fuel, String petrol, String open) {
+    return '⟦$fuel: áŧ łéášŧ $petrol % ƥéŧřół; úƥ ŧó $open % çáñ ƀé éŧĥáñół. ·············⟧';
+  }
+
+  @override
+  String fuelAndTankFactEthanol(String fuel, String ethanol) {
+    return '⟦$fuel: áŧ łéášŧ $ethanol % éŧĥáñół; ŧĥé řéšŧ ṽářîéš ŵîŧĥ ŧĥé šéášóñ. ··················⟧';
+  }
+
+  @override
+  String fuelAndTankFactDiesel(String fuel, String diesel, String open) {
+    return '⟦$fuel: áŧ łéášŧ $diesel % đîéšéł; úƥ ŧó $open % çáñ ƀé ƀîóđîéšéł. ··············⟧';
+  }
+
+  @override
+  String fuelAndTankFactLpg(String fuel) {
+    return '⟦$fuel: łîɋúéƒîéđ ƥéŧřółéúɱ ǧáš, á ƒúéł óƒ îŧš óŵñ. ···············⟧';
+  }
+
+  @override
+  String fuelAndTankFactOctane(String fuel) {
+    return '⟦$fuel ñáɱéš ŧĥé óçŧáñé řáŧîñǧ, ñóŧ ŧĥé éŧĥáñół çóñŧéñŧ. ··················⟧';
+  }
+
+  @override
+  String get fuelAndTankObjectiveTitle =>
+      '⟦Óƥŧîɱîšé ŧĥé ñéẋŧ ƒîłł ƒóř ··········⟧';
+
+  @override
+  String get fuelAndTankObjectiveCost => '⟦Łóŵéšŧ çóšŧ ƥéř ķɱ ·······⟧';
+
+  @override
+  String get fuelAndTankObjectiveConsumption => '⟦Łóŵéšŧ çóñšúɱƥŧîóñ ········⟧';
+
+  @override
+  String get fuelAndTankObjectiveCo2e => '⟦Łóŵéšŧ ÇÓ2é ····⟧';
+
+  @override
+  String get fuelAndTankObjectiveBalanced => '⟦Çóšŧ áñđ ÇÓ2é ·····⟧';
+
+  @override
+  String get fuelAndTankObjectiveRange => '⟦Łóñǧéšŧ řáñǧé ·····⟧';
+
+  @override
+  String get fuelAndTankNextFillTitle => '⟦Ñéẋŧ ƒîłł ····⟧';
+
+  @override
+  String fuelAndTankOutcomeRecommend(String fuel) {
+    return '⟦Ƒîłł $fuel ñéẋŧ ····⟧';
+  }
+
+  @override
+  String get fuelAndTankOutcomeNoAdvantage =>
+      '⟦Ñó ƒúéł îš çłéářłý ƀéŧŧéř řîǧĥŧ ñóŵ ·············⟧';
+
+  @override
+  String get fuelAndTankOutcomeInsufficient =>
+      '⟦Ñóŧ éñóúǧĥ éṽîđéñçé ŧó řéçóɱɱéñđ á ƒúéł ýéŧ ················⟧';
+
+  @override
+  String get fuelAndTankOutcomeTradeOff =>
+      '⟦Á ŧřáđé-óƒƒ: óñé ƒúéł îš çĥéáƥéř, áñóŧĥéř éɱîŧš łéšš ··················⟧';
+
+  @override
+  String get fuelAndTankOutcomeNoCompatible =>
+      '⟦Ñó ƥřîçéđ ƒúéł îš çóñƒîřɱéđ ƒóř ŧĥîš ṽéĥîçłé ·················⟧';
+
+  @override
+  String get fuelAndTankOutcomeCompatibilityUnknown =>
+      '⟦Áƥƥřóṽéđ ƒúéłš úñķñóŵñ — ñó řéçóɱɱéñđáŧîóñ ················⟧';
+
+  @override
+  String fuelAndTankDecisionConfidence(String confidence) {
+    return '⟦Đéçîšîóñ ɱáđé ŵîŧĥ $confidence ·······⟧';
+  }
+
+  @override
+  String get fuelAndTankNoPricesTitle =>
+      '⟦Ñó ƥřîçé çóɱƥářîšóñ ƥóššîƀłé ···········⟧';
+
+  @override
+  String get fuelAndTankNoPricesBody =>
+      '⟦Ñóñé óƒ ýóúř ƒáṽóúřîŧé šŧáŧîóñš ĥáš á çúřřéñŧ ƥřîçé ƒóř á ƒúéł ŧĥîš ṽéĥîçłé çáñ ŧáķé. Áđđ šŧáŧîóñš ŧó ýóúř ƒáṽóúřîŧéš ŧó çóɱƥářé. ···············································⟧';
+
+  @override
+  String fuelAndTankPricesSource(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Cheapest prices for $count fuels among your favourite stations',
+      one: 'Cheapest price for 1 fuel among your favourite stations',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get fuelAndTankReasonCapabilityUnknown =>
+      '⟦Ŧĥîš ṽéĥîçłé\'š áƥƥřóṽéđ ƒúéłš ářéñ\'ŧ šéŧ, šó ñóŧĥîñǧ çáñ ƀé řéçóɱɱéñđéđ. ··························⟧';
+
+  @override
+  String get fuelAndTankReasonGradeNotApproved =>
+      '⟦Ñóŧ çóñƒîřɱéđ áš áƥƥřóṽéđ îñ ýóúř ṽéĥîçłé šéŧŧîñǧš. ···················⟧';
+
+  @override
+  String get fuelAndTankReasonFillVolumeUnknown =>
+      '⟦Ŧĥé šîžé óƒ ŧĥé ñéẋŧ ƒîłł îš úñķñóŵñ — šéŧ ŧĥé ŧáñķ çáƥáçîŧý áñđ łóǧ á ƒúłł-ŧáñķ ƒîłł-úƥ. ·······························⟧';
+
+  @override
+  String get fuelAndTankReasonResultingBlendUnknown =>
+      '⟦Ŧĥé ŧáñķ ɱîẋ áƒŧéř ŧĥîš ƒîłł çáñ\'ŧ ƀé đéŧéřɱîñéđ. ··················⟧';
+
+  @override
+  String get fuelAndTankReasonNoBehaviourEvidence =>
+      '⟦Ñó çóñšúɱƥŧîóñ óñ řéçóřđ ƒóř ŧĥîš ɱîẋ ýéŧ. ···············⟧';
+
+  @override
+  String get fuelAndTankReasonInterpolated =>
+      '⟦Éšŧîɱáŧéđ ƒřóɱ ĥóŵ ýóúř çář ƀúřñš éáçĥ ƒúéł óñ îŧš óŵñ. ····················⟧';
+
+  @override
+  String get fuelAndTankReasonConfoundersUncontrolled =>
+      '⟦Ñóŧ áđĵúšŧéđ ƒóř đřîṽîñǧ çóñđîŧîóñš ýéŧ. ···············⟧';
+
+  @override
+  String get fuelAndTankReasonNoCo2eFactor =>
+      '⟦Ñó ÇÓ2é ƒáçŧóř óñ řéçóřđ ƒóř ŧĥîš ƒúéł ɱîẋ. ···············⟧';
+
+  @override
+  String get fuelAndTankReasonCapacityUnknown =>
+      '⟦Řáñǧé ñééđš ŧĥé ŧáñķ çáƥáçîŧý îñ ýóúř ṽéĥîçłé šéŧŧîñǧš. ·····················⟧';
+
+  @override
+  String get fuelAndTankReasonDetourNotPriced =>
+      '⟦Ŧĥé đéŧóúř ŧó ŧĥé šŧáŧîóñ îšñ\'ŧ ƥřîçéđ îñ. ···············⟧';
+
+  @override
+  String get fuelAndTankReasonDetourIncluded =>
+      '⟦Ŧĥé đéŧóúř ŧó ŧĥé šŧáŧîóñ îš ƥřîçéđ îñ. ··············⟧';
+
+  @override
+  String get fuelAndTankReasonOnlyOneCandidate =>
+      '⟦Óñłý óñé ƒúéł ĥáš á ƥřîçé, šó ŧĥéřé îš ñóŧĥîñǧ ŧó çóɱƥářé. ····················⟧';
+
+  @override
+  String get fuelAndTankReasonUnevaluatedAlternatives =>
+      '⟦Šóɱé ƒúéłš çóúłđñ\'ŧ ƀé éṽáłúáŧéđ ýéŧ. ··············⟧';
+
+  @override
+  String get fuelAndTankReasonUncertaintyDominates =>
+      '⟦Ŧĥé đîƒƒéřéñçé îš šɱáłłéř ŧĥáñ ŧĥé úñçéřŧáîñŧý îñ ýóúř đáŧá. ·······················⟧';
+
+  @override
+  String get fuelAndTankReasonBelowMaterialThreshold =>
+      '⟦Ŧĥé đîƒƒéřéñçé îš ŧóó šɱáłł ŧó ƀé ŵóřŧĥ šŵîŧçĥîñǧ. ··················⟧';
+
+  @override
+  String get fuelAndTankCandidatesToggle => '⟦Çóɱƥářé ŧĥé ƒúéłš ·······⟧';
+
+  @override
+  String fuelAndTankCandidatePrice(String price) {
+    return '⟦Ƥúɱƥ ƥřîçé $price ····⟧';
+  }
+
+  @override
+  String fuelAndTankCandidateFill(String litres) {
+    return '⟦Ƒîłłîñǧ $litres ···⟧';
+  }
+
+  @override
+  String fuelAndTankCandidateResultingMix(String mix) {
+    return '⟦Ŧáñķ áƒŧéř ŧĥîš ƒîłł: $mix ········⟧';
+  }
+
+  @override
+  String fuelAndTankExcludedLine(String fuel, String reason) {
+    return '⟦$fuel — $reason⟧';
+  }
+
+  @override
+  String fuelAndTankTradeOffCheaper(
+    String amount,
+    String currency,
+    String other,
+  ) {
+    return '⟦$amount $currency/ķɱ çĥéáƥéř ŧĥáñ $other ······⟧';
+  }
+
+  @override
+  String fuelAndTankTradeOffDearer(
+    String amount,
+    String currency,
+    String other,
+  ) {
+    return '⟦$amount $currency/ķɱ đéářéř ŧĥáñ $other ·····⟧';
+  }
+
+  @override
+  String fuelAndTankTradeOffCo2eLess(String grams, String other) {
+    return '⟦$grams ǧ ÇÓ2é/ķɱ łéšš ŧĥáñ $other ······⟧';
+  }
+
+  @override
+  String fuelAndTankTradeOffCo2eMore(String grams, String other) {
+    return '⟦$grams ǧ ÇÓ2é/ķɱ ɱóřé ŧĥáñ $other ······⟧';
+  }
+
+  @override
+  String fuelAndTankBreakEvenPrice(String fuel, String price, String other) {
+    return '⟦Ɓřéáķ-éṽéñ: $fuel áŧ $price çóšŧš ŧĥé šáɱé ƥéř ķɱ áš $other ··············⟧';
+  }
+
+  @override
+  String fuelAndTankBreakEvenConsumption(String other, String consumption) {
+    return '⟦Áŧ ŧóđáý\'š ƥřîçéš îŧ ŧîéš ŵîŧĥ $other áŧ $consumption ············⟧';
+  }
+
+  @override
+  String fuelAndTankCostPerKgCo2e(String fuel, String amount) {
+    return '⟦$fuel áṽóîđš ÇÓ2é áŧ $amount ƥéř ķǧ ·······⟧';
+  }
+
+  @override
+  String fuelAndTankConvergenceAlready(String percent, String fuel) {
+    return '⟦Ŧĥé ŧáñķ áłřéáđý ĥółđš áŧ łéášŧ $percent % $fuel. ············⟧';
+  }
+
+  @override
+  String fuelAndTankConvergenceReachable(
+    int count,
+    String fuel,
+    String percent,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills of $fuel bring the tank to at least $percent %.',
+      one: '1 fill of $fuel brings the tank to at least $percent %.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String fuelAndTankConvergenceUnreachable(
+    String fuel,
+    String percent,
+    String count,
+  ) {
+    return '⟦$fuel çáñ\'ŧ řéáçĥ $percent % ŵîŧĥîñ $count ƒîłłš. ·········⟧';
+  }
+
+  @override
+  String get fuelAndTankConvergenceNotComputable =>
+      '⟦Ĥóŵ ɋúîçķłý ŧĥé ŧáñķ çĥáñǧéš óṽéř çáñ\'ŧ ƀé çóɱƥúŧéđ ýéŧ. ····················⟧';
+
+  @override
+  String get fuelAndTankExcludedTitle => '⟦Łéƒŧ óúŧ ···⟧';
 
   @override
   String get fuelEfficiencyCardTitle =>

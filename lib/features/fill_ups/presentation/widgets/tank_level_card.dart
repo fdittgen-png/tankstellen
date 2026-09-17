@@ -16,6 +16,7 @@ import '../../providers/tank_level_provider.dart';
 import '../../providers/tank_mix_provider.dart';
 import '../../../trips/api.dart';
 import '../../../../core/utils/localized_fuel_name.dart';
+import 'fuel_and_tank/fuel_and_tank_entry_button.dart';
 
 /// Tank-level card on the Fuel tab (#1195) — the Carburant tab's
 /// **primary card** since #3950 (Epic #3947).
@@ -222,6 +223,9 @@ class _PopulatedTankLevelCard extends ConsumerWidget {
               style: labelStyle,
             ),
           ],
+          // #4278 — the way into the Fuel & Tank surface (self-hides
+          // unless the active vehicle burns liquid fuel).
+          const FuelAndTankEntryButton(),
         ],
       ),
     );

@@ -66,6 +66,7 @@ export 'domain/situation_classifier.dart';
 export 'domain/trip_recorder.dart';
 export 'domain/trip_sample.dart';
 export 'domain/trip_summary.dart';
+export 'domain/trip_consumption_source_class.dart'; // #4230 / #4276
 export 'domain/trip_fuel_source.dart'; // #3919
 export 'domain/calibrated_trip_figures.dart'; // #3918
 export 'presentation/screens/trajets_map_screen.dart';

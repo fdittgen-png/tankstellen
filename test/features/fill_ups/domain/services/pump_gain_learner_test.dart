@@ -31,7 +31,8 @@ FillUp _fill(String id, int day, double odo, double liters,
       linkedTripIds: trips,
     );
 
-TripSummary _trip(double km, double liters, {double? gain, String? fuelKey}) =>
+TripSummary _trip(double km, double liters,
+        {double? gain, String? fuelKey, String? dominant}) =>
     TripSummary(
       distanceKm: km,
       maxRpm: 3000,
@@ -44,6 +45,7 @@ TripSummary _trip(double km, double liters, {double? gain, String? fuelKey}) =>
       startedAt: _t0,
       pumpGainApplied: gain,
       pumpGainFuelKey: fuelKey,
+      dominantFuelSource: dominant,
     );
 
 void main() {
@@ -83,7 +85,8 @@ void main() {
     await repo.save(const VehicleProfile(
         id: 'car', name: 'Flex', pumpGain: 0.6, pumpGainSamples: 1));
     // Recorded WITH gain 0.6: 6.3 L/100 km shown → raw 10.5; pump 6.39.
-    final trips = {'a': _trip(500, 31.5, gain: 0.6)};
+    // #4321 — an ESTIMATED trip: only those branches multiply by the gain.
+    final trips = {'a': _trip(500, 31.5, gain: 0.6, dominant: 'speedDensity')};
     final r = await learner.reconcileAfterFillUp(
       vehicleId: 'car',
       closing: _fill('f2', 10, 100559, 35.7, trips: ['a']),
@@ -94,6 +97,58 @@ void main() {
     // target 0.608, blended 0.5/0.5 with 0.6 → ≈ 0.604
     expect(r.newGain, closeTo(0.604, 0.005));
     expect(r.sampleCount, 2);
+  });
+
+  // #4321 — the recorder stamps `pumpGainApplied` on EVERY trip, but only
+  // the estimated branches (MAF / speed-density) multiply by it. A measured
+  // trip's litres were never scaled, so dividing them by the stamp would
+  // feed the ECU's own figure into calibration scaled by 1/gain.
+  for (final source in ['pid5E', 'pid9D', 'pidA2']) {
+    test('#4321 — a measured ($source) trip stamped pg 0.8 contributes its '
+        'RAW litres, not litres ÷ 0.8', () async {
+      await repo.save(const VehicleProfile(
+          id: 'car', name: 'Flex', pumpGain: 0.8, pumpGainSamples: 1));
+      final trips = {'a': _trip(453, 47.6, gain: 0.8, dominant: source)};
+      final closing = _fill('f2', 10, 100559, 35.7, trips: ['a']);
+      final o = await learner.evaluate(
+          vehicleId: 'car',
+          closing: closing,
+          fillUps: [_fill('f1', 0, 100000, 40), closing],
+          tripSummariesById: trips);
+      expect(o.rawRecordedLPer100Km, closeTo(10.5, 0.01),
+          reason: '47.6 L / 453 km as the ECU reported it; 13.13 means the '
+              'unapplied gain was divided back out');
+      expect(o.result!.newGain, closeTo(0.5 * 0.608 + 0.5 * 0.8, 0.005));
+    });
+  }
+
+  test('#4321 — an estimated trip still has its gain removed exactly once, '
+      'and a GPS trip is never unscaled', () async {
+    final closing = _fill('f2', 10, 100559, 35.7, trips: ['a', 'b']);
+    final o = await learner.evaluate(
+        vehicleId: 'car',
+        closing: closing,
+        fillUps: [_fill('f1', 0, 100000, 40), closing],
+        tripSummariesById: {
+          // 30 L/100 raw × 0.8 stored → 24 L; stripped once → 30 L.
+          'a': _trip(300, 25.2, gain: 0.8, dominant: 'maf'),
+          // GPS physics: no pump gain ever multiplied it.
+          'b': TripSummary(
+            distanceKm: 153,
+            maxRpm: 0,
+            highRpmSeconds: 0,
+            idleSeconds: 0,
+            harshBrakes: 0,
+            harshAccelerations: 0,
+            fuelLitersConsumed: 16.07,
+            avgLPer100Km: 16.07 / 153 * 100,
+            startedAt: _t0,
+            pumpGainApplied: 0.8,
+            kind: TripKind.gpsOnly,
+          ),
+        });
+    // (25.2 / 0.8 + 16.07) / 453 km × 100 = 10.5 L/100 km.
+    expect(o.rawRecordedLPer100Km, closeTo(10.5, 0.01));
   });
 
   test('partial fill, thin coverage, and implausible ratios are refused', () async {

@@ -38,6 +38,7 @@ void main() {
     StorageKeys.helpBannerCriteria,
     StorageKeys.helpBannerAlerts,
     StorageKeys.supabaseAnonKey,
+    StorageKeys.fillObjective,
   ];
 
   group('StorageKeys', () {

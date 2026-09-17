@@ -166,14 +166,12 @@ class TankReport {
   final PumpCalibration? calibration;
 }
 
-/// Build the report. [fillUps] must already be scoped to one vehicle
-/// (the provider layer owns that); [tripSummariesById] resolves the
-/// closing pleins' `linkedTripIds`.
-TankReport buildTankReport({
-  required List<FillUp> fillUps,
-  required Map<String, TripSummary> tripSummariesById,
-}) {
-  if (fillUps.length < 2) return TankReport.empty;
+/// Every closed, plausible plein-to-plein window of [fillUps], oldest
+/// first — the #1362 walk, shared by the tank report and the fuel
+/// behaviour evidence (#4276) so the two can never disagree on a window.
+/// [fillUps] must already be scoped to one vehicle.
+List<TankPeriod> closedTankPeriods(List<FillUp> fillUps) {
+  if (fillUps.length < 2) return const [];
   final sorted = [...fillUps]..sort((a, b) => a.date.compareTo(b.date));
 
   // Walk the #1362 windows: opening plein/first fill → closing plein.
@@ -202,6 +200,17 @@ TankReport buildTankReport({
       cost = 0.0;
     }
   }
+  return periods;
+}
+
+/// Build the report. [fillUps] must already be scoped to one vehicle
+/// (the provider layer owns that); [tripSummariesById] resolves the
+/// closing pleins' `linkedTripIds`.
+TankReport buildTankReport({
+  required List<FillUp> fillUps,
+  required Map<String, TripSummary> tripSummariesById,
+}) {
+  final periods = closedTankPeriods(fillUps);
   if (periods.isEmpty) return TankReport.empty;
 
   TankBehavior behaviorOf(TankPeriod p) => TankBehavior.fromTrips(

@@ -1,0 +1,789 @@
+{
+  "fuelAndTankTitle": "Fuel & Tank",
+  "@fuelAndTankTitle": {
+    "description": "App bar title of the Fuel & Tank explanation surface (#4278)."
+  },
+  "fuelAndTankOpenAction": "What's in my tank?",
+  "@fuelAndTankOpenAction": {
+    "description": "Button on the tank level card that opens the Fuel & Tank surface (#4278)."
+  },
+  "fuelAndTankNoVehicle": "Select a vehicle that runs on liquid fuel to see its tank and how it behaves on each fuel.",
+  "@fuelAndTankNoVehicle": {
+    "description": "Fuel & Tank empty state when there is no active vehicle or it does not burn liquid fuel (#4278)."
+  },
+  "fuelAndTankMixTitle": "In your tank now",
+  "@fuelAndTankMixTitle": {
+    "description": "Heading of the tank mix card (#4278)."
+  },
+  "fuelAndTankMixFocalAtLeast": "≥ {percent} %",
+  "@fuelAndTankMixFocalAtLeast": {
+    "description": "Focal number of the tank mix card: the guaranteed minimum share of the leading fuel. The fuel name is shown beside it (#4278).",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixFocalExact": "{percent} %",
+  "@fuelAndTankMixFocalExact": {
+    "description": "Focal number of the tank mix card when the mix is fully known (#4278).",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixShareAtLeast": "≥ {percent} % {fuel}",
+  "@fuelAndTankMixShareAtLeast": {
+    "description": "One fuel's guaranteed minimum share in the tank mix line, e.g. '≥ 62 % E85' (#4278).",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixShareExact": "{percent} % {fuel}",
+  "@fuelAndTankMixShareExact": {
+    "description": "One fuel's exact share in a fully known tank mix (#4278).",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixUnknownShare": "{percent} % unknown",
+  "@fuelAndTankMixUnknownShare": {
+    "description": "The share of the tank no fuel can be credited with (#4278).",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixExplainPartial": "The shares are guaranteed minimums. The unknown part could be any of these fuels — it grows with fill-ups logged without a tank level.",
+  "@fuelAndTankMixExplainPartial": {
+    "description": "Explains a partly unknown tank mix (#4278)."
+  },
+  "fuelAndTankMixExplainExact": "Every litre is accounted for by your fill-up history.",
+  "@fuelAndTankMixExplainExact": {
+    "description": "Explains a fully known tank mix (#4278)."
+  },
+  "fuelAndTankMixUnknownTitle": "Mix unknown",
+  "@fuelAndTankMixUnknownTitle": {
+    "description": "Tank mix card title when nothing about the tank's content can be attributed (#4278)."
+  },
+  "fuelAndTankMixUnknownBody": "Your fill-up history can't tell what is in the tank yet. A fill-up to a full tank makes the mix known again.",
+  "@fuelAndTankMixUnknownBody": {
+    "description": "Tank mix card body in the unknown state (#4278)."
+  },
+  "fuelAndTankMixVolumeExact": "{litres} in the tank",
+  "@fuelAndTankMixVolumeExact": {
+    "description": "Tank volume when it is known exactly; litres is a formatted volume like '32.0 L' (#4278).",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixVolumeRange": "Between {min} and {max} in the tank",
+  "@fuelAndTankMixVolumeRange": {
+    "description": "Tank volume as an interval of formatted volumes (#4278).",
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixVolumeAtLeast": "At least {min} in the tank",
+  "@fuelAndTankMixVolumeAtLeast": {
+    "description": "Tank volume when only a lower bound is known (#4278).",
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMixBarSemantics": "Tank mix: {summary}",
+  "@fuelAndTankMixBarSemantics": {
+    "description": "Screen-reader label of the tank mix bar; summary is the mix line (#4278).",
+    "placeholders": {
+      "summary": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompatTitle": "Fuels for this vehicle",
+  "@fuelAndTankCompatTitle": {
+    "description": "Heading of the compatible fuels card (#4278)."
+  },
+  "fuelAndTankCompatApproved": "Approved in your vehicle settings",
+  "@fuelAndTankCompatApproved": {
+    "description": "Label above the fuels the vehicle settings approve (#4278)."
+  },
+  "fuelAndTankCompatUnconfirmed": "Fit, but not confirmed for this vehicle",
+  "@fuelAndTankCompatUnconfirmed": {
+    "description": "Label above fuels that physically fit but no setting approves (#4278)."
+  },
+  "fuelAndTankCompatUnknown": "This vehicle has no fuel set, so its approved fuels are unknown. Set its fuel in the vehicle settings.",
+  "@fuelAndTankCompatUnknown": {
+    "description": "Compatible fuels card when the capability is unknown (#4278)."
+  },
+  "fuelAndTankCompatHint": "Only your vehicle settings count as approval — a fuel that fits the filler neck is not necessarily approved.",
+  "@fuelAndTankCompatHint": {
+    "description": "Caption under the compatible fuels (#4278)."
+  },
+  "fuelAndTankBehaviourTitle": "How your car behaves",
+  "@fuelAndTankBehaviourTitle": {
+    "description": "Heading of the vehicle-specific behaviour card (#4278)."
+  },
+  "fuelAndTankObservedBadge": "Your car",
+  "@fuelAndTankObservedBadge": {
+    "description": "Badge marking figures observed on this vehicle, as opposed to general facts (#4278)."
+  },
+  "fuelAndTankMetricConsumption": "Consumption",
+  "@fuelAndTankMetricConsumption": {
+    "description": "Metric label (#4278)."
+  },
+  "fuelAndTankMetricCostPerKm": "Cost per km",
+  "@fuelAndTankMetricCostPerKm": {
+    "description": "Metric label (#4278)."
+  },
+  "fuelAndTankMetricRange": "Range per tank",
+  "@fuelAndTankMetricRange": {
+    "description": "Metric label (#4278)."
+  },
+  "fuelAndTankMetricCo2e": "CO2e per km",
+  "@fuelAndTankMetricCo2e": {
+    "description": "Metric label (#4278)."
+  },
+  "fuelAndTankCostPerKmValue": "{amount} {currency}/km",
+  "@fuelAndTankCostPerKmValue": {
+    "description": "A cost per kilometre, amount already locale-formatted (#4278).",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCo2eValue": "{grams} g/km",
+  "@fuelAndTankCo2eValue": {
+    "description": "CO2e in grams per kilometre, already locale-formatted (#4278).",
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankNotEnoughEvidence": "Not enough evidence yet",
+  "@fuelAndTankNotEnoughEvidence": {
+    "description": "Shown instead of a number when a figure has insufficient evidence (#4278)."
+  },
+  "fuelAndTankProvenanceMeasured": "Measured",
+  "@fuelAndTankProvenanceMeasured": {
+    "description": "Provenance label of a figure based on measurements (#4278)."
+  },
+  "fuelAndTankProvenanceEstimated": "Estimated",
+  "@fuelAndTankProvenanceEstimated": {
+    "description": "Provenance label of a figure based on estimates (#4278)."
+  },
+  "fuelAndTankProvenanceGeneral": "General information",
+  "@fuelAndTankProvenanceGeneral": {
+    "description": "Provenance label of general technical facts, not measured on this car (#4278)."
+  },
+  "fuelAndTankSampleCount": "{count, plural, =1{1 sample} other{{count} samples}}",
+  "@fuelAndTankSampleCount": {
+    "description": "Number of trips or fill windows a figure rests on (#4278).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fuelAndTankConfidenceLow": "low confidence",
+  "@fuelAndTankConfidenceLow": {
+    "description": "Confidence of a figure or decision (#4278)."
+  },
+  "fuelAndTankConfidenceMedium": "medium confidence",
+  "@fuelAndTankConfidenceMedium": {
+    "description": "Confidence of a figure or decision (#4278)."
+  },
+  "fuelAndTankConfidenceHigh": "high confidence",
+  "@fuelAndTankConfidenceHigh": {
+    "description": "Confidence of a figure or decision (#4278)."
+  },
+  "fuelAndTankInterval": "95 % range {low} – {high}",
+  "@fuelAndTankInterval": {
+    "description": "The 95 % interval of a figure, both ends formatted with units (#4278).",
+    "placeholders": {
+      "low": {
+        "type": "String"
+      },
+      "high": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankInsufficientNoEvidence": "No data on this fuel yet",
+  "@fuelAndTankInsufficientNoEvidence": {
+    "description": "Why a figure is missing (#4278)."
+  },
+  "fuelAndTankInsufficientTooFewSamples": "Too few samples so far",
+  "@fuelAndTankInsufficientTooFewSamples": {
+    "description": "Why a figure is missing (#4278)."
+  },
+  "fuelAndTankInsufficientTooLittleDistance": "Not enough distance driven yet",
+  "@fuelAndTankInsufficientTooLittleDistance": {
+    "description": "Why a figure is missing (#4278)."
+  },
+  "fuelAndTankInsufficientCapacityUnknown": "Needs the tank capacity in your vehicle settings",
+  "@fuelAndTankInsufficientCapacityUnknown": {
+    "description": "Why a figure is missing (#4278)."
+  },
+  "fuelAndTankInsufficientNoCo2eFactor": "No CO2e factor on record for this fuel",
+  "@fuelAndTankInsufficientNoCo2eFactor": {
+    "description": "Why a figure is missing (#4278)."
+  },
+  "fuelAndTankInsufficientContextNotPure": "Not available for a mixed tank",
+  "@fuelAndTankInsufficientContextNotPure": {
+    "description": "Why a figure is missing (#4278)."
+  },
+  "fuelAndTankInsufficientTooUncertain": "Too uncertain to show",
+  "@fuelAndTankInsufficientTooUncertain": {
+    "description": "Why a figure is missing (#4278)."
+  },
+  "fuelAndTankUncontrolled": "Not adjusted for driving conditions yet — hills, cold starts and traffic are still in these figures.",
+  "@fuelAndTankUncontrolled": {
+    "description": "Disclosure when a figure is not condition-controlled (#4278)."
+  },
+  "fuelAndTankBasisReferenceWindows": "From full-tank to full-tank fill-ups",
+  "@fuelAndTankBasisReferenceWindows": {
+    "description": "Where a figure comes from (#4278)."
+  },
+  "fuelAndTankBasisMeasuredTrips": "From engine readings on your trips",
+  "@fuelAndTankBasisMeasuredTrips": {
+    "description": "Where a figure comes from (#4278)."
+  },
+  "fuelAndTankBasisEstimatedTrips": "Estimated from your trips",
+  "@fuelAndTankBasisEstimatedTrips": {
+    "description": "Where a figure comes from (#4278)."
+  },
+  "fuelAndTankBasisMeasuredResiduals": "From engine readings, adjusted for driving conditions",
+  "@fuelAndTankBasisMeasuredResiduals": {
+    "description": "Where a figure comes from (#4278)."
+  },
+  "fuelAndTankBasisEstimatedResiduals": "Estimated, adjusted for driving conditions",
+  "@fuelAndTankBasisEstimatedResiduals": {
+    "description": "Where a figure comes from (#4278)."
+  },
+  "fuelAndTankBasisDerived": "Calculated from your other figures",
+  "@fuelAndTankBasisDerived": {
+    "description": "Where a figure comes from (#4278)."
+  },
+  "fuelAndTankMixedContext": "Mixed {first} + {second}",
+  "@fuelAndTankMixedContext": {
+    "description": "Name of a mixed-fuel tank context (#4278).",
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankNoEvidenceRow": "Not driven on this fuel yet",
+  "@fuelAndTankNoEvidenceRow": {
+    "description": "Compact behaviour row for an approved fuel with no evidence (#4278)."
+  },
+  "fuelAndTankDetailsToggle": "How these figures are made",
+  "@fuelAndTankDetailsToggle": {
+    "description": "Expandable technical details (#4278)."
+  },
+  "fuelAndTankModelVersions": "Behaviour model v{profile} · blend model v{blend}",
+  "@fuelAndTankModelVersions": {
+    "description": "Model versions in the technical details (#4278).",
+    "placeholders": {
+      "profile": {
+        "type": "String"
+      },
+      "blend": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareMore": "{fuel} uses {percent} % more than {other}",
+  "@fuelAndTankCompareMore": {
+    "description": "Vehicle-specific consumption comparison (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareLess": "{fuel} uses {percent} % less than {other}",
+  "@fuelAndTankCompareLess": {
+    "description": "Vehicle-specific consumption comparison (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareSame": "{fuel} and {other} use about the same",
+  "@fuelAndTankCompareSame": {
+    "description": "Vehicle-specific consumption comparison (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareInsufficient": "Not enough evidence yet to compare {fuel} with {other}",
+  "@fuelAndTankCompareInsufficient": {
+    "description": "Vehicle-specific consumption comparison without a ratio (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCompareWithinUncertainty": "The difference is still within the uncertainty.",
+  "@fuelAndTankCompareWithinUncertainty": {
+    "description": "Caption when a comparison is not significant (#4278)."
+  },
+  "fuelAndTankCompareAdjusted": "Adjusted for driving conditions.",
+  "@fuelAndTankCompareAdjusted": {
+    "description": "Caption when a comparison is condition-controlled (#4278)."
+  },
+  "fuelAndTankCompareNeedsTwo": "Drive on two different fuels to compare them.",
+  "@fuelAndTankCompareNeedsTwo": {
+    "description": "Shown when fewer than two fuels have evidence (#4278)."
+  },
+  "fuelAndTankFactsTitle": "General fuel facts",
+  "@fuelAndTankFactsTitle": {
+    "description": "Heading of the general technical facts card (#4278)."
+  },
+  "fuelAndTankFactsSubtitle": "From the fuel standards — not measured on your car.",
+  "@fuelAndTankFactsSubtitle": {
+    "description": "Subtitle of the general facts card (#4278)."
+  },
+  "fuelAndTankFactPetrol": "{fuel}: at least {petrol} % petrol; up to {open} % can be ethanol.",
+  "@fuelAndTankFactPetrol": {
+    "description": "General fact about a petrol grade (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "petrol": {
+        "type": "String"
+      },
+      "open": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankFactEthanol": "{fuel}: at least {ethanol} % ethanol; the rest varies with the season.",
+  "@fuelAndTankFactEthanol": {
+    "description": "General fact about E85 (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "ethanol": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankFactDiesel": "{fuel}: at least {diesel} % diesel; up to {open} % can be biodiesel.",
+  "@fuelAndTankFactDiesel": {
+    "description": "General fact about a diesel grade (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "diesel": {
+        "type": "String"
+      },
+      "open": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankFactLpg": "{fuel}: liquefied petroleum gas, a fuel of its own.",
+  "@fuelAndTankFactLpg": {
+    "description": "General fact about LPG (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankFactOctane": "{fuel} names the octane rating, not the ethanol content.",
+  "@fuelAndTankFactOctane": {
+    "description": "General fact: E98 is an octane rating (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankObjectiveTitle": "Optimise the next fill for",
+  "@fuelAndTankObjectiveTitle": {
+    "description": "Heading of the objective selector (#4278)."
+  },
+  "fuelAndTankObjectiveCost": "Lowest cost per km",
+  "@fuelAndTankObjectiveCost": {
+    "description": "Fill objective (#4278)."
+  },
+  "fuelAndTankObjectiveConsumption": "Lowest consumption",
+  "@fuelAndTankObjectiveConsumption": {
+    "description": "Fill objective (#4278)."
+  },
+  "fuelAndTankObjectiveCo2e": "Lowest CO2e",
+  "@fuelAndTankObjectiveCo2e": {
+    "description": "Fill objective (#4278)."
+  },
+  "fuelAndTankObjectiveBalanced": "Cost and CO2e",
+  "@fuelAndTankObjectiveBalanced": {
+    "description": "Fill objective: cost and CO2e side by side (#4278)."
+  },
+  "fuelAndTankObjectiveRange": "Longest range",
+  "@fuelAndTankObjectiveRange": {
+    "description": "Fill objective (#4278)."
+  },
+  "fuelAndTankNextFillTitle": "Next fill",
+  "@fuelAndTankNextFillTitle": {
+    "description": "Heading of the next-fill guidance card (#4278)."
+  },
+  "fuelAndTankOutcomeRecommend": "Fill {fuel} next",
+  "@fuelAndTankOutcomeRecommend": {
+    "description": "Next-fill outcome: one fuel is materially better (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankOutcomeNoAdvantage": "No fuel is clearly better right now",
+  "@fuelAndTankOutcomeNoAdvantage": {
+    "description": "Next-fill outcome (#4278)."
+  },
+  "fuelAndTankOutcomeInsufficient": "Not enough evidence to recommend a fuel yet",
+  "@fuelAndTankOutcomeInsufficient": {
+    "description": "Next-fill outcome (#4278)."
+  },
+  "fuelAndTankOutcomeTradeOff": "A trade-off: one fuel is cheaper, another emits less",
+  "@fuelAndTankOutcomeTradeOff": {
+    "description": "Next-fill outcome for the balanced objective (#4278)."
+  },
+  "fuelAndTankOutcomeNoCompatible": "No priced fuel is confirmed for this vehicle",
+  "@fuelAndTankOutcomeNoCompatible": {
+    "description": "Next-fill outcome (#4278)."
+  },
+  "fuelAndTankOutcomeCompatibilityUnknown": "Approved fuels unknown — no recommendation",
+  "@fuelAndTankOutcomeCompatibilityUnknown": {
+    "description": "Next-fill outcome (#4278)."
+  },
+  "fuelAndTankDecisionConfidence": "Decision made with {confidence}",
+  "@fuelAndTankDecisionConfidence": {
+    "description": "Caption naming the decision confidence; confidence is e.g. 'low confidence' (#4278).",
+    "placeholders": {
+      "confidence": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankNoPricesTitle": "No price comparison possible",
+  "@fuelAndTankNoPricesTitle": {
+    "description": "Next-fill card when no offers exist (#4278)."
+  },
+  "fuelAndTankNoPricesBody": "None of your favourite stations has a current price for a fuel this vehicle can take. Add stations to your favourites to compare.",
+  "@fuelAndTankNoPricesBody": {
+    "description": "Next-fill card body when no offers exist (#4278)."
+  },
+  "fuelAndTankPricesSource": "{count, plural, =1{Cheapest price for 1 fuel among your favourite stations} other{Cheapest prices for {count} fuels among your favourite stations}}",
+  "@fuelAndTankPricesSource": {
+    "description": "Where the next-fill prices come from (#4278).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fuelAndTankReasonCapabilityUnknown": "This vehicle's approved fuels aren't set, so nothing can be recommended.",
+  "@fuelAndTankReasonCapabilityUnknown": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonGradeNotApproved": "Not confirmed as approved in your vehicle settings.",
+  "@fuelAndTankReasonGradeNotApproved": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonFillVolumeUnknown": "The size of the next fill is unknown — set the tank capacity and log a full-tank fill-up.",
+  "@fuelAndTankReasonFillVolumeUnknown": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonResultingBlendUnknown": "The tank mix after this fill can't be determined.",
+  "@fuelAndTankReasonResultingBlendUnknown": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonNoBehaviourEvidence": "No consumption on record for this mix yet.",
+  "@fuelAndTankReasonNoBehaviourEvidence": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonInterpolated": "Estimated from how your car burns each fuel on its own.",
+  "@fuelAndTankReasonInterpolated": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonConfoundersUncontrolled": "Not adjusted for driving conditions yet.",
+  "@fuelAndTankReasonConfoundersUncontrolled": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonNoCo2eFactor": "No CO2e factor on record for this fuel mix.",
+  "@fuelAndTankReasonNoCo2eFactor": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonCapacityUnknown": "Range needs the tank capacity in your vehicle settings.",
+  "@fuelAndTankReasonCapacityUnknown": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonDetourNotPriced": "The detour to the station isn't priced in.",
+  "@fuelAndTankReasonDetourNotPriced": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonDetourIncluded": "The detour to the station is priced in.",
+  "@fuelAndTankReasonDetourIncluded": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonOnlyOneCandidate": "Only one fuel has a price, so there is nothing to compare.",
+  "@fuelAndTankReasonOnlyOneCandidate": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonUnevaluatedAlternatives": "Some fuels couldn't be evaluated yet.",
+  "@fuelAndTankReasonUnevaluatedAlternatives": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonUncertaintyDominates": "The difference is smaller than the uncertainty in your data.",
+  "@fuelAndTankReasonUncertaintyDominates": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankReasonBelowMaterialThreshold": "The difference is too small to be worth switching.",
+  "@fuelAndTankReasonBelowMaterialThreshold": {
+    "description": "Decision reason (#4278)."
+  },
+  "fuelAndTankCandidatesToggle": "Compare the fuels",
+  "@fuelAndTankCandidatesToggle": {
+    "description": "Expandable candidate details on the next-fill card (#4278)."
+  },
+  "fuelAndTankCandidatePrice": "Pump price {price}",
+  "@fuelAndTankCandidatePrice": {
+    "description": "A candidate's price per litre, formatted with its unit (#4278).",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCandidateFill": "Filling {litres}",
+  "@fuelAndTankCandidateFill": {
+    "description": "The litres a candidate fill assumes, formatted volume (#4278).",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCandidateResultingMix": "Tank after this fill: {mix}",
+  "@fuelAndTankCandidateResultingMix": {
+    "description": "The resulting tank mix of a candidate fill (#4278).",
+    "placeholders": {
+      "mix": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankExcludedLine": "{fuel} — {reason}",
+  "@fuelAndTankExcludedLine": {
+    "description": "A fuel left out of the decision, with the reason (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankTradeOffCheaper": "{amount} {currency}/km cheaper than {other}",
+  "@fuelAndTankTradeOffCheaper": {
+    "description": "Cost per km advantage of the leading fuel (#4278).",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankTradeOffDearer": "{amount} {currency}/km dearer than {other}",
+  "@fuelAndTankTradeOffDearer": {
+    "description": "Cost per km disadvantage of the leading fuel (#4278).",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankTradeOffCo2eLess": "{grams} g CO2e/km less than {other}",
+  "@fuelAndTankTradeOffCo2eLess": {
+    "description": "CO2e advantage of the leading fuel (#4278).",
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankTradeOffCo2eMore": "{grams} g CO2e/km more than {other}",
+  "@fuelAndTankTradeOffCo2eMore": {
+    "description": "CO2e disadvantage of the leading fuel (#4278).",
+    "placeholders": {
+      "grams": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankBreakEvenPrice": "Break-even: {fuel} at {price} costs the same per km as {other}",
+  "@fuelAndTankBreakEvenPrice": {
+    "description": "Break-even price of the leading fuel against an alternative (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankBreakEvenConsumption": "At today's prices it ties with {other} at {consumption}",
+  "@fuelAndTankBreakEvenConsumption": {
+    "description": "Break-even consumption of the leading fuel (#4278).",
+    "placeholders": {
+      "other": {
+        "type": "String"
+      },
+      "consumption": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankCostPerKgCo2e": "{fuel} avoids CO2e at {amount} per kg",
+  "@fuelAndTankCostPerKgCo2e": {
+    "description": "The price of each kg CO2e the cleaner but dearer fuel avoids, in a trade-off (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankConvergenceAlready": "The tank already holds at least {percent} % {fuel}.",
+  "@fuelAndTankConvergenceAlready": {
+    "description": "Convergence status (#4278).",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      },
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankConvergenceReachable": "{count, plural, =1{1 fill of {fuel} brings the tank to at least {percent} %.} other{{count} fills of {fuel} bring the tank to at least {percent} %.}}",
+  "@fuelAndTankConvergenceReachable": {
+    "description": "Convergence status (#4278).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "fuel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankConvergenceUnreachable": "{fuel} can't reach {percent} % within {count} fills.",
+  "@fuelAndTankConvergenceUnreachable": {
+    "description": "Convergence status (#4278).",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankConvergenceNotComputable": "How quickly the tank changes over can't be computed yet.",
+  "@fuelAndTankConvergenceNotComputable": {
+    "description": "Convergence status (#4278)."
+  },
+  "fuelAndTankExcludedTitle": "Left out",
+  "@fuelAndTankExcludedTitle": {
+    "description": "Heading of fuels excluded from the decision (#4278)."
+  }
+}

@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../../core/domain/pump_gain_entry.dart';
 import '../../../../core/domain/pump_gain_resolution.dart';
-import '../../../trips/api.dart' show TripSummary;
+import '../../../trips/api.dart' show TripSummary, tripPumpGainCarried;
 import '../../../vehicle/data/repositories/vehicle_profile_repository.dart';
 import '../entities/fill_up.dart';
 import 'tank_report.dart';
@@ -140,8 +140,9 @@ class PumpGainOutcome {
 /// figure over the km it actually saw. Comparing the two **per km** makes
 /// recording coverage cancel out (the 19 % of the tank nobody recorded
 /// does not bias the ratio, only lowers its weight), and stripping the
-/// gain each trip was recorded with ([TripSummary.pumpGainApplied])
-/// recovers the raw estimator output, so the target is absolute:
+/// gain each ESTIMATED trip was recorded with ([tripPumpGainCarried] —
+/// measured and GPS litres were never scaled, #4321) recovers the raw
+/// estimator output, so the target is absolute:
 ///
 ///     target = pumpLPer100Km / rawRecordedLPer100Km
 ///
@@ -254,7 +255,7 @@ class PumpGainLearner {
       if (t == null || t.isVirtual) continue;
       final liters = t.fuelLitersConsumed;
       if (liters == null || liters <= 0 || t.distanceKm <= 0) continue;
-      rawLiters += liters / (t.pumpGainApplied ?? 1.0);
+      rawLiters += liters / tripPumpGainCarried(t); // #4321
       recordedKm += t.distanceKm;
       final key = normalizePumpGainFuelKey(t.pumpGainFuelKey);
       if (key != null) burnedKeys.add(key);

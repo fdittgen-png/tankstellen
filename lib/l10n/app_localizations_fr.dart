@@ -5439,6 +5439,531 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileSectionRegion => 'Région';
 
   @override
+  String get fuelAndTankTitle => 'Carburant & réservoir';
+
+  @override
+  String get fuelAndTankOpenAction => 'Que contient mon réservoir ?';
+
+  @override
+  String get fuelAndTankNoVehicle =>
+      'Sélectionnez un véhicule à carburant liquide pour voir son réservoir et son comportement selon le carburant.';
+
+  @override
+  String get fuelAndTankMixTitle => 'Dans votre réservoir';
+
+  @override
+  String fuelAndTankMixFocalAtLeast(String percent) {
+    return '≥ $percent %';
+  }
+
+  @override
+  String fuelAndTankMixFocalExact(String percent) {
+    return '$percent %';
+  }
+
+  @override
+  String fuelAndTankMixShareAtLeast(String percent, String fuel) {
+    return '≥ $percent % $fuel';
+  }
+
+  @override
+  String fuelAndTankMixShareExact(String percent, String fuel) {
+    return '$percent % $fuel';
+  }
+
+  @override
+  String fuelAndTankMixUnknownShare(String percent) {
+    return '$percent % inconnu';
+  }
+
+  @override
+  String get fuelAndTankMixExplainPartial =>
+      'Les parts sont des minimums garantis. La part inconnue peut être n\'importe lequel de ces carburants ; elle grandit avec les pleins saisis sans niveau de réservoir.';
+
+  @override
+  String get fuelAndTankMixExplainExact =>
+      'Chaque litre est justifié par votre historique de pleins.';
+
+  @override
+  String get fuelAndTankMixUnknownTitle => 'Mélange inconnu';
+
+  @override
+  String get fuelAndTankMixUnknownBody =>
+      'Votre historique de pleins ne permet pas encore de savoir ce que contient le réservoir. Un plein complet rend le mélange à nouveau connu.';
+
+  @override
+  String fuelAndTankMixVolumeExact(String litres) {
+    return '$litres dans le réservoir';
+  }
+
+  @override
+  String fuelAndTankMixVolumeRange(String min, String max) {
+    return 'Entre $min et $max dans le réservoir';
+  }
+
+  @override
+  String fuelAndTankMixVolumeAtLeast(String min) {
+    return 'Au moins $min dans le réservoir';
+  }
+
+  @override
+  String fuelAndTankMixBarSemantics(String summary) {
+    return 'Mélange du réservoir : $summary';
+  }
+
+  @override
+  String get fuelAndTankCompatTitle => 'Carburants pour ce véhicule';
+
+  @override
+  String get fuelAndTankCompatApproved =>
+      'Autorisés dans les réglages du véhicule';
+
+  @override
+  String get fuelAndTankCompatUnconfirmed =>
+      'Compatibles à la pompe, mais non confirmés pour ce véhicule';
+
+  @override
+  String get fuelAndTankCompatUnknown =>
+      'Aucun carburant n\'est défini pour ce véhicule : ses carburants autorisés sont inconnus. Définissez-le dans les réglages du véhicule.';
+
+  @override
+  String get fuelAndTankCompatHint =>
+      'Seuls les réglages du véhicule valent autorisation : un carburant qui entre dans le réservoir n\'est pas forcément autorisé.';
+
+  @override
+  String get fuelAndTankBehaviourTitle => 'Comportement de votre voiture';
+
+  @override
+  String get fuelAndTankObservedBadge => 'Votre voiture';
+
+  @override
+  String get fuelAndTankMetricConsumption => 'Consommation';
+
+  @override
+  String get fuelAndTankMetricCostPerKm => 'Coût au km';
+
+  @override
+  String get fuelAndTankMetricRange => 'Autonomie par plein';
+
+  @override
+  String get fuelAndTankMetricCo2e => 'CO2e au km';
+
+  @override
+  String fuelAndTankCostPerKmValue(String amount, String currency) {
+    return '$amount $currency/km';
+  }
+
+  @override
+  String fuelAndTankCo2eValue(String grams) {
+    return '$grams g/km';
+  }
+
+  @override
+  String get fuelAndTankNotEnoughEvidence => 'Pas encore assez de données';
+
+  @override
+  String get fuelAndTankProvenanceMeasured => 'Mesuré';
+
+  @override
+  String get fuelAndTankProvenanceEstimated => 'Estimé';
+
+  @override
+  String get fuelAndTankProvenanceGeneral => 'Information générale';
+
+  @override
+  String fuelAndTankSampleCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mesures',
+      one: '1 mesure',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fuelAndTankConfidenceLow => 'fiabilité faible';
+
+  @override
+  String get fuelAndTankConfidenceMedium => 'fiabilité moyenne';
+
+  @override
+  String get fuelAndTankConfidenceHigh => 'fiabilité élevée';
+
+  @override
+  String fuelAndTankInterval(String low, String high) {
+    return 'Intervalle à 95 % : $low – $high';
+  }
+
+  @override
+  String get fuelAndTankInsufficientNoEvidence =>
+      'Aucune donnée sur ce carburant';
+
+  @override
+  String get fuelAndTankInsufficientTooFewSamples =>
+      'Trop peu de mesures pour l\'instant';
+
+  @override
+  String get fuelAndTankInsufficientTooLittleDistance =>
+      'Pas encore assez de distance parcourue';
+
+  @override
+  String get fuelAndTankInsufficientCapacityUnknown =>
+      'Nécessite la capacité du réservoir dans les réglages du véhicule';
+
+  @override
+  String get fuelAndTankInsufficientNoCo2eFactor =>
+      'Aucun facteur CO2e enregistré pour ce carburant';
+
+  @override
+  String get fuelAndTankInsufficientContextNotPure =>
+      'Indisponible pour un réservoir mélangé';
+
+  @override
+  String get fuelAndTankInsufficientTooUncertain =>
+      'Trop incertain pour être affiché';
+
+  @override
+  String get fuelAndTankUncontrolled =>
+      'Pas encore corrigé des conditions de conduite : dénivelé, démarrages à froid et circulation pèsent encore sur ces chiffres.';
+
+  @override
+  String get fuelAndTankBasisReferenceWindows =>
+      'D\'après vos pleins complets successifs';
+
+  @override
+  String get fuelAndTankBasisMeasuredTrips =>
+      'D\'après les données moteur de vos trajets';
+
+  @override
+  String get fuelAndTankBasisEstimatedTrips => 'Estimé à partir de vos trajets';
+
+  @override
+  String get fuelAndTankBasisMeasuredResiduals =>
+      'D\'après les données moteur, corrigé des conditions de conduite';
+
+  @override
+  String get fuelAndTankBasisEstimatedResiduals =>
+      'Estimé, corrigé des conditions de conduite';
+
+  @override
+  String get fuelAndTankBasisDerived =>
+      'Calculé à partir de vos autres chiffres';
+
+  @override
+  String fuelAndTankMixedContext(String first, String second) {
+    return 'Mélange $first + $second';
+  }
+
+  @override
+  String get fuelAndTankNoEvidenceRow => 'Pas encore roulé avec ce carburant';
+
+  @override
+  String get fuelAndTankDetailsToggle => 'Comment ces chiffres sont obtenus';
+
+  @override
+  String fuelAndTankModelVersions(String profile, String blend) {
+    return 'Modèle de comportement v$profile · modèle de mélange v$blend';
+  }
+
+  @override
+  String fuelAndTankCompareMore(String fuel, String percent, String other) {
+    return '$fuel consomme $percent % de plus que $other';
+  }
+
+  @override
+  String fuelAndTankCompareLess(String fuel, String percent, String other) {
+    return '$fuel consomme $percent % de moins que $other';
+  }
+
+  @override
+  String fuelAndTankCompareSame(String fuel, String other) {
+    return '$fuel et $other consomment à peu près autant';
+  }
+
+  @override
+  String fuelAndTankCompareInsufficient(String fuel, String other) {
+    return 'Pas encore assez de données pour comparer $fuel à $other';
+  }
+
+  @override
+  String get fuelAndTankCompareWithinUncertainty =>
+      'L\'écart reste dans la marge d\'incertitude.';
+
+  @override
+  String get fuelAndTankCompareAdjusted =>
+      'Corrigé des conditions de conduite.';
+
+  @override
+  String get fuelAndTankCompareNeedsTwo =>
+      'Roulez avec deux carburants différents pour les comparer.';
+
+  @override
+  String get fuelAndTankFactsTitle => 'Généralités sur les carburants';
+
+  @override
+  String get fuelAndTankFactsSubtitle =>
+      'D\'après les normes de carburant, non mesuré sur votre voiture.';
+
+  @override
+  String fuelAndTankFactPetrol(String fuel, String petrol, String open) {
+    return '$fuel : au moins $petrol % d\'essence ; jusqu\'à $open % peuvent être de l\'éthanol.';
+  }
+
+  @override
+  String fuelAndTankFactEthanol(String fuel, String ethanol) {
+    return '$fuel : au moins $ethanol % d\'éthanol ; le reste varie selon la saison.';
+  }
+
+  @override
+  String fuelAndTankFactDiesel(String fuel, String diesel, String open) {
+    return '$fuel : au moins $diesel % de gazole ; jusqu\'à $open % peuvent être du biodiesel.';
+  }
+
+  @override
+  String fuelAndTankFactLpg(String fuel) {
+    return '$fuel : gaz de pétrole liquéfié, un carburant à part entière.';
+  }
+
+  @override
+  String fuelAndTankFactOctane(String fuel) {
+    return '$fuel désigne l\'indice d\'octane, pas la teneur en éthanol.';
+  }
+
+  @override
+  String get fuelAndTankObjectiveTitle => 'Optimiser le prochain plein pour';
+
+  @override
+  String get fuelAndTankObjectiveCost => 'Coût au km le plus bas';
+
+  @override
+  String get fuelAndTankObjectiveConsumption => 'Consommation la plus basse';
+
+  @override
+  String get fuelAndTankObjectiveCo2e => 'CO2e le plus bas';
+
+  @override
+  String get fuelAndTankObjectiveBalanced => 'Coût et CO2e';
+
+  @override
+  String get fuelAndTankObjectiveRange => 'Autonomie la plus longue';
+
+  @override
+  String get fuelAndTankNextFillTitle => 'Prochain plein';
+
+  @override
+  String fuelAndTankOutcomeRecommend(String fuel) {
+    return 'Faites le prochain plein en $fuel';
+  }
+
+  @override
+  String get fuelAndTankOutcomeNoAdvantage =>
+      'Aucun carburant n\'est nettement meilleur pour l\'instant';
+
+  @override
+  String get fuelAndTankOutcomeInsufficient =>
+      'Pas encore assez de données pour recommander un carburant';
+
+  @override
+  String get fuelAndTankOutcomeTradeOff =>
+      'Un compromis : un carburant coûte moins cher, un autre émet moins';
+
+  @override
+  String get fuelAndTankOutcomeNoCompatible =>
+      'Aucun carburant avec prix n\'est confirmé pour ce véhicule';
+
+  @override
+  String get fuelAndTankOutcomeCompatibilityUnknown =>
+      'Carburants autorisés inconnus : pas de recommandation';
+
+  @override
+  String fuelAndTankDecisionConfidence(String confidence) {
+    return 'Décision prise avec une $confidence';
+  }
+
+  @override
+  String get fuelAndTankNoPricesTitle => 'Comparaison de prix impossible';
+
+  @override
+  String get fuelAndTankNoPricesBody =>
+      'Aucune de vos stations favorites n\'affiche de prix actuel pour un carburant adapté à ce véhicule. Ajoutez des stations en favoris pour comparer.';
+
+  @override
+  String fuelAndTankPricesSource(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Prix les plus bas pour $count carburants parmi vos stations favorites',
+      one: 'Prix le plus bas pour 1 carburant parmi vos stations favorites',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fuelAndTankReasonCapabilityUnknown =>
+      'Les carburants autorisés de ce véhicule ne sont pas définis : aucune recommandation possible.';
+
+  @override
+  String get fuelAndTankReasonGradeNotApproved =>
+      'Non confirmé comme autorisé dans les réglages du véhicule.';
+
+  @override
+  String get fuelAndTankReasonFillVolumeUnknown =>
+      'Le volume du prochain plein est inconnu : indiquez la capacité du réservoir et saisissez un plein complet.';
+
+  @override
+  String get fuelAndTankReasonResultingBlendUnknown =>
+      'Le mélange après ce plein ne peut pas être déterminé.';
+
+  @override
+  String get fuelAndTankReasonNoBehaviourEvidence =>
+      'Aucune consommation enregistrée pour ce mélange.';
+
+  @override
+  String get fuelAndTankReasonInterpolated =>
+      'Déduit de la consommation de votre voiture avec chaque carburant pris seul.';
+
+  @override
+  String get fuelAndTankReasonConfoundersUncontrolled =>
+      'Pas encore corrigé des conditions de conduite.';
+
+  @override
+  String get fuelAndTankReasonNoCo2eFactor =>
+      'Aucun facteur CO2e enregistré pour ce mélange.';
+
+  @override
+  String get fuelAndTankReasonCapacityUnknown =>
+      'L\'autonomie nécessite la capacité du réservoir dans les réglages du véhicule.';
+
+  @override
+  String get fuelAndTankReasonDetourNotPriced =>
+      'Le détour jusqu\'à la station n\'est pas chiffré.';
+
+  @override
+  String get fuelAndTankReasonDetourIncluded =>
+      'Le détour jusqu\'à la station est chiffré.';
+
+  @override
+  String get fuelAndTankReasonOnlyOneCandidate =>
+      'Un seul carburant a un prix : rien à comparer.';
+
+  @override
+  String get fuelAndTankReasonUnevaluatedAlternatives =>
+      'Certains carburants n\'ont pas encore pu être évalués.';
+
+  @override
+  String get fuelAndTankReasonUncertaintyDominates =>
+      'L\'écart est plus faible que l\'incertitude de vos données.';
+
+  @override
+  String get fuelAndTankReasonBelowMaterialThreshold =>
+      'L\'écart est trop faible pour justifier un changement.';
+
+  @override
+  String get fuelAndTankCandidatesToggle => 'Comparer les carburants';
+
+  @override
+  String fuelAndTankCandidatePrice(String price) {
+    return 'Prix à la pompe $price';
+  }
+
+  @override
+  String fuelAndTankCandidateFill(String litres) {
+    return 'Plein de $litres';
+  }
+
+  @override
+  String fuelAndTankCandidateResultingMix(String mix) {
+    return 'Réservoir après ce plein : $mix';
+  }
+
+  @override
+  String fuelAndTankExcludedLine(String fuel, String reason) {
+    return '$fuel : $reason';
+  }
+
+  @override
+  String fuelAndTankTradeOffCheaper(
+    String amount,
+    String currency,
+    String other,
+  ) {
+    return '$amount $currency/km moins cher que $other';
+  }
+
+  @override
+  String fuelAndTankTradeOffDearer(
+    String amount,
+    String currency,
+    String other,
+  ) {
+    return '$amount $currency/km plus cher que $other';
+  }
+
+  @override
+  String fuelAndTankTradeOffCo2eLess(String grams, String other) {
+    return '$grams g CO2e/km de moins que $other';
+  }
+
+  @override
+  String fuelAndTankTradeOffCo2eMore(String grams, String other) {
+    return '$grams g CO2e/km de plus que $other';
+  }
+
+  @override
+  String fuelAndTankBreakEvenPrice(String fuel, String price, String other) {
+    return 'Seuil : à $price, $fuel coûte autant au km que $other';
+  }
+
+  @override
+  String fuelAndTankBreakEvenConsumption(String other, String consumption) {
+    return 'Aux prix du jour, égalité avec $other à $consumption';
+  }
+
+  @override
+  String fuelAndTankCostPerKgCo2e(String fuel, String amount) {
+    return '$fuel évite du CO2e pour $amount par kg';
+  }
+
+  @override
+  String fuelAndTankConvergenceAlready(String percent, String fuel) {
+    return 'Le réservoir contient déjà au moins $percent % de $fuel.';
+  }
+
+  @override
+  String fuelAndTankConvergenceReachable(
+    int count,
+    String fuel,
+    String percent,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count pleins de $fuel portent le réservoir à au moins $percent %.',
+      one: '1 plein de $fuel porte le réservoir à au moins $percent %.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelAndTankConvergenceUnreachable(
+    String fuel,
+    String percent,
+    String count,
+  ) {
+    return '$fuel ne peut pas atteindre $percent % en $count pleins.';
+  }
+
+  @override
+  String get fuelAndTankConvergenceNotComputable =>
+      'La vitesse de renouvellement du réservoir ne peut pas encore être calculée.';
+
+  @override
+  String get fuelAndTankExcludedTitle => 'Écartés';
+
+  @override
   String get fuelEfficiencyCardTitle => 'Coût au kilomètre par carburant';
 
   @override
