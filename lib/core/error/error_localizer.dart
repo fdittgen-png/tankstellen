@@ -43,6 +43,10 @@ class ErrorLocalizer {
       return l10n.errorUpstreamCertExpired(error.host);
     }
 
+    if (error is ProviderUnavailableException) {
+      return l10n.errorProviderUnavailable;
+    }
+
     if (error is ServiceChainExhaustedException) {
       return l10n.errorAllServicesFailed;
     }

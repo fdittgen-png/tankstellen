@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../domain/search_params.dart';
+import '../error/exceptions.dart';
 import '../domain/station.dart';
 import '../background/provider_request_budget.dart';
 import '../cache/cache_manager.dart';
@@ -18,6 +19,7 @@ import 'non_fuel_station_guard.dart';
 import 'service_result.dart';
 import 'station_service.dart';
 import 'chain_executor.dart';
+import 'provider_capability.dart';
 import 'provider_freshness_monitor.dart';
 import 'station_service_chain_codec.dart';
 import 'station_transient_retry.dart';
@@ -86,6 +88,12 @@ class StationServiceChain with _ChainCoalescing implements StationService {
   /// upstream response against the country's declared freshness promise.
   final ProviderFreshnessMonitor? _freshness;
 
+  /// #4348 — the country's declared capability. A provider it declares
+  /// unavailable is refused before any cache read or request, with a
+  /// typed [ProviderUnavailableException] the UI can name. Null (legacy
+  /// call sites, unit tests) keeps the chain's historical behaviour.
+  final ProviderCapability? _capability;
+
   StationServiceChain(this._primary, this._cache, {
     this._errorSource = ServiceSource.tankerkoenigApi,
     this.countryCode = '',
@@ -93,6 +101,7 @@ class StationServiceChain with _ChainCoalescing implements StationService {
     this._recorder,
     this._budget,
     this._freshness,
+    this._capability,
   });
 
   /// Generic cache-through + request coalescing.
@@ -182,6 +191,12 @@ class StationServiceChain with _ChainCoalescing implements StationService {
     SearchParams params, {
     CancelToken? cancelToken,
   }) async {
+    // #4348 — a dead provider is a structural state, not a failed request:
+    // refuse before the cache, the transient retry or the stale fallback
+    // can dress it up as "try again".
+    if (_capability?.isUnavailable ?? false) {
+      throw ProviderUnavailableException(countryCode);
+    }
     // #2264 — bulk-file sources local-filter a persisted whole-country
     // dataset, so a per-search-key cache only duplicates that work and can
     // serve a stale slice; answer nearby straight from the primary instead.

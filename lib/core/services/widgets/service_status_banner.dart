@@ -120,6 +120,9 @@ class ServiceChainErrorWidget extends StatelessWidget {
     if (error is LocationException) {
       return l10n.errorTitleLocation;
     }
+    if (error is ProviderUnavailableException) {
+      return l10n.errorTitleProviderUnavailable;
+    }
     return l10n.noResults;
   }
 
@@ -130,6 +133,11 @@ class ServiceChainErrorWidget extends StatelessWidget {
   /// the making, which is how a screen ends up telling a user their
   /// route failed and that their route still works.
   _ChainFailure _classify() {
+    // #4348 — typed first: its message must never be sniffed into a
+    // "connection" hint that promises a retry will help.
+    if (error is ProviderUnavailableException) {
+      return _ChainFailure.providerUnavailable;
+    }
     final msg = error.toString().toLowerCase();
     if (msg.contains('no stations found') ||
         msg.contains('keine tankstellen')) {
@@ -162,6 +170,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
         _ChainFailure.location => l10n.locationDenied,
         _ChainFailure.connection => l10n.errorHintConnection,
         _ChainFailure.routing => l10n.errorHintRouting,
+        _ChainFailure.providerUnavailable => l10n.errorProviderUnavailable,
         _ChainFailure.unclassified => l10n.errorHintFallback,
       };
 
@@ -172,6 +181,8 @@ class ServiceChainErrorWidget extends StatelessWidget {
         _ChainFailure.location => l10n.recoveryStillWorksLocation,
         _ChainFailure.connection => l10n.recoveryStillWorksConnection,
         _ChainFailure.routing => l10n.recoveryStillWorksRouting,
+        _ChainFailure.providerUnavailable =>
+          l10n.recoveryStillWorksProviderUnavailable,
         _ChainFailure.unclassified => l10n.recoveryStillWorksFallback,
       };
 
@@ -260,7 +271,7 @@ class ServiceChainErrorWidget extends StatelessWidget {
   }
 }
 
-/// The six failures this screen distinguishes (#4141). An enum rather
+/// The failures this screen distinguishes (#4141, #4348). An enum rather
 /// than a chain of `if`s repeated per rendered line, so a new failure
 /// cannot reach one line and miss another.
 enum _ChainFailure {
@@ -269,5 +280,9 @@ enum _ChainFailure {
   location,
   connection,
   routing,
+
+  /// #4348 — the country's provider is declared dead; structural, so no
+  /// "check your connection" hint.
+  providerUnavailable,
   unclassified,
 }

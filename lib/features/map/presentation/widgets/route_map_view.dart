@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/services/station_offer.dart';
 import '../../../../core/utils/best_stops.dart';
 import '../../../../core/widgets/shell_bottom_inset.dart';
 import '../../../../core/utils/navigation_utils.dart';
@@ -324,7 +325,13 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         : _getBestStopStations(allStations, result);
 
     final polyline = result.route.geometry;
-    selectedStations = List<Station>.from(selectedStations)
+    // #4348 — a reference price stood in at a town centre is not a stop
+    // anyone can make; it never becomes a waypoint.
+    selectedStations = selectedStations
+        .where((s) => StationOffer.forStation(
+                stationId: s.id, lat: s.lat, lng: s.lng)
+            .canRouteTo)
+        .toList()
       ..sort((a, b) {
         final aIdx = _nearestPolylineIndex(a.lat, a.lng, polyline);
         final bIdx = _nearestPolylineIndex(b.lat, b.lng, polyline);

@@ -323,8 +323,8 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList>
       rating: stationRating,
       profileFuelType: profileFuel,
       closenessRadiusMeters: closenessRadiusMeters,
-      onNavigate: () => NavigationUtils.openInMaps(
-        station.lat, station.lng,
+      onNavigate: () => NavigationUtils.openStation(
+        stationId: station.id, lat: station.lat, lng: station.lng,
         label: station.displayName,
       ),
       onIgnore: () {

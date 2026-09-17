@@ -139,6 +139,14 @@ class DecisionHeader extends ConsumerWidget {
           // §4.1 — the missing ranking is stated, not hidden.
           if (!decision.valueRankingAvailable)
             _ValueUnavailableRow(text: l10n.decisionValueUnavailable),
+          // #4348 — a partial source (DK's brand feeds) speaks for the
+          // stations it lists, not for the country; say so where the
+          // decision is made.
+          if (decision.coverageIncomplete)
+            _ValueUnavailableRow(
+              key: const Key('decision_partial_coverage_note'),
+              text: l10n.decisionPartialCoverageNote,
+            ),
           _Footer(
             count: items.length,
             assumption: decision.valueRankingAvailable
@@ -183,7 +191,7 @@ String _caveatText(AppLocalizations l10n, Set<LeadCaveat> caveats) => [
 
 /// The Best Value row's stand-in when the vehicle side is unknown.
 class _ValueUnavailableRow extends StatelessWidget {
-  const _ValueUnavailableRow({required this.text});
+  const _ValueUnavailableRow({super.key, required this.text});
 
   final String text;
 
