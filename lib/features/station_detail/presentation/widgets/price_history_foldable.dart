@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/station.dart';
+import '../../../../core/storage/hive_boxes.dart';
+import '../../../../core/storage/hive_deferred_user_boxes.dart';
 import '../../../feature_management/api.dart';
 import 'price_history_section.dart';
 
@@ -34,7 +36,13 @@ class PriceHistoryFoldable extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final enabled =
         ref.watch(enabledFeaturesProvider).contains(Feature.priceHistory);
-    if (!enabled) return const SizedBox.shrink();
+    // #4318 — false only when the deferred price-history box FAILED to
+    // open (the detail provider waited for it); the failure is already
+    // logged, and a section that would throw on read is left out.
+    if (!enabled ||
+        !HiveDeferredUserBoxes.isReadable(HiveBoxes.priceHistory)) {
+      return const SizedBox.shrink();
+    }
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     return Card(

@@ -12,6 +12,8 @@ import '../../../core/data/storage_repository.dart';
 import '../../../core/network/connectivity_service.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/storage/storage_keys.dart';
+import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/hive_deferred_user_boxes.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../price_history/providers/price_prediction_provider.dart';
 import '../data/home_widget_service.dart';
@@ -150,6 +152,8 @@ class NearestWidgetRefresh extends _$NearestWidgetRefresh {
     try {
       final storage = ref.read(storageRepositoryProvider);
       final stationService = ref.read(stationServiceProvider);
+      // #4318 — both predictors below read the deferred price-history box.
+      await HiveDeferredUserBoxes.settled(HiveBoxes.priceHistory);
       // #1803 — refresh the favorites variant too. It's a cheap local
       // read (favorite ids + their stored prices, no network), so
       // running it on every tick keeps the favorites widget from going

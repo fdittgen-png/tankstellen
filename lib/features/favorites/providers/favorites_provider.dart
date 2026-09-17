@@ -9,6 +9,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/data/storage_repository.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/hive_deferred_user_boxes.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
@@ -80,6 +82,8 @@ class Favorites extends _$Favorites {
   void _refreshWidget(StorageRepository storage) {
     unawaited(() async {
       try {
+        // #4318 — the predictor reads the deferred price-history box.
+        await HiveDeferredUserBoxes.settled(HiveBoxes.priceHistory);
         // Wire the price predictor for the predictive variant (#1121).
         // The widget config decides whether to render predictive nudges;
         // we always attach the data so the user's choice doesn't need a

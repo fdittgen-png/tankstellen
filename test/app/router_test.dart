@@ -6,12 +6,15 @@
 // stub reads exclusively -- see test/helpers/mock_providers.dart (#3742).
 // ignore_for_file: deprecated_member_use_from_same_package
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tankstellen/app/router.dart';
+import 'package:tankstellen/app/startup/launch_critical_path.dart';
 import 'package:tankstellen/core/language/language_provider.dart';
 import 'package:tankstellen/core/services/service_result.dart';
 import 'package:tankstellen/core/constants/app_constants.dart';
@@ -335,6 +338,28 @@ void main() {
               'landing screen so the cold-start flow lands on the '
               'station detail without the landing-screen flash',
         );
+      },
+    );
+
+    testWidgets(
+      '#4319 — the URI LaunchCriticalPath commits is what the router\'s '
+      'first redirect consumes, even when the probe answered before storage',
+      (tester) async {
+        final storage = Completer<bool>();
+        final path = LaunchCriticalPath.run(
+          probeWidgetLaunch: () async =>
+              Uri.parse('tankstellenwidget://station?id=de-4319'),
+          storage: () => storage.future,
+          dateFormatting: () async {},
+          createContainer: () =>
+              ProviderContainer(overrides: overrides.cast()),
+        );
+        await tester.pump();
+        storage.complete(true);
+        final container = (await path)!;
+        addTearDown(container.dispose);
+
+        expect(await resolveRedirect(tester, container), '/station/de-4319');
       },
     );
 

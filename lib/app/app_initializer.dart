@@ -8,7 +8,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -29,10 +28,12 @@ import '../core/logging/app_log.dart';
 import '../core/logging/error_log_denoise.dart';
 import '../core/logging/error_logger.dart';
 import '../core/notifications/local_notification_service.dart';
+import '../core/notifications/notification_launch_ledger.dart';
 import '../core/perf/launch_sync_trace.dart';
 import '../core/perf/startup_timer.dart';
 import '../core/services/country_service_registry.dart';
 import '../core/storage/hive_boxes.dart';
+import '../core/storage/hive_deferred_user_boxes.dart';
 import '../core/storage/hive_storage.dart';
 import '../core/sync/community_config.dart';
 import '../core/sync/supabase_client.dart';
@@ -44,20 +45,21 @@ import '../features/obd2/data/obd2_connect_trace_persistence.dart';
 import '../features/feature_management/application/legacy_toggle_migration_provider.dart';
 import '../features/price_history/data/repositories/price_history_repository.dart';
 import '../features/profile/data/repositories/profile_repository.dart';
-import '../features/widget/data/home_widget_service.dart';
-import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'startup/startup_overrides.dart';
 import 'startup/storage_failure_gate.dart';
 import 'startup/launch_sync_phase.dart';
+import 'startup/launch_critical_path.dart';
 import 'startup/provider_warmup_phase.dart';
+import 'startup/runtime_services_phase.dart';
 import 'startup/telemetry_replay_phase.dart';
 import 'startup/trip_recovery_phase.dart';
+import 'startup/widget_launch_probe.dart';
 
 part 'app_initializer_boot_support.dart';
 part 'app_initializer_deferred_tasks.dart';
 
 /// Drives the cold-start sequence in well-defined phases: **bootstrap** →
-/// **storage** → **services** (parallel) → **optional deferred**
+/// **storage** → **services** (post-frame, #4317) → **optional deferred**
 /// (post-first-frame) → **runApp**. Full phase narrative + #3139 notes:
 /// atop `app_initializer_deferred_tasks.dart` (`part`, move-only #3761).
 ///
@@ -78,34 +80,37 @@ class AppInitializer {
     _bootstrap();
     StartupTimer.instance.mark('binding');
 
-    // #2978 — load `intl` locale date-symbols so `DateFormat.EEEE` works
-    // for non-`en_US` locales instead of throwing `LocaleDataException`.
-    await initializeDateFormatting();
-
-    // #2294 / #3149 / #4116 / #4118 — the storage phase and its three
-    // distinct failure verdicts live in one place; see the gate for why
-    // the distinction is not cosmetic.
-    if (!await runStoragePhaseGuarded(_initStorage)) return;
-    StartupTimer.instance.mark('storage_ready');
-
-    await _initServicesInParallel();
-    StartupTimer.instance.mark('services_init');
-
-    final container = createContainer();
+    // #4319 — the prerequisites as a dependency graph; the classes and
+    // the ordering rationale live in LaunchCriticalPath. #4317 — the probe
+    // also SENDS the home-widget group id, before anything else.
+    final widgetLaunch = WidgetLaunchProbe();
+    final container = await LaunchCriticalPath.run(
+      // Inbound-launch critical (#widget-deeplink, 200 ms cap).
+      probeWidgetLaunch: widgetLaunch.start,
+      // Storage-safety critical: #2294 / #3149 / #4116 / #4118 — the
+      // storage phase and its three failure verdicts live in the gate.
+      storage: () => runStoragePhaseGuarded(_initStorage),
+      // Route-critical (#2978): first real frames format dates with the
+      // user's locale — AlertsLastCheckedFooter on the favorites landing,
+      // the collapsed price-history stats on a deep-linked station. Kept.
+      dateFormatting: initializeDateFormatting,
+      createContainer: createContainer,
+    );
+    if (container == null) return;
+    StartupTimer.instance.mark('launch_critical_services');
 
     final storage = HiveStorage();
 
-    // #1794/#1768 — post-first-frame storage work: deep-box opens
-    // (idempotent + cached; later post-frame readers await the same
-    // opens), #2264 bounded cache eviction (#3610 records the yield),
-    // the #2317 price-history retention trim, profile migrations.
+    // #1794/#1768 — post-frame storage work: deep-box opens (cached), #2264
+    // cache eviction (#3610), #2317 price-history trim, profile migrations.
     _deferPostFirstFrame(() async {
       unawaited(HiveBoxes.initDeferred());
       final evicted = await CacheManager(storage).evictBounded();
       if (evicted > 0) {
         healthCounters.increment('cache.evicted', by: evicted);
       }
-      await PriceHistoryRepository(storage).evictOldRecords();
+      await HiveDeferredUserBoxes.whenReadable(HiveBoxes.priceHistory,
+          PriceHistoryRepository(storage).evictOldRecords); // #4318
       await _migrateProfilesDeferred(storage);
     });
 
@@ -142,11 +147,6 @@ class AppInitializer {
     // four post-frame registrations, in order (see the part file).
     _schedulePostFrameWarmups(container);
 
-    // Eagerly resolve the home-widget cold-launch URI BEFORE the router
-    // builds (#widget-deeplink); 200 ms cap — see [_stashWidgetLaunchUri].
-    await _stashWidgetLaunchUri(container);
-    StartupTimer.instance.mark('widget_launch_probe');
-
     StartupTimer.instance.mark('pre_run_app');
 
     // #1769 — Sentry no longer wraps `runApp`: the app paints first,
@@ -175,7 +175,7 @@ class AppInitializer {
       };
     }
 
-    _launch(container, appBuilder);
+    _launch(container, appBuilder, widgetLaunch);
   }
 
   /// Builds the app's ONE root [ProviderContainer] — the production
@@ -213,25 +213,21 @@ class AppInitializer {
 
   // Phase 2 — storage.
 
-  static Future<void> _initStorage() async {
-    // #4110 — HiveBoxes.init marks its own sub-phases from inside.
-    await HiveStorage.init();
-
-    // #795 phase 1 — API-key load (secure-storage read + legacy Hive
-    // settings migration) and trace-storage box-open are independent;
-    // `Future.wait` overlaps I/O waits that used to be sequential.
-    await Future.wait<void>([
-      HiveStorage.loadApiKey(),
-      TraceStorage.init(),
-      // #3184 — persisted OBD2 connect-trace ring (own box; best-effort).
-      Obd2ConnectTracePersistence.init(),
-      HealthCounters.init(), // #3146 — always-on production counters
-    ]);
-
-    // Debug-mode country-registry check + the #555 default-profile safety
-    // net (critical path — the first route depends on a profile existing).
-    await _verifyRegistryAndSeedProfile();
-  }
+  /// #795 phase 1 overlapped the key load with the telemetry opens; #4319
+  /// overlaps the #555 default-profile seed with them too — box ownership
+  /// and dependency classes are documented in `storagePhase`.
+  static Future<void> _initStorage() => LaunchCriticalPath.storagePhase(
+        // #4110 — HiveBoxes.init marks its own sub-phases from inside.
+        openBoxes: HiveStorage.init,
+        loadApiKeys: HiveStorage.loadApiKey,
+        seedDefaultProfile: _verifyRegistryAndSeedProfile,
+        telemetry: {
+          'trace_storage': TraceStorage.init,
+          // #3184 — persisted OBD2 connect-trace ring (own box).
+          'obd2_connect_traces': Obd2ConnectTracePersistence.init,
+          'health_counters': HealthCounters.init, // #3146
+        },
+      );
 
   // Post-first-frame deferral.
 
@@ -261,28 +257,8 @@ class AppInitializer {
     });
   }
 
-  // Phase 3 — services (parallel).
-
-  /// Notifications, background tasks and the home widget initialiser are
-  /// independent — parallelised; each future is individually
-  /// error-protected so one failing plugin doesn't block the others.
-  static Future<void> _initServicesInParallel() async {
-    await Future.wait<void>([
-      _safe('notifications', LocalNotificationService().initialize),
-      _safe('background', _maybeInitBackground),
-      _safe('home_widget', HomeWidgetService.init),
-    ]);
-  }
-
-  /// Schedule periodic price polling only when the user has at least one
-  /// active alert (#713 — per Tankerkönig's ToS, requests on demand only).
-  /// #2210 — reconcile gates BOTH price and radius alerts. #3169 — a cold
-  /// launch also fires an opportunistic scan (an execution window iOS
-  /// reliably grants; Android no-ops), cross-trigger-cooldown-gated.
-  static Future<void> _maybeInitBackground() async {
-    await BackgroundService.reconcile();
-    await BackgroundService.onOpportunisticWake();
-  }
+  // Phase 3 — runtime services: post-first-frame since #4317, see
+  // RuntimeServicesPhase and `_launch`.
 
   // Phase 4 — optional TankSync.
 
@@ -304,19 +280,6 @@ class AppInitializer {
     }
   }
 
-  /// Reads the URI carried by the home-widget tap that cold-started the
-  /// app (if any) and stashes it in [pendingWidgetUriProvider]. The probe
-  /// body (200 ms cap) lives in [_probeWidgetLaunchUri]; the stash
-  /// closure keeps the provider read lazy — only fired when a URI exists.
-  static Future<void> _stashWidgetLaunchUri(
-    ProviderContainer container,
-  ) {
-    return _probeWidgetLaunchUri(
-      stash: (uri) =>
-          container.read(pendingWidgetUriProvider.notifier).set(uri),
-    );
-  }
-
   // Phase 5 — runApp.
 
   /// Wires the framework + platform error handlers onto the app's
@@ -334,6 +297,7 @@ class AppInitializer {
   static void _launch(
     ProviderContainer container,
     Widget Function(ProviderContainer container) appBuilder,
+    WidgetLaunchProbe widgetLaunch,
   ) {
     // #1104 — bind the unified errorLogger to this container so every
     // foreground `errorLogger.log(...)` routes through TraceRecorder +
@@ -341,6 +305,19 @@ class AppInitializer {
     // by TelemetryReplayPhase).
     errorLogger.bind(container);
     _installErrorHandlers();
+    // #4319 — the probe ran before storage, so it held its failures.
+    unawaited(widgetLaunch.reportAfterBind());
+
+    // #4317 — notifications, the #713/#2210 alert-gated scheduler and the
+    // #3169 cold-launch scan, off the critical path. Registered after the
+    // bind and in the same synchronous block as `runApp`, so they report
+    // through the foreground pipeline and never start before the handoff.
+    RuntimeServicesPhase.scheduleAfterFirstFrame(RuntimeServices(
+      initNotifications: LocalNotificationService().initialize,
+      reconcileBackground: BackgroundService.reconcile,
+      opportunisticWake: BackgroundService.onOpportunisticWake,
+      homeWidgetSetup: widgetLaunch.groupIdAnswered,
+    ));
 
     // #609 heartbeat, #1004/#1303 trip recoveries, orchestrator start,
     // aggregator hook, isolate-spool drain — in order (see part file).

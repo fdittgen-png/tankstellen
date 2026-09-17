@@ -41,26 +41,63 @@ abstract final class HiveOpenTiming {
   static List<String> get openedBoxes => List.unmodifiable(_opened);
   static final List<String> _opened = [];
 
-  /// Forget the recorded long pole and the opened-box list — test
+  /// The phase of an open in the first-frame batch.
+  static const String firstFramePhase = 'first_frame';
+
+  /// The phase of an open after the first frame (#4318).
+  static const String deferredPhase = 'deferred';
+
+  /// Every timed open, first-frame and deferred, in completion order —
+  /// with its duration and the number of values it loaded (#4318).
+  ///
+  /// [slowest] names the long pole; this is what makes a box that is
+  /// GROWING visible before it becomes one. `entries` is what `openBox`
+  /// deserialized, and a count that climbs launch over launch is the
+  /// #4110 regression announcing itself early. Null when the open failed.
+  static List<BoxOpenRecord> get opens => List.unmodifiable(_records);
+  static final List<BoxOpenRecord> _records = [];
+
+  /// Forget the recorded long pole and the opened-box lists — test
   /// isolation only.
   @visibleForTesting
   static void reset() {
     _slowest = null;
     _opened.clear();
+    _records.clear();
   }
 
-  static Future<Box<T>> timed<T>(
-      String name, Future<Box<T>> Function() open) async {
+  /// Times [open]. Only [firstFramePhase] opens feed [slowest] and
+  /// [openedBoxes] — those answer questions about the batch the first
+  /// frame waits for, and a deferred open must not change their meaning.
+  static Future<Box<T>> timed<T>(String name, Future<Box<T>> Function() open,
+      {String phase = firstFramePhase}) async {
     final sw = Stopwatch()..start();
+    Box<T>? box;
     try {
-      return await open();
+      return box = await open();
     } finally {
       sw.stop();
-      _opened.add(name);
-      final current = _slowest;
-      if (current == null || sw.elapsedMilliseconds > current.$2) {
-        _slowest = (name, sw.elapsedMilliseconds);
+      final ms = sw.elapsedMilliseconds;
+      _records.add((name: name, phase: phase, ms: ms, entries: box?.length));
+      if (phase == firstFramePhase) {
+        _opened.add(name);
+        final current = _slowest;
+        if (current == null || ms > current.$2) _slowest = (name, ms);
       }
     }
   }
+
+  /// [opens] as export rows.
+  static List<Map<String, Object?>> exportRows() => [
+        for (final r in _records)
+          {
+            'box': r.name,
+            'phase': r.phase,
+            'durationMs': r.ms,
+            if (r.entries != null) 'entries': r.entries,
+          },
+      ];
 }
+
+/// One timed box open (#4318).
+typedef BoxOpenRecord = ({String name, String phase, int ms, int? entries});

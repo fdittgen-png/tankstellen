@@ -140,37 +140,26 @@ void main() {
         }
       });
 
-      test('the first-frame batch opens all six domain boxes', () {
-        // #4110 — the first-frame open batch moved to its own library
-        // when hive_boxes.dart reached the 400-line cap. These
-        // assertions are about the OPENS, so they follow them there.
+      test('the first-frame batch opens the five first-route domain boxes',
+          () {
+        // #4318 — the batch opens whatever its declared contract lists;
+        // that it RUNS is proven by hive_first_frame_boxes_test.dart and
+        // first_frame_route_matrix_test.dart. This pins the declaration.
         final opensSource =
             File('lib/core/storage/hive_first_frame_boxes.dart')
                 .readAsStringSync();
-
-        final initMatch = RegExp(
-          r'static Future<void> openAll\(HiveAesCipher\? cipher\) async \{'
-          r'(.*?)\n  \}',
-          dotAll: true,
-        ).firstMatch(opensSource);
-        expect(initMatch, isNotNull);
-        final initBody = initMatch!.group(1)!;
-
-        // Count that all boxes are opened (after the migration loop)
         for (final boxName in [
           'settings',
           'profiles',
           'favorites',
           'cache',
-          'priceHistory',
           'alerts',
         ]) {
-          expect(
-            initBody.contains(boxName),
-            isTrue,
-            reason: 'init() must open the $boxName box',
-          );
+          expect(opensSource.contains('name: HiveBoxes.$boxName'), isTrue,
+              reason: 'the contract must declare the $boxName box');
         }
+        // #4318 — priceHistory is a deferred user-data box now.
+        expect(opensSource.contains('name: HiveBoxes.priceHistory'), isFalse);
       });
 
       test('initInIsolate() opens the six background boxes', () {
@@ -374,7 +363,6 @@ void main() {
           'settings',
           'featureFlags',
           'appProfile',
-          'isolateErrorSpool',
         ]) {
           expect(
             firstFrame.contains(box),
@@ -383,6 +371,10 @@ void main() {
                 'first frame',
           );
         }
+        // #4318 — the spool opens itself on first write; see
+        // isolate_error_spool_deferred_open_test.dart.
+        expect(firstFrame.contains('name: HiveBoxes.isolateErrorSpool'),
+            isFalse);
       });
     });
 

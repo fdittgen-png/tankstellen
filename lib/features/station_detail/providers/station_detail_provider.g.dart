@@ -68,7 +68,7 @@ final class StationDetailProvider
   }
 }
 
-String _$stationDetailHash() => r'1bab34a8d7d948e20dde2f0119870bfb23a9e0ea';
+String _$stationDetailHash() => r'27c709aabc4688a80044619a396d9c6f6a03069a';
 
 final class StationDetailFamily extends $Family
     with

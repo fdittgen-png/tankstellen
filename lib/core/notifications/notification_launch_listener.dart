@@ -10,6 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../app/router.dart';
 import 'local_notification_service.dart';
+import 'notification_launch_ledger.dart';
 import 'notification_payload.dart';
 import 'notification_tap_dispatcher.dart';
 import '../../core/logging/error_logger.dart';
@@ -68,6 +69,12 @@ NotificationLaunchHandler notificationLaunchHandler(Ref ref) {
 ///
 /// Both paths funnel through [NotificationLaunchHandler] so the
 /// routing logic has a single, tested entry point.
+///
+/// #4317 — `initialize()` now runs after the first frame, so the cold probe
+/// can run BEFORE the plugin is ready. The listener re-reads the launch
+/// details once [NotificationLaunchLedger.pluginReady] completes, and the
+/// ledger decides whether a probed payload is new — see it for the
+/// per-platform reasons.
 class NotificationLaunchListener extends ConsumerStatefulWidget {
   final Widget child;
 
@@ -98,7 +105,7 @@ class _NotificationLaunchListenerState
     unawaited(_handleColdLaunch());
     _subscription =
         // #4070 — only the payloads addressed to this handler.
-        NotificationTapDispatcher.instance.launchPayloads.listen(_dispatch);
+        NotificationTapDispatcher.instance.launchPayloads.listen(_onTap);
   }
 
   @override
@@ -110,14 +117,42 @@ class _NotificationLaunchListenerState
   Future<void> _handleColdLaunch() async {
     try {
       final service = widget.coldLaunchService ?? LocalNotificationService();
+      final wasReady = NotificationLaunchLedger.isPluginReady;
       final payload = await service.getColdLaunchPayload();
       // The router may not have attached its Navigator yet on cold
       // start. Defer to after the first frame so `push` lands on a
       // live navigator rather than an empty stack.
-      WidgetsBinding.instance.addPostFrameCallback((_) => _dispatch(payload));
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _routeProbed(payload));
+      if (wasReady) return;
+      // #4317 — a tap that arrived before the deferred initialize() is
+      // only visible in the launch details on iOS; read them once more.
+      await NotificationLaunchLedger.pluginReady;
+      if (!mounted) return;
+      _routeProbed(await service.getColdLaunchPayload());
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {'where': 'NotificationLaunchListener: cold-launch probe failed'}));
     }
+  }
+
+  /// A launch-details payload is claimed only when it is actually routed,
+  /// so an unmounted listener leaves it for its remounted successor.
+  void _routeProbed(String? payload) {
+    if (!mounted) return;
+    if (!NotificationLaunchLedger.claimLaunchPayload(payload)) return;
+    _dispatch(payload);
+  }
+
+  void _onTap(String? payload) {
+    // Before the plugin is ready a stream tap is the channel buffer
+    // draining — on Android the same tap the launch probe may already have
+    // routed through `setIntent`. Only a tap after that is a fresh gesture.
+    if (!NotificationLaunchLedger.isPluginReady) {
+      _routeProbed(payload);
+      return;
+    }
+    NotificationLaunchLedger.recordDelivered(payload);
+    _dispatch(payload);
   }
 
   void _dispatch(String? payload) {

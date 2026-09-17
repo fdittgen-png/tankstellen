@@ -11,6 +11,8 @@ import '../../../core/services/non_fuel_station_guard.dart';
 import '../../../core/services/service_providers.dart';
 import '../../../core/services/service_result.dart';
 import '../../../core/services/station_service.dart';
+import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/hive_deferred_user_boxes.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../ev/api.dart';
 import '../../route_search/providers/route_search_provider.dart';
@@ -42,6 +44,24 @@ const _detailOnlyOpeningHoursCountries = {'DE', 'PT'};
 
 @riverpod
 Future<ServiceResult<StationDetail>> stationDetail(
+  Ref ref,
+  String stationId,
+) async {
+  // #4318 — the price-history box is no longer opened before launch, and
+  // the detail surfaces read it synchronously (collapsed stats, chart,
+  // fill-up guidance). A deep-linked cold start can get here first, so the
+  // detail resolves only once the box has opened: the loading shimmer
+  // covers the open instead of the stats row appearing a moment late.
+  // The load starts first (its synchronous part reads the providers), and
+  // both are awaited together so a failing load is never left unlistened.
+  final detail = _loadStationDetail(ref, stationId);
+  if (HiveDeferredUserBoxes.isReadable(HiveBoxes.priceHistory)) return detail;
+  final both = await Future.wait<Object?>(
+      [detail, HiveDeferredUserBoxes.settled(HiveBoxes.priceHistory)]);
+  return both.first! as ServiceResult<StationDetail>;
+}
+
+Future<ServiceResult<StationDetail>> _loadStationDetail(
   Ref ref,
   String stationId,
 ) async {

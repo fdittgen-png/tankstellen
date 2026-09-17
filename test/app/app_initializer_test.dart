@@ -56,8 +56,8 @@ void main() {
   });
 
   group('AppInitializer phase ordering', () {
-    test('runs in order: bootstrap → storage → services → optional → launch',
-        () {
+    test('runs in order: bootstrap → storage → launch-critical service '
+        'send → optional → launch', () {
       // Pin the call ordering inside AppInitializer.run so a future edit
       // can't accidentally do storage-before-bootstrap or skip a phase.
       final runBody = _extractMethodBody(initSource, 'static Future<void> run');
@@ -69,7 +69,11 @@ void main() {
       // verdicts moved into the gate), so match the name without the
       // call parens. This test is about ORDER, not call syntax.
       final storage = runBody.indexOf('_initStorage');
-      final services = runBody.indexOf('_initServicesInParallel()');
+      // #4317 — the parallel service await is gone. #4319 — what stays
+      // before the launch is one dependency graph whose probe SENDS the
+      // home-widget group id first.
+      final services =
+          runBody.indexOf("StartupTimer.instance.mark('launch_critical_services')");
       final tankSync = runBody.indexOf('_maybeInitTankSync');
       final launch = runBody.indexOf('_launch(');
 
@@ -89,39 +93,32 @@ void main() {
           reason: 'TankSync must precede _launch');
     });
 
-    test('service inits run in parallel via Future.wait', () {
-      // A future regression that swaps Future.wait back to sequential awaits
-      // must fail this test — that was the whole point of the refactor.
-      final body = _extractMethodBody(
-        initSource,
-        'static Future<void> _initServicesInParallel',
-      );
-      expect(body, isNotNull);
-      expect(body, contains('Future.wait'));
-      expect(body, contains('LocalNotificationService'));
-      // Background polling is now gated on active alerts (#713); the
-      // parallel slot may reference the gating helper instead of the
-      // service directly. Either is fine so long as background work
-      // still happens in the same Future.wait slot.
-      expect(
-        body!.contains('BackgroundService.init') ||
-            body.contains('_maybeInitBackground'),
-        isTrue,
-        reason: 'background init (or its gating helper) must run in parallel',
-      );
-      expect(body, contains('HomeWidgetService.init'));
-    });
+    test('#4317 — runtime services are scheduled from _launch, after the '
+        'bind, and nothing awaits them before the handoff', () {
+      // The behaviour (parallel, failure-isolated, post-frame, once) is
+      // EXECUTED by test/app/startup/runtime_services_phase_test.dart; this
+      // only pins where production wires it.
+      final runBody = _extractMethodBody(initSource, 'static Future<void> run');
+      expect(runBody, isNot(contains('LocalNotificationService')));
+      expect(runBody, isNot(contains('BackgroundService')));
 
-    test('each parallel service init is wrapped in error protection', () {
-      // Failing notifications must not block background or home widget init.
-      final body = _extractMethodBody(
-        initSource,
-        'static Future<void> _initServicesInParallel',
-      );
-      expect(body, isNotNull);
-      expect(body, contains('_safe('),
-          reason: 'each parallel init should go through _safe to isolate '
-              'failures across services');
+      final launchBody = _extractMethodBody(initSource, 'static void _launch');
+      final bind = launchBody!.indexOf('errorLogger.bind(container)');
+      final schedule =
+          launchBody.indexOf('RuntimeServicesPhase.scheduleAfterFirstFrame(');
+      final runApp = launchBody.indexOf('runApp(');
+      expect(bind, isNonNegative);
+      expect(schedule, greaterThan(bind),
+          reason: 'failures must report through the bound pipeline');
+      expect(runApp, greaterThan(schedule));
+      for (final service in [
+        'LocalNotificationService().initialize',
+        'BackgroundService.reconcile',
+        'BackgroundService.onOpportunisticWake',
+        'widgetLaunch.groupIdAnswered',
+      ]) {
+        expect(launchBody, contains(service));
+      }
     });
 
     test('TankSync init is bounded by an 8-second timeout', () {
@@ -348,28 +345,22 @@ void main() {
 
   group('Widget cold-launch URI dispatch (#2600)', () {
     test(
-        '_stashWidgetLaunchUri stashes the launch URI with no refresh '
-        'discrimination', () {
+        'the probe stashes the launch URI with no refresh discrimination '
+        '(#4319: it lives in LaunchCriticalPath now)', () {
       // #2600 — the refresh button is now a native broadcast handled in
       // place; it never launches the app. The former #2159 refresh-marker
-      // interception (`isWidgetRefreshUri` → `nearestWidgetRefreshProvider`
-      // before the stash) was therefore removed: every cold-launch URI is
-      // a station deep-link to stash for the router redirect.
-      final body = _extractMethodBody(
-          initSource, 'static Future<void> _stashWidgetLaunchUri');
-      expect(body, isNotNull,
-          reason: '_stashWidgetLaunchUri must exist');
-
-      expect(body, contains('pendingWidgetUriProvider.notifier'),
-          reason: 'launch URIs must flow through the pending stash');
-      expect(body, isNot(contains('isWidgetRefreshUri')),
-          reason:
-              'the refresh-marker discriminator is gone — refresh no '
-              'longer launches the app (#2600)');
-      expect(body, isNot(contains('nearestWidgetRefreshProvider')),
-          reason:
-              'the cold-launch path must not dispatch to the refresh '
-              'notifier any more (#2600)');
+      // interception was removed: every cold-launch URI is a station
+      // deep-link to stash for the router redirect. The stash itself is
+      // EXECUTED by launch_critical_path_test.dart and router_test.dart.
+      final path =
+          File('lib/app/startup/launch_critical_path.dart').readAsStringSync();
+      final probe =
+          File('lib/app/startup/widget_launch_probe.dart').readAsStringSync();
+      expect(path, contains('pendingWidgetUriProvider.notifier'));
+      for (final source in [path, probe]) {
+        expect(source, isNot(contains('isWidgetRefreshUri')));
+        expect(source, isNot(contains('nearestWidgetRefreshProvider')));
+      }
     });
   });
 }

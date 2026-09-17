@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'notification_launch_ledger.dart';
 import 'notification_service.dart';
 import 'notification_tap_dispatcher.dart';
 import '../../core/logging/error_logger.dart';
@@ -40,8 +41,19 @@ class LocalNotificationService implements NotificationService {
   static const _serviceChannelDescription =
       'Reminders when your odometer crosses a scheduled service interval';
 
+  /// #4317 — runs after the first frame now. [NotificationLaunchLedger]
+  /// is told when it has finished — succeeded or not — so the launch
+  /// listener can collect a tap that arrived while it was pending.
   @override
   Future<void> initialize() async {
+    try {
+      await _initialize();
+    } finally {
+      NotificationLaunchLedger.markPluginReady();
+    }
+  }
+
+  Future<void> _initialize() async {
     const androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     // #3094 — iOS (Darwin) init is REQUIRED for notifications on iPhone: it

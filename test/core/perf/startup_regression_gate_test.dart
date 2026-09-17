@@ -50,7 +50,7 @@ void main() {
       tmpDir.deleteSync(recursive: true);
     });
 
-    test('is exactly the ten boxes the budget was measured against',
+    test('is exactly the boxes the budget was measured against',
         () async {
       await HiveFirstFrameBoxes.openAll(null);
 
@@ -59,8 +59,8 @@ void main() {
         _firstFrameBoxBaseline,
         reason: 'The first-frame batch changed.\n\n'
             'Adding a box spends ${kHiveOpenBudget.limit} '
-            '${kHiveOpenBudget.unit} that were measured against the ten '
-            'below, and every millisecond it costs is a millisecond '
+            '${kHiveOpenBudget.unit} that were measured against the '
+            'set below, and every millisecond it costs is a millisecond '
             'before the user can read a price '
             '(${kColdStartBudget.limit} ${kColdStartBudget.unit}).\n\n'
             'If the box genuinely gates the first frame: add it here AND '
@@ -95,7 +95,7 @@ void main() {
               'asserts nothing until that is fixed');
     });
 
-    test('blocks on exactly the four steps the budget accounts for', () {
+    test('blocks on exactly the steps the budget accounts for', () {
       final blocking = [
         for (final line in bodyLines)
           if (_isTopLevelStatement(line) && _mentionsAwait(line)) line.trim(),
@@ -105,7 +105,7 @@ void main() {
           reason: 'The set of steps that BLOCK the first frame changed.\n\n'
               'Each one of these is serial time before anything paints, '
               'and ${kColdStartBudget.limit} ${kColdStartBudget.unit} was '
-              'measured with these four.\n\n'
+              'measured with these.\n\n'
               'Before adding one, ask what #4110 asked: does the first '
               'frame actually need it, or can it go through '
               '_deferPostFirstFrame? If it must block, update this list '
@@ -140,9 +140,10 @@ final Set<String> _firstFrameBoxBaseline = {
   HiveBoxes.profiles,
   HiveBoxes.favorites,
   HiveBoxes.cache,
-  HiveBoxes.priceHistory,
+  // #4318 — `priceHistory` left (HiveDeferredUserBoxes) and so did
+  // `isolateErrorSpool` (IsolateErrorSpool opens it lazily): a win, locked
+  // in. Each remaining box names its route consumer in the contract.
   HiveBoxes.alerts,
-  HiveBoxes.isolateErrorSpool,
   HiveBoxes.featureFlags,
   HiveBoxes.appProfile,
   HiveBoxes.boxSchema,
@@ -151,16 +152,19 @@ final Set<String> _firstFrameBoxBaseline = {
 /// The statements in `AppInitializer.run` that the first frame waits for,
 /// verbatim and in order.
 const List<String> _preFirstFrameAwaits = [
-  'await initializeDateFormatting();',
-  'if (!await runStoragePhaseGuarded(_initStorage)) return;',
-  'await _initServicesInParallel();',
-  'await _stashWidgetLaunchUri(container);',
+  // #4319 — ONE await: the date formatting, the guarded storage phase and
+  // the widget probe used to be three serial awaits; they are now started
+  // together and awaited as one dependency graph, whose ordering is
+  // EXECUTED by test/app/startup/launch_critical_path_test.dart.
+  // #4317 — `await _initServicesInParallel();` left: notifications, the
+  // background scheduler and the home-widget answer run post-frame.
+  'final container = await LaunchCriticalPath.run(',
 ];
 
 /// Every `await` in the body, including those inside the post-first-frame
 /// closures — the backstop for an await added where [_isTopLevelStatement]
 /// cannot see it.
-const int _totalAwaitsInRunBody = 11;
+const int _totalAwaitsInRunBody = 8;
 
 final RegExp _awaitPattern = RegExp(r'\bawait\b');
 

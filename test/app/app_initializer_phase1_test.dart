@@ -37,11 +37,16 @@ void main() {
   group('#795 phase 1 — parallelized storage init', () {
     test('_initStorage batches loadApiKey + TraceStorage.init via Future.wait',
         () {
+      // #4319 — the batch lives in LaunchCriticalPath.storagePhase (its
+      // overlap with the profile seed is EXECUTED by
+      // launch_critical_path_test.dart); _initStorage names the tasks.
+      expect(initSource, contains('loadApiKeys: HiveStorage.loadApiKey'));
+      expect(initSource, contains("'trace_storage': TraceStorage.init"));
       final body = _extractMethodBody(
-        initSource,
-        'static Future<void> _initStorage',
+        File('lib/app/startup/launch_critical_path.dart').readAsStringSync(),
+        'static Future<void> storagePhase',
       );
-      expect(body, isNotNull, reason: '_initStorage method must exist');
+      expect(body, isNotNull, reason: 'storagePhase must exist');
 
       // Must contain a Future.wait containing BOTH load calls.
       final futureWaitIdx = body!.indexOf('Future.wait');
@@ -55,9 +60,9 @@ void main() {
       expect(listEnd, isNonNegative,
           reason: 'Future.wait must be followed by a list literal');
       final batch = body.substring(futureWaitIdx, listEnd);
-      expect(batch, contains('HiveStorage.loadApiKey'),
+      expect(batch, contains('loadApiKeys'),
           reason: 'loadApiKey must be inside the parallel batch');
-      expect(batch, contains('TraceStorage.init'),
+      expect(batch, contains('telemetry.entries'),
           reason: 'TraceStorage.init must be inside the parallel batch');
     });
 
@@ -187,12 +192,12 @@ void main() {
       // that `storage_ready` is reported from the run body — not from
       // inside _initStorage (which would mean we forgot to move it
       // when refactoring).
-      final runBody =
-          _extractMethodBody(initSource, 'static Future<void> run');
-      expect(runBody, isNotNull);
-      expect(runBody, contains("StartupTimer.instance.mark('storage_ready')"),
-          reason: 'storage_ready must be marked from run() so it captures '
-              'the real end of phase-2 storage init');
+      // #4319 — marked by LaunchCriticalPath the moment the storage
+      // verdict lands; executed in launch_critical_path_test.dart.
+      final path =
+          File('lib/app/startup/launch_critical_path.dart').readAsStringSync();
+      expect(path, contains("StartupTimer.instance.mark('storage_ready')"),
+          reason: 'storage_ready must capture the real end of storage init');
     });
 
     test('#4110 — storage marks its SUB-phases from inside HiveBoxes, not '
