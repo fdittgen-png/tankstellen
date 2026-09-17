@@ -407,7 +407,9 @@ void main() {
     'lib/features/obd2/data/transport/bluetooth_obd2_transport.dart': 448,
     'lib/features/search/presentation/widgets/search_results_list.dart': 440,
     'lib/features/fill_ups/domain/services/monthly_insights_aggregator.dart': 415,
-    'lib/core/sync/sync_provider.dart': 413,
+    // #4338 — 413 → 412: markRelinkRequired now marks the relink owner
+    // and rebuilds instead of copying the whole config by hand.
+    'lib/core/sync/sync_provider.dart': 412,
   };
 
   test('no library in lib/ (declaring file + its hand-written parts) '

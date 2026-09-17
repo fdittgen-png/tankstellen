@@ -18,6 +18,7 @@ import '../../core/sync/sync_pull_coordinator.dart';
 import '../../core/sync/sync_run_trace.dart';
 import '../../core/sync/tanksync_init.dart';
 import '../../core/sync/tanksync_init_retry.dart';
+import '../../core/sync/tanksync_relink_provider.dart';
 import '../../core/sync/tanksync_session_gate.dart';
 import '../../features/trips/api.dart';
 import '../../features/feature_management/application/feature_flags_provider.dart';
@@ -97,7 +98,17 @@ class LaunchSyncPhase {
       authenticated: () => TankSyncClient.sessionUserId != null,
     );
     // #4162 — the session gate reads its facts from the same settings.
-    TankSyncSessionGate.instance.bind(storage);
+    // #4338 — a session the SDK drops mid-session is flagged for relink
+    // now, not at the next cold start's identity guard.
+    TankSyncSessionGate.instance.bind(
+      storage,
+      relink: () => container.read(tankSyncRelinkProvider),
+      onSessionLost: () {
+        if (storage.getSetting('sync_user_id') != null) {
+          _markRelinkRequired(container);
+        }
+      },
+    );
     // #4337 — a consent change takes effect in-session: a withdrawal
     // releases the client locally, a grant resumes the stored identity.
     ConsentEnforcement.cloudSyncHook = (enabled) async {

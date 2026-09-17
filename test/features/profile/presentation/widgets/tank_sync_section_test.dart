@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tankstellen/core/navigation/app_routes.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
+import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/features/profile/presentation/widgets/tank_sync_section.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
@@ -121,5 +122,44 @@ void main() {
       expect(find.byKey(const Key('cloudSyncConsentRequest')), findsNothing);
       expect(find.text('setup-route'), findsOneWidget);
     });
+  });
+
+  /// #4338 — the relink guidance a lost session raises is surfaced in the
+  /// section, and a provider rebuild no longer drops it.
+  testWidgets('relink guidance shows in the section and survives a '
+      'SyncState rebuild (#4338)', (tester) async {
+    final storage = FakeHiveStorage();
+    await storage.putSetting('sync_enabled', true);
+    await storage.putSetting(StorageKeys.consentCloudSync, true);
+    await storage.putSetting('supabase_url', 'https://a.supabase.co');
+    await storage.setSupabaseAnonKey('key');
+    await storage.putSetting('sync_user_id', 'u1');
+    final container = ProviderContainer(
+      overrides: [hiveStorageProvider.overrideWithValue(storage)],
+    );
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale('en'),
+          home: Scaffold(
+            body: SingleChildScrollView(child: TankSyncSection()),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tankSyncRelinkTile')), findsNothing);
+
+    container.read(syncStateProvider.notifier).markRelinkRequired();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tankSyncRelinkTile')), findsOneWidget);
+
+    container.invalidate(syncStateProvider);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tankSyncRelinkTile')), findsOneWidget);
   });
 }

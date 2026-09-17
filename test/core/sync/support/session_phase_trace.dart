@@ -11,21 +11,19 @@ typedef SessionEdge = (TankSyncSessionPhase from, TankSyncSessionPhase to);
 /// Session anomalies the app is KNOWN to produce although the table and
 /// the invariants forbid them (#4162). Each element is either a
 /// [SessionEdge] or a [SessionInvariant], and each is a filed defect the
-/// fix removes:
-///
-/// * `ready → sessionLost` — #4338 (S3): a rejected refresh token drops
-///   the session and nothing flags it for re-linking.
+/// fix removes. The three this started with — #4336 (a disconnect kept
+/// the old backend's client), #4337 (setup and uploads without consent, a
+/// withdrawal leaving the client live) and #4338 (a lost session nobody
+/// flagged) — are fixed, so it is empty.
 ///
 /// This set may only SHRINK — [kKnownSessionAnomaliesCeiling] pins its
 /// size. Adding an entry to make a trace pass is exactly what the ceiling
 /// exists to refuse: fix the writer.
-const Set<Object> kKnownSessionAnomalies = {
-  (TankSyncSessionPhase.ready, TankSyncSessionPhase.sessionLost),
-};
+const Set<Object> kKnownSessionAnomalies = {};
 
 /// The size [kKnownSessionAnomalies] may never exceed. Lower it with every
 /// fix.
-const int kKnownSessionAnomaliesCeiling = 1;
+const int kKnownSessionAnomaliesCeiling = 0;
 
 /// Records every observation [TankSyncSessionGate.instance] makes.
 class SessionPhaseTrace {

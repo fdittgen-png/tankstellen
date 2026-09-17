@@ -52,11 +52,10 @@ typedef SessionViolation = ({
 /// the next exported error log says which writer did what.
 ///
 /// **Observe mode only.** The phase is derived, so there is nothing to
-/// refuse: the gate changes no control flow. Its single addition to the
-/// app is the READ-ONLY `onAuthStateChange` subscription installed by
-/// [watchAuth], which records the session changes the SDK makes on its
-/// own — a refresh token rejected mid-session is otherwise seen by
-/// nobody (#4338).
+/// refuse. The `onAuthStateChange` subscription installed by [watchAuth]
+/// records the session changes the SDK makes on its own — a refresh token
+/// rejected mid-session was otherwise seen by nobody — and, since #4338,
+/// hands a session the SDK dropped to the relink owner at once.
 ///
 /// Never throws: it sits on the path of every client init and sign-out,
 /// and a sync that cannot record its state must still sync.
@@ -72,6 +71,8 @@ class TankSyncSessionGate {
   final Queue<SessionViolation> _violations = Queue<SessionViolation>();
   StorageRepository? _storage;
   SyncConfig? _config;
+  bool Function()? _relink;
+  void Function()? _onSessionLost;
   TankSyncSessionPhase? _lastLawful;
   StreamSubscription<AuthState>? _authSub;
   int _initInFlight = 0;
@@ -90,8 +91,19 @@ class TankSyncSessionGate {
   /// Install the settings the facts are read from. Until this runs (the
   /// launch wiring, `LaunchSyncPhase.registerPulls`) [observe] records
   /// nothing.
-  void bind(StorageRepository storage) {
+  ///
+  /// [relink] reads the relink owner (`TankSyncRelink`) directly, so the
+  /// flag is current even before `SyncState` republishes. [onSessionLost]
+  /// runs when the SDK drops the session on its own — before the
+  /// observation, so the owner has flagged it by then (#4338).
+  void bind(
+    StorageRepository storage, {
+    bool Function()? relink,
+    void Function()? onSessionLost,
+  }) {
     _storage = storage;
+    _relink = relink;
+    _onSessionLost = onSessionLost;
     observe('bind');
   }
 
@@ -128,6 +140,7 @@ class TankSyncSessionGate {
             return;
           }
           final reason = state.signOutReason;
+          if (state.event == AuthChangeEvent.signedOut) _sessionLost();
           observe(reason == null
               ? 'auth:${state.event.name}'
               : 'auth:${state.event.name}(${reason.name})');
@@ -141,6 +154,15 @@ class TankSyncSessionGate {
       );
     } catch (e, st) {
       log.warn('TankSyncSessionGate: auth watch failed',
+          error: e, stack: st, layer: ErrorLayer.sync);
+    }
+  }
+
+  void _sessionLost() {
+    try {
+      _onSessionLost?.call();
+    } catch (e, st) {
+      log.warn('TankSyncSessionGate: session-lost hook failed',
           error: e, stack: st, layer: ErrorLayer.sync);
     }
   }
@@ -196,7 +218,7 @@ class TankSyncSessionGate {
       backendHost: TankSyncClient.backendHost,
       sessionUserId: TankSyncClient.sessionUserId,
       storedUserId: storage.getSetting('sync_user_id') as String?,
-      relinkFlag: config?.relinkRequired ?? false,
+      relinkFlag: _relink?.call() ?? config?.relinkRequired ?? false,
       configEnabled: config?.enabled ?? false,
       initInFlight: _initInFlight > 0,
       retryPending: TankSyncInitRetry.instance.pending,
@@ -231,6 +253,8 @@ class TankSyncSessionGate {
     _authSub = null;
     _storage = null;
     _config = null;
+    _relink = null;
+    _onSessionLost = null;
     _lastLawful = null;
     _initInFlight = 0;
     _violations.clear();

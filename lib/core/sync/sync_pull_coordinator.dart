@@ -23,7 +23,7 @@ enum SyncPassOutcome {
   completedWithTimeouts,
 
   /// The entries ran, but no user session existed — every pull no-ops
-  /// unauthenticated, so nothing was synced.
+  /// unauthenticated, so nothing was synced and nothing is stamped.
   completedUnauthenticated,
 
   /// The master gate was closed (sync off, no client, no consent).
@@ -188,12 +188,17 @@ class SyncPullCoordinator {
         _pass(SyncPassOutcome.fenced);
         return;
       }
+      // #4338 — a pass without a session synced nothing: it is recorded
+      // as such and never stamps, so the resume debounce does not read it
+      // as fresh.
+      if (!authenticatedAtStart || !_authenticated()) {
+        _pass(SyncPassOutcome.completedUnauthenticated);
+        return;
+      }
       _lastCompletedAt = now();
-      _pass(!authenticatedAtStart || !_authenticated()
-          ? SyncPassOutcome.completedUnauthenticated
-          : timedOut.contains(true)
-              ? SyncPassOutcome.completedWithTimeouts
-              : SyncPassOutcome.completed);
+      _pass(timedOut.contains(true)
+          ? SyncPassOutcome.completedWithTimeouts
+          : SyncPassOutcome.completed);
     } catch (e, st) {
       _pass(SyncPassOutcome.failed);
       log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'SyncPullCoordinator.pullAll'});

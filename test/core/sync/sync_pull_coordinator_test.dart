@@ -246,7 +246,7 @@ void main() {
     });
 
     test('a pass without a session — at its start or its end — is '
-        'completedUnauthenticated', () async {
+        'completedUnauthenticated and stamps nothing', () async {
       var session = false;
       coordinator.register(
         enabled: () => true,
@@ -255,11 +255,14 @@ void main() {
       );
       await coordinator.pullAll();
       expect(coordinator.lastOutcome, SyncPassOutcome.completedUnauthenticated);
+      expect(coordinator.lastCompletedAt, isNull,
+          reason: '#4338 — a pass that synced nothing never stamps');
 
       session = true;
       await coordinator.pullAll();
       expect(coordinator.lastOutcome, SyncPassOutcome.completedUnauthenticated,
           reason: 'the session was lost during the pass');
+      expect(coordinator.lastCompletedAt, isNull);
     });
 
     test('a gate that throws records failed and still completes', () async {
