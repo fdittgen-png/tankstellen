@@ -300,6 +300,9 @@ final _pipelineProvider =
 
 class _FakeWalHost implements Obd2RecordingPipelineHost {
   @override
+  void tearDownFinalisedTrip() {}
+
+  @override
   TripRecordingState state = const TripRecordingState();
 
   @override

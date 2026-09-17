@@ -77,14 +77,9 @@ mixin _TripRecordingPersist
       }
     }
 
-    // #3597 — the snapshot's summary is a skeleton (distance + maxRpm
-    // only); replay the persisted samples through the canonical recorder
-    // so the salvaged trip keeps its consumption figure, idle/high-RPM
-    // time and cold-start flag instead of surfacing avgLPer100Km null.
-    final summary = rebuildRecoveredSummary(
-      skeleton: snapshot.summary,
-      samples: snapshot.samples,
-    );
+    // #3597 — the skeleton replayed into a full summary; #4329 — of the
+    // kind the row's evidence names (see recoveredTripKind).
+    final summary = recoveredTripSummary(snapshot);
 
     // Transition state synchronously so the recording screen flips to
     // the summary view immediately — even if the Hive writes below

@@ -266,18 +266,8 @@ mixin _TripRecordingLifecycle
     // #1925 — finalise the opt-in OBD2 debug session so its summary
     // (duration, reconnects, data gaps) is complete for export.
     Obd2DebugSessionRecorder.endSession();
-    _scheduler?.stop();
-    _emitTimer?.cancel();
-    _emitTimer = null;
-    // #1904 / #2188 — tear down the grace timer + the pending silent-
-    // reconnect window so neither can fire after the trip has stopped,
-    // and stop the reconnect scanner.
-    _droppedSession.cancelAllTimers();
+    _haltSampling(); // #4329 — the step a self-finalised trip takes too
     await _droppedSession.stopReconnectScanner();
-    // #2565 — `end()` also clears the degrade flag so a stop while
-    // degraded finalises cleanly (the drop-window GPS samples persist in
-    // the mixed trip).
-    _run.end();
     _dropDetector.reset();
     _emitState();
     if (!_stateController.isClosed) {
@@ -288,6 +278,16 @@ mixin _TripRecordingLifecycle
     }
     _distance.publishGateRejectionTally(); // #3253 — once-per-trip tally
     return _finaliseSummary();
+  }
+
+  /// #4329 — the trip is over, and nothing samples it or fires after it
+  /// (#1904/#2188 windows); `end()` clears the #2565 degrade too.
+  void _haltSampling() {
+    _run.end();
+    _scheduler?.stop();
+    _emitTimer?.cancel();
+    _emitTimer = null;
+    _droppedSession.cancelAllTimers();
   }
 
   @override

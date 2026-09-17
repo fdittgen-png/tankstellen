@@ -7,6 +7,7 @@ import '../data/trip_history_entry.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_termination.dart';
 import '../domain/recording_session_journal.dart';
+import '../domain/services/recovered_summary_rebuild.dart';
 import '../domain/trip_recorder.dart';
 import 'recording_lifecycle_marks_recorder.dart';
 
@@ -81,6 +82,46 @@ TripHistoryEntry finishedTripEntry(
             : const TripTermination(TripTerminationReason.userStopped)),
     sessionJournal: sessionJournal,
   );
+}
+
+/// The summary a trip recovered after its process died is saved with.
+///
+/// #3597 — the WAL row's summary is a skeleton (distance + maxRpm only);
+/// the persisted samples are replayed through the canonical recorder so
+/// the salvaged trip keeps its consumption figure, idle/high-RPM time and
+/// cold-start flag instead of surfacing avgLPer100Km null. #4329 — and it
+/// is the kind [recoveredTripKind] names.
+TripSummary recoveredTripSummary(ActiveTripSnapshot snapshot) =>
+    rebuildRecoveredSummary(
+      skeleton: snapshot.summary,
+      samples: snapshot.samples,
+    ).copyWith(kind: recoveredTripKind(snapshot));
+
+/// Which kind of trip a recovered WAL row holds (#4329).
+///
+/// Since #4313 the GPS-only WAL stamps `gpsOnly` on its row. A row written
+/// by an earlier build carries the recorder's default, `gpsPlusObd2`,
+/// whichever pipeline wrote it — so the row's own word is final only when
+/// it says `gpsOnly`. Otherwise the evidence decides, and a dongle leaves
+/// two kinds of it:
+///
+/// * an identity — a VIN or an odometer reading: an adapter answered;
+/// * a sample with an engine reading — rpm above zero or a measured fuel
+///   rate, the [TripKind.fromSamples] rule.
+///
+/// A row with samples and neither is a GPS-only trip. That includes an
+/// OBD2 recording that died before its adapter produced anything (the
+/// #3858 engine-off wait): nothing in it came from a dongle, which is what
+/// [TripKind.gpsOnly] means. A row without samples has no evidence either
+/// way and keeps its word.
+TripKind recoveredTripKind(ActiveTripSnapshot snapshot) {
+  final written = snapshot.summary.kind;
+  if (written == TripKind.gpsOnly) return written;
+  final adapterAnswered = snapshot.vin != null ||
+      snapshot.odometerStartKm != null ||
+      snapshot.odometerLatestKm != null;
+  if (adapterAnswered || snapshot.samples.isEmpty) return written;
+  return TripKind.fromSamples(snapshot.samples);
 }
 
 /// The history row a trip recovered after its process died is saved as

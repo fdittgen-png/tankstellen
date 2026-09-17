@@ -103,9 +103,6 @@ void main() {
     final trace = PhaseTrace(container);
     addTearDown(trace.close);
     final notifier = await RecordingSessionDriver.startObd2(container);
-    // A grace-finalised controller keeps its emit timer until a Stop tears
-    // it down (the F1 path below) — tear it down before the container goes.
-    addTearDown(notifier.stop);
     RecordingSessionDriver.captureObd2Samples(notifier, 5);
     final ctl = notifier.debugController!
       ..debugTriggerDrop(reason: TripDropReason.silentFailure);
@@ -121,6 +118,37 @@ void main() {
         reason: 'the finalised trip is in history; a row on disk would be '
             'discarded at the next launch with a false error');
     expect(disk.pausedBox.isEmpty, isTrue);
+    trace.expectLawful();
+  });
+
+  test('#4329 — the grace finalise tears the pipeline down as a Stop does: '
+      'no Stop is needed, and nothing samples the finished trip', () async {
+    final container = driver.container();
+    addTearDown(container.dispose);
+    final trace = PhaseTrace(container);
+    addTearDown(trace.close);
+    final notifier = await RecordingSessionDriver.startObd2(container);
+    RecordingSessionDriver.captureObd2Samples(notifier, 5);
+    final ctl = notifier.debugController!
+      ..debugTriggerDrop(reason: TripDropReason.silentFailure);
+    await RecordingDisk.settle();
+    var readings = 0;
+    final sub = ctl.live.listen((_) => readings++);
+    addTearDown(sub.cancel);
+
+    await ctl.debugExpireGraceWindow();
+    await RecordingDisk.settle();
+
+    expect(notifier.debugController, isNull,
+        reason: 'the pipeline let go of the finished controller — its live '
+            'and state subscriptions, GPS and link went with it');
+    readings = 0;
+    await Future<void>.delayed(const Duration(milliseconds: 600));
+    expect(readings, 0, reason: 'the 250 ms loop no longer samples it');
+    expect(container.read(tripRecordingProvider).phase,
+        TripRecordingPhase.finished);
+    expect(disk.historyRepo.loadAll(), hasLength(1),
+        reason: 'the teardown saved nothing a second time');
     trace.expectLawful();
   });
 
