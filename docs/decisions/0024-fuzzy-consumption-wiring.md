@@ -163,7 +163,8 @@ renderer would add `≈`. Today it renders plain. That glyph is a visible
 change needing a product decision, so the plain rendering is **kept**.
 
 The trace export gains `consumptionSource` and `consumptionVersion` beside
-the unchanged `avgLPer100Km` (schema v6, additive).
+the unchanged `avgLPer100Km`. The change is additive, so the schema stays
+5, as it did for #4203's and #4205's blocks.
 
 ### 8. No estimator can be selected — enforced
 

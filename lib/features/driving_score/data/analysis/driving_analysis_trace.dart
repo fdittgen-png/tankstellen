@@ -3,6 +3,7 @@
 
 import 'dart:convert';
 
+import '../../../../core/domain/consumption_estimate.dart';
 import '../../domain/driving_score.dart';
 import '../../../trips/api.dart';
 import '../../domain/lessons/driving_lesson.dart';
@@ -135,6 +136,11 @@ class DrivingAnalysisTrace {
   /// #4205 — the behaviour dimensions (value + confidence + evidence).
   final Map<String, Object?>? dimensions;
 
+  /// #4233 — the trip's consumption as the canonical contract. No vehicle:
+  /// the export records the stored figure, never a re-expression.
+  ConsumptionEstimate get _consumption =>
+      tripConsumptionEstimate(summary, null);
+
   Map<String, dynamic> toJson() => {
         'schema': schema,
         'kind': 'drivingAnalysis',
@@ -151,6 +157,10 @@ class DrivingAnalysisTrace {
           'distanceKm': _round(summary.distanceKm, 3),
           'durationSec': _durationSec(summary),
           'avgLPer100Km': _roundN(summary.avgLPer100Km, 2),
+          // #4233 — the figure's provenance through the canonical adapter
+          // (ADR 0024 §7); additive, the stored figure above is unchanged.
+          'consumptionSource': _consumption.sourceClass.name,
+          'consumptionVersion': _consumption.version?.toJson(),
           'distanceSource': summary.distanceSource,
           // #3599 — engine-off transport (tow/flatbed/train) telemetry.
           'engineRunningSeconds': _roundN(summary.engineRunningSeconds, 1),

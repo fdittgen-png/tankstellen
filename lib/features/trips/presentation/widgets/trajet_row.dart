@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/calibrated_trip_figures.dart';
+import '../../domain/trip_consumption_estimate.dart';
 import '../../domain/trajet_data_quality.dart';
 import 'fuel_source_chip.dart';
 import 'trajet_stripe_colors.dart';
@@ -65,6 +66,8 @@ class TrajetRow extends StatelessWidget {
     final isEv = vehicle?.type == VehicleType.ev;
     final avgUnit = isEv ? 'kWh/100 km' : 'L/100 km';
     final figures = CalibratedTripFigures.of(s, vehicle);
+    // #4233 — the L/100 km through the canonical adapter (ADR 0024 §7).
+    final avg = tripConsumptionEstimate(s, vehicle).litresPer100Km.valueOrNull;
     // Compact density on landscape / tablet widths — drops the
     // per-row vertical margin from 3 → 1 dp and the inner padding
     // from (12, 8) → (10, 4) so a 600+ dp viewport shows ~50 % more
@@ -163,21 +166,14 @@ class TrajetRow extends StatelessWidget {
                         // #3918 — the consumption figure is re-expressed
                         // at the vehicle's CURRENT pump gain (display
                         // only); #3919 — the fuel-source chip follows it.
-                        if (figures.lPer100Km != null)
+                        // #3576 — a persisted GPS-physics estimate alone is
+                        // `~`-prefixed; #4233 keeps that rule exactly.
+                        if (avg != null)
                           _Chip(
                             icon: Icons.eco,
                             text: l.trajetsRowAvgConsumption(
-                              UnitFormatter.formatDecimal(figures.lPer100Km!),
-                              avgUnit,
-                            ),
-                          )
-                        // #3576 — persisted GPS-physics estimate,
-                        // `~`-prefixed per the estimate convention.
-                        else if (s.estimatedAvgLPer100Km != null)
-                          _Chip(
-                            icon: Icons.eco,
-                            text: l.trajetsRowAvgConsumption(
-                              '~${UnitFormatter.formatDecimal(s.estimatedAvgLPer100Km!)}',
+                              '${s.avgLPer100Km == null ? '~' : ''}'
+                              '${UnitFormatter.formatDecimal(avg)}',
                               avgUnit,
                             ),
                           ),
