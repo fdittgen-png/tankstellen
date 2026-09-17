@@ -76,6 +76,56 @@ void main() {
     });
   });
 
+  // #4324 — the persisted declaration.
+  group('declared approved grades', () {
+    test('an E10 car declared flex-fuel is offered E85', () {
+      final c = vehicleFuelCapabilityOf(car('e10')
+          .copyWith(approvedFuelGrades: const ['e5', 'e10', 'e98', 'e85']));
+      expect(c.approvedGrades,
+          {FuelGrade.e5, FuelGrade.e10, FuelGrade.e98, FuelGrade.e85});
+      expect(c.permits(FuelGrade.e85), isTrue);
+      expect(c.provenance, kCapabilityProvenanceDeclared);
+    });
+
+    test('declarations EXTEND the derivation; unknown keys are dropped', () {
+      final c = vehicleFuelCapabilityOf(car('diesel')
+          .copyWith(approvedFuelGrades: const ['E85', 'b100', 'electric']));
+      expect(c.approvedGrades, {FuelGrade.diesel, FuelGrade.e85});
+    });
+
+    test('nothing declared (every old profile) resolves exactly as before',
+        () {
+      for (final v in [
+        car('e10'),
+        car('e10', multi: true),
+        car('e85', multi: true),
+        car('e85'),
+        car('diesel'),
+        car(null),
+      ]) {
+        final c = vehicleFuelCapabilityOf(v);
+        expect(v.approvedFuelGrades, isEmpty);
+        expect(c.provenance, isNot(kCapabilityProvenanceDeclared));
+      }
+      // An old JSON blob without the field decodes to nothing declared.
+      final old = VehicleProfile.fromJson(const {
+        'id': 'v',
+        'name': 'Old',
+        'preferredFuelType': 'e10',
+      });
+      expect(old.approvedFuelGrades, isEmpty);
+      expect(vehicleFuelCapabilityOf(old).approvedGrades, {FuelGrade.e10});
+    });
+
+    test('an EV stays unknown whatever it declares', () {
+      expect(
+          vehicleFuelCapabilityOf(car('e10', type: VehicleType.ev)
+                  .copyWith(approvedFuelGrades: const ['e85']))
+              .isUnknown,
+          isTrue);
+    });
+  });
+
   group('priceableGradesOf', () {
     test('the physical family, in grade order', () {
       expect(priceableGradesOf(car('e85')),

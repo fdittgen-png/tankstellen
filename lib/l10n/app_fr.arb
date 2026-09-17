@@ -6886,5 +6886,10 @@
   "fuelAndTankConvergenceReachable": "{count, plural, =1{1 plein de {fuel} porte le réservoir à au moins {percent} %.} other{{count} pleins de {fuel} portent le réservoir à au moins {percent} %.}}",
   "fuelAndTankConvergenceUnreachable": "{fuel} ne peut pas atteindre {percent} % en {count} pleins.",
   "fuelAndTankConvergenceNotComputable": "La vitesse de renouvellement du réservoir ne peut pas encore être calculée.",
-  "fuelAndTankExcludedTitle": "Écartés"
+  "fuelAndTankExcludedTitle": "Écartés",
+  "fuelAndTankPricesSourceNearby": "{count, plural, =1{Prix le plus bas pour 1 carburant parmi les stations de votre dernière recherche, détour compris} other{Prix les plus bas pour {count} carburants parmi les stations de votre dernière recherche, détour compris}}",
+  "fuelAndTankConvergenceTolerance": "Considéré comme atteint à {tolerance} points près de l'objectif de {target} %.",
+  "fuelAndTankMaterialThreshold": "Un carburant n'est suggéré que s'il est meilleur d'au moins {percent} %.",
+  "vehicleFlexFuelApprovedLabel": "Homologué E85 (flexfuel)",
+  "vehicleFlexFuelApprovedHelper": "Seulement si le constructeur homologue l'E85. Carburant & réservoir compare alors l'E85 même si vous faites le plein d'un autre carburant."
 }

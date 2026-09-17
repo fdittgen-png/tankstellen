@@ -7,6 +7,7 @@ import 'package:tankstellen/core/domain/fuel/fuel_grade.dart';
 import 'package:tankstellen/core/domain/fuel/next_fill_decision.dart';
 import 'package:tankstellen/core/domain/fuel/next_fill_request.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -15,7 +16,9 @@ import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/favorites/api.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/next_fill_offers.dart';
 import 'package:tankstellen/features/fill_ups/providers/fuel_and_tank_provider.dart';
+import 'package:tankstellen/features/search/api.dart';
 import 'package:tankstellen/features/trips/api.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
@@ -54,6 +57,18 @@ class _Favorites extends FavoriteStations {
           fetchedAt: DateTime.utc(2026, 9, 16)));
 }
 
+/// The in-memory result of the last search — no network behind it.
+class _Search extends SearchState {
+  _Search(this._items);
+  final List<SearchResultItem> _items;
+  @override
+  AsyncValue<ServiceResult<List<SearchResultItem>>> build() => AsyncValue.data(
+      ServiceResult(
+          data: _items,
+          source: ServiceSource.cache,
+          fetchedAt: DateTime.utc(2026, 9, 16)));
+}
+
 Station _station(String id, {double? e10, double? e85, double? diesel}) =>
     Station(
       id: id,
@@ -83,8 +98,10 @@ void main() {
     List<VehicleProfile> vehicles = const [flex],
     List<Station> favorites = const [],
     List<FillUp> fills = const [],
+    List<SearchResultItem> search = const [],
   }) {
     final c = ProviderContainer(overrides: [
+      searchStateProvider.overrideWith(() => _Search(search)),
       storageRepositoryProvider.overrideWithValue(FakeStorageRepository()),
       vehicleProfileListProvider.overrideWith(() => _Vehicles(vehicles)),
       fillUpListProvider.overrideWith(() => _FillUps(fills)),
@@ -153,6 +170,46 @@ void main() {
     test('no favourites → no offers', () {
       expect(container().read(nextFillOffersProvider('v1')), isEmpty);
     });
+
+    // #4324 — the last search's results, already in memory, win: their
+    // stations carry distances, so the decider prices the detour.
+    test('stations of the last search come first, each with its distance',
+        () {
+      final c = container(
+        favorites: [_station('fav', e10: 1.50, e85: 0.90)],
+        search: [
+          const FuelStationResult(Station(
+              id: 'near',
+              name: 'near',
+              brand: 'B',
+              street: 'S',
+              postCode: '00000',
+              place: 'P',
+              lat: 0,
+              lng: 0,
+              dist: 3.2,
+              isOpen: true,
+              e10: 1.85,
+              e85: 1.05)),
+        ],
+      );
+      final offers = c.read(nextFillOffersProvider('v1'));
+      expect([
+        for (final o in offers)
+          (o.grade, o.pricePerLitre, o.station?.stationId, o.station?.oneWayKm)
+      ], [
+        (FuelGrade.e10, 1.85, 'near', 3.2),
+        (FuelGrade.e85, 1.05, 'near', 3.2),
+      ], reason: 'never mixed with the detour-free favourites');
+      final view = c.read(fuelAndTankViewProvider('v1'));
+      expect(view.nextFill.offerSource, NextFillOfferSource.nearbySearch);
+    });
+
+    test('no search this session → the favourites, as before', () {
+      final c = container(favorites: [_station('fav', e10: 1.5)]);
+      expect(c.read(fuelAndTankViewProvider('v1')).nextFill.offerSource,
+          NextFillOfferSource.favourites);
+    });
   });
 
   group('fuelAndTankView', () {
@@ -167,6 +224,25 @@ void main() {
           NextFillOutcome.insufficientEvidence);
       expect(view.nextFill.decision.reasons,
           contains(DecisionReason.fillVolumeUnknown));
+    });
+
+    test('#4324 — an E10 car declared flex-fuel: E85 approved and priced',
+        () {
+      const declared = VehicleProfile(
+          id: 'v1',
+          name: 'Flex on E10',
+          tankCapacityL: 50,
+          preferredFuelType: 'e10',
+          approvedFuelGrades: ['e5', 'e10', 'e98', 'e85']);
+      final c = container(
+          vehicles: const [declared],
+          favorites: [_station('a', e10: 1.8, e85: 1.1)]);
+      final view = c.read(fuelAndTankViewProvider('v1'));
+      expect(view.compatibility.approved,
+          [FuelGrade.e5, FuelGrade.e10, FuelGrade.e98, FuelGrade.e85]);
+      expect(view.compatibility.unconfirmed, isEmpty);
+      expect(
+          view.nextFill.decision.excluded.map((e) => e.grade), isNot(contains(FuelGrade.e85)));
     });
 
     test('a car with no configured fuel: compatibility unknown', () {

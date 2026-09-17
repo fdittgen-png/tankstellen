@@ -32,6 +32,16 @@ enum FuelGrade {
       };
 }
 
+/// The grades a flex-fuel petrol vehicle is built for: E0–E85 (#4324). The
+/// one approval set both a configured E85 multi-fuel car and a declared
+/// flex-fuel approval resolve to.
+const List<FuelGrade> kFlexFuelGrades = [
+  FuelGrade.e5,
+  FuelGrade.e10,
+  FuelGrade.e98,
+  FuelGrade.e85,
+];
+
 /// Explicit vehicle approval. A primary preference or a station price never
 /// creates this contract.
 ///

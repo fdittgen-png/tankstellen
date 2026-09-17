@@ -79,6 +79,10 @@ abstract class VehicleProfile with _$VehicleProfile {
     // diesel / LPG / CNG / EV. Defaults `false` so legacy profiles
     // deserialize cleanly via freezed's `@Default`.
     @Default(false) bool multiFuelCapable,
+    // #4324 — grades the user declared manufacturer-approved (FuelGrade
+    // keys, e.g. a flex-fuel car filled with E10). Empty = derive from the
+    // fuel + multi-fuel flag, as before. JSONB field-add, sync-transparent.
+    @Default(<String>[]) List<String> approvedFuelGrades,
 
     // Engine parameters for the speed-density fuel-rate fallback
     // (#812). Only populated when the VIN decoder or the user's

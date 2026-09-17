@@ -208,6 +208,7 @@ class BackupXmlReader {
       pumpGainUpdatedAt: DateTime.tryParse(readText(v, 'PumpGainUpdatedAt') ?? ''),
       pumpGainByFuel: readPumpGainByFuel(v), // #3918
       tankFuelKey: readTankFuelKey(v),
+      approvedFuelGrades: readApprovedFuelGrades(v), // #4324
       curbWeightKg: readInt(v, 'CurbWeightKg'),
       obd2AdapterMac: readText(v, 'Obd2AdapterMac'),
       obd2AdapterName: readText(v, 'Obd2AdapterName'),

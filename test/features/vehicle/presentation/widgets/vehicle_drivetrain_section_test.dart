@@ -50,6 +50,7 @@ Future<void> _pump(
               powerKwController: powerCtrl,
               multiFuelCapable: false,
               onMultiFuelCapableChanged: (_) {},
+              flexFuelApproved: ValueNotifier(false),
               onFuelTypeChanged: (_) {},
               numberValidator: (_) => null,
             ),

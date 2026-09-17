@@ -10001,6 +10001,36 @@ abstract class AppLocalizations {
   /// **'Left out'**
   String get fuelAndTankExcludedTitle;
 
+  /// Where the next-fill prices come from when the stations of the last search (with their distances) are used (#4324).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Cheapest price for 1 fuel among the stations of your last search, detour included} other{Cheapest prices for {count} fuels among the stations of your last search, detour included}}'**
+  String fuelAndTankPricesSourceNearby(int count);
+
+  /// Added under a convergence sentence whose share stays under the target but inside the plan's tolerance (#4324).
+  ///
+  /// In en, this message translates to:
+  /// **'Counted as reached within {tolerance} points of the {target} % target.'**
+  String fuelAndTankConvergenceTolerance(String tolerance, String target);
+
+  /// Quotes the decision's material-advantage threshold when the difference between fuels was too small (#4324).
+  ///
+  /// In en, this message translates to:
+  /// **'A fuel is only suggested when it is at least {percent} % better.'**
+  String fuelAndTankMaterialThreshold(String percent);
+
+  /// Switch on the vehicle edit screen (combustion section) for E5/E10/E98 petrol vehicles: the manufacturer approves E85 for this car (#4324).
+  ///
+  /// In en, this message translates to:
+  /// **'Approved for E85 (flex-fuel)'**
+  String get vehicleFlexFuelApprovedLabel;
+
+  /// Helper subtitle under the E85-approval switch on the vehicle edit screen (#4324).
+  ///
+  /// In en, this message translates to:
+  /// **'Only if the manufacturer approves E85. Fuel & Tank then compares E85 even when you usually fill another fuel.'**
+  String get vehicleFlexFuelApprovedHelper;
+
   /// Title of the per-fuel-type efficiency comparison card on the consumption-statistics page, comparing real cost-per-km across the fuels a multi-fuel vehicle has used (#2887, Epic #2881).
   ///
   /// In en, this message translates to:

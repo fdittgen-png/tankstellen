@@ -150,6 +150,7 @@ class BackupXmlWriter {
       }
       // #3918 — per-fuel gains + tank grade; both omitted when empty.
       writePumpGainByFuel(builder, v.pumpGainByFuel, v.tankFuelKey);
+      writeApprovedFuelGrades(builder, v.approvedFuelGrades); // #4324
 
       if (v.curbWeightKg != null) {
         _writeText(builder, 'CurbWeightKg', v.curbWeightKg!.toString());

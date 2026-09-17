@@ -158,6 +158,7 @@ class VehicleEditForm extends StatelessWidget {
               powerKwController: ctrl.powerKwController,
               multiFuelCapable: multiFuelCapable,
               onMultiFuelCapableChanged: onMultiFuelCapableChanged,
+              flexFuelApproved: ctrl.flexFuelApproved,
               // #2885 — rebuild so the multi-fuel switch shows / hides as the
               // preferred fuel moves in and out of the E10 / E85 set.
               onFuelTypeChanged: onFuelTypeChanged,

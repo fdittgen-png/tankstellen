@@ -8704,5 +8704,48 @@
   "@fuelAndTankExcludedTitle": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelAndTankPricesSourceNearby": "{count, plural, =1{Cheapest price for 1 fuel among the stations of your last search, detour included} other{Cheapest prices for {count} fuels among the stations of your last search, detour included}}",
+  "@fuelAndTankPricesSourceNearby": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fuelAndTankConvergenceTolerance": "Counted as reached within {tolerance} points of the {target} % target.",
+  "@fuelAndTankConvergenceTolerance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "tolerance": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "fuelAndTankMaterialThreshold": "A fuel is only suggested when it is at least {percent} % better.",
+  "@fuelAndTankMaterialThreshold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleFlexFuelApprovedLabel": "Approved for E85 (flex-fuel)",
+  "@vehicleFlexFuelApprovedLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehicleFlexFuelApprovedHelper": "Only if the manufacturer approves E85. Fuel & Tank then compares E85 even when you usually fill another fuel.",
+  "@vehicleFlexFuelApprovedHelper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

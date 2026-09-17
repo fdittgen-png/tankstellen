@@ -1023,4 +1023,59 @@ void main() {
       expect(snapshot.curbWeightKg, 1300);
     });
   });
+
+  group('VehicleFormControllers — E85 approval (#4324)', () {
+    VehicleProfile build(VehicleFormControllers c,
+            {VehicleType type = VehicleType.combustion}) =>
+        c.buildProfile(
+          existing: const VehicleProfile(id: 'fx-1', name: 'old'),
+          type: type,
+          connectors: const {},
+          adapterMac: null,
+          adapterName: null,
+          engineDisplacementCc: null,
+          engineCylinders: null,
+          curbWeightKg: null,
+        );
+
+    test('an E10 car declared E85-approved persists the flex-fuel grades',
+        () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.fuelTypeController.text = 'e10';
+      c.flexFuelApproved.value = true;
+      expect(build(c).approvedFuelGrades, ['e5', 'e10', 'e98', 'e85']);
+    });
+
+    test('undeclared, or no longer offered (E85 / diesel / EV), saves none',
+        () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.fuelTypeController.text = 'e10';
+      expect(build(c).approvedFuelGrades, isEmpty);
+      c.flexFuelApproved.value = true;
+      for (final fuel in ['e85', 'diesel']) {
+        c.fuelTypeController.text = fuel;
+        expect(build(c).approvedFuelGrades, isEmpty, reason: fuel);
+      }
+      c.fuelTypeController.text = 'e10';
+      expect(build(c, type: VehicleType.ev).approvedFuelGrades, isEmpty);
+    });
+
+    test('load reads the declaration back, and toggling it dirties the form',
+        () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.load(const VehicleProfile(
+          id: 'fx-2',
+          name: 'Flex',
+          preferredFuelType: 'e10',
+          approvedFuelGrades: ['e5', 'e10', 'e98', 'e85']));
+      expect(c.flexFuelApproved.value, isTrue);
+      c.snapshotBaseline();
+      expect(c.isDirty, isFalse);
+      c.flexFuelApproved.value = false;
+      expect(c.isDirty, isTrue);
+    });
+  });
 }

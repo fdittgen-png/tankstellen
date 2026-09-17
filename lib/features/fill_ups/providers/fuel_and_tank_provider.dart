@@ -5,14 +5,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/domain/fuel/fuel_grade.dart';
 import '../../../core/domain/fuel/next_fill_request.dart';
-import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../../../core/storage/storage_keys.dart';
 import '../../../core/storage/storage_providers.dart';
-import '../../../core/utils/price_utils.dart';
 import '../../favorites/api.dart';
+import '../../search/api.dart';
 import '../../vehicle/api.dart';
 import '../domain/services/fuel_and_tank_view.dart';
+import '../domain/services/next_fill_offers.dart';
 import '../domain/services/vehicle_fuel_capability_policy.dart';
 import 'fuel_behaviour_provider.dart';
 import 'next_fill_decision_provider.dart';
@@ -42,31 +42,29 @@ class FillObjectiveSetting extends _$FillObjectiveSetting {
 }
 
 /// The approvals [vehicleId]'s profile vouches for (#4278) — see
-/// [vehicleFuelCapabilityOf]; nothing persists a capability yet.
+/// [vehicleFuelCapabilityOf], which reads the persisted declared grades
+/// (#4324).
 @riverpod
 VehicleFuelCapability vehicleFuelCapability(Ref ref, String vehicleId) =>
     vehicleFuelCapabilityOf(_vehicle(ref, vehicleId));
 
-/// One offer per priceable grade (#4278): the cheapest current price
-/// among the user's favourite stations — the price cache the app already
-/// holds, so opening the surface costs no network call. No station is
-/// attached: favourites carry no distance, so no detour is priced. Empty
-/// when no favourite has a price for any grade the vehicle can take.
+/// The offers for the priceable grades, from prices the app ALREADY holds
+/// — opening the surface never costs a network call.
+///
+/// #4324 — the last search's results come first: each station carries its
+/// distance, so the decision prices the detour (`RefuelEconomics`).
+/// Reading [searchStateProvider] never searches; with no search this
+/// session it is empty. Only then the favourite stations' cached prices
+/// (#4278), which carry no distance, so no detour is priced. The two are
+/// never mixed: a detour-free favourite would undercut every priced one.
 @riverpod
 List<FuelOffer> nextFillOffers(Ref ref, String vehicleId) {
-  final stations = ref.watch(favoriteStationsProvider).value?.data ?? const [];
-  final offers = <FuelOffer>[];
-  for (final grade in priceableGradesOf(_vehicle(ref, vehicleId))) {
-    final fuel = FuelType.fromString(grade.key);
-    double? best;
-    for (final station in stations) {
-      final price = priceForFuelType(station, fuel);
-      if (price == null || !price.isFinite || price <= 0) continue;
-      if (best == null || price < best) best = price;
-    }
-    if (best != null) offers.add(FuelOffer(grade: grade, pricePerLitre: best));
-  }
-  return offers;
+  final grades = priceableGradesOf(_vehicle(ref, vehicleId));
+  final nearby = nearbySearchOffers(
+      grades, ref.watch(searchStateProvider).value?.data ?? const []);
+  if (nearby.isNotEmpty) return nearby;
+  return favouriteOffers(
+      grades, ref.watch(favoriteStationsProvider).value?.data ?? const []);
 }
 
 /// The decision request for [vehicleId]: objective, capability, offers.

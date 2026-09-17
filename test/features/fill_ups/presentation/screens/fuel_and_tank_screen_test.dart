@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tankstellen/core/domain/fuel/fuel_grade.dart';
 import 'package:tankstellen/core/domain/fuel/next_fill_request.dart';
+import 'package:tankstellen/core/domain/refuel_economics.dart';
 import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/fill_ups/presentation/screens/fuel_and_tank_screen.dart';
 
@@ -86,6 +87,20 @@ void main() {
           findsOneWidget);
       final e85 = find.byKey(const ValueKey('fuel_and_tank_compat_e85'));
       expect(tester.widget<Text>(e85).data, 'E85 Bioethanol');
+    });
+
+    // #4324 — the persisted declaration reaches the surface.
+    testWidgets('an E10 car declared E85-approved lists E85 as approved',
+        (tester) async {
+      await pump(
+          tester,
+          fuelAndTankOverrides(
+              vehicle: e10Car.copyWith(
+                  approvedFuelGrades: const ['e5', 'e10', 'e98', 'e85'])));
+      expect(find.text('Fit, but not confirmed for this vehicle'), findsNothing);
+      final e85 = find.byKey(const ValueKey('fuel_and_tank_compat_e85'));
+      expect(tester.widget<Text>(e85).data, 'E85 Bioethanol');
+      expect(find.text('Fill E85 Bioethanol next'), findsOneWidget);
     });
   });
 
@@ -202,6 +217,10 @@ void main() {
       expect(find.text('No fuel is clearly better right now'), findsOneWidget);
       expect(find.text('The difference is too small to be worth switching.'),
           findsOneWidget);
+      // #4324 — "too small" quotes the decision's own threshold.
+      expect(
+          find.text('A fuel is only suggested when it is at least 2 % better.'),
+          findsOneWidget);
       expect(find.text('Fill E85 Bioethanol next'), findsNothing);
       expect(find.text('Fill Super E10 next'), findsNothing);
     });
@@ -237,6 +256,63 @@ void main() {
           findsOneWidget);
       expect(find.text('E85 Bioethanol avoids CO2e at 0,62 € per kg'),
           findsOneWidget);
+    });
+
+    // #4324 — a share under the target counted as reached says so.
+    testWidgets('already at target within the tolerance quotes both figures',
+        (tester) async {
+      await pump(
+          tester,
+          fuelAndTankOverrides(
+              tank: tankOf({FuelGrade.e85: 0.82, FuelGrade.e10: 0.18},
+                  min: 30, max: 30)));
+      expect(find.text('Fill E85 Bioethanol next'), findsOneWidget);
+      expect(
+          find.text('The tank already holds at least 82 % E85 Bioethanol.'),
+          findsOneWidget);
+      expect(
+          find.text('Counted as reached within 5 points of the 85 % target.'),
+          findsOneWidget);
+    });
+
+    testWidgets('a target actually reached adds no tolerance line',
+        (tester) async {
+      await pump(tester, fuelAndTankOverrides());
+      expect(find.text('2 fills of E85 Bioethanol bring the tank to at least '
+          '86 %.'), findsOneWidget);
+      expect(find.byKey(const Key('fuel_and_tank_convergence_tolerance')),
+          findsNothing);
+    });
+
+    // #4324 — prices from the last search name their source; the detour is
+    // priced into the decision.
+    testWidgets('nearby-search offers say where the prices come from',
+        (tester) async {
+      const station = RefuelCandidate(stationId: 'near', oneWayKm: 3);
+      await pump(
+          tester,
+          fuelAndTankOverrides(
+              tank: tankOf({FuelGrade.e85: 1}, min: 30, max: 30),
+              offerList: [
+            FuelOffer(
+                grade: FuelGrade.e10, pricePerLitre: 1.80, station: station),
+            FuelOffer(
+                grade: FuelGrade.e85, pricePerLitre: 1.10, station: station),
+          ]));
+      expect(
+          find.text('Cheapest prices for 2 fuels among the stations of your '
+              'last search, detour included'),
+          findsOneWidget);
+      expect(
+          find.text('Cheapest prices for 2 fuels among your favourite stations'),
+          findsNothing);
+      // The station's distance reached RefuelEconomics: the detour is
+      // priced into each candidate (a favourite could never say this).
+      await expandAll(tester);
+      expect(find.text('The detour to the station is priced in.'),
+          findsWidgets);
+      expect(find.text("The detour to the station isn't priced in."),
+          findsNothing);
     });
 
     testWidgets('no compatible fuel: the unapproved one is left out',

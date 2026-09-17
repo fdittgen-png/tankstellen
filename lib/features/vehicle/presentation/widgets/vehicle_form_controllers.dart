@@ -4,11 +4,18 @@
 import 'package:flutter/widgets.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../core/domain/fuel/fuel_grade.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../data/vehicle_profile_catalog_matcher.dart';
 import '../../domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../core/utils/number_parsing.dart';
+
+/// #4324 — whether the vehicle editor offers the E85 (flex-fuel) approval
+/// for [fuel]: a petrol grade below E85, where the configured fuel does
+/// not already say E85. Shared by the switch and the profile build.
+bool offersFlexFuelApproval(FuelType? fuel) =>
+    fuel == FuelType.e5 || fuel == FuelType.e10 || fuel == FuelType.e98;
 
 /// Bundles the text controllers, focus node, and scalar form state
 /// used by [EditVehicleScreen]. Keeps the screen class focused on
@@ -38,6 +45,9 @@ class VehicleFormControllers {
   final maxSocController = TextEditingController(text: '80');
   final vinController = TextEditingController();
   final vinFocusNode = FocusNode();
+  // #4324 — the declared E85 (flex-fuel) approval. A notifier, so the
+  // combustion section rebuilds its switch without a screen `setState`.
+  final flexFuelApproved = ValueNotifier<bool>(false);
 
   /// Copy the saved [profile] fields into the text controllers.
   /// Non-controller fields (type, connectors, engine ids, adapter
@@ -55,6 +65,8 @@ class VehicleFormControllers {
     maxSocController.text =
         profile.chargingPreferences.maxSocPercent.toString();
     vinController.text = profile.vin ?? '';
+    flexFuelApproved.value =
+        profile.approvedFuelGrades.contains(FuelGrade.e85.key);
     return VehicleFormSnapshot(
       id: profile.id,
       type: profile.type,
@@ -214,6 +226,14 @@ class VehicleFormControllers {
         preferredFuelType != null &&
         _offersMultiFuel(FuelType.fromString(preferredFuelType)) &&
         multiFuelCapable;
+    // #4324 — the E85 declaration persists only while it is offered (a
+    // petrol grade below E85); otherwise it is cleared, like multi-fuel.
+    final approvedFuelGrades = type != VehicleType.ev &&
+            preferredFuelType != null &&
+            offersFlexFuelApproval(FuelType.fromString(preferredFuelType)) &&
+            flexFuelApproved.value
+        ? [for (final g in kFlexFuelGrades) g.key]
+        : const <String>[];
     final chargingPreferences = ChargingPreferences(
       minSocPercent: _parseIntOr(minSocController.text, 20).clamp(0, 100),
       maxSocPercent: _parseIntOr(maxSocController.text, 80).clamp(0, 100),
@@ -249,6 +269,7 @@ class VehicleFormControllers {
         tankCapacityL: tankCapacityL,
         preferredFuelType: preferredFuelType,
         multiFuelCapable: effectiveMultiFuel,
+        approvedFuelGrades: approvedFuelGrades,
         chargingPreferences: chargingPreferences,
         obd2AdapterMac: adapterMac,
         obd2AdapterName: adapterName,
@@ -278,6 +299,7 @@ class VehicleFormControllers {
       tankCapacityL: tankCapacityL,
       preferredFuelType: preferredFuelType,
       multiFuelCapable: effectiveMultiFuel,
+      approvedFuelGrades: approvedFuelGrades,
       chargingPreferences: chargingPreferences,
       obd2AdapterMac: adapterMac,
       obd2AdapterName: adapterName,
@@ -302,6 +324,7 @@ class VehicleFormControllers {
         'minSoc': minSocController.text,
         'maxSoc': maxSocController.text,
         'vin': vinController.text,
+        'flexFuel': flexFuelApproved.value.toString(),
       };
 
   /// Capture the current controller values as the "clean" baseline.
@@ -333,6 +356,7 @@ class VehicleFormControllers {
     maxSocController.dispose();
     vinController.dispose();
     vinFocusNode.dispose();
+    flexFuelApproved.dispose();
   }
 
 

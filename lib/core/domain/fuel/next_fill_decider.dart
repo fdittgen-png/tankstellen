@@ -60,6 +60,7 @@ abstract final class NextFillDecider {
           confidence: confidence,
           profileModelVersion: profile.modelVersion,
           blendModelVersion: tank.modelVersion,
+          minMaterialAdvantage: request.minMaterialAdvantage,
           recommended: recommended,
           convergence: convergence,
         );

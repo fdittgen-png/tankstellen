@@ -29,6 +29,7 @@ void main() {
     bool multiFuelCapable = false,
     ValueChanged<bool>? onMultiFuel,
     ValueChanged<FuelType?>? onFuelChanged,
+    ValueNotifier<bool>? flexFuel,
   }) =>
       VehicleCombustionSection(
         tankController: tank,
@@ -39,6 +40,7 @@ void main() {
         powerKwController: power ?? TextEditingController(),
         multiFuelCapable: multiFuelCapable,
         onMultiFuelCapableChanged: onMultiFuel ?? (_) {},
+        flexFuelApproved: flexFuel ?? ValueNotifier(false),
         onFuelTypeChanged: onFuelChanged ?? (_) {},
         numberValidator: _requireNumber,
       );
@@ -253,6 +255,42 @@ void main() {
             reason: 'Electric is configured via the EV section, not here');
         expect(find.text(FuelType.all.displayName), findsNothing,
             reason: 'The synthetic "all" sentinel must not be pickable');
+      },
+    );
+
+    testWidgets(
+      '#4324 — the E85 approval switch is offered for E5 / E10 / E98 only, '
+      'and writes the notifier',
+      (tester) async {
+        const switchKey = Key('vehicle_flex_fuel_approved_switch');
+        for (final fuelCode in ['e85', 'diesel', 'lpg']) {
+          final tank = TextEditingController();
+          final fuel = TextEditingController(text: fuelCode);
+          addTearDown(tank.dispose);
+          addTearDown(fuel.dispose);
+          await pumpApp(tester, buildSection(tank: tank, fuel: fuel));
+          expect(find.byKey(switchKey), findsNothing,
+              reason: '$fuelCode: nothing to declare');
+        }
+
+        final tank = TextEditingController();
+        final fuel = TextEditingController(text: 'e10');
+        final approved = ValueNotifier(false);
+        addTearDown(tank.dispose);
+        addTearDown(fuel.dispose);
+        addTearDown(approved.dispose);
+        await pumpApp(
+            tester, buildSection(tank: tank, fuel: fuel, flexFuel: approved));
+
+        expect(find.text('Approved for E85 (flex-fuel)'), findsOneWidget);
+        expect(tester.widget<SwitchListTile>(find.byKey(switchKey)).value,
+            isFalse);
+        await tester.ensureVisible(find.byKey(switchKey));
+        await tester.tap(find.byKey(switchKey));
+        await tester.pumpAndSettle();
+        expect(approved.value, isTrue);
+        expect(tester.widget<SwitchListTile>(find.byKey(switchKey)).value,
+            isTrue);
       },
     );
   });

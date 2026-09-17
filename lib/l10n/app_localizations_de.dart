@@ -5946,6 +5946,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fuelAndTankExcludedTitle => 'Nicht berücksichtigt';
 
   @override
+  String fuelAndTankPricesSourceNearby(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Günstigste Preise für $count Kraftstoffe unter den Tankstellen deiner letzten Suche, Umweg eingerechnet',
+      one:
+          'Günstigster Preis für 1 Kraftstoff unter den Tankstellen deiner letzten Suche, Umweg eingerechnet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fuelAndTankConvergenceTolerance(String tolerance, String target) {
+    return 'Gilt als erreicht bis $tolerance Punkte unter dem Ziel von $target %.';
+  }
+
+  @override
+  String fuelAndTankMaterialThreshold(String percent) {
+    return 'Ein Kraftstoff wird nur empfohlen, wenn er mindestens $percent % besser ist.';
+  }
+
+  @override
+  String get vehicleFlexFuelApprovedLabel => 'Für E85 freigegeben (Flexfuel)';
+
+  @override
+  String get vehicleFlexFuelApprovedHelper =>
+      'Nur wenn der Hersteller E85 freigibt. Kraftstoff & Tank vergleicht E85 dann auch, wenn du meist einen anderen Kraftstoff tankst.';
+
+  @override
   String get fuelEfficiencyCardTitle => 'Kosten pro Kilometer nach Kraftstoff';
 
   @override
