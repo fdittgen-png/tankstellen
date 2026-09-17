@@ -396,31 +396,99 @@ jobs:
           else
             echo "Selector emitted empty list — shard will fall back to full suite"
           fi
+      # #4347 — the changed-line coverage policy judges coverage produced by
+      # the PR's own shards. Whether a shard collects any is decided from
+      # the diff by the policy tool (one definition of "maintained source");
+      # test-, docs- and generated-only PRs run exactly as before.
+      - name: Decide changed-line coverage (PR only)
+        id: cov
+        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          git diff --unified=0 --no-color -M "origin/${BASE_REF}...HEAD" -- lib/ > changed-lines.diff
+          dart tool/coverage_policy.dart --diff changed-lines.diff --applicable-only >> "$GITHUB_OUTPUT"
       # Excludes the `network` + `flaky` tags — those tests hit real
       # third-party APIs (Argentina, Italy MIMIT) or platform plugins
       # (share_plus) that intermittently fail and cannot block PRs.
       # The nightly-flaky workflow re-runs both buckets.
-      - name: Run test shard ${{ matrix.shard }} of 4 (PR — affected only, no coverage)
+      - name: Run test shard ${{ matrix.shard }} of 4 (PR — affected only, coverage for tests of changed lib/)
         if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
         shell: bash
+        env:
+          COLLECT_COVERAGE: ${{ steps.cov.outputs.applicable }}
+          SHARD: ${{ matrix.shard }}
         run: |
-          if [ -s affected_tests.txt ]; then
-            # Read into a bash array so flutter test receives all
-            # files in a single invocation; sharding then splits
-            # this stable, sorted list deterministically across
-            # the 4 matrix runners.
-            mapfile -t TESTS < affected_tests.txt
-            flutter test "${TESTS[@]}" \
-              --exclude-tags=network,flaky \
-              --total-shards=4 \
-              --shard-index=${{ matrix.shard }}
-          else
-            # Empty selector output ⇒ paranoia: run full suite.
-            flutter test \
-              --exclude-tags=network,flaky \
-              --total-shards=4 \
-              --shard-index=${{ matrix.shard }}
+          if [ "$COLLECT_COVERAGE" != "true" ]; then
+            if [ -s affected_tests.txt ]; then
+              # Read into a bash array so flutter test receives all
+              # files in a single invocation; sharding then splits
+              # this stable, sorted list deterministically across
+              # the 4 matrix runners.
+              mapfile -t TESTS < affected_tests.txt
+              flutter test "${TESTS[@]}" \
+                --exclude-tags=network,flaky \
+                --total-shards=4 \
+                --shard-index="$SHARD"
+            else
+              # Empty selector output ⇒ paranoia: run full suite.
+              flutter test \
+                --exclude-tags=network,flaky \
+                --total-shards=4 \
+                --shard-index="$SHARD"
+            fi
+            exit $?
           fi
+
+          # #4347 — coverage costs 1.8–2.3× test time (matched full-suite
+          # PR vs master shards), so only the tests that DEPEND on a changed
+          # maintained lib/ file run with --coverage; everything else the
+          # selector picked (always-run bucket included) runs as before.
+          if [ -s affected_tests.txt ]; then
+            cp affected_tests.txt run_tests.txt
+          else
+            find test -name '*_test.dart' | LC_ALL=C sort > run_tests.txt
+          fi
+          dart tool/coverage_policy.dart --diff changed-lines.diff --coverage-tests > coverage_tests.txt
+          grep -Fxf coverage_tests.txt run_tests.txt > measured_tests.txt || true
+          grep -vFxf coverage_tests.txt run_tests.txt > other_tests.txt || true
+          # File-level split of the coverage subset, so a shard with no
+          # slice is visible (and writes an empty report) instead of
+          # tripping flutter's no-tests exit.
+          awk -v shard="$SHARD" '(NR - 1) % 4 == shard' measured_tests.txt > measured_mine.txt
+          REST=(); MINE=()
+          while IFS= read -r t; do REST+=("$t"); done < other_tests.txt
+          while IFS= read -r t; do MINE+=("$t"); done < measured_mine.txt
+          echo "Coverage subset: $(wc -l < measured_tests.txt) files (${#MINE[@]} on this shard); without coverage: ${#REST[@]}"
+
+          status=0
+          if [ "${#REST[@]}" -gt 0 ]; then
+            flutter test "${REST[@]}" \
+              --exclude-tags=network,flaky \
+              --total-shards=4 \
+              --shard-index="$SHARD" || status=$?
+          fi
+          rm -rf coverage
+          if [ "${#MINE[@]}" -gt 0 ]; then
+            code=0
+            flutter test "${MINE[@]}" --coverage --exclude-tags=network,flaky || code=$?
+            # 79 = every test in the slice was tag-excluded: nothing ran.
+            if [ "$code" -ne 0 ] && [ "$code" -ne 79 ]; then status=$code; fi
+          fi
+          mkdir -p coverage
+          [ -f coverage/lcov.info ] || : > coverage/lcov.info
+          exit "$status"
+      - name: Upload PR shard coverage (#4347)
+        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' && steps.cov.outputs.applicable == 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: pr-coverage-shard-${{ matrix.shard }}
+          path: coverage/lcov.info
+          # A shard that should have measured and did not must not look
+          # like "nothing to measure" downstream.
+          if-no-files-found: error
+          retention-days: 1
       - name: Run test shard ${{ matrix.shard }} of 4 (master/nightly — full suite + coverage)
         if: github.event_name != 'pull_request'
         run: |
@@ -448,6 +516,9 @@ jobs:
     needs: [test]
     steps:
       - uses: actions/checkout@v7
+        with:
+          # #4347 — the drift check below diffs the pushed range.
+          fetch-depth: 0
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
@@ -494,6 +565,105 @@ jobs:
         # coverage is checked after merge — a deliberate autonomy trade
         # (#2338 removed it from required checks), not an oversight.
         run: bash scripts/check_coverage.sh --threshold 40
+      # #4347 — drift detection for the pre-merge policy. The PR gate
+      # judged this change on its affected tests' coverage; the full suite
+      # judges it again here. A disagreement is reported, not enforced:
+      # the change is already on master, and the 40 % floor above stays
+      # the post-merge gate.
+      - name: Changed-line policy on full-suite coverage (drift report)
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -uo pipefail
+          if ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            echo "::notice::push base $BEFORE is not in this clone (force push?) — no drift report"
+            exit 0
+          fi
+          git diff --unified=0 --no-color -M "$BEFORE" "$GITHUB_SHA" -- lib/ > pushed-lines.diff
+          dart tool/coverage_policy.dart --diff pushed-lines.diff --lcov coverage/lcov.info --summary "$GITHUB_STEP_SUMMARY"
+          code=$?
+          if [ "$code" -ne 0 ]; then
+            echo "::warning::Full-suite coverage judges this push differently from the pre-merge policy (exit $code) — see the job summary (#4347)."
+          fi
+
+  # #4347 — pre-merge changed-line coverage, ADVISORY for now (maintainer
+  # decision): the job reports its verdict in the step summary and as
+  # `::warning::` annotations listing the uncovered changed lines, and its
+  # conclusion stays green. Policy, denominator and allowances:
+  # tool/coverage_policy.dart. Missing or corrupt coverage (tool exit 2)
+  # is reported the same way. It is not a required check and
+  # `record-green` does not depend on it.
+  #
+  # TO ENFORCE: set COVERAGE_POLICY_ENFORCE below to 'true' (policy
+  # failures and missing evidence then fail the job), add
+  # "coverage-policy" to TARGET_CHECKS in
+  # scripts/configure_branch_protection.sh plus a pass-through stub in
+  # ci-docs-stub.yml, and make record-green require its success.
+  coverage-policy:
+    needs: [green-gate, test]
+    if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COVERAGE_POLICY_ENFORCE: 'false'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        # Advisory: an infrastructure hiccup here must not paint the PR red.
+        continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
+        with:
+          channel: stable
+          flutter-version: "3.44.9"
+          cache: true
+      - name: Changed lines against the PR base
+        id: cov
+        continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          git diff --unified=0 --no-color -M "origin/${BASE_REF}...HEAD" -- lib/ > changed-lines.diff
+          dart tool/coverage_policy.dart --diff changed-lines.diff --applicable-only >> "$GITHUB_OUTPUT"
+      - name: Download PR shard coverage
+        if: steps.cov.outputs.applicable == 'true'
+        continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
+        uses: actions/download-artifact@v8
+        with:
+          pattern: pr-coverage-shard-*
+          path: pr-coverage
+      - name: Changed-line coverage policy
+        env:
+          APPLICABLE: ${{ steps.cov.outputs.applicable }}
+        run: |
+          set -uo pipefail
+          ENFORCE="${COVERAGE_POLICY_ENFORCE:-false}"
+          LEVEL=warning
+          if [ "$ENFORCE" = "true" ]; then LEVEL=error; fi
+          ARGS=(--diff changed-lines.diff --summary "$GITHUB_STEP_SUMMARY" --annotation-level "$LEVEL")
+          if [ "$APPLICABLE" = "true" ]; then
+            # Every shard's report is named: a missing one is exit 2.
+            for shard in 0 1 2 3; do
+              ARGS+=(--lcov "pr-coverage/pr-coverage-shard-${shard}/lcov.info")
+            done
+          fi
+          code=0
+          dart tool/coverage_policy.dart "${ARGS[@]}" || code=$?
+          if [ "$code" -eq 0 ]; then
+            exit 0
+          fi
+          if [ "$ENFORCE" = "true" ]; then
+            exit "$code"
+          fi
+          case "$code" in
+            1) why="the changed lines break the coverage policy" ;;
+            2) why="coverage evidence is missing or corrupt" ;;
+            *) why="the policy tool crashed" ;;
+          esac
+          echo "::warning title=Changed-line coverage (advisory)::${why} (exit ${code}). Advisory while COVERAGE_POLICY_ENFORCE is not 'true' — see the job summary (#4347)."
+          exit 0
 
   # #1582 — Startup-budget gate split out of coverage-merge so PRs
   # still enforce it. Cheap: runs only the test/core/perf/ subset.

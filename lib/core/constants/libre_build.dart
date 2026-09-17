@@ -4,8 +4,8 @@
 /// #3788 — the LIBRE build switch: this binary must reach no
 /// developer-hosted service by default.
 ///
-/// Set with `--dart-define=FDROID_LIBRE=true` by the F-Droid recipe (and
-/// by `scripts/fdroid_publish.sh` for the self-hosted repo), alongside
+/// Set with `--dart-define=FDROID_LIBRE=true` by the F-Droid recipe, and by
+/// `tool/fdroid_dart_defines.json` for the self-hosted repo (#4369), alongside
 /// the existing `FORCE_LOCATION_MANAGER` / `FGS_FORM_APPROVED` defines.
 ///
 /// ## Why

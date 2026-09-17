@@ -4,21 +4,47 @@
 // Path-affected test selector (#1592 / Epic #1591).
 //
 // Reads a list of changed paths (one per line, on stdin or from git
-// diff), walks the Dart import graph, and emits the set of test files
-// whose transitive imports touch any changed `lib/` file.
+// diff), walks the Dart dependency graph, and emits the set of test files
+// whose transitive dependencies touch any changed file.
 //
-// Two special cases trigger a full-suite run (output: every test
-// file under `test/`):
-//   1. Any changed file in `lib/main.dart` or `lib/app/router.dart` —
-//      these are global entry-points that reach the rest of the tree.
-//   2. Any changed file in `pubspec.yaml`, `analysis_options.yaml`,
-//      `lib/l10n/_fragments/`, or under `lib/l10n/`. ARB / dep / lint
-//      changes can affect everything.
+// The graph follows `import` directives (every branch of a conditional
+// one) and, since #4347, `part` directives: a part is compiled into its
+// library, and before #4347 a change to a part file — e.g. one of the ten
+// trip_recording_controller parts — selected no test at all. Measured on
+// the last 25 master commits, adding parts selects 0–2 more tests per PR.
 //
-// Tests that don't transitively import any `lib/` file are part of
+// `export` edges are deliberately NOT followed. Following them is the
+// sound compile graph, but barrels export whole features, so every test
+// that imports any barrel would depend on most of lib/: measured on the
+// same 25 commits, a typical lib/ PR would select ~950 of 1,825 tests
+// instead of 94–673. That trade-off is the maintainer's to make. Until
+// then a file reached only through a barrel export is not selected for —
+// 28 lib/ files on 2026-09-17 — and tool/coverage_policy.dart, which uses
+// this same graph, counts such a file as untested rather than assuming
+// it was measured.
+//
+// Special cases trigger a full-suite run (output: every test file under
+// `test/`):
+//   1. `lib/main.dart`, `lib/app/router.dart`, `lib/app/app_initializer*`
+//      — global entry points that reach the rest of the tree.
+//   2. `pubspec.yaml`, `pubspec.lock`, `analysis_options.yaml`, anything
+//      under `lib/l10n/`. ARB / dep / lint changes can affect everything.
+//   3. Shared test infrastructure and runtime-loaded inputs the import
+//      graph cannot see (#4347): `dart_test.yaml`,
+//      `test/flutter_test_config.dart` and anything under `assets/`.
+//
+// A changed test file selects itself; a changed non-test Dart file under
+// `test/` (a helper, fake or fixture builder) selects every test that
+// depends on it. A changed non-Dart file under `test/` (a JSON fixture, a
+// golden) is read at run time, so no import names it: every Dart file
+// under `test/` whose source mentions its file name counts as changed,
+// and if none does the selector falls back to the full suite. Shell tests
+// under `test/scripts/` are not Flutter tests and select nothing.
+//
+// Tests that don't transitively depend on any `lib/` file are part of
 // the **always-run bucket** (test/lint/*, test/security/*, …) — they
 // always appear in the output set regardless of the diff. Detected
-// automatically: zero overlap between the test's transitive imports
+// automatically: zero overlap between the test's transitive dependencies
 // and `lib/**/*.dart`.
 //
 // Usage:
@@ -41,14 +67,21 @@
 
 import 'dart:io';
 
+import 'architecture_graph.dart' show parseDirectives;
+
 const Set<String> _runAllSentinels = {
   'lib/main.dart',
   'lib/app/router.dart',
+  // #4347 — shared test infrastructure.
+  'dart_test.yaml',
+  'test/flutter_test_config.dart',
 };
 
 const List<String> _runAllPrefixes = [
   'lib/l10n/',
   'lib/app/app_initializer',
+  // #4347 — runtime-loaded inputs the import graph cannot see.
+  'assets/',
 ];
 
 const List<String> _runAllExactMatches = [
@@ -73,6 +106,63 @@ class TestSelection {
   final Set<String> alwaysRun;
 }
 
+/// The whole decision for a list of changed paths (#4347).
+class SelectorDecision {
+  const SelectorDecision({
+    required this.fullSuite,
+    required this.reason,
+    required this.tests,
+  });
+
+  /// Whether every test must run.
+  final bool fullSuite;
+
+  /// The changed path that forced [fullSuite], or null.
+  final String? reason;
+
+  /// The selected tests when not [fullSuite]: affected ∪ always-run ∪ the
+  /// changed test files themselves.
+  final Set<String> tests;
+}
+
+/// The dependency graph of every Dart file under `lib/` and `test/`, and
+/// each test's transitive closure over it. Build once per process.
+class DependencyGraph {
+  DependencyGraph._(this.edges, this.tests);
+
+  factory DependencyGraph.scan() {
+    final edges = <String, Set<String>>{};
+    _scanDartFiles(_libRoot, edges);
+    _scanDartFiles(_testRoot, edges);
+    // Only `_test.dart` files are emitted — helpers / fixtures in
+    // `test/helpers/`, `test/mocks/`, etc. aren't directly runnable.
+    final tests = edges.keys
+        .where((k) => k.startsWith(_testRoot) && k.endsWith('_test.dart'))
+        .toList()
+      ..sort();
+    return DependencyGraph._(edges, tests);
+  }
+
+  /// file -> files it imports or includes as a part (exports are not
+  /// followed; see the header).
+  final Map<String, Set<String>> edges;
+
+  /// Every runnable test, sorted.
+  final List<String> tests;
+
+  final _closures = <String, Set<String>>{};
+
+  /// Everything [test] transitively depends on, itself included.
+  Set<String> closureOf(String test) =>
+      _closures[test] ??= _transitiveClosure(test, edges);
+
+  /// `lib/` files at least one test transitively depends on.
+  Set<String> libFilesReachedByTests() => {
+        for (final t in tests)
+          ...closureOf(t).where((f) => f.startsWith(_libRoot)),
+      };
+}
+
 /// Compute the selection for [libChanged], **in process**.
 ///
 /// Extracted from [main] so `always_run_bucket_test` can call it
@@ -81,38 +171,80 @@ class TestSelection {
 /// parallel `flutter test` has in flight, and went red twice for that
 /// reason — a contract guard that fails for a reason unrelated to its
 /// contract is worse than no guard, because the third red gets ignored.
-TestSelection selectTests(Set<String> libChanged) {
-  // The file → direct-imports forward edge map for every Dart file under
-  // `lib/` and `test/`. Keys and values are POSIX-style relative paths
-  // from the project root.
-  final imports = <String, Set<String>>{};
-  _scanDartFiles(_libRoot, imports);
-  _scanDartFiles(_testRoot, imports);
-
-  // Only `_test.dart` files are emitted — helpers / fixtures in
-  // `test/helpers/`, `test/mocks/`, etc. aren't directly runnable.
-  final allTests = imports.keys
-      .where((k) => k.startsWith(_testRoot) && k.endsWith('_test.dart'))
-      .toList()
-    ..sort();
-
+///
+/// [libChanged] may also hold changed Dart files under `test/` (helpers):
+/// every test depending on one is affected (#4347).
+TestSelection selectTests(Set<String> libChanged, {DependencyGraph? graph}) {
+  final g = graph ?? DependencyGraph.scan();
   final affected = <String>{};
   final alwaysRun = <String>{};
 
-  for (final t in allTests) {
-    final transitive = _transitiveClosure(t, imports);
+  for (final t in g.tests) {
+    final transitive = g.closureOf(t);
     final libDeps = transitive.where((f) => f.startsWith(_libRoot)).toSet();
 
     if (libDeps.isEmpty) {
       // Cross-cutting: no transitive lib import → always-run bucket.
       alwaysRun.add(t);
+      // A changed helper it depends on still makes it affected — it runs
+      // anyway, so recording that changes nothing but the bookkeeping.
       continue;
     }
-    if (libDeps.any(libChanged.contains)) {
+    if (transitive.any(libChanged.contains)) {
       affected.add(t);
     }
   }
   return TestSelection(affected: affected, alwaysRun: alwaysRun);
+}
+
+/// The selector's full decision for [changed] repo-relative paths, in
+/// process (#4347). [main] prints exactly this.
+SelectorDecision selectForChangedPaths(
+  Iterable<String> changed, {
+  DependencyGraph? graph,
+}) {
+  for (final p in changed) {
+    final fullSuite = _runAllSentinels.contains(p) ||
+        _runAllExactMatches.contains(p) ||
+        _runAllPrefixes.any(p.startsWith);
+    if (fullSuite) {
+      return SelectorDecision(fullSuite: true, reason: p, tests: const {});
+    }
+  }
+
+  final dartChanged = changed
+      .where((p) =>
+          (p.startsWith(_libRoot) || p.startsWith(_testRoot)) &&
+          p.endsWith('.dart'))
+      .toSet();
+  final g = graph ?? DependencyGraph.scan();
+
+  // Runtime-loaded test data: the files that name it stand in for it.
+  final data = changed.where((p) =>
+      p.startsWith(_testRoot) &&
+      !p.endsWith('.dart') &&
+      !p.startsWith('${_testRoot}scripts/'));
+  for (final p in data) {
+    final name = p.substring(p.lastIndexOf('/') + 1);
+    final readers = g.edges.keys
+        .where((f) => f.startsWith(_testRoot))
+        .where((f) => File(f).readAsStringSync().contains(name))
+        .toSet();
+    if (readers.isEmpty) {
+      return SelectorDecision(fullSuite: true, reason: p, tests: const {});
+    }
+    dartChanged.addAll(readers);
+  }
+
+  final selection = selectTests(dartChanged, graph: g);
+  final changedTests = dartChanged
+      .where((p) => p.endsWith('_test.dart') && g.tests.contains(p))
+      .toSet();
+  return SelectorDecision(
+    fullSuite: false,
+    reason: null,
+    tests: {...selection.affected, ...selection.alwaysRun, ...changedTests},
+  );
 }
 
 Future<void> main(List<String> argv) async {
@@ -134,39 +266,29 @@ Future<void> main(List<String> argv) async {
     exit(2);
   }
 
-  // Bail-out shortcuts. Anything that can plausibly affect every test
-  // tree falls back to the full suite.
-  for (final p in changed) {
-    if (_runAllSentinels.contains(p) ||
-        _runAllExactMatches.contains(p) ||
-        _runAllPrefixes.any(p.startsWith)) {
-      _emitFullSuite();
-      return;
-    }
+  final decision = selectForChangedPaths(changed);
+  if (decision.fullSuite) {
+    stderr.writeln('test_selector: ${decision.reason} forces the full suite');
+    _emitFullSuite();
+    return;
   }
-
-  final libChanged = changed
-      .where((p) => p.startsWith(_libRoot) && p.endsWith('.dart'))
-      .toSet();
-
-  final selection = selectTests(libChanged);
-  final out = (<String>{}
-        ..addAll(selection.affected)
-        ..addAll(selection.alwaysRun))
-      .toList()
-    ..sort();
-  for (final t in out) {
+  for (final t in decision.tests.toList()..sort()) {
     stdout.writeln(t);
   }
 }
 
-List<String> _readStdinPaths() => stdin
-    .readLineSync(retainNewlines: false)
-    ?.split('\n')
-    .map((s) => s.trim())
-    .where((s) => s.isNotEmpty)
-    .toList() ??
-    <String>[];
+/// Every non-empty line on stdin (#4347: previously only the first line
+/// was read, so a multi-path list silently selected for one path).
+List<String> _readStdinPaths() {
+  final paths = <String>[];
+  for (String? line = stdin.readLineSync();
+      line != null;
+      line = stdin.readLineSync()) {
+    final trimmed = line.trim();
+    if (trimmed.isNotEmpty) paths.add(trimmed);
+  }
+  return paths;
+}
 
 List<String> _gitDiff(String base) {
   final r = Process.runSync(
@@ -196,11 +318,11 @@ void _emitFullSuite() {
   }
 }
 
-void _scanDartFiles(String root, Map<String, Set<String>> imports) {
+void _scanDartFiles(String root, Map<String, Set<String>> edges) {
   _walk(root, (p) {
     if (!p.endsWith('.dart')) return;
     final content = File(p).readAsStringSync();
-    imports[p] = _extractImports(p, content);
+    edges[p] = extractDependencies(p, content);
   });
 }
 
@@ -214,18 +336,26 @@ void _walk(String root, void Function(String) visit) {
   }
 }
 
-// Matches `import '...';` and `import "...";` at the start of a line
-// (no leading whitespace permitted — Dart imports live at file top).
-final RegExp _importRe = RegExp(
-  r'''^\s*import\s+["']([^"']+)["']''',
+// `part 'x.dart';` — a part is compiled into the declaring library.
+final RegExp _partRe = RegExp(
+  r'''^\s*part\s+["']([^"']+)["']\s*;''',
   multiLine: true,
 );
 
-Set<String> _extractImports(String file, String content) {
+/// The edges the selector follows from [file]: every branch of its
+/// `import` directives and its `part` files (#4347). `export` directives
+/// are skipped on purpose — see the header for the measured cost.
+Set<String> extractDependencies(String file, String content) {
   final result = <String>{};
-  for (final m in _importRe.allMatches(content)) {
-    final uri = m.group(1)!;
-    final resolved = _resolve(file, uri);
+  for (final directive in parseDirectives(content)) {
+    if (directive.isExport) continue;
+    for (final uri in directive.uris) {
+      final resolved = _resolve(file, uri);
+      if (resolved != null) result.add(resolved);
+    }
+  }
+  for (final m in _partRe.allMatches(content)) {
+    final resolved = _resolve(file, m.group(1)!);
     if (resolved != null) result.add(resolved);
   }
   return result;
@@ -263,16 +393,16 @@ String? _resolve(String fromFile, String uri) {
   return parts.join('/');
 }
 
-/// Transitive closure of imports starting from [start].
+/// Transitive closure of dependencies starting from [start].
 ///
 /// Iterative BFS — Dart import graphs can have cycles (test helpers
 /// importing each other), so the visited set prevents infinite loops.
-Set<String> _transitiveClosure(String start, Map<String, Set<String>> imports) {
+Set<String> _transitiveClosure(String start, Map<String, Set<String>> edges) {
   final visited = <String>{start};
   final queue = <String>[start];
   while (queue.isNotEmpty) {
     final current = queue.removeLast();
-    final next = imports[current];
+    final next = edges[current];
     if (next == null) continue;
     for (final n in next) {
       if (visited.add(n)) queue.add(n);

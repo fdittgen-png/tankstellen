@@ -5,6 +5,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../tool/architecture_graph.dart';
+
 /// Feature-boundary gate (#3132, epic #3129) — the import-direction lint.
 ///
 /// The feature-first layout describes folders, not the dependency graph:
@@ -65,95 +67,30 @@ void main() {
   final shellImports = <String, int>{};
   final violationLines = <String>[];
 
+  // The barrel-aware graph (#4346): every feature -> feature edge,
+  // api.dart included.
+  final barrelAwareEdges = <String, int>{};
+  var featureSccs = <List<String>>[];
+
   // ---------------------------------------------------------------------
   // Scan: resolve every import/export directive in lib/ to a lib/ path.
+  // #4346 — one scanner, tool/architecture_graph.dart, feeds both graphs:
+  // the reach-in rules below are unchanged (the exact baselines prove it),
+  // and the same pass yields the barrel-aware graph.
   // ---------------------------------------------------------------------
   setUpAll(() {
-    final directive = RegExp(
-      r'''^\s*(?:import|export)\s+['"]([^'"]+)['"]''',
-      multiLine: true,
-    );
-
-    String normalize(String path) {
-      final parts = <String>[];
-      for (final seg in path.split('/')) {
-        if (seg == '.' || seg.isEmpty) continue;
-        if (seg == '..') {
-          if (parts.isNotEmpty) parts.removeLast();
-          continue;
-        }
-        parts.add(seg);
-      }
-      return parts.join('/');
-    }
-
-    /// `lib/features/<name>/...` → `<name>`, else null.
-    String? featureOf(String libPath) =>
-        RegExp(r'^lib/features/([^/]+)/').firstMatch('$libPath/')?.group(1);
-
-    final libDir = Directory('lib');
     expect(
-      libDir.existsSync(),
+      Directory('lib').existsSync(),
       isTrue,
       reason: 'lib/ must exist at project root',
     );
-
-    for (final entity in libDir.listSync(recursive: true)) {
-      if (entity is! File) continue;
-      final path = entity.path.replaceAll(r'\', '/');
-      if (!path.endsWith('.dart')) continue;
-      if (path.endsWith('.g.dart') || path.endsWith('.freezed.dart')) {
-        continue;
-      }
-      if (path.contains('/l10n/app_localizations')) continue;
-
-      final fromFeature = featureOf(path);
-      final isCore = path.startsWith('lib/core/');
-      if (fromFeature == null && !isCore) continue; // shell: out of scope
-
-      final source = entity.readAsStringSync();
-      final dir = path.substring(0, path.lastIndexOf('/'));
-      for (final match in directive.allMatches(source)) {
-        final uri = match.group(1)!;
-        String target;
-        if (uri.startsWith('package:tankstellen/')) {
-          target = 'lib/${uri.substring('package:tankstellen/'.length)}';
-        } else if (uri.startsWith('dart:') || uri.startsWith('package:')) {
-          continue; // SDK / third-party
-        } else {
-          target = normalize('$dir/$uri');
-        }
-        final toFeature = featureOf(target);
-        if (toFeature == null) {
-          // feature → app shell (#3133): lib/ outside core/, features/
-          // and l10n/ is the composition root (lib/app/ + lib/main.dart).
-          if (fromFeature != null &&
-              target.startsWith('lib/') &&
-              !target.startsWith('lib/core/') &&
-              !target.startsWith('lib/l10n/')) {
-            shellImports.update(fromFeature, (v) => v + 1, ifAbsent: () => 1);
-            violationLines.add('$path -> $target');
-          }
-          continue; // target outside lib/features
-        }
-        if (fromFeature == toFeature) continue; // intra-feature: fine
-
-        if (isCore) {
-          // core -> feature: ALWAYS a violation, even via api.dart.
-          coreImports.update(toFeature, (v) => v + 1, ifAbsent: () => 1);
-          violationLines.add('$path -> $target');
-        } else {
-          // feature -> feature: api.dart barrel is the public contract.
-          if (target == 'lib/features/$toFeature/api.dart') continue;
-          featurePairs.update(
-            '$fromFeature -> $toFeature',
-            (v) => v + 1,
-            ifAbsent: () => 1,
-          );
-          violationLines.add('$path -> $target');
-        }
-      }
-    }
+    final inventory = ArchitectureInventory.scan();
+    featurePairs.addAll(inventory.reachInPairs);
+    coreImports.addAll(inventory.coreImportsByFeature);
+    shellImports.addAll(inventory.shellImportsByFeature);
+    violationLines.addAll(inventory.reachInLines);
+    barrelAwareEdges.addAll(inventory.featureEdges);
+    featureSccs = inventory.featureSccs;
   });
 
   /// Renders [actual] as the Dart map literal to paste over a baseline.
@@ -268,6 +205,54 @@ void main() {
           'regression — break it before merging. A broken cycle must be '
           'locked in by lowering _cycleBaseline in the same PR.\n\n'
           'Current cycles:\n${sorted.join('\n')}',
+    );
+  });
+
+  // -----------------------------------------------------------------------
+  // #4346 — the barrel-aware graph. The ratchets above exempt api.dart, so
+  // a cycle built only from public barrels was invisible to them. These two
+  // pin the ACTUAL graph's cycles. They do not ban a new public dependency:
+  // only a new mutual pair or a change in cycle membership fails.
+  // -----------------------------------------------------------------------
+
+  test('barrel-aware mutual feature pairs match the baseline (#4346)', () {
+    final actual = mutualPairsOf(barrelAwareEdges.keys);
+    final drift = [
+      for (final p in actual)
+        if (!_barrelAwareMutualPairBaseline.contains(p)) '$p — NEW, break it',
+      for (final p in _barrelAwareMutualPairBaseline)
+        if (!actual.contains(p)) '$p — gone, remove it from the baseline',
+    ];
+    expect(
+      drift,
+      isEmpty,
+      reason:
+          'Mutual feature dependencies INCLUDING api.dart imports drifted '
+          '(#4346). An import through a barrel is still a dependency, so two '
+          'features that reach each other through their barrels still form '
+          'a cycle. Break a new one before merging; lock a broken one in by '
+          'removing it from _barrelAwareMutualPairBaseline in the same PR. '
+          'Run `dart run tool/architecture_graph.dart` for the full graph.\n\n'
+          'Current pairs:\n${actual.join('\n')}',
+    );
+  });
+
+  test('barrel-aware feature SCC membership matches the baseline (#4346)',
+      () {
+    final actual = [for (final scc in featureSccs) scc.join(', ')];
+    expect(
+      featureSccs,
+      _featureSccBaseline,
+      reason:
+          'The strongly connected components of the feature graph '
+          '(api.dart imports included) changed (#4346). A cycle through '
+          'three or more features — even through public barrels only — is '
+          'a component here while it is zero mutual pairs. A feature that '
+          'joined a component, or a new component, is a regression; a '
+          'feature that left one must be locked in by updating '
+          '_featureSccBaseline in the same PR. Run '
+          '`dart run tool/architecture_graph.dart` for the full graph.\n\n'
+          'Current components:\n${actual.join('\n')}',
     );
   });
 }
@@ -514,3 +499,81 @@ const _shellImportBaseline = <String, int>{
 // (barrel imports from the new Settings topic screens), breaking the
 // driving <-> profile and widget <-> profile cycles.
 const _cycleBaseline = 9;
+
+/// #4346 — bidirectional feature pairs of the BARREL-AWARE graph: `a <-> b`
+/// when some file under lib/features/a/ has an import or export directive
+/// resolving into lib/features/b/ AND some file under lib/features/b/ has
+/// one resolving into lib/features/a/, api.dart barrels included (unlike
+/// [_cycleBaseline], which counts reach-ins only). Directives are resolved
+/// by tool/architecture_graph.dart: relative and package:tankstellen URIs,
+/// every branch of a conditional directive, hand-written Dart only.
+/// Measured with that scanner by pinning this list empty and copying back
+/// what the test reported. Target: empty. ONLY EVER SHRINKS.
+const _barrelAwareMutualPairBaseline = <String>[
+  'alerts <-> favorites',
+  'approach <-> profile',
+  'approach <-> trips',
+  'carbon <-> fill_ups',
+  'charging <-> fill_ups',
+  'driving <-> obd2',
+  'driving <-> profile',
+  'driving <-> trips',
+  'driving_score <-> obd2',
+  'driving_score <-> trips',
+  'ev <-> search',
+  'favorites <-> search',
+  'feature_management <-> profile',
+  'fill_ups <-> obd2',
+  'fill_ups <-> profile',
+  'fill_ups <-> search',
+  'fill_ups <-> trips',
+  'fill_ups <-> vehicle',
+  'map <-> search',
+  'obd2 <-> trips',
+  'obd2 <-> vehicle',
+  'profile <-> search',
+  'profile <-> trips',
+  'profile <-> vehicle',
+  'profile <-> widget',
+  'route_search <-> search',
+  'search <-> station_detail',
+  'search <-> trips',
+  'sync <-> trips',
+  'trips <-> vehicle',
+];
+
+/// #4346 — the strongly connected components (two or more features) of
+/// the same barrel-aware feature graph, each listed as its sorted members,
+/// largest component first. A component is the set of
+/// features that can each reach every other one along directive edges, so
+/// it captures cycles through three or more features that no mutual pair
+/// shows. Measured the same way as [_barrelAwareMutualPairBaseline].
+/// Target: empty. Membership only ever shrinks.
+const _featureSccBaseline = <List<String>>[
+  [
+    'alerts',
+    'approach',
+    'carbon',
+    'charging',
+    'driving',
+    'driving_score',
+    'ev',
+    'favorites',
+    'feature_management',
+    'fill_ups',
+    'glide_coach',
+    'itinerary',
+    'map',
+    'obd2',
+    'price_history',
+    'profile',
+    'receipts_ocr',
+    'route_search',
+    'search',
+    'station_detail',
+    'sync',
+    'trips',
+    'vehicle',
+    'widget',
+  ],
+];

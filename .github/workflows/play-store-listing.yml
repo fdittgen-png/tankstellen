@@ -147,6 +147,44 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
+      - name: Resolve newest release on the track (#4371)
+        # `supply` looks up a release on the target track even for a
+        # metadata-only run, and refuses with "More than one release
+        # found in this track. Please specify with the :version_code
+        # option" once the Release Train (#3792) leaves several releases
+        # there — every run failed that way from 2026-08-26. The store
+        # listing itself is global; the version code only satisfies that
+        # lookup, so the newest code on the track is the right pick.
+        id: version_code
+        if: steps.track.outputs.dry_run != 'true'
+        env:
+          SUPPLY_JSON_KEY: /tmp/play-store-key.json
+          SUPPLY_PACKAGE_NAME: de.tankstellen.fuelprices
+          SUPPLY_TRACK: ${{ steps.track.outputs.track }}
+        run: |
+          set -euo pipefail
+          # The action returns every version code of every release on
+          # the track. Codes arrive from the API as strings, so compare
+          # them as integers — a lexical max would pick 999 over 5138.
+          bundle exec ruby -e '
+            require "fastlane"
+            Fastlane.load_actions
+            action = Fastlane::Actions::GooglePlayTrackVersionCodesAction
+            params = FastlaneCore::Configuration.create(
+              action.available_options,
+              package_name: ENV.fetch("SUPPLY_PACKAGE_NAME"),
+              track: ENV.fetch("SUPPLY_TRACK"),
+              json_key: ENV.fetch("SUPPLY_JSON_KEY"),
+            )
+            codes = action.run(params).map { |c| Integer(c.to_s, 10) }
+            if codes.empty?
+              puts "::error::Track #{ENV.fetch("SUPPLY_TRACK")} has no release, so supply has no release to attach the listing to. Publish a build to that track first, or dispatch with a track that has one."
+              exit 1
+            end
+            File.open(ENV.fetch("GITHUB_OUTPUT"), "a") { |f| f.puts "version_code=#{codes.max}" }
+            puts "Newest version code on #{ENV.fetch("SUPPLY_TRACK")}: #{codes.max} (of #{codes.sort.join(", ")})"
+          '
+
       - name: fastlane supply (metadata + listing assets)
         if: steps.track.outputs.dry_run != 'true'
         env:
@@ -160,6 +198,7 @@ jobs:
           # locale name and Google's API rejects the upload with
           # `android - Invalid request` (run 25607897831).
           SUPPLY_METADATA_PATH: docs/play-store/metadata/android
+          SUPPLY_VERSION_CODE: ${{ steps.version_code.outputs.version_code }}
         run: |
           set -euo pipefail
           # --skip_upload_aab / --skip_upload_apk: metadata-only run.
@@ -173,10 +212,17 @@ jobs:
           # to attach it to (run 25608959525).
           # The defaults still push everything else from the
           # metadata tree at $SUPPLY_METADATA_PATH/<locale>/.
+          # --version_code selects one release on the track (#4371);
+          # without it supply stops once the track holds several.
+          if [ -z "${SUPPLY_VERSION_CODE:-}" ]; then
+            echo "::error::No version code resolved for track $SUPPLY_TRACK — refusing to run supply without --version_code (#4371)."
+            exit 1
+          fi
           bundle exec fastlane supply \
             --json_key "$SUPPLY_JSON_KEY" \
             --package_name "$SUPPLY_PACKAGE_NAME" \
             --track "$SUPPLY_TRACK" \
+            --version_code "$SUPPLY_VERSION_CODE" \
             --metadata_path "$SUPPLY_METADATA_PATH" \
             --skip_upload_aab \
             --skip_upload_apk \
