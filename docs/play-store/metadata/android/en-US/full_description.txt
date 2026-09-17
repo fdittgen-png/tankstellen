@@ -1,40 +1,44 @@
 A 10-cent difference per litre doesn't feel like much. Multiply it by a full tank, then by every fill-up this year — that is what choosing the right station is actually worth.
 
-Sparkilo shows you which station near you is cheapest right now, from each country's official price data, then helps you burn less of what you buy.
+Sparkilo shows which station near you or along your route is cheapest, using each country's price data, then helps you see what every kilometre really costs.
 
-Free. No ads, no account, no tracking, open source.
+Free and open source. No ads, no tracking, no account needed.
 
-WHY IT IS WORTH TRUSTING
-• Official open-data prices, country by country — not crowdsourced guesses that send you on a wasted detour.
-• Petrol, diesel, LPG, CNG, E85 and EV charging on one map, in one search.
-• Cheapest first: pins are coloured cheap-to-expensive and the winner carries a Cheapest badge.
-• API keys are sent only to the service they belong to, search coordinates only to the official price source of the country you are in, and recorded GPS trips leave your device only if you switch on TankSync trip sync. No ads, no account, no tracking — and the source code is public.
+WHERE THE PRICES COME FROM
+• Government open data in most countries, retailer feeds where there is no national source — every result names its source.
+• Petrol, diesel, LPG, CNG and E85 wherever a country's source publishes them, plus EV charging locations from Open Charge Map.
 
 SAVE ON THE PRICE
-• Search nearby or along your entire route. Filter by fuel type, radius, open now, amenities and highway-only.
-• Route mode finds the best stop inside your travel corridor, so the detour pays for itself.
-• Price alerts, per station or by radius, computed on your device and firing only when a deal is genuinely near you.
-• Favourites show every fuel price at a glance; EV chargers show kW, connectors and live availability.
+• Search nearby or along your route. Filter by fuel, radius and, where the source provides them, opening hours and amenities.
+• Route mode finds good stops inside your travel corridor, including across a border into another supported country.
+• Price alerts per station or within a radius, checked in the background on your device.
+• Favourites show every fuel price at a glance; EV chargers show power, connectors and the status Open Charge Map reports.
 
 THEN SAVE ON THE LITRES
-• Consumption tracker: tank level and range, average L/100 km, cost per km, total spent, and a fill-up history with deltas.
-• Log fill-ups by hand, or scan the pump display or the receipt with OCR.
-• Trip logbook records hands-free over an OBD2 ELM327 adapter, or with GPS alone, and colours your route by efficiency.
-• Eco-coaching turns throttle and RPM histograms into habits you can actually change, compared month over month.
-• Carbon dashboard: cost and CO2 broken down by trip length and speed band.
+• Consumption tracking: tank level and range, average L/100 km, cost per km, total spent and a fill-up history.
+• Log fill-ups by hand; the Google Play build can also read the pump display or receipt with on-device OCR.
+• Record trips with GPS alone or with a compatible OBD2 (ELM327) adapter, and see your route coloured by efficiency.
+• With an adapter, throttle and engine-speed breakdowns show which driving habits cost you fuel.
+• Carbon dashboard: cost and CO2 by trip length and speed band.
+• GPS-only figures are estimates, calibrated against your fill-ups.
 
 WHILE YOU DRIVE
-• Live-price overlay for the station you are approaching.
-• Home-screen widget, Android Auto, and spoken price announcements.
-• Basic, Medium and Full presets keep the app as simple or as deep as you want. Multiple driver profiles supported.
+• While a trip is recording, the closest station and its price stay in view as you approach.
+• Home-screen widget, spoken price announcements and, in the Google Play build, Android Auto.
+• Basic, Medium and Full presets keep the app as simple or as deep as you want.
 
-YOUR DATA STAYS YOURS
-• Privacy Dashboard: see, export or delete everything, at any time.
-• Optional TankSync syncs favourites, vehicles, fill-ups and alerts to a server you control — or, if you choose, to the Sparkilo Community database hosted in the EU.
-• GDPR: no trackers, no ad SDKs. Export everything as one ZIP and delete everything, on the device and on the server, from inside the app. Every consent can be revoked at any time. Privacy policy: https://fdittgen-png.github.io/tankstellen/privacy-policy/
+PRIVACY
+• Your records are stored on your device. A search sends its location to the price source for that country, and address, routing, charging and map services receive what they need to answer. Your Tankerkönig key goes only to Tankerkönig.
+• Recorded GPS trips leave your device only if you turn on TankSync trip sync.
+• Optional TankSync syncs favourites, vehicles, fill-ups and alerts to your own server or to the Sparkilo Community database hosted in the EU.
+• Privacy Dashboard: export everything as one ZIP, delete your data on the device and on the server, and revoke any consent at any time. Privacy policy: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
-COUNTRIES WITH OFFICIAL LIVE PRICES
-Austria, Argentina, Australia, Chile, Denmark, France, Germany, Greece, Italy, Luxembourg, Mexico, Portugal, Romania, Slovenia, South Korea, Spain and the United Kingdom. EV charging worldwide via Open Charge Map.
+COUNTRIES
+• Station prices: Austria, France, Germany (free Tankerkönig API key required), Italy, Mexico, Portugal, Slovenia, Spain and the United Kingdom.
+• Denmark: OK, Shell and Q8 stations only.
+• Luxembourg: the national regulated price, shown by city.
+• Greece: regional average prices from official bulletins.
+Fuel grades, station details and update frequency vary by country. EV charging locations worldwide via Open Charge Map.
 
 23 languages. Open source (MIT):
 https://github.com/fdittgen-png/tankstellen

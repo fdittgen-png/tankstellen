@@ -1,40 +1,44 @@
 10 centesimi di differenza al litro sembrano pochi. Moltiplicali per un pieno intero, poi per ogni rifornimento dell'anno: ecco quanto vale davvero scegliere il distributore giusto.
 
-Sparkilo ti mostra quale distributore vicino a te è il più economico in questo momento, dai dati ufficiali sui prezzi di ogni paese. E poi ti aiuta a consumarne di meno.
+Sparkilo ti mostra quale distributore vicino a te o lungo il tuo itinerario è il più economico, dai dati sui prezzi di ogni paese. E poi ti aiuta a vedere quanto costa davvero ogni chilometro.
 
-Gratis. Senza pubblicità, senza account, senza tracciamento, open source.
+Gratis e open source. Senza pubblicità, senza tracciamento, nessun account necessario.
 
-PERCHÉ PUOI FIDARTI
-• Prezzi ufficiali in open data, paese per paese — non stime della community che ti mandano a fare una deviazione inutile.
-• Benzina, diesel, GPL, metano, E85 e ricarica elettrica su un'unica mappa, in un'unica ricerca.
-• Prima il più economico: i segnaposto sono colorati dal più conveniente al più caro e il vincitore porta un badge Il più economico.
-• Le chiavi API vengono inviate solo al servizio a cui appartengono, le coordinate di ricerca solo alla fonte ufficiale dei prezzi del paese in cui ti trovi, e i viaggi GPS registrati lasciano il dispositivo solo se attivi la sincronizzazione dei viaggi di TankSync. Senza pubblicità, senza account, senza tracciamento — e il codice è pubblico.
+DA DOVE VENGONO I PREZZI
+• Open data pubblici nella maggior parte dei paesi, dati delle catene dove non esiste una fonte nazionale — ogni risultato indica la sua fonte.
+• Benzina, diesel, GPL, metano ed E85 quando la fonte del paese li pubblica, più le colonnine di ricarica di Open Charge Map.
 
 RISPARMIA SUL PREZZO
-• Cerca nelle vicinanze o lungo tutto il tuo itinerario. Filtra per carburante, raggio, aperto adesso, servizi e solo autostrada.
-• La modalità itinerario trova la sosta migliore nel tuo corridoio di viaggio, così la deviazione si ripaga da sola.
-• Avvisi di prezzo, per distributore o per raggio, calcolati sul dispositivo e attivati solo quando l'offerta è davvero vicina.
-• I preferiti mostrano tutti i prezzi a colpo d'occhio; le colonnine indicano kW, connettori e disponibilità in tempo reale.
+• Cerca nelle vicinanze o lungo il tuo itinerario. Filtra per carburante, raggio e, quando la fonte li fornisce, orari di apertura e servizi.
+• La modalità itinerario trova buone soste nel tuo corridoio di viaggio, anche oltre confine in un altro paese supportato.
+• Avvisi di prezzo per distributore o entro un raggio, controllati in background sul tuo dispositivo con la frequenza consentita da iOS.
+• I preferiti mostrano tutti i prezzi a colpo d'occhio; le colonnine indicano potenza, connettori e lo stato segnalato da Open Charge Map.
 
 E POI SUI LITRI
-• Monitoraggio dei consumi: livello e autonomia, media L/100 km, costo al km, spesa totale e storico dei rifornimenti con le differenze.
-• Registra i rifornimenti a mano oppure scansiona il display della pompa o lo scontrino con l'OCR.
-• Il diario di bordo registra a mani libere tramite un adattatore OBD2 ELM327, o con il solo GPS, e colora il percorso in base all'efficienza.
-• L'eco-coaching trasforma gli istogrammi di acceleratore e giri motore in abitudini che puoi davvero cambiare, mese dopo mese.
+• Monitoraggio dei consumi: livello e autonomia, media L/100 km, costo al km, spesa totale e storico dei rifornimenti.
+• Registra i rifornimenti a mano oppure leggi il display della pompa o lo scontrino con l'OCR sul dispositivo.
+• Registra i viaggi con il solo GPS o con un adattatore OBD2 compatibile (ELM327) e guarda il percorso colorato in base all'efficienza.
+• Con un adattatore, l'analisi di acceleratore e giri motore mostra quali abitudini di guida ti costano carburante.
 • Dashboard CO2: costi e CO2 suddivisi per lunghezza del viaggio e fascia di velocità.
+• I valori basati sul solo GPS sono stime, calibrate sui tuoi rifornimenti.
 
 MENTRE GUIDI
-• Sovrimpressione con il prezzo in tempo reale del distributore verso cui stai andando.
+• Durante la registrazione di un viaggio, il distributore più vicino e il suo prezzo restano in vista mentre ti avvicini.
 • Widget nella schermata home per preferiti e distributori vicini, più gli annunci vocali dei prezzi.
-• I preset Base, Medio e Completo mantengono l'app semplice o completa quanto vuoi. Supporta più profili conducente.
+• I preset Base, Medio e Completo mantengono l'app semplice o completa quanto vuoi.
 
-I TUOI DATI RESTANO TUOI
-• Dashboard privacy: consulta, esporta o cancella tutto, quando vuoi.
-• TankSync, opzionale, sincronizza preferiti, veicoli, rifornimenti e avvisi su un server che controlli tu — oppure, se lo scegli, sul database Sparkilo Community ospitato nell'UE.
-• GDPR: nessun tracker, nessun SDK pubblicitario. Esporta tutto in un unico ZIP e cancella tutto, sul dispositivo e sul server, direttamente dall'app. Ogni consenso può essere revocato in qualsiasi momento. Informativa sulla privacy: https://fdittgen-png.github.io/tankstellen/privacy-policy/
+PRIVACY
+• I tuoi dati sono salvati sul dispositivo. Una ricerca invia la sua posizione alla fonte dei prezzi di quel paese, e i servizi di indirizzi, percorsi, ricarica e mappe ricevono ciò che serve per rispondere. La tua chiave Tankerkönig viene inviata solo a Tankerkönig.
+• I viaggi GPS registrati lasciano il dispositivo solo se attivi la sincronizzazione dei viaggi di TankSync.
+• TankSync, opzionale, sincronizza preferiti, veicoli, rifornimenti e avvisi sul tuo server o sul database Sparkilo Community ospitato nell'UE.
+• Dashboard privacy: esporta tutto in un unico ZIP, cancella i tuoi dati sul dispositivo e sul server e revoca ogni consenso in qualsiasi momento. Informativa sulla privacy: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
-PAESI CON PREZZI UFFICIALI IN TEMPO REALE
-Austria, Argentina, Australia, Cile, Danimarca, Francia, Germania, Grecia, Italia, Lussemburgo, Messico, Portogallo, Romania, Slovenia, Corea del Sud, Spagna e Regno Unito. Ricarica elettrica in tutto il mondo tramite Open Charge Map.
+PAESI
+• Prezzi per distributore: Austria, Francia, Germania (serve una chiave API Tankerkönig gratuita), Italia, Messico, Portogallo, Regno Unito, Slovenia e Spagna.
+• Danimarca: solo distributori OK, Shell e Q8.
+• Lussemburgo: il prezzo nazionale regolamentato, mostrato per città.
+• Grecia: prezzi medi regionali dai bollettini ufficiali.
+Carburanti, dettagli dei distributori e frequenza di aggiornamento variano da paese a paese. Ricarica elettrica in tutto il mondo tramite Open Charge Map.
 
 23 lingue. Open source (MIT):
 https://github.com/fdittgen-png/tankstellen

@@ -1,40 +1,44 @@
 10 Cent Unterschied pro Liter klingen nach wenig. Rechnen Sie sie auf eine volle Tankfüllung hoch, dann auf jede Tankfüllung dieses Jahres — genau so viel ist die richtige Tankstelle wert.
 
-Sparkilo zeigt Ihnen, welche Tankstelle in Ihrer Nähe gerade am günstigsten ist, aus den offiziellen Preisdaten des jeweiligen Landes. Und danach hilft es Ihnen, weniger davon zu verbrauchen.
+Sparkilo zeigt Ihnen, welche Tankstelle in Ihrer Nähe oder entlang Ihrer Route am günstigsten ist, aus den Preisdaten des jeweiligen Landes. Und danach hilft es Ihnen zu sehen, was jeder Kilometer wirklich kostet.
 
-Kostenlos. Keine Werbung, kein Konto, kein Tracking, Open Source.
+Kostenlos und Open Source. Keine Werbung, kein Tracking, kein Konto nötig.
 
-WARUM SIE SICH DARAUF VERLASSEN KÖNNEN
-• Offizielle Open-Data-Preise, Land für Land — keine Community-Schätzungen, die Sie zu einem sinnlosen Umweg schicken.
-• Benzin, Diesel, LPG, CNG, E85 und Ladesäulen auf einer Karte, in einer Suche.
-• Günstigste zuerst: Preis-Pins sind von günstig nach teuer eingefärbt, die beste trägt ein Günstigste-Abzeichen.
-• API-Schlüssel gehen nur an den Dienst, zu dem sie gehören, Suchkoordinaten nur an die offizielle Preisquelle des Landes, in dem Sie sich befinden, und aufgezeichnete GPS-Fahrten verlassen Ihr Gerät nur, wenn Sie die TankSync-Fahrtensynchronisation einschalten. Keine Werbung, kein Konto, kein Tracking — und der Quellcode ist öffentlich.
+WOHER DIE PREISE KOMMEN
+• Offene Behördendaten in den meisten Ländern; wo es keine nationale Quelle gibt, Daten der Tankstellenketten — jedes Ergebnis nennt seine Quelle.
+• Benzin, Diesel, LPG, CNG und E85, soweit die Quelle des Landes sie veröffentlicht, dazu Ladesäulen aus Open Charge Map.
 
 SPAREN SIE BEIM PREIS
-• Suchen Sie in der Nähe oder entlang Ihrer gesamten Route. Filtern Sie nach Kraftstoff, Umkreis, jetzt geöffnet, Ausstattung und nur Autobahn.
-• Der Routenmodus findet den besten Stopp in Ihrem Reisekorridor, damit sich der Umweg auch lohnt.
-• Preisalarme, pro Tankstelle oder im Umkreis, werden auf dem Gerät berechnet und lösen nur aus, wenn ein Angebot wirklich in Ihrer Nähe ist.
-• Favoriten zeigen jeden Kraftstoffpreis auf einen Blick, Ladesäulen kW, Stecker und Live-Verfügbarkeit.
+• Suchen Sie in der Nähe oder entlang Ihrer Route. Filtern Sie nach Kraftstoff, Umkreis und, wo die Quelle sie liefert, Öffnungszeiten und Ausstattung.
+• Der Routenmodus findet gute Stopps in Ihrem Reisekorridor, auch über die Grenze in ein anderes unterstütztes Land.
+• Preisalarme pro Tankstelle oder im Umkreis, im Hintergrund auf Ihrem Gerät geprüft, so oft iOS es zulässt.
+• Favoriten zeigen jeden Kraftstoffpreis auf einen Blick; Ladesäulen zeigen Leistung, Stecker und den von Open Charge Map gemeldeten Status.
 
 UND DANN BEI DEN LITERN
-• Verbrauchs-Tracker: Tankfüllstand und Reichweite, Durchschnitt l/100 km, Kosten pro km, Gesamtausgaben und eine Tankhistorie mit Veränderungen.
-• Tankvorgänge von Hand erfassen oder Zapfsäulen-Display bzw. Beleg per OCR scannen.
-• Das Fahrtenbuch zeichnet freihändig über einen OBD2-ELM327-Adapter oder nur per GPS auf und färbt Ihre Route nach Effizienz.
-• Eco-Coaching macht aus Gaspedal- und Drehzahl-Histogrammen Gewohnheiten, die Sie wirklich ändern können, Monat für Monat vergleichbar.
+• Verbrauchs-Tracker: Tankfüllstand und Reichweite, Durchschnitt l/100 km, Kosten pro km, Gesamtausgaben und eine Tankhistorie.
+• Tankvorgänge von Hand erfassen oder Zapfsäulen-Display bzw. Beleg per OCR auf dem Gerät lesen.
+• Fahrten nur per GPS oder mit einem kompatiblen OBD2-Adapter (ELM327) aufzeichnen und die Route nach Effizienz eingefärbt sehen.
+• Mit Adapter zeigen Gaspedal- und Drehzahlauswertungen, welche Fahrgewohnheiten Sie Sprit kosten.
 • CO2-Dashboard: Kosten und CO2 nach Fahrtlänge und Geschwindigkeitsbereich.
+• Reine GPS-Werte sind Schätzungen, die an Ihren Tankvorgängen kalibriert werden.
 
 WÄHREND DER FAHRT
-• Live-Preis-Overlay für die Tankstelle, auf die Sie zufahren.
+• Bei einer laufenden Fahrtaufzeichnung bleiben die nächste Tankstelle und ihr Preis im Blick, während Sie darauf zufahren.
 • Homescreen-Widget für Favoriten und Tankstellen in der Nähe, dazu gesprochene Preisansagen.
-• Die Voreinstellungen Basis, Mittel und Voll halten die App so einfach oder so tief, wie Sie möchten. Mehrere Fahrerprofile möglich.
+• Die Voreinstellungen Basis, Mittel und Voll halten die App so einfach oder so tief, wie Sie möchten.
 
-IHRE DATEN BLEIBEN IHRE
-• Privatsphäre-Dashboard: alles jederzeit einsehen, exportieren oder löschen.
-• Optionales TankSync synchronisiert Favoriten, Fahrzeuge, Tankvorgänge und Alarme auf einen Server, den Sie kontrollieren — oder, wenn Sie möchten, in die in der EU gehostete Sparkilo-Community-Datenbank.
-• DSGVO: keine Tracker, keine Werbe-SDKs. Exportieren Sie alles als eine ZIP-Datei und löschen Sie alles, auf dem Gerät und auf dem Server, direkt in der App. Jede Einwilligung lässt sich jederzeit widerrufen. Datenschutzerklärung: https://fdittgen-png.github.io/tankstellen/privacy-policy/
+DATENSCHUTZ
+• Ihre Aufzeichnungen werden auf Ihrem Gerät gespeichert. Eine Suche sendet ihren Standort an die Preisquelle des jeweiligen Landes; Adress-, Routen-, Lade- und Kartendienste erhalten, was sie für die Antwort brauchen. Ihr Tankerkönig-Schlüssel geht nur an Tankerkönig.
+• Aufgezeichnete GPS-Fahrten verlassen Ihr Gerät nur, wenn Sie die TankSync-Fahrtensynchronisation einschalten.
+• Optionales TankSync synchronisiert Favoriten, Fahrzeuge, Tankvorgänge und Alarme auf Ihren eigenen Server oder in die in der EU gehostete Sparkilo-Community-Datenbank.
+• Privatsphäre-Dashboard: alles als eine ZIP-Datei exportieren, Ihre Daten auf dem Gerät und auf dem Server löschen und jede Einwilligung jederzeit widerrufen. Datenschutzerklärung: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
-LÄNDER MIT OFFIZIELLEN LIVE-PREISEN
-Österreich, Argentinien, Australien, Chile, Dänemark, Frankreich, Deutschland, Griechenland, Italien, Luxemburg, Mexiko, Portugal, Rumänien, Slowenien, Südkorea, Spanien und das Vereinigte Königreich. Ladesäulen weltweit über Open Charge Map.
+LÄNDER
+• Tankstellenpreise: Deutschland (kostenloser Tankerkönig-API-Schlüssel nötig), Frankreich, Italien, Mexiko, Österreich, Portugal, Slowenien, Spanien und das Vereinigte Königreich.
+• Dänemark: nur Tankstellen von OK, Shell und Q8.
+• Luxemburg: der staatlich regulierte Preis, pro Stadt angezeigt.
+• Griechenland: regionale Durchschnittspreise aus amtlichen Bulletins.
+Kraftstoffsorten, Tankstellendetails und Aktualisierungstakt variieren je Land. Ladesäulen weltweit über Open Charge Map.
 
 23 Sprachen. Open Source (MIT):
 https://github.com/fdittgen-png/tankstellen

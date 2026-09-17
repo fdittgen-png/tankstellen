@@ -1,40 +1,44 @@
 10 céntimos de diferencia por litro parecen poca cosa. Multiplícalos por un depósito lleno y después por cada repostaje del año: eso es lo que vale de verdad elegir bien la gasolinera.
 
-Sparkilo te muestra cuál de las que tienes cerca es la más barata ahora mismo, con los datos oficiales de precios de cada país. Y después te ayuda a gastar menos de lo que has repostado.
+Sparkilo te muestra qué gasolinera cercana o de tu ruta es la más barata, con los datos de precios de cada país. Y después te ayuda a ver lo que cuesta de verdad cada kilómetro.
 
-Gratis. Sin anuncios, sin cuenta, sin rastreo, código abierto.
+Gratis y de código abierto. Sin anuncios, sin rastreo, sin necesidad de cuenta.
 
-POR QUÉ PUEDES FIARTE
-• Precios oficiales en datos abiertos, país por país — no estimaciones de la comunidad que te mandan a dar un rodeo para nada.
-• Gasolina, diésel, GLP, GNC, E85 y recarga eléctrica en un solo mapa y una sola búsqueda.
-• La más barata primero: los marcadores van de barato a caro y el ganador lleva una insignia La más barata.
-• Tus claves de API solo se envían al servicio al que pertenecen, las coordenadas de búsqueda solo a la fuente oficial de precios del país en el que estás, y los trayectos GPS grabados solo salen de tu dispositivo si activas la sincronización de trayectos de TankSync. Sin anuncios, sin cuenta, sin rastreo — y el código es público.
+DE DÓNDE SALEN LOS PRECIOS
+• Datos públicos abiertos en la mayoría de los países y datos de las cadenas donde no hay una fuente nacional — cada resultado indica su fuente.
+• Gasolina, diésel, GLP, GNC y E85 cuando la fuente del país los publica, además de puntos de recarga de Open Charge Map.
 
 AHORRA EN EL PRECIO
-• Busca cerca de ti o a lo largo de toda tu ruta. Filtra por combustible, radio, abierto ahora, servicios y solo autopista.
-• El modo ruta encuentra la mejor parada dentro de tu corredor de viaje, para que el rodeo salga rentable.
-• Alertas de precio, por gasolinera o por radio, calculadas en tu dispositivo y que solo saltan cuando la oferta está realmente cerca.
-• Los favoritos muestran todos los precios de un vistazo; los puntos de recarga indican kW, conectores y disponibilidad en directo.
+• Busca cerca de ti o a lo largo de tu ruta. Filtra por combustible, radio y, cuando la fuente los ofrece, horarios y servicios.
+• El modo ruta encuentra buenas paradas dentro de tu corredor de viaje, también al otro lado de la frontera en otro país compatible.
+• Alertas de precio por gasolinera o dentro de un radio, comprobadas en segundo plano en tu dispositivo tan a menudo como iOS lo permita.
+• Los favoritos muestran todos los precios de un vistazo; los puntos de recarga indican potencia, conectores y el estado que informa Open Charge Map.
 
 Y DESPUÉS EN LOS LITROS
-• Seguimiento de consumo: nivel y autonomía, media de L/100 km, coste por km, gasto total e historial de repostajes con diferencias.
-• Registra los repostajes a mano o escanea el display del surtidor o el ticket con OCR.
-• El cuaderno de viaje graba con manos libres mediante un adaptador OBD2 ELM327, o solo con GPS, y colorea tu ruta según la eficiencia.
-• El eco-coaching convierte los histogramas de acelerador y revoluciones en hábitos que puedes cambiar de verdad, mes a mes.
+• Seguimiento de consumo: nivel y autonomía, media de L/100 km, coste por km, gasto total e historial de repostajes.
+• Registra los repostajes a mano o lee el display del surtidor o el ticket con OCR en el dispositivo.
+• Graba tus trayectos solo con GPS o con un adaptador OBD2 compatible (ELM327) y mira tu ruta coloreada según la eficiencia.
+• Con un adaptador, el análisis del acelerador y de las revoluciones muestra qué hábitos de conducción te cuestan combustible.
 • Panel de CO2: coste y CO2 desglosados por longitud de trayecto y franja de velocidad.
+• Las cifras basadas solo en GPS son estimaciones, calibradas con tus repostajes.
 
 MIENTRAS CONDUCES
-• Superposición con el precio en directo de la gasolinera a la que te acercas.
+• Mientras se graba un trayecto, la gasolinera más cercana y su precio siguen a la vista cuando te acercas.
 • Widget en la pantalla de inicio para favoritos y gasolineras cercanas, más anuncios de voz con los precios.
-• Los preajustes Básico, Medio y Completo mantienen la app tan sencilla o tan completa como quieras. Admite varios perfiles de conductor.
+• Los preajustes Básico, Intermedio y Completo mantienen la app tan sencilla o tan completa como quieras.
 
-TUS DATOS SIGUEN SIENDO TUYOS
-• Panel de privacidad: consulta, exporta o borra todo cuando quieras.
-• TankSync, opcional, sincroniza favoritos, vehículos, repostajes y alertas con un servidor que controlas tú — o, si lo eliges, con la base de datos Sparkilo Community alojada en la UE.
-• RGPD: sin rastreadores ni SDK publicitarios. Exporta todo en un único ZIP y borra todo, en el dispositivo y en el servidor, desde la propia app. Cada consentimiento se puede revocar en cualquier momento. Política de privacidad: https://fdittgen-png.github.io/tankstellen/privacy-policy/
+PRIVACIDAD
+• Tus registros se guardan en tu dispositivo. Una búsqueda envía su ubicación a la fuente de precios de ese país, y los servicios de direcciones, rutas, recarga y mapas reciben lo que necesitan para responder. Tu clave de Tankerkönig solo se envía a Tankerkönig.
+• Los trayectos GPS grabados solo salen de tu dispositivo si activas la sincronización de trayectos de TankSync.
+• TankSync, opcional, sincroniza favoritos, vehículos, repostajes y alertas con tu propio servidor o con la base de datos Sparkilo Community alojada en la UE.
+• Panel de privacidad: exporta todo en un único ZIP, borra tus datos en el dispositivo y en el servidor y revoca cualquier consentimiento cuando quieras. Política de privacidad: https://fdittgen-png.github.io/tankstellen/privacy-policy/
 
-PAÍSES CON PRECIOS OFICIALES EN DIRECTO
-Austria, Argentina, Australia, Chile, Dinamarca, Francia, Alemania, Grecia, Italia, Luxemburgo, México, Portugal, Rumanía, Eslovenia, Corea del Sur, España y Reino Unido. Recarga eléctrica en todo el mundo mediante Open Charge Map.
+PAÍSES
+• Precios por gasolinera: Alemania (requiere una clave API gratuita de Tankerkönig), Austria, Eslovenia, España, Francia, Italia, México, Portugal y Reino Unido.
+• Dinamarca: solo gasolineras OK, Shell y Q8.
+• Luxemburgo: el precio nacional regulado, mostrado por ciudad.
+• Grecia: precios medios regionales de los boletines oficiales.
+Los combustibles, los detalles de las gasolineras y la frecuencia de actualización varían según el país. Recarga eléctrica en todo el mundo mediante Open Charge Map.
 
 23 idiomas. Código abierto (MIT):
 https://github.com/fdittgen-png/tankstellen
