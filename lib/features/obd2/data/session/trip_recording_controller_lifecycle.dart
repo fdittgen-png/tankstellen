@@ -42,16 +42,16 @@ mixin _TripRecordingLifecycle
   bool get isPausedDueToDrop => _run.pausedDueToDrop;
   bool get isActive => _run.started;
 
-  /// Pause the polling loop without tearing down the recorder. The
-  /// scheduler is stopped (no wasted Bluetooth chatter while the user
-  /// is looking at another screen) but the emit timer keeps ticking so
-  /// a frozen `TripLiveReading` still flushes if UI subscribed late.
-  /// [resume] restarts the scheduler. Safe to call when not recording
-  /// — no-op.
-  void pause() {
-    if (!_run.pauseByUser()) return;
+  /// Pause the polling loop without tearing down the recorder: the
+  /// scheduler stops (no Bluetooth chatter while the user looks away), the
+  /// emit timer keeps ticking so a frozen reading still flushes, and
+  /// [resume] restarts it. Returns whether it paused (#4312) — false when
+  /// not running, or already paused either way (a drop pause included).
+  bool pause() {
+    if (!_run.pauseByUser()) return false;
     _scheduler?.stop();
     _emitState();
+    return true;
   }
 
   /// Resume a paused recording. Works from both user-pause and

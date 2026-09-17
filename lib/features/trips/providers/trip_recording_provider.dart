@@ -148,12 +148,14 @@ class TripRecording extends _$TripRecording
     Obd2Service? service,
     bool automatic = false,
   }) async {
-    if (state.isActive || _startInProgress) {
+    // C1 (#4162) — a hands-free start never takes over a manual start
+    // whose adapter is still connecting: the user already asked for it.
+    if (state.isActive || _startInProgress ||
+        (automatic && state.isConnecting)) {
       return StartTripOutcome.alreadyActive;
     }
     final activeVehicle = _tryReadActiveVehicle();
     final resolvedVehicleId = vehicleId ?? activeVehicle?.id;
-    final resolvedMac = adapterMac ?? activeVehicle?.obd2AdapterMac;
     _lastTrip.begin(
       vehicleId: resolvedVehicleId,
       startedAt: DateTime.now(),
@@ -167,10 +169,7 @@ class TripRecording extends _$TripRecording
       await start(service, automatic: automatic);
       return StartTripOutcome.started;
     }
-    if (resolvedMac == null || resolvedMac.isEmpty) {
-      return StartTripOutcome.needsPicker;
-    }
-    // Pinned adapter but no service handed in — the UI picker is
+    // No service handed in, pinned adapter or not — the UI picker is
     // still the right place to fire a connect: it reuses the exact
     // same scan + connect flow (with retry/error surfacing) and
     // short-circuits on the pinned MAC. Keeping the connect logic

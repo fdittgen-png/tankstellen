@@ -249,13 +249,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     );
   }
 
+  /// #4312 — true only when the controller actually paused: a drop pause
+  /// refuses, and publishing `paused` over it hid the drop banner.
   @override
-  bool pause() {
-    final ctl = _controller;
-    if (ctl == null) return false;
-    ctl.pause();
-    return true;
-  }
+  bool pause() => _controller?.pause() ?? false;
 
   @override
   bool resume() {
