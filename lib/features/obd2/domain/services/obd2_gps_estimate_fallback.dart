@@ -96,6 +96,9 @@ class Obd2GpsEstimateFallback {
       summary: summary.copyWith(
         avgLPer100Km: est.avgLPer100Km,
         fuelLitersConsumed: est.fuelLitersConsumed,
+        // #4233 — the figure went through the fuzzy stage; a GPS road-load
+        // figure carries no pump gain, so no calibration generation.
+        consumptionVersion: tripConsumptionVersion(),
       ),
       samples: est.samples,
     );

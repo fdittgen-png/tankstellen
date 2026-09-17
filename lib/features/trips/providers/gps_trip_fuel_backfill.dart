@@ -5,6 +5,7 @@ import '../../../core/domain/gps_calibration_matrix.dart';
 import '../domain/gps_driving_features.dart';
 import '../domain/services/gps_fuel_estimator.dart';
 import '../domain/services/gps_live_estimate_folder.dart';
+import '../domain/trip_consumption_provenance.dart';
 import '../domain/trip_recorder.dart';
 
 /// Stop-time fuel backfill for trips without OBD2 fuel-rate coverage —
@@ -39,9 +40,15 @@ TripSummary backfillGpsTripFuel(
     }
   }
   if (s.avgLPer100Km == null) {
+    final avg = liveFolder?.finalAvgLPer100Km;
+    final litres = liveFolder?.finalFuelLiters;
     s = s.copyWith(
-      estimatedAvgLPer100Km: liveFolder?.finalAvgLPer100Km,
-      estimatedFuelLitersConsumed: liveFolder?.finalFuelLiters,
+      estimatedAvgLPer100Km: avg,
+      estimatedFuelLitersConsumed: litres,
+      // #4233 — only the live-folder figure went through the fuzzy stage;
+      // the batch estimator above stays unversioned until #4234 (F5).
+      consumptionVersion:
+          avg == null && litres == null ? null : tripConsumptionVersion(),
     );
   }
   return s;
