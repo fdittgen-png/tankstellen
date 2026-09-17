@@ -7235,6 +7235,11 @@ class AppLocalizationsLt extends AppLocalizations {
       'Ryšio detalės pagal PID šiai kelionei nebuvo užfiksuotos. Kad jas surinktum, prieš įrašymą įjunk kūrėjo režimą.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nepavyko pasiekti \"$adapterName\" — pasirinkite kitą adapterį';
   }

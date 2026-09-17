@@ -7250,6 +7250,11 @@ class AppLocalizationsEl extends AppLocalizations {
       'Οι λεπτομέρειες επικοινωνίας ανά PID δεν καταγράφηκαν για αυτή τη διαδρομή. Ενεργοποιήστε τη λειτουργία προγραμματιστή πριν την εγγραφή για να συλλεχθούν.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Δεν ήταν δυνατή η επαφή με \'$adapterName\' — επιλέξτε άλλον προσαρμογέα';
   }

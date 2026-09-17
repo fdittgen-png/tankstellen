@@ -7252,6 +7252,11 @@ class AppLocalizationsBg extends AppLocalizations {
       'Подробностите за комуникацията по PID не бяха записани за това пътуване. Включете режима за разработчици преди запис, за да ги съберете.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Не може да се достигне до \'$adapterName\' — изберете друг адаптер';
   }

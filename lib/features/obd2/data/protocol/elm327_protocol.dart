@@ -28,6 +28,7 @@ import 'elm327_commands.dart';
 import 'elm327_parsers.dart';
 import 'elm327_mode22_parsers.dart';
 import 'elm327_vin_parser.dart';
+import 'frame_decode.dart';
 
 export 'elm327_commands.dart';
 export 'elm327_parsers.dart';
@@ -119,10 +120,18 @@ class Elm327Protocol {
   static double? parseBatteryVoltage(String raw) =>
       Elm327Parsers.parseBatteryVoltage(raw);
 
+  /// #4325 — [parseBatteryVoltage] with an out-of-bounds reply named.
+  static FrameDecode<double> decodeBatteryVoltage(String raw) =>
+      Elm327Parsers.decodeBatteryVoltage(raw);
+
   static int? parseDistanceSinceDtcCleared(String raw) =>
       Elm327Parsers.parseDistanceSinceDtcCleared(raw);
 
   static double? parseOdometer(String raw) => Elm327Parsers.parseOdometer(raw);
+
+  /// #4325 — [parseOdometer] with an out-of-bounds frame named.
+  static FrameDecode<double> decodeOdometer(String raw) =>
+      Elm327Parsers.decodeOdometer(raw);
 
   static double? parseEngineLoad(String raw) =>
       Elm327Parsers.parseEngineLoad(raw);
@@ -221,6 +230,31 @@ class Elm327Protocol {
         expectedPidHi: expectedPidHi,
         expectedPidLo: expectedPidLo,
       );
+
+  /// #4325 — the three manufacturer odometer decodes, implausible named.
+  static FrameDecode<double> decodeMfgOdometer3Byte(
+    String raw, {
+    required int expectedPidHi,
+    required int expectedPidLo,
+  }) =>
+      Elm327Mode22Parsers.decodeMfgOdometer3Byte(raw,
+          expectedPidHi: expectedPidHi, expectedPidLo: expectedPidLo);
+
+  static FrameDecode<double> decodeMfgOdometer2Byte(
+    String raw, {
+    required int expectedPidHi,
+    required int expectedPidLo,
+  }) =>
+      Elm327Mode22Parsers.decodeMfgOdometer2Byte(raw,
+          expectedPidHi: expectedPidHi, expectedPidLo: expectedPidLo);
+
+  static FrameDecode<double> decodeMfgOdometerMilesTimes10(
+    String raw, {
+    required int expectedPidHi,
+    required int expectedPidLo,
+  }) =>
+      Elm327Mode22Parsers.decodeMfgOdometerMilesTimes10(raw,
+          expectedPidHi: expectedPidHi, expectedPidLo: expectedPidLo);
 
   static String? parseVin(String raw) => Elm327Parsers.parseVin(raw);
   // Routed straight to the VIN parser (not via Elm327Parsers) to keep the

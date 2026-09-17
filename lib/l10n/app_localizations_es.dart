@@ -7245,6 +7245,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'El desglose de comunicación por PID no se capturó en este trayecto. Activa el modo desarrollador antes de grabar para recogerlo.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'No se pudo contactar con «$adapterName»: elige otro adaptador';
   }

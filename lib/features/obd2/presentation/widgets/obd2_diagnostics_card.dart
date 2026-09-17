@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../data/obd2_diagnostics_summary.dart';
 import '../../data/obd2_session_diagnostic.dart';
 import '../../data/obd2_trip_evidence.dart';
+import '../../data/protocol/frame_decode.dart';
 import 'obd2_init_transcript_section.dart';
 import 'obd2_trip_evidence_card.dart';
 import 'obd2_reconnect_section.dart';
@@ -230,9 +231,23 @@ class Obd2DiagnosticsCard extends StatelessWidget {
             _pidRowText(l, row),
             key: Key('obd2_diag_pid_${row.pid}'),
           ),
+        // #4325 — frames that arrived but broke a plausibility bound are a
+        // distinct outcome from NO DATA; shown only once one was seen.
+        if (session.implausibleFrames.isNotEmpty)
+          _line(
+            theme,
+            l.obd2DiagnosticsImplausibleFramesLine(
+              _implausible(ImplausibleFrameKind.batteryVoltage),
+              _implausible(ImplausibleFrameKind.odometer),
+            ),
+            key: const Key('obd2_diag_implausible_line'),
+          ),
       ],
     );
   }
+
+  int _implausible(ImplausibleFrameKind kind) =>
+      session.implausibleFrames[kind.name] ?? 0;
 
   String _pidRowText(AppLocalizations l, Obd2PidRowView row) {
     final s = row.stat;

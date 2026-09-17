@@ -3,7 +3,9 @@
 
 import 'package:flutter/foundation.dart';
 
+import '../obd2_comm_diagnostics.dart';
 import '../protocol/elm327_protocol.dart';
+import '../protocol/frame_decode.dart';
 
 /// The odometer fallback chain (#719, refactored in #950 phase 2),
 /// extracted from [Obd2Service] in #3540. Holds no state — the service
@@ -38,7 +40,19 @@ class Obd2OdometerReader {
   /// to null without sending anything.
   final bool Function() isConnected;
 
-  const Obd2OdometerReader({required this.send, required this.isConnected});
+  /// Where a frame that arrived but decoded to an implausible odometer
+  /// goes (#4325) — the comm diagnostics collector unless a test injects
+  /// its own. The read still treats that frame as a miss and walks on.
+  final void Function(ImplausibleFrameKind kind)? onImplausibleFrame;
+
+  const Obd2OdometerReader({
+    required this.send,
+    required this.isConnected,
+    this.onImplausibleFrame,
+  });
+
+  void _report(ImplausibleFrameKind kind) => (onImplausibleFrame ??
+      Obd2CommDiagnostics.instance.noteImplausibleFrame)(kind);
 
   Future<double?> read({String? odometerPidStrategy}) async {
     if (!isConnected()) return null;
@@ -46,7 +60,7 @@ class Obd2OdometerReader {
     try {
       // 1. Direct odometer (standard PID A6)
       final a6 = await send(Elm327Protocol.odometerCommand);
-      final odometer = Elm327Protocol.parseOdometer(a6);
+      final odometer = Elm327Protocol.decodeOdometer(a6).valueReporting(_report);
       if (odometer != null) return odometer;
 
       // 2. Distance since DTC cleared (standard PID 31)
@@ -106,24 +120,25 @@ class Obd2OdometerReader {
     for (final entry in Elm327Protocol.mfgOdometerCatalog) {
       if (entry.brand != brand) continue;
       final response = await send(entry.command);
-      final value = switch (entry.kind) {
-        MfgOdometerKind.threeBytesKm => Elm327Protocol.parseMfgOdometer3Byte(
+      final decoded = switch (entry.kind) {
+        MfgOdometerKind.threeBytesKm => Elm327Protocol.decodeMfgOdometer3Byte(
             response,
             expectedPidHi: entry.pidHi,
             expectedPidLo: entry.pidLo,
           ),
-        MfgOdometerKind.twoBytesKm => Elm327Protocol.parseMfgOdometer2Byte(
+        MfgOdometerKind.twoBytesKm => Elm327Protocol.decodeMfgOdometer2Byte(
             response,
             expectedPidHi: entry.pidHi,
             expectedPidLo: entry.pidLo,
           ),
         MfgOdometerKind.twoBytesMilesTimes10 =>
-          Elm327Protocol.parseMfgOdometerMilesTimes10(
+          Elm327Protocol.decodeMfgOdometerMilesTimes10(
             response,
             expectedPidHi: entry.pidHi,
             expectedPidLo: entry.pidLo,
           ),
       };
+      final value = decoded.valueReporting(_report);
       if (value != null) return value;
     }
     return null;

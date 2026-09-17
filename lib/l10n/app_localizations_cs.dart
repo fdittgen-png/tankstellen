@@ -7210,6 +7210,11 @@ class AppLocalizationsCs extends AppLocalizations {
       'Podrobnosti komunikace podle PID nebyly u této jízdy zachyceny. Chcete-li je sbírat, zapněte před nahráváním vývojářský režim.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nelze se připojit k \'$adapterName\' — vyberte jiný adaptér';
   }

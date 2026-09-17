@@ -11979,6 +11979,12 @@ abstract class AppLocalizations {
   /// **'The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.'**
   String get obd2DiagnosticsTripNoPidDetail;
 
+  /// Row under the per-PID outcomes on the OBD2 diagnostics card (#4325): frames that arrived but decoded outside their plausible bounds — an ATRV battery voltage outside 5–20 V, an odometer of 0 km or above 2,000,000 km. Counted apart from no-data replies because a rejected-but-present frame points at an adapter or ECU fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Implausible frames: {voltage} battery voltage · {odometer} odometer'**
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer);
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

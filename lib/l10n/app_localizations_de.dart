@@ -7237,6 +7237,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Die detaillierte PID-Kommunikationsaufschlüsselung wurde für diese Fahrt nicht erfasst. Aktivieren Sie vor der Aufzeichnung den Entwicklermodus, um sie zu erheben.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Unplausible Frames: $voltage Batteriespannung · $odometer Kilometerstand';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }

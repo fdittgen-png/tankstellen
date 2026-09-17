@@ -7223,6 +7223,11 @@ class AppLocalizationsHr extends AppLocalizations {
       'Detalji komunikacije po PID-u za ovu vožnju nisu zabilježeni. Za njihovo prikupljanje uključite razvojni način prije snimanja.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nije moguće dosegnuti \'$adapterName\' — odaberite drugi adapter';
   }

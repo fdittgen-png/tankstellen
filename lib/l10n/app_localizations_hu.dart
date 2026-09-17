@@ -7234,6 +7234,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'A PID-enkénti kommunikációs részleteket nem rögzítettük ehhez az úthoz. A gyűjtéshez kapcsold be a fejlesztői módot a rögzítés előtt.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nem sikerült elérni a(z) \'$adapterName\'-t — válasszon másik adaptert';
   }

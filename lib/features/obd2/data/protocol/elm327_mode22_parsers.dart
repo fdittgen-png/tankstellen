@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'elm327_decode_util.dart';
+import 'frame_decode.dart';
 
 /// Mode 22 manufacturer-specific odometer parsers (#719), extracted from
 /// [Elm327Parsers] (#3279) so the OBD-mode decoders live in focused files.
@@ -22,12 +23,23 @@ class Elm327Mode22Parsers {
     String raw, {
     required int expectedPidHi,
     required int expectedPidLo,
+  }) =>
+      decodeMfgOdometer3Byte(raw,
+              expectedPidHi: expectedPidHi, expectedPidLo: expectedPidLo)
+          .value;
+
+  /// [parseMfgOdometer3Byte] as a decode outcome (#4325): an implausible
+  /// value is a named implausible frame, not an absent one.
+  static FrameDecode<double> decodeMfgOdometer3Byte(
+    String raw, {
+    required int expectedPidHi,
+    required int expectedPidLo,
   }) {
     final bytes = _parseMode22Body(raw, expectedPidHi, expectedPidLo,
         minBytes: 6);
-    if (bytes == null) return null;
+    if (bytes == null) return const FrameDecode.absent();
     final km = ((bytes[3] << 16) | (bytes[4] << 8) | bytes[5]).toDouble();
-    return isPlausibleOdometerKm(km) ? km : null; // #3275
+    return odometerFrameDecode(km); // #3275
   }
 
   /// Parse a 2-byte (big-endian, km) manufacturer odometer — used by
@@ -37,12 +49,22 @@ class Elm327Mode22Parsers {
     String raw, {
     required int expectedPidHi,
     required int expectedPidLo,
+  }) =>
+      decodeMfgOdometer2Byte(raw,
+              expectedPidHi: expectedPidHi, expectedPidLo: expectedPidLo)
+          .value;
+
+  /// [parseMfgOdometer2Byte] as a decode outcome (#4325).
+  static FrameDecode<double> decodeMfgOdometer2Byte(
+    String raw, {
+    required int expectedPidHi,
+    required int expectedPidLo,
   }) {
     final bytes = _parseMode22Body(raw, expectedPidHi, expectedPidLo,
         minBytes: 5);
-    if (bytes == null) return null;
+    if (bytes == null) return const FrameDecode.absent();
     final km = ((bytes[3] << 8) | bytes[4]).toDouble();
-    return isPlausibleOdometerKm(km) ? km : null; // #3275
+    return odometerFrameDecode(km); // #3275
   }
 
   /// Parse a Ford-style 2-byte miles-times-10 odometer (22 40 4D).
@@ -52,13 +74,22 @@ class Elm327Mode22Parsers {
     String raw, {
     required int expectedPidHi,
     required int expectedPidLo,
+  }) =>
+      decodeMfgOdometerMilesTimes10(raw,
+              expectedPidHi: expectedPidHi, expectedPidLo: expectedPidLo)
+          .value;
+
+  /// [parseMfgOdometerMilesTimes10] as a decode outcome (#4325).
+  static FrameDecode<double> decodeMfgOdometerMilesTimes10(
+    String raw, {
+    required int expectedPidHi,
+    required int expectedPidLo,
   }) {
     final bytes = _parseMode22Body(raw, expectedPidHi, expectedPidLo,
         minBytes: 5);
-    if (bytes == null) return null;
+    if (bytes == null) return const FrameDecode.absent();
     final milesTimes10 = (bytes[3] << 8) | bytes[4];
-    final km = (milesTimes10 / 10.0) * 1.609344;
-    return isPlausibleOdometerKm(km) ? km : null; // #3275
+    return odometerFrameDecode((milesTimes10 / 10.0) * 1.609344); // #3275
   }
 
   static List<int>? _parseMode22Body(

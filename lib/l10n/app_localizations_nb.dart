@@ -7200,6 +7200,11 @@ class AppLocalizationsNb extends AppLocalizations {
       'Kommunikasjonsdetaljene per PID ble ikke fanget for denne turen. Slå på utviklermodus før opptak for å samle dem inn.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Kunne ikke nå \'$adapterName\' – velg en annen adapter';
   }

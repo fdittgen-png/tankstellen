@@ -7245,6 +7245,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'O detalhe de comunicação por PID não foi captado nesta viagem. Ative o modo de programador antes de gravar para o recolher.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Não foi possível alcançar \'$adapterName\' — escolha outro adaptador';
   }

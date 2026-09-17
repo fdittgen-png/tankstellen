@@ -79,15 +79,15 @@ mixin _Obd2ServiceReads on _Obd2ServiceLink {
   /// measurement (`ATRV`). An AT command: answered by the ELM chip
   /// without any vehicle-bus traffic, so it is safe to poll while the
   /// ECU is silent, mid protocol-search, and through the UNABLE-TO-
-  /// CONNECT livelock — every case where PIDs say nothing. The parsed
-  /// value feeds the vehicle power model through the session hook; this
-  /// returns it for the caller's own bookkeeping (the recording loop's
-  /// slow-cadence `bv` stamp). Null when not connected or unparsable.
+  /// CONNECT livelock. The value feeds the power model through the session
+  /// hook and returns for the recording loop's `bv` stamp. Null when not
+  /// connected, unparsable, or out of bounds — #4325 counts the last.
   Future<double?> readBatteryVoltageV() async {
     if (!_transport.isConnected) return null;
     try {
       final response = await _rawSend(Elm327Commands.readVoltageCommand);
-      final volts = Elm327Protocol.parseBatteryVoltage(response);
+      final volts = Elm327Protocol.decodeBatteryVoltage(response)
+          .valueReporting(Obd2CommDiagnostics.instance.noteImplausibleFrame);
       // The session hook already stamped the model when a session is
       // attached; a pre-session read (connect-time) stamps here.
       if (volts != null && _session.lastVoltageV != volts) {

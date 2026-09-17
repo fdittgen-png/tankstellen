@@ -7212,6 +7212,11 @@ class AppLocalizationsSl extends AppLocalizations {
       'Podrobnosti komunikacije po PID za to vožnjo niso bile zajete. Če jih želite zbrati, pred snemanjem vklopite razvijalski način.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ni bilo mogoče doseči \'$adapterName\' — izberite drug adapter';
   }

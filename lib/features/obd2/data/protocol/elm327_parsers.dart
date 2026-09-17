@@ -3,6 +3,7 @@
 
 import 'elm327_decode_util.dart';
 import 'elm327_vin_parser.dart';
+import 'frame_decode.dart';
 
 /// ELM327 response parsers — pure string→value decoders for Mode 01,
 /// Mode 09 and Mode 22 responses.
@@ -96,14 +97,23 @@ class Elm327Parsers {
   /// `?` / NO DATA / anything without a number followed by `V`, and
   /// rejects readings outside 5–20 V — the adapter's own supply can't be
   /// lower and no 12 V system reads higher; anything else is garbage.
-  static double? parseBatteryVoltage(String raw) {
+  static double? parseBatteryVoltage(String raw) =>
+      decodeBatteryVoltage(raw).value;
+
+  /// [parseBatteryVoltage] as a decode outcome (#4325): a reading outside
+  /// 5–20 V (both inclusive) is an implausible frame, not an absent one.
+  static FrameDecode<double> decodeBatteryVoltage(String raw) {
     final s = raw.replaceAll('>', ' ').toUpperCase();
-    if (s.contains('?') || s.contains('NO DATA')) return null;
+    if (s.contains('?') || s.contains('NO DATA')) {
+      return const FrameDecode.absent();
+    }
     final match = RegExp(r'(\d+(?:\.\d+)?)\s*V\b').firstMatch(s);
-    if (match == null) return null;
-    final volts = double.tryParse(match.group(1)!);
-    if (volts == null || volts < 5.0 || volts > 20.0) return null;
-    return volts;
+    final volts = match == null ? null : double.tryParse(match.group(1)!);
+    if (volts == null) return const FrameDecode.absent();
+    if (volts < 5.0 || volts > 20.0) {
+      return const FrameDecode.implausible(ImplausibleFrameKind.batteryVoltage);
+    }
+    return FrameDecode.value(volts);
   }
 
   /// Parse distance since DTC cleared from Mode 01 PID 31 response.
@@ -120,16 +130,15 @@ class Elm327Parsers {
 
   /// Parse odometer from Mode 01 PID A6 response.
   /// Response format: "41 A6 XX YY ZZ WW" where odometer = value / 10 km.
-  static double? parseOdometer(String raw) {
-    final clean = cleanResponse(raw);
-    if (clean == null) return null;
+  static double? parseOdometer(String raw) => decodeOdometer(raw).value;
 
-    final bytes = parseElmHexBytes(clean);
-    if (bytes.length < 6 || bytes[0] != 0x41 || bytes[1] != 0xA6) return null;
-
+  /// [parseOdometer] as a decode outcome (#4325): a 0 km or > 2,000,000 km
+  /// frame is an implausible frame, not an absent one.
+  static FrameDecode<double> decodeOdometer(String raw) {
+    final bytes = parseModeOneBody(raw, 0xA6, minBytes: 6);
+    if (bytes == null) return const FrameDecode.absent();
     final value = (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
-    final km = value / 10.0; // Odometer in km (1/10 km resolution)
-    return isPlausibleOdometerKm(km) ? km : null;
+    return odometerFrameDecode(value / 10.0); // 1/10 km resolution
   }
 
   /// Parse calculated engine load from Mode 01 PID 04 response (#717).

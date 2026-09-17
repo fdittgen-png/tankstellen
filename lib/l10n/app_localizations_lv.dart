@@ -7238,6 +7238,11 @@ class AppLocalizationsLv extends AppLocalizations {
       'Sakaru detaļas pa PID šim braucienam netika reģistrētas. Lai tās apkopotu, pirms ieraksta ieslēdz izstrādātāja režīmu.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nevarēja sasniegt \'$adapterName\' — izvēlieties citu adapteru';
   }

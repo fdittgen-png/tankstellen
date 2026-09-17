@@ -7191,6 +7191,11 @@ class AppLocalizationsSv extends AppLocalizations {
       'Kommunikationsdetaljerna per PID fångades inte för den här resan. Slå på utvecklarläget före inspelning för att samla in dem.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Kunde inte nå \'$adapterName\' – välj en annan adapter';
   }

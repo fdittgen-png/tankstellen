@@ -7193,6 +7193,11 @@ class AppLocalizationsEt extends AppLocalizations {
       'PID-põhist sidedetaili selle sõidu kohta ei salvestatud. Selle kogumiseks lülita enne salvestamist sisse arendajarežiim.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ei suutnud jõuda \'$adapterName\' — vali teine adapter';
   }

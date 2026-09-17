@@ -7167,6 +7167,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Couldn\'t reach \'$adapterName\' — pick another adapter';
   }
@@ -17526,6 +17531,11 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2DiagnosticsTripNoPidDetail =>
       '⟦Ŧĥé ƥéř-ƤÎĐ çóɱɱúñîçáŧîóñ ƀřéáķđóŵñ ŵáš ñóŧ çáƥŧúřéđ ƒóř ŧĥîš ŧřîƥ. Ŧúřñ óñ đéṽéłóƥéř ɱóđé ƀéƒóřé řéçóřđîñǧ ŧó çółłéçŧ îŧ. ·············································⟧';
+
+  @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return '⟦Îɱƥłáúšîƀłé ƒřáɱéš: $voltage ƀáŧŧéřý ṽółŧáǧé · $odometer óđóɱéŧéř ··················⟧';
+  }
 
   @override
   String obd2PickerPinnedFallback(String adapterName) {

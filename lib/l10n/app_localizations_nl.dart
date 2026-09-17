@@ -7215,6 +7215,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'De communicatiedetails per PID zijn voor deze rit niet vastgelegd. Zet de ontwikkelaarsmodus aan vóór het opnemen om ze te verzamelen.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Kon \'$adapterName\' niet bereiken — kies een andere adapter';
   }
