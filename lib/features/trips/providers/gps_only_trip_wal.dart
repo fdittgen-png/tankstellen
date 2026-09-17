@@ -145,7 +145,9 @@ class GpsOnlyTripWal {
       vin: null,
       automatic: _automatic,
       phase: 'recording',
-      summary: summary,
+      // #4313 — the row knows its trip is dongle-less, so a recovery saves
+      // it as one (a recorder summary carries the gpsPlusObd2 default).
+      summary: summary.copyWith(kind: TripKind.gpsOnly),
       samples: samples,
       odometerStartKm: null,
       odometerLatestKm: null,

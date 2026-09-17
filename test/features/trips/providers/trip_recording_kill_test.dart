@@ -12,9 +12,11 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
 import '../../../helpers/silence_error_logger.dart';
+import '../support/gated_trip_history_repository.dart';
 import '../support/phase_trace.dart';
 import '../support/recording_disk_image.dart';
 import '../support/recording_session_driver.dart';
@@ -149,6 +151,36 @@ void main() {
     await windDown(old);
 
     await relaunchAndEnd(image, expectedSamples: 5);
+  });
+
+  test('#4313 — a GPS-only trip killed while its stop waits on the history '
+      'write is recovered, and ends as a GPS-only trip', () async {
+    final gated = GatedTripHistoryRepository(box: disk.historyBox);
+    final old = ProviderContainer(overrides: [
+      ...driver.overrides,
+      tripHistoryRepositoryProvider.overrideWithValue(gated),
+    ]);
+    final notifier = await RecordingSessionDriver.startGpsOnly(old);
+    for (var i = 0; i < 5; i++) {
+      driver.emitFix(index: i);
+    }
+    await RecordingDisk.settle();
+    final stopping = notifier.stop();
+    await gated.reached;
+
+    final image = await disk.capture();
+    expect(image.active, isNotEmpty,
+        reason: 'the trip is not in history yet, so its WAL row must be');
+    gated.release();
+    await stopping;
+    await RecordingDisk.settle();
+    old.dispose();
+
+    final next = await relaunchAndEnd(image, expectedSamples: 5);
+    expect(disk.historyRepo.loadAll().single.summary.kind, TripKind.gpsOnly,
+        reason: 'a dongle-less trip stays dongle-less through a recovery');
+    expect(next.read(tripRecordingProvider).phase,
+        TripRecordingPhase.finished);
   });
 
   test('a kill while still connecting leaves nothing to recover', () async {
