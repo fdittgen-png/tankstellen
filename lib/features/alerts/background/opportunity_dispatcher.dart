@@ -55,6 +55,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/app_log.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/notifications/notification_delivery.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../data/budget_state_store.dart';
 import '../data/opportunity_feed_store.dart';
@@ -88,15 +89,19 @@ class OpportunityCandidate {
 @immutable
 class DispatchOutcome {
   const DispatchOutcome({
-    required this.notified,
+    this.delivery,
     required this.recorded,
     required this.demotions,
     this.notifiedOpportunity,
   });
 
-  /// Whether a notification actually went out. False when the budget
-  /// refused everything AND when the winner could not be rendered.
-  final bool notified;
+  /// What became of the winner's notification (#4162) — null when nothing
+  /// was attempted: the budget refused everything, or the winner could not
+  /// be rendered.
+  final NotificationDelivery? delivery;
+
+  /// Whether a notification actually went out.
+  bool get notified => delivery?.wasPosted ?? false;
 
   /// The one that was sent, when one was. Callers need it to record
   /// what they told the user about — `PriceAlert.lastTriggeredAt` is
@@ -163,8 +168,7 @@ class OpportunityDispatcher {
     }
 
     if (candidates.isEmpty) {
-      return const DispatchOutcome(
-          notified: false, recorded: 0, demotions: []);
+      return const DispatchOutcome(recorded: 0, demotions: []);
     }
 
     final prebuilt = <Opportunity, NotificationCopy>{
@@ -187,7 +191,7 @@ class OpportunityDispatcher {
       watched: watched.contains,
     );
 
-    var notified = false;
+    NotificationDelivery? delivery;
     if (outcome.notify case final winner?) {
       final copy = prebuilt[winner] ??
           OpportunityNotificationCopy.render(
@@ -220,8 +224,8 @@ class OpportunityDispatcher {
           key: BudgetState.keyFor(winner),
           at: now,
         ));
-        notified = await _notify(winner, copy, notifier);
-        if (notified) {
+        delivery = await _notify(winner, copy, notifier);
+        if (delivery.wasPosted) {
           await budgetState.write(reserved, now); // commit
           // #4185 — the dedup / cooldown write, now that a notification
           // really went out. Never for a refused candidate: that is the
@@ -243,10 +247,11 @@ class OpportunityDispatcher {
 
     await feed.recordScan(outcome, now);
 
+    final posted = delivery?.wasPosted ?? false;
     return DispatchOutcome(
-      notified: notified,
-      notifiedOpportunity: notified ? outcome.notify : null,
-      recorded: outcome.demoted.length + (notified ? 1 : 0),
+      delivery: delivery,
+      notifiedOpportunity: posted ? outcome.notify : null,
+      recorded: outcome.demoted.length + (posted ? 1 : 0),
       demotions: outcome.demoted,
     );
   }
@@ -257,11 +262,12 @@ class OpportunityDispatcher {
   static int notificationIdFor(Opportunity o) =>
       (o.stationId ?? o.kind.name).hashCode;
 
-  /// Show one notification. Returns whether it went out.
+  /// Show one notification and say what became of it — the one producer of
+  /// [NotificationDelivery] for price alerts (#4162).
   ///
   /// Never throws: a notification channel that rejects a post must not
   /// take the scan down with it, and the finding is recorded either way.
-  Future<bool> _notify(
+  Future<NotificationDelivery> _notify(
     Opportunity o,
     NotificationCopy copy,
     NotificationService notifier,
@@ -272,13 +278,13 @@ class OpportunityDispatcher {
         title: copy.title,
         body: copy.body,
       );
-      return true;
+      return NotificationDelivery.posted;
     } on Object catch (e, st) {
       log.error(e, st, layer: ErrorLayer.background, context: {
         'where': 'OpportunityDispatcher._notify',
         'kind': o.kind.name,
       });
-      return false;
+      return NotificationDelivery.failed;
     }
   }
 }

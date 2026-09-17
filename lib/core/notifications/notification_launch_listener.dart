@@ -11,6 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../app/router.dart';
 import 'local_notification_service.dart';
 import 'notification_launch_ledger.dart';
+import 'notification_plugin_phase.dart';
 import 'notification_payload.dart';
 import 'notification_tap_dispatcher.dart';
 import '../../core/logging/error_logger.dart';
@@ -135,24 +136,28 @@ class _NotificationLaunchListenerState
     }
   }
 
-  /// A launch-details payload is claimed only when it is actually routed,
-  /// so an unmounted listener leaves it for its remounted successor.
-  void _routeProbed(String? payload) {
-    if (!mounted) return;
-    if (!NotificationLaunchLedger.claimLaunchPayload(payload)) return;
-    _dispatch(payload);
-  }
+  void _routeProbed(String? payload) => _route(TapSource.probe, payload);
 
-  void _onTap(String? payload) {
-    // Before the plugin is ready a stream tap is the channel buffer
-    // draining — on Android the same tap the launch probe may already have
-    // routed through `setIntent`. Only a tap after that is a fresh gesture.
-    if (!NotificationLaunchLedger.isPluginReady) {
-      _routeProbed(payload);
-      return;
+  // Before the plugin is ready a stream tap is the channel buffer draining —
+  // on Android the same tap the launch probe may already have routed
+  // through `setIntent`. Only a tap after that is a fresh gesture. The rule
+  // is [kLaunchTapRouting]'s (#4162).
+  void _onTap(String? payload) => _route(TapSource.stream, payload);
+
+  void _route(TapSource source, String? payload) {
+    switch (NotificationLaunchLedger.routeFor(source, payload)) {
+      case TapRoute.drop:
+        return;
+      case TapRoute.routeAndClaim:
+        // Claimed only when actually routed, so an unmounted listener
+        // leaves it for its remounted successor.
+        if (!mounted) return;
+        NotificationLaunchLedger.claimLaunchPayload(payload);
+        _dispatch(payload);
+      case TapRoute.routeAndRecord:
+        NotificationLaunchLedger.recordDelivered(payload);
+        _dispatch(payload);
     }
-    NotificationLaunchLedger.recordDelivered(payload);
-    _dispatch(payload);
   }
 
   void _dispatch(String? payload) {

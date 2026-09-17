@@ -42,14 +42,19 @@ class LocalNotificationService implements NotificationService {
       'Reminders when your odometer crosses a scheduled service interval';
 
   /// #4317 — runs after the first frame now. [NotificationLaunchLedger]
-  /// is told when it has finished — succeeded or not — so the launch
-  /// listener can collect a tap that arrived while it was pending.
+  /// is told when it has finished — succeeded or not (#4162: which one is
+  /// its plugin phase) — so the launch listener can collect a tap that
+  /// arrived while it was pending.
   @override
   Future<void> initialize() async {
+    var succeeded = false;
     try {
       await _initialize();
+      succeeded = true;
     } finally {
-      NotificationLaunchLedger.markPluginReady();
+      succeeded
+          ? NotificationLaunchLedger.markPluginReady()
+          : NotificationLaunchLedger.markPluginInitFailed();
     }
   }
 

@@ -104,6 +104,61 @@ class DeliveryTrace implements NotificationService {
   Future<void> cancelAll() async {}
 }
 
+/// A delivery reported as `posted` that the user never saw (#4162).
+enum DeliveryMisreport {
+  /// N2 (#4335) — notifications turned off for the app.
+  revokedPermissionCountedPosted,
+
+  /// N2 (#4335) — the price-alert channel disabled.
+  disabledChannelCountedPosted,
+}
+
+/// Misreports that reproduce today, each a filed issue.
+const Set<DeliveryMisreport> kKnownMisreportedDeliveries = {
+  DeliveryMisreport.revokedPermissionCountedPosted, // #4335 N2
+  DeliveryMisreport.disabledChannelCountedPosted, // #4335 N2
+};
+
+/// The size [kKnownMisreportedDeliveries] may never exceed.
+const int kKnownMisreportedDeliveriesCeiling = 2;
+
+/// Something the radius notification lost on its way through the budget.
+enum EnvelopeDefect {
+  /// N1 (#4334) — the payload that deep-links the tap was dropped.
+  radiusPayloadDropped,
+
+  /// N3 (#4334) — the id is per station, not per alert.
+  radiusIdPerStation,
+}
+
+/// Envelope defects that reproduce today, each a filed issue.
+const Set<EnvelopeDefect> kKnownEnvelopeDefects = {
+  EnvelopeDefect.radiusPayloadDropped, // #4334 N1
+  EnvelopeDefect.radiusIdPerStation, // #4334 N3
+};
+
+/// The size [kKnownEnvelopeDefects] may never exceed.
+const int kKnownEnvelopeDefectsCeiling = 2;
+
+/// Fails when [observed] holds a misreport that is not a known one.
+void expectOnlyKnownMisreports(Iterable<DeliveryMisreport> observed) {
+  expect(kKnownMisreportedDeliveries.length,
+      lessThanOrEqualTo(kKnownMisreportedDeliveriesCeiling));
+  final unexplained =
+      observed.toSet().difference(kKnownMisreportedDeliveries);
+  expect(unexplained, isEmpty,
+      reason: 'delivery misreports that are not a filed, known defect');
+}
+
+/// Fails when [observed] holds an envelope defect that is not a known one.
+void expectOnlyKnownEnvelopeDefects(Iterable<EnvelopeDefect> observed) {
+  expect(kKnownEnvelopeDefects.length,
+      lessThanOrEqualTo(kKnownEnvelopeDefectsCeiling));
+  final unexplained = observed.toSet().difference(kKnownEnvelopeDefects);
+  expect(unexplained, isEmpty,
+      reason: 'envelope defects that are not a filed, known defect');
+}
+
 /// Fails when [observed] holds a defect that is not a known one.
 void expectOnlyKnownDeliveryDefects(Iterable<DeliveryDefect> observed) {
   final unexplained = observed.toSet().difference(kKnownDeliveryDefects);
