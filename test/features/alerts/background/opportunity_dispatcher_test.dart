@@ -447,6 +447,39 @@ void main() {
     });
   });
 
+  group('the notification envelope (#4334)', () {
+    test("a detector's envelope — its id and deep-link payload — is posted "
+        'as built', () async {
+      final spy = _RecordingNotifier();
+      await dispatcher.dispatch(
+        candidates: [
+          OpportunityCandidate(
+            opportunity(kind: OpportunityKind.exceptionalLocalPrice),
+            envelope: (id: 4242, payload: '{"kind":"radius"}'),
+          ),
+        ],
+        now: now,
+        notifier: spy,
+        templates: templates,
+      );
+      expect(spy.sent.single.id, 4242);
+      expect(spy.payloads.single, '{"kind":"radius"}');
+    });
+
+    test('without one, the per-station id scheme and no payload stay',
+        () async {
+      final spy = _RecordingNotifier();
+      await dispatcher.dispatch(
+        candidates: [OpportunityCandidate(opportunity())],
+        now: now,
+        notifier: spy,
+        templates: templates,
+      );
+      expect(spy.sent.single.id, 'de-a'.hashCode);
+      expect(spy.payloads.single, isNull);
+    });
+  });
+
   test("a detector's own copy is used verbatim", () async {
     // The radius case: one grouped notification over five stations,
     // which a single per-station Opportunity cannot reproduce. The
@@ -480,6 +513,7 @@ void main() {
 /// Records what was posted instead of touching a platform channel.
 class _RecordingNotifier implements NotificationService {
   final List<({int id, String title, String body})> sent = [];
+  final List<String?> payloads = [];
   bool throwOnSend = false;
   void Function()? onPost;
 
@@ -493,6 +527,7 @@ class _RecordingNotifier implements NotificationService {
     onPost?.call();
     if (throwOnSend) throw StateError('channel unavailable');
     sent.add((id: id, title: title, body: body));
+    payloads.add(payload);
   }
 
   @override

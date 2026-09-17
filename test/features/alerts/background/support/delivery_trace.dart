@@ -132,13 +132,10 @@ enum EnvelopeDefect {
 }
 
 /// Envelope defects that reproduce today, each a filed issue.
-const Set<EnvelopeDefect> kKnownEnvelopeDefects = {
-  EnvelopeDefect.radiusPayloadDropped, // #4334 N1
-  EnvelopeDefect.radiusIdPerStation, // #4334 N3
-};
+const Set<EnvelopeDefect> kKnownEnvelopeDefects = {};
 
 /// The size [kKnownEnvelopeDefects] may never exceed.
-const int kKnownEnvelopeDefectsCeiling = 2;
+const int kKnownEnvelopeDefectsCeiling = 0;
 
 /// Fails when [observed] holds a misreport that is not a known one.
 void expectOnlyKnownMisreports(Iterable<DeliveryMisreport> observed) {

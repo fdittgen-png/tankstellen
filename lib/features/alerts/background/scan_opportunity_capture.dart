@@ -61,6 +61,10 @@ class CapturedNotification {
   final String? payload;
 
   NotificationCopy get copy => (title: title, body: body);
+
+  /// #4334 — the id and payload the runner posted with, carried to the
+  /// dispatcher unchanged.
+  NotificationEnvelope get envelope => (id: id, payload: payload);
 }
 
 /// A [NotificationService] that records instead of posting.

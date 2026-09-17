@@ -248,8 +248,8 @@ void main() {
       return trace;
     }
 
-    test('the tap opens the cheapest station — or reproduces only N1',
-        () async {
+    test('N1 (#4334) — the tap opens the cheapest station: the payload the '
+        'radius runner built reaches the post', () async {
       provider.stations = [forecourt('de-b', 1.759), forecourt('de-a', 1.699)];
       final trace = await scan(kScanT0);
 
@@ -258,12 +258,15 @@ void main() {
         if (payload?.stationId != 'de-a') EnvelopeDefect.radiusPayloadDropped,
       };
       expectOnlyKnownEnvelopeDefects(defects);
-      expect(defects, contains(EnvelopeDefect.radiusPayloadDropped),
-          reason: 'N1 still reproduces — delete the known entry with the fix');
+      expect(payload?.kind, NotificationPayload.kindRadius);
+      expect(payload?.stationId, 'de-a', reason: 'the cheapest match');
+      expect(payload?.country, 'DE', reason: "the centre's country");
+      expect(payload?.toRouterPath(), isNotNull,
+          reason: 'the launch listener can route it');
     });
 
-    test('one notification id per alert across scans — or reproduces only '
-        'N3', () async {
+    test('N3 (#4334) — one notification id per alert across scans, even '
+        'when the cheapest station changes', () async {
       provider.stations = [forecourt('de-a', 1.699)];
       final first = await scan(kScanT0);
       provider.stations = [forecourt('de-c', 1.649)];
@@ -276,8 +279,31 @@ void main() {
           EnvelopeDefect.radiusIdPerStation,
       };
       expectOnlyKnownEnvelopeDefects(defects);
-      expect(defects, contains(EnvelopeDefect.radiusIdPerStation),
-          reason: 'N3 still reproduces — delete the known entry with the fix');
+      expect(second.posts.single.id, first.posts.single.id,
+          reason: 'the second replaces the first instead of stacking');
+    });
+
+    test('N3 — two alerts whose cheapest station is the same keep two ids',
+        () async {
+      await RadiusAlertStore().upsert(RadiusAlert(
+        id: 'work-e10',
+        fuelType: 'e10',
+        threshold: 1.799,
+        centerLat: 52.52,
+        centerLng: 13.40,
+        radiusKm: 3,
+        label: 'Work',
+        createdAt: DateTime.utc(2026, 9, 1),
+        frequencyPerDay: 4,
+      ));
+      provider.stations = [forecourt('de-a', 1.699)];
+      final candidates = await BackgroundScanRunners.detectRadiusAlerts(
+          now: kScanT0, resolver: resolver, templates: templates);
+
+      expect({for (final c in candidates) c.envelope?.id}, {
+        'radius:home-e10'.hashCode,
+        'radius:work-e10'.hashCode,
+      }, reason: 'neither overwrites the other on the shade');
     });
   });
 }

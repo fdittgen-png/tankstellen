@@ -66,17 +66,39 @@ import '../domain/opportunity_confidence.dart';
 import 'notification_templates.dart';
 import 'opportunity_notification_copy.dart';
 
+/// Where a notification goes and what it opens (#4334): the id that
+/// decides whether it replaces an earlier one on the shade, and the
+/// payload its tap deep-links through.
+typedef NotificationEnvelope = ({int id, String? payload});
+
 /// One candidate, plus the copy its detector already built when it has
 /// better copy than a single opportunity can produce. See the library
 /// doc for the radius case this exists for.
 @immutable
 class OpportunityCandidate {
-  const OpportunityCandidate(this.opportunity, {this.copy, this.onNotified});
+  const OpportunityCandidate(
+    this.opportunity, {
+    this.copy,
+    this.onNotified,
+    this.envelope,
+  });
 
   final Opportunity opportunity;
 
   /// Used verbatim when non-null. Null means "render me from the kind".
   final NotificationCopy? copy;
+
+  /// #4334 — the id and payload the detector built, posted as they are.
+  /// Null means the per-station id scheme and no deep link
+  /// ([OpportunityDispatcher.notificationIdFor]).
+  ///
+  /// The radius runner's notification is one per ALERT
+  /// (`'radius:<alertId>'`) and its tap opens the cheapest station. #4183
+  /// dropped both on the way through the budget: taps stopped opening the
+  /// station, the same alert with a new cheapest station stacked a second
+  /// notification, and two alerts sharing a cheapest station overwrote
+  /// each other.
+  final NotificationEnvelope? envelope;
 
   /// #4185 — run ONLY for the candidate whose notification actually went
   /// out, and only after it did. This is where a detector's dedup /
@@ -219,12 +241,14 @@ class OpportunityDispatcher {
         // says so. A process killed after the post can no longer leave the
         // budget unaware and re-notify on the next wake (B4).
         final reserved = state.recording(winner, now);
+        final envelope = byOpportunity[winner]?.envelope ??
+            (id: notificationIdFor(winner), payload: null);
         await budgetState.write(reserved, now, pending: (
-          id: notificationIdFor(winner),
+          id: envelope.id,
           key: BudgetState.keyFor(winner),
           at: now,
         ));
-        delivery = await _notify(winner, copy, notifier);
+        delivery = await _notify(winner, copy, envelope, notifier);
         if (delivery.wasPosted) {
           await budgetState.write(reserved, now); // commit
           // #4185 — the dedup / cooldown write, now that a notification
@@ -270,13 +294,15 @@ class OpportunityDispatcher {
   Future<NotificationDelivery> _notify(
     Opportunity o,
     NotificationCopy copy,
+    NotificationEnvelope envelope,
     NotificationService notifier,
   ) async {
     try {
       await notifier.showPriceAlert(
-        id: notificationIdFor(o),
+        id: envelope.id,
         title: copy.title,
         body: copy.body,
+        payload: envelope.payload,
       );
       return NotificationDelivery.posted;
     } on Object catch (e, st) {
