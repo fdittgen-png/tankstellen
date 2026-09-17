@@ -239,14 +239,11 @@ class HiveBoxes {
     // the legacy box files; elsewhere identical to Hive.initFlutter().
     await HiveDirectoryResolver.initHive();
     StartupTimer.instance.mark('hive_dir');
+    // #4118/#4341 — throws StorageKeyLostException, before any key is
+    // written or any box opened, when the files on disk need another key.
     final cipher = await HiveCipherLoader.loadGuarded();
     StartupTimer.instance.mark('hive_cipher');
     HiveDeferredUserBoxes.arm(cipher); // #4318 — the deferred opens' key
-
-    // #4118 — stop before the first open if this install has no key for
-    // the boxes already on disk; see the guard for why "before" is the
-    // whole point.
-    HiveCipherLoader.assertKeyMatchesExistingBoxes();
 
     // Phase 1 — migrate any pre-encryption plaintext boxes, ONCE ever.
     // #4110 — this ran on every cold start and cost a full open+close of

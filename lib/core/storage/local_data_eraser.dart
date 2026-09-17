@@ -13,6 +13,7 @@ import '../data/storage_repository.dart';
 import '../feedback/feedback_consent.dart';
 import '../feedback/github_issue_reporter_provider.dart';
 import 'hive_boxes.dart';
+import 'secure_storage_options.dart';
 
 /// #3867 (Epic #3865, GDPR Art. 17) — the ONE local erasure.
 ///
@@ -63,7 +64,8 @@ class LocalDataEraser {
     await step('apiKeys', storage.deleteAllApiKeys);
     await step('supabaseAnonKey', storage.deleteSupabaseAnonKey);
     await step('githubToken',
-        () => const FlutterSecureStorage().delete(key: kGithubFeedbackTokenKey));
+        () => const FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions)
+            .delete(key: kGithubFeedbackTokenKey));
     await step('feedbackConsent', () async {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(FeedbackConsent.storageKey);

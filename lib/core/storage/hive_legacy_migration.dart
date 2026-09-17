@@ -2,19 +2,23 @@
 // SPDX-License-Identifier: MIT
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../logging/app_log.dart';
 import '../logging/error_logger.dart';
+import 'hive_box_key_probe.dart';
+import 'impl/hive_directory_resolver.dart';
 
 /// One-time migration of pre-encryption plaintext Hive boxes into their
 /// encrypted equivalents (#1686).
 ///
 /// Extracted from `HiveBoxes` (#2670) so the box-lifecycle file stays under
-/// the file-length norm. The behaviour is unchanged: corruption is never
-/// resolved by deleting user data — a box Hive cannot open at all is left on
-/// disk for `HiveBoxes.init`'s Phase 2 to surface as a corruption error.
+/// the file-length norm. Corruption is never resolved by deleting user
+/// data, and since #4372 no box file is opened with the key until its own
+/// frame checksum says it is not plaintext.
 class HiveLegacyMigration {
   HiveLegacyMigration._();
 
@@ -35,8 +39,9 @@ class HiveLegacyMigration {
   /// Run the plaintext probes ONCE, ever, and record that they ran.
   ///
   /// #4110 — this used to happen on every cold start, for every encrypted
-  /// box. The happy path of [migrateLegacyPlaintextBox] is "open the box
-  /// with the cipher, close it again", and `HiveBoxes.init`'s Phase 2 then
+  /// box. The happy path of [migrateLegacyPlaintextBox] was "open the box
+  /// with the cipher, close it again" (#4372 replaced that open with a
+  /// read-only frame check), and `HiveBoxes.init`'s Phase 2 then
   /// opens all six a SECOND time — so every launch paid twelve opens where
   /// six would do. Worse, Hive's default compaction can fire on that
   /// close, so the probe could rewrite the whole `cache` file before the
@@ -68,57 +73,128 @@ class HiveLegacyMigration {
     await meta.put(doneKey, doneValue);
   }
 
+  /// Suffix of the encrypted staging box a plaintext box is copied into
+  /// before its plaintext file is deleted (#4372). The same suffix
+  /// `HiveTripBoxEncryption` uses, so `LocalDataEraser` already erases a
+  /// staging box a crash left behind.
+  @visibleForTesting
+  static String stagingBoxName(String boxName) => '${boxName}_enc_staging';
+
+  /// Test seam: the write of the plaintext records into the staging box,
+  /// so a failure mid-copy can be injected.
+  @visibleForTesting
+  static Future<void> Function(Box<dynamic> staging, Map<dynamic, dynamic>)
+      stagingWriter = _putAll;
+
+  static Future<void> _putAll(
+          Box<dynamic> box, Map<dynamic, dynamic> entries) =>
+      box.putAll(entries);
+
+  /// Reset [stagingWriter]. Call from `tearDown`.
+  @visibleForTesting
+  static void resetForTest() => stagingWriter = _putAll;
+
   /// Migrate a pre-encryption plaintext [boxName] into an encrypted box.
   ///
-  /// A box already written with the cipher opens cleanly — nothing to do.
-  /// When the cipher open fails, a plaintext open is attempted: a box that
-  /// still carries plaintext data is migrated; one that fails the plaintext
-  /// open too is damaged and is **left on disk untouched**. A box Hive cannot
-  /// open at all then surfaces in `init`'s Phase 2 as a corruption error.
+  /// #4372 — this used to open the box WITH the cipher first and expect a
+  /// plaintext file to throw. Hive does not throw there: its crash recovery
+  /// reads the plaintext frames as corrupt and TRUNCATES the file (#4118).
+  /// The plaintext branch was unreachable and every legacy box came back
+  /// empty. So the file is now classified from its own frame checksum
+  /// ([HiveBoxKeyProbe.classify]) and no keyed open ever touches it:
+  ///
+  /// * **plaintext** → [migrateToEncrypted];
+  /// * **under the key, empty, missing** → nothing to migrate, except a
+  ///   staging box a crash left between "plaintext deleted" and "records
+  ///   promoted", which is promoted now;
+  /// * **unknown** (no Hive path, unreadable file) → the normal path, as
+  ///   before: nothing here can tell what the file is.
+  ///
+  /// Throws when a copy cannot be verified. The plaintext file is then
+  /// still intact, the done flag stays unset, and the launch fails into
+  /// the cause-unknown recovery screen instead of letting Phase 2 open
+  /// the plaintext file with the key — the next launch retries.
   static Future<void> migrateLegacyPlaintextBox(
       String boxName, HiveAesCipher cipher) async {
+    final path = HiveDirectoryResolver.hivePath;
+    if (path == null) return;
+    final BoxFileKind kind;
+    final BoxFileKind stagingKind;
     try {
-      final box = await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
-      await box.close();
-      return; // Already encrypted, or a fresh install.
-    } catch (_) {
-      // ignore: silent_catch — Fall through — the box may be a pre-encryption plaintext box.
-    }
-
-    Box<dynamic> plain;
-    try {
-      plain = await Hive.openBox(boxName);
+      kind = HiveBoxKeyProbe.classify(_file(path, boxName), cipher);
+      stagingKind = HiveBoxKeyProbe.classify(
+          _file(path, stagingBoxName(boxName)), cipher);
     } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: {
-        'where': 'HiveLegacyMigration: plaintext probe failed for $boxName'
-      }));
-      debugPrint('Hive: "$boxName" unreadable during the migration probe '
-          '— left on disk for Phase 2 to surface.');
+      log.warn('HiveLegacyMigration: "$boxName" could not be classified',
+          error: e, stack: st, layer: ErrorLayer.storage);
       return;
     }
-
-    await migrateToEncrypted(boxName, plain, cipher);
+    if (kind == BoxFileKind.plaintext) {
+      await migrateToEncrypted(
+          boxName, await Hive.openBox<dynamic>(boxName), cipher);
+      return;
+    }
+    final mainIsSafe =
+        kind == BoxFileKind.empty || kind == BoxFileKind.underKey;
+    if (mainIsSafe && stagingKind == BoxFileKind.underKey) {
+      await _promote(boxName, cipher);
+    }
   }
 
   /// Copies an already-open plaintext [plain] box into an encrypted box of
-  /// the same name (#1686).
+  /// the same name (#1686), crash-safe (#4372).
   ///
-  /// The plaintext file is deleted only *after* its entries are held in
-  /// memory, so an interruption mid-migration cannot lose data — a crash
-  /// leaves the still-intact plaintext box, never an empty one.
+  /// The records reach disk under the key — in a staging box, verified —
+  /// BEFORE the plaintext file is deleted. A failure mid-copy therefore
+  /// leaves the plaintext file intact for the next launch; a crash after
+  /// the delete leaves the verified staging box, which the next launch
+  /// promotes. At no point do the records exist only in memory.
   static Future<void> migrateToEncrypted(
       String boxName, Box<dynamic> plain, HiveAesCipher cipher) async {
     final entries = Map<dynamic, dynamic>.from(plain.toMap());
-    await plain.close();
-
-    await Hive.deleteBoxFromDisk(boxName);
-    final encryptedBox =
-        await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
-    if (entries.isNotEmpty) {
-      await encryptedBox.putAll(entries);
+    final staging = await Hive.openBox<dynamic>(stagingBoxName(boxName),
+        encryptionCipher: cipher);
+    try {
+      await stagingWriter(staging, entries);
+      _verify(staging, entries, stagingBoxName(boxName));
+    } finally {
+      await staging.close();
     }
-    await encryptedBox.close();
+    await plain.close();
+    await Hive.deleteBoxFromDisk(boxName);
+    await _promote(boxName, cipher);
     debugPrint('Hive: migrated "$boxName" to encrypted storage '
         '(${entries.length} entries)');
   }
+
+  /// Staging → the real box, verified, then the staging box is deleted.
+  /// Every write is an upsert, so a repeat after a crash is harmless.
+  static Future<void> _promote(String boxName, HiveAesCipher cipher) async {
+    final stagingName = stagingBoxName(boxName);
+    final staging =
+        await Hive.openBox<dynamic>(stagingName, encryptionCipher: cipher);
+    final entries = Map<dynamic, dynamic>.from(staging.toMap());
+    await staging.close();
+    final target =
+        await Hive.openBox<dynamic>(boxName, encryptionCipher: cipher);
+    try {
+      await target.putAll(entries);
+      _verify(target, entries, boxName);
+    } finally {
+      await target.close();
+    }
+    await Hive.deleteBoxFromDisk(stagingName);
+  }
+
+  static void _verify(
+      Box<dynamic> box, Map<dynamic, dynamic> entries, String name) {
+    if (box.length < entries.length || !entries.keys.every(box.containsKey)) {
+      throw StateError('HiveLegacyMigration: "$name" holds ${box.length} of '
+          '${entries.length} records after the copy');
+    }
+  }
+
+  // Hive lower-cases box names for their files.
+  static File _file(String path, String boxName) =>
+      File('$path/${boxName.toLowerCase()}.hive');
 }

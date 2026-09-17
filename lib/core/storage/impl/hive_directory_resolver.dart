@@ -36,8 +36,9 @@ class HiveDirectoryResolver {
   /// `openBox`, and Hive keeps its own base path private. Opening an
   /// encrypted box under the wrong key does not throw: Hive's crash
   /// recovery decides the frames are corrupt and TRUNCATES the file to
-  /// zero bytes. So "are there boxes here?" is a question that can only
-  /// be answered before the opens, and only with this path.
+  /// zero bytes. So "which key were these boxes written with?" is a
+  /// question that can only be answered before the opens, and only with
+  /// this path (`HiveBoxKeyProbe`, #4341).
   static String? get hivePath => _hivePath;
   static String? _hivePath;
 
@@ -55,37 +56,25 @@ class HiveDirectoryResolver {
     // resolved here too so [hivePath] can answer. path_provider caches
     // the lookup, so this is not a second platform round-trip.
     await Hive.initFlutter();
+    await _recordDocumentsPath();
+  }
+
+  /// Record the documents dir `Hive.initFlutter()` rooted Hive in.
+  ///
+  /// Hive is already initialised either way. An unknown path does not
+  /// cost the launch of an install that has its key, but it does stop a
+  /// key-less one from minting a key (#4341) — so the iOS fallback
+  /// records it too.
+  static Future<void> _recordDocumentsPath() async {
     try {
       _hivePath = (await getApplicationDocumentsDirectory()).path;
     } catch (e, st) {
-      // Hive is already initialised either way; an unknown path only
-      // costs the #4118 pre-open check, never the launch.
       log.warn('HiveDirectoryResolver: documents dir unavailable',
           error: e, stack: st, layer: ErrorLayer.storage);
     }
   }
 
-  /// Whether any Hive box file already exists in [hivePath] (#4118).
-  ///
-  /// False when the path is unknown or unreadable — the safe direction:
-  /// this gates a hard stop, so an I/O hiccup must never invent one.
-  static bool get hasExistingBoxFiles {
-    final path = _hivePath;
-    if (path == null) return false;
-    try {
-      final dir = Directory(path);
-      if (!dir.existsSync()) return false;
-      return dir
-          .listSync()
-          .any((e) => e is File && e.path.endsWith('.hive'));
-    } catch (e, st) {
-      log.warn('HiveDirectoryResolver: box-file scan failed',
-          error: e, stack: st, layer: ErrorLayer.storage);
-      return false;
-    }
-  }
-
-  /// Test seam for [hivePath] / [hasExistingBoxFiles].
+  /// Test seam for [hivePath].
   @visibleForTesting
   static set hivePathForTest(String? path) => _hivePath = path;
 
@@ -107,6 +96,7 @@ class HiveDirectoryResolver {
       debugPrint('HiveDirectoryResolver: iOS dir resolution failed ($e) '
           '— falling back to the legacy Documents dir.');
       await Hive.initFlutter();
+      await _recordDocumentsPath();
     }
   }
 

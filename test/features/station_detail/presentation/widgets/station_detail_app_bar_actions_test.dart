@@ -7,6 +7,7 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 import 'package:tankstellen/features/station_detail/presentation/widgets/station_detail_app_bar_actions.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../fixtures/stations.dart';
 import '../../../../helpers/mock_providers.dart';
@@ -69,6 +70,36 @@ void main() {
       // Favorited -> filled star icon.
       expect(find.byIcon(Icons.star), findsWidgets);
     });
+
+    // #4350 — German, whose strings differ from English, so a literal
+    // English tooltip in either branch cannot pass by accident.
+    for (final isFav in [false, true]) {
+      testWidgets(
+          '#4350 — the favorite tooltip is localized when '
+          '${isFav ? 'favorited' : 'not favorited'}', (tester) async {
+        const id = '51d4b477-a095-1aa0-e100-80009459e03a';
+        await pumpApp(
+          tester,
+          const StationDetailAppBarActions(
+              stationId: id, station: testStation),
+          locale: const Locale('de'),
+          overrides: [
+            favoritesOverride(isFav ? const [id] : const []),
+            isFavoriteOverride(id, isFav),
+          ],
+        );
+
+        final context =
+            tester.element(find.byType(StationDetailAppBarActions));
+        final l10n = AppLocalizations.of(context);
+        final expected = isFav ? l10n.removeFavorite : l10n.addFavorite;
+        expect(expected, isFav ? 'Aus Favoriten entfernen'
+            : 'Zu Favoriten hinzufügen');
+        expect(find.byTooltip(expected), findsOneWidget);
+        expect(find.byTooltip(isFav ? 'Remove from favorites'
+            : 'Add to favorites'), findsNothing);
+      });
+    }
 
     testWidgets(
         '#1638 — shows the scan-QR and report actions when their features '

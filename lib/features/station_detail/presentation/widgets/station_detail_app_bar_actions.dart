@@ -92,7 +92,7 @@ class StationDetailAppBarActions extends ConsumerWidget {
                   .toggle(stationId, stationData: station),
             );
           },
-          tooltip: isFav ? 'Remove from favorites' : 'Add to favorites',
+          tooltip: isFav ? l10n.removeFavorite : l10n.addFavorite,
         ),
       ],
     );

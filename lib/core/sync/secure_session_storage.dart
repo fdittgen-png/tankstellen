@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../logging/error_logger.dart';
 import '../logging/app_log.dart';
+import '../storage/secure_storage_options.dart';
 
 /// Minimal key-value seam over [FlutterSecureStorage] so tests can fake
 /// (and fault-inject) the platform keychain/keystore without a method
@@ -29,7 +30,8 @@ abstract class SecureKeyValueStore {
 class FlutterSecureKeyValueStore implements SecureKeyValueStore {
   const FlutterSecureKeyValueStore();
 
-  static const _storage = FlutterSecureStorage();
+  static const _storage =
+      FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions);
 
   @override
   Future<String?> read(String key) => _storage.read(key: key);
