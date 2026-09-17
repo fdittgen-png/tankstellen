@@ -8,6 +8,8 @@ import '../../domain/fuel_mixture_model.dart' as mixture_model;
 import '../fuel_rate_diagnostics.dart';
 import '../../domain/fuel_rate_estimator.dart' as estimator;
 import '../obd2_breadcrumb_collector.dart';
+import '../../domain/vehicle_signal.dart';
+import 'obd2_signal_support.dart';
 
 /// Narrow read-port the fuel-rate fallback chain needs from [Obd2Service]
 /// (#3540 — extracted from the service following the #811/#3528
@@ -44,47 +46,27 @@ abstract interface class Obd2FuelRateReads {
 
 /// The engine fuel-rate fallback chain (#717, #800, #3428), extracted from
 /// [Obd2Service] in #3540. One instance per call is fine — the class holds
-/// no state beyond its two collaborators.
+/// no state beyond its two collaborators. Support is asked per signal by
+/// name (#4159); the adapter's table owns the PID and the gate kind.
 ///
 /// Fallback order:
 ///
-///   0. **PID 9D / A2** — ECU-reported fuel MASS (g/s or mg/stroke).
-///      Top precision: only the fuel density touches the conversion —
-///      no AFR / VE / φ / trim guess. 0xA2 additionally needs a known
-///      cylinder count. A 9D-vs-5E divergence cross-check stamps the
-///      breadcrumb trace (#3428).
-///   1. **PID 5E** — direct `engine fuel rate` reading. Modern ECUs
-///      (~2014+) answer directly. Best accuracy, preferred when supported.
-///   2. **PID 10 MAF** — derive fuel rate from mass air flow:
-///      `L/h = MAF_g_per_s × 3600 / (AFR × density)`. Accepted ~5–10 %
-///      error, still very usable. Fails on cars without a MAF sensor.
-///   3. **MAP + IAT + RPM speed-density** — when neither direct fuel
-///      rate nor MAF is available (e.g. Peugeot 107 1.0L 1KR-FE), use
-///      the ideal gas law to estimate air mass flow from intake
-///      manifold pressure, intake air temperature, engine RPM, engine
-///      displacement, and volumetric efficiency. Accepted ~10–15 %
-///      error — still infinitely better than the `—` placeholder the
-///      trip summary would otherwise show.
+///   0. **Fuel mass** (fuel mass rate, then cylinder fuel rate with a known
+///      cylinder count) — only the density touches the conversion; a
+///      mass-vs-volume divergence cross-check stamps the trace (#3428).
+///   1. **Fuel rate** — the ECU's own post-trim L/h (~2014+ ECUs).
+///   2. **MAF** (dual-sensor total preferred) — `MAF × 3600 / (AFR ×
+///      density)`, ~5–10 % error.
+///   3. **Speed-density** (MAP + IAT + RPM, ideal gas law with the car's
+///      displacement + η_v, #812) — ~10–15 % error, e.g. Peugeot 107
+///      1KR-FE; absent profile fields fall back per field to
+///      `kDefaultEngineDisplacementCc` / `kDefaultVolumetricEfficiency`.
 ///
-/// Pass the active [VehicleProfile] via `vehicle` to feed the step-3
-/// speed-density fallback the car's real engine displacement and
-/// volumetric efficiency (#812 phase 3); absent fields fall back to
-/// `kDefaultEngineDisplacementCc` / `kDefaultVolumetricEfficiency` (the
-/// 1.0 L NA petrol class that motivated the fallback), per-field.
-///
-/// Fuel-trim correction (#813) applies on the MAF and speed-density
-/// branches — both compute air-mass at stoichiometric AFR while the ECU
-/// trims the real mixture ±10 %; the `(1 + (STFT + LTFT) / 100)` factor
-/// closes most of the gap. Skipped on the direct-5E path (already
-/// post-trim). Both branches honour
-/// [VehicleProfile.preferredFuelType] for AFR/density (#800); an absent
-/// or unrecognised fuel type defaults to petrol.
-///
-/// #3427 / #3429 / #3430 — the mixture refinements mirror the live path:
-/// a measured ethanol % (PID 0x52) blends the petrol↔E85 constants; a
-/// MEASURED wideband φ (0x24–0x2B / 0x34–0x3B) beats the commanded 0x44;
-/// and a diesel skips the trim + commanded-φ corrections entirely
-/// (lean-burn — see `fuel_mixture_model.dart`).
+/// Fuel trims (#813, bank-2 #2458) correct branches 2 and 3 only. AFR and
+/// density follow [VehicleProfile.preferredFuelType] (#800, default
+/// petrol). #3427 / #3429 / #3430 mirror the live path: measured ethanol
+/// blends petrol↔E85, measured wideband φ beats commanded φ, and a diesel
+/// skips the trim + commanded-φ corrections (see `fuel_mixture_model`).
 class Obd2FuelRateReader {
   /// The live reads (implemented by `Obd2Service`).
   final Obd2FuelRateReads reads;
@@ -145,7 +127,7 @@ class Obd2FuelRateReader {
     // the reference-catalog fuel string is the fallback key, so that path
     // also gets E85/LPG/CNG coverage, not just diesel. Mirrors the live
     // path's `resolveMixtureConstants` so the two can't disagree.
-    final ethanolPercent = reads.isPidKnownSupported(0x52)
+    final ethanolPercent = reads.supports(VehicleSignal.ethanolPercent)
         ? await reads.readEthanolPercent()
         : null;
     final afrDensity = mixture_model.resolveMixtureConstants(vehicle,
@@ -176,7 +158,7 @@ class Obd2FuelRateReader {
       engineDisplacementCc: engineDisplacementCc.toDouble(),
       volumetricEfficiency: volumetricEfficiency,
       readRpm: reads.readRpm,
-      isMafSupported: () => reads.isPidSupported(0x10),
+      isMafSupported: () => reads.supports(VehicleSignal.maf),
       readMaf: reads.readMafGramsPerSecond,
     );
 
@@ -184,7 +166,7 @@ class Obd2FuelRateReader {
     // the density touches the conversion (no AFR / VE / φ / trim guess).
     // 0x9D outranks 0x5E (finer 0.02 g/s resolution, the SAE-designated
     // fuel-economy PID); 0xA2 needs RPM + a known cylinder count.
-    if (reads.isPidKnownSupported(0x9D)) {
+    if (reads.supports(VehicleSignal.fuelMassRate)) {
       final gPerS = await reads.readEngineFuelRateGramsPerSecond();
       final lph = gPerS == null
           ? null
@@ -193,14 +175,14 @@ class Obd2FuelRateReader {
       if (lph != null) {
         await diagnostics.recordMassRate(
           lph,
-          isPid5ESupported: () => reads.isPidSupported(0x5E),
+          isPid5ESupported: () => reads.supports(VehicleSignal.fuelRate),
           readPid5E: reads.readDirectFuelRatePid5E,
         );
         return lph;
       }
     }
     final cylinders = vehicle?.engineCylinders;
-    if (reads.isPidKnownSupported(0xA2) && cylinders != null) {
+    if (reads.supports(VehicleSignal.cylinderFuelRate) && cylinders != null) {
       final mgPerStroke = await reads.readCylinderFuelRateMgPerStroke();
       final rpmForCyl = mgPerStroke == null ? null : await reads.readRpm();
       final gPerS = (mgPerStroke == null || rpmForCyl == null)
@@ -223,7 +205,7 @@ class Obd2FuelRateReader {
     // Step 1: direct fuel-rate PID (already post-trim — no correction).
     // Skipped when #811 discovery proved the car doesn't implement PID 5E.
     double? directRate;
-    if (reads.isPidSupported(0x5E)) {
+    if (reads.supports(VehicleSignal.fuelRate)) {
       directRate = await reads.readDirectFuelRatePid5E();
     }
     if (directRate != null) {
@@ -235,12 +217,13 @@ class Obd2FuelRateReader {
     // without a MAF sensor returns empty set on PID 10, saves the
     // Bluetooth round-trip on every tick. #3428 — the dual-sensor PID
     // 0x66 total is preferred over the legacy PID 0x10 when supported.
-    if (reads.isPidKnownSupported(0x66) || reads.isPidSupported(0x10)) {
+    if (reads.supports(VehicleSignal.mafDual) ||
+        reads.supports(VehicleSignal.maf)) {
       double? maf;
-      if (reads.isPidKnownSupported(0x66)) {
+      if (reads.supports(VehicleSignal.mafDual)) {
         maf = await reads.readMafSensorGramsPerSecond();
       }
-      if (maf == null && reads.isPidSupported(0x10)) {
+      if (maf == null && reads.supports(VehicleSignal.maf)) {
         maf = await reads.readMafGramsPerSecond();
       }
       if (maf != null) {
@@ -250,10 +233,11 @@ class Obd2FuelRateReader {
         // meaningless as a diesel load signal, and the 0x44 read is
         // skipped outright). Nothing available → effectiveAfr == afr.
         final measuredPhi = await reads.readMeasuredPhi();
-        final commandedPhi =
-            (!isDiesel && measuredPhi == null && reads.isPidSupported(0x44))
-                ? await reads.readCommandedEquivalenceRatio()
-                : null;
+        final commandedPhi = (!isDiesel &&
+                measuredPhi == null &&
+                reads.supports(VehicleSignal.commandedPhi))
+            ? await reads.readCommandedEquivalenceRatio()
+            : null;
         final effectiveAfr = mixture_model.effectiveAfrForMixture(
           afr,
           measuredPhi: measuredPhi,
@@ -274,9 +258,9 @@ class Obd2FuelRateReader {
     // Step 3: speed-density fallback. Requires all three of MAP / IAT
     // / RPM. If any one is known-unsupported, the step can't run and
     // we surface null — there's no partial correction worth shipping.
-    if (!reads.isPidSupported(0x0B) ||
-        !reads.isPidSupported(0x0F) ||
-        !reads.isPidSupported(0x0C)) {
+    if (!reads.supports(VehicleSignal.manifoldPressure) ||
+        !reads.supports(VehicleSignal.intakeAirTemp) ||
+        !reads.supports(VehicleSignal.engineRpm)) {
       diagnostics.recordNoBranch();
       return null;
     }
@@ -297,13 +281,15 @@ class Obd2FuelRateReader {
     // the 0x44 read is skipped there). All supportsPid-gated; absent →
     // the pre-#2456 result exactly. φ is passed pre-resolved
     // (`phi: null`) so the estimator can't double-apply it.
-    final baroKpa =
-        reads.isPidSupported(0x33) ? await reads.readBaroPressureKpa() : null;
+    final baroKpa = reads.supports(VehicleSignal.baroPressure)
+        ? await reads.readBaroPressureKpa()
+        : null;
     final sdMeasuredPhi = await reads.readMeasuredPhi();
-    final sdCommandedPhi =
-        (!isDiesel && sdMeasuredPhi == null && reads.isPidSupported(0x44))
-            ? await reads.readCommandedEquivalenceRatio()
-            : null;
+    final sdCommandedPhi = (!isDiesel &&
+            sdMeasuredPhi == null &&
+            reads.supports(VehicleSignal.commandedPhi))
+        ? await reads.readCommandedEquivalenceRatio()
+        : null;
     final sdEffectiveAfr = mixture_model.effectiveAfrForMixture(
       afr,
       measuredPhi: sdMeasuredPhi,
@@ -353,10 +339,10 @@ class Obd2FuelRateReader {
     // #2458 — fold in bank-2 trims (PIDs 08 / 09) when the car exposes
     // them so dual-bank engines get the bank-averaged correction. Both
     // supportsPid-gated; absent → null → bank-1-only, unchanged.
-    final stft2 = reads.isPidSupported(0x08)
+    final stft2 = reads.supports(VehicleSignal.stftBank2)
         ? await reads.readShortTermFuelTrimBank2Percent()
         : null;
-    final ltft2 = reads.isPidSupported(0x09)
+    final ltft2 = reads.supports(VehicleSignal.ltftBank2)
         ? await reads.readLongTermFuelTrimBank2Percent()
         : null;
     return estimator.applyFuelTrimCorrection(

@@ -5,12 +5,17 @@ import '../../../vehicle/domain/entities/reference_vehicle.dart';
 import '../../../../core/domain/pump_gain_resolution.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../protocol/elm327_protocol.dart';
+import '../protocol/obd2_signal_pids.dart';
 import '../../domain/fuel_mixture_model.dart';
 import '../../domain/vehicle_power_state.dart';
 import '../obd2_breadcrumb_collector.dart';
 import 'obd2_service.dart';
+import 'obd2_signal_support.dart';
 import '../../domain/pid_scheduler.dart';
 import '../../domain/precision_pid_latches.dart';
+import '../../domain/signal_latch_store.dart';
+import '../../domain/signal_reading.dart';
+import '../../domain/vehicle_signal.dart';
 
 part 'live_sample_snapshot_latches.dart';
 part 'live_sample_snapshot_subscriptions.dart';
@@ -51,8 +56,7 @@ class LiveSampleSnapshot
     required this._onHighPriorityParse,
     required this._onSpeedSample,
     DateTime Function()? clock,
-  })  : _clock = clock ?? DateTime.now,
-        _precision = PrecisionPidLatches(clock: clock);
+  }) : _clock = clock ?? DateTime.now;
 
   /// #3784 — point the snapshot at the freshly-reconnected service after
   /// a mid-trip rebind (`replaceService` swaps only the controller's
@@ -73,14 +77,19 @@ class LiveSampleSnapshot
   final void Function(Object? parsedValue) _onHighPriorityParse;
   @override
   final void Function(double speedKmh) _onSpeedSample;
-  // #2505 — IAT-staleness clock (test seam).
+  // Arrival clock for every latch (#2505 IAT staleness, #4159) — test seam.
   @override
   final DateTime Function() _clock;
+
+  // #4159 — per-signal latest value + arrival time.
+  @override
+  late final SignalLatchStore _signals = SignalLatchStore(clock: _clock);
 
   // Epic #3416 — latches + subscriptions for the precision PID families
   // (measured wideband φ #3427, MAF 0x66 / fuel-rate 0x9D / 0xA2 #3428,
   // ethanol 0x52 #3429). A collaborator so this grandfathered file grows
   // by a field + one subscribe call, not by twenty latches.
   @override
-  final PrecisionPidLatches _precision;
+  late final PrecisionPidLatches _precision =
+      PrecisionPidLatches(clock: _clock, store: _signals);
 }

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../obd2/api.dart'
+    show SignalPlausibility, classifyBaroKpa, classifyCommandedPhi;
 import 'trip_sample.dart';
 
 /// Per-trip aggregate of the **OBD2** telemetry a trip actually captured —
@@ -93,6 +95,16 @@ class Obd2TripFeatures {
   /// was down), a `1.0` a fully-streamed signal.
   final Map<String, double> signalCoverage;
 
+  /// #4159 — per stored signal with a clamp band, the share of the
+  /// samples CARRYING it whose value sits outside the band the fuel math
+  /// clamps to: `lambda` (commanded φ — the petrol band; a diesel never
+  /// applies commanded φ) and `baroKpa`. A key is absent when
+  /// the trip never carried the signal. The fuel figures are unchanged —
+  /// this names the adapter / sensor fault the clamp would hide. Measured
+  /// wideband φ is not here: its band depends on the resolved fuel, which
+  /// the samples do not record (the live `SignalReading` marks it).
+  final Map<String, double> implausibleShare;
+
   const Obd2TripFeatures({
     required this.sampleCount,
     required this.obd2SampleCount,
@@ -112,6 +124,7 @@ class Obd2TripFeatures {
     required this.fuelSourceShares,
     required this.dominantFuelSource,
     required this.signalCoverage,
+    this.implausibleShare = const {},
   });
 
   /// Build the aggregate from a trip's samples, or `null` when no sample
@@ -219,6 +232,10 @@ class Obd2TripFeatures {
         'oilTempC': _coverage(samples, (s) => s.oilTempC),
         'ambientTempC': _coverage(samples, (s) => s.ambientTempC),
       },
+      implausibleShare: {
+        'lambda': ?_implausible(samples, (s) => s.lambda, classifyCommandedPhi),
+        'baroKpa': ?_implausible(samples, (s) => s.baroKpa, classifyBaroKpa),
+      },
     );
   }
 
@@ -248,6 +265,10 @@ class Obd2TripFeatures {
         'signalCoverage': {
           for (final e in signalCoverage.entries) e.key: _r(e.value, 3),
         },
+        // #4159 — additive key.
+        'implausibleShare': {
+          for (final e in implausibleShare.entries) e.key: _r(e.value, 3),
+        },
       };
 
   static Obd2SignalDistribution _distOf(
@@ -257,6 +278,24 @@ class Obd2TripFeatures {
       Obd2SignalDistribution.from(
         [for (final s in samples) pick(s)].whereType<double>().toList(),
       );
+
+  /// Share of the samples carrying [pick] that [classify] marks
+  /// implausible; null when no sample carried it.
+  static double? _implausible(
+    List<TripSample> samples,
+    double? Function(TripSample) pick,
+    SignalPlausibility Function(double) classify,
+  ) {
+    var carried = 0;
+    var implausible = 0;
+    for (final s in samples) {
+      final v = pick(s);
+      if (v == null) continue;
+      carried++;
+      if (classify(v) == SignalPlausibility.implausible) implausible++;
+    }
+    return carried == 0 ? null : implausible / carried;
+  }
 
   static double _coverage(
     List<TripSample> samples,

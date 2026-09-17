@@ -3,11 +3,11 @@
 
 part of 'live_sample_snapshot.dart';
 
-/// The per-PID latest-value latches extracted from [LiveSampleSnapshot]
+/// The latest-value facade extracted from [LiveSampleSnapshot]
 /// as a `part` mixin so they keep private-member access while
 /// `live_sample_snapshot.dart` stays under the #1680 file-length cap
 /// (sanctioned #3760 decomposition — move-only, behaviour preserved):
-/// the latch fields, their public getters, and the provider-pushed
+/// the signal getters over the latch store, and the provider-pushed
 /// GPS / OEM-fuel update entry points.
 mixin _LiveSampleSnapshotLatches {
   // Constructor-owned collaborators — the class owns the fields; the
@@ -18,8 +18,9 @@ mixin _LiveSampleSnapshotLatches {
   Obd2BreadcrumbRecorder? get _breadcrumbCollector;
   void Function(Object? parsedValue) get _onHighPriorityParse;
   void Function(double speedKmh) get _onSpeedSample;
-  DateTime Function() get _clock; // #2505 — IAT-staleness clock (test seam).
   PrecisionPidLatches get _precision;
+  DateTime Function() get _clock;
+  SignalLatchStore get _signals; // #4159 — value + arrival per signal.
 
   /// The ECU's own fuel-type answer (PID 0x51) read ONCE at comm-session
   /// start (#3429) — runtime truth that beats the free-text profile fuel
@@ -28,65 +29,8 @@ mixin _LiveSampleSnapshotLatches {
   /// then falls back to the profile exactly as before.
   String? sessionFuelTypeKey;
 
-  // Latest parsed values, keyed by PID command. Written by scheduler
-  // callbacks, read by the controller's `_emit` when assembling a
-  // TripLiveReading. Not a typed struct because most fields are
-  // optional doubles and a freezed class for this scratch space buys
-  // nothing.
-  double? _latestSpeedKmh;
-  double? _latestRpm;
-  double? _latestMaf;
-  double? _latestMapKpa;
-  double? _latestIatCelsius;
-  // #2505 — when [_latestIatCelsius] last landed. Lets the speed-density
-  // branch reuse a slightly-stale IAT (see [_freshIatCelsius]).
-  DateTime? _latestIatAt;
-  double? _latestThrottlePercent;
-  double? _latestEngineLoadPercent;
-  double? _latestCoolantTempC;
-  double? _latestFuelLevelPercent;
-  double? _latestStft;
-  double? _latestLtft;
-  double? _latestDirectFuelRate;
-
-  // #2456 — commanded fuel–air equivalence ratio φ (PID 0x44 — SAE
-  // convention verified #3426: φ > 1 rich, φ < 1 lean, λ = 1/φ) and
-  // absolute barometric pressure (PID 0x33). Both refine the MAF /
-  // speed-density fuel derivation when the car exposes them and stay
-  // null (today's behaviour, bit-for-bit) on cars that don't. φ is
-  // sampled fast (it tracks the mixture under load); baro is sampled
-  // slowly (it only changes with altitude / weather).
-  double? _latestCommandedPhi;
-  double? _latestBaroKpa;
-
-  // #2458 — bank-2 fuel trims (PIDs 0x08 / 0x09). Fold into the MAF /
-  // speed-density trim correction on dual-bank (V / boxer) engines;
-  // null on inline engines, where the correction stays bank-1-only.
-  double? _latestStftBank2;
-  double? _latestLtftBank2;
-
-  // #2458 — absolute load (PID 0x43, a boosted-engine high-load proxy
-  // that can exceed 100 %) and accelerator-pedal position (PIDs 0x49 /
-  // 0x4A / 0x4B; the snapshot stores the max of whichever channels the
-  // car exposes). Both acquired + persisted here; the driving-style
-  // consumption of pedal is #2460.
-  double? _latestAbsLoadPercent;
-  // Per-channel pedal latches (PIDs 0x49 / 0x4A / 0x4B). The three track
-  // the same physical pedal; `latestPedalPercent` returns the max of the
-  // most-recent non-null channels (the least-damped reading) rather than
-  // a running max across callbacks, which could never decrease.
-  double? _latestPedalD;
-  double? _latestPedalE;
-  double? _latestPedalF;
-
-  // #2459 — optional diagnostic-context thermal signals: engine oil
-  // temperature (PID 0x5C) and ambient air temperature (PID 0x46). Null
-  // on cars that don't expose them.
-  double? _latestOilTempC;
-  double? _latestAmbientTempC;
-
-  /// #3692 — ignition timing advance (PID 0x0E), latest value.
-  double? _latestTimingAdvanceDeg;
+  // #4159 — every OBD2 latch lives in [_signals]; the getters below are a
+  // hold-last facade over it (per-signal history is on each subscription).
 
   // #1374 phase 1 — most recent GPS fix, pushed in by the provider when
   // the `Feature.gpsTripPath` flag is enabled (the controller never
@@ -119,12 +63,28 @@ mixin _LiveSampleSnapshotLatches {
   // no read) → null and `_emit` matches pre-#1615 behaviour.
   double? _latestOemFuelLevelLitres;
 
-  double? get latestSpeedKmh => _latestSpeedKmh;
-  double? get latestRpm => _latestRpm;
-  double? get latestThrottlePercent => _latestThrottlePercent;
-  double? get latestEngineLoadPercent => _latestEngineLoadPercent;
-  double? get latestCoolantTempC => _latestCoolantTempC;
-  double? get latestFuelLevelPercent => _latestFuelLevelPercent;
+  double? _latest(VehicleSignal signal) => _signals.latest(signal);
+
+  /// [signal] with unit, provenance and freshness (#4159); wideband φ by
+  /// the [latestMeasuredPhi] sensor rule; φ and baro marked against the
+  /// fuel math's clamp bands (wideband by this session's resolved fuel).
+  SignalReading reading(VehicleSignal signal) => markPlausibility(
+        signal == VehicleSignal.widebandPhi
+            ? _precision.measuredPhiReading()
+            : _signals.reading(signal),
+        isDiesel: resolveMixtureConstants(_vehicle,
+                    sessionFuelTypeKey: sessionFuelTypeKey,
+                    measuredEthanolPercent: _precision.ethanolPercent)
+                .kind ==
+            ResolvedFuelKind.diesel,
+      );
+
+  double? get latestSpeedKmh => _latest(VehicleSignal.vehicleSpeed);
+  double? get latestRpm => _latest(VehicleSignal.engineRpm);
+  double? get latestThrottlePercent => _latest(VehicleSignal.throttle);
+  double? get latestEngineLoadPercent => _latest(VehicleSignal.engineLoad);
+  double? get latestCoolantTempC => _latest(VehicleSignal.coolantTemp);
+  double? get latestFuelLevelPercent => _latest(VehicleSignal.fuelTankLevel);
   double? get latestLatitude => _latestLatitude;
   double? get latestLongitude => _latestLongitude;
   double? get latestAltitudeM => _latestAltitudeM;
@@ -137,41 +97,47 @@ mixin _LiveSampleSnapshotLatches {
   // controller's `_emit` persists onto each TripSample (#2459). The
   // raw mixture inputs (MAF / MAP / STFT / LTFT) are read here too so the
   // diagnostic-capture path can stamp them for post-hoc re-derivation.
-  // (Named λ pre-#3426; the PID 0x44 wire value is the SAE fuel–air
+  // (Named λ pre-#3426; the commanded wire value is the SAE fuel–air
   // equivalence ratio φ — see `effectiveAfrForPhi`.)
-  double? get latestCommandedPhi => _latestCommandedPhi;
-  double? get latestBaroKpa => _latestBaroKpa;
-  double? get latestAbsLoadPercent => _latestAbsLoadPercent;
+  double? get latestCommandedPhi => _latest(VehicleSignal.commandedPhi);
+  double? get latestBaroKpa => _latest(VehicleSignal.baroPressure);
+  double? get latestAbsLoadPercent => _latest(VehicleSignal.absoluteLoad);
 
-  /// Freshest MEASURED wideband φ (PIDs 0x24–0x2B / 0x34–0x3B, #3427),
-  /// bank-1-sensor-1 priority. Null on cars without a wideband sensor or
-  /// when the last reading went stale.
+  /// Freshest MEASURED wideband φ (#3427), bank-1-sensor-1 priority. Null
+  /// on cars without a wideband sensor or when the last reading went
+  /// stale.
   double? get latestMeasuredPhi => _precision.measuredPhi();
 
-  /// Measured ethanol fuel % (PID 0x52, #3429). Null when unsupported.
+  /// Measured ethanol fuel % (#3429). Null when unsupported.
   double? get latestEthanolPercent => _precision.ethanolPercent;
 
   /// Accelerator-pedal position (%) — the max of whichever of the three
-  /// channels (D / E / F, PIDs 0x49 / 0x4A / 0x4B) have landed (#2458).
-  /// Null until at least one channel reports.
+  /// channels (D / E / F) have landed (#2458): the least-damped reading,
+  /// not a running max (which could never decrease). Null until at least
+  /// one channel reports.
   double? get latestPedalPercent {
     double? best;
-    for (final v in [_latestPedalD, _latestPedalE, _latestPedalF]) {
+    for (final signal in const [
+      VehicleSignal.pedalD,
+      VehicleSignal.pedalE,
+      VehicleSignal.pedalF,
+    ]) {
+      final v = _latest(signal);
       if (v != null && (best == null || v > best)) best = v;
     }
     return best;
   }
-  double? get latestOilTempC => _latestOilTempC;
-  double? get latestAmbientTempC => _latestAmbientTempC;
+  double? get latestOilTempC => _latest(VehicleSignal.oilTemp);
+  double? get latestAmbientTempC => _latest(VehicleSignal.ambientAirTemp);
 
   /// #3692 — the persisted-signal getters: IAT was latched since #2505
   /// but never exposed for recording; timing advance is new.
-  double? get latestIatCelsius => _latestIatCelsius;
-  double? get latestTimingAdvanceDeg => _latestTimingAdvanceDeg;
-  double? get latestMaf => _latestMaf;
-  double? get latestMapKpa => _latestMapKpa;
-  double? get latestStft => _latestStft;
-  double? get latestLtft => _latestLtft;
+  double? get latestIatCelsius => _latest(VehicleSignal.intakeAirTemp);
+  double? get latestTimingAdvanceDeg => _latest(VehicleSignal.timingAdvance);
+  double? get latestMaf => _latest(VehicleSignal.maf);
+  double? get latestMapKpa => _latest(VehicleSignal.manifoldPressure);
+  double? get latestStft => _latest(VehicleSignal.stftBank1);
+  double? get latestLtft => _latest(VehicleSignal.ltftBank1);
 
   /// Push the most recent GPS fix into the per-tick snapshot
   /// (#1374 phase 1; altitude added #1935 child A; horizontal accuracy +

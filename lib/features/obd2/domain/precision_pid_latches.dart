@@ -1,8 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../core/domain/data_value.dart';
 import '../data/protocol/elm327_precision_pids.dart';
+import '../data/protocol/obd2_signal_pids.dart';
 import 'pid_scheduler.dart';
+import 'signal_latch_store.dart';
+import 'signal_reading.dart';
+import 'vehicle_signal.dart';
 
 /// Latest-value latches + scheduler subscriptions for the
 /// consumption-precision PID families (Epic #3416): measured wideband φ
@@ -14,11 +19,18 @@ import 'pid_scheduler.dart';
 /// twenty latches). Same contract as the snapshot's own latches: scheduler
 /// callbacks write, the derivation reads, everything is support-mask gated
 /// so a car without a PID never subscribes it and the getters stay null.
+///
+/// #4159 — the four single-PID families latch into a [SignalLatchStore]
+/// (the snapshot passes its own, so every OBD2 latch lives in one place);
+/// wideband φ keeps its per-sensor map here, because the priority rule
+/// needs each sensor's own arrival time.
 class PrecisionPidLatches {
-  PrecisionPidLatches({DateTime Function()? clock})
-      : _clock = clock ?? DateTime.now;
+  PrecisionPidLatches({DateTime Function()? clock, SignalLatchStore? store})
+      : _clock = clock ?? DateTime.now,
+        _store = store ?? SignalLatchStore(clock: clock ?? DateTime.now);
 
   final DateTime Function() _clock;
+  final SignalLatchStore _store;
 
   /// How long a latched wideband φ stays usable (#3427). The mixture tier
   /// targets 2 Hz but the #2457 governor may demote it on a slow link;
@@ -33,27 +45,24 @@ class PrecisionPidLatches {
   final Map<int, double> _phiByPid = {};
   final Map<int, DateTime> _phiAtByPid = {};
 
-  double? _mafSensorGPerS;
-  double? _engineFuelRate9dGPerS;
-  double? _cylinderFuelRateMgPerStroke;
-  double? _ethanolPercent;
-
   /// Total MAF from the dual-sensor PID 0x66 (g/s), preferred over the
   /// legacy PID 0x10 in the MAF fuel branch (#3428). Null when
   /// unsupported / not yet landed.
-  double? get mafSensorGPerS => _mafSensorGPerS;
+  double? get mafSensorGPerS => _store.latest(VehicleSignal.mafDual);
 
   /// Engine fuel rate from PID 0x9D (g/s) — the top-precision mass-based
   /// branch (#3428). Null when unsupported / not yet landed.
-  double? get engineFuelRate9dGPerS => _engineFuelRate9dGPerS;
+  double? get engineFuelRate9dGPerS =>
+      _store.latest(VehicleSignal.fuelMassRate);
 
   /// Cylinder fuel rate from PID 0xA2 (mg/stroke, per cylinder). Needs
   /// RPM + cylinder count to become g/s (#3428). Null when unsupported.
-  double? get cylinderFuelRateMgPerStroke => _cylinderFuelRateMgPerStroke;
+  double? get cylinderFuelRateMgPerStroke =>
+      _store.latest(VehicleSignal.cylinderFuelRate);
 
   /// Measured ethanol fuel fraction from PID 0x52 (%), driving the
   /// petrol↔E85 AFR/density blend (#3429). Null when unsupported.
-  double? get ethanolPercent => _ethanolPercent;
+  double? get ethanolPercent => _store.latest(VehicleSignal.ethanolPercent);
 
   /// The freshest MEASURED wideband φ (#3427), with bank-1-sensor-1
   /// priority: PID 0x24 (voltage family) then 0x34 (current family) win
@@ -62,14 +71,38 @@ class PrecisionPidLatches {
   /// answered. Values older than [measuredPhiStaleness] are ignored, so a
   /// dead sensor's last reading can't linger. Null when nothing fresh.
   double? measuredPhi() {
+    final pid = _freshPhiPid(_clock());
+    return pid == null ? null : _phiByPid[pid];
+  }
+
+  /// [measuredPhi] with provenance (#4159): `Measured(at)` for the sensor
+  /// the priority rule picks; when no sensor is fresh, the most recent one
+  /// as `Stale(age)`; `Unknown(notMeasuredYet)` before any landed.
+  SignalReading measuredPhiReading() {
     final now = _clock();
+    DataValue<double> value =
+        const Unknown(reason: DataUnknownReason.notMeasuredYet);
+    final pid = _freshPhiPid(now) ?? _newestPhiPid();
+    if (pid != null) {
+      final at = _phiAtByPid[pid]!;
+      final age = now.difference(at);
+      value = age <= measuredPhiStaleness
+          ? DataValue.measured(_phiByPid[pid]!, at: at)
+          : DataValue.stale(_phiByPid[pid]!, age: age);
+    }
+    return SignalReading(signal: VehicleSignal.widebandPhi, value: value);
+  }
+
+  /// The sensor [measuredPhi] reads at [now]: a fresh primary sensor in
+  /// family order, else the freshest other fresh sensor, else null.
+  int? _freshPhiPid(DateTime now) {
     bool fresh(int pid) {
       final at = _phiAtByPid[pid];
       return at != null && now.difference(at) <= measuredPhiStaleness;
     }
 
-    for (final pid in const [0x24, 0x34]) {
-      if (fresh(pid)) return _phiByPid[pid];
+    for (final pid in Elm327PrecisionPids.primaryWidebandPids) {
+      if (fresh(pid)) return pid;
     }
     int? bestPid;
     DateTime? bestAt;
@@ -80,7 +113,18 @@ class PrecisionPidLatches {
         bestPid = entry.key;
       }
     }
-    return bestPid == null ? null : _phiByPid[bestPid];
+    return bestPid;
+  }
+
+  /// The sensor whose φ landed last, fresh or not; null before any.
+  int? _newestPhiPid() {
+    int? newest;
+    for (final entry in _phiAtByPid.entries) {
+      if (newest == null || entry.value.isAfter(_phiAtByPid[newest]!)) {
+        newest = entry.key;
+      }
+    }
+    return newest;
   }
 
   /// Wire the precision-PID subscriptions onto [scheduler], gated by
@@ -97,6 +141,8 @@ class PrecisionPidLatches {
     PidScheduler scheduler, {
     required bool Function(int pid) isPidSupported,
   }) {
+    bool supports(VehicleSignal signal) =>
+        isPidSupported(Obd2SignalPids.pidOf(signal));
     for (final pid in Elm327PrecisionPids.allWidebandPids) {
       if (!isPidSupported(pid)) continue;
       scheduler.subscribe(
@@ -111,46 +157,46 @@ class PrecisionPidLatches {
         },
       );
     }
-    if (isPidSupported(0x66)) {
+    if (supports(VehicleSignal.mafDual)) {
       scheduler.subscribe(
         Elm327PrecisionPids.mafSensorCommand,
         ScheduledPid(
             hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics),
         (r) {
           final v = Elm327PrecisionPids.parseMafSensorGramsPerSecond(r);
-          if (v != null) _mafSensorGPerS = v;
+          if (v != null) _store.write(VehicleSignal.mafDual, v);
         },
       );
     }
-    if (isPidSupported(0x9D)) {
+    if (supports(VehicleSignal.fuelMassRate)) {
       scheduler.subscribe(
         Elm327PrecisionPids.engineFuelRateGramsCommand,
         ScheduledPid(
             hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics),
         (r) {
           final v = Elm327PrecisionPids.parseEngineFuelRateGramsPerSecond(r);
-          if (v != null) _engineFuelRate9dGPerS = v;
+          if (v != null) _store.write(VehicleSignal.fuelMassRate, v);
         },
       );
     }
-    if (isPidSupported(0xA2)) {
+    if (supports(VehicleSignal.cylinderFuelRate)) {
       scheduler.subscribe(
         Elm327PrecisionPids.cylinderFuelRateCommand,
         ScheduledPid(
             hz: 5.0, priority: PidPriority.high, tier: PidTier.dynamics),
         (r) {
           final v = Elm327PrecisionPids.parseCylinderFuelRateMgPerStroke(r);
-          if (v != null) _cylinderFuelRateMgPerStroke = v;
+          if (v != null) _store.write(VehicleSignal.cylinderFuelRate, v);
         },
       );
     }
-    if (isPidSupported(0x52)) {
+    if (supports(VehicleSignal.ethanolPercent)) {
       scheduler.subscribe(
         Elm327PrecisionPids.ethanolPercentCommand,
         ScheduledPid(hz: 0.5, tier: PidTier.slowCorrection),
         (r) {
           final v = Elm327PrecisionPids.parseEthanolPercent(r);
-          if (v != null) _ethanolPercent = v;
+          if (v != null) _store.write(VehicleSignal.ethanolPercent, v);
         },
       );
     }

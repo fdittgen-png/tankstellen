@@ -113,6 +113,15 @@ const double _gasConstant = 287.0;
 /// pre-#2456 formula carried. 101.325 kPa is the ISA standard.
 const double kSeaLevelBaroKpa = 101.325;
 
+/// Clamp band for the speed-density air-density factor
+/// `baroKpa / kSeaLevelBaroKpa` (#2456): so a garbage baro reading cannot
+/// invert or blow up the air mass. A reading outside it is marked
+/// implausible (#4159, `classifyBaroKpa`), never silently trusted.
+const double kMinBaroDensityFactor = 0.6;
+
+/// Upper end of the air-density factor band (see [kMinBaroDensityFactor]).
+const double kMaxBaroDensityFactor = 1.1;
+
 /// Lower clamp for the equivalence ratio φ on a stoich-controlled spark
 /// engine (PID 0x44 / wideband 0x24–0x2B, #2456 / #3426). Spark engines
 /// never run leaner than φ ≈ 0.5 in normal operation (lean-burn cruise
@@ -358,7 +367,8 @@ double? estimateFuelRateLPerHourFromMap({
   // i.e. the pre-#2456 sea-level assumption, unchanged.
   final baroFactor = baroKpa == null
       ? 1.0
-      : (baroKpa / kSeaLevelBaroKpa).clamp(0.6, 1.1);
+      : (baroKpa / kSeaLevelBaroKpa)
+          .clamp(kMinBaroDensityFactor, kMaxBaroDensityFactor);
   final airMassGPerS = airMassKgPerS * 1000.0 * baroFactor;
   // #2456 / #3426 — when φ (PID 0x44, SAE fuel–air equivalence ratio) is
   // present, divide by the effective AFR (`afr / φ`) instead of the

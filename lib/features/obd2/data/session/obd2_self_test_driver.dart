@@ -14,6 +14,7 @@ import 'obd2_connection_service.dart';
 import 'obd2_link_supervisor.dart';
 import '../protocol/obd2_response_class.dart';
 import 'obd2_self_test_report.dart';
+import 'obd2_self_test_samples.dart';
 import 'obd2_service.dart';
 
 // #3555 — the public model/verdict types moved next door (this file sat at

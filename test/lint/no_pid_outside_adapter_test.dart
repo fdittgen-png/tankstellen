@@ -18,19 +18,19 @@
 /// ```
 ///
 /// `PID 0C`, `PID 04`, `PID 10` should be meaningless outside
-/// `data/protocol/`. Today they are not: the session layer wires
-/// subscriptions with bare hex, and `domain/precision_pid_latches.dart`
-/// asks `isPidSupported(0x66)` — a PID number in the DOMAIN layer, which
-/// is the clearest form of the leak this issue is about.
+/// `data/protocol/`. Above it, code names a `VehicleSignal`
+/// (`domain/vehicle_signal.dart`) and the adapter's table
+/// (`data/protocol/obd2_signal_pids.dart`) turns the name into a PID, a
+/// request and a support gate.
 ///
-/// This is a **ratchet, not a ban**: the count is frozen and may only
-/// fall. #4159's migration is explicitly incremental ("introduce the
-/// layer, move consumers one at a time, keep the recorded-session
-/// fixtures passing"), and moving a consumer is device-validated work —
-/// `obd2_rewrite_epic_3527` and the OBD2 memories are unambiguous that
-/// changes on this path need a real adapter before they are trusted.
-/// The ratchet is what makes that migration actually happen instead of
-/// stalling after the layer exists.
+/// Since #4159 this is a **ban**: the baseline is empty. The migration
+/// moved one consumer at a time, and what made each move safe was not a
+/// device drive but the pins that landed before it — the exact
+/// resolved schedule and gate calls
+/// (`live_sample_snapshot_schedule_pin_test`), the measured-φ priority
+/// rule (`precision_pid_latches_test`), the fuel-rate reader's gate/read
+/// call log and the snapshot's read facade. A move that changes what a
+/// session subscribes, asks or derives turns one of those red.
 ///
 /// ## What is deliberately NOT counted
 ///
@@ -41,21 +41,28 @@
 /// * comment lines — a doc comment explaining which PID a value came
 ///   from is documentation, and removing those would make the code
 ///   worse, not better.
+///
+/// ## The second spelling: Mode 01 request strings
+///
+/// `0x0B` is not the only way to write a PID. `'010B\r'` is the same PID
+/// as a request, and the hex-literal scan never saw it: when this check
+/// was added (#4159) there were 13 such literals across
+/// `domain/broken_map_detector.dart` and the self-test steps. They now
+/// use the adapter's request constants, and the per-file baseline for
+/// request strings is empty too (exact both ways, via `expectRatchet`).
 library;
 
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'ratchet_baseline.dart';
+
 /// Raw PID hex literals outside the adapter layer, per file.
 ///
-/// Frozen 2026-09-14. **Only ever decreases.** A consumer that moves to
-/// the normalized layer takes its entries with it.
-const Map<String, int> _baseline = {
-  'lib/features/obd2/data/session/obd2_fuel_rate_reader.dart': 18,
-  'lib/features/obd2/data/session/live_sample_snapshot_subscriptions.dart': 14,
-  'lib/features/obd2/domain/precision_pid_latches.dart': 6,
-};
+/// Frozen 2026-09-14 at 38 across three files; empty since #4159. Never
+/// add an entry — name the signal instead.
+const Map<String, int> _baseline = {};
 
 const _skipPrefixes = [
   'lib/features/obd2/data/protocol/',
@@ -64,7 +71,15 @@ const _skipPrefixes = [
 
 final _pid = RegExp(r'0x[0-9A-Fa-f]{2}\b');
 
-Map<String, int> _scan() {
+/// A quoted Mode 01 request: `'010C'`, `'010C\r'`, `"0133\r"`.
+final _mode01Request = RegExp(r'''['"]01[0-9A-Fa-f]{2}(?:\\r)?['"]''');
+
+/// Mode 01 request-string literals outside the adapter layer, per file.
+/// Empty since #4159 (13 when first counted).
+const Map<String, int> _requestBaseline = {};
+
+Map<String, int> _scan([RegExp? pattern]) {
+  final re = pattern ?? _pid;
   final counts = <String, int>{};
   for (final entity
       in Directory('lib/features/obd2').listSync(recursive: true)) {
@@ -77,7 +92,7 @@ Map<String, int> _scan() {
     for (final line in entity.readAsLinesSync()) {
       final t = line.trim();
       if (t.startsWith('///') || t.startsWith('//')) continue;
-      n += _pid.allMatches(line).length;
+      n += re.allMatches(line).length;
     }
     if (n > 0) counts[path] = n;
   }
@@ -116,6 +131,30 @@ void main() {
         reason: 'These files now carry FEWER raw PIDs than the baseline '
             'claims — lower it in the same commit, or the ratchet stops '
             'protecting the ground you just took: $stale');
+  });
+
+  test('request-string matcher finds quoted Mode 01 requests only', () {
+    const sample = '''
+      const a = '010B\\r';        // 1
+      send("0133\\r");            // 2
+      key('010C');                // 3
+      const b = 'ATRV\\r';        // AT command, not a PID
+      const c = '0100AB';         // longer token
+      final d = '\$pid\\r';       // interpolated, not a literal
+    ''';
+    expect(_mode01Request.allMatches(sample), hasLength(3));
+  });
+
+  test('no file gains Mode 01 request strings outside the adapter (#4159)',
+      () {
+    expectRatchet(
+      measured: _scan(_mode01Request),
+      baseline: _requestBaseline,
+      what: 'Mode 01 request-string literals above the adapter layer',
+      hint: 'A request string is a PID in another spelling. Use '
+          'Obd2SignalPids.commandOf(VehicleSignal.x) or the '
+          'Elm327Commands constant (#4159).',
+    );
   });
 
   test('the adapter layer is where PIDs live, and it is not empty', () {

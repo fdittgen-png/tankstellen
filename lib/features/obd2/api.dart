@@ -56,6 +56,9 @@ export 'data/paused_trip_repository.dart';
 export 'domain/trip_distance_source.dart';
 export 'domain/trip_live_reading.dart';
 export 'domain/rolling_consumption_window.dart'; // #3883
+// #4159 — the plausibility bands of the fuel math, so the trip aggregate
+// can mark stored φ / baro the clamps would have hidden.
+export 'domain/signal_plausibility.dart';
 // #3855 — the vehicle power state (engine / ignition on-off) is a NEW
 // cross-feature contract: the trips surfaces key their copy and actions on
 // it (the same sanctioned-growth shape as the #3437 / #3743 seams).
