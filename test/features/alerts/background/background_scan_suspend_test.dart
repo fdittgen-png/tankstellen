@@ -15,11 +15,13 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/app/startup/runtime_services_phase.dart';
 import 'package:tankstellen/core/background/background_price_fetcher.dart';
 import 'package:tankstellen/core/background/background_scan_trigger.dart';
 import 'package:tankstellen/core/background/hive_isolate_lock.dart';
 import 'package:tankstellen/core/background/scan_run_phase.dart';
 import 'package:tankstellen/features/alerts/background/alert_schedule_reconciler.dart';
+import 'package:tankstellen/features/alerts/background/background_service.dart';
 import 'package:tankstellen/features/alerts/background/slc_wake_monitor.dart';
 
 import '../../../helpers/silence_error_logger.dart';
@@ -189,33 +191,105 @@ void main() {
   });
 
   group('schedule', () {
-    test('B2 — an arm suspended on its register while a later cancel lands '
-        'ends ARMED: reproduces only the filed defect', () async {
-      final fetcher = GatedFetcher();
-      final slc = RecordingSlc();
-      var active = true;
-      final reconciler = AlertScheduleReconciler(
-        gate: () async => active,
+    late GatedFetcher fetcher;
+    late RecordingSlc slc;
+    late bool active;
+    late int gateReads;
+    late AlertScheduleReconciler reconciler;
+
+    setUp(() {
+      fetcher = GatedFetcher();
+      slc = RecordingSlc();
+      active = true;
+      gateReads = 0;
+      reconciler = AlertScheduleReconciler(
+        gate: () async {
+          gateReads++;
+          return active;
+        },
         fetcher: () => fetcher,
         slc: () => slc,
         persistTemplates: () async {},
       );
+    });
 
+    test('B2 (#4332) — an arm suspended on its register while the last alert '
+        'is deleted ends CANCELLED', () async {
       fetcher.holdInit = Completer<void>();
       final arm = reconciler.reconcile(); // reads true, parks in init()
       await pumpEventQueue();
       active = false; // the last alert is deleted meanwhile
-      await reconciler.reconcile(); // reads false, cancels
+      final cancel = reconciler.reconcile();
+      await pumpEventQueue();
       fetcher.holdInit!.complete();
-      await arm;
+      await Future.wait([arm, cancel]);
 
-      expect(fetcher.calls, ['init', 'cancelAll']);
+      expect(fetcher.calls, ['init', 'cancelAll'],
+          reason: 'the cancel waits for the arm, then re-reads the gate');
+      expect(reconciler.phase, AlertSchedulePhase.cancelled);
+      expect(slc.calls.last, isFalse,
+          reason: 'the iOS SLC wake follows the final reading too');
       final violations = [for (final v in reconciler.debugViolations) v.$1];
       expectOnlyKnownScheduleViolations(violations);
-      expect(violations, contains(ScheduleViolation.staleArmAfterCancel),
-          reason: 'B2 still reproduces — delete the known entry with the fix');
-      expect(slc.calls.last, isTrue,
-          reason: 'the stale arm also re-armed the iOS SLC wake');
+      expect(violations, isEmpty);
+    });
+
+    test('a burst of reconciles applies once, with the final gate (#4332)',
+        () async {
+      final calls = [
+        for (var i = 0; i < 5; i++) reconciler.reconcile(),
+      ];
+      active = false; // decided before any of them got to read
+      await Future.wait(calls);
+
+      expect(gateReads, 1);
+      expect(fetcher.calls, ['cancelAll']);
+      expect(reconciler.debugApplies, hasLength(1));
+    });
+
+    test('calls during an apply coalesce into ONE re-read (#4332)', () async {
+      fetcher.holdInit = Completer<void>();
+      final first = reconciler.reconcile();
+      await pumpEventQueue();
+      final followers = [
+        for (var i = 0; i < 4; i++) reconciler.reconcile(),
+      ];
+      active = false;
+      fetcher.holdInit!.complete();
+      await Future.wait([first, ...followers]);
+
+      expect(gateReads, 2);
+      expect(fetcher.calls, ['init', 'cancelAll']);
+    });
+
+    test('startup post-frame reconcile racing delete-last-alert, through the '
+        'integrated RuntimeServicesPhase and BackgroundService.reconcile, '
+        'ends cancelled (#4332, #4317)', () async {
+      final original = BackgroundService.schedule;
+      addTearDown(() => BackgroundService.schedule = original);
+      BackgroundService.schedule = reconciler;
+      fetcher.holdInit = Completer<void>();
+
+      final startup = RuntimeServicesPhase.run(RuntimeServices(
+        initNotifications: () async {},
+        reconcileBackground: BackgroundService.reconcile,
+        opportunisticWake: () async {},
+        homeWidgetSetup: () async {},
+      ));
+      await pumpEventQueue();
+      expect(fetcher.calls, ['init'], reason: 'startup read an active alert');
+
+      // The user deletes the last alert while startup is still registering:
+      // the provider's reconcile.
+      active = false;
+      final delete = BackgroundService.reconcile();
+      await pumpEventQueue();
+      fetcher.holdInit!.complete();
+      await Future.wait([startup, delete]);
+
+      expect(fetcher.calls, ['init', 'cancelAll']);
+      expect(reconciler.phase, AlertSchedulePhase.cancelled);
+      expect(reconciler.debugViolations, isEmpty);
     });
   });
 }

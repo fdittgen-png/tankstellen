@@ -101,8 +101,8 @@ typedef ScheduleApply = ({
 /// Each apply is numbered when it reads the gate, and recorded with that
 /// reading. An apply that breaks the invariant (see [ScheduleViolation])
 /// is recorded in [debugViolations] and left as a breadcrumb — and still
-/// performed, exactly as before. Fixing a violation is a behaviour change
-/// with its own issue; this class only makes it visible.
+/// performed. With reconciles serialized (#4332) nothing in this process
+/// produces one any more; the check stays as the regression detector.
 ///
 /// Never throws: a scheduling hiccup must not crash an alert mutation, the
 /// startup phase or a boot task.
@@ -129,6 +129,12 @@ class AlertScheduleReconciler {
 
   AlertSchedulePhase _phase = AlertSchedulePhase.unknown;
   int _generation = 0;
+
+  /// The drain loop applying reconciles one at a time (#4332), or null.
+  Future<void>? _draining;
+
+  /// A reconcile was requested that the running drain has not read yet.
+  bool _requested = false;
   int _newestCancelLanded = 0;
   final Queue<ScheduleApply> _applies = Queue<ScheduleApply>();
   final Queue<(ScheduleViolation, ScheduleApply)> _violations =
@@ -148,7 +154,42 @@ class AlertScheduleReconciler {
   /// .reconcile`'s body, unchanged in order: read the gate; when active,
   /// persist the localized templates (#2306) and register; otherwise
   /// cancel; then mirror the result into the iOS SLC wake (#3169).
-  Future<void> reconcile({String cause = 'reconcile'}) async {
+  ///
+  /// ## Latest wins (#4332)
+  ///
+  /// Reconciles are applied one at a time. A call that arrives while one is
+  /// applying does not start a second, concurrent apply — it asks the
+  /// running one to read the gate AGAIN once it has landed, and completes
+  /// only after that re-read has been applied. Any number of calls in the
+  /// meantime coalesce into that one re-read, and a synchronous burst into
+  /// a single apply.
+  ///
+  /// Before this, an apply that read "active" could land its register after
+  /// a later apply had read "inactive" and cancelled — B2: the schedule
+  /// ended armed with no alert, and the iOS SLC wake with it. The startup
+  /// reconcile running after the first frame (#4317) made that overlap with
+  /// the user deleting an alert likely rather than theoretical.
+  Future<void> reconcile({String cause = 'reconcile'}) {
+    _requested = true;
+    return _draining ??= _drain(cause);
+  }
+
+  Future<void> _drain(String cause) async {
+    try {
+      // Let a synchronous burst of calls land on the flag before reading.
+      await Future<void>.value();
+      while (_requested) {
+        _requested = false;
+        await _apply(cause);
+      }
+    } finally {
+      // Same synchronous step as the loop's last check: a call can never
+      // join a drain that has already decided to stop.
+      _draining = null;
+    }
+  }
+
+  Future<void> _apply(String cause) async {
     final generation = ++_generation;
     bool? active;
     try {
