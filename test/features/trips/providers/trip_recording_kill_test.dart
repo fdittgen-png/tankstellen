@@ -15,6 +15,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
+import 'package:tankstellen/features/obd2/data/active_trip_sample_wal.dart';
+import 'package:tankstellen/features/obd2/domain/trip_distance_source.dart';
 import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
@@ -273,6 +275,95 @@ void main() {
         reason: 'a dongle-less trip stays dongle-less through a recovery');
     expect(next.read(tripRecordingProvider).phase,
         TripRecordingPhase.finished);
+  });
+
+  group('#4329 — a WAL row written before #4313 recovers as the kind its '
+      'evidence names', () {
+    /// Put a WAL row on disk exactly as a build before #4313 left it — the
+    /// recorder's default kind, so no `kind` key at all — relaunch, and End
+    /// the recovered trip. Returns the kind the saved trip carries.
+    Future<TripKind> recoverLegacyRow({
+      required String? vin,
+      required List<TripSample> samples,
+    }) async {
+      final start = RecordingSessionDriver.tripStart;
+      final wal = ActiveTripSampleWal.instance;
+      await wal.openFresh();
+      samples.forEach(wal.append);
+      await wal.readAll(); // flushes the sink
+      await disk.activeRepo.saveSnapshot(ActiveTripSnapshot(
+        id: start.toIso8601String(),
+        vehicleId: null,
+        vin: vin,
+        automatic: false,
+        phase: 'recording',
+        summary: TripSummary(
+          distanceKm: 1.2,
+          maxRpm: 0,
+          highRpmSeconds: 0,
+          idleSeconds: 0,
+          harshBrakes: 0,
+          harshAccelerations: 0,
+          distanceSource: kDistanceSourceGps,
+          startedAt: start,
+        ),
+        samples: const [],
+        odometerStartKm: null,
+        odometerLatestKm: null,
+        startedAt: start,
+        lastFlushedAt: const SystemClock().now(),
+        processInstanceId: 'a-process-that-died',
+      ));
+      expect(disk.activeBox.values.single, isNot(contains('"kind"')),
+          reason: 'precondition: the legacy row names no kind');
+      final image = await disk.capture();
+
+      final next = await disk.relaunch(image, overrides: driver.overrides);
+      addTearDown(next.dispose);
+      expect(next.read(tripRecordingProvider).phase,
+          TripRecordingPhase.pausedDueToDrop);
+      final result = await next.read(tripRecordingProvider.notifier).stop();
+      final saved = disk.historyRepo.loadAll().single;
+      expect(result.summary.kind, saved.summary.kind,
+          reason: 'the summary view shows the kind the trip was saved as');
+      return saved.summary.kind;
+    }
+
+    List<TripSample> gpsFixes() => [
+          for (var i = 0; i < 6; i++)
+            TripSample(
+              timestamp: RecordingSessionDriver.tripStart
+                  .add(Duration(seconds: i)),
+              speedKmh: 40,
+              latitude: 43.4 + i * 0.001,
+              longitude: 3.5,
+            ),
+        ];
+
+    test('GPS fixes only, no adapter identity: a GPS-only trip', () async {
+      expect(await recoverLegacyRow(vin: null, samples: gpsFixes()),
+          TripKind.gpsOnly);
+    });
+
+    test('an engine reading among the samples: a dongle trip', () async {
+      final samples = gpsFixes()
+        ..add(TripSample(
+          timestamp: RecordingSessionDriver.tripStart
+              .add(const Duration(seconds: 7)),
+          speedKmh: 42,
+          rpm: 1800,
+          fuelRateLPerHour: 5.5,
+        ));
+      expect(await recoverLegacyRow(vin: null, samples: samples),
+          TripKind.gpsPlusObd2);
+    });
+
+    test('an adapter that answered (a VIN): a dongle trip, even with GPS-only '
+        'samples', () async {
+      expect(
+          await recoverLegacyRow(vin: 'VF1RFB00X12345678', samples: gpsFixes()),
+          TripKind.gpsPlusObd2);
+    });
   });
 
   test('a kill while still connecting leaves nothing to recover', () async {

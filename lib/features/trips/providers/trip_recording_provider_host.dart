@@ -88,6 +88,9 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
   @override
   Future<void> clearActiveSnapshot() => _n._clearActiveSnapshot();
 
+  @override // #4329 — the finalised pipeline's stop saves nothing twice
+  void tearDownFinalisedTrip() => unawaited(_n.stop());
+
   @override
   Future<List<TripSample>> readAllCapturedSamples() =>
       _n.readAllCapturedSamples(); // #3878

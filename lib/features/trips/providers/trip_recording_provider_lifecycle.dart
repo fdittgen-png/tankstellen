@@ -143,7 +143,10 @@ mixin _TripRecordingLifecycle
         state.phase == TripRecordingPhase.pausedDueToDrop) {
       return _finalizeRecoveredSnapshot();
     }
-    _publish(const TripRecordingState(), 'stop without a trip');
+    // #4329 — a Stop on a trip the controller finished keeps its summary.
+    if (state.phase != TripRecordingPhase.finished) {
+      _publish(const TripRecordingState(), 'stop without a trip');
+    }
     return const StoppedTripResult.empty();
   }
 

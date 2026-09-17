@@ -115,7 +115,7 @@ class _DroppedSessionHostAdapter implements DroppedSessionHost {
   @override
   bool get started => _c._run.started;
   @override
-  void finalise() => _c._run.end();
+  void finalise() => _c._haltSampling(); // #4329 — not the run alone
 
   @override
   bool get paused => _c._run.paused;

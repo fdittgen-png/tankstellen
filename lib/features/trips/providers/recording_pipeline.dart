@@ -215,6 +215,11 @@ abstract class Obd2RecordingPipelineHost implements RecordingPipelineHost {
   /// Drop the persisted snapshot once the trip is finalised in history.
   Future<void> clearActiveSnapshot();
 
+  /// #4329 — the controller ended the trip itself (the grace window, the
+  /// parked finalise) and saved it: run the stop's teardown NOW — the emit
+  /// loop, the subscriptions, GPS, the link — which saves nothing twice.
+  void tearDownFinalisedTrip();
+
   /// #3878 — every captured sample of the running trip (WAL + ring).
   Future<List<TripSample>> readAllCapturedSamples();
 }

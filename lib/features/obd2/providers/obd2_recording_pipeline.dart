@@ -237,8 +237,13 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     });
     // #797 phase 1 — listen to explicit state changes so the UI surfaces
     // "pausedDueToDrop" even when no TripLiveReading lands.
-    _stateSub = ctl.stateChanges.listen((_) {
+    _stateSub = ctl.stateChanges.listen((state) {
       _host.state = stateAfterControllerChange(_host.state, ctl);
+      // #4329 — the controller ended the trip on its own: tear down as a
+      // Stop would, now, instead of sampling a finished trip until one.
+      if (state == TripRecordingControllerState.stopped) {
+        return _host.tearDownFinalisedTrip();
+      }
       // #1303 — phase transitions force an immediate snapshot.
       unawaited(_host.flushActiveSnapshot(force: true));
     });

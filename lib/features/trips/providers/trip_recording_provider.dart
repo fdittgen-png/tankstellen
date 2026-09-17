@@ -24,7 +24,6 @@ import '../data/trip_history_repository.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_save_stage.dart';
 import '../domain/entities/trip_start_stage.dart';
-import '../domain/services/recovered_summary_rebuild.dart';
 import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
 import 'active_vehicle_read.dart';
