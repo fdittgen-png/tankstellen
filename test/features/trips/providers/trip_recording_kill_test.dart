@@ -9,8 +9,12 @@
 /// assertion is always about what the relaunched app hands the user.
 library;
 
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/time/app_clock.dart';
+import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
 import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
@@ -135,6 +139,94 @@ void main() {
         n.pause();
         await RecordingDisk.settle();
       }, TripRecordingPhase.paused);
+    });
+  });
+
+  group('#4314 — a trip killed while degraded has a paused row AND a WAL '
+      'row under one id, and is still recovered exactly once', () {
+    /// Kill an OBD2 trip degraded onto GPS: the drop wrote a paused-trip
+    /// row next to the WAL row.
+    Future<RecordingDiskImage> killWhileDegraded() async {
+      final old = driver.container();
+      final notifier = await RecordingSessionDriver.startObd2(old);
+      RecordingSessionDriver.captureObd2Samples(notifier, 12);
+      notifier.debugController!
+        ..updateGpsFix(latitude: 48, longitude: 7, speedKmh: 50)
+        ..debugTriggerDrop(reason: TripDropReason.silentFailure);
+      await RecordingDisk.settle();
+      await notifier.onAppBackgrounded();
+      final image = await disk.capture();
+      expect(image.paused, hasLength(1));
+      expect(image.active, hasLength(1));
+      final activeId =
+          ActiveTripSnapshot.fromJson(jsonDecode(image.active.values.single)
+                  as Map<String, dynamic>)
+              .id;
+      expect(image.paused.keys.single, activeId,
+          reason: 'the precondition: two rows, one trip');
+      await windDown(old);
+      return image;
+    }
+
+    DateTime Function() minutesLater(int m) =>
+        () => const SystemClock().now().add(Duration(minutes: m));
+
+    void expectOneCompleteTrip() {
+      final saved = disk.historyRepo.loadAll();
+      expect(saved, hasLength(1));
+      expect(saved.single.samples, hasLength(12),
+          reason: 'the sample-less paused copy must never win');
+      expect(saved.single.termination?.reason,
+          TripTerminationReason.recoveredAfterProcessDeath);
+    }
+
+    test('relaunched after the sweep threshold: the sweep leaves the '
+        'recoverable trip alone', () async {
+      final image = await killWhileDegraded();
+
+      final next = await disk.relaunch(image,
+          overrides: driver.overrides, now: minutesLater(10));
+      addTearDown(next.dispose);
+      expect(disk.historyRepo.loadAll(), isEmpty,
+          reason: 'the active row is still recoverable — the paused sweep '
+              'must not save a sample-less copy of it');
+      expect(next.read(tripRecordingProvider).phase,
+          TripRecordingPhase.pausedDueToDrop);
+
+      await next.read(tripRecordingProvider.notifier).stop();
+      expectOneCompleteTrip();
+      expect(disk.pausedBox.isEmpty, isTrue);
+    });
+
+    test('ended at once, then a later launch sweeps: the good row survives',
+        () async {
+      final image = await killWhileDegraded();
+      final first = await disk.relaunch(image, overrides: driver.overrides);
+      await first.read(tripRecordingProvider.notifier).stop();
+      expectOneCompleteTrip();
+      expect(disk.pausedBox.isEmpty, isTrue,
+          reason: 'finalising the recovered trip deletes its paused row');
+      final afterEnd = await disk.capture();
+      first.dispose();
+
+      final later = await disk.relaunch(afterEnd,
+          overrides: driver.overrides, now: minutesLater(30));
+      addTearDown(later.dispose);
+      expectOneCompleteTrip();
+    });
+
+    test('discarding the recovered trip (reset) deletes its paused row too',
+        () async {
+      final image = await killWhileDegraded();
+      final next = await disk.relaunch(image, overrides: driver.overrides);
+      addTearDown(next.dispose);
+
+      next.read(tripRecordingProvider.notifier).reset();
+      await RecordingDisk.settle();
+
+      expect(disk.activeBox.isEmpty, isTrue);
+      expect(disk.pausedBox.isEmpty, isTrue,
+          reason: 'a discarded trip must not come back as a sweep row');
     });
   });
 
