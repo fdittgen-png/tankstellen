@@ -109,7 +109,7 @@ create_lcov "$TEST_DIR"
 OUTPUT=$(cd "$TEST_DIR" && bash "$SCRIPT" --threshold 50 2>&1)
 EXIT=$?
 assert_exit_code "exits with 0" 0 "$EXIT"
-assert_output_contains "shows coverage percentage" "Coverage: 60%" "$OUTPUT"
+assert_output_contains "shows coverage percentage" "Coverage: 60.00%" "$OUTPUT"
 assert_output_contains "shows passed message" "Coverage check passed" "$OUTPUT"
 
 # Test 3: Coverage below threshold fails
@@ -131,7 +131,7 @@ create_lcov_with_generated "$TEST_DIR"
 OUTPUT=$(cd "$TEST_DIR" && bash "$SCRIPT" --threshold 50 2>&1)
 EXIT=$?
 assert_exit_code "passes when generated files excluded" 0 "$EXIT"
-assert_output_contains "coverage is 50%" "Coverage: 50%" "$OUTPUT"
+assert_output_contains "coverage is 50%" "Coverage: 50.00%" "$OUTPUT"
 
 # Test 5: Custom lcov path
 echo "Test 5: Custom lcov path"
@@ -153,16 +153,17 @@ OUTPUT=$(cd "$TEST_DIR" && bash "$SCRIPT" --threshold abc 2>&1) || EXIT=$?
 assert_exit_code "exits with error" 1 "$EXIT"
 assert_output_contains "shows error" "Threshold must be a positive integer" "$OUTPUT"
 
-# Test 7: Default threshold is 45%
-echo "Test 7: Default threshold is 45%"
+# Test 7: Default threshold is 40% (the script default; ci.yml passes it
+# explicitly)
+echo "Test 7: Default threshold is 40%"
 TEST_DIR="$TEMP_DIR/test7"
 mkdir -p "$TEST_DIR"
 create_lcov "$TEST_DIR"
-# 60% coverage is above default 45%
+# 60% coverage is above default 40%
 OUTPUT=$(cd "$TEST_DIR" && bash "$SCRIPT" 2>&1)
 EXIT=$?
 assert_exit_code "passes with default threshold" 0 "$EXIT"
-assert_output_contains "shows 45% threshold" "Threshold: 45%" "$OUTPUT"
+assert_output_contains "shows 40% threshold" "Threshold: 40%" "$OUTPUT"
 
 # Test 8: Unknown argument
 echo "Test 8: Unknown argument"
@@ -172,6 +173,17 @@ EXIT=0
 OUTPUT=$(cd "$TEST_DIR" && bash "$SCRIPT" --unknown 2>&1) || EXIT=$?
 assert_exit_code "exits with error" 1 "$EXIT"
 assert_output_contains "shows usage" "Usage:" "$OUTPUT"
+
+# Test 9 (#4347): a report with nothing left after filtering is not
+# positive evidence and must fail
+echo "Test 9: Fully filtered report fails"
+TEST_DIR="$TEMP_DIR/test9"
+mkdir -p "$TEST_DIR/coverage"
+printf 'SF:lib/models/station.g.dart\nDA:1,1\nend_of_record\n' > "$TEST_DIR/coverage/lcov.info"
+EXIT=0
+OUTPUT=$(cd "$TEST_DIR" && bash "$SCRIPT" 2>&1) || EXIT=$?
+assert_exit_code "exits with error" 1 "$EXIT"
+assert_output_contains "names the missing evidence" "No coverage data left" "$OUTPUT"
 
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="

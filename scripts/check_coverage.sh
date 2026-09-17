@@ -71,17 +71,24 @@ with open('$LCOV_FILE') as f:
 TOTAL_LINES=$(grep -c "^DA:" "$FILTERED_FILE" || true)
 HIT_LINES=$(grep "^DA:" "$FILTERED_FILE" | grep -cv ",0$" || true)
 
+# #4347 — an empty or fully filtered report is not positive coverage
+# evidence: nothing was measured, so it must not satisfy the gate. (This
+# branch used to warn and exit 0.)
 if [ "$TOTAL_LINES" -eq 0 ]; then
-  echo "::warning::No coverage data found after filtering generated files."
-  exit 0
+  echo "::error::No coverage data left after filtering generated files ($LCOV_FILE has no maintained-source DA records) — refusing to report a pass."
+  exit 1
 fi
 
-COVERAGE=$((HIT_LINES * 100 / TOTAL_LINES))
-echo "Coverage: ${COVERAGE}% (${HIT_LINES}/${TOTAL_LINES} lines, excluding generated code)"
+# #4347 — report the exact ratio to two decimals (62,680 / 72,069 is
+# 86.97 %, which integer division printed as 86 %). The gate compares the
+# exact rational, HIT/TOTAL < THRESHOLD/100, which for an integer threshold
+# decides exactly as the old truncated comparison did.
+COVERAGE_2DP=$(LC_ALL=C awk -v h="$HIT_LINES" -v t="$TOTAL_LINES" 'BEGIN { printf "%.2f", h * 100 / t }')
+echo "Coverage: ${COVERAGE_2DP}% (${HIT_LINES}/${TOTAL_LINES} lines, excluding generated code)"
 echo "Threshold: ${THRESHOLD}%"
 
-if [ "$COVERAGE" -lt "$THRESHOLD" ]; then
-  echo "::error::Coverage ${COVERAGE}% is below ${THRESHOLD}% threshold"
+if [ $((HIT_LINES * 100)) -lt $((THRESHOLD * TOTAL_LINES)) ]; then
+  echo "::error::Coverage ${COVERAGE_2DP}% is below ${THRESHOLD}% threshold"
   exit 1
 fi
 
