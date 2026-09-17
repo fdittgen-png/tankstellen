@@ -4,9 +4,11 @@
 import '../../../vehicle/api.dart' show ReferenceVehicle, EtaVCurvePoint, defaultVolumetricEfficiency, etaVCurveFor;
 import '../../../../core/domain/pump_gain_resolution.dart';
 import '../../../../core/domain/vehicle_profile.dart';
+import '../../../trips/api.dart' show estimatedFuelRateLPerHour, FuzzyPhysicsBasis;
 import '../../domain/fuel_mixture_model.dart' as mixture_model;
 import '../fuel_rate_diagnostics.dart';
 import '../../domain/fuel_rate_estimator.dart' as estimator;
+import '../../domain/obd2_fuzzy_context.dart';
 import '../obd2_breadcrumb_collector.dart';
 import '../../domain/vehicle_signal.dart';
 import 'obd2_signal_support.dart';
@@ -105,8 +107,8 @@ class Obd2FuelRateReader {
     // or users who explicitly typed a non-default value through the
     // calibration card.
     final manualVe = vehicle?.manualVolumetricEfficiencyOverride;
-    final profileVe =
-        _resolveProfileVolumetricEfficiency(vehicle, referenceVehicle);
+    final profileVe = profileVolumetricEfficiency(vehicle,
+        hasReferenceVehicle: referenceVehicle != null);
     final volumetricEfficiency = manualVe ??
         profileVe ??
         (referenceVehicle != null
@@ -248,8 +250,11 @@ class Obd2FuelRateReader {
         final rate = maf * 3600.0 / (effectiveAfr * fuelDensityGPerL);
         // #3430 — STFT/LTFT are petrol stoich-feedback trims: skipped on
         // diesel.
-        final corrected =
-            (skipTrim ? rate : await _applyFuelTrimCorrection(rate)) * pumpGain;
+        // #4233 — through the fuzzy stage, which applies the gain once.
+        final corrected = estimatedFuelRateLPerHour(
+            skipTrim ? rate : await _applyFuelTrimCorrection(rate),
+            FuzzyPhysicsBasis.maf,
+            pumpGain: pumpGain, context: obd2PullFuzzyContext(vehicle));
         diagnostics.recordMaf(corrected: corrected, maf: maf);
         return corrected;
       }
@@ -317,7 +322,10 @@ class Obd2FuelRateReader {
       return null;
     }
     // #3430 — trim correction skipped on diesel (petrol stoich feedback).
-    final corrected = (skipTrim ? rate : await _applyFuelTrimCorrection(rate)) * pumpGain;
+    final corrected = estimatedFuelRateLPerHour(
+        skipTrim ? rate : await _applyFuelTrimCorrection(rate),
+        FuzzyPhysicsBasis.speedDensity,
+        pumpGain: pumpGain, context: obd2PullFuzzyContext(vehicle, rpm: rpm));
     diagnostics.recordSpeedDensity(
       corrected: corrected,
       mapKpa: mapKpa,
@@ -353,37 +361,4 @@ class Obd2FuelRateReader {
       ltftBank2: ltft2,
     );
   }
-}
-
-/// Returns the user-profile η_v that should beat the catalog helper, or
-/// null when the engine-tech default should kick in instead (#1422 phase 1).
-///
-/// Resolution rules:
-///   - Profile is null → null (caller falls back to catalog helper).
-///   - Profile carries a learned EWMA value
-///     (`volumetricEfficiencySamples > 0`) → return the stored value, no
-///     matter what it is. The user's own car beats the table.
-///   - Profile carries a non-default value (anything ≠ 0.85) → return it.
-///     This covers users who typed a non-default value somewhere upstream
-///     even though the sample counter never bumped.
-///   - Profile sits at the cold-start default 0.85 with zero learned
-///     samples → null. Caller resolves
-///     `defaultVolumetricEfficiency(reference)` instead so a Dacia dCi
-///     gets 0.95 from day one rather than being stuck at 0.85 until
-///     VeLearner converges over several plein cycles.
-double? _resolveProfileVolumetricEfficiency(
-  VehicleProfile? vehicle,
-  ReferenceVehicle? referenceVehicle,
-) {
-  if (vehicle == null) return null;
-  // Without a reference vehicle to derive a better default from, the
-  // stored value is the best we have — even if it equals 0.85.
-  if (referenceVehicle == null) return vehicle.volumetricEfficiency;
-  if (vehicle.volumetricEfficiencySamples > 0) {
-    return vehicle.volumetricEfficiency;
-  }
-  if (vehicle.volumetricEfficiency != estimator.kDefaultVolumetricEfficiency) {
-    return vehicle.volumetricEfficiency;
-  }
-  return null;
 }

@@ -369,7 +369,10 @@ void main() {
     // `tankFuelKeyOf`, read from the evidence-only tank blend.
     'lib/features/fill_ups/providers/consumption_providers.dart': 967,
     'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': 948,
-    'lib/features/obd2/data/session/live_sample_snapshot.dart': 910,
+    // #4233 — 910 → 900: the profile-η_v rule moved to a pure domain
+    // function shared with the pull reader; the fuzzy stage call sites
+    // and their context getter took back 12 of the 22 lines.
+    'lib/features/obd2/data/session/live_sample_snapshot.dart': 900,
     'lib/features/profile/presentation/widgets/profile_edit_sheet.dart': 855,
     'lib/features/obd2/data/session/obd2_self_test_driver.dart': 828,
     'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 824,

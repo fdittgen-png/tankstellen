@@ -122,7 +122,8 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // engine-tech helper on the reference catalog row → hard 0.85 fallback.
     // Both paths must agree so live + pull-mode produce identical numbers.
     final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
-        _resolveControllerProfileVe() ??
+        profileVolumetricEfficiency(_vehicle,
+            hasReferenceVehicle: _referenceVehicle != null) ??
         (_referenceVehicle != null
             ? defaultVolumetricEfficiency(_referenceVehicle)
             : 0.85);
@@ -266,7 +267,10 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       final raw = maf * 3600.0 / (effectiveAfr * density);
       // #3430 — STFT/LTFT are petrol stoich-feedback trims; skipped on
       // diesel (they don't model a lean-burn mixture).
-      final corrected = (skipTrim ? raw : _applyTrim(raw)) * pumpGain;
+      // #4233 — through the fuzzy stage, which applies the gain once.
+      final corrected = estimatedFuelRateLPerHour(
+          skipTrim ? raw : _applyTrim(raw), FuzzyPhysicsBasis.maf,
+          pumpGain: pumpGain, context: _fuzzyContext());
       collector?.record(
         branch: Obd2BranchTag.maf,
         fuelRateLPerHour: corrected,
@@ -337,7 +341,9 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       return null;
     }
     // #3430 — trim correction skipped on diesel (petrol stoich feedback).
-    final corrected = (skipTrim ? raw : _applyTrim(raw)) * pumpGain;
+    final corrected = estimatedFuelRateLPerHour(
+        skipTrim ? raw : _applyTrim(raw), FuzzyPhysicsBasis.speedDensity,
+        pumpGain: pumpGain, context: _fuzzyContext()); // #4233 — as MAF
     collector?.record(
       branch: Obd2BranchTag.speedDensity,
       fuelRateLPerHour: corrected,
@@ -357,28 +363,9 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     return corrected;
   }
 
-  /// Returns the user profile's η_v that should beat the engine-tech
-  /// helper, or null when the helper should kick in instead (#1422
-  /// phase 1). Mirrors the rules in [_resolveProfileVolumetricEfficiency]
-  /// in `obd2_service.dart` so both the live integrator and the
-  /// pull-mode estimator agree on a per-tick basis.
-  ///
-  /// Profile null → null (caller will use the helper or hard fallback).
-  /// Without a reference catalog row the stored profile value is the
-  /// best we can do, even if it equals the legacy 0.85 default.
-  /// Otherwise: keep the stored value when the VeLearner has logged at
-  /// least one sample OR when the value differs from the legacy 0.85
-  /// default. A cold-start profile sitting on 0.85 with zero samples
-  /// returns null, letting the engine-tech helper provide a closer
-  /// initial guess (e.g. 0.95 for a Dacia dCi VNT diesel).
-  double? _resolveControllerProfileVe() {
-    final v = _vehicle;
-    if (v == null) return null;
-    if (_referenceVehicle == null) return v.volumetricEfficiency;
-    if (v.volumetricEfficiencySamples > 0) return v.volumetricEfficiency;
-    if (v.volumetricEfficiency != 0.85) return v.volumetricEfficiency;
-    return null;
-  }
+  /// #4233 — the latches, with their arrival ages, as fuzzy context.
+  FuzzyConsumptionInput _fuzzyContext() =>
+      obd2LiveFuzzyContext(_signals, now: _clock(), vehicle: _vehicle);
 
   /// Apply the STFT + LTFT correction used on the MAF / speed-density
   /// branches (#813; bank-2 #2458). Returns [raw] unchanged when either

@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
+import '../../../trips/api.dart'
+    show estimatedFuelRateLPerHour, FuzzyConsumptionInput, FuzzyPhysicsBasis;
 import '../../../../core/domain/pump_gain_resolution.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../protocol/elm327_protocol.dart';
 import '../protocol/obd2_signal_pids.dart';
 import '../../domain/fuel_mixture_model.dart';
+import '../../domain/obd2_fuzzy_context.dart';
 import '../../domain/vehicle_power_state.dart';
 import '../obd2_breadcrumb_collector.dart';
 import 'obd2_service.dart';
