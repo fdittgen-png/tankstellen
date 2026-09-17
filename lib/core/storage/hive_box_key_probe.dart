@@ -88,11 +88,11 @@ abstract final class HiveBoxKeyProbe {
       var foreign = false;
       for (final (:file, size: _) in boxes) {
         switch (_firstFrame(file, keyCrc, onRead)) {
-          case _Frame.thisKey:
+          case BoxFileKind.underKey:
             return BoxKeyVerdict.consistent;
-          case _Frame.foreign:
+          case BoxFileKind.foreign:
             foreign = true;
-          case _Frame.none || _Frame.plaintext:
+          case BoxFileKind.empty || BoxFileKind.plaintext:
             break;
         }
       }
@@ -104,18 +104,28 @@ abstract final class HiveBoxKeyProbe {
     }
   }
 
-  static _Frame _firstFrame(
+  /// What the first frame of ONE box [file] is, read-only (#4372).
+  ///
+  /// A missing file is [BoxFileKind.empty]. Throws on any other I/O
+  /// failure — the caller owns what "cannot tell" permits; the plaintext
+  /// migration, for one, must not guess.
+  static BoxFileKind classify(File file, HiveAesCipher? cipher) {
+    if (!file.existsSync()) return BoxFileKind.empty;
+    return _firstFrame(file, cipher?.calculateKeyCrc(), null);
+  }
+
+  static BoxFileKind _firstFrame(
       File file, int? keyCrc, void Function(File, int)? onRead) {
     final raf = file.openSync();
     try {
       final size = raf.lengthSync();
-      if (size < 8) return _Frame.none;
+      if (size < 8) return BoxFileKind.empty;
       final header = raf.readSync(4);
       final length =
           ByteData.sublistView(header).getUint32(0, Endian.little);
       // Hive reads a frame shorter than 8 bytes, or longer than the file,
       // as no frame at all.
-      if (length < 8 || length > size) return _Frame.none;
+      if (length < 8 || length > size) return BoxFileKind.empty;
       final frame = Uint8List(length)
         ..setRange(0, 4, header)
         ..setRange(4, length, raf.readSync(length - 4));
@@ -123,15 +133,28 @@ abstract final class HiveBoxKeyProbe {
       final body = Uint8List.sublistView(frame, 0, length - 4);
       final stored = ByteData.sublistView(frame)
           .getUint32(length - 4, Endian.little);
-      if (getCrc32(body) == stored) return _Frame.plaintext;
+      if (getCrc32(body) == stored) return BoxFileKind.plaintext;
       if (keyCrc != null && getCrc32(body, keyCrc) == stored) {
-        return _Frame.thisKey;
+        return BoxFileKind.underKey;
       }
-      return _Frame.foreign;
+      return BoxFileKind.foreign;
     } finally {
       raf.closeSync();
     }
   }
 }
 
-enum _Frame { none, plaintext, thisKey, foreign }
+/// What a box file's first complete frame says about how it was written.
+enum BoxFileKind {
+  /// No complete first frame: a missing, empty or torn file.
+  empty,
+
+  /// Written without a cipher.
+  plaintext,
+
+  /// Written under the key the caller asked about.
+  underKey,
+
+  /// Ciphertext under some other key (or a damaged first frame).
+  foreign,
+}

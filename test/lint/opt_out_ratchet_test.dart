@@ -48,7 +48,7 @@ void main() {
   //                                      TOTAL may still only shrink)
   // Measured 2026-08-17.
   const optOutBaseline = <String, int>{
-    '// ignore: silent_catch': 32,
+    '// ignore: silent_catch': 31, // #4372 removed the legacy migration's keyed-open catch
     '// ignore: catch_no_st': 14,
     '// ignore: log_raw_debugprint': 0,
     '// i18n-ignore:': 122,

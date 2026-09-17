@@ -309,12 +309,11 @@ void main() {
       expect(keyWrites, 1);
     });
 
-    test('a legacy plaintext box is handed to the #1686 migration, not '
-        'refused as a lost key', () async {
-      // OBSERVATION — #4372. Only the verdict is pinned here: the #1686
-      // migration then truncates this box (its cipher-first open does not
-      // throw), so this test must NOT assert the data survives until #4372
-      // fixes the migration.
+    test('a legacy plaintext box is migrated with its data, not refused as '
+        'a lost key (#1686, #4372)', () async {
+      // Was an OBSERVATION of #4372: the migration's cipher-first open
+      // truncated this box. The migration now classifies the file first,
+      // so the record survives the real launch.
       final legacy = await Hive.openBox<dynamic>(HiveBoxes.favorites);
       await legacy.put('station-1', '{"id":"station-1"}');
       await legacy.close();
@@ -322,6 +321,8 @@ void main() {
 
       await expectLater(launch(), completes);
       expect(keyWrites, 1);
+      expect(Hive.box<dynamic>(HiveBoxes.favorites).get('station-1'),
+          '{"id":"station-1"}');
     });
   });
 }

@@ -106,21 +106,23 @@ void main() {
     });
   });
 
-  // OBSERVATION — tracked as #4372. The #1686 migration's cipher-first
-  // open truncates a legacy plaintext box. This pins the CURRENT loss and
-  // never asserts the data survives; #4372 flips it when it lands.
-  test('OBSERVATION (pre-existing, not #4341; #4372): the #1686 legacy '
-      'migration probe opens a plaintext box WITH the cipher, which '
-      'truncates it', () async {
+  // Was an OBSERVATION of #4372: the #1686 migration's cipher-first open
+  // truncated a legacy plaintext box. Fixed by #4372 — the migration now
+  // classifies the file with HiveBoxKeyProbe before any keyed open, so the
+  // data must survive.
+  test('#4372: the #1686 legacy migration keeps a plaintext box\'s data',
+      () async {
     await writeBox('favorites', data: {'station-1': '{"id":"station-1"}'});
     expect(boxFile('favorites').lengthSync(), greaterThan(0));
+    HiveDirectoryResolver.hivePathForTest = dir.path;
+    addTearDown(() => HiveDirectoryResolver.hivePathForTest = null);
     await HiveLegacyMigration.migrateLegacyPlaintextBox('favorites', key);
     final box = await Hive.openBox<dynamic>('favorites', encryptionCipher: key);
     // ignore: avoid_print
     print('legacy favorites after migration: ${box.toMap()} '
         '(file ${boxFile('favorites').lengthSync()} bytes)');
-    expect(box.get('station-1'), isNull,
-        reason: 'documents the pre-existing loss; flip if migration is fixed');
+    expect(box.get('station-1'), '{"id":"station-1"}',
+        reason: 'the plaintext record must be carried into the keyed box');
   });
 
   group('8 — plaintext boxes are never another key', () {
