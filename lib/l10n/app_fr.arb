@@ -6874,5 +6874,10 @@
   "alertsNotificationsOffChannelBody": "Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications d'alertes de prix sont désactivées dans les réglages de votre téléphone.",
   "alertsNotificationsOffOpenSettings": "Ouvrir les réglages",
   "tripSaveFailedKept": "Trajet non enregistré — il est conservé et sera réessayé",
-  "tripSaveRetryAction": "Réessayer"
+  "tripSaveRetryAction": "Réessayer",
+  "stationReferencePriceNotice": "Prix de référence pour ce secteur, pas l'emplacement d'une station — il n'y a pas de destination de navigation.",
+  "decisionPartialCoverageNote": "La source de ce pays ne recense qu'une partie des stations : ces choix sont les meilleurs parmi les stations affichées.",
+  "errorTitleProviderUnavailable": "Aucun prix pour ce pays",
+  "errorProviderUnavailable": "La source de prix de ce pays ne publie actuellement aucun prix en direct. Réessayer n'y changera rien.",
+  "recoveryStillWorksProviderUnavailable": "Vos favoris, vos pleins et les recherches dans d'autres pays fonctionnent toujours."
 }

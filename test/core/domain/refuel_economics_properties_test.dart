@@ -249,6 +249,9 @@ void main() {
       },
     );
 
+    // #4360 — compared at the SAME terminal state. Raw pump cash compares
+    // a plan ending near the reserve with one ending on a full tank; the
+    // comparable cost values the difference at the set's one basis.
     Glados3(consumption, price, price).test(
       'the cheapest plan never costs more than the fastest one',
       (c, pA, pB) {
@@ -269,7 +272,8 @@ void main() {
         ));
         final cheap = plans.cheapest, fast = plans.fastest;
         if (cheap == null || fast == null) return;
-        expect(cheap.totalCost, lessThanOrEqualTo(fast.totalCost + 1e-6),
+        expect(plans.comparableCost(cheap)!,
+            lessThanOrEqualTo(plans.comparableCost(fast)! + 1e-6),
             reason: 'the "cheapest" plan cost more than the fastest one');
       },
     );

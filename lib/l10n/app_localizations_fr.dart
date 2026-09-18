@@ -8400,6 +8400,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get splashLoadingLabel => 'Chargement de Sparkilo';
 
   @override
+  String get stationReferencePriceNotice =>
+      'Prix de référence pour ce secteur, pas l\'emplacement d\'une station — il n\'y a pas de destination de navigation.';
+
+  @override
+  String get decisionPartialCoverageNote =>
+      'La source de ce pays ne recense qu\'une partie des stations : ces choix sont les meilleurs parmi les stations affichées.';
+
+  @override
+  String get errorTitleProviderUnavailable => 'Aucun prix pour ce pays';
+
+  @override
+  String get errorProviderUnavailable =>
+      'La source de prix de ce pays ne publie actuellement aucun prix en direct. Réessayer n\'y changera rien.';
+
+  @override
+  String get recoveryStillWorksProviderUnavailable =>
+      'Vos favoris, vos pleins et les recherches dans d\'autres pays fonctionnent toujours.';
+
+  @override
   String get storageRecoveryTitle => 'Problème de stockage';
 
   @override

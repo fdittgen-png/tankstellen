@@ -13856,6 +13856,36 @@ abstract class AppLocalizations {
   /// **'Loading Sparkilo'**
   String get splashLoadingLabel;
 
+  /// Map sheet line replacing the Navigate button for a reference/aggregate price (Luxembourg decree, Greek prefecture average) that is pinned at a stand-in point rather than a real forecourt (#4348).
+  ///
+  /// In en, this message translates to:
+  /// **'Reference price for this area, not a station location — there is nowhere to navigate to.'**
+  String get stationReferencePriceNotice;
+
+  /// Qualifier under the refuel decision picks when a result comes from a partial-coverage provider such as Denmark's brand feeds (#4348).
+  ///
+  /// In en, this message translates to:
+  /// **'This country\'s source lists only some stations, so these picks are the best among the stations shown.'**
+  String get decisionPartialCoverageNote;
+
+  /// Error screen title when the country's price provider is declared unavailable (retired or publishing no prices), e.g. Australia (#4348).
+  ///
+  /// In en, this message translates to:
+  /// **'No prices for this country'**
+  String get errorTitleProviderUnavailable;
+
+  /// Explains a structurally unavailable price provider — not a network failure, so it must not suggest checking the connection (#4348).
+  ///
+  /// In en, this message translates to:
+  /// **'This country\'s price source publishes no live prices at the moment. Retrying will not change that.'**
+  String get errorProviderUnavailable;
+
+  /// Recovery 'what still works' line for an unavailable country price provider (#4348).
+  ///
+  /// In en, this message translates to:
+  /// **'Your favorites, fill-ups and searches in other countries still work.'**
+  String get recoveryStillWorksProviderUnavailable;
+
   /// Title of the cold-start recovery screen shown when a Hive box is corrupted beyond repair and the app cannot open its local data store (#2294).
   ///
   /// In en, this message translates to:

@@ -8324,6 +8324,25 @@ class AppLocalizationsCs extends AppLocalizations {
   String get splashLoadingLabel => 'Načítání Sparkilo';
 
   @override
+  String get stationReferencePriceNotice =>
+      'Reference price for this area, not a station location — there is nowhere to navigate to.';
+
+  @override
+  String get decisionPartialCoverageNote =>
+      'This country\'s source lists only some stations, so these picks are the best among the stations shown.';
+
+  @override
+  String get errorTitleProviderUnavailable => 'No prices for this country';
+
+  @override
+  String get errorProviderUnavailable =>
+      'This country\'s price source publishes no live prices at the moment. Retrying will not change that.';
+
+  @override
+  String get recoveryStillWorksProviderUnavailable =>
+      'Your favorites, fill-ups and searches in other countries still work.';
+
+  @override
   String get storageRecoveryTitle => 'Problém s úložištěm';
 
   @override

@@ -30,8 +30,12 @@ final _now = DateTime.utc(2026, 9, 16, 12);
 
 void main() {
   // Roughly 1° of latitude ≈ 111 km, so this route is ~444 km.
+  // #4360 — dense enough that each station projects onto a vertex beside
+  // it: with one vertex per degree a station half-way between two sat
+  // 55 km "off route", and a planner that now pays for its detours
+  // honestly could not reach it.
   final geometry = [
-    for (var i = 0; i <= 4; i++) LatLng(44.0 + i, 5.0),
+    for (var i = 0; i <= 40; i++) LatLng(44.0 + i / 10, 5.0),
   ];
 
   Station station(String id, double lat, double price) => Station(
@@ -163,7 +167,7 @@ void main() {
       TravelContext? asked;
       final c = container(
         route: result(stations: [station('middle', 45.5, 1.60)]),
-        level: 20,
+        level: 25, // 200 km usable: the stop at ~166 km is reachable
         fetcher: (context, stops) async {
           asked = context;
           return [
@@ -185,9 +189,11 @@ void main() {
       final sub = c.listen(refuelPlanProvider, (_, _) {});
       addTearDown(sub.close);
 
-      expect(c.read(refuelPlanProvider).plans!.cheapest!.detourTimeIsApproximate,
-          isTrue,
-          reason: 'before the router answers the detour is approximate');
+      expect(
+          c.read(refuelPlanProvider).plans!.cheapest!.stops.single.candidate
+              .roadExtraKm,
+          isNull,
+          reason: 'before the router answers the detour is the projection');
       await Future<void>.delayed(Duration.zero);
       await Future<void>.delayed(Duration.zero);
 

@@ -8279,6 +8279,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashLoadingLabel => 'Loading Sparkilo';
 
   @override
+  String get stationReferencePriceNotice =>
+      'Reference price for this area, not a station location — there is nowhere to navigate to.';
+
+  @override
+  String get decisionPartialCoverageNote =>
+      'This country\'s source lists only some stations, so these picks are the best among the stations shown.';
+
+  @override
+  String get errorTitleProviderUnavailable => 'No prices for this country';
+
+  @override
+  String get errorProviderUnavailable =>
+      'This country\'s price source publishes no live prices at the moment. Retrying will not change that.';
+
+  @override
+  String get recoveryStillWorksProviderUnavailable =>
+      'Your favorites, fill-ups and searches in other countries still work.';
+
+  @override
   String get storageRecoveryTitle => 'Storage problem';
 
   @override
@@ -18691,6 +18710,26 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get splashLoadingLabel => '⟦Łóáđîñǧ Šƥářķîłó ·······⟧';
+
+  @override
+  String get stationReferencePriceNotice =>
+      '⟦Řéƒéřéñçé ƥřîçé ƒóř ŧĥîš ářéá, ñóŧ á šŧáŧîóñ łóçáŧîóñ — ŧĥéřé îš ñóŵĥéřé ŧó ñáṽîǧáŧé ŧó. ································⟧';
+
+  @override
+  String get decisionPartialCoverageNote =>
+      '⟦Ŧĥîš çóúñŧřý\'š šóúřçé łîšŧš óñłý šóɱé šŧáŧîóñš, šó ŧĥéšé ƥîçķš ářé ŧĥé ƀéšŧ áɱóñǧ ŧĥé šŧáŧîóñš šĥóŵñ. ·····································⟧';
+
+  @override
+  String get errorTitleProviderUnavailable =>
+      '⟦Ñó ƥřîçéš ƒóř ŧĥîš çóúñŧřý ··········⟧';
+
+  @override
+  String get errorProviderUnavailable =>
+      '⟦Ŧĥîš çóúñŧřý\'š ƥřîçé šóúřçé ƥúƀłîšĥéš ñó łîṽé ƥřîçéš áŧ ŧĥé ɱóɱéñŧ. Řéŧřýîñǧ ŵîłł ñóŧ çĥáñǧé ŧĥáŧ. ····································⟧';
+
+  @override
+  String get recoveryStillWorksProviderUnavailable =>
+      '⟦Ýóúř ƒáṽóřîŧéš, ƒîłł-úƥš áñđ šéářçĥéš îñ óŧĥéř çóúñŧřîéš šŧîłł ŵóřķ. ·························⟧';
 
   @override
   String get storageRecoveryTitle => '⟦Šŧóřáǧé ƥřóƀłéɱ ······⟧';
