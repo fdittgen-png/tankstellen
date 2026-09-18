@@ -117,7 +117,11 @@ void main() {
     });
 
     test('stations exist but none has a price for the selected fuel', () {
+      // #4362 — the tank is short of the 444 km route (44.4 L needed, 20
+      // aboard), so a stop is genuinely required. With a sufficient tank
+      // this is a no-stop plan instead, not a blocker.
       final c = container(
+        level: 20,
         route: result(stations: const [
           Station(
             id: 'a', name: 'a', brand: 'b', street: 'r', postCode: '1',

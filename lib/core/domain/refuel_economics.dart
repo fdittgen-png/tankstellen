@@ -196,7 +196,7 @@ abstract final class RefuelEconomics {
       if (target == null || code == null || code == target) return amount;
       if (now == null) return null;
       return profile.rates
-          .convert(Money(amount, code), target, now!)
+          .convert(Money(amount, code), target, now)
           .converted
           ?.amount;
     }
