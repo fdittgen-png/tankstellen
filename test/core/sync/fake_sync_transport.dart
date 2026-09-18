@@ -95,4 +95,21 @@ class FakeSyncTransport implements SyncTransport {
     tables[table]?.removeWhere(
         (row) => filters.entries.every((f) => row[f.key] == f.value));
   }
+
+  /// One recorded [deleteOlderThan] call, as `column<before`.
+  final List<DeleteCall> pruneCalls = [];
+
+  @override
+  Future<void> deleteOlderThan(
+    String table,
+    String column,
+    String before,
+  ) async {
+    if (failDeletes) throw Exception('FakeSyncTransport: delete offline');
+    pruneCalls.add(DeleteCall(table, {column: before}));
+    tables[table]?.removeWhere((row) {
+      final stamp = row[column];
+      return stamp is String && stamp.compareTo(before) < 0;
+    });
+  }
 }

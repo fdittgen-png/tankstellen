@@ -6,12 +6,17 @@
 /// and granted again (#4337).
 library;
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/supabase_client.dart';
 import 'package:tankstellen/core/sync/sync_provider.dart';
 import 'package:tankstellen/core/sync/sync_pull_coordinator.dart';
 import 'package:tankstellen/core/sync/sync_transport.dart';
 import 'package:tankstellen/core/sync/tanksync_session_phase.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/data/trips_sync.dart';
+import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 import '../support/sync_session_driver.dart';
@@ -92,6 +97,92 @@ void main() {
         reason: 'no upload may reach the server after the withdrawal');
     expect(SyncPullCoordinator.instance.lastOutcome, SyncPassOutcome.fenced);
     expect(SyncPullCoordinator.instance.lastCompletedAt, isNull);
+    s.trace.expectClean();
+  });
+
+  /// A trip the way the recorder hands it to `TripsSync.uploadSummary`.
+  TripHistoryEntry trip(String id) => TripHistoryEntry(
+        id: id,
+        vehicleId: 'veh-1',
+        summary: TripSummary(
+          startedAt: DateTime.utc(2026, 9, 16, 9),
+          endedAt: DateTime.utc(2026, 9, 16, 9, 30),
+          distanceKm: 12,
+          maxRpm: 2800,
+          highRpmSeconds: 3,
+          idleSeconds: 20,
+          harshBrakes: 0,
+          harshAccelerations: 0,
+        ),
+      );
+
+  test('withdrawing consent mid trips upload: the trips upload and merge '
+      'that hold a transport opened before the withdrawal are refused '
+      'before the wire — no request completes a write (#4377)', () async {
+    final pull = GatedPull();
+    s = await SyncSession.start(entries: [pull.entry(table: 'trip_summaries')]);
+    await s.connectConsented();
+    final transport = SupabaseSyncTransport.currentOrNull()!;
+    final local = [trip('local-only')];
+    List<TripHistoryEntry>? merged;
+    pull.body = () async {
+      await TripsSync.uploadSummary(local.single, transport: transport);
+      merged = await TripsSync.merge(local, transport: transport);
+    };
+    final pass = SyncPullCoordinator.instance
+        .pullAll(now: () => DateTime.utc(2026, 9, 16, 12));
+    await pull.started.future;
+    final project = s.backend.project(kHostA);
+    final writesBefore = project.writes.length;
+    final requestsBefore = s.backend.requests.length;
+
+    await s.setConsent(false);
+    pull.release.complete();
+    await pass;
+
+    expect(project.writes.length, writesBefore,
+        reason: 'no trips write may reach the server after the withdrawal');
+    expect(s.backend.requests.length, requestsBefore,
+        reason: 'refused by the fence before the wire, not by RLS');
+    expect(identical(merged, local), isTrue,
+        reason: 'the merge hands its input back unchanged');
+    expect(SyncPullCoordinator.instance.lastOutcome, SyncPassOutcome.fenced);
+
+    // A trips upload STARTED after the withdrawal opens no transport.
+    await TripsSync.uploadSummary(trip('after'));
+    await TripsSync.merge([trip('after')]);
+    expect(s.backend.requests.length, requestsBefore);
+    s.trace.expectClean();
+  });
+
+  test('a trips merge parked on the wire when consent is withdrawn '
+      'completes no write: its next call is refused (#4377)', () async {
+    s = await SyncSession.start();
+    await s.connectConsented();
+    final project = s.backend.project(kHostA);
+    final writesBefore = project.writes.length;
+    final requestsBefore = s.backend.requests.length;
+    final network = Completer<void>();
+    s.backend.hang = network;
+
+    // The merge resolves its transport NOW, with consent, and parks on
+    // its first select; it holds a local-only trip it would upload next.
+    final local = [trip('local-only')];
+    final merge = TripsSync.merge(local);
+    while (s.backend.requests.length == requestsBefore) {
+      await pumpEventQueue();
+    }
+
+    await s.setConsent(false);
+    s.backend.hang = null;
+    network.complete();
+    final merged = await merge;
+
+    expect(project.writes.length, writesBefore,
+        reason: 'the local-only trip must not be uploaded after the '
+            'withdrawal — before #4377 the captured client carried on');
+    expect(project.rows('trip_summaries'), isEmpty);
+    expect(identical(merged, local), isTrue);
     s.trace.expectClean();
   });
 

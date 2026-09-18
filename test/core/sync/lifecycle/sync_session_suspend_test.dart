@@ -12,6 +12,8 @@ import 'package:tankstellen/app/startup/launch_sync_phase.dart';
 import 'package:tankstellen/core/sync/app_resume_sync.dart';
 import 'package:tankstellen/core/sync/supabase_client.dart';
 import 'package:tankstellen/core/sync/sync_pull_coordinator.dart';
+import 'package:tankstellen/core/sync/sync_pull_lease.dart';
+import 'package:tankstellen/core/sync/sync_transport.dart';
 import 'package:tankstellen/core/sync/tanksync_init.dart';
 import 'package:tankstellen/core/sync/tanksync_init_retry.dart';
 import 'package:tankstellen/core/sync/tanksync_session_phase.dart';
@@ -51,9 +53,14 @@ void main() {
   });
 
   test('a pull that outlives its timeout: the pass ends and releases the '
-      'gate while the abandoned pull still runs — pinned (S6), a second '
-      'pass overlaps it', () async {
-    final hung = Completer<void>();
+      'gate while the abandoned pull is still on the wire — its late answer '
+      'is refused at the transport and never persisted; the next pass '
+      'persists once (S6, #4377)', () async {
+    // Every request parks on the fake network until released — the
+    // abandoned select and the next pass's select both wait here.
+    final network = Completer<void>();
+    final persisted = <int>[];
+    final refused = <Object>[];
     var inFlight = 0;
     var maxInFlight = 0;
     s = await SyncSession.start(entries: [
@@ -63,24 +70,49 @@ void main() {
         pull: () async {
           inFlight++;
           if (inFlight > maxInFlight) maxInFlight = inFlight;
-          await hung.future;
-          inFlight--;
-          return 0;
+          final transport = SupabaseSyncTransport.currentOrNull()!;
+          try {
+            final rows = await transport.select('favorites', 'id');
+            // The persist step every real pull ends with.
+            persisted.add(rows.length);
+            return rows.length;
+          } catch (e) {
+            refused.add(e);
+            rethrow;
+          } finally {
+            inFlight--;
+          }
         },
       ),
     ]);
     await s.connectConsented();
+    s.backend.hang = network;
+
     await SyncPullCoordinator.instance.pullAll(now: () => t0);
     expect(SyncPullCoordinator.instance.lastOutcome,
         SyncPassOutcome.completedWithTimeouts);
     expect(SyncPullCoordinator.instance.isRunning, isFalse);
+    expect(inFlight, 1, reason: 'the timeout does not cancel the pull');
 
-    await SyncPullCoordinator.instance.pullAll(now: () => t0);
-
-    expect(maxInFlight, greaterThanOrEqualTo(2),
-        reason: 'the timeout does not cancel the pull it abandons');
-    hung.complete();
+    // The resume / "sync now" pass starts while the abandoned select is
+    // still parked; then the network answers both.
+    final second = SyncPullCoordinator.instance.pullAll(now: () => t0);
     await SyncSession.settle();
+    expect(maxInFlight, 2);
+    s.backend.hang = null;
+    network.complete();
+    await second;
+    await SyncSession.settle();
+
+    expect(persisted, [0],
+        reason: 'exactly one pass persists the table — the current one; '
+            'the abandoned answer must be discarded');
+    expect(refused.single, isA<SyncPullAbandonedException>());
+    expect(SyncPullCoordinator.instance.discardedFor(const ['favorites']), 1);
+    expect(SyncPullCoordinator.instance.lastOutcome, SyncPassOutcome.completed);
+    expect(SyncPullCoordinator.instance.lastCompletedAt, t0);
+    expect(inFlight, 0);
+    s.trace.expectClean();
   });
 
   test('an init parked past its launch budget: the ladder arms while the '

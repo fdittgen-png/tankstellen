@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import '../logging/error_logger.dart';
 import '../logging/app_log.dart';
 import '../perf/launch_sync_trace.dart';
+import 'sync_pull_lease.dart';
 import 'sync_run_trace.dart';
 
 /// How one [SyncPullCoordinator.pullAll] call ended (#4162).
@@ -151,6 +152,8 @@ class SyncPullCoordinator {
     // test that left a strike on the board would change the log LEVEL of
     // the next test's timeout.
     _consecutiveTimeouts.clear();
+    _generation.clear();
+    _discarded.clear();
   }
 
   /// Run every registered pull in parallel (#3450). No-ops when the master
@@ -241,16 +244,70 @@ class SyncPullCoordinator {
   int consecutiveTimeoutsFor(Iterable<String> tables) =>
       _consecutiveTimeouts[tables.join('+')] ?? 0;
 
+  /// #4377 — the current generation per table set. Every pass mints the
+  /// next one for each entry; a timeout retires the pass's generation at
+  /// once, so the pull the timeout abandoned (still running — a timeout
+  /// cancels nothing) fails its next [SyncPullLease.checkLive] instead of
+  /// persisting a snapshot from a pass that already ended.
+  final Map<String, int> _generation = {};
+
+  /// Late results refused per table set (#4377) — the record a pass that
+  /// ended `completedWithTimeouts` leaves when its abandoned pull finally
+  /// answers.
+  final Map<String, int> _discarded = {};
+
+  /// How many abandoned-pull results were refused, per table set.
+  @visibleForTesting
+  int discardedFor(Iterable<String> tables) =>
+      _discarded[tables.join('+')] ?? 0;
+
+  /// How many abandoned-pull results were refused in this process.
+  int get discardedLateResults =>
+      _discarded.values.fold(0, (sum, n) => sum + n);
+
+  /// #4377 — an abandoned pull tried to go on: log it with the stack it
+  /// was refused on, breadcrumb it under the run, count it.
+  void _discard(SyncPullLease lease, StackTrace stack) {
+    _discarded[lease.tables] = (_discarded[lease.tables] ?? 0) + 1;
+    SyncRunTrace.discarded(lease.tables, lease.generation);
+    log.warn(
+      'sync pull result discarded: the pass that started it timed out',
+      error: SyncPullAbandonedException(lease.tables, lease.generation),
+      stack: stack,
+      layer: ErrorLayer.sync,
+      context: {
+        'where': 'SyncPullCoordinator: abandoned pull refused',
+        'tables': lease.tables,
+        'generation': lease.generation,
+      },
+    );
+  }
+
   /// Returns whether the entry timed out.
   Future<bool> _pullOne(SyncPullEntry entry, LaunchSyncTrace? trace) async {
     final name = entry.tables.join('+');
     var pulled = 0;
     var timedOut = false;
+    // #4377 — this pass's generation for the entry; the pull runs with it
+    // as the ambient lease so the transport can refuse a late answer.
+    final generation = (_generation[name] ?? 0) + 1;
+    _generation[name] = generation;
+    final lease = SyncPullLease(
+      tables: name,
+      generation: generation,
+      isCurrent: () => _generation[name] == generation,
+      onDiscarded: _discard,
+    );
     await LaunchSyncTrace.spanned(trace, name, () async {
       try {
-        pulled = await entry.pull().timeout(entry.timeout);
+        pulled = await lease.run(entry.pull).timeout(entry.timeout);
         _consecutiveTimeouts.remove(name);
       } on TimeoutException catch (e, st) {
+        // #4377 — the pull is still running; retire its generation so
+        // whatever it still produces is refused, never persisted.
+        if (_generation[name] == generation) {
+          _generation[name] = generation + 1;
+        }
         // #4112 — escalate on persistence, not on the first occurrence.
         timedOut = true;
         final strikes = (_consecutiveTimeouts[name] ?? 0) + 1;

@@ -12,6 +12,7 @@ import 'deletions_sync.dart';
 import 'schema_drift_notice.dart';
 import 'locally_retained_ids.dart';
 import 'sync_helper.dart';
+import 'sync_pull_lease.dart';
 import 'sync_row_ops.dart';
 import 'sync_run_trace.dart';
 import 'sync_transport.dart';
@@ -252,6 +253,9 @@ class EntitySync<T> {
           idOf(r): r,
       };
 
+      // #4377 — the last gate before the caller persists: a pass that
+      // timed out while the rows were decoding hands nothing back.
+      SyncPullLease.current?.checkLive();
       // #3126 — per-table counts into the exportable trace.
       SyncRunTrace.table(
         table,
@@ -276,8 +280,10 @@ class EntitySync<T> {
       // settings tile watches; the merge degrades to input-unchanged
       // exactly as before. Everything else still ERROR-logs.
       // #4337 — a fenced transport is the consent withdrawal (or a
-      // disconnect) doing its job, not a fault.
-      if (e is SyncFencedException) {
+      // disconnect) doing its job, not a fault; #4377 — so is a refused
+      // late answer of a pull the pass abandoned (already logged, once,
+      // with its stack, by the coordinator).
+      if (e is SyncFencedException || e is SyncPullAbandonedException) {
         log.info('$logName.merge fenced: $table', tag: 'sync');
         return local;
       }
