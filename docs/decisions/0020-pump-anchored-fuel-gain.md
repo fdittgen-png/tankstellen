@@ -32,7 +32,8 @@ express a 40 % correction.
 
 1. **One knob, learned from the pump.** `VehicleProfile.pumpGain`
    multiplies every ESTIMATED fuel-rate branch (speed-density and MAF)
-   in the live snapshot chain and the pull-mode reader. ECU-reported
+   in the live snapshot chain (and, until #4315 deleted it, the uncalled
+   pull-mode reader). ECU-reported
    fuel (PID 5E / 9D) is never scaled. η_v goes back to its catalog /
    manual value and is no longer mutated.
 2. **Full-to-full windows, compared per km.** `PumpGainLearner` runs

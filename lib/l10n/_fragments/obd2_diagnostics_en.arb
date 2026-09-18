@@ -571,5 +571,17 @@
   "obd2DiagnosticsTripNoPidDetail": "The per-PID communication breakdown was not captured for this trip. Turn on developer mode before recording to collect it.",
   "@obd2DiagnosticsTripNoPidDetail": {
     "description": "Honest explanation that only the detailed per-PID table is missing, replacing the old text that wrongly claimed no OBD2 session existed at all (#3824)."
+  },
+  "obd2DiagnosticsImplausibleFramesLine": "Implausible frames: {voltage} battery voltage · {odometer} odometer",
+  "@obd2DiagnosticsImplausibleFramesLine": {
+    "description": "Row under the per-PID outcomes on the OBD2 diagnostics card (#4325): frames that arrived but decoded outside their plausible bounds — an ATRV battery voltage outside 5–20 V, an odometer of 0 km or above 2,000,000 km. Counted apart from no-data replies because a rejected-but-present frame points at an adapter or ECU fault.",
+    "placeholders": {
+      "voltage": {
+        "type": "int"
+      },
+      "odometer": {
+        "type": "int"
+      }
+    }
   }
 }

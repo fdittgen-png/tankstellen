@@ -7247,6 +7247,11 @@ class AppLocalizationsRo extends AppLocalizations {
       'Detaliile de comunicare pe PID nu au fost captate pentru această cursă. Activează modul dezvoltator înainte de înregistrare pentru a le colecta.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nu s-a putut accesa \'$adapterName\' — alegeți alt adaptor';
   }

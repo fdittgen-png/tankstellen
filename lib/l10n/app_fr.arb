@@ -6891,5 +6891,6 @@
   "fuelAndTankConvergenceTolerance": "Considéré comme atteint à {tolerance} points près de l'objectif de {target} %.",
   "fuelAndTankMaterialThreshold": "Un carburant n'est suggéré que s'il est meilleur d'au moins {percent} %.",
   "vehicleFlexFuelApprovedLabel": "Homologué E85 (flexfuel)",
-  "vehicleFlexFuelApprovedHelper": "Seulement si le constructeur homologue l'E85. Carburant & réservoir compare alors l'E85 même si vous faites le plein d'un autre carburant."
+  "vehicleFlexFuelApprovedHelper": "Seulement si le constructeur homologue l'E85. Carburant & réservoir compare alors l'E85 même si vous faites le plein d'un autre carburant.",
+  "obd2DiagnosticsImplausibleFramesLine": "Trames invraisemblables : {voltage} tension batterie · {odometer} compteur kilométrique"
 }

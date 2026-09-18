@@ -7269,6 +7269,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Le détail de communication par PID n\'a pas été capturé pour ce trajet. Activez le mode développeur avant l\'enregistrement pour le collecter.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Trames invraisemblables : $voltage tension batterie · $odometer compteur kilométrique';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Impossible de joindre \'$adapterName\' — choisissez un autre adaptateur';
   }

@@ -121,16 +121,17 @@ to switch AFR / density constants — see `isDieselProfile` in
 
 | Field                          | Type      | Default  | Purpose                                                                                                    | Read by                       |
 | ------------------------------ | --------- | -------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------- |
-| `engineDisplacementCc`         | `int?`    | `null`   | Total swept volume in cc. Drives speed-density air-mass calculation. Null → catalog → 1000 cc fallback.    | speed-density estimator       |
+| `engineDisplacementCc`         | `int?`    | `null`   | Total swept volume in cc. Drives speed-density air-mass calculation. Null → 1000 cc fallback (#4315).      | speed-density estimator       |
 | `engineCylinders`              | `int?`    | `null`   | Reserved for firing-event-based estimation + engine-stress indicators. No default — null is honest.        | future features               |
 | `volumetricEfficiency`         | `double`  | `0.85`   | Fraction of theoretical air mass actually inducted. 0.60–0.95 typical. **Adaptive — see Section 6.**       | speed-density estimator       |
 | `volumetricEfficiencySamples`  | `int`     | `0`      | EWMA sample counter. Bumped each successful tankful reconciliation. Used for UX ("calibrated from 3 fillups"). | UI debug surface           |
 | `curbWeightKg`                 | `int?`    | `null`   | Mass in kg. Used by future rolling-resistance estimator. Null → 1500 kg default downstream.                | future estimator (#812)       |
 
 Note: `volumetricEfficiency` defaults to `0.85` directly on the entity
-(non-nullable), so the precedence chain in the OBD-II service treats
-"user has a profile" as "user has a VE", and the catalog VE wins only
-when `vehicle == null`. See `obd2_service.dart:494`.
+(non-nullable). Since #1422 a cold-start profile (0.85, zero learned
+samples) with a catalog match yields to the engine-tech default
+`defaultVolumetricEfficiency(referenceVehicle)`. See
+`profileVolumetricEfficiency` in `obd2/domain/obd2_fuzzy_context.dart`.
 
 ### OBD-II adapter pairing (#784, #1004)
 
@@ -236,9 +237,9 @@ adding a new variant is a JSON-only change.
    (a `Future<List<ReferenceVehicle>>`).
 3. It linearly scans the list for the catalog entry whose
    `slugFor(entry)` matches the profile's slug.
-4. The matched `ReferenceVehicle` is passed to
-   `readFuelRateLPerHour` (and similar consumers) alongside the
-   `VehicleProfile`. Per-instance values still win — see Section 4.
+4. The matched `ReferenceVehicle` is passed to the live
+   `LiveSampleSnapshot` (through `TripRecordingController`) alongside
+   the `VehicleProfile`. Per-instance values still win — see Section 4.
 
 If no slug is set yet (pre-#950 profiles, or a user who hasn't gone
 through onboarding), the migrator runs `bestMatch` from the catalog
@@ -259,15 +260,26 @@ the abstraction layer and is meant to grow.
 
 ## Section 4 — The fuel-rate fallback chain
 
-Source: `lib/features/obd2/data/obd2_service.dart:480`
-(`readFuelRateLPerHour`).
+Source: `lib/features/obd2/data/session/live_sample_snapshot_fuel_rate.dart`
+(`LiveSampleSnapshot.deriveFuelRateLPerHour`).
+
+Since #4315 this live derivation over the scheduler's latched values is
+the **only** fuel-rate and speed-density implementation. The pull-mode
+`Obd2Service.readFuelRateLPerHour` / `Obd2FuelRateReader` had no caller
+since #863 and was deleted, together with the #1625 η_v(rpm) curve that
+only it used. The curve may return later as a fuzzy-engine input, once
+#4231's replay corpus can validate it.
+
+The diagram below predates the #3428 mass-rate branches (0x9D / 0xA2,
+ahead of 0x5E) and the 0x66 MAF preference; the branch order in the
+source file is authoritative.
 
 The fuel-rate estimator dispatches on **PID capability discovered at
 runtime** (#811), not on vehicle make. Three steps, in order of
 preference:
 
 ```
-                       readFuelRateLPerHour()
+                   deriveFuelRateLPerHour()
                                 |
                     +-----------+-----------+
                     | precedence resolution |
@@ -306,34 +318,37 @@ preference:
                        L/h      L/h      L/h | null
 ```
 
-### Precedence resolution (lines 491-507)
+### Precedence resolution
 
-Before any PID is queried, the service resolves the engine parameters
+Before any branch runs, the snapshot resolves the engine parameters
 by walking the precedence chain:
 
 ```dart
-final engineDisplacementCc = vehicle?.engineDisplacementCc
-    ?? referenceVehicle?.displacementCc
-    ?? estimator.kDefaultEngineDisplacementCc;     // 1000 cc
+final displacement = vehicle?.manualEngineDisplacementCcOverride?.round()
+    ?? vehicle?.engineDisplacementCc
+    ?? 1000;                                        // no catalog step
 
-final volumetricEfficiency = vehicle?.volumetricEfficiency
-    ?? referenceVehicle?.volumetricEfficiency
-    ?? estimator.kDefaultVolumetricEfficiency;     // 0.85
+final ve = vehicle?.manualVolumetricEfficiencyOverride
+    ?? profileVolumetricEfficiency(vehicle,
+        hasReferenceVehicle: referenceVehicle != null)
+    ?? (referenceVehicle != null
+        ? defaultVolumetricEfficiency(referenceVehicle)
+        : 0.85);
 
-final isDiesel = vehicle != null
-    ? estimator.isDieselProfile(vehicle)
-    : referenceVehicle?.fuelType.toLowerCase() == 'diesel';
+final mixture = resolveMixtureConstants(vehicle,
+    sessionFuelTypeKey: sessionFuelTypeKey,
+    measuredEthanolPercent: ethanolPercent);   // AFR, density, diesel?
 ```
 
-User-set values on `VehicleProfile` win, then the catalog row, then
-the fallback constants. (Note: `volumetricEfficiency` is non-nullable
-on `VehicleProfile`, so when a profile exists, the catalog VE never
-gets to vote — the profile's adaptive value is authoritative.)
+Manual overrides win, then the profile, then the catalog's engine-tech
+η_v default, then the fallback constants. The catalog **displacement**
+is not consulted: a profile without one uses 1000 cc (#4315 records
+this as the live behaviour).
 
 ### Step 1 — PID 0x5E (direct fuel rate)
 
-When `isPidSupported(0x5E)` returns true, the service issues
-`Elm327Protocol.engineFuelRateCommand` and parses L/h directly. This
+When a 0x5E value has landed, the snapshot returns the ECU's L/h
+directly. This
 is the cleanest path: the ECU has already applied fuel trim, so no
 correction is needed.
 
@@ -388,14 +403,14 @@ const double kDefaultVolumetricEfficiency = 0.85;
 
 | Constant                          | Value | Fires only when                                                                       | Origin                                       |
 | --------------------------------- | ----- | ------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `kDefaultEngineDisplacementCc`    | 1000  | `vehicle?.engineDisplacementCc == null` AND `referenceVehicle?.displacementCc == null` | Peugeot 107 / Aygo / C1 (1KR-FE 1.0L NA)     |
-| `kDefaultVolumetricEfficiency`    | 0.85  | `vehicle == null` AND `referenceVehicle?.volumetricEfficiency == null`                 | Sensible NA-petrol-at-cruise midpoint        |
+| `kDefaultEngineDisplacementCc`    | 1000  | no manual override AND `vehicle?.engineDisplacementCc == null`                          | Peugeot 107 / Aygo / C1 (1KR-FE 1.0L NA)     |
+| `kDefaultVolumetricEfficiency`    | 0.85  | no manual override, no profile η_v, AND no catalog match                               | Sensible NA-petrol-at-cruise midpoint        |
 
 These are the "Peugeot 107 fingerprints" — the only place in the
 codebase where a vehicle-specific assumption is baked in. Their reach
-is **limited to fully-unconfigured vehicles**: a profile that knows
-its displacement, OR a catalog match for the make/model/year, sidesteps
-both constants entirely.
+is **limited to unconfigured vehicles**: a profile that knows its
+displacement sidesteps the first, and a profile or a catalog match for
+the make/model/year sidesteps the second.
 
 They exist as a safety net so that an OBD-II live read on a brand-new
 profile (no make, no model, no VIN, never opened the edit screen)

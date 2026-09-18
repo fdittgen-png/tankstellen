@@ -5,20 +5,17 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../vehicle/domain/entities/reference_vehicle.dart';
-import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../protocol/adapter_capability.dart';
 import '../auto_record_trace_log.dart';
 import '../transport/bluetooth_obd2_transport.dart';
 import '../protocol/elm327_adapter.dart';
-import '../protocol/elm327_precision_pids.dart';
 import '../protocol/elm327_protocol.dart';
 import '../../domain/obd2_engine_evidence.dart';
 import '../../domain/vehicle_power_state.dart';
 import '../../domain/fuel_rate_estimator.dart' as estimator;
 import '../negotiated_protocol_cache.dart';
 import '../transport/obd2_atpc_teardown.dart';
-import '../obd2_breadcrumb_collector.dart';
 import '../protocol/obd2_can_frame_stream.dart';
 import '../obd2_comm_diagnostics.dart';
 import '../obd2_connect_trace.dart';
@@ -27,7 +24,7 @@ import '../../domain/obd2_connection_errors.dart';
 import '../obd2_read_telemetry.dart';
 import 'obd2_service_session.dart';
 import '../obd2_debug_session.dart';
-import 'obd2_fuel_rate_reader.dart';
+import 'obd2_signal_support.dart';
 import 'obd2_odometer_reader.dart';
 import '../transport/obd2_transport.dart';
 import '../protocol/oem_pid_table.dart';
@@ -118,7 +115,7 @@ class Obd2Service
         _Obd2ServiceInit,
         _Obd2ServiceConnect,
         _Obd2ServiceReads
-    implements Obd2RawCommandPort, Obd2FuelRateReads {
+    implements Obd2RawCommandPort, Obd2PidSupport {
   @override
   final Obd2Transport _transport;
 
@@ -128,19 +125,6 @@ class Obd2Service
   /// in the constructor body so it can capture the [_send] tear-off.
   @override
   late final SupportedPidsResolver _pids;
-
-  /// Optional fuel-rate diagnostic breadcrumb collector (#1395). When
-  /// present, every PID 5E read + MAF read inside
-  /// [readFuelRateLPerHour] is captured into a ring buffer the
-  /// in-app diagnostic overlay can render. Null in production paths
-  /// that don't need the trace (e.g. one-shot VIN reads); the trip
-  /// recording controller wires it up at the start of each trip via
-  /// the [breadcrumbCollector] setter. Typed as the
-  /// [Obd2BreadcrumbRecorder] interface so production passes the
-  /// Riverpod notifier (state-republishing) and unit tests pass the
-  /// raw [Obd2BreadcrumbCollector].
-  @override
-  Obd2BreadcrumbRecorder? breadcrumbCollector;
 
   /// Persistent negotiated-protocol cache (#2261 concern 3). When
   /// present and [_protocolCacheKey] resolves, a warm connect replays
@@ -161,7 +145,6 @@ class Obd2Service
     String? vehicleFallbackKey,
     this._protocolCache,
     this._protocolCacheKey,
-    this.breadcrumbCollector,
   }) {
     // #1916 — the supported-PIDs prime + discovery run during connect,
     // when the BLE link is least settled. Wrap their `_send` callback
@@ -275,7 +258,6 @@ class Obd2Service
     required double volumetricEfficiency,
     double afr = estimator.kPetrolAfr,
     double fuelDensityGPerL = estimator.kPetrolDensityGPerL,
-    List<EtaVCurvePoint> etaVCurve = const [],
     double? baroKpa,
     double? phi,
   }) =>
@@ -287,7 +269,6 @@ class Obd2Service
         volumetricEfficiency: volumetricEfficiency,
         afr: afr,
         fuelDensityGPerL: fuelDensityGPerL,
-        etaVCurve: etaVCurve,
         baroKpa: baroKpa,
         phi: phi,
       );

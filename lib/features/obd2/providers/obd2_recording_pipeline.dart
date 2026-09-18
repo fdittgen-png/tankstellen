@@ -109,8 +109,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     _adapterMac = service.adapterMac;
     _adapterName = service.adapterName;
     _adapterFirmware = service.adapterFirmware;
-    // #812/#797 — the active vehicle drives `readFuelRateLPerHour` and
-    // tags any pause-on-drop snapshot.
+    // #812/#797 — the active vehicle drives the live fuel-rate derivation
+    // and tags any pause-on-drop snapshot.
     final activeVehicle = _readActiveVehicle();
     // #797/#3423 — reconnect pin: vehicle MAC, else the #3019 auto-pin.
     final pinnedMac = resolveAdapterPinMac(activeVehicle?.obd2AdapterMac,
@@ -118,7 +118,6 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // #1395 — per-trip breadcrumb sink; cleared for a fresh denominator.
     final breadcrumbs = _ref.read(obd2BreadcrumbsProvider.notifier);
     breadcrumbs.clear();
-    service.breadcrumbCollector = breadcrumbs;
     final matchedReference = // #1422 — catalog η_v default; null on miss.
         tryMatchReferenceVehicle(_ref, activeVehicle);
     // #2506 — GPS-physics estimate + coaching folder.

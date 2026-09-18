@@ -51,6 +51,11 @@ _Obd2SessionDiagnostic _$Obd2SessionDiagnosticFromJson(
   framing: json['frm'] == null
       ? const Obd2FramingStats()
       : Obd2FramingStats.fromJson(json['frm'] as Map<String, dynamic>),
+  implausibleFrames:
+      (json['imp'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, (e as num).toInt()),
+      ) ??
+      const <String, int>{},
   fuelTierTicks:
       (json['ft'] as Map<String, dynamic>?)?.map(
         (k, e) => MapEntry(k, (e as num).toInt()),
@@ -92,6 +97,7 @@ Map<String, dynamic> _$Obd2SessionDiagnosticToJson(
   'de': instance.disconnectExceptions,
   'sch': instance.scheduler.toJson(),
   'frm': instance.framing.toJson(),
+  'imp': instance.implausibleFrames,
   'ft': instance.fuelTierTicks,
   'fd': instance.fuelDowngrade.toJson(),
   'as': instance.sessionActiveSeconds,

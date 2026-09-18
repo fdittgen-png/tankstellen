@@ -149,7 +149,7 @@ class PumpGainOutcome {
 /// The gain is blended (sample-dependent weight — the first window is
 /// taken at face value, later ones smooth) and bounded to
 /// [[minGain], [maxGain]]; it multiplies every ESTIMATED fuel-rate branch
-/// (speed-density, MAF) in the live chain and the pull-mode reader, while
+/// (speed-density, MAF) in the live chain, while
 /// ECU-reported fuel (PID 5E / 9D) stays untouched. η_v is no longer the
 /// compensation knob (the #815 learner mutated it in the wrong direction
 /// whenever coverage was partial).

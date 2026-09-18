@@ -13,6 +13,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
 import '../../domain/calibrated_trip_figures.dart';
+import '../../domain/trip_consumption_estimate.dart';
 import '../../domain/obd2_engine_coverage.dart';
 import '../../domain/trip_fuel_source.dart';
 import '../../domain/trip_recorder.dart';
@@ -79,11 +80,14 @@ class TripSummaryCard extends ConsumerWidget {
     // #3918 — measured litres pass through; estimated litres are
     // re-expressed at the vehicle's CURRENT pump gain (display only).
     final figures = CalibratedTripFigures.of(s, vehicle);
-    final avgConsumption = figures.lPer100Km != null
-        ? UnitFormatter.formatConsumption(figures.lPer100Km!, isEv: isEv)
-        : s.estimatedAvgLPer100Km != null
-            ? '~${UnitFormatter.formatConsumption(s.estimatedAvgLPer100Km!, isEv: isEv)}'
-            : unknown;
+    // #4233 — the L/100 km reads through the canonical adapter (ADR 0024
+    // §7). `~` keeps its old rule (no stored avg), so a GPS batch figure
+    // still renders plain although the contract classes it as estimated.
+    final avg = tripConsumptionEstimate(s, vehicle).litresPer100Km.valueOrNull;
+    final avgConsumption = avg == null
+        ? unknown
+        : '${s.avgLPer100Km == null ? '~' : ''}'
+            '${UnitFormatter.formatConsumption(avg, isEv: isEv)}';
     final fuelUsed = figures.liters != null
         ? '${UnitFormatter.formatDecimal(figures.liters!, fractionDigits: 2)} L'
         : s.estimatedFuelLitersConsumed != null

@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import '../../../core/domain/consumption_estimate.dart';
 import '../domain/trip_recorder.dart';
 import '../domain/imu_event_record.dart';
 
@@ -82,6 +83,9 @@ Map<String, dynamic> tripSummaryToJson(TripSummary s) => {
       if (s.imuEventRecordsDropped != 0) 'ierd': s.imuEventRecordsDropped,
       // #3599 — engine-running seconds for the transport detector.
       if (s.engineRunningSeconds != null) 'ergs': s.engineRunningSeconds,
+      // #4233 — fuzzy model/rules/calibration versions (ADR 0024). Omitted
+      // when null so legacy and unstamped trips round-trip byte-identical.
+      if (s.consumptionVersion != null) 'cmv': s.consumptionVersion!.toJson(),
     };
 
 TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
@@ -146,4 +150,6 @@ TripSummary tripSummaryFromJson(Map<String, dynamic> j) => TripSummary(
       ],
       imuEventRecordsDropped: (j['ierd'] as num?)?.toInt() ?? 0,
       engineRunningSeconds: (j['ergs'] as num?)?.toDouble(),
+      // Missing or malformed → null: no invented provenance (ADR 0022 §4).
+      consumptionVersion: ConsumptionModelVersion.tryDecode(j['cmv']),
     );

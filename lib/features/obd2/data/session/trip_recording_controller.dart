@@ -184,7 +184,7 @@ class TripRecordingController
   /// fuel-rate fallback (#810, #812 phase 3). Captured once at
   /// construction — the user's vehicle doesn't change mid-trip, and
   /// re-reading the profile every tick would just burn CPU. When
-  /// null, `readFuelRateLPerHour` falls back to its generic 1.0 L /
+  /// null, the live fuel-rate derivation falls back to its generic 1.0 L /
   /// η_v 0.85 defaults — still honest, just less precise.
   @override
   final VehicleProfile? _vehicle;

@@ -9,7 +9,6 @@ import 'package:uuid/uuid.dart';
 
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../obd2/api.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/domain/entities/vin_data.dart';
 import '../../../vehicle/presentation/widgets/vin_confirm_dialog.dart';
@@ -238,7 +237,7 @@ class _OnboardingObd2StepState extends ConsumerState<OnboardingObd2Step> {
   /// Map vPIC's free-text "Fuel Type - Primary" value to the app's
   /// internal fuel-type keys. vPIC returns labels like "Gasoline",
   /// "Diesel", "Electric" — we map the diesel branch explicitly so
-  /// the speed-density fallback in [Obd2Service.readFuelRateLPerHour]
+  /// the live speed-density fallback (`LiveSampleSnapshot`)
   /// picks up the right AFR / density later. Anything else defaults
   /// to "e10", matching the combustion vehicle section's default on
   /// the edit screen.

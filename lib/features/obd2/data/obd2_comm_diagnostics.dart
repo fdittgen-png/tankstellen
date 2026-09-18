@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import 'obd2_connect_trace_log.dart';
+import 'protocol/frame_decode.dart';
 import 'protocol/obd2_response_class.dart';
 import 'obd2_session_completeness.dart';
 import 'obd2_session_diagnostic.dart';
@@ -352,8 +353,8 @@ class Obd2CommDiagnostics {
     if (!enabled) return null;
     try {
       final live = _current != null ? _summarise(_current!) : null;
-      if (live != null && _hasSignal(live)) return live;
-      if (_finished.isNotEmpty && _hasSignal(_finished.last)) {
+      if (live != null && live.hasSignal) return live;
+      if (_finished.isNotEmpty && _finished.last.hasSignal) {
         return _finished.last;
       }
       return null;
@@ -361,21 +362,6 @@ class Obd2CommDiagnostics {
       return null;
     }
   }
-
-  /// Whether [d] carries any diagnostic signal worth surfacing — the same
-  /// predicate `computeObd2DiagnosticsSummary` uses to choose its non-empty
-  /// branch. Kept inline so the collector stays free of a presentation-layer
-  /// import; a connection ATTEMPT alone (even a failed connect) counts, which
-  /// is exactly the "adapter never connected" case #2912 must still surface.
-  static bool _hasSignal(Obd2SessionDiagnostic d) =>
-      d.pidStats.isNotEmpty ||
-      d.connection.attempts > 0 ||
-      d.redactedMac != null ||
-      d.elmVersion != null ||
-      d.reconnectAttempts.isNotEmpty ||
-      d.transitions.isNotEmpty ||
-      d.disconnectExceptions > 0 ||
-      d.fallbackActivatedAtMs != null;
 
   /// Finalise the live session into the capped ring. No-op when disabled
   /// or when there is no live session.

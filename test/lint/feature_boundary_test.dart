@@ -338,7 +338,9 @@ const _featurePairBaseline = <String, int>{
   // barrel). 42 → 40.
   'obd2 -> driving': 1,
   'obd2 -> feature_management': 4,
-  'obd2 -> vehicle': 10,
+  // #4315 — 10 → 9: fuel_rate_estimator imported reference_vehicle only
+  // for the deleted #1625 η_v curve point.
+  'obd2 -> vehicle': 9,
   'price_history -> feature_management': 6,
   'profile -> alerts': 2,
   'profile -> approach': 1,

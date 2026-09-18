@@ -122,6 +122,18 @@ extension Obd2ReconnectTelemetryRecording on Obd2CommDiagnostics {
   }
 }
 
+/// Implausible-frame record API (#4325) — gated like the rest of the
+/// collector, and deliberately NOT routed through the breadcrumb
+/// collector's `recordFlag`, whose suspicious tally feeds `fuelRateSuspect`.
+extension Obd2ImplausibleFrameRecording on Obd2CommDiagnostics {
+  /// Count one frame that arrived but decoded outside its [kind] bounds.
+  /// No-op when disabled or before a session is live.
+  void noteImplausibleFrame(ImplausibleFrameKind kind) {
+    final tally = enabled ? _current?.implausibleFrames : null;
+    if (tally != null) tally[kind.name] = (tally[kind.name] ?? 0) + 1;
+  }
+}
+
 /// Mutable live-session accumulator. Converted to the immutable
 /// [Obd2SessionDiagnostic] on `snapshot()`/`endSession()`.
 class _LiveSession {
@@ -165,6 +177,7 @@ class _LiveSession {
   int leftoverBytes = 0;
   int strayPrompts = 0;
   int garbageReads = 0;
+  final Map<String, int> implausibleFrames = <String, int>{}; // #4325
 
   final Map<String, int> fuelTierTicks = <String, int>{};
   int fuelTotalSamples = 0;
@@ -238,6 +251,7 @@ class _LiveSession {
           strayPrompts: strayPrompts,
           garbageReads: garbageReads,
         ),
+        implausibleFrames: Map.unmodifiable(implausibleFrames),
         fuelTierTicks: Map.unmodifiable(fuelTierTicks),
         fuelDowngrade: Obd2FuelDowngradeStats(
           totalSamples: fuelTotalSamples,

@@ -7225,6 +7225,11 @@ class AppLocalizationsPl extends AppLocalizations {
       'Szczegóły komunikacji dla poszczególnych PID nie zostały zarejestrowane dla tej trasy. Włącz tryb dewelopera przed nagrywaniem, aby je zebrać.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nie można było dotrzeć do \'$adapterName\' — wybierz inny adapter';
   }

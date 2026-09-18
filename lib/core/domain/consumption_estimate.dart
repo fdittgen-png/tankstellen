@@ -135,13 +135,14 @@ class ConsumptionModelVersion {
   /// are retuned against the replay corpus.
   final int rules;
 
-  /// The vehicle's calibration generation, or null when nothing has been
-  /// learned yet.
+  /// The vehicle's calibration generation, or null when the figure is not
+  /// attributable to a fill-anchored generation.
   ///
-  /// Null is meaningfully different from 0: "never calibrated" is not
-  /// "calibrated at generation zero". A figure with a null calibration is
-  /// the estimator's raw output, which is what
-  /// `PumpGainSource.uncalibrated` already says on the gain side.
+  /// Null is meaningfully different from 0: "not attributable" is not
+  /// "calibrated at generation zero". ADR 0024 §5 widened null from
+  /// "never calibrated" to "not attributable". It covers an uncalibrated
+  /// vehicle, a figure that carries no pump gain (GPS road-load), and a gain
+  /// that moved after the figure was integrated.
   final int? calibration;
 
   /// Whether this figure was produced by an older build than [other].
@@ -201,7 +202,7 @@ class ConsumptionEstimate {
   const ConsumptionEstimate({
     required this.litresPer100Km,
     required this.sourceClass,
-    required this.version,
+    this.version,
     this.confidence,
     this.pumpGain,
     this.recordedAt,
@@ -221,8 +222,11 @@ class ConsumptionEstimate {
   /// Which production path produced it.
   final ConsumptionSourceClass sourceClass;
 
-  /// The versions it was produced under.
-  final ConsumptionModelVersion version;
+  /// The versions it was produced under, or null when the producing path
+  /// stamped none — a legacy trip, the batch GPS estimator, a figure
+  /// finalised before #4233's stamp reached its path. Absence is stated,
+  /// never defaulted to `model: 1` (ADR 0022 §4, ADR 0024 §6).
+  final ConsumptionModelVersion? version;
 
   /// How much the producer trusts it, in `[0, 1]`, or null when the
   /// producer has no calibrated notion of confidence.
@@ -267,7 +271,7 @@ class ConsumptionEstimate {
   /// figure" is itself the classification.
   factory ConsumptionEstimate.unavailable({
     required DataUnknownReason reason,
-    required ConsumptionModelVersion version,
+    ConsumptionModelVersion? version,
     DateTime? recordedAt,
     String? recordingId,
   }) =>

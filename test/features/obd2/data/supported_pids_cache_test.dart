@@ -428,18 +428,21 @@ void main() {
       await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 
-    test('readFuelRateLPerHour polls 5E/MAF optimistically despite the '
-        'cached bitmap; 3× NO DATA parks them via probation and the '
-        'speed-density path still wins (#3532, Peugeot 107 flow)', () async {
+    test('bitmap-absent MAF is read optimistically despite the cached '
+        'bitmap; 3× NO DATA parks it via probation (#3532, Peugeot 107 '
+        'flow)', () async {
       // Seed cache with the real Peugeot 107 1KR-FE profile: no 5E,
       // no MAF, but MAP/IAT/RPM all present.
       const vin = 'VF7PPPP0000000001';
       await SupportedPidsCache(box).put(vin, {0x0B, 0x0C, 0x0F});
 
-      // '015E' / '0110' intentionally NOT wired: FakeObd2Transport
-      // answers them with a real 'NO DATA>' — under #3532 they ARE
-      // queried (the cached bitmap is a prior, not a gate) and each
-      // real NO DATA feeds the probation streak.
+      // '0110' intentionally NOT wired: FakeObd2Transport answers it
+      // with a real 'NO DATA>' — under #3532 it IS queried (the cached
+      // bitmap is a prior, not a gate) and each real NO DATA feeds the
+      // probation streak. #4315 — the reads used to go through the
+      // deleted pull reader; the typed MAF read feeds the same funnel,
+      // and the consumer-side skip of a parked PID is pinned by
+      // `live_sample_snapshot_subscription_test`.
       final transport = FakeObd2Transport({
         ..._initResponses,
         '0902': _vinResponse(vin),
@@ -458,27 +461,15 @@ void main() {
           reason: '#3532 optimistic — the bitmap must not reject up-front');
       expect(service.isPidSupported(0x10), isTrue);
 
-      // 3 reads: each probes 5E + MAF (real NO DATA), then falls through
-      // to the speed-density path and still produces a rate.
+      // 3 reads: each probes MAF (real NO DATA).
       for (var i = 0; i < 3; i++) {
-        final rate = await service.readFuelRateLPerHour();
-        expect(rate, isNotNull);
-        expect(rate!, greaterThan(0));
+        expect(await service.readMafGramsPerSecond(), isNull);
       }
-      expect(transport.sentCommands.where((c) => c == '015E').length, 3);
       expect(transport.sentCommands.where((c) => c == '0110').length, 3);
-      expect(service.isPidSupported(0x5E), isFalse,
-          reason: '3× real NO DATA → probation parks 5E (#3532)');
       expect(service.isPidSupported(0x10), isFalse,
           reason: '3× real NO DATA → probation parks MAF (#3532)');
-
-      // A 4th read no longer spends Bluetooth time on the parked PIDs.
-      final rate = await service.readFuelRateLPerHour();
-      expect(rate, isNotNull);
-      expect(rate, greaterThan(0));
-      expect(transport.sentCommands.where((c) => c == '015E').length, 3,
-          reason: 'a probation-parked PID must not be polled again');
-      expect(transport.sentCommands.where((c) => c == '0110').length, 3);
+      expect(service.isPidSupported(0x0B), isTrue,
+          reason: 'probation parks only the PID that missed');
       await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
   });
@@ -649,15 +640,16 @@ void main() {
     });
 
     test(
-        'warm HIT → bitmap-absent PIDs ARE polled optimistically by the '
-        'recording-loop consumers until 3× NO DATA parks them (#3532; the '
-        'cache benefit is the scan/0902 skip, not read-skipping)', () async {
+        'warm HIT → bitmap-absent PIDs stay optimistically readable until '
+        '3× NO DATA parks them (#3532; the cache benefit is the scan/0902 '
+        'skip, not read-skipping)', () async {
       // Peugeot 107 1KR-FE: no 5E, no MAF; MAP/IAT/RPM present.
       await SupportedPidsCache(box).put(prodKey, {0x0B, 0x0C, 0x0F});
 
       // 015E / 0110 intentionally NOT wired: FakeObd2Transport answers
       // them with a real 'NO DATA>' — each poll feeds the probation
-      // streak (#3532).
+      // streak (#3532). #4315 — driven by the typed MAF read since the
+      // pull reader was deleted.
       final transport = FakeObd2Transport({
         ..._initResponses,
         '010B': '41 0B 28>', // MAP 40 kPa
@@ -679,26 +671,15 @@ void main() {
           reason: '#3532 optimistic — the bitmap must not reject up-front');
       expect(service.isPidSupported(0x10), isTrue);
 
-      // Every read still yields a speed-density rate while 5E/MAF answer
-      // real NO DATA; after 3 misses probation parks them.
+      // MAF answers real NO DATA; after 3 misses probation parks it.
       for (var i = 0; i < 3; i++) {
-        final rate = await service.readFuelRateLPerHour();
-        expect(rate, isNotNull);
-        expect(rate!, greaterThan(0));
+        expect(await service.readMafGramsPerSecond(), isNull);
       }
-      expect(transport.sentCommands.where((c) => c == '015E').length, 3);
       expect(transport.sentCommands.where((c) => c == '0110').length, 3);
-      expect(service.isPidSupported(0x5E), isFalse,
-          reason: '3× real NO DATA → probation parks 5E (#3532)');
-      expect(service.isPidSupported(0x10), isFalse);
-
-      // From then on the parked PIDs cost no further round-trips.
-      final rate = await service.readFuelRateLPerHour();
-      expect(rate, isNotNull);
-      expect(rate, greaterThan(0));
-      expect(transport.sentCommands.where((c) => c == '015E').length, 3,
-          reason: 'a probation-parked PID must not be polled again');
-      expect(transport.sentCommands.where((c) => c == '0110').length, 3);
+      expect(service.isPidSupported(0x10), isFalse,
+          reason: '3× real NO DATA → probation parks MAF (#3532)');
+      expect(service.isPidSupported(0x5E), isTrue,
+          reason: 'a PID that was never read is not parked');
       await service.disconnect(); // #3528 — dispose the ElmSession watchdog
     });
 

@@ -7,6 +7,8 @@
 /// the other, and the decomposition leaves a single definition of each.
 library;
 
+import 'frame_decode.dart';
+
 /// Parse a space-separated hex-byte string ("41 0C 1A F8") into a list of
 /// byte values, dropping any token that isn't valid hex.
 List<int> parseElmHexBytes(String hex) => hex
@@ -25,6 +27,13 @@ const double maxPlausibleOdometerKm = 2000000.0;
 /// Whether [km] is a plausible odometer reading (#3275).
 bool isPlausibleOdometerKm(double km) =>
     km.isFinite && km > 0 && km <= maxPlausibleOdometerKm;
+
+/// [km] from a frame that ARRIVED, as a decode outcome (#4325): the reading
+/// when [isPlausibleOdometerKm], else a named implausible-odometer frame
+/// rather than a null that reads the same as NO DATA.
+FrameDecode<double> odometerFrameDecode(double km) => isPlausibleOdometerKm(km)
+    ? FrameDecode.value(km)
+    : const FrameDecode.implausible(ImplausibleFrameKind.odometer);
 
 /// Clean a raw ELM327 response: strip `>`, CR/LF and surrounding space,
 /// reject the NO DATA / UNABLE / ERROR / `?` placeholders, and anchor on the

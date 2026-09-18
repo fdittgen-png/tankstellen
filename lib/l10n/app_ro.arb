@@ -8747,5 +8747,18 @@
   "@vehicleFlexFuelApprovedHelper": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "obd2DiagnosticsImplausibleFramesLine": "Implausible frames: {voltage} battery voltage · {odometer} odometer",
+  "@obd2DiagnosticsImplausibleFramesLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "voltage": {
+        "type": "int"
+      },
+      "odometer": {
+        "type": "int"
+      }
+    }
   }
 }

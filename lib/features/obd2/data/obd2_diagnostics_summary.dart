@@ -208,19 +208,9 @@ Obd2DiagnosticsSummary computeObd2DiagnosticsSummary(
   Obd2SessionDiagnostic session,
 ) {
   // A session with no PID rows, no connection attempts and no adapter is
-  // the const-default empty snapshot — nothing worth rendering.
-  final hasSignal = session.pidStats.isNotEmpty ||
-      session.connection.attempts > 0 ||
-      session.redactedMac != null ||
-      session.elmVersion != null ||
-      // #2905 — a reconnect-only / drop-only session (no successful cold
-      // connect, ran entirely on fallback) is exactly the field case worth
-      // surfacing — it must NOT be the empty sentinel.
-      session.reconnectAttempts.isNotEmpty ||
-      session.transitions.isNotEmpty ||
-      session.disconnectExceptions > 0 ||
-      session.fallbackActivatedAtMs != null;
-  if (!hasSignal) return Obd2DiagnosticsSummary.empty;
+  // the const-default empty snapshot — nothing worth rendering. #2905 — a
+  // reconnect-only / drop-only session must NOT be the empty sentinel.
+  if (!session.hasSignal) return Obd2DiagnosticsSummary.empty;
 
   final completeness = session.completeness;
 

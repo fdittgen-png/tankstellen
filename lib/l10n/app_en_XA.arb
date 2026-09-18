@@ -1955,6 +1955,7 @@
   "obd2DiagnosticsTripDurationLine": "⟦Šéššîóñ łéñǧŧĥ: {duration} ······⟧",
   "obd2DiagnosticsTripFuelMeasured": "⟦Ƒúéł ƒîǧúřéš çáɱé ƒřóɱ ŧĥé áđáƥŧéř, ñóŧ ƒřóɱ ǦƤŠ éšŧîɱáŧéš. ······················⟧",
   "obd2DiagnosticsTripNoPidDetail": "⟦Ŧĥé ƥéř-ƤÎĐ çóɱɱúñîçáŧîóñ ƀřéáķđóŵñ ŵáš ñóŧ çáƥŧúřéđ ƒóř ŧĥîš ŧřîƥ. Ŧúřñ óñ đéṽéłóƥéř ɱóđé ƀéƒóřé řéçóřđîñǧ ŧó çółłéçŧ îŧ. ·············································⟧",
+  "obd2DiagnosticsImplausibleFramesLine": "⟦Îɱƥłáúšîƀłé ƒřáɱéš: {voltage} ƀáŧŧéřý ṽółŧáǧé · {odometer} óđóɱéŧéř ··················⟧",
   "obd2PickerPinnedFallback": "⟦Çóúłđñ'ŧ řéáçĥ '{adapterName}' — ƥîçķ áñóŧĥéř áđáƥŧéř ··············⟧",
   "obd2PickerOtherDevices": "⟦Óŧĥéř Ɓłúéŧóóŧĥ đéṽîçéš ·········⟧",
   "obd2PickerTapToTry": "⟦Úñřéçóǧñîžéđ — ŧáƥ ŧó ŧřý ·········⟧",

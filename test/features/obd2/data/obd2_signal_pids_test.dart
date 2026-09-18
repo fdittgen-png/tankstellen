@@ -4,7 +4,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/protocol/elm327_precision_pids.dart';
 import 'package:tankstellen/features/obd2/data/protocol/obd2_signal_pids.dart';
-import 'package:tankstellen/features/obd2/data/session/obd2_fuel_rate_reader.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_signal_support.dart';
 import 'package:tankstellen/features/obd2/domain/vehicle_signal.dart';
 
@@ -15,7 +14,7 @@ import 'package:tankstellen/features/obd2/domain/vehicle_signal.dart';
 
 String _hex(int pid) => pid.toRadixString(16).toUpperCase().padLeft(2, '0');
 
-class _Reads implements Obd2FuelRateReads {
+class _Reads implements Obd2PidSupport {
   final List<String> asked = <String>[];
 
   @override
@@ -29,10 +28,6 @@ class _Reads implements Obd2FuelRateReads {
     asked.add('strict:${_hex(pid)}');
     return false;
   }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) =>
-      throw UnsupportedError('supports() must not read');
 }
 
 void main() {

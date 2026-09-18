@@ -4,7 +4,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/protocol/elm327_parsers.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
-import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 
 /// #3426 — pins the PID 0x44 equivalence-ratio convention against SAE
 /// J1979 with REAL frame bytes driven through the real parser (no echo
@@ -75,56 +74,7 @@ void main() {
     });
   });
 
-  group('full pull path: raw 0x44 transcript → readFuelRateLPerHour', () {
-    const initResponses = {
-      'ATZ': 'ELM327 v1.5>',
-      'ATE0': 'OK>',
-      'ATL0': 'OK>',
-      'ATH0': 'OK>',
-      'ATSP0': 'OK>',
-    };
-    // MAF branch fixture: PID 10 = 10.24 g/s, mass PIDs + 5E + wideband +
-    // trims all NO DATA, so ONLY the 0x44 frame differs between cases.
-    const mafBase = {
-      '019D': 'NO DATA>',
-      '01A2': 'NO DATA>',
-      '015E': 'NO DATA>',
-      '0166': 'NO DATA>',
-      '0110': '41 10 04 00>', // 10.24 g/s
-      '0124': 'NO DATA>',
-      '0152': 'NO DATA>',
-      '0106': 'NO DATA>',
-      '0107': 'NO DATA>',
-    };
-
-    Future<double?> rateWith0x44(String frame) async {
-      final transport = FakeObd2Transport({
-        ...initResponses,
-        ...mafBase,
-        '0144': frame,
-      });
-      final service = Obd2Service(transport);
-      await service.connect();
-      return service.readFuelRateLPerHour();
-    }
-
-    test(
-        'lean commanded (41 44 66 66) yields ~20 % LESS fuel than stoich '
-        '(41 44 80 00) — the SAE direction, end to end', () async {
-      final lean = await rateWith0x44('41 44 66 66>');
-      final stoich = await rateWith0x44('41 44 80 00>');
-      expect(lean, isNotNull);
-      expect(stoich, isNotNull);
-      expect(lean!, lessThan(stoich!));
-      expect(lean / stoich, closeTo(0.7999, 0.005));
-    });
-
-    test(
-        'rich commanded (41 44 99 9A) yields ~20 % MORE fuel than stoich',
-        () async {
-      final rich = await rateWith0x44('41 44 99 9A>');
-      final stoich = await rateWith0x44('41 44 80 00>');
-      expect(rich! / stoich!, closeTo(1.2, 0.005));
-    });
-  });
+  // The end-to-end raw-frame direction (lean ≈ 0.8×, rich ≈ 1.2× the
+  // stoich rate) runs through the live snapshot since #4315:
+  // `live_sample_snapshot_fuel_chain_test.dart`.
 }

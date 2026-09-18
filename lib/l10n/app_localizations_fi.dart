@@ -7201,6 +7201,11 @@ class AppLocalizationsFi extends AppLocalizations {
       'PID-kohtaisia viestintätietoja ei tallennettu tältä matkalta. Ota kehittäjätila käyttöön ennen tallennusta kerätäksesi ne.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Ei voitu tavoittaa \'$adapterName\' — valitse toinen sovitin';
   }

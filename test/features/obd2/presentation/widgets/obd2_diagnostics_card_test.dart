@@ -265,4 +265,48 @@ void main() {
       expect(find.text('Dongle init transcript'), findsNothing);
     });
   });
+
+  group('Obd2DiagnosticsCard — implausible frames (#4325)', () {
+    Future<void> pumpExpanded(
+      WidgetTester tester,
+      Obd2SessionDiagnostic session,
+    ) async {
+      await pumpApp(
+        tester,
+        ListView(children: [Obd2DiagnosticsCard(session: session)]),
+      );
+      await tester.tap(find.byKey(const Key('obd2_diagnostics_tile')));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('a row names each kind with its own count', (tester) async {
+      await pumpExpanded(
+        tester,
+        const Obd2SessionDiagnostic(
+          connection: Obd2ConnectionStats(attempts: 1, successes: 1),
+          pidStats: {'01A6': Obd2PidStat(polled: 3, noData: 2)},
+          implausibleFrames: {'batteryVoltage': 4, 'odometer': 1},
+        ),
+      );
+      expect(
+        find.byKey(const Key('obd2_diag_implausible_line')),
+        findsOneWidget,
+      );
+      expect(
+        find.text('Implausible frames: 4 battery voltage · 1 odometer'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('no row until a frame was implausible', (tester) async {
+      await pumpExpanded(
+        tester,
+        const Obd2SessionDiagnostic(
+          connection: Obd2ConnectionStats(attempts: 1, successes: 1),
+          pidStats: {'01A6': Obd2PidStat(polled: 3, noData: 2)},
+        ),
+      );
+      expect(find.byKey(const Key('obd2_diag_implausible_line')), findsNothing);
+    });
+  });
 }

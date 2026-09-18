@@ -7223,6 +7223,11 @@ class AppLocalizationsSk extends AppLocalizations {
       'Podrobnosti komunikácie podľa PID neboli pri tejto jazde zachytené. Ak ich chcete zbierať, pred nahrávaním zapnite vývojársky režim.';
 
   @override
+  String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer) {
+    return 'Implausible frames: $voltage battery voltage · $odometer odometer';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Nepodarilo sa dosiahnuť \'$adapterName\' — vyberte iný adaptér';
   }

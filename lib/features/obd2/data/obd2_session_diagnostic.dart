@@ -124,6 +124,15 @@ abstract class Obd2SessionDiagnostic with _$Obd2SessionDiagnostic {
     @JsonKey(name: 'frm')
     @Default(Obd2FramingStats()) Obd2FramingStats framing,
 
+    /// Frames that ARRIVED but decoded outside their plausible bounds
+    /// (#4325), keyed by `ImplausibleFrameKind.name` (`'batteryVoltage'`,
+    /// `'odometer'`). Consumers received null for these exactly as for
+    /// NO DATA; this keeps the adapter/ECU fault behind them visible. Kept
+    /// apart from the fuel breadcrumbs, whose suspicious tally feeds
+    /// `fuelRateSuspect`. Bounded by the small enum.
+    @JsonKey(name: 'imp')
+    @Default(<String, int>{}) Map<String, int> implausibleFrames,
+
     /// Per-tick fuel-resolution-tier distribution: branch tag → tick
     /// count (e.g. `{'pid5E': 412, 'maf': 88, 'speedDensity': 3}`).
     @JsonKey(name: 'ft')
@@ -173,6 +182,22 @@ abstract class Obd2SessionDiagnostic with _$Obd2SessionDiagnostic {
 
   factory Obd2SessionDiagnostic.fromJson(Map<String, dynamic> json) =>
       _$Obd2SessionDiagnosticFromJson(json);
+
+  /// Whether this session carries any diagnostic signal worth surfacing —
+  /// the one predicate the collector's `captureForTrip` and
+  /// `computeObd2DiagnosticsSummary` share. A connection ATTEMPT alone
+  /// (even a failed connect) counts, which is exactly the "adapter never
+  /// connected" case #2912 must still surface; so does a reconnect-only /
+  /// drop-only / fallback-only session (#2905).
+  bool get hasSignal =>
+      pidStats.isNotEmpty ||
+      connection.attempts > 0 ||
+      redactedMac != null ||
+      elmVersion != null ||
+      reconnectAttempts.isNotEmpty ||
+      transitions.isNotEmpty ||
+      disconnectExceptions > 0 ||
+      fallbackActivatedAtMs != null;
 
   /// Hard cap on the retained init-transcript lines (one-shot per
   /// session). Mirrored by the collector so the snapshot can never carry
