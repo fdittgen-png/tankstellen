@@ -3,7 +3,9 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/country/country_config.dart';
 import '../../../core/domain/data_value.dart';
+import '../../../core/domain/exchange_rate_provider.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/refuel_economics.dart';
 import '../../../core/time/app_clock.dart';
@@ -52,7 +54,14 @@ part 'refuel_decision_provider.g.dart';
 @riverpod
 RefuelDecision refuelDecision(Ref ref, List<SearchResultItem> items) {
   final fuelType = ref.watch(selectedFuelTypeProvider);
-  final profile = ref.watch(refuelProfileProvider);
+  // #4361 — the vehicle side comes from fill-ups, the money side from
+  // where the driver is. A mixed-currency list is then ranked in ONE
+  // currency or not ranked on money at all; it is never sorted on bare
+  // numbers whose units differ.
+  final profile = ref.watch(refuelProfileProvider).withComparison(
+        currency: ref.watch(comparisonCurrencyProvider),
+        rates: ref.watch(exchangeRatesProvider),
+      );
   // #4139 — the gates for the conditional lead (spec §3.1). Neither
   // enters the arithmetic; both decide whether Best Value is confident
   // enough to be stated as THE answer rather than one of three.
@@ -87,6 +96,7 @@ RefuelDecision refuelDecision(Ref ref, List<SearchResultItem> items) {
         ),
     ],
     profile,
+    now: now,
   );
 }
 
@@ -122,6 +132,11 @@ RefuelCandidate _candidate(
     isRoadDistance: road != null,
     roadTravel: road,
     pricePerLitre: item.station.priceFor(fuelType),
+    // The SELLING country's currency (#4361). A Danish forecourt on a
+    // German list quotes DKK, and 13 is not less than 1.80.
+    currencyCode: offer.countryCode == null
+        ? null
+        : Countries.byCode(offer.countryCode!)?.currency,
     isPhysicalStation: offer.canHoldStationRanking,
     coverageComplete: offer.coverageComplete,
     // An unregistered country gets the candidate's own defaults, which

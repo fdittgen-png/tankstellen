@@ -59,6 +59,7 @@ abstract final class RefuelPlanner {
       cheapest: _cheapest(request, sorted),
       fastest: _fastest(request, sorted),
       reserveLitres: request.reserveLitres,
+      currencyCode: request.currencyCode,
       valuationPricePerLitre: sorted.isEmpty
           ? null
           : sorted.map((c) => c.pricePerLitre).reduce(math.min),
@@ -278,6 +279,7 @@ class _Ledger {
       startLitres: r.startLitres,
       consumedLitres: consumed + last,
       endLitres: litres - last,
+      currencyCode: r.currencyCode,
     );
   }
 }

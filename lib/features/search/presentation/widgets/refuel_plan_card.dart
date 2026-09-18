@@ -158,6 +158,10 @@ class _Blocked extends StatelessWidget {
       RefuelPlanBlocker.noTankLevel =>
         l10n.refuelPlanNeedsTank,
       RefuelPlanBlocker.noPricedStations => l10n.refuelPlanNeedsPrices,
+      // #4361 — the prices exist; what is missing is a rate to compare
+      // them at, and saying so is the honest answer.
+      RefuelPlanBlocker.noComparableCurrency =>
+        l10n.refuelPlanNeedsExchangeRate,
       RefuelPlanBlocker.noRoute => l10n.startSearch,
     };
 

@@ -18,6 +18,7 @@ class RefuelCandidate {
     required this.stationId,
     required this.oneWayKm,
     this.pricePerLitre,
+    this.currencyCode,
     this.isRoadDistance = false,
     this.roadTravel,
     this.isPhysicalStation = true,
@@ -40,6 +41,16 @@ class RefuelCandidate {
   /// publish one. A candidate without a price can still be the closest;
   /// it can never hold an economic ranking (spec §4.3).
   final double? pricePerLitre;
+
+  /// ISO 4217 currency [pricePerLitre] is quoted in — the SELLING
+  /// country's, not the driver's (#4361).
+  ///
+  /// Null means nobody stated one. A null currency never joins a money
+  /// ranking against a stated one: on a DE→DK list, 13 (DKK) sorts below
+  /// 1.80 (EUR) as a bare number and recommends the dearer station with
+  /// total confidence. Every candidate in one comparison must be in one
+  /// currency, or be converted at a stated, fresh rate.
+  final String? currencyCode;
 
   /// True when [oneWayKm] is a real road distance, so no correction
   /// factor applies.
@@ -100,6 +111,7 @@ class RefuelCandidate {
       other.stationId == stationId &&
       other.oneWayKm == oneWayKm &&
       other.pricePerLitre == pricePerLitre &&
+      other.currencyCode == currencyCode &&
       other.isRoadDistance == isRoadDistance &&
       identical(other.roadTravel, roadTravel) &&
       other.isPhysicalStation == isPhysicalStation &&
@@ -109,6 +121,7 @@ class RefuelCandidate {
 
   @override
   int get hashCode =>
-      Object.hash(stationId, oneWayKm, pricePerLitre, isRoadDistance,
-          roadTravel, isPhysicalStation, coverageComplete, openState, priceAge);
+      Object.hash(stationId, oneWayKm, pricePerLitre, currencyCode,
+          isRoadDistance, roadTravel, isPhysicalStation, coverageComplete,
+          openState, priceAge);
 }

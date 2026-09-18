@@ -19,6 +19,8 @@ library;
 
 import 'package:meta/meta.dart';
 
+import 'money.dart';
+
 /// Litres kept in the tank as a buffer. A plan that runs the tank to zero
 /// is arithmetic, not advice — the driver has no margin for a closed
 /// forecourt, a queue, or a consumption figure that was 8 % optimistic.
@@ -36,6 +38,8 @@ class PlanCandidate {
     required this.stationId,
     required this.alongRouteKm,
     required this.pricePerLitre,
+    this.nativePrice,
+    this.countryCode,
     this.detourKm = 0,
     this.roadExtraKm,
     this.roadExtraMinutes,
@@ -47,8 +51,25 @@ class PlanCandidate {
   /// positions on a line; the caller projects stations onto the polyline.
   final double alongRouteKm;
 
-  /// Price of the fuel actually being bought.
+  /// Price of the fuel actually being bought, ALREADY EXPRESSED in
+  /// [RefuelPlanRequest.currencyCode] (#4361).
+  ///
+  /// Normalisation happens before planning, in the layer that holds the
+  /// rate snapshot, for one reason: a candidate whose price cannot be
+  /// converted at a stated, fresh rate must not reach the planner at all
+  /// — there is no honest way for an optimiser to rank a number whose
+  /// currency it does not know, and "drop it silently" and "convert it at
+  /// 1:1" are both wrong. See `refuel_plan_provider.dart`.
   final double pricePerLitre;
+
+  /// The pump price as the country quotes it, kept for display and for
+  /// the explanation of a converted total. Null when the caller stated
+  /// no currency.
+  final Money? nativePrice;
+
+  /// The SELLING country, so a plan can make a border crossing visible
+  /// and attribute a coverage or setup caveat to the right side of it.
+  final String? countryCode;
 
   /// Extra kilometres to leave the route and rejoin it. One-way
   /// deviation — the caller doubles it if the station is an errand rather
@@ -121,6 +142,7 @@ class RefuelPlan {
     this.startLitres = 0,
     this.consumedLitres = 0,
     this.endLitres = 0,
+    this.currencyCode,
   });
 
   /// Infeasible: the driver cannot cross [gap] on a full tank.
@@ -135,9 +157,14 @@ class RefuelPlan {
         approximateDetourKm = 0,
         startLitres = 0,
         consumedLitres = 0,
-        endLitres = 0;
+        endLitres = 0,
+        currencyCode = null;
 
   final List<PlannedStop> stops;
+
+  /// The one currency every figure in this plan is denominated in
+  /// (#4361). Null only when the caller stated none.
+  final String? currencyCode;
 
   /// Cash paid at the pumps — every purchased litre counted once,
   /// including the litres the detours burn (#4360).
@@ -191,6 +218,13 @@ class RefuelPlan {
   /// the tank and bought at a pump, counted those litres twice.
   double get totalCost => fuelCost;
 
+  /// [totalCost] with its currency attached — the form a surface may
+  /// render or compare (#4361). Null when no currency was stated.
+  Money? get totalMoney {
+    final code = currencyCode;
+    return code == null ? null : Money(totalCost, code);
+  }
+
   /// Minutes the detours add, plus the fixed cost of stopping at all.
   double get detourMinutes =>
       _detourDrivingMinutes + stops.length * kStopOverheadMinutes;
@@ -226,6 +260,7 @@ class RefuelPlanRequest {
     required this.consumptionLPer100km,
     required this.candidates,
     this.reserveLitres = kDefaultReserveLitres,
+    this.currencyCode,
   });
 
   final double routeKm;
@@ -239,6 +274,10 @@ class RefuelPlanRequest {
 
   /// Litres the plan refuses to dip below.
   final double reserveLitres;
+
+  /// The currency every [PlanCandidate.pricePerLitre] is already
+  /// expressed in (#4361). Null for a caller that states none.
+  final String? currencyCode;
 
   /// Whether the arithmetic can run at all.
   ///
@@ -287,6 +326,7 @@ class RefuelPlanSet {
     this.gap,
     this.reserveLitres = kDefaultReserveLitres,
     this.valuationPricePerLitre,
+    this.currencyCode,
   });
 
   /// Minimum total money.
@@ -311,6 +351,10 @@ class RefuelPlanSet {
   /// pay. Null when there were no candidates.
   final double? valuationPricePerLitre;
 
+  /// The currency [valuationPricePerLitre] and every plan total are in
+  /// (#4361).
+  final String? currencyCode;
+
   /// [plan]'s pump cash with its fuel above the reserve at the destination
   /// valued back at [valuationPricePerLitre] — the figure two plans with
   /// different terminal inventories CAN be compared on (#4360 fixture
@@ -321,5 +365,12 @@ class RefuelPlanSet {
     final basis = valuationPricePerLitre;
     if (basis == null) return null;
     return plan.fuelCost - (plan.endLitres - reserveLitres) * basis;
+  }
+
+  /// [comparableCost] with its currency attached (#4361).
+  Money? comparableMoney(RefuelPlan plan) {
+    final code = currencyCode;
+    final value = comparableCost(plan);
+    return code == null || value == null ? null : Money(value, code);
   }
 }
