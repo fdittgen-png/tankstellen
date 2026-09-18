@@ -1,0 +1,67 @@
+{
+  "refuelPlanLeastDrivingTitle": "Least extra driving",
+  "@refuelPlanLeastDrivingTitle": {
+    "description": "Title of the refuelling plan that adds the fewest extra road kilometres to the journey (#4362/#4363)."
+  },
+  "refuelPlanStopNamed": "{position}. {station}",
+  "@refuelPlanStopNamed": {
+    "description": "One ordered stop in a refuelling plan, named by the real station (#4363).",
+    "placeholders": {
+      "position": {"type": "int"},
+      "station": {"type": "String"}
+    }
+  },
+  "refuelPlanStopDetail": "Buy {litres} for {cost} · arrive with {arrival}",
+  "@refuelPlanStopDetail": {
+    "description": "What to do at one plan stop: the quantity, its cost and the tank level on arrival (#4363).",
+    "placeholders": {
+      "litres": {"type": "String"},
+      "cost": {"type": "String"},
+      "arrival": {"type": "String"}
+    }
+  },
+  "refuelPlanStopNativePrice": "{price} at the pump",
+  "@refuelPlanStopNativePrice": {
+    "description": "A cross-border stop's pump price in the selling country's own currency, shown beside the converted total (#4361/#4363).",
+    "placeholders": {"price": {"type": "String"}}
+  },
+  "refuelPlanJourneyTotals": "{distance} · {duration}",
+  "@refuelPlanJourneyTotals": {
+    "description": "Distance and time of a whole refuelling plan, stops included (#4363).",
+    "placeholders": {
+      "distance": {"type": "String"},
+      "duration": {"type": "String"}
+    }
+  },
+  "refuelPlanTradeOff": "Against the cheapest: {cost} · {minutes} · {distance}",
+  "@refuelPlanTradeOff": {
+    "description": "What an alternative plan sacrifices or saves against the lowest-cost plan, as three separate signed figures rather than one score (#4363).",
+    "placeholders": {
+      "cost": {"type": "String"},
+      "minutes": {"type": "String"},
+      "distance": {"type": "String"}
+    }
+  },
+  "refuelPlanNoStopSummary": "Your tank covers this journey — about {litres} used, nothing to buy.",
+  "@refuelPlanNoStopSummary": {
+    "description": "A plan with no stop at all. Zero pump spend is not zero consumption, so the fuel used is still stated (#4362/#4363).",
+    "placeholders": {"litres": {"type": "String"}}
+  },
+  "refuelPlanDetourTimeApproximate": "Detour times are estimated from the route's average speed.",
+  "@refuelPlanDetourTimeApproximate": {
+    "description": "Caveat when at least one stop has no routed duration, so its detour time is an approximation rather than a road answer (#4359/#4363)."
+  },
+  "refuelPlanSearchBounded": "The best of the itineraries compared — this route has more stations than the planner combines.",
+  "@refuelPlanSearchBounded": {
+    "description": "Caveat when the planner's documented candidate limit was reached, so the result is the best found rather than provably the best (#4362/#4363)."
+  },
+  "refuelPlanEvidenceIncomplete": "Some stations were left out — hidden by you, or not listed by this country's source — so this is the best among the rest.",
+  "@refuelPlanEvidenceIncomplete": {
+    "description": "Caveat when the candidate set is incomplete: an ignored station or a partial-coverage provider. Distinguishes a gap in the candidates from proof that no station exists (#4348/#4362/#4363)."
+  },
+  "refuelPlanReferencePricesSkipped": "{count, plural, =1{1 reference price for this area is not a place you can stop at} other{{count} reference prices for this area are not places you can stop at}}",
+  "@refuelPlanReferencePricesSkipped": {
+    "description": "Explains why a regulated or aggregate price on this route (Luxembourg decree, Greek prefecture average) is not among the plan's stops (#4348/#4363).",
+    "placeholders": {"count": {"type": "int"}}
+  }
+}

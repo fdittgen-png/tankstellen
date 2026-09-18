@@ -130,6 +130,23 @@ class RefuelPlanSet {
         if (identical(leastDetour, plan)) RefuelObjective.leastExtraDistance,
       };
 
+  /// What [plan] costs in money, minutes and kilometres against
+  /// [reference] — the explanation an alternative objective owes the
+  /// driver (#4363).
+  ///
+  /// Positive means MORE than the reference. Money is null when the two
+  /// plans are not in one currency or one of them has no total, which is
+  /// the #4361 case where a combined figure is withheld; minutes and
+  /// kilometres are always available, because neither needs a rate.
+  RefuelPlanTradeOff tradeOff(RefuelPlan plan, RefuelPlan reference) {
+    final a = plan.totalMoney, b = reference.totalMoney;
+    return RefuelPlanTradeOff(
+      cost: a == null || b == null ? null : a - b,
+      minutes: plan.totalMinutes - reference.totalMinutes,
+      km: plan.detourKm - reference.detourKm,
+    );
+  }
+
   /// The distinct plans worth presenting, each once, cost first.
   List<RefuelPlan> get distinctPlans {
     final out = <RefuelPlan>[];
@@ -138,4 +155,35 @@ class RefuelPlanSet {
     }
     return out;
   }
+}
+
+/// What one plan costs against another, per objective (#4363).
+///
+/// Never a single number: "€3 more, 14 minutes quicker, 8 km further" is
+/// a trade the driver can make. A weighted total of the three would be
+/// the opaque score `docs/specs/refuel-economics.md` §5 refuses.
+@immutable
+class RefuelPlanTradeOff {
+  const RefuelPlanTradeOff({
+    required this.cost,
+    required this.minutes,
+    required this.km,
+  });
+
+  /// Positive: this plan costs MORE. Null when no comparable total
+  /// exists (#4361) — the minutes and kilometres still do.
+  final Money? cost;
+
+  /// Positive: this plan takes LONGER.
+  final double minutes;
+
+  /// Positive: this plan drives FURTHER off the route.
+  final double km;
+
+  /// Whether anything at all differs — an identical alternative is a
+  /// label on the same result, never a second row.
+  bool get isMaterial =>
+      (cost != null && cost!.amount.abs() > 0.005) ||
+      minutes.abs() > 0.5 ||
+      km.abs() > 0.05;
 }

@@ -79,7 +79,10 @@ void main() {
 
     expect(find.textContaining('Cheapest trip'), findsOneWidget);
     expect(find.textContaining('Fastest trip'), findsOneWidget);
-    expect(find.textContaining('1 stop'), findsNWidgets(2));
+    // #4363 — the same itinerary answering two objectives is ONE result
+    // carrying both titles. It used to be printed twice, which read as
+    // two choices where there is one.
+    expect(find.textContaining('1 stop'), findsOneWidget);
   });
 
   testWidgets('#4360 — the total is the pump cash, detour fuel NOT added '
@@ -100,8 +103,10 @@ void main() {
     await pumpWith(
         tester, const RefuelPlanState.ready(RefuelPlanSet(cheapest: plan)));
 
-    expect(find.textContaining(PriceFormatter.formatPrice(48)), findsWidgets);
-    expect(find.textContaining(PriceFormatter.formatPrice(48.96)), findsNothing);
+    // #4363 — a TOTAL is formatted as a total (two decimals), not with
+    // the three-decimal per-litre mask the card used to borrow.
+    expect(find.textContaining(PriceFormatter.formatTotal(48)), findsWidgets);
+    expect(find.textContaining(PriceFormatter.formatTotal(48.96)), findsNothing);
   });
 
   testWidgets('a trip needing no stop says so rather than showing nothing',

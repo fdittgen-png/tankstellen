@@ -1,0 +1,13 @@
+{
+  "refuelPlanLeastDrivingTitle": "Kürzester Umweg",
+  "refuelPlanStopNamed": "{position}. {station}",
+  "refuelPlanStopDetail": "{litres} für {cost} tanken · Ankunft mit {arrival}",
+  "refuelPlanStopNativePrice": "{price} an der Zapfsäule",
+  "refuelPlanJourneyTotals": "{distance} · {duration}",
+  "refuelPlanTradeOff": "Gegenüber der günstigsten: {cost} · {minutes} · {distance}",
+  "refuelPlanNoStopSummary": "Dein Tank reicht für diese Fahrt – rund {litres} Verbrauch, nichts zu kaufen.",
+  "refuelPlanDetourTimeApproximate": "Umwegzeiten sind aus der Durchschnittsgeschwindigkeit der Route geschätzt.",
+  "refuelPlanSearchBounded": "Die beste der verglichenen Routenfolgen – diese Strecke hat mehr Stationen, als der Planer kombiniert.",
+  "refuelPlanEvidenceIncomplete": "Einige Stationen blieben außen vor – von dir ausgeblendet oder von der Datenquelle dieses Landes nicht gelistet –, das ist also die beste der übrigen.",
+  "refuelPlanReferencePricesSkipped": "{count, plural, =1{1 Referenzpreis für dieses Gebiet ist kein Ort, an dem du halten kannst} other{{count} Referenzpreise für dieses Gebiet sind keine Orte, an denen du halten kannst}}"
+}
