@@ -58,3 +58,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0022 | One consumption contract — provenance, versions and the pump-gain rule travel with the number (#4230) | Accepted |
 | 0023 | The fuzzy consumption engine — physics as input, measured passes through, neutral priors until the corpus is real (#4232) | Accepted |
 | 0024 | Wiring the fuzzy engine — one per-sample stage, the gain once, the version on the trip (#4233) | Accepted |
+| 0025 | Fleet tenancy and claims — org-scoped tables behind oracles, RPC-only writes, every fleet number declares what it is (#4212, #4219) | Accepted |
