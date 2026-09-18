@@ -3,6 +3,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/refuel_plan.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/search/presentation/widgets/refuel_plan_card.dart';
 import 'package:tankstellen/features/search/providers/refuel_plan_provider.dart';
 
@@ -79,6 +80,28 @@ void main() {
     expect(find.textContaining('Cheapest trip'), findsOneWidget);
     expect(find.textContaining('Fastest trip'), findsOneWidget);
     expect(find.textContaining('1 stop'), findsNWidgets(2));
+  });
+
+  testWidgets('#4360 — the total is the pump cash, detour fuel NOT added '
+      'a second time', (tester) async {
+    // 6 km of detour at 10 L/100 km = 0.6 L, already bought inside the
+    // 30 L at €1.60. The old total added 0.6 × 1.60 = €0.96 on top.
+    const candidate = PlanCandidate(
+      stationId: 'a', alongRouteKm: 100, pricePerLitre: 1.6, detourKm: 3,
+    );
+    const stop = PlannedStop(
+      candidate: candidate, litres: 30, cost: 48, arrivalLitres: 10,
+    );
+    const plan = RefuelPlan(
+      stops: [stop], fuelCost: 48, detourKm: 6, routeKm: 500,
+      drivingMinutes: 300, consumptionLPer100km: 10,
+    );
+
+    await pumpWith(
+        tester, const RefuelPlanState.ready(RefuelPlanSet(cheapest: plan)));
+
+    expect(find.textContaining(PriceFormatter.formatPrice(48)), findsWidgets);
+    expect(find.textContaining(PriceFormatter.formatPrice(48.96)), findsNothing);
   });
 
   testWidgets('a trip needing no stop says so rather than showing nothing',

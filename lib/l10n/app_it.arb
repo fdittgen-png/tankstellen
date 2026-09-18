@@ -8263,5 +8263,30 @@
         "type": "int"
       }
     }
+  },
+  "stationReferencePriceNotice": "Reference price for this area, not a station location — there is nowhere to navigate to.",
+  "@stationReferencePriceNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "decisionPartialCoverageNote": "This country's source lists only some stations, so these picks are the best among the stations shown.",
+  "@decisionPartialCoverageNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "errorTitleProviderUnavailable": "No prices for this country",
+  "@errorTitleProviderUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "errorProviderUnavailable": "This country's price source publishes no live prices at the moment. Retrying will not change that.",
+  "@errorProviderUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "recoveryStillWorksProviderUnavailable": "Your favorites, fill-ups and searches in other countries still work.",
+  "@recoveryStillWorksProviderUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

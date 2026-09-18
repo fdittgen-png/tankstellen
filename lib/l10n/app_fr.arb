@@ -6892,5 +6892,10 @@
   "fuelAndTankMaterialThreshold": "Un carburant n'est suggéré que s'il est meilleur d'au moins {percent} %.",
   "vehicleFlexFuelApprovedLabel": "Homologué E85 (flexfuel)",
   "vehicleFlexFuelApprovedHelper": "Seulement si le constructeur homologue l'E85. Carburant & réservoir compare alors l'E85 même si vous faites le plein d'un autre carburant.",
-  "obd2DiagnosticsImplausibleFramesLine": "Trames invraisemblables : {voltage} tension batterie · {odometer} compteur kilométrique"
+  "obd2DiagnosticsImplausibleFramesLine": "Trames invraisemblables : {voltage} tension batterie · {odometer} compteur kilométrique",
+  "stationReferencePriceNotice": "Prix de référence pour ce secteur, pas l'emplacement d'une station — il n'y a pas de destination de navigation.",
+  "decisionPartialCoverageNote": "La source de ce pays ne recense qu'une partie des stations : ces choix sont les meilleurs parmi les stations affichées.",
+  "errorTitleProviderUnavailable": "Aucun prix pour ce pays",
+  "errorProviderUnavailable": "La source de prix de ce pays ne publie actuellement aucun prix en direct. Réessayer n'y changera rien.",
+  "recoveryStillWorksProviderUnavailable": "Vos favoris, vos pleins et les recherches dans d'autres pays fonctionnent toujours."
 }
