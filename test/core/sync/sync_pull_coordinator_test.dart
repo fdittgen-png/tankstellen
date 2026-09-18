@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/sync_pull_coordinator.dart';
+import 'package:tankstellen/core/sync/sync_pull_lease.dart';
 
 import '../../helpers/silence_error_logger.dart';
 
@@ -272,6 +273,147 @@ void main() {
       );
       await expectLater(coordinator.pullAll(), completes);
       expect(coordinator.lastOutcome, SyncPassOutcome.failed);
+    });
+  });
+
+  group('#4377 — a pull that outlives its timeout never writes', () {
+    /// A pull shaped like every real one: the wire answers, then the
+    /// result is checked against the pass's lease before it is persisted.
+    /// [wire] is the network the test holds open.
+    SyncPullEntry checked(
+      Completer<int> wire, {
+      required List<int> persisted,
+      required List<Object> refused,
+      required List<SyncPullLease?> leases,
+    }) =>
+        SyncPullEntry(
+          tables: const ['favorites'],
+          timeout: const Duration(seconds: 15),
+          pull: () async {
+            final lease = SyncPullLease.current;
+            leases.add(lease);
+            final rows = await wire.future;
+            try {
+              lease?.checkLive();
+              persisted.add(rows);
+            } catch (e) {
+              refused.add(e);
+            }
+            return rows;
+          },
+        );
+
+    test('the pass ends completedWithTimeouts; when the abandoned pull '
+        'finally answers, its lease is dead, the result is refused and '
+        'recorded, nothing is persisted', () {
+      fakeAsync((async) {
+        final wire = Completer<int>();
+        final persisted = <int>[];
+        final refused = <Object>[];
+        final leases = <SyncPullLease?>[];
+        coordinator.register(enabled: () => true, entries: [
+          checked(wire,
+              persisted: persisted, refused: refused, leases: leases),
+        ]);
+
+        unawaited(coordinator.pullAll());
+        async.flushMicrotasks();
+        expect(leases.single, isNotNull,
+            reason: 'the pull runs with its pass lease as the ambient one');
+        expect(leases.single!.isLive, isTrue);
+        expect(leases.single!.generation, 1);
+
+        async.elapse(const Duration(seconds: 16));
+        expect(coordinator.lastOutcome, SyncPassOutcome.completedWithTimeouts);
+        expect(coordinator.isRunning, isFalse);
+        expect(leases.single!.isLive, isFalse,
+            reason: 'the timeout retired the generation it abandoned');
+
+        wire.complete(7);
+        async.flushMicrotasks();
+        expect(persisted, isEmpty,
+            reason: 'the late answer belongs to a pass that already ended');
+        expect(refused.single, isA<SyncPullAbandonedException>());
+        expect(coordinator.discardedFor(const ['favorites']), 1);
+        expect(coordinator.discardedLateResults, 1);
+      });
+    });
+
+    test('the next pass runs the SAME table under a newer generation and '
+        'persists; the abandoned one still cannot', () {
+      fakeAsync((async) {
+        final first = Completer<int>();
+        final second = Completer<int>();
+        var calls = 0;
+        final persisted = <int>[];
+        final refused = <Object>[];
+        final leases = <SyncPullLease?>[];
+        coordinator.register(enabled: () => true, entries: [
+          SyncPullEntry(
+            tables: const ['favorites'],
+            timeout: const Duration(seconds: 15),
+            pull: () async {
+              final wire = ++calls == 1 ? first : second;
+              final lease = SyncPullLease.current;
+              leases.add(lease);
+              final rows = await wire.future;
+              try {
+                lease?.checkLive();
+                persisted.add(rows);
+              } catch (e) {
+                refused.add(e);
+              }
+              return rows;
+            },
+          ),
+        ]);
+
+        unawaited(coordinator.pullAll());
+        async.elapse(const Duration(seconds: 16));
+        expect(coordinator.lastOutcome, SyncPassOutcome.completedWithTimeouts);
+
+        // The resume / "sync now" pass: both pulls are now in flight.
+        unawaited(coordinator.pullAll());
+        async.flushMicrotasks();
+        expect(calls, 2);
+        expect(leases[1]!.generation, greaterThan(leases[0]!.generation));
+        expect(leases[1]!.isLive, isTrue);
+        expect(leases[0]!.isLive, isFalse);
+
+        // The wire answers the ABANDONED pull first, then the live one.
+        first.complete(1);
+        async.flushMicrotasks();
+        second.complete(2);
+        async.flushMicrotasks();
+
+        expect(persisted, [2],
+            reason: 'exactly one snapshot is persisted — the current '
+                "pass's, never the abandoned one's");
+        expect(refused, hasLength(1));
+        expect(coordinator.lastOutcome, SyncPassOutcome.completed);
+        expect(coordinator.discardedFor(const ['favorites']), 1);
+      });
+    });
+
+    test('a pull that answers within its budget keeps its lease and is '
+        'never refused', () async {
+      final wire = Completer<int>()..complete(3);
+      final persisted = <int>[];
+      final refused = <Object>[];
+      final leases = <SyncPullLease?>[];
+      coordinator.register(enabled: () => true, entries: [
+        checked(wire, persisted: persisted, refused: refused, leases: leases),
+      ]);
+      await coordinator.pullAll();
+      expect(persisted, [3]);
+      expect(refused, isEmpty);
+      expect(coordinator.discardedLateResults, 0);
+      expect(coordinator.lastOutcome, SyncPassOutcome.completed);
+    });
+
+    test('outside any pass there is no lease: a direct merge is never '
+        'refused', () {
+      expect(SyncPullLease.current, isNull);
     });
   });
 }

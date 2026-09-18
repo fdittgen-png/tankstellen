@@ -81,6 +81,16 @@ class SyncRunTrace {
         detail: 'run=${_runId ?? 'untracked'} outcome=$outcome');
   }
 
+  /// Report an abandoned pull's late result being refused (#4377): the
+  /// pass that started the [tableName] pull timed out and ended, the pull
+  /// answered afterwards, and the answer was discarded instead of
+  /// persisted over the next pass's.
+  static void discarded(String tableName, int generation) {
+    BreadcrumbCollector.add('sync:discard',
+        detail: 'run=${_runId ?? 'untracked'} table=$tableName '
+            'generation=$generation');
+  }
+
   /// Clear the current run id between tests.
   @visibleForTesting
   static void resetForTest() => _runId = null;

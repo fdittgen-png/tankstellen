@@ -4,6 +4,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_client.dart';
+import 'sync_pull_lease.dart';
 
 /// A decoded Supabase row.
 typedef JsonRow = Map<String, dynamic>;
@@ -63,6 +64,14 @@ class SyncFencedException implements Exception {
 }
 
 /// The production [SyncTransport] over the live [TankSyncClient].
+///
+/// Two fences, checked before every call: the client it was opened on
+/// must still be the live one (#4337, [SyncFencedException]), and the
+/// pull pass it runs inside — if any — must still be the current one
+/// (#4377, [SyncPullAbandonedException]). The second is checked AGAIN
+/// after every awaited answer: a select parked on the wire past its
+/// pass's timeout answers into a pass that already ended, and that answer
+/// must never reach the persist step.
 class SupabaseSyncTransport implements SyncTransport {
   final SupabaseClient _client;
 
@@ -96,6 +105,7 @@ class SupabaseSyncTransport implements SyncTransport {
       query = query.eq(filter.key, filter.value);
     }
     final rows = await query;
+    _settle();
     return List<JsonRow>.from(rows);
   }
 
@@ -107,6 +117,7 @@ class SupabaseSyncTransport implements SyncTransport {
   }) async {
     _fence();
     await _client.from(table).upsert(rows, onConflict: onConflict);
+    _settle();
   }
 
   @override
@@ -117,12 +128,19 @@ class SupabaseSyncTransport implements SyncTransport {
       query = query.eq(filter.key, filter.value);
     }
     await query;
+    _settle();
   }
 
-  /// #4337 — refuse to touch a client that is no longer the live one.
+  /// #4337 — refuse to touch a client that is no longer the live one;
+  /// #4377 — or to start a call for a pull pass that was abandoned.
   void _fence() {
     if (!identical(TankSyncClient.client, _client)) {
       throw const SyncFencedException();
     }
+    SyncPullLease.current?.checkLive();
   }
+
+  /// #4377 — the answer arrived; refuse to hand it back to a pass that was
+  /// abandoned while it was on the wire.
+  void _settle() => SyncPullLease.current?.checkLive();
 }
