@@ -29,6 +29,7 @@ import 'package:meta/meta.dart';
 import 'data_value.dart';
 import 'refuel_candidate.dart';
 import 'refuel_decision.dart';
+import 'refuel_trip_cost.dart';
 
 // Re-exported so every existing caller keeps one import: the split
 // (#4139) is an internal seam, not a change to this layer's contract.
@@ -123,9 +124,13 @@ class RefuelProfile {
   /// Whether [consumptionLPer100km] is modelled rather than measured.
   final bool consumptionIsEstimated;
 
-  /// Litres this refuel is assumed to buy. The user's own median
-  /// fill-up when known — the whole point of [kDefaultRefuelLitres]
-  /// being a fallback and not a question.
+  /// The NET refill this decision is priced for — the fuel the driver is
+  /// better off by after the trip (#4360, `RefuelPurchaseQuantity.netIncrease`).
+  /// The user's own median fill-up when known — the whole point of
+  /// [kDefaultRefuelLitres] being a fallback and not a question.
+  ///
+  /// Not the litres dispensed: the pump delivers this plus the fuel the
+  /// trip burns ([RefuelQuote.litresToDispense]).
   final double litresIntended;
 
   /// 2 there-and-back, 1 en route. See [kRoundTripFactor].
@@ -187,10 +192,16 @@ class RefuelCost {
   /// [detourLitres] priced at this station — you are replacing it here.
   final double detourCost;
 
-  /// `litresIntended × pricePerLitre`.
+  /// `litresIntended × pricePerLitre` — the price of the net refill.
   final double purchaseCost;
 
-  /// What the refuel costs in total.
+  /// CASH AT THE PUMP for a net refill of `litresIntended` (#4360).
+  ///
+  /// `(litresIntended + detourLitres) × price`: the pump delivers the
+  /// refill plus what the trip burns, each litre paid once. Not "litres
+  /// bought plus a travel charge" — and because every candidate is priced
+  /// for the same net refill, every candidate ends in the same tank state
+  /// and these totals compare directly.
   double get totalCost => purchaseCost + detourCost;
 }
 
@@ -203,8 +214,13 @@ class RefuelQuote {
   final RefuelCandidate candidate;
   final RefuelCost? cost;
 
-  /// Cost per litre BOUGHT, detour included — the quantity Best Value
-  /// ranks on. Null when [cost] is.
+  /// The litres the pump actually delivers for the net refill (#4360).
+  /// Null when [cost] is.
+  double? get litresToDispense =>
+      cost == null ? null : _litres + cost!.detourLitres;
+
+  /// Cash per NET litre gained, detour included — the quantity Best
+  /// Value ranks on. Null when [cost] is.
   double? get effectivePricePerLitre => cost == null
       ? null
       : cost!.totalCost / _litres;
@@ -255,6 +271,13 @@ abstract final class RefuelEconomics {
         profile.tripFactor *
         (candidate.isRoadDistance ? 1 : profile.roadFactor);
   }
+
+  /// One refuelling TRIP with fuel conserved on its outbound and return
+  /// legs, a purchase quantity whose meaning is kept, and cash counted
+  /// once (#4360). The ledger lives in `refuel_trip_cost.dart`; this is
+  /// the single calculator's entry point for it.
+  static RefuelTripOutcome tripCost(RefuelTripInput input) =>
+      computeRefuelTrip(input);
 
   /// Rank [candidates] three ways under [profile].
   ///

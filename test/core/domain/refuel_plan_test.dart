@@ -181,9 +181,12 @@ void main() {
 
       final plan = set.cheapest!;
       expect(plan.detourKm, closeTo(6, 1e-9), reason: 'off the road and back');
-      // 6 km at 10 L/100 km = 0.6 L, valued at the price actually paid.
-      expect(plan.detourCost, closeTo(0.6 * 1.60, 1e-6));
-      expect(plan.totalCost, closeTo(plan.fuelCost + plan.detourCost, 1e-9));
+      // 6 km at 10 L/100 km = 0.6 L. #4360 — those litres come out of
+      // the tank and are bought at the pump, so the total IS the pump
+      // cash; adding a separately valued detour would count them twice.
+      expect(plan.detourLitres, closeTo(0.6, 1e-9));
+      expect(plan.totalCost, closeTo(plan.fuelCost, 1e-9));
+      expect(plan.consumedLitres, closeTo(50.6, 1e-9)); // 506 km
     });
 
     test('a stop costs time even with no detour', () {
