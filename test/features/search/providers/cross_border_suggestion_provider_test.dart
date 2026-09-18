@@ -4,6 +4,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
@@ -14,9 +15,37 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/cross_border_suggestion_provider.dart';
+import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 
+import '../../../fakes/fake_hive_storage.dart';
+
 void main() {
+  group('crossBorderStationServiceFactoryProvider (#4381)', () {
+    test(
+        'the REAL resolver still resolves a neighbour service after its own '
+        'element would have been torn down', () async {
+      final storage = FakeHiveStorage();
+      final container = ProviderContainer(overrides: [
+        hiveStorageProvider.overrideWithValue(storage),
+        cacheManagerProvider.overrideWithValue(CacheManager(storage)),
+      ]);
+      addTearDown(container.dispose);
+
+      // Every other test in this file overrides the factory, so the real
+      // one's `Ref` lifetime was never exercised — which is exactly how
+      // #4381 hid here.
+      final factory =
+          container.read(crossBorderStationServiceFactoryProvider);
+
+      // The probe loop calls the resolver once per neighbour, i.e. after an
+      // await, and an unlistened auto-dispose element is gone by then.
+      await Future<void>.delayed(const Duration(milliseconds: 80));
+
+      expect(factory('FR'), isA<StationService>());
+    });
+  });
+
   group('crossBorderSuggestionProvider', () {
     test('returns null when user position is unknown', () async {
       final container = _container(

@@ -245,7 +245,15 @@ class ShareReceiptHandler {
 ReceiptPdfRasterizer receiptPdfRasterizer(Ref ref) =>
     const ReceiptPdfRasterizer();
 
-@riverpod
+/// #4381 — `keepAlive`: [ShareReceiptHandler] retains this `Ref` and uses it
+/// *after* an `await` on the shared-PDF path (`_rasterizeAndRoute` →
+/// `_stashAndRoute`). The only caller reads the handler without listening
+/// (`ref.read(...).handle(intent)` from the share listener), so an
+/// auto-dispose element is torn down while the rasterisation is still in
+/// flight and the stash + route silently degrades to "couldn't read the
+/// receipt". The handler is a stateless router over app-lifetime providers,
+/// so matching the listener's lifetime is the correct scope.
+@Riverpod(keepAlive: true)
 ShareReceiptHandler shareReceiptHandler(Ref ref) => ShareReceiptHandler(
   ref,
   pdfRasterizer: ref.read(receiptPdfRasterizerProvider),

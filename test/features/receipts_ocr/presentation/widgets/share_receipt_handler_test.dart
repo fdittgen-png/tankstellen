@@ -68,6 +68,21 @@ class _FakeRasterizer extends ReceiptPdfRasterizer {
   }
 }
 
+/// Like [_FakeRasterizer] but takes real wall-clock time, which is what lets
+/// an auto-dispose provider element be torn down mid-flight (#4381).
+class _SlowRasterizer extends ReceiptPdfRasterizer {
+  _SlowRasterizer(this._result);
+  final String? _result;
+  String? receivedPdfPath;
+
+  @override
+  Future<String?> rasterize(String path) async {
+    receivedPdfPath = path;
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    return _result;
+  }
+}
+
 String _fixture(String name) => File(
       'test/features/receipts_ocr/data/ereceipt/fixtures/$name',
     ).readAsStringSync();
@@ -152,6 +167,31 @@ void main() {
       expect(container.read(pendingSharedReceiptProvider),
           '/tmp/receipt.pdf.page1.jpg',
           reason: 'the rasterised JPEG must be stashed for the SAME OCR path');
+      expect(find.text('add-fill-up'), findsOneWidget);
+    });
+
+    testWidgets(
+        'a SLOW rasterisation still stashes + routes — the handler must not '
+        'depend on a provider scope it can outlive (#4381)', (tester) async {
+      final router = _router();
+      final fake = _SlowRasterizer('/tmp/slow.pdf.page1.jpg');
+      final container = await pump(tester,
+          router: router, enabled: featureOn, rasterizer: fake);
+
+      container
+          .read(shareReceiptHandlerProvider)
+          .handle(_pdfIntent('/tmp/slow.pdf'));
+      // Real wall-clock time, so the provider scheduler gets the chance to
+      // tear down an unlistened element while the rasterisation is in flight.
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 80)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(fake.receivedPdfPath, '/tmp/slow.pdf');
+      expect(container.read(pendingSharedReceiptProvider),
+          '/tmp/slow.pdf.page1.jpg',
+          reason: 'the post-await stash must survive the provider teardown');
       expect(find.text('add-fill-up'), findsOneWidget);
     });
 
