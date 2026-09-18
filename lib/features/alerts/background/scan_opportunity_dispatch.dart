@@ -25,6 +25,8 @@ library;
 
 import '../../../core/logging/app_log.dart';
 import '../../../core/notifications/local_notification_service.dart';
+import '../../../core/notifications/notification_delivery.dart';
+import '../../../core/notifications/notification_service.dart';
 import '../../../core/storage/hive_storage.dart';
 import '../data/models/price_alert.dart';
 import '../data/repositories/alert_repository.dart';
@@ -35,13 +37,20 @@ import 'notification_templates.dart';
 import 'opportunity_dispatcher.dart';
 import 'velocity_scan_detector.dart';
 
+/// What one scan's dispatch did, for the scan journal: how many
+/// notifications went out (at most one, #3147), and what became of the
+/// winner's notification when it did not (#4335) — null when nothing was
+/// attempted or it was posted.
+typedef ScanDispatchResult = ({int alertsFired, NotificationDelivery? undelivered});
+
 /// Run the three detectors, hand everything to one budget, and record
 /// what the user was actually told.
 ///
-/// Returns the number of notifications that went out — at most one —
-/// which is what the coordinator's persisted scan journal counts
-/// (#3147).
-Future<int> detectAndDispatch({
+/// [notifier] builds the initialized notifier the dispatch posts through
+/// (#4162) — the platform plugin in production, a recording fake in the
+/// lifecycle suites. Called after detection, as the inline construction
+/// it replaced was.
+Future<ScanDispatchResult> detectAndDispatch({
   required AlertRepository repo,
   required List<PriceAlert> alerts,
   required Map<String, Map<String, dynamic>> prices,
@@ -51,6 +60,7 @@ Future<int> detectAndDispatch({
   required CountryAlertStrategyResolver resolver,
   String? activeCountry,
   OpportunityDispatcher dispatcher = const OpportunityDispatcher(),
+  Future<NotificationService> Function()? notifier,
 }) async {
   final candidates = <OpportunityCandidate>[
     ...await BackgroundScanRunners.detectPerStationAlerts(
@@ -76,12 +86,10 @@ Future<int> detectAndDispatch({
     ),
   ];
 
-  final notifier = LocalNotificationService();
-  await notifier.initialize();
   final dispatch = await dispatcher.dispatch(
     candidates: candidates,
     now: now,
-    notifier: notifier,
+    notifier: await (notifier ?? initializedLocalNotifier)(),
     templates: templates,
   );
 
@@ -104,5 +112,17 @@ Future<int> detectAndDispatch({
         tag: 'detectAndDispatch');
   }
 
-  return dispatch.notified ? 1 : 0;
+  final delivery = dispatch.delivery;
+  return (
+    alertsFired: dispatch.notified ? 1 : 0,
+    undelivered: delivery == null || delivery.wasPosted ? null : delivery,
+  );
+}
+
+/// The production notifier: the platform plugin, initialized (it registers
+/// the channels, #2209).
+Future<NotificationService> initializedLocalNotifier() async {
+  final notifier = LocalNotificationService();
+  await notifier.initialize();
+  return notifier;
 }

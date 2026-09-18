@@ -3332,6 +3332,20 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get alertsNotificationsOffTitle => 'Notifications are off';
+
+  @override
+  String get alertsNotificationsOffPermissionBody =>
+      'Your price alerts are still checked, but they can\'t notify you: notifications for this app are turned off in your phone\'s settings.';
+
+  @override
+  String get alertsNotificationsOffChannelBody =>
+      'Your price alerts are still checked, but they can\'t notify you: price alert notifications are turned off in your phone\'s settings.';
+
+  @override
+  String get alertsNotificationsOffOpenSettings => 'Open settings';
+
+  @override
   String alertReasonNetSaving(String amount) {
     return 'About $amount on your usual fill';
   }

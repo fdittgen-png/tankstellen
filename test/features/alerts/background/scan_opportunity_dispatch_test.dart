@@ -8,15 +8,22 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/constants/field_names.dart';
 import 'package:tankstellen/core/data/storage_repository.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/cache/cache_manager.dart';
+import 'package:tankstellen/core/notifications/notification_delivery.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
+import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/alerts/background/background_scan_runners.dart';
+import 'package:tankstellen/features/alerts/background/country_alert_strategy_resolver.dart';
 import 'package:tankstellen/features/alerts/background/notification_templates.dart';
 import 'package:tankstellen/features/alerts/background/opportunity_dispatcher.dart';
+import 'package:tankstellen/features/alerts/background/scan_opportunity_dispatch.dart';
 import 'package:tankstellen/features/alerts/data/models/price_alert.dart';
 import 'package:tankstellen/features/alerts/data/opportunity_feed_store.dart';
 import 'package:tankstellen/features/alerts/data/repositories/alert_repository.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity_budget.dart';
+
+import '../../../fakes/fake_storage_repository.dart';
 
 /// #4183 — a price observation in, a notification decision out.
 ///
@@ -177,6 +184,41 @@ void main() {
             'checkable one there is — the user set it');
   });
 
+  // #4335 — `lastTriggeredAt` is shown in the alert list as "you were
+  // told". A suppressed delivery must not write it.
+  group('lastTriggeredAt means the user was told (#4335)', () {
+    Future<PriceAlert> run(NotificationService notifier) async {
+      final storage = _FakeAlertStorage();
+      final repo = AlertRepository(storage);
+      final a = alert('de-1');
+      await repo.saveAlert(a);
+      await detectAndDispatch(
+        repo: repo,
+        alerts: [a],
+        prices: pricesFor({'de-1': 1.759}),
+        now: now,
+        templates: templates,
+        storage: HiveStorage(),
+        resolver: CountryAlertStrategyResolver(
+            storage: FakeStorageRepository(),
+            cache: CacheManager(FakeStorageRepository())),
+        activeCountry: 'DE',
+        notifier: () async => notifier,
+      );
+      return repo.getAlerts().single;
+    }
+
+    test('posted: written', () async {
+      expect((await run(_RecordingNotifier())).lastTriggeredAt, now);
+    });
+
+    test('suppressed: not written', () async {
+      final notifier = _SilencedNotifier();
+      expect((await run(notifier)).lastTriggeredAt, isNull);
+      expect(notifier.sent, isEmpty);
+    });
+  });
+
   test('THE issue, end to end: three tripped alerts, one notification',
       () async {
     // A price observation in, a notification decision out — the real
@@ -212,6 +254,18 @@ void main() {
         reason: 'nothing is lost; two of the three are simply not a push');
     expect(feed.where((e) => e.wasNotified), hasLength(1));
   });
+}
+
+/// A notifier whose OS has notifications turned off (#4335).
+class _SilencedNotifier extends _RecordingNotifier
+    implements NotificationDeliveryProbe {
+  @override
+  Future<NotificationDelivery?> blockedDelivery(
+          NotificationChannelKind channel) async =>
+      NotificationDelivery.suppressedPermission;
+
+  @override
+  Future<bool> openNotificationSettings() async => true;
 }
 
 /// Records what was posted instead of touching a platform channel.

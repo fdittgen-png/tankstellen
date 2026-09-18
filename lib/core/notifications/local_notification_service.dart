@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'notification_delivery.dart';
 import 'notification_launch_ledger.dart';
 import 'notification_service.dart';
 import 'notification_tap_dispatcher.dart';
@@ -19,7 +20,12 @@ import '../../core/logging/error_logger.dart';
 /// and each `show()` carries [DarwinNotificationDetails] so the banner
 /// actually surfaces — including in the foreground, which iOS otherwise
 /// suppresses.
-class LocalNotificationService implements NotificationService {
+///
+/// #4335 — it is also the [NotificationDeliveryProbe]: `show` returns
+/// normally when the OS will display nothing, so callers ask
+/// [blockedDelivery] first.
+class LocalNotificationService
+    implements NotificationService, NotificationDeliveryProbe {
   /// Visible for testing — allows injecting a fake plugin.
   final FlutterLocalNotificationsPlugin plugin;
 
@@ -42,14 +48,19 @@ class LocalNotificationService implements NotificationService {
       'Reminders when your odometer crosses a scheduled service interval';
 
   /// #4317 — runs after the first frame now. [NotificationLaunchLedger]
-  /// is told when it has finished — succeeded or not — so the launch
-  /// listener can collect a tap that arrived while it was pending.
+  /// is told when it has finished — succeeded or not (#4162: which one is
+  /// its plugin phase) — so the launch listener can collect a tap that
+  /// arrived while it was pending.
   @override
   Future<void> initialize() async {
+    var succeeded = false;
     try {
       await _initialize();
+      succeeded = true;
     } finally {
-      NotificationLaunchLedger.markPluginReady();
+      succeeded
+          ? NotificationLaunchLedger.markPluginReady()
+          : NotificationLaunchLedger.markPluginInitFailed();
     }
   }
 
@@ -128,20 +139,68 @@ class LocalNotificationService implements NotificationService {
     }
   }
 
+  /// Whether a price alert posted now would reach the user (#4335).
+  ///
+  /// Fails closed: it used to answer `true` on iOS (never asked) and on
+  /// every error, so a banner built on it would have said "on" exactly
+  /// when nothing could be read.
   @override
-  Future<bool> areNotificationsEnabled() async {
+  Future<bool> areNotificationsEnabled() async =>
+      await blockedDelivery(NotificationChannelKind.priceAlerts) == null;
+
+  /// #4335 — the platform probe: Android's app-level switch plus the
+  /// channel's importance, iOS's authorization. Never throws; an answer
+  /// the platform does not give is [NotificationDelivery.failed].
+  @override
+  Future<NotificationDelivery?> blockedDelivery(
+      NotificationChannelKind channel) async {
     try {
       final android = plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       if (android != null) {
-        return await android.areNotificationsEnabled() ?? true;
+        final enabled = await android.areNotificationsEnabled();
+        if (enabled == null) return NotificationDelivery.failed;
+        if (!enabled) return NotificationDelivery.suppressedPermission;
+        final id = switch (channel) {
+          NotificationChannelKind.priceAlerts => _channelId,
+          NotificationChannelKind.serviceReminders => _serviceChannelId,
+        };
+        final channels = await android.getNotificationChannels();
+        final match = channels?.where((c) => c.id == id).firstOrNull;
+        // A channel not created yet is created by the post itself.
+        return match?.importance == Importance.none
+            ? NotificationDelivery.suppressedChannel
+            : null;
       }
-      return true;
+      final ios = plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) {
+        final options = await ios.checkPermissions();
+        if (options == null) return NotificationDelivery.failed;
+        return options.isEnabled || options.isProvisionalEnabled
+            ? null
+            : NotificationDelivery.suppressedPermission;
+      }
+      // No platform backend: nothing posted here would reach anyone.
+      return NotificationDelivery.failed;
     } catch (e, st) {
       unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
-        'where': 'NotificationService.areNotificationsEnabled',
+        'where': 'NotificationService.blockedDelivery',
       }));
-      return true;
+      return NotificationDelivery.failed;
+    }
+  }
+
+  /// #4335 — the "open settings" action of the notifications-off banner.
+  @override
+  Future<bool> openNotificationSettings() async {
+    try {
+      return await plugin.openAppNotificationSettings() ?? false;
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.other, e, st, context: const {
+        'where': 'NotificationService.openNotificationSettings',
+      }));
+      return false;
     }
   }
 

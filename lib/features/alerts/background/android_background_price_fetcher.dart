@@ -23,7 +23,7 @@ import 'background_service.dart';
 /// #2413 — the task carries a `NetworkType.connected` constraint so a wake
 /// without connectivity is deferred by WorkManager instead of firing a dead
 /// request. The schedule is re-established after a reboot by [BootReceiver]
-/// (Android) re-running [BackgroundService.init] via the `bootReregister`
+/// (Android) re-applying the alerts gate (#4331) via the `bootReregister`
 /// one-off task.
 class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
   final Workmanager _workmanager;
@@ -63,9 +63,29 @@ class AndroidBackgroundPriceFetcher implements BackgroundPriceFetcher {
     );
   }
 
+  /// Cancel every task AND close the native enqueue gate (#4331 B5).
+  ///
+  /// `BackgroundScanEnqueuer` enqueues widget-refresh and boot scans
+  /// whenever a stamp for the installed build exists. Before this the stamp
+  /// outlived the cancel, so whether a user without alerts still got
+  /// widget-triggered scans depended on whether they had EVER had one —
+  /// polling nobody consented to. The stamp goes first, so a WorkManager
+  /// failure still leaves the gate closed; the next [init] re-stamps it.
   @override
   Future<void> cancelAll() async {
+    await _clearHandleBuild();
     await _workmanager.cancelAll();
+  }
+
+  Future<void> _clearHandleBuild() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(handleBuildKey);
+    } catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
+        'where': 'AndroidBackgroundPriceFetcher: clear handle build (#4331)',
+      });
+    }
   }
 
   /// #3688 — record WHICH build just persisted the WorkManager callback

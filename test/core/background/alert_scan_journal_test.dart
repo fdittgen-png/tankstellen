@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tankstellen/core/background/alert_scan_journal.dart';
+import 'package:tankstellen/core/background/scan_run_phase.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 
 /// #3147 — rolling journal of background alert-scan runs, persisted in
@@ -127,6 +128,117 @@ void main() {
       expect(section, hasLength(2));
       expect(section.first['trigger'], 'android_widget',
           reason: 'the most recent scan must lead the export payload');
+    });
+  });
+
+  // #4162 — the typed door. The export is read by people and by older
+  // tooling: a row written through `record(outcome)` must be byte for
+  // byte the row `append` always wrote for the same run.
+  group('record(ScanOutcome) — golden against the legacy rows', () {
+    Future<List<Map<String, Object?>>> rowsOf(
+        Future<void> Function(AlertScanJournal) write) async {
+      await Hive.box<dynamic>(HiveBoxes.alerts).clear();
+      final journal = AlertScanJournal();
+      await write(journal);
+      return journal.entries();
+    }
+
+    final cases = <String,
+        (
+          Future<void> Function(AlertScanJournal),
+          Future<void> Function(AlertScanJournal),
+        )>{
+      'completed': (
+        (j) => j.record(ScanOutcome.completed,
+            at: t0, trigger: 'workmanager_periodic',
+            stationsScanned: 7, alertsFired: 1),
+        (j) => j.append(at: t0, trigger: 'workmanager_periodic',
+            stationsScanned: 7, alertsFired: 1),
+      ),
+      'skippedLock': (
+        (j) => j.record(ScanOutcome.skippedLock,
+            at: t0, trigger: 'android_widget'),
+        (j) => j.append(at: t0, trigger: 'android_widget',
+            skippedReason: 'hive_lock'),
+      ),
+      'skippedCooldown': (
+        (j) => j.record(ScanOutcome.skippedCooldown,
+            at: t0, trigger: 'slcWake'),
+        (j) => j.append(at: t0, trigger: 'slcWake', skippedReason: 'cooldown'),
+      ),
+      'failed': (
+        (j) => j.record(ScanOutcome.failed,
+            at: t0, trigger: 'ios_bg_refresh', error: 'TimeoutException'),
+        (j) => j.append(at: t0, trigger: 'ios_bg_refresh',
+            error: 'TimeoutException'),
+      ),
+    };
+
+    for (final entry in cases.entries) {
+      test('${entry.key} writes the identical row', () async {
+        final typed = await rowsOf(entry.value.$1);
+        final legacy = await rowsOf(entry.value.$2);
+        expect(typed, legacy);
+        expect(typed.single.keys.toList(), legacy.single.keys.toList(),
+            reason: 'key order is part of the exported bytes');
+      });
+    }
+
+    test('every outcome has a golden case', () {
+      expect(cases.keys.toSet(), {for (final o in ScanOutcome.values) o.name});
+    });
+  });
+
+  // #4333 B4 — a run the OS ends mid-body still shows in the export.
+  group('in-flight marker', () {
+    test('the terminal row replaces its own marker — one row per run',
+        () async {
+      final journal = AlertScanJournal();
+      await journal.markInFlight(at: t0, trigger: 'workmanager_periodic');
+      expect(journal.entries().single[AlertScanJournal.inFlightKey], isTrue);
+
+      await journal.record(ScanOutcome.completed,
+          at: t0, trigger: 'workmanager_periodic',
+          stationsScanned: 3, alertsFired: 1);
+
+      expect(journal.entries().single, {
+        'at': t0.toIso8601String(),
+        'trigger': 'workmanager_periodic',
+        'stations': 3,
+        'alertsFired': 1,
+      });
+    });
+
+    test("a different run's row does not replace a marker", () async {
+      final journal = AlertScanJournal();
+      await journal.markInFlight(at: t0, trigger: 'workmanager_periodic');
+      await journal.record(ScanOutcome.skippedLock,
+          at: t0, trigger: 'android_widget');
+      expect(journal.entries(), hasLength(2));
+    });
+
+    test('the next run resolves a leftover marker into an interrupted row',
+        () async {
+      final journal = AlertScanJournal();
+      await journal.markInFlight(at: t0, trigger: 'ios_bg_refresh');
+
+      expect(await journal.resolveInterrupted(), 1);
+      expect(journal.entries().single, {
+        'at': t0.toIso8601String(),
+        'trigger': 'ios_bg_refresh',
+        'interrupted': true,
+      });
+      expect(await journal.resolveInterrupted(), 0,
+          reason: 'resolved once');
+    });
+
+    test('marker and resolve degrade to no-ops on a closed box', () async {
+      await Hive.box<dynamic>(HiveBoxes.alerts).close();
+      final journal = AlertScanJournal();
+      await expectLater(
+          journal.markInFlight(at: t0, trigger: 'slcWake'), completes);
+      expect(await journal.resolveInterrupted(), 0);
+      await Hive.openBox<dynamic>(HiveBoxes.alerts);
     });
   });
 

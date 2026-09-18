@@ -29,7 +29,23 @@ import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../domain/opportunity_budget.dart';
 
+/// A notification slot reserved before its post (#4333): enough identity
+/// to reconcile the reservation when the process dies before committing.
+typedef PendingDelivery = ({int id, String? key, DateTime at});
+
 /// Loads and persists the cross-kind attention budget's state.
+///
+/// ## Reservation, then commit (#4333)
+///
+/// The dispatcher writes the winner's slot BEFORE the post, together with
+/// a [PendingDelivery] marker, in one put: nothing can show a notification
+/// whose slot is not yet on disk. After the post it commits (the same
+/// state without the marker) or, when the post was refused, releases (the
+/// state as it was before). A process that dies in between leaves the
+/// marker, and the next dispatch resolves it ([resolvePending]) by keeping
+/// the slot spent: the OS may or may not have shown the notification, and
+/// the budget chooses **at most once** — a lost notification inside one
+/// quiet window over a duplicate.
 class BudgetStateStore {
   const BudgetStateStore();
 
@@ -84,8 +100,14 @@ class BudgetStateStore {
     }
   }
 
-  /// Persist [state], pruned against [now].
-  Future<void> write(BudgetState state, DateTime now) async {
+  /// Persist [state], pruned against [now] — with a [pending] reservation
+  /// marker when the dispatcher is about to post, without one otherwise
+  /// (which is a commit or a release of any previous marker).
+  Future<void> write(
+    BudgetState state,
+    DateTime now, {
+    PendingDelivery? pending,
+  }) async {
     final box = _boxOrNull();
     if (box == null) {
       log.debug('write: alerts box closed, dropping',
@@ -103,8 +125,42 @@ class BudgetStateStore {
           for (final e in pruned.lastToldByStationFuel.entries)
             e.key: e.value.toIso8601String(),
         },
+        if (pending != null)
+          'pending': {
+            'id': pending.id,
+            'key': pending.key,
+            'at': pending.at.toIso8601String(),
+          },
       }),
     );
+  }
+
+  /// The reservation a dispatch left uncommitted, or null.
+  PendingDelivery? readPending() {
+    final raw = _boxOrNull()?.get(storageKey);
+    if (raw is! String || raw.isEmpty) return null;
+    try {
+      final pending = (jsonDecode(raw) as Map?)?['pending'];
+      if (pending is! Map) return null;
+      final id = pending['id'];
+      final at = DateTime.tryParse('${pending['at']}');
+      if (id is! int || at == null) return null;
+      return (id: id, key: pending['key'] as String?, at: at);
+    } on FormatException catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
+        'where': 'BudgetStateStore.readPending: malformed state',
+      });
+      return null;
+    }
+  }
+
+  /// Resolve a reservation a dead process left: keep its slot spent, drop
+  /// the marker, and return it (null when there was none).
+  Future<PendingDelivery?> resolvePending(DateTime now) async {
+    final pending = readPending();
+    if (pending == null) return null;
+    await write(read(), now);
+    return pending;
   }
 
   /// Forget everything sent — the "clear all data" troubleshoot path.

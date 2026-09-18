@@ -48,7 +48,10 @@ void main() {
   //                                      TOTAL may still only shrink)
   // Measured 2026-08-17.
   const optOutBaseline = <String, int>{
-    '// ignore: silent_catch': 31, // #4372 removed the legacy migration's keyed-open catch
+    // #4372 removed the legacy migration's keyed-open catch (32 → 31) and
+    // #4333 made HiveIsolateLock's three silent best-effort closes log
+    // through log.warn (31 → 28).
+    '// ignore: silent_catch': 28,
     '// ignore: catch_no_st': 14,
     '// ignore: log_raw_debugprint': 0,
     '// i18n-ignore:': 122,

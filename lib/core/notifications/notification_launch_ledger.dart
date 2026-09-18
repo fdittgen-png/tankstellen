@@ -6,6 +6,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 
+import 'notification_plugin_phase.dart';
+
 /// Makes notification taps deterministic while the notification plugin is
 /// not yet initialised (#4317).
 ///
@@ -32,9 +34,11 @@ import 'package:flutter/foundation.dart';
 ///
 /// ## The contract
 ///
-/// * [markPluginReady] fires once `initialize()` has finished (success or
-///   not). The listener then re-reads the launch details ONCE — that is the
-///   iOS buffer.
+/// * [markPluginReady] / [markPluginInitFailed] fire once `initialize()` has
+///   finished. The listener then re-reads the launch details ONCE — that is
+///   the iOS buffer. The ledger owns the resulting [NotificationPluginPhase]
+///   (#4162); the listener looks its routing up in [kLaunchTapRouting]
+///   through [routeFor].
 /// * A payload read from the launch details is routed only if nothing has
 ///   routed it yet this process ([claimLaunchPayload]). On Android the same
 ///   tap arrives through the stream AND the intent; without this it would
@@ -57,19 +61,44 @@ abstract final class NotificationLaunchLedger {
 
   static Completer<void> _pluginReady = Completer<void>();
 
+  static NotificationPluginPhase _phase = NotificationPluginPhase.pending;
+
   /// Every payload that has been routed this process, by either path.
   static final Set<String> _routed = <String>{};
 
-  /// Completes once the notification plugin's `initialize()` has finished.
+  /// Completes once the notification plugin's `initialize()` has finished,
+  /// successfully or not.
   static Future<void> get pluginReady => _pluginReady.future;
 
-  /// Whether [pluginReady] has completed.
-  static bool get isPluginReady => _pluginReady.isCompleted;
+  /// Where the plugin is in this isolate — owned here, written only by
+  /// [markPluginReady] and [markPluginInitFailed].
+  static NotificationPluginPhase get pluginPhase => _phase;
 
-  /// Signals that `initialize()` finished. Idempotent.
-  static void markPluginReady() {
-    if (!_pluginReady.isCompleted) _pluginReady.complete();
+  /// Whether `initialize()` has finished — `pluginPhase != pending`.
+  static bool get isPluginReady => _phase != NotificationPluginPhase.pending;
+
+  /// Signals that `initialize()` succeeded. The first finish decides;
+  /// idempotent after it.
+  static void markPluginReady() => _finish(NotificationPluginPhase.ready);
+
+  /// Signals that `initialize()` threw. Routing treats it like ready: the
+  /// launch details stay readable, and no stream tap can arrive.
+  static void markPluginInitFailed() =>
+      _finish(NotificationPluginPhase.initFailed);
+
+  static void _finish(NotificationPluginPhase to) {
+    if (_phase != NotificationPluginPhase.pending) return;
+    _phase = to;
+    _pluginReady.complete();
   }
+
+  /// The route for a tap with [payload] from [source], per
+  /// [kLaunchTapRouting] and the current phase. Decides only — the caller
+  /// claims ([claimLaunchPayload]) or records ([recordDelivered]) when it
+  /// actually routes.
+  static TapRoute routeFor(TapSource source, String? payload) =>
+      launchTapRoute(_phase, source,
+          payload: payload, alreadyRouted: _routed.contains(payload));
 
   /// Widens the engine-side buffer of [pluginChannel] so taps sent before
   /// the plugin registers its handler are queued rather than discarded.
@@ -94,6 +123,7 @@ abstract final class NotificationLaunchLedger {
   @visibleForTesting
   static void resetForTest() {
     _pluginReady = Completer<void>();
+    _phase = NotificationPluginPhase.pending;
     _routed.clear();
   }
 }

@@ -3349,6 +3349,21 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get alertsNotificationsOffTitle =>
+      'Les notifications sont désactivées';
+
+  @override
+  String get alertsNotificationsOffPermissionBody =>
+      'Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications de cette application sont désactivées dans les réglages de votre téléphone.';
+
+  @override
+  String get alertsNotificationsOffChannelBody =>
+      'Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications d\'alertes de prix sont désactivées dans les réglages de votre téléphone.';
+
+  @override
+  String get alertsNotificationsOffOpenSettings => 'Ouvrir les réglages';
+
+  @override
   String alertReasonNetSaving(String amount) {
     return 'Environ $amount sur votre plein habituel';
   }

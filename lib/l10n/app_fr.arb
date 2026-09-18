@@ -6892,5 +6892,9 @@
   "fuelAndTankMaterialThreshold": "Un carburant n'est suggéré que s'il est meilleur d'au moins {percent} %.",
   "vehicleFlexFuelApprovedLabel": "Homologué E85 (flexfuel)",
   "vehicleFlexFuelApprovedHelper": "Seulement si le constructeur homologue l'E85. Carburant & réservoir compare alors l'E85 même si vous faites le plein d'un autre carburant.",
-  "obd2DiagnosticsImplausibleFramesLine": "Trames invraisemblables : {voltage} tension batterie · {odometer} compteur kilométrique"
+  "obd2DiagnosticsImplausibleFramesLine": "Trames invraisemblables : {voltage} tension batterie · {odometer} compteur kilométrique",
+  "alertsNotificationsOffTitle": "Les notifications sont désactivées",
+  "alertsNotificationsOffPermissionBody": "Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications de cette application sont désactivées dans les réglages de votre téléphone.",
+  "alertsNotificationsOffChannelBody": "Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications d'alertes de prix sont désactivées dans les réglages de votre téléphone.",
+  "alertsNotificationsOffOpenSettings": "Ouvrir les réglages"
 }

@@ -4,6 +4,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/notifications/local_notification_service.dart';
+import 'package:tankstellen/core/notifications/notification_delivery.dart';
 import '../../helpers/silence_error_logger.dart';
 
 /// A hand-written fake of [FlutterLocalNotificationsPlugin] that records
@@ -79,6 +80,67 @@ class _FakeFlutterLocalNotificationsPlugin extends Fake
     return launchDetails;
   }
 }
+
+/// #4335 — the Android plugin half the probe reads.
+class _FakeAndroid extends Fake implements AndroidFlutterLocalNotificationsPlugin {
+  _FakeAndroid({this.enabled = true, this.channels = const [], this.fail = false});
+  final bool? enabled;
+  final List<AndroidNotificationChannel>? channels;
+  final bool fail;
+  bool settingsOpened = false;
+
+  @override
+  Future<bool?> areNotificationsEnabled() async {
+    if (fail) throw StateError('binder died');
+    return enabled;
+  }
+
+  @override
+  Future<List<AndroidNotificationChannel>?> getNotificationChannels() async =>
+      channels;
+}
+
+/// #4335 — the iOS plugin half the probe reads.
+class _FakeIos extends Fake implements IOSFlutterLocalNotificationsPlugin {
+  _FakeIos(this.options);
+  final NotificationsEnabledOptions? options;
+
+  @override
+  Future<NotificationsEnabledOptions?> checkPermissions() async => options;
+}
+
+/// A plugin resolving to one platform half, or none.
+class _ProbePlugin extends Fake implements FlutterLocalNotificationsPlugin {
+  _ProbePlugin({this.android, this.ios, this.openSettings = true});
+  final _FakeAndroid? android;
+  final _FakeIos? ios;
+  final bool? openSettings;
+
+  @override
+  T? resolvePlatformSpecificImplementation<
+      T extends FlutterLocalNotificationsPlatform>() {
+    if (T == AndroidFlutterLocalNotificationsPlugin) return android as T?;
+    if (T == IOSFlutterLocalNotificationsPlugin) return ios as T?;
+    return null;
+  }
+
+  @override
+  Future<bool?> openAppNotificationSettings() async {
+    if (openSettings == null) throw StateError('no settings activity');
+    return openSettings;
+  }
+}
+
+NotificationsEnabledOptions _iosOptions({required bool enabled}) =>
+    NotificationsEnabledOptions(
+      isEnabled: enabled,
+      isSoundEnabled: enabled,
+      isAlertEnabled: enabled,
+      isBadgeEnabled: enabled,
+      isProvisionalEnabled: false,
+      isCriticalEnabled: false,
+      isProvidesAppNotificationSettingsEnabled: false,
+    );
 
 class _ShowCall {
   _ShowCall({
@@ -346,6 +408,104 @@ void main() {
 
     test('injected plugin is exposed via the public field', () {
       expect(service.plugin, same(fakePlugin));
+    });
+  });
+
+  // #4335 N2/N4 — a real platform probe that fails closed.
+  group('blockedDelivery — the platform probe (#4335)', () {
+    const alerts = NotificationChannelKind.priceAlerts;
+
+    Future<NotificationDelivery?> probe(_ProbePlugin plugin,
+            [NotificationChannelKind channel = alerts]) =>
+        LocalNotificationService(plugin: plugin).blockedDelivery(channel);
+
+    test('Android, enabled, channel on: clear', () async {
+      expect(
+          await probe(_ProbePlugin(
+              android: _FakeAndroid(channels: const [
+            AndroidNotificationChannel('price_alerts', 'Price Alerts',
+                importance: Importance.high),
+          ]))),
+          isNull);
+    });
+
+    test('Android, app notifications off: suppressedPermission', () async {
+      expect(await probe(_ProbePlugin(android: _FakeAndroid(enabled: false))),
+          NotificationDelivery.suppressedPermission);
+    });
+
+    test('Android, the price-alert channel disabled: suppressedChannel — '
+        'and the other channel unaffected', () async {
+      final plugin = _ProbePlugin(
+          android: _FakeAndroid(channels: const [
+        AndroidNotificationChannel('price_alerts', 'Price Alerts',
+            importance: Importance.none),
+        AndroidNotificationChannel('service_reminders', 'Service reminders'),
+      ]));
+      expect(await probe(plugin), NotificationDelivery.suppressedChannel);
+      expect(
+          await probe(plugin, NotificationChannelKind.serviceReminders),
+          isNull);
+    });
+
+    test('Android, a channel not created yet is not "disabled"', () async {
+      expect(await probe(_ProbePlugin(android: _FakeAndroid())), isNull);
+    });
+
+    test('iOS, not authorized: suppressedPermission; authorized: clear',
+        () async {
+      expect(
+          await probe(_ProbePlugin(ios: _FakeIos(_iosOptions(enabled: false)))),
+          NotificationDelivery.suppressedPermission);
+      expect(
+          await probe(_ProbePlugin(ios: _FakeIos(_iosOptions(enabled: true)))),
+          isNull);
+    });
+
+    test('fails CLOSED: an unanswered, unknown or throwing platform is '
+        'failed, never clear', () async {
+      expect(await probe(_ProbePlugin(android: _FakeAndroid(enabled: null))),
+          NotificationDelivery.failed);
+      expect(await probe(_ProbePlugin(ios: _FakeIos(null))),
+          NotificationDelivery.failed);
+      expect(await probe(_ProbePlugin()), NotificationDelivery.failed,
+          reason: 'no platform backend can post anything');
+      // Never throws — a throwing platform half is an answer, not a crash.
+      await expectLater(
+          probe(_ProbePlugin(android: _FakeAndroid(fail: true))), completes);
+      expect(await probe(_ProbePlugin(android: _FakeAndroid(fail: true))),
+          NotificationDelivery.failed);
+    });
+
+    test('areNotificationsEnabled fails closed too (N4)', () async {
+      expect(
+          await LocalNotificationService(
+                  plugin: _ProbePlugin(ios: _FakeIos(null)))
+              .areNotificationsEnabled(),
+          isFalse,
+          reason: 'it answered true on iOS and on every error');
+      expect(
+          await LocalNotificationService(
+                  plugin: _ProbePlugin(android: _FakeAndroid(fail: true)))
+              .areNotificationsEnabled(),
+          isFalse);
+      expect(
+          await LocalNotificationService(
+                  plugin: _ProbePlugin(android: _FakeAndroid()))
+              .areNotificationsEnabled(),
+          isTrue);
+    });
+
+    test('openNotificationSettings reports the platform answer and never '
+        'throws', () async {
+      expect(
+          await LocalNotificationService(plugin: _ProbePlugin())
+              .openNotificationSettings(),
+          isTrue);
+      await expectLater(
+          LocalNotificationService(plugin: _ProbePlugin(openSettings: null))
+              .openNotificationSettings(),
+          completion(isFalse));
     });
   });
 }
