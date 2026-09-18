@@ -13,6 +13,7 @@ library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
@@ -149,6 +150,35 @@ void main() {
         TripRecordingPhase.finished);
     expect(disk.historyRepo.loadAll(), hasLength(1),
         reason: 'the teardown saved nothing a second time');
+    trace.expectLawful();
+  });
+
+  test('#4344 — a Stop while the start waits on its odometer read: the late '
+      'read brings nothing alive, and nothing is saved or left on disk',
+      () async {
+    final container = driver.container();
+    addTearDown(container.dispose);
+    final trace = PhaseTrace(container);
+    addTearDown(trace.close);
+    final transport = SlowOdometerTransport()
+      ..odometerDelay = const Duration(milliseconds: 600);
+    final service = Obd2Service(transport);
+    await service.connect();
+    final notifier = container.read(tripRecordingProvider.notifier);
+    final starting = notifier.start(service);
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    expect(notifier.debugController, isNotNull,
+        reason: 'precondition: the start is under way');
+
+    await notifier.stop();
+    await starting;
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+
+    expect(container.read(tripRecordingProvider).phase,
+        TripRecordingPhase.idle);
+    expect(notifier.debugController, isNull);
+    expect(disk.activeBox.isEmpty, isTrue, reason: 'no WAL row was seeded');
+    expect(disk.historyRepo.loadAll(), isEmpty);
     trace.expectLawful();
   });
 
