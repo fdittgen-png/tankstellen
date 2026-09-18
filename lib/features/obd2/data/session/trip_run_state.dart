@@ -139,6 +139,16 @@ class TripRunState {
     _paused = false;
   }
 
+  /// #4344 — awaits [step], one of the start's reads, and answers whether
+  /// the trip is still alive after it. A stop that landed meanwhile ended
+  /// it synchronously, so the start must create nothing more: no poll loop,
+  /// no emit timer. A stopped trip never begins again, which makes the
+  /// answer final for a start that was already under way.
+  Future<bool> alive(Future<Object?> step) async {
+    await step;
+    return !_stopped;
+  }
+
   /// The user paused. No-op unless the trip is running and not already
   /// paused either way — returns whether the pause actually happened.
   bool pauseByUser() {

@@ -143,9 +143,9 @@ mixin _TripRecordingLifecycle
   /// Start polling. Reads the odometer and VIN ONCE to pin trip
   /// identity; subsequent ticks are scheduled per-PID by
   /// [PidScheduler]. Safe to call multiple times — no-op when already
-  /// recording.
+  /// recording, or once stopped. #4344 — every await is [TripRunState.alive].
   Future<void> start() async {
-    if (_run.started) return;
+    if (_run.started || _run.stopped) return;
     _run.begin();
     _startedAt = _now();
     // #3797 — anchor the lifecycle timeline at t=0 BEFORE any OBD work,
@@ -160,7 +160,7 @@ mixin _TripRecordingLifecycle
     power.evMode = _vehicle?.type == VehicleType.ev;
     if (_service.busProbe == Obd2BusProbeResult.probedSilent) {
       power.noteBusSilent();
-      await _service.readBatteryVoltageV();
+      if (!await _run.alive(_service.readBatteryVoltageV())) return;
     }
     if (_service.busProbe == Obd2BusProbeResult.probedSilent &&
         !power.engineRunning) {
@@ -191,8 +191,8 @@ mixin _TripRecordingLifecycle
     // timeout strikes, and the poll cadence would livelock the search
     // (#3577) for the rest of the trip. One quiet window here fixes all
     // of them at once. No-op when the bus is already confirmed.
-    await _ensureVehicleProtocol(where: 'trip-start');
-    await _readTripIdentity();
+    if (!await _run.alive(_ensureVehicleProtocol(where: 'trip-start'))) return;
+    if (!await _run.alive(_readTripIdentity())) return;
 
     _scheduler = _schedulerOverride ?? _buildScheduler();
     _liveSampleSnapshot.subscribeAllTiers(_scheduler!);

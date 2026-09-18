@@ -7,6 +7,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
+// #3776 — Obd2LinkSupervisorActions.reportServiceDead (extension scope).
+import '../data/session/obd2_link_supervisor.dart';
 import '../data/session/obd2_service.dart';
 import '../data/obd2_session_context_block.dart';
 import 'obd2_reconnect_provider.dart';
@@ -30,6 +32,24 @@ Future<void> teardownServiceRespectingSupervisor(
   } catch (e, st) {
     // #2472 — context adds the obd2Session block only when dev-armed.
     log.error(e, st, layer: ErrorLayer.providers, context: obd2DisconnectTraceContext());
+  }
+}
+
+/// #3776 — the trip layer never closes a supervisor-owned link: a dead
+/// one is handed to the owner, which closes and redials. False when the
+/// owner declined it, or when there is no supervisor graph (widget tests,
+/// the legacy path) — the caller then closes the service itself. Moved
+/// out of `Obd2RecordingPipeline` unchanged (#4344, its line cap).
+bool reportDeadLinkToSupervisor(Ref ref, Obd2Service svc, String reason) {
+  try {
+    return ref
+        .read(obd2ReconnectProvider.notifier)
+        .supervisor
+        .reportServiceDead(svc, reason: reason);
+  } catch (_) {
+    // No supervisor graph (widget tests / legacy path) — the
+    // caller closes the service itself.
+    return false;
   }
 }
 

@@ -13,8 +13,6 @@ import '../../../core/domain/vehicle_profile.dart';
 import '../data/adapter_pin_resolution.dart';
 import '../domain/obd2_connection_errors.dart';
 import '../data/session/obd2_disconnect_quietly.dart';
-// #3776 — Obd2LinkSupervisorActions.reportServiceDead (extension scope).
-import '../data/session/obd2_link_supervisor.dart';
 import '../data/session/obd2_service.dart';
 import '../domain/obd2_trip_start_budgets.dart';
 import '../data/session/trip_recording_controller.dart';
@@ -149,18 +147,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       // #3776 — the trip layer never closes a supervisor-owned link; a
       // dead one is handed to the owner, which closes + redials.
       isLinkSupervised: (svc) => supervisorOwnsService(_ref, svc),
-      reportSupervisedLinkDead: (svc, reason) {
-        try {
-          return _ref
-              .read(obd2ReconnectProvider.notifier)
-              .supervisor
-              .reportServiceDead(svc, reason: reason);
-        } catch (_) {
-          // No supervisor graph (widget tests / legacy path) — the
-          // caller closes the service itself.
-          return false;
-        }
-      },
+      reportSupervisedLinkDead: (svc, reason) =>
+          reportDeadLinkToSupervisor(_ref, svc, reason),
       breadcrumbCollector: breadcrumbs,
       gpsEstimateFolder: gpsEstimateFolder,
       allSamplesReader: _host.readAllCapturedSamples, // #3878
@@ -191,10 +179,14 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     } on TimeoutException {
       _controller = null;
       _imuFusion = null;
+      // #4344 — a timeout cancels nothing: END the abandoned start, or it
+      // polls, ticks and records when its held read finally answers.
+      unawaited(ctl.stop());
       unawaited(imuFusion.stop());
       unawaited(service.disconnectQuietly());
       throw const Obd2AdapterUnresponsive();
     }
+    if (!identical(_controller, ctl)) return; // #4344 — stopped mid-start
     // #1374/#1981 — GPS trip-path sampling; never blocks trip-start.
     unawaited(_gps.start(ctl));
     // #1615 — opt-in OEM-PID exact-fuel-level poll; no-op when off.
@@ -276,6 +268,19 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     final ctl = _controller;
     final svc = _service;
     if (ctl == null || svc == null) {
+      _host.state = const TripRecordingState();
+      return const StoppedTripResult.empty();
+    }
+    // #4344 — stopped before the start went live: end that start (it then
+    // creates nothing) and release what it took. No trip exists to save.
+    if (_liveSub == null) {
+      final imuFusion = _imuFusion;
+      _controller = null;
+      _imuFusion = null;
+      await ctl.stop();
+      await imuFusion?.stop();
+      await teardownServiceRespectingSupervisor(_ref, svc);
+      _service = null;
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
