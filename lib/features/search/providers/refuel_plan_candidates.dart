@@ -66,6 +66,7 @@ class PlanCandidateSet {
     required this.travelStops,
     required this.exclusions,
     required this.coverageIncomplete,
+    this.stationNames = const {},
   });
 
   static const empty = PlanCandidateSet(
@@ -74,6 +75,11 @@ class PlanCandidateSet {
     exclusions: {},
     coverageIncomplete: false,
   );
+
+  /// Station id to display name, so a plan can name its stops without a
+  /// surface reaching back into the search result for them (#4363). A
+  /// plan whose stops are ids is not an itinerary anyone can drive.
+  final Map<String, String> stationNames;
 
   /// Allowed stops, in route order, on projection distances only — call
   /// [withRoadEstimates] once the router has answered.
@@ -188,6 +194,9 @@ PlanCandidateSet buildPlanCandidates({
     ],
     exclusions: exclusions,
     coverageIncomplete: coverageIncomplete,
+    stationNames: {
+      for (final c in candidates) c.stationId: byId[c.stationId]!.name,
+    },
   );
 }
 

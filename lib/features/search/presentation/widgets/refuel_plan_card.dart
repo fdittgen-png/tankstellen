@@ -1,30 +1,43 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+/// The trip's refuelling plans (#4146, rebuilt for #4363).
+///
+/// One block per DISTINCT itinerary, never one verdict — the same rule as
+/// `docs/specs/refuel-economics.md` §3, and here it falls out of the
+/// problem rather than being imposed on it: cheapest, fastest and least
+/// driving are genuinely different trips, and which one a driver wants is
+/// not something the app gets to decide. Objectives that agree collapse
+/// into one block carrying both titles rather than repeating the same
+/// stops twice.
+///
+/// Everything this card cannot stand behind, it says out loud: a detour
+/// time estimated from the route's average speed, a candidate search that
+/// hit its documented limit, a candidate set narrowed by an ignored
+/// station or a partial-coverage source, and reference prices that are
+/// not places anyone can stop at (#4348).
+///
+/// When no plan can be computed at all it names WHICH input is missing.
+/// Range is the entire constraint the feature respects, so a guessed tank
+/// capacity or an assumed consumption would invent the answer rather than
+/// withhold it (economics spec §4.1).
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/domain/refuel_plan.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/spacing.dart';
-import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../providers/refuel_plan_candidates.dart';
 import '../../providers/refuel_plan_provider.dart';
+import 'refuel_plan_block.dart';
 
-/// The trip's refuelling plan (#4146).
-///
-/// Two plans, never one verdict — the same rule as
-/// `docs/specs/refuel-economics.md` §3, and here it falls out of the
-/// problem rather than being imposed on it: "cheapest" and "fastest" are
-/// genuinely different trips, and which one a driver wants is not
-/// something the app gets to decide.
-///
-/// When the plan cannot be computed this says WHICH input is missing.
-/// Range is the entire constraint the feature respects, so a guessed tank
-/// capacity or an assumed consumption would invent the answer rather than
-/// withhold it (economics spec §4.1).
+/// The route tab's refuelling plans: one block per distinct itinerary,
+/// their caveats, or the named reason there is no plan.
 class RefuelPlanCard extends ConsumerWidget {
   const RefuelPlanCard({super.key});
 
@@ -33,112 +46,126 @@ class RefuelPlanCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(refuelPlanProvider);
 
-    if (!state.isReady) {
-      return _Blocked(blocker: state.blocker!);
-    }
+    if (!state.isReady) return _Blocked(blocker: state.blocker!);
+
     final plans = state.plans!;
     if (!plans.isFeasible) {
-      return _Gap(gap: plans.gap!);
+      return _Gap(gap: plans.gap!, state: state);
     }
 
+    final cheapest = plans.cheapest;
+    final distinct = plans.distinctPlans;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (plans.cheapest case final plan?)
-          _PlanBlock(title: l10n.refuelPlanCheapestTitle, plan: plan),
-        if (plans.fastest case final plan?) ...[
-          const SizedBox(height: Spacing.md),
-          _PlanBlock(title: l10n.refuelPlanFastestTitle, plan: plan),
+        for (var i = 0; i < distinct.length; i++) ...[
+          if (i > 0) const SizedBox(height: Spacing.md),
+          RefuelPlanBlock(
+            titles: [
+              for (final objective in plans.objectivesFor(distinct[i]))
+                _title(l10n, objective),
+            ],
+            plan: distinct[i],
+            stationNames: state.candidates.stationNames,
+            tradeOff: cheapest == null || identical(distinct[i], cheapest)
+                ? null
+                : plans.tradeOff(distinct[i], cheapest),
+          ),
         ],
+        _Caveats(state: state),
       ],
     );
   }
+
+  static String _title(AppLocalizations l10n, RefuelObjective objective) =>
+      switch (objective) {
+        RefuelObjective.lowestCost => l10n.refuelPlanCheapestTitle,
+        RefuelObjective.shortestTime => l10n.refuelPlanFastestTitle,
+        RefuelObjective.leastExtraDistance => l10n.refuelPlanLeastDrivingTitle,
+      };
 }
 
-class _PlanBlock extends StatelessWidget {
-  const _PlanBlock({required this.title, required this.plan});
+/// What the plans above rest on, and what they do not.
+class _Caveats extends StatelessWidget {
+  const _Caveats({required this.state});
 
-  final String title;
-  final RefuelPlan plan;
+  final RefuelPlanState state;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    final perKm = plan.costPerKm;
+    final plans = state.plans;
+    final references = state.candidates
+        .excludedBy(PlanCandidateExclusion.referencePrice)
+        .length;
+    final approximate = plans != null &&
+        plans.distinctPlans.any((p) => p.detourTimeIsApproximate);
 
-    return SectionCard(
+    final lines = <String>[
+      if (approximate) l10n.refuelPlanDetourTimeApproximate,
+      if (plans?.searchWasBounded ?? false) l10n.refuelPlanSearchBounded,
+      if (state.evidenceIncomplete) l10n.refuelPlanEvidenceIncomplete,
+      if (references > 0) l10n.refuelPlanReferencePricesSkipped(references),
+    ];
+    if (lines.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: Spacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title, style: AppText.title(context)),
-          const SizedBox(height: Spacing.xs),
-          Text(
-            l10n.refuelPlanStopCount(plan.stops.length),
-            style: AppText.label(context)
-                .copyWith(color: theme.colorScheme.onSurfaceVariant),
-          ),
-          if (plan.stops.isNotEmpty) ...[
-            const SizedBox(height: Spacing.sm),
-            Text(
-              l10n.refuelPlanTotal(
-                PriceFormatter.formatPrice(plan.totalCost),
-                perKm == null ? '—' : PriceFormatter.formatPerKm(perKm),
-              ),
-              style: AppText.unit(context),
+          for (final line in lines)
+            Padding(
+              padding: const EdgeInsets.only(bottom: Spacing.xs),
+              child: Text(line, style: _muted(context)),
             ),
-            const SizedBox(height: Spacing.sm),
-            // Each stop states the litres to buy, because "just enough to
-            // reach a cheaper station" is the instruction — not always a
-            // full tank, and that is the whole point of the plan.
-            for (final stop in plan.stops)
-              Padding(
-                padding: const EdgeInsets.only(bottom: Spacing.xs),
-                child: Text(
-                  l10n.refuelPlanStopLine(
-                    UnitFormatter.formatVolume(stop.litres),
-                    PriceFormatter.formatPrice(stop.cost),
-                  ),
-                  style: AppText.body(context),
-                ),
-              ),
-          ],
         ],
       ),
     );
   }
 }
 
+TextStyle _muted(BuildContext context) => AppText.label(context)
+    .copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant);
+
 /// The route cannot be driven on this tank.
 ///
 /// A planner that dressed this up as a best-effort plan would strand
-/// someone, so the gap is the answer and it names the stretch.
+/// someone, so the gap is the answer and it names the stretch — and says
+/// when the gap is a fact about the CANDIDATES rather than the road.
 class _Gap extends StatelessWidget {
-  const _Gap({required this.gap});
+  const _Gap({required this.gap, required this.state});
 
   final RefuelPlanGap gap;
+  final RefuelPlanState state;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    return SectionCard(
-      child: Row(
-        children: [
-          Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error),
-          const SizedBox(width: Spacing.md),
-          Expanded(
-            child: Text(
-              l10n.refuelPlanGap(
-                UnitFormatter.formatDistance(gap.fromKm, fractionDigits: 0),
-                UnitFormatter.formatDistance(gap.toKm, fractionDigits: 0),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionCard(
+          child: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error),
+              const SizedBox(width: Spacing.md),
+              Expanded(
+                child: Text(
+                  l10n.refuelPlanGap(
+                    UnitFormatter.formatDistance(gap.fromKm, fractionDigits: 0),
+                    UnitFormatter.formatDistance(gap.toKm, fractionDigits: 0),
+                  ),
+                  style: AppText.body(context),
+                ),
               ),
-              style: AppText.body(context),
-            ),
+            ],
           ),
-        ],
-      ),
+        ),
+        _Caveats(state: state),
+      ],
     );
   }
 }
@@ -151,7 +178,6 @@ class _Blocked extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final message = switch (blocker) {
       RefuelPlanBlocker.noConsumption => l10n.refuelPlanNeedsConsumption,
       RefuelPlanBlocker.noTankCapacity ||
@@ -166,11 +192,7 @@ class _Blocked extends StatelessWidget {
     };
 
     return SectionCard(
-      child: Text(
-        message,
-        style: AppText.body(context)
-            .copyWith(color: theme.colorScheme.onSurfaceVariant),
-      ),
+      child: Text(message, style: _muted(context)),
     );
   }
 }
