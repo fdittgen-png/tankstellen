@@ -66,6 +66,8 @@ class RefuelDecision {
     this.cheapest,
     this.closest,
     this.bestValue,
+    this.comparisonCurrency,
+    this.moneyRankingWithheld = false,
   });
 
   final RefuelProfile profile;
@@ -76,6 +78,20 @@ class RefuelDecision {
   final RefuelQuote? cheapest;
   final RefuelQuote? closest;
   final RefuelQuote? bestValue;
+
+  /// The currency [cheapest] and [bestValue] were decided in (#4361), or
+  /// null when no candidate stated one. Never a default.
+  final String? comparisonCurrency;
+
+  /// True when at least one priced physical station was left OUT of the
+  /// money rankings because its amount could not be expressed in
+  /// [comparisonCurrency] — a missing or stale rate, or several
+  /// currencies with no comparison currency named.
+  ///
+  /// The station keeps its native price on screen; what is withheld is
+  /// the claim that one of them is cheapest. A UI that ignores this flag
+  /// is presenting a winner chosen from part of the list.
+  final bool moneyRankingWithheld;
 
   /// True when any ranked station comes from a source that covers only
   /// part of its country (#4348). The picks are then the best among the

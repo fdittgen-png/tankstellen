@@ -3,6 +3,9 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/country/country_config.dart';
+import '../../../core/domain/exchange_rate_provider.dart';
+import '../../../core/domain/money.dart';
 import '../../../core/domain/refuel_plan.dart';
 import '../../../core/domain/refuel_planner.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
@@ -29,6 +32,12 @@ enum RefuelPlanBlocker {
   noTankCapacity,
   noTankLevel,
   noPricedStations,
+
+  /// Every priced station on this route quotes a currency the plan
+  /// cannot express in the driver's own, at a stated and fresh rate
+  /// (#4361). The prices are real and stay on screen; what is missing is
+  /// a comparison, and inventing a 1:1 rate would manufacture a winner.
+  noComparableCurrency,
 }
 
 /// A plan, or the reason there is none.
@@ -72,27 +81,63 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
 
   final fuelType = ref.watch(selectedFuelTypeProvider);
   final projection = RouteProjection(result.route.geometry);
+  // #4361 — one currency for the whole plan, reached by a stated rate or
+  // not reached at all.
+  final currency = ref.watch(comparisonCurrencyProvider);
+  final rates = ref.watch(exchangeRatesProvider);
+  final now = ref.watch(appClockProvider).now();
 
   final geometry = result.route.geometry;
-  final priced = <({Station station, double price, double along, double off})>[];
+  final priced = <({
+    Station station,
+    double price,
+    Money? native,
+    String? country,
+    double along,
+    double off,
+  })>[];
+  var currencyBlocked = false;
   for (final item in result.stations) {
     if (item is! FuelStationResult) continue;
     final station = item.station;
     // #4348 — a reference price is not a stop anyone can make.
-    if (!StationOffer.forStation(
-            stationId: station.id, lat: station.lat, lng: station.lng)
-        .canRouteTo) {
-      continue;
-    }
+    final offer = StationOffer.forStation(
+        stationId: station.id, lat: station.lat, lng: station.lng);
+    if (!offer.canRouteTo) continue;
     // #2631 — each station is priced by its own country's profile fuel
     // on a cross-border route, exactly as the list and the map do.
     final fuel = fuelForStation(station, result.profileFuelByCountry, fuelType);
     final price = station.priceFor(fuel);
     if (price == null || price <= 0) continue;
 
+    // #4361 — normalise BEFORE planning. A price that cannot be stated
+    // in the plan's currency is excluded with a reason, never converted
+    // at an assumed rate and never compared as a bare number.
+    final code = offer.countryCode == null
+        ? null
+        : Countries.byCode(offer.countryCode!)?.currency;
+    final native = code == null ? null : Money(price, code);
+    final double normalised;
+    if (native == null || code == currency) {
+      normalised = price;
+    } else {
+      final converted = rates.convert(native, currency, now).converted;
+      if (converted == null) {
+        currencyBlocked = true;
+        continue;
+      }
+      normalised = converted.amount;
+    }
+
     final at = projection.project(station.lat, station.lng);
-    priced.add(
-        (station: station, price: price, along: at.alongKm, off: at.offRouteKm));
+    priced.add((
+      station: station,
+      price: normalised,
+      native: native,
+      country: offer.countryCode,
+      along: at.alongKm,
+      off: at.offRouteKm,
+    ));
   }
 
   // #4359 — the exit/rejoin cost of each stop, routed as origin → station
@@ -113,7 +158,6 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
       (id: p.station.id, lat: p.station.lat, lng: p.station.lng),
   ]);
   final estimates = ref.watch(stationTravelEstimatesProvider(request));
-  final now = ref.watch(appClockProvider).now();
 
   final candidates = <PlanCandidate>[
     for (final p in priced)
@@ -123,6 +167,8 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
           stationId: p.station.id,
           alongRouteKm: p.along,
           pricePerLitre: p.price,
+          nativePrice: p.native,
+          countryCode: p.country,
           detourKm: p.off,
           roadExtraKm: road.extraKm,
           roadExtraMinutes: road.extraDrivingMinutes,
@@ -132,12 +178,16 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
           stationId: p.station.id,
           alongRouteKm: p.along,
           pricePerLitre: p.price,
+          nativePrice: p.native,
+          countryCode: p.country,
           detourKm: p.off,
         ),
   ];
 
   if (candidates.isEmpty) {
-    return const RefuelPlanState.blocked(RefuelPlanBlocker.noPricedStations);
+    return RefuelPlanState.blocked(currencyBlocked
+        ? RefuelPlanBlocker.noComparableCurrency
+        : RefuelPlanBlocker.noPricedStations);
   }
 
   return RefuelPlanState.ready(RefuelPlanner.plan(RefuelPlanRequest(
@@ -150,5 +200,6 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
     startLitres: startLitres,
     consumptionLPer100km: consumption,
     candidates: candidates,
+    currencyCode: currency,
   )));
 });
