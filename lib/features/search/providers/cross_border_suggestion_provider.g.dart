@@ -18,6 +18,15 @@ part of 'cross_border_suggestion_provider.dart';
 /// duplicate API calls — already supported by chain").
 ///
 /// Tests override this with a closure returning a small in-memory fake.
+///
+/// #4381 — `keepAlive`: the returned closure captures this `Ref` and is
+/// called once per neighbour inside [crossBorderSuggestion]'s probe loop,
+/// i.e. across awaits. As an auto-dispose provider its element was gone by
+/// the second neighbour, and `Cannot use the Ref ... after it has been
+/// disposed` was swallowed by `_safeNeighborSearch` into an empty result —
+/// the banner just silently stopped appearing. The resolver only reaches
+/// keepAlive providers ([perCountryStationServiceProvider]), so
+/// container-lifetime is its correct scope.
 
 @ProviderFor(crossBorderStationServiceFactory)
 final crossBorderStationServiceFactoryProvider =
@@ -31,6 +40,15 @@ final crossBorderStationServiceFactoryProvider =
 /// duplicate API calls — already supported by chain").
 ///
 /// Tests override this with a closure returning a small in-memory fake.
+///
+/// #4381 — `keepAlive`: the returned closure captures this `Ref` and is
+/// called once per neighbour inside [crossBorderSuggestion]'s probe loop,
+/// i.e. across awaits. As an auto-dispose provider its element was gone by
+/// the second neighbour, and `Cannot use the Ref ... after it has been
+/// disposed` was swallowed by `_safeNeighborSearch` into an empty result —
+/// the banner just silently stopped appearing. The resolver only reaches
+/// keepAlive providers ([perCountryStationServiceProvider]), so
+/// container-lifetime is its correct scope.
 
 final class CrossBorderStationServiceFactoryProvider
     extends
@@ -48,13 +66,22 @@ final class CrossBorderStationServiceFactoryProvider
   /// duplicate API calls — already supported by chain").
   ///
   /// Tests override this with a closure returning a small in-memory fake.
+  ///
+  /// #4381 — `keepAlive`: the returned closure captures this `Ref` and is
+  /// called once per neighbour inside [crossBorderSuggestion]'s probe loop,
+  /// i.e. across awaits. As an auto-dispose provider its element was gone by
+  /// the second neighbour, and `Cannot use the Ref ... after it has been
+  /// disposed` was swallowed by `_safeNeighborSearch` into an empty result —
+  /// the banner just silently stopped appearing. The resolver only reaches
+  /// keepAlive providers ([perCountryStationServiceProvider]), so
+  /// container-lifetime is its correct scope.
   CrossBorderStationServiceFactoryProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'crossBorderStationServiceFactoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -85,7 +112,7 @@ final class CrossBorderStationServiceFactoryProvider
 }
 
 String _$crossBorderStationServiceFactoryHash() =>
-    r'34d2faf17883aa874ca6ac907c29a84c3ae104c9';
+    r'7977e3b17b582bc31e956fd30ce10043e83a8a5f';
 
 /// Async suggestion of "the neighbor country has cheaper fuel right now".
 ///

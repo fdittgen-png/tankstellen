@@ -46,7 +46,16 @@ typedef CrossBorderStationServiceFactory = StationService Function(
 /// duplicate API calls — already supported by chain").
 ///
 /// Tests override this with a closure returning a small in-memory fake.
-@riverpod
+///
+/// #4381 — `keepAlive`: the returned closure captures this `Ref` and is
+/// called once per neighbour inside [crossBorderSuggestion]'s probe loop,
+/// i.e. across awaits. As an auto-dispose provider its element was gone by
+/// the second neighbour, and `Cannot use the Ref ... after it has been
+/// disposed` was swallowed by `_safeNeighborSearch` into an empty result —
+/// the banner just silently stopped appearing. The resolver only reaches
+/// keepAlive providers ([perCountryStationServiceProvider]), so
+/// container-lifetime is its correct scope.
+@Riverpod(keepAlive: true)
 CrossBorderStationServiceFactory crossBorderStationServiceFactory(Ref ref) {
   return (code) => stationServiceForCountry(ref, code);
 }

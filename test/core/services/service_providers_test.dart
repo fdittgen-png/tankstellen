@@ -1,11 +1,15 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/cache/cache_manager.dart';
 import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
+import 'package:tankstellen/core/domain/search_params.dart';
 import 'package:tankstellen/core/services/impl/demo_station_service.dart';
 import 'package:tankstellen/core/services/service_providers.dart';
 import 'package:tankstellen/core/services/station_service_chain.dart';
@@ -13,6 +17,32 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 
 import '../../fakes/fake_hive_storage.dart';
 import '../../mocks/mocks.dart';
+
+/// Answers every request with an empty Tankerkönig list payload and records
+/// the URI it was asked for — the seam that proves the `apikey` query
+/// parameter survived the interceptor.
+class _CapturingAdapter implements HttpClientAdapter {
+  final List<Uri> requestUris = [];
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    requestUris.add(options.uri);
+    return ResponseBody.fromString(
+      jsonEncode({'ok': true, 'stations': <dynamic>[]}),
+      200,
+      headers: {
+        'content-type': ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
 
 class _FixedActiveCountry extends ActiveCountry {
   final CountryConfig _country;
@@ -33,10 +63,11 @@ void main() {
 
   ProviderContainer createContainer({
     CountryConfig country = Countries.germany,
+    CacheManager? cache,
   }) {
     final container = ProviderContainer(overrides: [
       hiveStorageProvider.overrideWithValue(fakeStorage),
-      cacheManagerProvider.overrideWithValue(mockCache),
+      cacheManagerProvider.overrideWithValue(cache ?? mockCache),
       activeCountryProvider.overrideWith(() => _FixedActiveCountry(country)),
     ]);
     addTearDown(container.dispose);
@@ -119,6 +150,49 @@ void main() {
 
       expect(service, isA<DemoStationService>());
     });
+  });
+
+  group('tankerkoenigDioProvider lifetime (#4381)', () {
+    test(
+        'the Dio retained by the keepAlive station service still applies the '
+        'API key after the Dio provider element is disposed', () async {
+      await fakeStorage.setApiKey('de', 'test-key');
+      final container = createContainer(
+        country: Countries.germany,
+        cache: CacheManager(fakeStorage),
+      );
+
+      // The keepAlive station service resolves the Tankerkönig Dio through
+      // the registry and RETAINS it inside the chain for the whole session.
+      final service = container.read(stationServiceProvider);
+      expect(service, isA<StationServiceChain>());
+
+      final dio = container.read(tankerkoenigDioProvider);
+      final adapter = _CapturingAdapter();
+      dio.httpClientAdapter = adapter;
+
+      // #4381 — tear the whole provider scope down. In production the gap
+      // was narrower (nothing listens to the Dio provider, so its
+      // auto-dispose element died the moment the registry's `ref.read`
+      // returned, while the keepAlive chain kept the instance) but the
+      // invariant is the same and this form is lifetime-agnostic: a Dio
+      // someone else holds must carry everything it needs, never a `Ref`
+      // it can outlive.
+      container.dispose();
+      await Future<void>.delayed(Duration.zero);
+
+      final result = await service.searchStations(
+        const SearchParams(lat: 52.52, lng: 13.405),
+      );
+
+      expect(result.data, isEmpty);
+      expect(adapter.requestUris, hasLength(1));
+      expect(
+        adapter.requestUris.single.queryParameters['apikey'],
+        'test-key',
+      );
+    });
+
   });
 
   group('geocodingChainProvider', () {

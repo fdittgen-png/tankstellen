@@ -22,7 +22,18 @@ part 'service_providers.g.dart';
 // from DioFactory + trace logging)
 // ---------------------------------------------------------------------------
 
-@riverpod
+/// The Tankerkönig Dio — rate limited, API-key injecting, trace logging.
+///
+/// #4381 — `keepAlive`: the returned Dio is **retained** by the
+/// [stationServiceProvider] chain, which is itself `keepAlive`. Under the
+/// previous auto-dispose declaration the provider element was torn down the
+/// moment the registry's `ref.read` returned (nothing ever listens to it),
+/// while the service went on using the instance for the rest of the session.
+/// Matching the lifetime of the consumer is half the fix; the other half is
+/// that no interceptor installed here may hold a `Ref` (see
+/// [_ApiKeyInterceptor]), so not even a full container teardown can break a
+/// Dio that is already in someone's hands.
+@Riverpod(keepAlive: true)
 Dio tankerkoenigDio(Ref ref) {
   final config = ServiceConfigs.tankerkoenig;
   // Tankerkoenig's published policy is one request per ~5s; we use 2s with
@@ -36,8 +47,11 @@ Dio tankerkoenigDio(Ref ref) {
     rateLimitJitterRangeMs: 500,
   );
 
-  // Inject API key from user settings
-  dio.interceptors.add(_ApiKeyInterceptor(ref));
+  // Inject API key from user settings. #3592 — the DE key has ONE accessor,
+  // [apiKeyStorageProvider]; #4381 — the interceptor gets a resolver bound to
+  // that keepAlive value, never the `Ref` itself.
+  final apiKeys = ref.watch(apiKeyStorageProvider);
+  dio.interceptors.add(_ApiKeyInterceptor(() => apiKeys.getApiKey('de')));
   // Record HTTP errors in trace log
   dio.interceptors.add(DioTraceInterceptor(ref));
 
@@ -130,17 +144,27 @@ GeocodingChain geocodingChain(Ref ref) {
 // Interceptors (moved from dio_client.dart, now private to this file)
 // ---------------------------------------------------------------------------
 
+/// Resolves the configured API key at request time.
+///
+/// Deliberately a plain callback rather than a Riverpod `Ref` (#4381): a Dio
+/// instance outlives the provider that built it — the station-service chain
+/// holds it for the whole session — so a `Ref` captured here is read after
+/// its element was disposed and every request dies with
+/// `DioException [unknown]: Cannot use the Ref ... after it has been
+/// disposed`. Bind the resolver to a keepAlive value instead, and the
+/// interceptor's lifetime stops depending on Riverpod's.
+typedef ApiKeyResolver = String? Function();
+
 // Key für den Zugriff auf die freie Tankerkönig-Spritpreis-API
 // Für eigenen Key bitte hier https://onboarding.tankerkoenig.de
 // registrieren.
 class _ApiKeyInterceptor extends Interceptor {
-  final Ref _ref;
-  _ApiKeyInterceptor(this._ref);
+  final ApiKeyResolver _resolveApiKey;
+  _ApiKeyInterceptor(this._resolveApiKey);
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final storage = _ref.read(storageRepositoryProvider);
-    final apiKey = storage.getApiKey('de');
+    final apiKey = _resolveApiKey();
     if (apiKey != null && apiKey.isNotEmpty) {
       options.queryParameters['apikey'] = apiKey;
     }

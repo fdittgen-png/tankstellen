@@ -10,19 +10,53 @@ part of 'service_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// The Tankerkönig Dio — rate limited, API-key injecting, trace logging.
+///
+/// #4381 — `keepAlive`: the returned Dio is **retained** by the
+/// [stationServiceProvider] chain, which is itself `keepAlive`. Under the
+/// previous auto-dispose declaration the provider element was torn down the
+/// moment the registry's `ref.read` returned (nothing ever listens to it),
+/// while the service went on using the instance for the rest of the session.
+/// Matching the lifetime of the consumer is half the fix; the other half is
+/// that no interceptor installed here may hold a `Ref` (see
+/// [_ApiKeyInterceptor]), so not even a full container teardown can break a
+/// Dio that is already in someone's hands.
 
 @ProviderFor(tankerkoenigDio)
 final tankerkoenigDioProvider = TankerkoenigDioProvider._();
 
+/// The Tankerkönig Dio — rate limited, API-key injecting, trace logging.
+///
+/// #4381 — `keepAlive`: the returned Dio is **retained** by the
+/// [stationServiceProvider] chain, which is itself `keepAlive`. Under the
+/// previous auto-dispose declaration the provider element was torn down the
+/// moment the registry's `ref.read` returned (nothing ever listens to it),
+/// while the service went on using the instance for the rest of the session.
+/// Matching the lifetime of the consumer is half the fix; the other half is
+/// that no interceptor installed here may hold a `Ref` (see
+/// [_ApiKeyInterceptor]), so not even a full container teardown can break a
+/// Dio that is already in someone's hands.
+
 final class TankerkoenigDioProvider extends $FunctionalProvider<Dio, Dio, Dio>
     with $Provider<Dio> {
+  /// The Tankerkönig Dio — rate limited, API-key injecting, trace logging.
+  ///
+  /// #4381 — `keepAlive`: the returned Dio is **retained** by the
+  /// [stationServiceProvider] chain, which is itself `keepAlive`. Under the
+  /// previous auto-dispose declaration the provider element was torn down the
+  /// moment the registry's `ref.read` returned (nothing ever listens to it),
+  /// while the service went on using the instance for the rest of the session.
+  /// Matching the lifetime of the consumer is half the fix; the other half is
+  /// that no interceptor installed here may hold a `Ref` (see
+  /// [_ApiKeyInterceptor]), so not even a full container teardown can break a
+  /// Dio that is already in someone's hands.
   TankerkoenigDioProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'tankerkoenigDioProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -49,7 +83,7 @@ final class TankerkoenigDioProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$tankerkoenigDioHash() => r'bf30524d1ff9225e6dd29e0a4b92c6cac725a4e3';
+String _$tankerkoenigDioHash() => r'8573f3db6f25b5ffca2ee651e89a21958571ef22';
 
 /// Returns the appropriate station service based on the active country.
 ///
