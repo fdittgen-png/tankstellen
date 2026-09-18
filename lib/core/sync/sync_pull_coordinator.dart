@@ -8,6 +8,40 @@ import 'package:flutter/foundation.dart';
 import '../logging/error_logger.dart';
 import '../logging/app_log.dart';
 import '../perf/launch_sync_trace.dart';
+import 'sync_run_trace.dart';
+
+/// How one [SyncPullCoordinator.pullAll] call ended (#4162).
+///
+/// Before this a pass left one trace: `lastCompletedAt`, stamped whether
+/// the pass pulled anything or not. A pass run without a session looked
+/// exactly like a healthy one (#4338).
+enum SyncPassOutcome {
+  /// Every entry ran and none timed out, with a live session.
+  completed,
+
+  /// Every entry ran; at least one timed out (#4112).
+  completedWithTimeouts,
+
+  /// The entries ran, but no user session existed — every pull no-ops
+  /// unauthenticated, so nothing was synced and nothing is stamped.
+  completedUnauthenticated,
+
+  /// The master gate was closed (sync off, no client, no consent).
+  skippedGateClosed,
+
+  /// A pass was already in flight.
+  skippedAlreadyRunning,
+
+  /// Nothing is registered yet.
+  skippedNothingRegistered,
+
+  /// The gate closed while the pass ran — consent withdrawn or sync
+  /// disconnected mid-pass (#4337). Not a completed pass.
+  fenced,
+
+  /// The pass itself threw (a torn-down container behind the gate).
+  failed,
+}
 
 /// One registered server→local pull covering [tables] (#3447).
 ///
@@ -65,8 +99,16 @@ class SyncPullCoordinator {
   /// not initialised. Checked once per [pullAll].
   bool Function() _enabled = () => false;
 
+  /// Whether a user session exists — installed at registration; a pass
+  /// without one is recorded as [SyncPassOutcome.completedUnauthenticated].
+  bool Function() _authenticated = () => true;
+
   bool _running = false;
   DateTime? _lastCompletedAt;
+  SyncPassOutcome? _lastOutcome;
+
+  /// How the most recent [pullAll] call ended; null before the first.
+  SyncPassOutcome? get lastOutcome => _lastOutcome;
 
   /// Whether a [pullAll] pass is currently in flight (the resume hook
   /// skips instead of stacking a second pass).
@@ -87,8 +129,10 @@ class SyncPullCoordinator {
   void register({
     required bool Function() enabled,
     required List<SyncPullEntry> entries,
+    bool Function()? authenticated,
   }) {
     _enabled = enabled;
+    _authenticated = authenticated ?? () => true;
     _entries
       ..clear()
       ..addAll(entries);
@@ -99,8 +143,10 @@ class SyncPullCoordinator {
   void resetForTest() {
     _entries.clear();
     _enabled = () => false;
+    _authenticated = () => true;
     _running = false;
     _lastCompletedAt = null;
+    _lastOutcome = null;
     // #4112 — the escalation counter is per-table and long-lived, so a
     // test that left a strike on the board would change the log LEVEL of
     // the next test's timeout.
@@ -119,19 +165,51 @@ class SyncPullCoordinator {
     LaunchSyncTrace? trace,
     DateTime Function() now = DateTime.now,
   }) async {
-    if (_running || _entries.isEmpty) return;
+    if (_running || _entries.isEmpty) {
+      _pass(_running
+          ? SyncPassOutcome.skippedAlreadyRunning
+          : SyncPassOutcome.skippedNothingRegistered);
+      return;
+    }
     _running = true;
     try {
       // The gate closure reads providers — a torn-down container must
       // degrade to "skip this pass", not escape the never-throws contract.
-      if (!_enabled()) return;
-      await Future.wait(_entries.map((e) => _pullOne(e, trace)));
+      if (!_enabled()) {
+        _pass(SyncPassOutcome.skippedGateClosed);
+        return;
+      }
+      final authenticatedAtStart = _authenticated();
+      final timedOut =
+          await Future.wait(_entries.map((e) => _pullOne(e, trace)));
+      // #4337 — a gate that closed under the pass (consent withdrawn,
+      // disconnected) fenced it: not a completed pass, no stamp.
+      if (!_enabled()) {
+        _pass(SyncPassOutcome.fenced);
+        return;
+      }
+      // #4338 — a pass without a session synced nothing: it is recorded
+      // as such and never stamps, so the resume debounce does not read it
+      // as fresh.
+      if (!authenticatedAtStart || !_authenticated()) {
+        _pass(SyncPassOutcome.completedUnauthenticated);
+        return;
+      }
       _lastCompletedAt = now();
+      _pass(timedOut.contains(true)
+          ? SyncPassOutcome.completedWithTimeouts
+          : SyncPassOutcome.completed);
     } catch (e, st) {
+      _pass(SyncPassOutcome.failed);
       log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'SyncPullCoordinator.pullAll'});
     } finally {
       _running = false;
     }
+  }
+
+  void _pass(SyncPassOutcome outcome) {
+    _lastOutcome = outcome;
+    SyncRunTrace.pass(outcome.name);
   }
 
   /// How many consecutive timed-out passes a table gets before its
@@ -163,15 +241,18 @@ class SyncPullCoordinator {
   int consecutiveTimeoutsFor(Iterable<String> tables) =>
       _consecutiveTimeouts[tables.join('+')] ?? 0;
 
-  Future<void> _pullOne(SyncPullEntry entry, LaunchSyncTrace? trace) async {
+  /// Returns whether the entry timed out.
+  Future<bool> _pullOne(SyncPullEntry entry, LaunchSyncTrace? trace) async {
     final name = entry.tables.join('+');
     var pulled = 0;
+    var timedOut = false;
     await LaunchSyncTrace.spanned(trace, name, () async {
       try {
         pulled = await entry.pull().timeout(entry.timeout);
         _consecutiveTimeouts.remove(name);
       } on TimeoutException catch (e, st) {
         // #4112 — escalate on persistence, not on the first occurrence.
+        timedOut = true;
         final strikes = (_consecutiveTimeouts[name] ?? 0) + 1;
         _consecutiveTimeouts[name] = strikes;
         final context = {
@@ -191,5 +272,6 @@ class SyncPullCoordinator {
         log.error(e, st, layer: ErrorLayer.sync, context: {'where': 'sync pull FAILED', 'tables': name});
       }
     }, attributes: () => {'table': name, 'pulled': pulled});
+    return timedOut;
   }
 }

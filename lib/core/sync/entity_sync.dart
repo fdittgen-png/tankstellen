@@ -275,6 +275,12 @@ class EntitySync<T> {
       // deletions-absent pattern) + the SchemaDriftNotice the TankSync
       // settings tile watches; the merge degrades to input-unchanged
       // exactly as before. Everything else still ERROR-logs.
+      // #4337 — a fenced transport is the consent withdrawal (or a
+      // disconnect) doing its job, not a fault.
+      if (e is SyncFencedException) {
+        log.info('$logName.merge fenced: $table', tag: 'sync');
+        return local;
+      }
       if (isSchemaDriftError(e)) {
         if (SchemaDriftNotice.instance.note(table)) {
           BreadcrumbCollector.add(

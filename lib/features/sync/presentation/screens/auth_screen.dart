@@ -11,6 +11,7 @@ import '../../../../core/error/guarded.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/sync/supabase_client.dart';
 import '../../../../core/sync/sync_provider.dart';
+import '../../../../core/sync/tanksync_session_gate.dart';
 import '../../../../core/storage/storage_providers.dart';
 import '../../../../core/utils/password_validator.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -80,6 +81,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       final userId = await TankSyncClient.signInAnonymously();
       if (userId != null) {
         await settings.putSetting('sync_user_id', userId);
+        TankSyncSessionGate.instance.observe('auth_screen.guest');
         if (!mounted) return;
         ref.invalidate(syncStateProvider);
         SnackBarHelper.showSuccess(

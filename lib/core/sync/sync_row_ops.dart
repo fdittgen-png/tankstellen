@@ -8,6 +8,7 @@ import '../../core/logging/error_logger.dart';
 import '../../core/logging/app_log.dart';
 import '../time/app_clock.dart';
 import 'deletions_sync.dart';
+import 'pending_deletions_journal.dart';
 import 'sync_device_identity.dart';
 import 'sync_transport.dart';
 
@@ -31,6 +32,13 @@ class SyncRowOps {
   /// not the read path. Returns `true` when the server row delete
   /// succeeded, `false` when unauthenticated or on a transient failure
   /// (the tombstone intent stays journaled either way, #3123).
+  ///
+  /// #4345 — "unauthenticated" includes a session that is lost, released
+  /// for a consent withdrawal, or not built yet. The intent is journaled
+  /// BEFORE that gate: returning early without it let the next union merge
+  /// pull the deleted row back from the server once the session returned.
+  /// Nothing is sent here; the journal replays only through a live
+  /// transport of the same backend and account.
   static Future<bool> deleteRow({
     required String table,
     required String idColumn,
@@ -40,7 +48,10 @@ class SyncRowOps {
     SyncTransport? transport,
   }) async {
     final t = transport ?? SupabaseSyncTransport.currentOrNull();
-    if (t == null) return false;
+    if (t == null) {
+      await PendingDeletionsJournal.addAll(table, [recordId]);
+      return false;
+    }
 
     // #3078/#3123 — tombstone-first (journal-backed) by default: the
     // durable "this id is dead" record must not depend on the row delete

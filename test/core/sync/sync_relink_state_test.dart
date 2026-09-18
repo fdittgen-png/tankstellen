@@ -45,6 +45,16 @@ void main() {
     expect(after.mode, before.mode);
   });
 
+  test('#4338 — the flag survives a rebuild of SyncState', () {
+    container.read(syncStateProvider.notifier).markRelinkRequired();
+    expect(container.read(syncStateProvider).relinkRequired, isTrue);
+
+    container.invalidate(syncStateProvider);
+
+    expect(container.read(syncStateProvider).relinkRequired, isTrue,
+        reason: 'the flag is re-derived at launch, never dropped in-session');
+  });
+
   test('an email sign-in (the re-link path) clears the flag', () async {
     final notifier = container.read(syncStateProvider.notifier);
     notifier.markRelinkRequired();

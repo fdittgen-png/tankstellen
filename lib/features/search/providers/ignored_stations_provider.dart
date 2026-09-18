@@ -51,8 +51,10 @@ class IgnoredStations extends _$IgnoredStations {
     // #3078 — delete (+ tombstone) the server row instead of re-running the
     // union merge, which used to re-add the still-server id so the station
     // never actually un-hid across devices.
-    await SyncHelper.syncIfEnabled(ref, 'IgnoredStations.remove',
-      () => IgnoredStationsSync.delete(stationId),
+    await SyncHelper.deleteIfEnabled(ref, 'IgnoredStations.remove',
+      table: SyncTables.ignoredStations,
+      recordId: stationId,
+      syncFn: () => IgnoredStationsSync.delete(stationId),
     );
   }
 

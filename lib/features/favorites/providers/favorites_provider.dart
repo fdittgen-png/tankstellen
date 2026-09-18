@@ -248,10 +248,12 @@ class Favorites extends _$Favorites {
         unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Cleanup'}));
       }
 
-      await SyncHelper.fireAndForget(
+      await SyncHelper.deleteIfEnabled(
         ref,
         'Favorites.remove',
-        () => FavoritesSync.delete(stationId),
+        table: SyncTables.favorites,
+        recordId: stationId,
+        syncFn: () => FavoritesSync.delete(stationId),
       );
     }
 
@@ -262,10 +264,12 @@ class Favorites extends _$Favorites {
 
       // #3452 — EV favorites sync too: tombstone + server delete so the
       // removal reaches other devices instead of resurrecting from them.
-      await SyncHelper.fireAndForget(
+      await SyncHelper.deleteIfEnabled(
         ref,
         'Favorites.removeEv',
-        () => FavoritesSync.delete(stationId),
+        table: SyncTables.favorites,
+        recordId: stationId,
+        syncFn: () => FavoritesSync.delete(stationId),
       );
     }
 

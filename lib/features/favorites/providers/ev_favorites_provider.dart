@@ -8,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../../../core/domain/ev/charging_station.dart';
 import '../../../core/sync/favorites_sync.dart';
+import '../../../core/sync/sync_events.dart';
 import '../../../core/sync/sync_helper.dart';
 import 'favorites_provider.dart';
 import '../../../core/logging/error_logger.dart';
@@ -50,10 +51,12 @@ class EvFavorites extends _$EvFavorites {
     state = storage.getEvFavoriteIds();
     // #3452 — tombstone + server delete so the removal reaches other
     // devices instead of resurrecting from them (#3078).
-    await SyncHelper.fireAndForget(
+    await SyncHelper.deleteIfEnabled(
       ref,
       'EvFavorites.remove',
-      () => FavoritesSync.delete(stationId),
+      table: SyncTables.favorites,
+      recordId: stationId,
+      syncFn: () => FavoritesSync.delete(stationId),
     );
   }
 

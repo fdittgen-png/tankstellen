@@ -18,6 +18,7 @@ import 'ignored_stations_sync.dart';
 import 'ratings_sync.dart';
 import 'sync_events.dart';
 import 'sync_run_trace.dart';
+import 'tanksync_relink_provider.dart';
 import 'user_data_sync.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/logging/app_log.dart';
@@ -48,16 +49,18 @@ class SyncState extends _$SyncState {
     final storage = ref.watch(storageRepositoryProvider);
     final modeStr = storage.getSetting('sync_mode') as String?;
     return SyncConfig(
-      // #3866 (Epic #3865) — the Cloud Sync CONSENT gates the whole sync
-      // path (coordinator, writers, helper): withdrawing it stops every
-      // upload, not only trips. `sync_enabled` alone is the wizard state.
-      enabled: (storage.getSetting('sync_enabled') as bool? ?? false) &&
-          ref.watch(gdprConsentProvider).cloudSync,
+      // #3866 — the Cloud Sync CONSENT gates the whole sync path. Watched
+      // FIRST (#4337): behind `sync_enabled &&` a launch with sync off never
+      // subscribed, so a withdrawal after an in-session setup changed nothing.
+      enabled: ref.watch(gdprConsentProvider).cloudSync &&
+          (storage.getSetting('sync_enabled') as bool? ?? false),
       supabaseUrl: storage.getSetting('supabase_url') as String?,
       supabaseAnonKey: storage.getSupabaseAnonKey(),
       userId: storage.getSetting('sync_user_id') as String?,
       userEmail: TankSyncClient.currentEmail,
       mode: _parseMode(modeStr),
+      relinkRequired: ref.read(tankSyncRelinkProvider) &&
+          TankSyncClient.sessionUserId == null,
     );
   }
 
@@ -80,8 +83,8 @@ class SyncState extends _$SyncState {
 
     final storage = ref.read(storageRepositoryProvider);
     try {
-      await TankSyncClient.init(url: cleanUrl, anonKey: cleanKey);
-      final userId = await TankSyncClient.signInAnonymously();
+      final userId = await openConnectSession(storage, cleanUrl, cleanKey,
+          consented: ref.read(gdprConsentProvider).cloudSync);
 
       await storage.putSetting('sync_enabled', true);
       await storage.putSetting('supabase_url', cleanUrl);
@@ -159,6 +162,7 @@ class SyncState extends _$SyncState {
     }
 
     if (userId == null) return EmailAuthResult.failed;
+    ref.read(tankSyncRelinkProvider.notifier).clear();
 
     final storage = ref.read(storageRepositoryProvider);
     await storage.putSetting('sync_user_id', userId);
@@ -195,18 +199,11 @@ class SyncState extends _$SyncState {
   /// #3449 — the launch identity guard found a stored `sync_user_id` with
   /// no live session: surface the relink-required state so sync settings
   /// can guide the user (email sign-in re-links; "start fresh" knowingly
-  /// abandons the old UUID via [switchToAnonymous]). Both of those paths
-  /// construct a fresh [SyncConfig], which clears the flag again.
+  /// abandons the old UUID via [switchToAnonymous]). #4338: the flag lives
+  /// in [TankSyncRelink], so a rebuild keeps it; both exits clear it there.
   void markRelinkRequired() {
-    state = SyncConfig(
-      enabled: state.enabled,
-      supabaseUrl: state.supabaseUrl,
-      supabaseAnonKey: state.supabaseAnonKey,
-      userId: state.userId,
-      mode: state.mode,
-      userEmail: state.userEmail,
-      relinkRequired: true,
-    );
+    ref.read(tankSyncRelinkProvider.notifier).mark();
+    ref.invalidateSelf();
   }
 
   /// Switch from email account back to anonymous.
@@ -236,6 +233,7 @@ class SyncState extends _$SyncState {
         await storage.putSetting('sync_user_id', userId);
       }
 
+      ref.read(tankSyncRelinkProvider.notifier).clear();
       state = SyncConfig(
         enabled: state.enabled,
         supabaseUrl: state.supabaseUrl,
@@ -268,6 +266,7 @@ class SyncState extends _$SyncState {
     await storage.putSetting('sync_user_id', null);
     await storage.putSetting('sync_mode', null);
 
+    ref.read(tankSyncRelinkProvider.notifier).clear();
     state = const SyncConfig();
   }
 

@@ -165,6 +165,12 @@ class GdprConsent extends _$GdprConsent {
     final storage = ref.read(storageRepositoryProvider);
     final previousErrorReporting =
         storage.getSetting(StorageKeys.consentErrorReporting) as bool? ?? false;
+    final previousCloudSync =
+        storage.getSetting(StorageKeys.consentCloudSync) as bool? ?? false;
+    // #4337 — a withdrawal releases the sync client before it is written.
+    if (previousCloudSync && !cloudSync) {
+      await ConsentEnforcement.notifyCloudSync(false);
+    }
     await storage.putSetting(StorageKeys.gdprConsentGiven, true);
     // #3866 — the consent record: when, and against which policy text.
     final recordedAt = ref.read(appClockProvider).now().toUtc();
@@ -201,6 +207,9 @@ class GdprConsent extends _$GdprConsent {
     // #3866 — withdrawal takes effect NOW, not at the next launch.
     if (previousErrorReporting != errorReporting) {
       await ConsentEnforcement.notifyErrorReporting(errorReporting);
+    }
+    if (!previousCloudSync && cloudSync) {
+      await ConsentEnforcement.notifyCloudSync(true);
     }
   }
 }

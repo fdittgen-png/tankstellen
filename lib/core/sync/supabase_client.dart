@@ -6,13 +6,29 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/logging/app_log.dart';
-import 'secure_session_storage.dart';
+import 'tanksync_sdk.dart';
+import 'tanksync_session_gate.dart';
 
 /// Thin wrapper around the Supabase Flutter SDK.
 ///
 /// Provides initialisation, anonymous auth, and a singleton accessor.
 class TankSyncClient {
   static bool _initialized = false;
+
+  /// #4162 — the SDK singleton behind this client, as a seam: a test
+  /// installs a fake backend that models it.
+  static TankSyncSdk _sdk = SupabaseFlutterSdk();
+
+  @visibleForTesting
+  static set debugSdk(TankSyncSdk sdk) => _sdk = sdk;
+
+  /// Forget the client and restore the production SDK — test isolation.
+  @visibleForTesting
+  static void resetForTest() {
+    _initialized = false;
+    _backendHost = null;
+    _sdk = SupabaseFlutterSdk();
+  }
 
   /// Hosts that may be reached over plain http — local dev / Android
   /// emulator loopback only (#3740). Everything else must be https so the
@@ -47,8 +63,13 @@ class TankSyncClient {
   /// Base delay for exponential backoff between upsert retries.
   static const upsertRetryBaseDelay = Duration(milliseconds: 500);
 
-  /// Initialize the Supabase client. Safe to call multiple times — subsequent
-  /// calls are no-ops.
+  /// Initialize the Supabase client. Safe to call multiple times — a call
+  /// for the backend already live is a no-op.
+  ///
+  /// #4336 — a call for a DIFFERENT backend replaces the client. The SDK
+  /// skips a second `initialize` while its first client is live, so
+  /// without the release the app would keep talking to the old backend
+  /// while settings (and #4047's per-backend scoping) name the new one.
   static Future<void> init({
     required String url,
     required String anonKey,
@@ -60,29 +81,23 @@ class TankSyncClient {
     // Validate URL format + https enforcement (#3740).
     final uri = validateUrl(cleanUrl);
 
-    if (_initialized) {
-      // Already initialized — check if URL changed
-      // If same URL, skip. If different, we need to re-init.
-      // Supabase SDK doesn't support re-init, so just return
-      // (the existing client is still valid).
-      return;
-    }
-    // #3740 — keep the persisted session (incl. the refresh token) in the
-    // platform keychain/keystore instead of the SDK's default plaintext
-    // SharedPreferences slot. The key mirrors the SDK default
+    final host = uri.host.toLowerCase();
+    if (_initialized && _sdk.host == host) return;
+    // #3740 — the session key mirrors the SDK default
     // (`sb-<host-first-label>-auth-token`) so SecureSessionLocalStorage
     // can find — and wipe — a legacy plaintext session on first run.
-    _backendHost = uri.host.toLowerCase();
-    await Supabase.initialize(
+    // A live SDK client for another backend would be kept by the SDK.
+    if (_sdk.isInitialized && _sdk.host != host) await _release();
+    _backendHost = host;
+    await _sdk.initialize(
       url: cleanUrl,
       publishableKey: cleanKey,
-      authOptions: FlutterAuthClientOptions(
-        localStorage: SecureSessionLocalStorage(
-          persistSessionKey: 'sb-${uri.host.split('.').first}-auth-token',
-        ),
-      ),
+      persistSessionKey: 'sb-${uri.host.split('.').first}-auth-token',
     );
     _initialized = true;
+    TankSyncSessionGate.instance
+      ..watchAuth(_sdk.client.auth.onAuthStateChange)
+      ..observe('client.init');
   }
 
   /// #4047 — host of the backend [init] connected to. Local sync state
@@ -96,8 +111,35 @@ class TankSyncClient {
   static String? get backendHost => _backendHost;
 
   /// The underlying Supabase client, or `null` if [init] has not been called.
+  ///
+  /// #4336 — also `null` when the SDK's live client is not the one for
+  /// [backendHost]: every write path treats that as "not connected"
+  /// rather than sending the user's data to a backend they did not pick.
   static SupabaseClient? get client =>
-      _initialized ? Supabase.instance.client : null;
+      _initialized && _sdk.isInitialized && _sdk.host == _backendHost
+          ? _sdk.client
+          : null;
+
+  /// #4336 — drop the client: the app flag, the backend and the SDK's own
+  /// client, so the next [init] builds one for whatever backend it names.
+  /// The persisted session stays where it is.
+  static Future<void> _release() async {
+    _initialized = false;
+    _backendHost = null;
+    await _sdk.dispose();
+  }
+
+  /// #4162 — this client's own initialised flag (the SDK's can differ).
+  static bool get isInitialized => _initialized;
+
+  /// #4162 — whether the SDK singleton holds a client.
+  static bool get sdkInitialized => _sdk.isInitialized;
+
+  /// #4162 — host the SDK's live client talks to, or null.
+  static String? get sdkHost => _sdk.isInitialized ? _sdk.host : null;
+
+  /// #4162 — the SDK's current user id, or null without a live session.
+  static String? get sessionUserId => client?.auth.currentUser?.id;
 
   /// Whether the client is initialised AND a user session exists.
   static bool get isConnected =>
@@ -224,12 +266,24 @@ class TankSyncClient {
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.sync, context: const {'where': 'TankSync: sign-out after upsert failure also failed'});
     }
-    _initialized = false;
+    await _release();
+    TankSyncSessionGate.instance.observe('client.publicUserFailed');
     throw StateError(
       'Failed to create public.users row after $maxUpsertRetries attempts. '
       'Signed out to prevent inconsistent state. '
       'Original error: $lastError',
     );
+  }
+
+  /// #4337 — the Cloud Sync consent was withdrawn: stop talking to the
+  /// backend now, locally. Auto-refresh stops and the client is released.
+  /// Nothing is signed out server-side and nothing is deleted; the
+  /// persisted session stays on the device, so granting the consent again
+  /// resumes the same identity instead of minting a new one.
+  static Future<void> releaseForConsentWithdrawal() async {
+    client?.auth.stopAutoRefresh();
+    await _release();
+    TankSyncSessionGate.instance.observe('client.consentWithdrawn');
   }
 
   /// Get the current user's email (null for anonymous users).
@@ -241,7 +295,8 @@ class TankSyncClient {
     return email != null && email.isNotEmpty;
   }
 
-  /// Sign out and reset the initialisation flag so [init] can be called again.
+  /// Sign out and release the client so [init] can be called again — for
+  /// this backend or another one (#4336).
   ///
   /// #3449 — safe to call while ALREADY signed out (the relink-required
   /// "start fresh" path runs `switchToAnonymous` on a sessionless client):
@@ -253,6 +308,7 @@ class TankSyncClient {
     if (c.auth.currentSession != null) {
       await c.auth.signOut();
     }
-    _initialized = false;
+    await _release();
+    TankSyncSessionGate.instance.observe('client.signOut');
   }
 }

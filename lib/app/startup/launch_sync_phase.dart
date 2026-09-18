@@ -9,14 +9,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/data/storage_repository.dart';
 import '../../core/logging/error_logger.dart';
 import '../../core/perf/launch_sync_trace.dart';
-import '../../core/storage/hive_storage.dart';
+import '../../core/privacy/consent_enforcement.dart';
 import '../../core/sync/app_resume_sync.dart';
 import '../../core/sync/supabase_client.dart';
+import '../../core/sync/sync_config.dart';
 import '../../core/sync/sync_provider.dart';
 import '../../core/sync/sync_pull_coordinator.dart';
 import '../../core/sync/sync_run_trace.dart';
 import '../../core/sync/tanksync_init.dart';
 import '../../core/sync/tanksync_init_retry.dart';
+import '../../core/sync/tanksync_relink_provider.dart';
+import '../../core/sync/tanksync_session_gate.dart';
 import '../../features/trips/api.dart';
 import '../../features/feature_management/application/feature_flags_provider.dart';
 import '../../features/feature_management/domain/feature.dart';
@@ -60,6 +63,11 @@ class LaunchSyncPhase {
   @visibleForTesting
   static bool Function()? clientReadyOverride;
 
+  /// Test seam (#4162): the pull entries to register instead of the full
+  /// matrix, so a session-lifecycle test can drive passes it controls.
+  @visibleForTesting
+  static List<SyncPullEntry> Function()? entriesOverride;
+
   static bool get _clientReady =>
       clientReadyOverride?.call() ?? (TankSyncClient.client != null);
 
@@ -85,8 +93,48 @@ class LaunchSyncPhase {
     SyncPullCoordinator.instance.register(
       enabled: () =>
           _clientReady && container.read(syncStateProvider).enabled,
-      entries: LaunchSyncPulls.buildEntries(container, storage),
+      entries: entriesOverride?.call() ??
+          LaunchSyncPulls.buildEntries(container, storage),
+      authenticated: () => TankSyncClient.sessionUserId != null,
     );
+    // #4162 — the session gate reads its facts from the same settings.
+    // #4338 — a session the SDK drops mid-session is flagged for relink
+    // now, not at the next cold start's identity guard.
+    TankSyncSessionGate.instance.bind(
+      storage,
+      relink: () => container.read(tankSyncRelinkProvider),
+      onSessionLost: () {
+        if (storage.getSetting('sync_user_id') != null) {
+          _markRelinkRequired(container);
+        }
+      },
+    );
+    // #4337 — a consent change takes effect in-session: a withdrawal
+    // releases the client locally, a grant resumes the stored identity.
+    ConsentEnforcement.cloudSyncHook = (enabled) async {
+      if (!enabled) return TankSyncClient.releaseForConsentWithdrawal();
+      unawaited(_resumeAfterConsent(container, storage));
+    };
+  }
+
+  /// #4337 — the Cloud Sync consent was granted again: run the init now
+  /// instead of at the next launch. The stored identity resumes from the
+  /// session the withdrawal left on the device (or #3449 relink is raised),
+  /// and a ready client pulls. Fire-and-forget from the consent save.
+  static Future<void> _resumeAfterConsent(
+    ProviderContainer container,
+    StorageRepository storage,
+  ) async {
+    try {
+      await TankSyncInit.run(storage).timeout(const Duration(seconds: 8));
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'LaunchSyncPhase: resume after consent'}));
+    }
+    handleInitOutcome(container, storage);
+    if (TankSyncInit.lastOutcome != TankSyncInitOutcome.ready) return;
+    SyncRunTrace.begin('consent-granted');
+    await runLaunchPulls(container);
   }
 
   /// Replay the registered pull matrix (#3450: parallel, per-table
@@ -110,8 +158,9 @@ class LaunchSyncPhase {
   ///  * `ready` / `notConfigured` → nothing to do.
   static void handleInitOutcome(
     ProviderContainer container,
-    HiveStorage storage,
+    StorageRepository storage,
   ) {
+    _observeSyncState(container);
     final outcome = TankSyncInit.lastOutcome;
     if (outcome == TankSyncInitOutcome.ready ||
         outcome == TankSyncInitOutcome.notConfigured) {
@@ -161,6 +210,25 @@ class LaunchSyncPhase {
         }
       },
     );
+  }
+
+  static ProviderSubscription<SyncConfig>? _syncStateSub;
+
+  /// #4162 — publish every `SyncConfig` to the session gate. Attached once
+  /// the launch init has run: listening builds the provider, and building
+  /// it before the client exists would pin a null `userEmail`.
+  static void _observeSyncState(ProviderContainer container) {
+    try {
+      _syncStateSub?.close();
+      _syncStateSub = container.listen<SyncConfig>(
+        syncStateProvider,
+        (_, next) => TankSyncSessionGate.instance.observeConfig(next),
+        fireImmediately: true,
+      );
+    } catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.sync, e, st,
+          context: const {'where': 'LaunchSyncPhase: observe SyncState'}));
+    }
   }
 
   static void _markRelinkRequired(ProviderContainer container) {
