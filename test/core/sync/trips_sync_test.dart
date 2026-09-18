@@ -9,7 +9,10 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/features/trips/data/trips_sync.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
+import 'package:tankstellen/core/sync/sync_pull_lease.dart';
+import 'package:tankstellen/core/sync/sync_transport.dart';
 import '../../helpers/silence_error_logger.dart';
+import 'fake_sync_transport.dart';
 import 'package:tankstellen/features/trips/data/trips_sync_rows.dart';
 
 /// #1479 phase 2 / #2239 — coverage of [TripsSync].
@@ -474,4 +477,197 @@ void main() {
       expect(TripsSyncRows.buildDetailRows(const [], 'u'), isEmpty);
     });
   });
+
+  // ───────────────────────────────────────────────────────────────────
+  // #4377 — every wire call goes through the fenced SyncTransport, the
+  // seam the other syncs already use. Before this the wire methods read
+  // TankSyncClient.client directly, so a consent withdrawal (#4337) or
+  // an abandoned pull pass (#4377) stopped short of trips.
+  // ───────────────────────────────────────────────────────────────────
+  group('#4377 — TripsSync through the fenced transport', () {
+    final started = DateTime.utc(2026, 9, 16, 9);
+    final ended = DateTime.utc(2026, 9, 16, 9, 30);
+
+    TripHistoryEntry trip(String id, {List<TripSample> samples = const []}) =>
+        TripHistoryEntry(
+          id: id,
+          vehicleId: 'veh-1',
+          summary: TripSummary(
+            startedAt: started,
+            endedAt: ended,
+            distanceKm: 12,
+            maxRpm: 2800,
+            highRpmSeconds: 3,
+            idleSeconds: 20,
+            harshBrakes: 0,
+            harshAccelerations: 0,
+          ),
+          samples: samples,
+        );
+
+    late FakeSyncTransport transport;
+    setUp(() => transport = FakeSyncTransport(userId: 'user-7'));
+
+    test('uploadSummary upserts the summary row through the transport, '
+        'scoped to ITS user; no details row without samples', () async {
+      await TripsSync.uploadSummary(trip('t-1'), transport: transport);
+
+      final rows = transport.upsertedRows('trip_summaries');
+      expect(rows.map((r) => r['id']), ['t-1']);
+      expect(rows.single['user_id'], 'user-7');
+      expect(transport.upsertCalls.single.onConflict, 'user_id,id');
+      expect(transport.upsertedRows('trip_details'), isEmpty);
+    });
+
+    test('uploadDetails ships the heavy blob to trip_details', () async {
+      final heavy = trip('t-2',
+          samples: [TripSample(timestamp: started, speedKmh: 10, rpm: 1200)]);
+      await TripsSync.uploadSummary(heavy, transport: transport);
+
+      final details = transport.upsertedRows('trip_details');
+      expect(details.map((r) => r['id']), ['t-2']);
+      expect(details.single['user_id'], 'user-7');
+      expect((details.single['data'] as Map).containsKey('samples'), isTrue);
+    });
+
+    test('fetchDetails reads the blob by id through the transport, null '
+        'when the server holds none', () async {
+      transport.tables['trip_details'] = [
+        {
+          'id': 't-3',
+          'user_id': 'user-7',
+          'data': {'samples': <Object>[], 'gpsd': <Object>[]},
+        },
+      ];
+      expect(await TripsSync.fetchDetails('t-3', transport: transport),
+          {'samples': <Object>[], 'gpsd': <Object>[]});
+      expect(
+          await TripsSync.fetchDetails('nope', transport: transport), isNull);
+    });
+
+    test('deleteSummary tombstones first, then deletes the row — both '
+        'through the transport', () async {
+      transport.tables['trip_summaries'] = [
+        {'id': 't-4', 'user_id': 'user-7', 'data': <String, Object>{}},
+      ];
+      await TripsSync.deleteSummary('t-4', transport: transport);
+
+      expect(transport.upsertedRows('deletions').map((r) => r['record_id']),
+          ['t-4']);
+      expect(transport.deleteCalls.single.table, 'trip_summaries');
+      expect(transport.deleteCalls.single.filters, {'id': 't-4'});
+      expect(transport.tables['trip_summaries'], isEmpty);
+    });
+
+    test('merge downloads server-only rows and heals local-only ones '
+        'through the transport', () async {
+      final local = trip('local-only');
+      final serverOnly = trip('server-only');
+      transport.tables['trip_summaries'] = [
+        TripsSyncRows.buildSummaryRow(serverOnly, 'user-7'),
+      ];
+
+      final merged = await TripsSync.merge([local], transport: transport);
+
+      expect(merged.map((e) => e.id).toSet(), {'local-only', 'server-only'});
+      expect(transport.upsertedRows('trip_summaries').map((r) => r['id']),
+          ['local-only'],
+          reason: 'the missing server row is healed, the downloaded one '
+              'is not re-uploaded');
+    });
+
+    test('forgetAllForUser deletes both tables through the transport '
+        '(user-scoped, no other filter)', () async {
+      await TripsSync.forgetAllForUser(transport: transport);
+      expect(transport.deleteCalls.map((c) => c.table),
+          ['trip_summaries', 'trip_details']);
+      expect(transport.deleteCalls.map((c) => c.filters),
+          [<String, Object>{}, <String, Object>{}]);
+    });
+
+    test('pruneOldDetails prunes trip_details on updated_at through the '
+        'transport with a UTC cutoff', () async {
+      await TripsSync.pruneOldDetails(olderThanDays: 90, transport: transport);
+      final prune = transport.pruneCalls.single;
+      expect(prune.table, 'trip_details');
+      final cutoff = prune.filters['updated_at'] as String;
+      expect(cutoff, endsWith('Z'),
+          reason: 'an offset-less local stamp would skew the retention '
+              'cutoff by the device offset (#3124)');
+    });
+
+    test('a fenced transport (consent withdrawn, client released) refuses '
+        'every write and the merge returns its input unchanged', () async {
+      final fenced = _FencedTransport();
+      final local = [trip('t-5')];
+
+      await TripsSync.uploadSummary(local.single, transport: fenced);
+      await TripsSync.deleteSummary('t-5', transport: fenced);
+      await TripsSync.forgetAllForUser(transport: fenced);
+      await TripsSync.pruneOldDetails(transport: fenced);
+      final merged = await TripsSync.merge(local, transport: fenced);
+
+      expect(fenced.calls, greaterThan(0), reason: 'the fence was consulted');
+      expect(fenced.upsertCalls, isEmpty);
+      expect(fenced.deleteCalls, isEmpty);
+      expect(fenced.pruneCalls, isEmpty);
+      expect(identical(merged, local), isTrue,
+          reason: 'the launch persist step must see "nothing changed"');
+    });
+
+    test('a merge whose pull pass was abandoned hands nothing back — even '
+        'when every wire call answered in time', () async {
+      final serverOnly = trip('server-only');
+      transport.tables['trip_summaries'] = [
+        TripsSyncRows.buildSummaryRow(serverOnly, 'user-7'),
+      ];
+      final local = <TripHistoryEntry>[];
+      final dead = SyncPullLease(
+        tables: 'trip_summaries',
+        generation: 1,
+        isCurrent: () => false,
+        onDiscarded: (_, _) {},
+      );
+
+      final merged =
+          await dead.run(() => TripsSync.merge(local, transport: transport));
+
+      expect(identical(merged, local), isTrue,
+          reason: 'the downloaded row must not reach the persist step of '
+              'a pass that already ended');
+    });
+  });
+}
+
+/// A transport whose client is no longer live (#4337): every operation
+/// throws before touching anything.
+class _FencedTransport extends FakeSyncTransport {
+  int calls = 0;
+
+  @override
+  Future<List<JsonRow>> select(String table, String columns,
+      {Map<String, Object> filters = const {}}) async {
+    calls++;
+    throw const SyncFencedException();
+  }
+
+  @override
+  Future<void> upsert(String table, List<JsonRow> rows,
+      {required String onConflict}) async {
+    calls++;
+    throw const SyncFencedException();
+  }
+
+  @override
+  Future<void> deleteWhere(String table, Map<String, Object> filters) async {
+    calls++;
+    throw const SyncFencedException();
+  }
+
+  @override
+  Future<void> deleteOlderThan(
+      String table, String column, String before) async {
+    calls++;
+    throw const SyncFencedException();
+  }
 }

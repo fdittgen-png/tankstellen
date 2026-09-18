@@ -49,6 +49,11 @@ abstract class SyncTransport {
 
   /// `DELETE FROM [table] WHERE user_id = userId AND filters`.
   Future<void> deleteWhere(String table, Map<String, Object> filters);
+
+  /// `DELETE FROM [table] WHERE user_id = userId AND [column] < [before]`
+  /// — the retention prune (#1479 phase 5; trips ride this seam since
+  /// #4377). [before] is an ISO-8601 UTC stamp.
+  Future<void> deleteOlderThan(String table, String column, String before);
 }
 
 /// Thrown by [SupabaseSyncTransport] when the client it was opened on is
@@ -128,6 +133,21 @@ class SupabaseSyncTransport implements SyncTransport {
       query = query.eq(filter.key, filter.value);
     }
     await query;
+    _settle();
+  }
+
+  @override
+  Future<void> deleteOlderThan(
+    String table,
+    String column,
+    String before,
+  ) async {
+    _fence();
+    await _client
+        .from(table)
+        .delete()
+        .eq('user_id', userId)
+        .lt(column, before);
     _settle();
   }
 

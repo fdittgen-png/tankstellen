@@ -11,9 +11,10 @@ import 'trips_sync_json.dart';
 /// `trip_details` row shapes the wire methods upsert, and the reconcile
 /// steps the launch merge composes (#4056 decomposition of `TripsSync`).
 ///
-/// `TripsSync` reads `TankSyncClient.client` directly, so its wire calls
-/// cannot be exercised without a live Supabase session. Everything that
-/// CAN be pinned by a unit test lives here instead: the column contract
+/// `TripsSync` talks to the backend through the fenced `SyncTransport`
+/// (#4377; before that it read `TankSyncClient.client` directly, so its
+/// wire calls could not be exercised without a live Supabase session).
+/// The pure steps still live here: the column contract
 /// (`buildSummaryRow` / `buildSummaryRows` / `buildDetailRows`), the
 /// union the caller must persist (`mergeRows`, the #2239 seam), and the
 /// wiped-but-kept rescue (`retainedAfterWipe`, the #4056 seam). The wire
