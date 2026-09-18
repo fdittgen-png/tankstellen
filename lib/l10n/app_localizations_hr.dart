@@ -8981,6 +8981,13 @@ class AppLocalizationsHr extends AppLocalizations {
       'Praćenje vaše rute za statistiku goriva i vožnje';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Podijeli s drugim računom';
 
   @override

@@ -14954,6 +14954,18 @@ abstract class AppLocalizations {
   /// **'Tracking your route for fuel & driving stats'**
   String get tripRecordingGpsNotificationText;
 
+  /// SnackBar shown after the user stops a recording whose history write failed (#4378, #4328). The trip is NOT lost: it is kept on disk under its own id and retried on the next launch, or immediately via the retry action. Never shown when the trip was saved, nor when it was discarded for no movement.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save this trip — it\'s kept and will be retried'**
+  String get tripSaveFailedKept;
+
+  /// Action on the SnackBar that reports a failed trip save (#4378). Tapping retries the history write now instead of waiting for the next app launch.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get tripSaveRetryAction;
+
   /// Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account.
   ///
   /// In en, this message translates to:

@@ -8985,6 +8985,13 @@ class AppLocalizationsPl extends AppLocalizations {
       'Śledzenie trasy dla statystyk paliwa i jazdy';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Udostępnij innemu kontu';
 
   @override

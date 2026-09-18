@@ -8956,6 +8956,13 @@ class AppLocalizationsFi extends AppLocalizations {
       'Seurataan reittiä polttoaine- ja ajotilastojen keräämiseksi';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Jaa toiselle tilille';
 
   @override

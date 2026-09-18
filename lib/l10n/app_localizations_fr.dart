@@ -9054,6 +9054,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Suivi GPS de votre itinéraire';
 
   @override
+  String get tripSaveFailedKept =>
+      'Trajet non enregistré — il est conservé et sera réessayé';
+
+  @override
+  String get tripSaveRetryAction => 'Réessayer';
+
+  @override
   String get tripShareAction => 'Partager avec un autre compte';
 
   @override

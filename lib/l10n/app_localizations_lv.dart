@@ -9003,6 +9003,13 @@ class AppLocalizationsLv extends AppLocalizations {
       'Izseko jūsu maršrutu degvielas un braukšanas statistikai';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Kopīgot ar citu kontu';
 
   @override

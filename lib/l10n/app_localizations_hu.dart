@@ -8996,6 +8996,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az útvonal követése üzemanyag- és vezetési statisztikákhoz';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Megosztás másik fiókkal';
 
   @override

@@ -8994,6 +8994,13 @@ class AppLocalizationsLt extends AppLocalizations {
       'Sekamas jūsų maršrutas degalų ir vairavimo statistikai';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Bendrinti su kita paskyra';
 
   @override

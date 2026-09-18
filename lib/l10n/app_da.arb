@@ -8263,5 +8263,15 @@
         "type": "int"
       }
     }
+  },
+  "tripSaveFailedKept": "Couldn't save this trip — it's kept and will be retried",
+  "@tripSaveFailedKept": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "tripSaveRetryAction": "Retry",
+  "@tripSaveRetryAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

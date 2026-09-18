@@ -9011,6 +9011,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Rastreando tu ruta para las estadísticas de combustible y conducción';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Compartir con otra cuenta';
 
   @override

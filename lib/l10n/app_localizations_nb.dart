@@ -8951,6 +8951,13 @@ class AppLocalizationsNb extends AppLocalizations {
       'Sporer ruten din for drivstoff- og kjørestatistikk';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Del med en annen konto';
 
   @override
