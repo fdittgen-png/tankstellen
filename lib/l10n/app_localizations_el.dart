@@ -9033,6 +9033,13 @@ class AppLocalizationsEl extends AppLocalizations {
       'Παρακολούθηση διαδρομής για στατιστικά καυσίμου & οδήγησης';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Κοινοποίηση σε άλλον λογαριασμό';
 
   @override

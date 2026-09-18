@@ -9028,6 +9028,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'A monitorizar o seu percurso para estatísticas de combustível e condução';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Partilhar com outra conta';
 
   @override

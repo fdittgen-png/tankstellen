@@ -375,9 +375,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // #769 / #780 — flush learned baselines + sync before release.
     await _baselines.flushAndSync();
     // #1312 — clear the captured adapter identity once persisted.
-    _adapterMac = null;
-    _adapterName = null;
-    _adapterFirmware = null;
+    _adapterMac = _adapterName = _adapterFirmware = null;
     // #3527 — keep-link: a supervisor-owned service stays connected at
     // trip end (see obd2_supervised_teardown.dart for the rationale).
     await teardownServiceRespectingSupervisor(_ref, svc);
@@ -397,6 +395,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       // #2509 — surface "no movement detected" only on a stationary discard.
       discardedNoMovement: outcome.isStationaryDiscard,
       entryId: outcome == TripPersistOutcome.saved ? ctl.sessionId : null,
+      saveFailed: outcome == TripPersistOutcome.failed, // #4378
     );
   }
 }

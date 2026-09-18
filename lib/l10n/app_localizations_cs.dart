@@ -8980,6 +8980,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Sledování vaší trasy pro statistiky paliva a jízdy';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Sdílet s jiným účtem';
 
   @override

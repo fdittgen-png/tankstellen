@@ -6182,25 +6182,9 @@
   "decisionLeadCaveatPriceAge": "cette source n'indique pas quand le prix a été relevé",
   "decisionLeadCaveatSeparator": " · ",
   "consumptionMetricLitres": "Litres",
-  "@consumptionMetricLitres": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "consumptionMetricSpend": "Spend",
-  "@consumptionMetricSpend": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "consumptionMetricPricePerLitre": "Price/L",
-  "@consumptionMetricPricePerLitre": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "consumptionMetricSpend": "Dépenses",
+  "consumptionMetricPricePerLitre": "Prix/L",
   "consumptionMetricPerHundred": "L/100 km",
-  "@consumptionMetricPerHundred": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
   "alertReasonNetSaving": "Environ {amount} sur votre plein habituel",
   "@alertReasonNetSaving": {
     "placeholders": {
@@ -6520,11 +6504,7 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "criteriaRadiusCustom": "Custom",
-  "@criteriaRadiusCustom": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "criteriaRadiusCustom": "Personnalisé",
   "insightHighRpmShare": "Engine over 3000 RPM ({pctTime}% of trip)",
   "@insightHighRpmShare": {
     "x-mt": "needs-native-review",
@@ -6618,11 +6598,7 @@
       }
     }
   },
-  "fillInventorySkipMixedFuel": "the tank held a mix of grades, so it cannot calibrate one",
-  "@fillInventorySkipMixedFuel": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
+  "fillInventorySkipMixedFuel": "le réservoir contenait un mélange de carburants – il ne peut en calibrer aucun seul",
   "opportunityRefusalNotWatched": "You are not watching for this",
   "@opportunityRefusalNotWatched": {
     "x-mt": "needs-native-review",
@@ -6896,5 +6872,7 @@
   "alertsNotificationsOffTitle": "Les notifications sont désactivées",
   "alertsNotificationsOffPermissionBody": "Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications de cette application sont désactivées dans les réglages de votre téléphone.",
   "alertsNotificationsOffChannelBody": "Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications d'alertes de prix sont désactivées dans les réglages de votre téléphone.",
-  "alertsNotificationsOffOpenSettings": "Ouvrir les réglages"
+  "alertsNotificationsOffOpenSettings": "Ouvrir les réglages",
+  "tripSaveFailedKept": "Trajet non enregistré — il est conservé et sera réessayé",
+  "tripSaveRetryAction": "Réessayer"
 }

@@ -8997,6 +8997,13 @@ class AppLocalizationsSk extends AppLocalizations {
       'Sledujem trasu pre štatistiky paliva a jazdy';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Zdieľať s iným účtom';
 
   @override

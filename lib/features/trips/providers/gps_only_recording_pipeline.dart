@@ -138,8 +138,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
     );
     _samples.clear();
     _gpsDiagnostics.clear(); // #3253
-    _startedAt = DateTime.now();
-    _host.lastTripStartedAt = DateTime.now();
+    _host.lastTripStartedAt = _startedAt = DateTime.now(); // one instant
     _host.lastTripVehicleId = _host.readActiveVehicleId();
     // #3248 — seed the WAL so an OS kill recovers (not loses) the trip.
     _wal.seed(startedAt: _startedAt!, automatic: false, vehicleId: _host.readActiveVehicleId());
@@ -374,6 +373,7 @@ class GpsOnlyRecordingPipeline implements RecordingPipeline {
       // dongle-less trip was discarded as genuinely stationary.
       discardedNoMovement: outcome.isStationaryDiscard,
       entryId: outcome == TripPersistOutcome.saved ? tripId : null,
+      saveFailed: outcome == TripPersistOutcome.failed, // #4378
     );
   }
 

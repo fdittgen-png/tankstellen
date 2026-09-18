@@ -4014,10 +4014,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get consumptionMetricLitres => 'Litres';
 
   @override
-  String get consumptionMetricSpend => 'Spend';
+  String get consumptionMetricSpend => 'Dépenses';
 
   @override
-  String get consumptionMetricPricePerLitre => 'Price/L';
+  String get consumptionMetricPricePerLitre => 'Prix/L';
 
   @override
   String get consumptionMetricPerHundred => 'L/100 km';
@@ -9069,6 +9069,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Suivi GPS de votre itinéraire';
 
   @override
+  String get tripSaveFailedKept =>
+      'Trajet non enregistré — il est conservé et sera réessayé';
+
+  @override
+  String get tripSaveRetryAction => 'Réessayer';
+
+  @override
   String get tripShareAction => 'Partager avec un autre compte';
 
   @override
@@ -9387,7 +9394,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get fillInventorySkipMixedFuel =>
-      'the tank held a mix of grades, so it cannot calibrate one';
+      'le réservoir contenait un mélange de carburants – il ne peut en calibrer aucun seul';
 
   @override
   String fillInventorySkipCoverageTooLow(int coverage) {
@@ -9494,7 +9501,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get criteriaSwapEndpoints => 'Inverser le départ et la destination';
 
   @override
-  String get criteriaRadiusCustom => 'Custom';
+  String get criteriaRadiusCustom => 'Personnalisé';
 
   @override
   String get criteriaIntentHeader => 'What are you looking for?';

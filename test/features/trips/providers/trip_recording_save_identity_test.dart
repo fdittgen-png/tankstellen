@@ -97,14 +97,19 @@ void main() {
   for (final recording in _recordings) {
     group('${recording.name} (#4328)', () {
       for (final failure in failures.entries) {
-        test('a failed history write keeps the WAL row — ${failure.key}; '
-            'the relaunch recovers the trip and End saves it once', () async {
+        test('a failed history write keeps the trip — ${failure.key}; '
+            'the relaunch saves it exactly once', () async {
           final old = processWith(await failure.value());
           final notifier = await recording.record(old, driver);
-          await notifier.stop();
+          final stopped = await notifier.stop();
           // The recording screen resets the provider after every stop.
           notifier.reset();
           await RecordingDisk.settle();
+
+          expect(stopped.saveFailed, isTrue,
+              reason: '#4378 — the stop reports the failure, so the screen '
+                  'can say the trip is kept instead of saved');
+          expect(stopped.entryId, isNull, reason: 'nothing was saved');
 
           expect(disk.historyRepo.loadAll(), isEmpty);
           expect(disk.activeRepo.loadSnapshot(), isNotNull,
@@ -115,8 +120,11 @@ void main() {
 
           final next = await disk.relaunch(image, overrides: driver.overrides);
           addTearDown(next.dispose);
+          // #4378 — the launch retries the kept trip through the same
+          // confirmed save; #4328's identity then retires its WAL row, so
+          // there is nothing left to hand back.
           expect(next.read(tripRecordingProvider).phase,
-              TripRecordingPhase.pausedDueToDrop);
+              TripRecordingPhase.idle);
           await next.read(tripRecordingProvider.notifier).stop();
 
           final saved = disk.historyRepo.loadAll();

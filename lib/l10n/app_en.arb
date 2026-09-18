@@ -9860,6 +9860,14 @@
   "@tripRecordingGpsNotificationText": {
     "description": "Body text of the Android GPS foreground-service notification shown while a trip is recording (#2766). Explains why location is tracked: to compute the route, fuel consumption and driving stats for this trip."
   },
+  "tripSaveFailedKept": "Couldn't save this trip — it's kept and will be retried",
+  "@tripSaveFailedKept": {
+    "description": "SnackBar shown after the user stops a recording whose history write failed (#4378, #4328). The trip is NOT lost: it is kept on disk under its own id and retried on the next launch, or immediately via the retry action. Never shown when the trip was saved, nor when it was discarded for no movement."
+  },
+  "tripSaveRetryAction": "Retry",
+  "@tripSaveRetryAction": {
+    "description": "Action on the SnackBar that reports a failed trip save (#4378). Tapping retries the history write now instead of waiting for the next app launch."
+  },
   "tripShareAction": "Share with another account",
   "@tripShareAction": {
     "description": "Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account."
