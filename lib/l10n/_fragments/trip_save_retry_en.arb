@@ -1,0 +1,10 @@
+{
+  "tripSaveFailedKept": "Couldn't save this trip — it's kept and will be retried",
+  "@tripSaveFailedKept": {
+    "description": "SnackBar shown after the user stops a recording whose history write failed (#4378, #4328). The trip is NOT lost: it is kept on disk under its own id and retried on the next launch, or immediately via the retry action. Never shown when the trip was saved, nor when it was discarded for no movement."
+  },
+  "tripSaveRetryAction": "Retry",
+  "@tripSaveRetryAction": {
+    "description": "Action on the SnackBar that reports a failed trip save (#4378). Tapping retries the history write now instead of waiting for the next app launch."
+  }
+}

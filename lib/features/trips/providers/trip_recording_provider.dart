@@ -8,7 +8,6 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
-import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/time/app_clock.dart';
 import '../data/trips_sync.dart';
@@ -20,6 +19,7 @@ import '../../vehicle/api.dart'
     show VehicleOdometerSnapshot, VehicleOdometerSource,
         vehicleOdometerSnapshotStoreProvider;
 import '../../obd2/api.dart';
+import '../data/pending_trip_saves.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_save_stage.dart';
@@ -37,6 +37,7 @@ import 'last_trip_identity.dart';
 import 'recording_pipeline.dart';
 import 'recording_pipeline_slot.dart';
 import 'recording_paused_row.dart';
+import 'recovered_finalise_deps.dart';
 import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';

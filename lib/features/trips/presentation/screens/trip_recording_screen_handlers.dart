@@ -70,6 +70,8 @@ mixin _TripRecordingEventHandlers on ConsumerState<TripRecordingScreen> {
     final messenger = ScaffoldMessenger.maybeOf(context);
     final notifier = ref.read(tripRecordingProvider.notifier);
     final repo = ref.read(tripHistoryRepositoryProvider);
+    final historyList = ref.read(tripHistoryListProvider.notifier);
+    final retrySave = ref.read(pendingTripSaveRetryProvider); // #4378
     final entryId = result.entryId; // #4328 — null when nothing was saved
 
     setState(() {
@@ -86,28 +88,15 @@ mixin _TripRecordingEventHandlers on ConsumerState<TripRecordingScreen> {
     }
 
     messenger?.hideCurrentSnackBar();
-    if (result.discardedNoMovement) {
-      // #2509 — a Stop that saves nothing is never silent data loss.
-      messenger?.showSnackBar(
-        SnackBarHelper.infoSnackBar(l.tripRecordingDiscardedNoMovement),
-      );
-      return;
-    }
-    // #3582 — the delete must remove the PERSISTED entry, not just reset
-    // the UI (the old "Discard" silently kept the trip in history).
-    messenger?.showSnackBar(
-      SnackBarHelper.infoSnackBar(
-        l.tripSummaryAutoSaved,
-        key: const Key('tripSavedSnackBar'),
-        duration: SnackBarHelper.undoDuration,
-        action: (entryId == null || repo == null)
-            ? null
-            : SnackBarAction(
-                label: l.tripSummaryDelete,
-                onPressed: () => unawaited(repo.delete(entryId)),
-              ),
-      ),
-    );
+    // #2509 / #3582 / #4378 — what the stop tells the user about this
+    // trip's persistence, in one place ([tripStopSnackBar]).
+    messenger?.showSnackBar(tripStopSnackBar(
+      l,
+      result: result,
+      repo: repo,
+      onRetry: retrySave,
+      onRetried: historyList.refresh,
+    ));
   }
 
   void _togglePause() {

@@ -17,6 +17,7 @@ import '../../features/obd2/data/active_trip_sample_wal.dart';
 import '../../features/obd2/data/paused_trip_recovery_service.dart';
 import '../../features/obd2/data/paused_trip_repository.dart';
 import '../../features/trips/api.dart';
+import '../../features/trips/data/pending_trip_saves.dart';
 import '../../core/navigation/app_routes.dart';
 import '../router.dart';
 
@@ -218,6 +219,14 @@ class TripRecoveryPhase {
     ProviderContainer container, {
     DateTime Function()? now,
   }) async {
+    // #4378 — retry the trips whose history write failed BEFORE the
+    // sweeps: one that lands turns its own WAL row into an already-saved
+    // row, which the active pass then retires instead of handing it back
+    // (#4328). One that fails again stays kept for the next launch.
+    final retried = await retryPendingTripSaves();
+    if (retried > 0) {
+      log.info('AppInitializer: retried $retried pending trip save(s)');
+    }
     if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return;
     if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
     final pausedRepo = PausedTripRepository(

@@ -255,6 +255,11 @@ class StoppedTripResult {
   /// was saved (a discard, a failed write, no trip).
   final String? entryId;
 
+  /// #4378 — the history write did not land. The trip is kept (its WAL row
+  /// and its own pending-save copy), so the stop says so and offers a retry
+  /// instead of reporting a save that never happened (#3582).
+  final bool saveFailed;
+
   const StoppedTripResult({
     required this.summary,
     required this.odometerStartKm,
@@ -263,6 +268,7 @@ class StoppedTripResult {
     this.distanceKmAtOdometerLatest,
     this.discardedNoMovement = false,
     this.entryId,
+    this.saveFailed = false,
   });
 
   const StoppedTripResult.empty()
@@ -279,7 +285,8 @@ class StoppedTripResult {
         odometerLatestAt = null,
         distanceKmAtOdometerLatest = null,
         discardedNoMovement = false,
-        entryId = null;
+        entryId = null,
+        saveFailed = false;
 
   /// End-of-trip km, derived: latest odometer read if we have one,
   /// otherwise start + integrated distance. Null when neither

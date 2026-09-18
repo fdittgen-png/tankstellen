@@ -379,10 +379,16 @@ void main() {
     // #4328 — 1379 → 1347: the history row a stop saves (and the one a
     // recovered trip saves) is built in standalone finished_trip_entry.dart,
     // beside the one-trip-one-id rule it now carries.
-    'lib/features/trips/providers/trip_recording_provider.dart': 1347,
+    // #4378 — 1347 → 1329: the recovered finalise's Riverpod reads moved
+    // into standalone recovered_finalise_deps.dart, paying for the
+    // pending-save keep on the failed-write path.
+    'lib/features/trips/providers/trip_recording_provider.dart': 1329,
     // #4037 — 1 032 across 5 files → 756 across 3: the pin/wake-lock
     // state became an owned collaborator and the body a plain widget.
-    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 756,
+    // #4378 — 756 → 747: what a stop tells the user about persistence is
+    // one decision in standalone trip_stop_snack_bar.dart, which is where
+    // the failed-write case and its retry landed.
+    'lib/features/trips/presentation/screens/trip_recording_screen.dart': 747,
     // #4322 — 973 → 967: the tankFuelKey rule left for the domain
     // `tankFuelKeyOf`, read from the evidence-only tank blend.
     'lib/features/fill_ups/providers/consumption_providers.dart': 967,

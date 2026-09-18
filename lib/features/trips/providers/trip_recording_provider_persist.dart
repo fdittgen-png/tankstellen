@@ -51,31 +51,8 @@ mixin _TripRecordingPersist
       _publish(const TripRecordingState(), 'finalise recovered: none');
       return const StoppedTripResult.empty();
     }
-    // Resolve every Riverpod-backed dependency synchronously up
-    // front. Reading `ref` after an `await` is unsafe — the provider
-    // could be disposed by then (rare in production thanks to
-    // `keepAlive: true`, frequent in tests where the container goes
-    // out of scope before the unawaited future settles).
-    TripHistoryRepository? historyRepo;
-    TripHistoryList? historyList;
-    Future<AutoRecordBadgeService>? badgeFuture;
-    try {
-      historyRepo = ref.read(tripHistoryRepositoryProvider);
-    } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: history repo read failed'});
-    }
-    try {
-      historyList = ref.read(tripHistoryListProvider.notifier);
-    } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: history list read failed'});
-    }
-    if (snapshot.automatic) {
-      try {
-        badgeFuture = ref.read(autoRecordBadgeServiceProvider.future);
-      } catch (e, st) {
-        log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: badge service read failed'});
-      }
-    }
+    // Every Riverpod-backed dependency, read synchronously up front.
+    final deps = recoveredFinaliseDeps(ref, automatic: snapshot.automatic);
 
     // #3597 — the skeleton replayed into a full summary; #4329 — of the
     // kind the row's evidence names (see recoveredTripKind).
@@ -89,7 +66,8 @@ mixin _TripRecordingPersist
 
     var saved = false;
     try {
-      saved = await historyRepo?.save(recoveredTripEntry(snapshot, summary)) ??
+      saved = await deps.historyRepo
+              ?.save(recoveredTripEntry(snapshot, summary)) ??
           false;
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: save failed'});
@@ -110,7 +88,7 @@ mixin _TripRecordingPersist
     if (saved) await _clearActiveSnapshot();
 
     try {
-      historyList?.refresh();
+      deps.historyList?.refresh();
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: list refresh failed'});
     }
@@ -118,9 +96,9 @@ mixin _TripRecordingPersist
     // Mirror the auto-record badge bookkeeping the regular
     // `_saveToHistory` path applies — a recovered auto-trip is still
     // an "unseen" trip the user should see in the launcher.
-    if (badgeFuture != null) {
+    if (deps.badge != null) {
       try {
-        final badge = await badgeFuture;
+        final badge = await deps.badge!;
         await badge.increment();
       } catch (e, st) {
         log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording recovered finalise: badge bump failed'});
@@ -169,7 +147,7 @@ mixin _TripRecordingPersist
     }
     // #3878 — ONE entry: saved, then reused for the upload (no re-decode
     // of the row just written).
-    final TripHistoryEntry entry;
+    TripHistoryEntry? entry;
     try {
       // #4328 — a write that did not land is not a save. Say so, and the
       // caller keeps the WAL row the next launch recovers the trip from.
@@ -190,9 +168,12 @@ mixin _TripRecordingPersist
         termination: termination,
         sessionJournal: sessionJournal,
       );
-      if (!await repo.save(entry)) return TripPersistOutcome.failed;
+      if (!await repo.save(entry)) throw StateError('the write did not land');
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording._saveToHistory'});
+      // #4378 — keep the trip under its own id: the active-trip WAL holds
+      // ONE row, and the next recording seeds over it.
+      if (entry != null) await PendingTripSaves.resolve()?.keep(entry);
       return TripPersistOutcome.failed;
     }
     try {

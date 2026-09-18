@@ -124,7 +124,8 @@ void main() {
     'lib/features/fill_ups/providers/consumption_providers_calibration.dart': 1,
     'lib/features/fill_ups/providers/consumption_providers_reconcile.dart': 1,
     'lib/features/fill_ups/providers/consumption_providers_windows.dart': 1,
-    'lib/features/trips/providers/gps_only_recording_pipeline.dart': 4,
+    // #4378 — 4 → 3: the trip's start is ONE instant, read once.
+    'lib/features/trips/providers/gps_only_recording_pipeline.dart': 3,
     'lib/features/trips/providers/gps_only_trip_wal.dart': 2,
     'lib/features/trips/providers/live_activity_provider.dart': 1,
     'lib/features/fill_ups/providers/maintenance_provider.dart': 3,
