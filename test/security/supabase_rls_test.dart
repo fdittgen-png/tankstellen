@@ -133,6 +133,24 @@ void main() {
     'tanksync_meta': {
       'tanksync_meta_read': 'SELECT',
     },
+    // #4212 (v13, ADR 0025) — fleet tenancy: SELECT-only through the
+    // SECURITY DEFINER oracles; writes are RPC-only, so exactly one
+    // policy per table and never an INSERT/UPDATE/DELETE/ALL.
+    'fleet_organizations': {
+      'fleet_organizations_member_select': 'SELECT',
+    },
+    'fleet_members': {
+      'fleet_members_select': 'SELECT',
+    },
+    'fleet_vehicles': {
+      'fleet_vehicles_member_select': 'SELECT',
+    },
+    'vehicle_assignments': {
+      'fleet_assignments_select': 'SELECT',
+    },
+    'fleet_policies': {
+      'fleet_policies_member_select': 'SELECT',
+    },
   };
 
   group('Supabase RLS matrix (#1110)', () {

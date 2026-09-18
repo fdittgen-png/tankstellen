@@ -24,7 +24,15 @@ void main() {
     // Tables without a per-user row are public data, not user data.
     const publicOnly = {'price_snapshots', 'tanksync_meta', 'database_owner',
       'wait_time_aggregates'};
-    final schemaTables = SchemaVerifier.allTables.toSet()..removeAll(publicOnly);
+    // #4212 — org-owned rows (ADR 0025 D9 matrix): the organisation, its
+    // vehicles and its policies belong to the org, not to any user; the
+    // user-linked fleet tables (fleet_members, vehicle_assignments) ARE
+    // in the delete set and must stay there.
+    const orgOwned = {'fleet_organizations', 'fleet_vehicles',
+      'fleet_policies'};
+    final schemaTables = SchemaVerifier.allTables.toSet()
+      ..removeAll(publicOnly)
+      ..removeAll(orgOwned);
     final deletable = UserDataSync.deletableTables.keys.toSet()
       ..addAll(['trip_summaries', 'trip_details']); // via forgetAllForUser
     final missing = schemaTables.difference(deletable);
@@ -34,8 +42,20 @@ void main() {
 
   test('erase_my_data() RPC and the client fallback cover the same tables',
       () {
-    final sql = File('supabase/migrations/20260829000001_erase_my_data.sql')
-        .readAsStringSync();
+    // The LATEST migration that (re)defines erase_my_data() is the source
+    // of truth — v13 (#4212) redefined it to add the fleet tables.
+    final defining = Directory('supabase/migrations')
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.sql'))
+        .where((f) => f
+            .readAsStringSync()
+            .contains('FUNCTION public.erase_my_data()'))
+        .map((f) => f.path)
+        .toList()
+      ..sort();
+    expect(defining, isNotEmpty);
+    final sql = File(defining.last).readAsStringSync();
     final inRpc = RegExp(r"ARRAY\['([a-z0-9_]+)',\s*'[a-z0-9_]+'\]")
         .allMatches(sql)
         .map((m) => m.group(1)!)

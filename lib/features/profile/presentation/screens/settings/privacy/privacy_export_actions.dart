@@ -100,6 +100,7 @@ mixin PrivacyExportActions<T extends ConsumerStatefulWidget>
         'recordedAt': consent.recordedAt?.toIso8601String(),
         'policyVersion': consent.policyVersion,
       },
+      fleetDirectory: box(HiveBoxes.fleetDirectory), // #4212
       server: server,
     );
     final bytes = buildFullDataExportZip(input);

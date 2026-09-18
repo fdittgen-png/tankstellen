@@ -17,6 +17,7 @@
 /// safely after a schema bump.
 library;
 
+import 'schema_sql_fleet.dart';
 import 'schema_sql_owner.dart';
 import 'schema_sql_policies.dart';
 import 'schema_table_specs.dart';
@@ -53,7 +54,12 @@ import 'schema_table_specs.dart';
 /// v12 (#4062): `wait_time_pings` reaches the wizard SQL — the client read
 /// and deleted it through UserDataSync's table maps, invisible to the
 /// literal `.from()` gate, so a self-host never got the table.
-const int kSupabaseSchemaVersion = 12;
+/// v13 (#4212, ADR 0025): fleet tenancy — `fleet_organizations`,
+/// `fleet_members`, `fleet_vehicles`, `vehicle_assignments`,
+/// `fleet_policies` (SELECT-only policies through the `is_fleet_member`
+/// / `fleet_role` oracles), the four `fleet_*` write RPCs, and the two
+/// user-linked fleet tables joining `erase_my_data()`.
+const int kSupabaseSchemaVersion = 13;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -126,12 +132,16 @@ String buildMigrationSql(Map<String, bool> schema) {
     // public.owns_trip(), and CREATE POLICY resolves its expression at
     // creation time, so the function has to exist first.
     ..writeln(ownershipFnSql)
+    // #4212 (v13) — same rule: the fleet policies call the membership
+    // oracles, so those must exist before rlsSql creates the policies.
+    ..writeln(fleetOracleSql)
     ..writeln(rlsSql)
     // v8 (#3747) — after rlsSql: the block replaces rlsSql's legacy
     // `users_own FOR ALL` policy with the owner-aware split, so it must
     // run last to be the final state.
     ..writeln(ownerProtectionSql)
     ..writeln(rpcSql)
+    ..writeln(fleetRpcSql)
     ..writeln(_metaSql);
 
   return buffer.toString();

@@ -47,6 +47,10 @@ class UserDataSync {
     'wait_time_pings': 'user_id',
     'sync_settings': 'user_id',
     'deletions': 'user_id',
+    // #4212 — the two fleet tables that name the person (ADR 0025 D9
+    // matrix); the org's own rows are not the user's to export or erase.
+    'fleet_members': 'user_id',
+    'vehicle_assignments': 'user_id',
     'users': 'id',
   };
 
@@ -104,6 +108,8 @@ class UserDataSync {
   /// becomes deletable but not exportable is a defect.
   @visibleForTesting
   static const deletableTables = <String, String>{
+    'vehicle_assignments': 'user_id', // #4212 — the person's fleet rows
+    'fleet_members': 'user_id',
     'trip_shares': 'owner_id',
     'content_reports': 'reporter_user_id', // #3726 — UGC report rows
     'price_reports': 'reporter_id',
