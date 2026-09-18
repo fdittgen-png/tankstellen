@@ -4,6 +4,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/sync/fleet/fleet_directory_sync.dart';
+import 'package:tankstellen/core/sync/fleet/fleet_transport.dart';
 import 'package:tankstellen/core/sync/schema_sql.dart';
 import 'package:tankstellen/core/sync/schema_verifier.dart';
 import 'package:tankstellen/core/sync/user_data_sync.dart';
@@ -48,6 +50,13 @@ void main() {
     'content_reports',
     'deletions',
     'wait_time_pings', // #4062 — map-routed, never a literal .from()
+    // #4212 (v13) — the org-scoped fleet tables, read through the
+    // FleetTransport's closed set; writes are RPC-only (ADR 0025 D7).
+    'fleet_organizations',
+    'fleet_members',
+    'fleet_vehicles',
+    'vehicle_assignments',
+    'fleet_policies',
   };
 
   // Tables read only by server-side SQL (functions / triggers / RPCs), never
@@ -151,6 +160,19 @@ void main() {
       expect(unaccounted, isEmpty,
           reason: 'UserDataSync reads/deletes these tables but the wizard SQL '
               'never creates them on a self-host: $unaccounted');
+    });
+
+    // #4212 — the fleet pull routes its tables through FleetTransport
+    // (a closed set with one literal `.from()` each) and names them in a
+    // constant set; like the #4062 map-routed rule, that set must be in
+    // the authoritative list so the wizard SQL creates every table.
+    test('every table the fleet pull routes by constant is in the '
+        'authoritative set (#4212)', () {
+      final routed = {...FleetDirectorySync.tables, ...FleetTables.all};
+      final unaccounted = routed.difference(syncedTables);
+      expect(unaccounted, isEmpty,
+          reason: 'the fleet transport reads these tables but the wizard '
+              'SQL never creates them on a self-host: $unaccounted');
     });
 
     test('scans the sync sources — no .from() table is unaccounted for', () {
