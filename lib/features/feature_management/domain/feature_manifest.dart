@@ -4,6 +4,7 @@
 import 'build_channel.dart';
 import 'feature.dart';
 import 'feature_manifest_entry.dart';
+import 'fleet_feature_entries.dart';
 
 export 'feature_manifest_entry.dart';
 
@@ -378,5 +379,8 @@ class FeatureManifest {
           'Speak nearby cheap fuel stations aloud as you drive, so you '
               'can keep your eyes on the road.',
     ),
+    // #4212 — the fleet capabilities live in fleet_feature_entries.dart
+    // (beta-only, default-off); spread so the registry stays single.
+    ...fleetManifestEntries,
   });
 }

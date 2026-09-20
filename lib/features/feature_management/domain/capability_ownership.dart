@@ -49,12 +49,20 @@ const Map<Feature, SparkiloSubprocess> capabilityOwner =
   Feature.carbonDashboard: SparkiloSubprocess.trackCostPerKmAndSavings,
 
   // ── 4. Manage vehicle ───────────────────────────────────────────
-  // (No standalone Feature yet: vehicle identity and adapter pairing
-  // are screens, not flags. #4213 adds fleet vehicle switching here.)
+  // Vehicle identity and adapter pairing are screens, not flags. The
+  // one flag here is #4212's fleet mode: what the employee turning it
+  // on is doing is picking the right company car, so it is owned by
+  // `switchCurrentVehicle` — not by the fleet process, which is the
+  // manager's side of the same epic.
+  Feature.fleetMode: SparkiloSubprocess.switchCurrentVehicle,
 
   // ── 5. Manage expenses and documents ────────────────────────────
   Feature.addFillUpOcrReceipt: SparkiloSubprocess.captureReceipt,
   Feature.addFillUpShareIntentReceipt: SparkiloSubprocess.captureReceipt,
+
+  // ── 6. Manage fleet (#4212) ─────────────────────────────────────
+  // The manager's side: watching the org's cost, never a person.
+  Feature.fleetManagerTools: SparkiloSubprocess.monitorAggregateCosts,
 
   // ── 7. Stay informed and act ────────────────────────────────────
   Feature.priceAlerts: SparkiloSubprocess.alertsWithAttentionBudget,

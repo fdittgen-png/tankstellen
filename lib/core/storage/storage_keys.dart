@@ -40,6 +40,22 @@ class StorageKeys {
   /// enabled at all.
   static const String consentSyncTrips = 'consent_sync_trips';
 
+  /// #4212 (Epic #4211) — opt-in consent for sharing fleet-relevant data
+  /// (fill-up totals, expense submissions, aggregate cost/km) with the
+  /// organisation the user belongs to. Defaults to false and is gated on
+  /// [consentCloudSync] exactly like [consentSyncTrips]: without the
+  /// master cloud-sync consent there is no backend to share with, so the
+  /// fleet consent reads false whatever is stored.
+  static const String consentFleetSharing = 'consent_fleet_sharing';
+
+  /// #4212 — the organisation the device is currently scoped to, and the
+  /// role it last saw itself in (`FleetRole.wireName`). Written when a
+  /// membership pull succeeds; read at launch so the cached org
+  /// directory can be found before any network call. Absent means "in no
+  /// fleet" — never a guess at one.
+  static const String fleetOrgId = 'fleet_org_id';
+  static const String fleetRole = 'fleet_role';
+
   /// #3866 (Epic #3865) — the consent record: ISO-8601 instant of the last
   /// save and the privacy-policy version the user was shown. A version
   /// bump re-surfaces the consent screen once (`ConsentRecord.isCurrent`).

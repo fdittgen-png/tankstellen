@@ -9217,6 +9217,54 @@ abstract class AppLocalizations {
   /// **'Save anyway'**
   String get fillUpWarningSaveAnyway;
 
+  /// Feature-management toggle label for the employee half of Sparkilo Fleet (#4212).
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet mode'**
+  String get featureLabel_fleetMode;
+
+  /// Feature-management toggle subtitle for fleet mode (#4212).
+  ///
+  /// In en, this message translates to:
+  /// **'Company-vehicle mode: your fleet assignment, the org vehicle directory, and an explicit current-vehicle switcher.'**
+  String get featureDescription_fleetMode;
+
+  /// Tooltip shown when fleet mode cannot be enabled because its TankSync prerequisite is off (#4212).
+  ///
+  /// In en, this message translates to:
+  /// **'Turn TankSync on first — a fleet lives in your own database.'**
+  String get featureBlockedEnable_fleetMode;
+
+  /// Feature-management toggle label for the manager surfaces of Sparkilo Fleet (#4212).
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet manager tools'**
+  String get featureLabel_fleetManagerTools;
+
+  /// Feature-management toggle subtitle for the fleet manager tools (#4212).
+  ///
+  /// In en, this message translates to:
+  /// **'Aggregate fleet cost and efficiency views for a manager — totals and exceptions, never per-employee journeys.'**
+  String get featureDescription_fleetManagerTools;
+
+  /// Tooltip shown when the fleet manager tools cannot be enabled because fleet mode is off (#4212).
+  ///
+  /// In en, this message translates to:
+  /// **'Turn fleet mode on first.'**
+  String get featureBlockedEnable_fleetManagerTools;
+
+  /// Section header of the fleet capabilities in Settings → Feature management (#4212).
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet'**
+  String get featureGroupTitle_fleet;
+
+  /// Section subtitle of the fleet capabilities in Settings → Feature management (#4212).
+  ///
+  /// In en, this message translates to:
+  /// **'Company vehicles, assignments and manager reporting.'**
+  String get featureGroupDescription_fleet;
+
   /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
   ///
   /// In en, this message translates to:

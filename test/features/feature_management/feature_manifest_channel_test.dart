@@ -106,12 +106,26 @@ void main() {
   group('FeatureManifest.defaultManifest', () {
     const manifest = FeatureManifest.defaultManifest;
 
-    test('every entry is available in both channels (#1673 migration)', () {
+    // #4212 — the ONE deliberate departure from the #1673 migration's
+    // "everything, everywhere" snapshot: the fleet capabilities are
+    // registered before the manager dashboard exists, so production must
+    // not be able to switch them on at all (ADR 0025 D6 keeps the single
+    // privacy-policy bump for that later slice). The set is listed here
+    // rather than skipped, so widening it is a deliberate edit.
+    const betaOnlyOnPurpose = <Feature>{
+      Feature.fleetMode,
+      Feature.fleetManagerTools,
+    };
+
+    test('every entry is available in beta, and in production too unless '
+        'it is deliberately beta-only (#1673 migration, #4212)', () {
       for (final entry in manifest.entries.values) {
-        expect(entry.isAvailableIn(BuildChannel.production), isTrue,
-            reason: '${entry.feature} must be available in production');
         expect(entry.isAvailableIn(BuildChannel.beta), isTrue,
             reason: '${entry.feature} must be available in beta');
+        expect(entry.isAvailableIn(BuildChannel.production),
+            !betaOnlyOnPurpose.contains(entry.feature),
+            reason: '${entry.feature}: production availability must match '
+                'the beta-only list above');
       }
     });
 

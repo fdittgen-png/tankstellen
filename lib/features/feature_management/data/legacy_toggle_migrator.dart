@@ -9,6 +9,7 @@ import '../../../core/storage/storage_keys.dart';
 import '../../profile/data/models/user_profile.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../domain/feature.dart';
+import '../domain/feature_dependency_graph.dart';
 import '../domain/feature_manifest.dart';
 import 'feature_flags_repository.dart';
 import '../../../core/logging/error_logger.dart';
@@ -203,10 +204,12 @@ Future<void> _migrateHapticEcoCoach({
       // Force-enable the prerequisite first per the manifest's
       // dependency graph — otherwise the central system would refuse
       // the hapticEcoCoach enable on its first toggle attempt.
-      final entry = manifest.entryFor(Feature.hapticEcoCoach);
       final next = <Feature>{
         ...current,
-        ...entry.requires,
+        // #4212 — the TRANSITIVE closure: the graph is no longer
+        // one level deep, and a one-level spread would persist a
+        // dependent whose grandparent is disabled.
+        ...requiredClosure(Feature.hapticEcoCoach, manifest),
         Feature.hapticEcoCoach,
       };
       await featureFlags.saveEnabled(next);
@@ -251,10 +254,12 @@ Future<void> _migrateSyncBaselines({
       // [Feature.tankSync], so the cascade promotes both. Without
       // this the central system would refuse the baselineSync enable
       // on its first toggle attempt.
-      final entry = manifest.entryFor(Feature.baselineSync);
       final next = <Feature>{
         ...current,
-        ...entry.requires,
+        // #4212 — the TRANSITIVE closure: the graph is no longer
+        // one level deep, and a one-level spread would persist a
+        // dependent whose grandparent is disabled.
+        ...requiredClosure(Feature.baselineSync, manifest),
         Feature.baselineSync,
       };
       await featureFlags.saveEnabled(next);
@@ -520,10 +525,12 @@ Future<void> _migrateShowConsumptionTab({
       // [Feature.obd2TripRecording], so the cascade promotes both.
       // Without this the persisted set would be in a contract-
       // violating shape (dependent enabled, prerequisite disabled).
-      final entry = manifest.entryFor(Feature.showConsumptionTab);
       final next = <Feature>{
         ...current,
-        ...entry.requires,
+        // #4212 — the TRANSITIVE closure: the graph is no longer
+        // one level deep, and a one-level spread would persist a
+        // dependent whose grandparent is disabled.
+        ...requiredClosure(Feature.showConsumptionTab, manifest),
         Feature.showConsumptionTab,
       };
       await featureFlags.saveEnabled(next);

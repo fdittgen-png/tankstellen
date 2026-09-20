@@ -62,6 +62,8 @@ class FeatureSectionHeader extends StatelessWidget {
         return l.featureGroupTitle_sync;
       case FeatureCategory.input:
         return l.featureGroupTitle_input;
+      case FeatureCategory.fleet:
+        return l.featureGroupTitle_fleet;
       case FeatureCategory.developer:
         return l.featureGroupTitle_developer;
     }
@@ -82,6 +84,8 @@ class FeatureSectionHeader extends StatelessWidget {
         return l.featureGroupDescription_sync;
       case FeatureCategory.input:
         return l.featureGroupDescription_input;
+      case FeatureCategory.fleet:
+        return l.featureGroupDescription_fleet;
       case FeatureCategory.developer:
         return l.featureGroupDescription_developer;
     }

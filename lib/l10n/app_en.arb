@@ -4988,6 +4988,38 @@
   "@fillUpWarningSaveAnyway": {
     "description": "Button on the fill-up warning dialog that proceeds to save the fill-up despite the warnings (#2836)."
   },
+  "featureLabel_fleetMode": "Fleet mode",
+  "@featureLabel_fleetMode": {
+    "description": "Feature-management toggle label for the employee half of Sparkilo Fleet (#4212)."
+  },
+  "featureDescription_fleetMode": "Company-vehicle mode: your fleet assignment, the org vehicle directory, and an explicit current-vehicle switcher.",
+  "@featureDescription_fleetMode": {
+    "description": "Feature-management toggle subtitle for fleet mode (#4212)."
+  },
+  "featureBlockedEnable_fleetMode": "Turn TankSync on first — a fleet lives in your own database.",
+  "@featureBlockedEnable_fleetMode": {
+    "description": "Tooltip shown when fleet mode cannot be enabled because its TankSync prerequisite is off (#4212)."
+  },
+  "featureLabel_fleetManagerTools": "Fleet manager tools",
+  "@featureLabel_fleetManagerTools": {
+    "description": "Feature-management toggle label for the manager surfaces of Sparkilo Fleet (#4212)."
+  },
+  "featureDescription_fleetManagerTools": "Aggregate fleet cost and efficiency views for a manager — totals and exceptions, never per-employee journeys.",
+  "@featureDescription_fleetManagerTools": {
+    "description": "Feature-management toggle subtitle for the fleet manager tools (#4212)."
+  },
+  "featureBlockedEnable_fleetManagerTools": "Turn fleet mode on first.",
+  "@featureBlockedEnable_fleetManagerTools": {
+    "description": "Tooltip shown when the fleet manager tools cannot be enabled because fleet mode is off (#4212)."
+  },
+  "featureGroupTitle_fleet": "Fleet",
+  "@featureGroupTitle_fleet": {
+    "description": "Section header of the fleet capabilities in Settings → Feature management (#4212)."
+  },
+  "featureGroupDescription_fleet": "Company vehicles, assignments and manager reporting.",
+  "@featureGroupDescription_fleet": {
+    "description": "Section subtitle of the fleet capabilities in Settings → Feature management (#4212)."
+  },
   "fillUpSectionWhatTitle": "What you filled",
   "@fillUpSectionWhatTitle": {
     "description": "Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2)."

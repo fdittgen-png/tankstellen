@@ -86,6 +86,10 @@ String featureLabel(AppLocalizations l, Feature f) {
       return l.featureLabel_voiceFeedback;
     case Feature.startupTrace:
       return l.featureLabel_startupTrace;
+    case Feature.fleetMode:
+      return l.featureLabel_fleetMode;
+    case Feature.fleetManagerTools:
+      return l.featureLabel_fleetManagerTools;
   }
 }
 
@@ -163,6 +167,10 @@ String featureDescription(AppLocalizations l, Feature f) {
       return l.featureDescription_voiceFeedback;
     case Feature.startupTrace:
       return l.featureDescription_startupTrace;
+    case Feature.fleetMode:
+      return l.featureDescription_fleetMode;
+    case Feature.fleetManagerTools:
+      return l.featureDescription_fleetManagerTools;
   }
 }
 
@@ -190,6 +198,10 @@ String blockedEnableMessage(AppLocalizations l, Feature f) {
       // #2681 — renamed prerequisite from "approach overlay" to "Fuel
       // Station Radar" to match the renamed parent toggle.
       return l.featureBlockedEnable_voiceAnnouncements;
+    case Feature.fleetMode:
+      return l.featureBlockedEnable_fleetMode;
+    case Feature.fleetManagerTools:
+      return l.featureBlockedEnable_fleetManagerTools;
     // Features without prerequisites can never reach this branch — the
     // dependency-graph helpers short-circuit. Return a generic fallback
     // so the function is total in case the manifest changes.

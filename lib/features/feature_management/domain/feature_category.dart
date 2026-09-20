@@ -36,6 +36,11 @@ enum FeatureCategory {
   /// Input / scanning helpers for logging fill-ups.
   input,
 
+  /// Fleet — the company-vehicle capabilities (#4212). Rendered just
+  /// before Developer: almost nobody is in a fleet, and those who are
+  /// reach the day-to-day surfaces from navigation, not from here.
+  fleet,
+
   /// Developer & experimental power-user tools (rendered last).
   developer,
 }
@@ -49,6 +54,7 @@ const List<FeatureCategory> categoryOrder = <FeatureCategory>[
   FeatureCategory.consumption,
   FeatureCategory.sync,
   FeatureCategory.input,
+  FeatureCategory.fleet,
   FeatureCategory.developer,
 ];
 
@@ -107,7 +113,12 @@ const Map<Feature, FeatureCategory> featureCategory = <Feature, FeatureCategory>
   Feature.addFillUpShareIntentReceipt: FeatureCategory.input,
   Feature.loyaltyCards: FeatureCategory.input,
 
-  // 7. Developer & experimental (last).
+  // 7. Fleet (#4212) — beta-only capabilities, hidden in production
+  // because the manifest makes them unavailable there.
+  Feature.fleetMode: FeatureCategory.fleet,
+  Feature.fleetManagerTools: FeatureCategory.fleet,
+
+  // 8. Developer & experimental (last).
   Feature.developerPatToken: FeatureCategory.developer,
   Feature.debugMode: FeatureCategory.developer,
   Feature.startupTrace: FeatureCategory.developer,

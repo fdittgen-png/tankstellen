@@ -122,6 +122,14 @@ void main() {
           Feature.manualConsumption,
           Feature.showConsumptionTab,
         };
+        // #4212 — the fleet capabilities are registered beta-only until
+        // the manager dashboard ships, and this screen renders in the
+        // production channel by default, so they are absent here on
+        // purpose (the #1675 pair below proves the channel mechanism).
+        const betaOnlyFlags = <Feature>{
+          Feature.fleetMode,
+          Feature.fleetManagerTools,
+        };
         for (final f in Feature.values) {
           if (consoModeFlags.contains(f)) {
             expect(
@@ -130,6 +138,13 @@ void main() {
               reason:
                   '${f.name} is driven by the Conso segmented control '
                   '(#1571) — it must not render as a stand-alone switch.',
+            );
+          } else if (betaOnlyFlags.contains(f)) {
+            expect(
+              find.byKey(Key('featureToggle_${f.name}')),
+              findsNothing,
+              reason: '${f.name} is beta-only (#4212) — a production '
+                  'build must not offer it at all.',
             );
           } else {
             expect(
@@ -141,7 +156,7 @@ void main() {
         }
         expect(
           Feature.values.length,
-          32,
+          34,
           reason:
               '#1373 phase 1 shipped 13 features; phase 3d added '
               'autoRecord (14); phase 3c bundled showFuel + showElectric + '
@@ -157,7 +172,9 @@ void main() {
               '#2569 added voiceAnnouncements (31); #2735 added '
               'addFillUpShareIntentReceipt (32); #3383 added '
               'startupTrace (33); #3605 added voiceFeedback (34); #3765 '
-              'removed addFillUpOcrPump (33). '
+              'removed addFillUpOcrPump (33)... and the count landed at '
+              '32 after the #1571/#1789 removals; #4212 added fleetMode + '
+              'fleetManagerTools (34), both beta-only. '
               'Update the test if a new feature was added or removed.',
         );
       },

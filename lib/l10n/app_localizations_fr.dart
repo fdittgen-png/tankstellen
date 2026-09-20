@@ -5417,6 +5417,36 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fillUpWarningSaveAnyway => 'Enregistrer quand même';
 
   @override
+  String get featureLabel_fleetMode => 'Mode flotte';
+
+  @override
+  String get featureDescription_fleetMode =>
+      'Mode véhicule de société : votre affectation de véhicule, l\'annuaire des véhicules de l\'organisation et un changement explicite du véhicule actuel.';
+
+  @override
+  String get featureBlockedEnable_fleetMode =>
+      'Activez d\'abord TankSync — une flotte réside dans votre propre base de données.';
+
+  @override
+  String get featureLabel_fleetManagerTools =>
+      'Outils de gestionnaire de flotte';
+
+  @override
+  String get featureDescription_fleetManagerTools =>
+      'Vues agrégées des coûts et de l\'efficacité de la flotte — totaux et exceptions, jamais les trajets individuels des collaborateurs.';
+
+  @override
+  String get featureBlockedEnable_fleetManagerTools =>
+      'Activez d\'abord le mode flotte.';
+
+  @override
+  String get featureGroupTitle_fleet => 'Flotte';
+
+  @override
+  String get featureGroupDescription_fleet =>
+      'Véhicules de société, affectations et rapports pour les gestionnaires.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Votre plein';
 
   @override

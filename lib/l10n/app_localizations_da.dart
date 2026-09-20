@@ -5365,6 +5365,35 @@ class AppLocalizationsDa extends AppLocalizations {
   String get fillUpWarningSaveAnyway => 'Gem alligevel';
 
   @override
+  String get featureLabel_fleetMode => 'Fleet mode';
+
+  @override
+  String get featureDescription_fleetMode =>
+      'Company-vehicle mode: your fleet assignment, the org vehicle directory, and an explicit current-vehicle switcher.';
+
+  @override
+  String get featureBlockedEnable_fleetMode =>
+      'Turn TankSync on first — a fleet lives in your own database.';
+
+  @override
+  String get featureLabel_fleetManagerTools => 'Fleet manager tools';
+
+  @override
+  String get featureDescription_fleetManagerTools =>
+      'Aggregate fleet cost and efficiency views for a manager — totals and exceptions, never per-employee journeys.';
+
+  @override
+  String get featureBlockedEnable_fleetManagerTools =>
+      'Turn fleet mode on first.';
+
+  @override
+  String get featureGroupTitle_fleet => 'Fleet';
+
+  @override
+  String get featureGroupDescription_fleet =>
+      'Company vehicles, assignments and manager reporting.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Hvad du tankede';
 
   @override

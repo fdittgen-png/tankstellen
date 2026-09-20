@@ -6,6 +6,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/feature_management/domain/capability_ownership.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
+import 'package:tankstellen/features/feature_management/domain/feature_dependency_graph.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 import 'package:tankstellen/features/feature_management/domain/migration_matrix.dart';
 import 'package:tankstellen/features/feature_management/domain/registry_coverage.dart';
@@ -56,30 +57,44 @@ void main() {
   group('dependency safety (#4227)', () {
     const manifest = FeatureManifest.defaultManifest;
 
-    test('the manifest graph is ONE level deep — the migrator depends '
-        'on it', () {
+    test('promoting any feature with its TRANSITIVE closure writes a '
+        'consistent state', () {
       // `legacy_toggle_migrator` promotes a legacy toggle by writing
-      // {...current, ...entry.requires, feature}. That spread is only
-      // sufficient because no prerequisite has a prerequisite of its
-      // own: a two-level chain would leave the grandparent disabled and
-      // write exactly the inconsistent state this issue forbids.
-      //
-      // Measured on master: 33 entries, 11 with `requires`, 0 chains.
-      final chains = <String>[];
-      for (final entry in manifest.entries.values) {
-        for (final parent in entry.requires) {
-          final grandparents = manifest.entryFor(parent).requires;
-          if (grandparents.isNotEmpty) {
-            chains.add('${entry.feature.name} -> ${parent.name} -> '
-                '${grandparents.map((g) => g.name).join(",")}');
+      // {...current, ...requiredClosure(feature, manifest), feature}.
+      // It used to spread `entry.requires` alone, which was sufficient
+      // only while the graph was one level deep; #4212's fleet chain
+      // (fleetManagerTools -> fleetMode -> tankSync) ended that, and a
+      // one-level spread would now persist a dependent whose
+      // GRANDparent is disabled — exactly the inconsistent state this
+      // issue forbids. The closure is what makes the promotion safe at
+      // any depth, so that is what is pinned here.
+      final broken = <String>[];
+      for (final feature in Feature.values) {
+        final promoted = <Feature>{
+          ...requiredClosure(feature, manifest),
+          feature,
+        };
+        for (final enabled in promoted) {
+          if (!canEnable(enabled, manifest, promoted)) {
+            broken.add('${feature.name}: ${enabled.name} unsatisfied in '
+                '{${promoted.map((f) => f.name).join(",")}}');
           }
         }
       }
-      expect(chains, isEmpty,
-          reason: 'a multi-level requires chain appeared. Either flatten '
-              'it, or change legacy_toggle_migrator to spread the '
-              'TRANSITIVE closure — its one-level spread would now write '
-              'a state with a disabled grandparent.\n${chains.join("\n")}');
+      expect(broken, isEmpty,
+          reason: 'requiredClosure must return EVERY transitive '
+              'prerequisite — the migrator writes that set verbatim.\n'
+              '${broken.join("\n")}');
+    });
+
+    test('#4212 — the fleet chain is genuinely two levels deep, so the '
+        'closure is not vacuous', () {
+      expect(manifest.entryFor(Feature.fleetManagerTools).requires,
+          {Feature.fleetMode});
+      expect(manifest.entryFor(Feature.fleetMode).requires,
+          {Feature.tankSync});
+      expect(requiredClosure(Feature.fleetManagerTools, manifest),
+          {Feature.fleetMode, Feature.tankSync});
     });
 
     test('every requires target is itself a declared capability', () {
