@@ -3,6 +3,10 @@
 
 import 'package:flutter/foundation.dart';
 
+import 'driving_pattern_evidence.dart';
+
+export 'driving_pattern_evidence.dart';
+
 /// #4205 — the independently interpretable behaviour dimensions a trip is
 /// described by. The 0–100 [DrivingScore] stays as a presentation
 /// compatibility surface; it is never a fuel estimator or a fuel correction.
@@ -58,7 +62,14 @@ class DrivingDimension {
   final double? value;
   final DimensionConfidence confidence;
 
-  /// Events or seconds of evidence behind [value].
+  /// Events or seconds of evidence behind [value] — **whichever the
+  /// dimension happened to count**, and for `accelerationDemand` both at
+  /// once (`accelEvents + fullThrottleSeconds.round()`).
+  ///
+  /// It is a within-trip confidence hint, NOT an aggregatable numerator.
+  /// Never divide it by a distance and never sum it across trips: use
+  /// [DrivingDimensions.totals], whose numerators are typed by what they
+  /// count and carry their own eligible exposure (#4366).
   final int evidenceCount;
 
   /// A short machine-readable note of what the evidence was.
@@ -74,9 +85,20 @@ class DrivingDimension {
 
 @immutable
 class DrivingDimensions {
-  const DrivingDimensions(this.byKind);
+  const DrivingDimensions(this.byKind, {this.rawTotals});
 
   final Map<DrivingDimensionKind, DrivingDimension> byKind;
+
+  /// The typed evidence as computed, or null when this object was built
+  /// without any — read it through [totals].
+  final DrivingPatternTotals? rawTotals;
+
+  /// #4366 — the same trip's evidence as TYPED, additive raw numerators
+  /// with their eligible exposure, for cross-trip aggregation. Empty on
+  /// a [DrivingDimensions] built without it (a hand-made test fixture, a
+  /// trip too short to analyse): empty means "no evidence", never
+  /// "measured zero", because a measured zero carries exposure.
+  DrivingPatternTotals get totals => rawTotals ?? DrivingPatternTotals.empty;
 
   DrivingDimension operator [](DrivingDimensionKind kind) =>
       byKind[kind] ?? DrivingDimension.unknown(kind);

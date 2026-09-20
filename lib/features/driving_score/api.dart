@@ -27,6 +27,16 @@ export 'domain/live_driving_band.dart';
 export 'domain/driving_score.dart';
 export 'domain/lessons/driving_lesson.dart';
 export 'domain/lessons/driving_lesson_rule.dart';
+// #4366 (Epic #4358 work package G) — the driving-pattern comparison:
+// the read model, its bounded aggregation and the surface that renders
+// it. #4365's vehicle-selection/period flow mounts the card and feeds
+// the request; nothing here selects a vehicle.
+export 'data/driving_pattern_aggregator.dart';
+export 'data/driving_pattern_cache.dart';
+export 'data/driving_pattern_measures.dart';
+export 'domain/driving_pattern_comparison.dart';
+export 'presentation/widgets/driving_pattern_comparison_card.dart';
+export 'providers/driving_pattern_comparison_provider.dart';
 export 'presentation/widgets/coaching_chip.dart';
 export 'presentation/widgets/driving_analysis_trace_card.dart';
 export 'presentation/widgets/driving_insights_card.dart';
