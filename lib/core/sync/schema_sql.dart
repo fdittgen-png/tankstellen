@@ -19,6 +19,7 @@ library;
 
 import 'schema_sql_fleet.dart';
 import 'schema_sql_fleet_expenses.dart';
+import 'schema_sql_fleet_invites.dart';
 import 'schema_sql_fleet_metrics.dart';
 import 'schema_sql_owner.dart';
 import 'schema_sql_policies.dart';
@@ -77,7 +78,16 @@ import 'schema_table_specs.dart';
 /// trail on an export. No new table: an RPC alone still bumps the
 /// version, because a self-host that never re-runs the SQL has no
 /// function to call and the dashboard fails with nothing to say.
-const int kSupabaseSchemaVersion = 15;
+/// v16 (#4399, ADR 0025 D1/D2/D3/D7): the JOIN half of onboarding —
+/// `fleet_invites` (server-only: RLS on, no policy, the default
+/// anon/authenticated table grants revoked, and the plaintext code
+/// never stored — the key is its SHA-256), `fleet_invite_hash()`,
+/// `fleet_create_invite()` for a manager and the `fleet_join()` the
+/// client has been calling since #4217 against a function that did
+/// not exist. Every code-dependent failure collapses into one
+/// `invalid_code`, so an invite is not an oracle for org existence
+/// or membership.
+const int kSupabaseSchemaVersion = 16;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -168,6 +178,11 @@ String buildMigrationSql(Map<String, bool> schema) {
     // #4216 (v15) — after the audit table it INSERTs into and after
     // fleet_role(), which its body calls.
     ..writeln(fleetMetricsRpcSql)
+    // #4399 (v16) — after the fleet tables it references by FK, after
+    // fleet_role() (the issuer calls it) and after the audit table
+    // (both RPCs INSERT into it).
+    ..writeln(fleetInviteTableSql)
+    ..writeln(fleetInviteRpcSql)
     ..writeln(_metaSql);
 
   return buffer.toString();

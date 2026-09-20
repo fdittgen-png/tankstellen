@@ -235,7 +235,13 @@ void main() {
       'RPC alone still counts', () {
     expect(kSupabaseSchemaVersion, greaterThanOrEqualTo(15));
     expect(migration, contains("VALUES ('schema_version', '15', now())"));
-    expect(wizard, contains("VALUES ('schema_version', '15', now())"));
+    // The wizard records the CURRENT version, not this migration's:
+    // #4399 took it to 16, and a literal here would fail every later
+    // bump for a reason that has nothing to do with the metrics RPC.
+    expect(
+      wizard,
+      contains("VALUES ('schema_version', '$kSupabaseSchemaVersion', now())"),
+    );
   });
 
   group('CO2 factor parity with the Dart registry (#4392) —', () {
