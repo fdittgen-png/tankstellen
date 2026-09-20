@@ -15,7 +15,8 @@ import '../../../ev/presentation/widgets/ev_filter_chips.dart';
 import '../../../ev/presentation/widgets/ev_map_overlay.dart';
 import '../../../ev/providers/ev_providers.dart';
 import '../../../route_search/providers/route_search_provider.dart';
-import '../../../search/api.dart' show SearchSummaryBar;
+import '../../../search/api.dart'
+    show SearchSummaryBar, refreshActiveSearch;
 import '../../../search/providers/search_provider.dart';
 import '../../../../core/domain/search_result_item.dart';
 import '../widgets/nearby_map_view.dart';
@@ -151,7 +152,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
     if (!mounted || pausedAt == null) return;
     if (_now().difference(pausedAt) < _resumeRefreshThreshold) return;
     if (ref.read(currentShellBranchProvider) != _mapBranchIndex) return;
-    unawaited(ref.read(searchStateProvider.notifier).repeatLastSearch());
+    unawaited(refreshActiveSearch(ref));
   }
 
   @override
@@ -203,11 +204,7 @@ class _MapScreenState extends ConsumerState<MapScreen>
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh),
-          onPressed: () {
-            unawaited(
-              ref.read(searchStateProvider.notifier).repeatLastSearch(),
-            );
-          },
+          onPressed: () => unawaited(refreshActiveSearch(ref)),
           tooltip: l10n.refreshPrices,
         ),
         const EvToggleButton(),

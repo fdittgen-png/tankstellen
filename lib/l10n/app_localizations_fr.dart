@@ -9109,6 +9109,23 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String routeOriginStaleCurrentLocation(String age) {
+    return 'Position actuelle (il y a $age)';
+  }
+
+  @override
+  String routeStopOffRoute(String distance) {
+    return '$distance de l\'itinéraire';
+  }
+
+  @override
+  String get routeStopOffRouteQualifier => 'estimation géométrique';
+
+  @override
+  String get routeStopOffRouteTooltip =>
+      'Distance à vol d\'oiseau entre cet itinéraire et la station. Ce n\'est ni la distance depuis votre position, ni le trajet supplémentaire qu\'un arrêt coûterait.';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/L';
   }

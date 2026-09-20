@@ -100,13 +100,13 @@ mixin _SearchCriteriaActions on ConsumerState<SearchCriteriaScreen> {
     Navigator.of(context).pop();
   }
 
-  void performRouteSearch(List<RouteWaypoint> waypoints) {
+  // #4432 — capturedAt: when a vehicle-position origin was measured.
+  void performRouteSearch(List<RouteWaypoint> wps, [DateTime? capturedAt]) {
     if (searchFired || !mounted) return;
     searchFired = true;
     final fuelType = ref.read(selectedFuelTypeProvider);
     // #2592 — the route-planning params come from the criteria screen's
-    // per-search overrides (defaulted from the profile). #1602 — the
-    // corridor radius is the detour budget.
+    // per-search overrides (profile-defaulted). #1602 — radius = detour.
     final detourBudgetKm = ref.read(routeDetourSearchParamProvider);
     final segmentKm = ref.read(routeSegmentSearchParamProvider);
     final minSaving = ref.read(minRouteSavingSearchParamProvider);
@@ -115,11 +115,12 @@ mixin _SearchCriteriaActions on ConsumerState<SearchCriteriaScreen> {
       ref
           .read(routeSearchStateProvider.notifier)
           .searchAlongRoute(
-            waypoints: waypoints,
+            waypoints: wps,
             fuelType: fuelType,
             searchRadiusKm: detourBudgetKm,
             segmentKm: segmentKm,
             minSavingPerLiter: minSaving,
+            originCapturedAt: capturedAt,
           ),
     );
     Navigator.of(context).pop();
@@ -157,9 +158,8 @@ mixin _SearchCriteriaActions on ConsumerState<SearchCriteriaScreen> {
     final excludeHighway = ref.read(excludeHighwayStationsProvider);
 
     // #3159 — read everything BEFORE the storage awaits below: a
-    // post-await ref.read throws a StateError if the screen unmounted
-    // while the settings were persisting. The captured notifier still
-    // finishes the profile write on the unmounted path.
+    // post-await ref.read throws once the screen has unmounted. The
+    // captured notifier still finishes the write on that path.
     final storage = ref.read(storageRepositoryProvider);
     final profile = ref.read(activeProfileProvider);
     final profileNotifier = ref.read(activeProfileProvider.notifier);

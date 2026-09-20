@@ -46,6 +46,11 @@ class StationMapLayers extends StatefulWidget {
   final MapController mapController;
   final List<Station> stations;
   final LatLng center;
+
+  /// #4432 — the point this surface may honestly mark as the search's
+  /// origin, or null when the camera centre is not one (the route map).
+  /// Forwarded verbatim to [StationMapBody.originMarker].
+  final LatLng? originMarker;
   final double zoom;
   final double searchRadiusKm;
   final FuelType selectedFuel;
@@ -146,6 +151,7 @@ class StationMapLayers extends StatefulWidget {
     required this.mapController,
     required this.stations,
     required this.center,
+    this.originMarker,
     required this.zoom,
     required this.searchRadiusKm,
     required this.selectedFuel,
@@ -346,6 +352,7 @@ class _StationMapLayersState extends State<StationMapLayers> {
         StationMapBody(
           mapController: widget.mapController,
           center: widget.center,
+          originMarker: widget.originMarker,
           zoom: widget.zoom,
           fitBounds: _fitBounds,
           onMapReady: () {

@@ -5,20 +5,24 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/error/exceptions.dart';
+import '../../../core/location/location_service.dart';
+import '../../../core/time/app_clock.dart';
 import '../../../core/logging/error_logger.dart';
-import '../../../core/country/country_bounding_box.dart';
 import '../../../core/utils/geo_utils.dart';
 import '../../../core/utils/station_extensions.dart';
-import '../../profile/data/models/user_profile.dart';
-import '../../search/providers/ev_charging_service_provider.dart';
 import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/search_result_item.dart';
+import '../../profile/data/models/user_profile.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../data/cross_border_corridor.dart';
-import '../data/strategies/route_geometry.dart';
+import '../data/ev_along_route.dart';
+import '../domain/min_saving_filter.dart';
+import '../domain/route_origin.dart';
+import '../domain/route_search_request.dart';
 import '../data/services/routing_service.dart';
 import '../domain/entities/route_info.dart';
 import '../domain/route_search_result.dart';
@@ -26,6 +30,8 @@ import '../domain/route_search_strategy.dart';
 import '../domain/route_search_strategy_factory.dart';
 
 // Re-export so existing imports of route_search_provider.dart keep working.
+export '../domain/min_saving_filter.dart';
+export '../domain/route_search_request.dart';
 export '../domain/route_search_result.dart';
 export '../domain/route_search_strategy_factory.dart';
 
@@ -41,6 +47,34 @@ class RouteSearchState extends _$RouteSearchState {
   @override
   AsyncValue<RouteSearchResult?> build() => const AsyncValue.data(null);
 
+  /// #4432 — the active request generation.
+  ///
+  /// Every submission takes the next number and every publication —
+  /// loading, each streamed partial, the final result and each error
+  /// arm — is fenced against it. Without this, a slow first search
+  /// could overwrite the results of the search the driver ran after it
+  /// (the corridor sweep streams for seconds), and [clear] could not
+  /// retire work already in flight. Incremented, never reused.
+  int _generation = 0;
+
+  /// #4432 — the last submitted search, so [refresh] can re-run THAT
+  /// request instead of the nearby replay the screens used to call.
+  RouteSearchRequest? _lastRequest;
+
+  /// The generation a publication must carry to be accepted.
+  @visibleForTesting
+  int get activeRevision => _generation;
+
+  /// Write [value] only if [generation] is still the active request.
+  ///
+  /// Visible for the provider's own tests: an obsolete completion must
+  /// be a no-op, not a state write nobody notices.
+  @visibleForTesting
+  void publish(int generation, AsyncValue<RouteSearchResult?> value) {
+    if (generation != _generation || !ref.mounted) return;
+    state = value;
+  }
+
   Future<void> searchAlongRoute({
     required List<RouteWaypoint> waypoints,
     required FuelType fuelType,
@@ -51,7 +85,19 @@ class RouteSearchState extends _$RouteSearchState {
     // defaults so existing callers are untouched.
     double? segmentKm,
     double? minSavingPerLiter,
+    DateTime? originCapturedAt,
   }) async {
+    final generation = ++_generation;
+    _lastRequest = RouteSearchRequest(
+      revision: generation,
+      waypoints: waypoints,
+      fuelType: fuelType,
+      searchRadiusKm: searchRadiusKm,
+      strategyType: strategyType,
+      segmentKm: segmentKm,
+      minSavingPerLiter: minSavingPerLiter,
+      originCapturedAt: originCapturedAt,
+    );
     state = const AsyncValue.loading();
     try {
       // #2872 — last-line guard before routing: drop degenerate waypoints
@@ -101,7 +147,7 @@ class RouteSearchState extends _$RouteSearchState {
 
       List<SearchResultItem> allResults;
       if (fuelType == FuelType.electric) {
-        allResults = await _searchEVAlongRoute(route, effectiveRadius);
+        allResults = await searchEvAlongRoute(ref, route, effectiveRadius);
       } else {
         final strategy = strategyFor(strategyType);
         final queryFn = buildCorridorQueryFunction(
@@ -124,7 +170,7 @@ class RouteSearchState extends _$RouteSearchState {
           // are still in flight. The final state.write below replaces
           // this with the fully-reduced, isolate-sorted result.
           onPartial: (partial) {
-            state = AsyncValue.data(RouteSearchResult(
+            publish(generation, AsyncValue.data(RouteSearchResult(
               route: route,
               stations: partial,
               cheapestId: null,
@@ -133,7 +179,7 @@ class RouteSearchState extends _$RouteSearchState {
               isPartial: true,
               corridorCountryCodes: corridorMap.keys.toSet(),
               profileFuelByCountry: profileFuels,
-            ));
+            )));
           },
         );
       }
@@ -184,7 +230,7 @@ class RouteSearchState extends _$RouteSearchState {
         );
       }
 
-      state = AsyncValue.data(RouteSearchResult(
+      publish(generation, AsyncValue.data(RouteSearchResult(
         route: route,
         stations: allResults,
         cheapestId: cheapestId,
@@ -194,22 +240,15 @@ class RouteSearchState extends _$RouteSearchState {
         // #2631 — carried to the map/list so each station prices by its
         // own country fuel (cross-border ES → E10 instead of '--').
         profileFuelByCountry: profileFuels,
-      ));
-    } on DioException catch (e, st) {
-      if (e.type == DioExceptionType.cancel) return;
+      )));
+    } catch (e, st) {
+      // A cancelled request is the caller superseding us, not a failure.
+      if (e is DioException && e.type == DioExceptionType.cancel) return;
       // #2308 — log so an OSRM outage is distinguishable from a
       // country-service exhaustion or a Dart error in exportable logs.
       unawaited(errorLogger.log(ErrorLayer.providers, e, st,
           context: const {'where': 'RouteSearchState.searchAlongRoute'}));
-      state = AsyncValue.error(e, st);
-    } on AppException catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-          context: const {'where': 'RouteSearchState.searchAlongRoute'}));
-      state = AsyncValue.error(e, st);
-    } catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
-          context: const {'where': 'RouteSearchState.searchAlongRoute'}));
-      state = AsyncValue.error(e, st);
+      publish(generation, AsyncValue.error(e, st));
     }
   }
 
@@ -279,106 +318,59 @@ class RouteSearchState extends _$RouteSearchState {
     );
   }
 
-  Future<List<SearchResultItem>> _searchEVAlongRoute(
-    RouteInfo route,
-    double radiusKm,
-  ) async {
-    final service = ref.read(evChargingServiceProvider);
-    if (service == null) {
-      throw const ApiException(message: 'OpenChargeMap API key required');
-    }
-
-    final seen = <String>{};
-    final results = <SearchResultItem>[];
-
-    for (final point in route.samplePoints) {
-      try {
-        // #697/#3742 — `countryCode` is no longer passed: OCM's
-        // countrycode filter dropped legitimate results in border
-        // regions and the service stopped sending it to the API; the
-        // lat/lng + distance constraint is the geographic filter.
-        final result = await service.searchStations(
-          lat: point.latitude,
-          lng: point.longitude,
-          radiusKm: radiusKm,
-          maxResults: 20,
-        );
-        for (final station in result.data) {
-          if (seen.add(station.id)) {
-            results.add(EVStationResult(station));
-          }
-        }
-      } catch (e, st) {
-        // #2146 — sample failures are tolerated (other points still
-        // yield results), but route to the exportable log so
-        // recurring blackouts of EV results are recoverable.
-        // #3145 — coords bucketed to 1 decimal: triage never needs more.
-        unawaited(errorLogger.log(ErrorLayer.services, e, st, context: {
-          'where': 'RouteSearch EV: sample point query',
-          'lat': point.latitude.toStringAsFixed(1),
-          'lng': point.longitude.toStringAsFixed(1),
-        }));
-      }
-    }
-
-    // Sort by position along route (itinerary order)
-    sortByItineraryOrder(results, route.geometry);
-    return results;
-  }
-
   void clear() {
+    // #4432 — retire whatever is in flight FIRST. A sweep that was
+    // already streaming partials could otherwise repopulate the list
+    // the user just cleared.
+    _generation++;
+    _lastRequest = null;
     state = const AsyncValue.data(null);
   }
-}
 
-/// Keeps only fuel stations priced within [minSaving] €/L of the
-/// cheapest station found along the route (#1872).
-///
-/// The cheapest priced station is the anchor; a station survives when its
-/// price is at most `cheapest + minSaving`. Stations with no price are
-/// kept — an unknown price is not a reason to hide a stop — and the list
-/// is returned unchanged when no station carries a comparable price. EV
-/// results never reach here (the caller gates on a non-electric fuel
-/// type).
-///
-/// #2595 — each station is priced by ITS country's profile fuel via
-/// [profileFuelByCountry] (resolved offline from the station's lat/lng),
-/// falling back to [fuelType] for a country with no profile or a station
-/// outside every bbox. This keeps the cross-border min-saving compare
-/// like-for-like (FR→E85 vs ES→E10) instead of pricing every station by a
-/// single fuel one country may not even sell. When [profileFuelByCountry]
-/// is empty (the historical single-country path) every station is priced
-/// by [fuelType], preserving the original behaviour exactly.
-List<SearchResultItem> filterRouteResultsByMinSaving(
-  List<SearchResultItem> results,
-  FuelType fuelType,
-  double minSaving, {
-  Map<String, FuelType> profileFuelByCountry = const {},
-}) {
-  FuelType fuelFor(FuelStationResult item) {
-    if (profileFuelByCountry.isEmpty) return fuelType;
-    final code =
-        countryCodeFromLatLng(item.station.lat, item.station.lng)?.toUpperCase();
-    if (code == null) return fuelType;
-    return profileFuelByCountry[code] ?? fuelType;
-  }
-
-  double? cheapest;
-  for (final item in results) {
-    if (item is FuelStationResult) {
-      final price = item.station.priceFor(fuelFor(item));
-      if (price != null && (cheapest == null || price < cheapest)) {
-        cheapest = price;
+  /// #4432 — re-run the ACTIVE route search.
+  ///
+  /// The list and map refresh actions called the nearby
+  /// `repeatLastSearch()` even while route results were on screen: they
+  /// re-fixed the separately stored user position and re-ran a
+  /// proximity search, leaving the corridor exactly as stale as before.
+  /// A current-position route re-resolves its origin here, so refresh
+  /// means "from where I am now"; a named origin stays put and only the
+  /// prices move. Returns false when there is no route to refresh, so
+  /// the caller can fall back to the nearby replay.
+  Future<bool> refresh() async {
+    var request = _lastRequest;
+    if (request == null) return false;
+    if (request.originIsVehiclePosition) {
+      final first = request.waypoints.first;
+      final origin = await resolveCurrentPositionOrigin(
+        locationService: ref.read(locationServiceProvider),
+        clock: ref.read(appClockProvider),
+        stored: LatLng(first.lat, first.lng),
+        capturedAt: request.originCapturedAt,
+      );
+      if (!ref.mounted) return true;
+      // No usable origin at all: keep the one the request already has
+      // and refresh the prices. Refusing to do anything would make the
+      // refresh action a silent no-op, which is its own small lie.
+      final coords = origin.coords;
+      if (coords != null) {
+        request = request.withOrigin(
+          coords,
+          ref.read(appClockProvider).now().subtract(origin.age),
+        );
       }
     }
+    await searchAlongRoute(
+      waypoints: request.waypoints,
+      fuelType: request.fuelType,
+      searchRadiusKm: request.searchRadiusKm,
+      strategyType: request.strategyType,
+      segmentKm: request.segmentKm,
+      minSavingPerLiter: request.minSavingPerLiter,
+      originCapturedAt: request.originCapturedAt,
+    );
+    return true;
   }
-  if (cheapest == null) return results;
-  final ceiling = cheapest + minSaving;
-  return results.where((item) {
-    if (item is! FuelStationResult) return true;
-    final price = item.station.priceFor(fuelFor(item));
-    return price == null || price <= ceiling;
-  }).toList();
 }
 
 /// Resolves the route-segment spacing for a search (#2592).

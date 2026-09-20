@@ -8982,6 +8982,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String routeOriginStaleCurrentLocation(String age) {
+    return 'Current position ($age ago)';
+  }
+
+  @override
+  String routeStopOffRoute(String distance) {
+    return '$distance from the route';
+  }
+
+  @override
+  String get routeStopOffRouteQualifier => 'geometric estimate';
+
+  @override
+  String get routeStopOffRouteTooltip =>
+      'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/L';
   }
@@ -21017,6 +21034,23 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
     );
     return '⟦$_temp0⟧';
   }
+
+  @override
+  String routeOriginStaleCurrentLocation(String age) {
+    return '⟦Çúřřéñŧ ƥóšîŧîóñ ($age áǧó) ········⟧';
+  }
+
+  @override
+  String routeStopOffRoute(String distance) {
+    return '⟦$distance ƒřóɱ ŧĥé řóúŧé ·····⟧';
+  }
+
+  @override
+  String get routeStopOffRouteQualifier => '⟦ǧéóɱéŧřîç éšŧîɱáŧé ········⟧';
+
+  @override
+  String get routeStopOffRouteTooltip =>
+      '⟦Šŧřáîǧĥŧ-łîñé đîšŧáñçé ƒřóɱ ŧĥîš řóúŧé ŧó ŧĥé šŧáŧîóñ. Ñóŧ ŧĥé đîšŧáñçé ƒřóɱ ýóú, áñđ ñóŧ ŧĥé éẋŧřá đřîṽîñǧ á šŧóƥ ŵóúłđ çóšŧ. ·············································⟧';
 
   @override
   String stationCardPriceUnit(String currency) {

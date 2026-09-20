@@ -140,6 +140,7 @@ class DrivingMapView extends StatelessWidget {
       mapController: mapController,
       stations: stations,
       center: center,
+      originMarker: center,
       zoom: 13,
       // Driving has no search-radius circle; frame the actual station bounds.
       searchRadiusKm: 0,

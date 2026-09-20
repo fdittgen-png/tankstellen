@@ -294,7 +294,15 @@ as List<LatLng>,
 /// @nodoc
 mixin _$RouteWaypoint {
 
- double get lat; double get lng; String get label;
+ double get lat; double get lng; String get label;/// #4432 — this waypoint is where the VEHICLE is, read from GPS at
+/// search time, not a place the user named.
+///
+/// The distinction is not cosmetic. An origin that is the driver has
+/// a direction: everything behind it has been passed and is not a
+/// candidate (`dropStationsBehindOrigin`). A named city has no
+/// behind — it has a near side and a far side — so the flag defaults
+/// to false and every existing caller keeps the old corridor.
+ bool get isVehiclePosition;
 /// Create a copy of RouteWaypoint
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -305,16 +313,16 @@ $RouteWaypointCopyWith<RouteWaypoint> get copyWith => _$RouteWaypointCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RouteWaypoint&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.label, label) || other.label == label));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RouteWaypoint&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.label, label) || other.label == label)&&(identical(other.isVehiclePosition, isVehiclePosition) || other.isVehiclePosition == isVehiclePosition));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lat,lng,label);
+int get hashCode => Object.hash(runtimeType,lat,lng,label,isVehiclePosition);
 
 @override
 String toString() {
-  return 'RouteWaypoint(lat: $lat, lng: $lng, label: $label)';
+  return 'RouteWaypoint(lat: $lat, lng: $lng, label: $label, isVehiclePosition: $isVehiclePosition)';
 }
 
 
@@ -325,7 +333,7 @@ abstract mixin class $RouteWaypointCopyWith<$Res>  {
   factory $RouteWaypointCopyWith(RouteWaypoint value, $Res Function(RouteWaypoint) _then) = _$RouteWaypointCopyWithImpl;
 @useResult
 $Res call({
- double lat, double lng, String label
+ double lat, double lng, String label, bool isVehiclePosition
 });
 
 
@@ -342,12 +350,13 @@ class _$RouteWaypointCopyWithImpl<$Res>
 
 /// Create a copy of RouteWaypoint
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? lat = null,Object? lng = null,Object? label = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? lat = null,Object? lng = null,Object? label = null,Object? isVehiclePosition = null,}) {
   return _then(_self.copyWith(
 lat: null == lat ? _self.lat : lat // ignore: cast_nullable_to_non_nullable
 as double,lng: null == lng ? _self.lng : lng // ignore: cast_nullable_to_non_nullable
 as double,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
-as String,
+as String,isVehiclePosition: null == isVehiclePosition ? _self.isVehiclePosition : isVehiclePosition // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -432,10 +441,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double lat,  double lng,  String label)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double lat,  double lng,  String label,  bool isVehiclePosition)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RouteWaypoint() when $default != null:
-return $default(_that.lat,_that.lng,_that.label);case _:
+return $default(_that.lat,_that.lng,_that.label,_that.isVehiclePosition);case _:
   return orElse();
 
 }
@@ -453,10 +462,10 @@ return $default(_that.lat,_that.lng,_that.label);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double lat,  double lng,  String label)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double lat,  double lng,  String label,  bool isVehiclePosition)  $default,) {final _that = this;
 switch (_that) {
 case _RouteWaypoint():
-return $default(_that.lat,_that.lng,_that.label);case _:
+return $default(_that.lat,_that.lng,_that.label,_that.isVehiclePosition);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -473,10 +482,10 @@ return $default(_that.lat,_that.lng,_that.label);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double lat,  double lng,  String label)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double lat,  double lng,  String label,  bool isVehiclePosition)?  $default,) {final _that = this;
 switch (_that) {
 case _RouteWaypoint() when $default != null:
-return $default(_that.lat,_that.lng,_that.label);case _:
+return $default(_that.lat,_that.lng,_that.label,_that.isVehiclePosition);case _:
   return null;
 
 }
@@ -488,12 +497,21 @@ return $default(_that.lat,_that.lng,_that.label);case _:
 
 
 class _RouteWaypoint implements RouteWaypoint {
-  const _RouteWaypoint({required this.lat, required this.lng, required this.label});
+  const _RouteWaypoint({required this.lat, required this.lng, required this.label, this.isVehiclePosition = false});
   
 
 @override final  double lat;
 @override final  double lng;
 @override final  String label;
+/// #4432 — this waypoint is where the VEHICLE is, read from GPS at
+/// search time, not a place the user named.
+///
+/// The distinction is not cosmetic. An origin that is the driver has
+/// a direction: everything behind it has been passed and is not a
+/// candidate (`dropStationsBehindOrigin`). A named city has no
+/// behind — it has a near side and a far side — so the flag defaults
+/// to false and every existing caller keeps the old corridor.
+@override@JsonKey() final  bool isVehiclePosition;
 
 /// Create a copy of RouteWaypoint
 /// with the given fields replaced by the non-null parameter values.
@@ -505,16 +523,16 @@ _$RouteWaypointCopyWith<_RouteWaypoint> get copyWith => __$RouteWaypointCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RouteWaypoint&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.label, label) || other.label == label));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RouteWaypoint&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.label, label) || other.label == label)&&(identical(other.isVehiclePosition, isVehiclePosition) || other.isVehiclePosition == isVehiclePosition));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,lat,lng,label);
+int get hashCode => Object.hash(runtimeType,lat,lng,label,isVehiclePosition);
 
 @override
 String toString() {
-  return 'RouteWaypoint(lat: $lat, lng: $lng, label: $label)';
+  return 'RouteWaypoint(lat: $lat, lng: $lng, label: $label, isVehiclePosition: $isVehiclePosition)';
 }
 
 
@@ -525,7 +543,7 @@ abstract mixin class _$RouteWaypointCopyWith<$Res> implements $RouteWaypointCopy
   factory _$RouteWaypointCopyWith(_RouteWaypoint value, $Res Function(_RouteWaypoint) _then) = __$RouteWaypointCopyWithImpl;
 @override @useResult
 $Res call({
- double lat, double lng, String label
+ double lat, double lng, String label, bool isVehiclePosition
 });
 
 
@@ -542,12 +560,13 @@ class __$RouteWaypointCopyWithImpl<$Res>
 
 /// Create a copy of RouteWaypoint
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? lat = null,Object? lng = null,Object? label = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? lat = null,Object? lng = null,Object? label = null,Object? isVehiclePosition = null,}) {
   return _then(_RouteWaypoint(
 lat: null == lat ? _self.lat : lat // ignore: cast_nullable_to_non_nullable
 as double,lng: null == lng ? _self.lng : lng // ignore: cast_nullable_to_non_nullable
 as double,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
-as String,
+as String,isVehiclePosition: null == isVehiclePosition ? _self.isVehiclePosition : isVehiclePosition // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

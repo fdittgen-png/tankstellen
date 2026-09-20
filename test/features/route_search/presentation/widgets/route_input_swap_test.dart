@@ -35,7 +35,7 @@ void main() {
 
     await pumpApp(
       tester,
-      RouteInput(onSearch: (_) {}),
+      RouteInput(onSearch: (_, _) {}),
       overrides: [
         ...test.overrides,
         locationSearchServiceProvider.overrideWithValue(searchService),
@@ -76,7 +76,7 @@ void main() {
             return MaterialApp(
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(body: RouteInput(onSearch: (_) {})),
+              home: Scaffold(body: RouteInput(onSearch: (_, _) {})),
             );
           },
         ),

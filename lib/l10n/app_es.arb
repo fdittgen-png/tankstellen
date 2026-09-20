@@ -10782,5 +10782,35 @@
   "@refuelComparePickPrompt": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "routeOriginStaleCurrentLocation": "Current position ({age} ago)",
+  "@routeOriginStaleCurrentLocation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "routeStopOffRoute": "{distance} from the route",
+  "@routeStopOffRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "routeStopOffRouteQualifier": "geometric estimate",
+  "@routeStopOffRouteQualifier": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeStopOffRouteTooltip": "Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.",
+  "@routeStopOffRouteTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

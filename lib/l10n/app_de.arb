@@ -4297,6 +4297,10 @@
   "refuelPlanSearchBounded": "Die beste der verglichenen Routenfolgen – diese Strecke hat mehr Stationen, als der Planer kombiniert.",
   "refuelPlanEvidenceIncomplete": "Einige Stationen blieben außen vor – von dir ausgeblendet oder von der Datenquelle dieses Landes nicht gelistet –, das ist also die beste der übrigen.",
   "refuelPlanReferencePricesSkipped": "{count, plural, =1{1 Referenzpreis für dieses Gebiet ist kein Ort, an dem du halten kannst} other{{count} Referenzpreise für dieses Gebiet sind keine Orte, an denen du halten kannst}}",
+  "routeOriginStaleCurrentLocation": "Aktuelle Position (vor {age})",
+  "routeStopOffRoute": "{distance} von der Route",
+  "routeStopOffRouteQualifier": "geometrische Schätzung",
+  "routeStopOffRouteTooltip": "Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde.",
   "stationCardPriceUnit": "{currency}/l",
   "@stationCardPriceUnit": {
     "description": "Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').",

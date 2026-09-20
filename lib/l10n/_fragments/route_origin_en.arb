@@ -1,0 +1,24 @@
+{
+  "routeOriginStaleCurrentLocation": "Current position ({age} ago)",
+  "@routeOriginStaleCurrentLocation": {
+    "description": "The route start field when the current-position origin could NOT be re-read at search time and the previously captured fix is used instead (#4432). The bare 'Current location' label asserted a freshness the coordinate did not have — at motorway speed a four-minute-old fix is five kilometres behind. {age} is the position-age vocabulary the results bar already uses ('< 1 min', '4 min', '2 h', '3 d').",
+    "placeholders": {
+      "age": {"type": "String"}
+    }
+  },
+  "routeStopOffRoute": "{distance} from the route",
+  "@routeStopOffRoute": {
+    "description": "The distance segment of a station row in a route search (#4432). It is the straight-line offset from the route line to the station — NOT how far the station is from the driver (a stop 60 km ahead can be 4.4 km off the route) and NOT a road detour (leaving and rejoining is driven, not flown). The row used to show a bare '4.4 km' in the same typography a proximity row uses for 'from me'. {distance} is already unit-formatted.",
+    "placeholders": {
+      "distance": {"type": "String"}
+    }
+  },
+  "routeStopOffRouteQualifier": "geometric estimate",
+  "@routeStopOffRouteQualifier": {
+    "description": "Short qualifier shown with the off-route figure (#4432): the number is measured on the map, not driven, so it is an estimate of position rather than a routed distance."
+  },
+  "routeStopOffRouteTooltip": "Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.",
+  "@routeStopOffRouteTooltip": {
+    "description": "Long-press / screen-reader sentence on the route row's distance segment, naming the quantity outright and saying which two quantities it is NOT (#4432)."
+  }
+}

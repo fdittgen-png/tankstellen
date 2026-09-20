@@ -11,13 +11,12 @@ import '../../../../core/domain/price_freshness.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/theme/spacing.dart';
-import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/price_freshness_words.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/time/app_clock.dart';
-import '../../providers/road_distance_provider.dart';
 import '../../../../core/country/country_config.dart';
+import 'station_card_distance.dart';
 
 /// The card's single **label**-role metadata line (#3949):
 /// `distance · Updated {time} · ●`.
@@ -104,51 +103,6 @@ class _Separator extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: Spacing.sm),
       // A language-neutral punctuation glyph, not a translatable string.
       child: Text('·', style: style),
-    );
-  }
-}
-
-/// The distance segment. #3634 — when the OSRM table has answered for
-/// this station, the REAL road distance replaces the crow-flies figure
-/// (the route icon marks the difference); otherwise the haversine value
-/// stands as always.
-class _DistanceSegment extends StatelessWidget {
-  final Station station;
-  final TextStyle style;
-
-  const _DistanceSegment({required this.station, required this.style});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, _) {
-        final roadKm = ref.watch(
-          roadDistancesProvider.select((m) => m[station.id]),
-        );
-        if (roadKm == null) {
-          return Text(
-            PriceFormatter.formatDistance(station.dist),
-            style: style,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          );
-        }
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.route, size: 12, color: style.color),
-            const SizedBox(width: Spacing.xs),
-            Flexible(
-              child: Text(
-                PriceFormatter.formatDistance(roadKm),
-                style: style,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }
@@ -319,7 +273,7 @@ class StationCardPlaceLine extends StatelessWidget {
             ),
           ),
         if (place.isNotEmpty) _Separator(style: style),
-        _DistanceSegment(station: station, style: style),
+        StationCardDistanceSegment(station: station, style: style),
       ],
     );
   }

@@ -9073,6 +9073,23 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String routeOriginStaleCurrentLocation(String age) {
+    return 'Aktuelle Position (vor $age)';
+  }
+
+  @override
+  String routeStopOffRoute(String distance) {
+    return '$distance von der Route';
+  }
+
+  @override
+  String get routeStopOffRouteQualifier => 'geometrische Schätzung';
+
+  @override
+  String get routeStopOffRouteTooltip =>
+      'Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde.';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/l';
   }

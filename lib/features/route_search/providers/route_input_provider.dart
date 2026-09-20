@@ -26,6 +26,22 @@ class RouteInputState {
   final bool hasStartText;
   final bool hasEndText;
 
+  /// #4432 — the start is the "current position" one, captured from GPS
+  /// rather than typed or picked from the autocomplete.
+  ///
+  /// The field said "Current location" while holding wherever the driver
+  /// was when they last tapped the GPS button. At motorway speed that is
+  /// tens of kilometres, and the route was then drawn from there. The
+  /// flag is what lets the search re-read GPS before routing, and what
+  /// lets the UI qualify the label when the re-read fails.
+  final bool startIsCurrentLocation;
+
+  /// When [startCoords] was read from GPS, or null when it was not.
+  /// Stamped through the injected `AppClock` seam, never the raw wall
+  /// clock — an "age of fix" that disagrees with the test's calendar is
+  /// not a test.
+  final DateTime? startCapturedAt;
+
   const RouteInputState({
     this.startCoords,
     this.endCoords,
@@ -34,6 +50,8 @@ class RouteInputState {
     this.isSearching = false,
     this.hasStartText = false,
     this.hasEndText = false,
+    this.startIsCurrentLocation = false,
+    this.startCapturedAt,
   });
 
   /// True when both endpoints carry text and no search is in flight —
@@ -50,6 +68,9 @@ class RouteInputState {
     bool? isSearching,
     bool? hasStartText,
     bool? hasEndText,
+    bool? startIsCurrentLocation,
+    DateTime? startCapturedAt,
+    bool clearStartCapturedAt = false,
   }) {
     return RouteInputState(
       startCoords:
@@ -60,6 +81,11 @@ class RouteInputState {
       isSearching: isSearching ?? this.isSearching,
       hasStartText: hasStartText ?? this.hasStartText,
       hasEndText: hasEndText ?? this.hasEndText,
+      startIsCurrentLocation:
+          startIsCurrentLocation ?? this.startIsCurrentLocation,
+      startCapturedAt: clearStartCapturedAt
+          ? null
+          : (startCapturedAt ?? this.startCapturedAt),
     );
   }
 }
@@ -69,10 +95,29 @@ class RouteInputController extends _$RouteInputController {
   @override
   RouteInputState build() => const RouteInputState();
 
+  /// Set a start the user NAMED — typed, autocompleted or swapped in.
+  ///
+  /// #4432 — always clears the current-location flag and its capture
+  /// stamp: whatever this coordinate is, it is no longer "where I am".
   void setStartCoords(LatLng? coords) {
     state = state.copyWith(
       startCoords: coords,
       clearStartCoords: coords == null,
+      startIsCurrentLocation: false,
+      clearStartCapturedAt: true,
+    );
+  }
+
+  /// #4432 — set the start from a GPS fix taken at [capturedAt].
+  ///
+  /// Distinct from [setStartCoords] because the pair (coordinate,
+  /// when it was read) is the whole point: the search re-reads GPS
+  /// before routing, and shows the age when it cannot.
+  void setStartFromCurrentPosition(LatLng coords, DateTime capturedAt) {
+    state = state.copyWith(
+      startCoords: coords,
+      startIsCurrentLocation: true,
+      startCapturedAt: capturedAt,
     );
   }
 

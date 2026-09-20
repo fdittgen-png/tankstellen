@@ -7,16 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../../core/error/exceptions.dart';
 import '../../../../core/location/location_service.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
+import '../../../../core/time/app_clock.dart';
+import '../../../../core/utils/duration_formatter.dart';
 import '../../../../core/utils/frame_callbacks.dart';
-import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/route_info.dart';
+import '../../domain/route_origin.dart';
 import '../../providers/route_input_provider.dart';
 import 'city_autocomplete_field.dart';
 
@@ -29,7 +30,9 @@ import 'city_autocomplete_field.dart';
 /// [TextEditingController]s stay in this widget because they must follow
 /// Flutter's lifecycle rules.
 class RouteInput extends ConsumerStatefulWidget {
-  final void Function(List<RouteWaypoint> waypoints) onSearch;
+  /// #4432 — the waypoints, plus when a vehicle-position origin was
+  /// MEASURED, so a later refresh can judge its age.
+  final void Function(List<RouteWaypoint>, DateTime?) onSearch;
 
   const RouteInput({super.key, required this.onSearch});
 
@@ -92,33 +95,48 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
     super.dispose();
   }
 
+  /// Seed the start from GPS. The #2872 degenerate-fix guard and the
+  /// #2146 logging live in [captureCurrentPositionOrigin]; what stays
+  /// here is the widget's own concern — whose text this may overwrite.
   Future<void> _useGpsForStart() async {
-    try {
-      final locationService = ref.read(locationServiceProvider);
-      final position = await locationService.getCurrentPosition();
-      if (!mounted) return;
-      // #2872 — defence-in-depth behind getCurrentPosition's own guard:
-      // never seed the route start from a degenerate fix. A (0,0)/(lat,0)
-      // origin makes OSRM route from the Gulf of Guinea and centres the
-      // route map in the Sahara. Fall through to the manual-entry / GPS
-      // error path instead of calling setStartCoords.
-      if (!isUsableCoord(position.latitude, position.longitude)) {
-        throw const LocationException(
-          message: 'Degenerate GPS fix; ask the user for a manual start.',
-        );
-      }
-      final coords = LatLng(position.latitude, position.longitude);
-      ref.read(routeInputControllerProvider.notifier).setStartCoords(coords);
-      final l10n = AppLocalizations.of(context);
-      _startController.text = l10n.currentLocation;
-    } catch (e, st) {
-      // #2146 — route to the exportable log; the snackbar is transient.
-      logFailure(e, st, where: 'RouteInput._useGpsForStart');
-      if (mounted) {
-        final l10n = AppLocalizations.of(context);
-        SnackBarHelper.showError(context, '${l10n.gpsError}: $e');
-      }
+    final before = _startController.text;
+    final origin = await captureCurrentPositionOrigin(
+      locationService: ref.read(locationServiceProvider),
+      clock: ref.read(appClockProvider),
+    );
+    if (!mounted) return;
+    // #4432 — a late fix must never overwrite an endpoint the user has
+    // typed, picked or swapped while it was in flight. The auto-trigger
+    // in initState races the driver's first keystroke by design.
+    if (_startController.text != before) return;
+    if (origin.coords == null) {
+      // #1692 — a localized message, never a raw exception toString().
+      SnackBarHelper.showError(context, AppLocalizations.of(context).gpsError);
+      return;
     }
+    _adoptOrigin(origin);
+  }
+
+  /// Write [origin] into the start field and the shared state (#4432).
+  ///
+  /// The label may never assert a freshness the coordinate does not
+  /// have: a fix accepted as current reads "Current location"; anything
+  /// else reads as the previous position it is, with its age. The stamp
+  /// stored alongside is the fix's own measurement time, so the age is
+  /// a measurement rather than a record of when some code ran.
+  void _adoptOrigin(ResolvedRouteOrigin origin) {
+    final coords = origin.coords;
+    if (coords == null) return;
+    final l10n = AppLocalizations.of(context);
+    ref.read(routeInputControllerProvider.notifier)
+        .setStartFromCurrentPosition(
+          coords,
+          ref.read(appClockProvider).now().subtract(origin.age),
+        );
+    _startController.text = origin.isStale
+        ? l10n.routeOriginStaleCurrentLocation(
+            formatPositionAge(l10n, origin.age))
+        : l10n.currentLocation;
   }
 
   void _addStop() {
@@ -170,6 +188,25 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
         .setStopCoord(i, LatLng(city.lat, city.lng));
   }
 
+  /// #4432 — renew the current-position origin at submission time.
+  ///
+  /// Bounded, so a slow or refused fix degrades to the stored coordinate
+  /// (relabelled with its age) rather than hanging the search behind the
+  /// platform's acquisition. Null = no usable origin at all.
+  Future<LatLng?> _renewCurrentPositionOrigin(
+    RouteInputState routeState,
+  ) async {
+    final origin = await resolveCurrentPositionOrigin(
+      locationService: ref.read(locationServiceProvider),
+      clock: ref.read(appClockProvider),
+      stored: routeState.startCoords,
+      capturedAt: routeState.startCapturedAt,
+    );
+    if (!mounted) return null;
+    _adoptOrigin(origin);
+    return origin.coords;
+  }
+
   /// Resolve any unresolved city text into coordinates and invoke
   /// [RouteInput.onSearch] with the waypoints. Public so the shell-level
   /// FAB can trigger it via [RouteInputWidgetState] (#2131).
@@ -186,48 +223,53 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       var endCoords = routeState.endCoords;
       final stopCoords = List<LatLng?>.from(routeState.stopCoords);
 
-      // Resolve start if needed
-      if (startCoords == null && _startController.text.isNotEmpty) {
-        final results = await searchService.searchCities(_startController.text);
-        if (results.isNotEmpty) {
-          startCoords = LatLng(results.first.lat, results.first.lng);
-          notifier.setStartCoords(startCoords);
+      // Geocode whatever the user typed but never picked from the list.
+      // Only a CHANGED coordinate is written back: re-setting the start
+      // to its own value would clear the #4432 current-location flag.
+      final geoStart = await geocodeIfNeeded(
+          searchService, startCoords, _startController.text);
+      if (geoStart != startCoords) {
+        notifier.setStartCoords(startCoords = geoStart);
+      }
+      final geoEnd =
+          await geocodeIfNeeded(searchService, endCoords, _endController.text);
+      if (geoEnd != endCoords) notifier.setEndCoords(endCoords = geoEnd);
+      for (var i = 0; i < _stopControllers.length && i < stopCoords.length;
+          i++) {
+        final geo = await geocodeIfNeeded(
+            searchService, stopCoords[i], _stopControllers[i].text);
+        if (geo != stopCoords[i]) notifier.setStopCoord(i, stopCoords[i] = geo);
+      }
+
+      // #4432 — "Position actuelle" must mean the position NOW: the
+      // stored fix is where the driver was when they tapped the button,
+      // which at motorway speed starts the corridor 50 km behind them.
+      var originIsVehicle = false;
+      DateTime? originCapturedAt;
+      if (routeState.startIsCurrentLocation) {
+        final renewed = await _renewCurrentPositionOrigin(routeState);
+        if (!mounted) return;
+        if (renewed != null) {
+          startCoords = renewed;
+          originIsVehicle = true;
+          originCapturedAt =
+              ref.read(routeInputControllerProvider).startCapturedAt;
         }
       }
 
-      // Resolve end if needed
-      if (endCoords == null && _endController.text.isNotEmpty) {
-        final results = await searchService.searchCities(_endController.text);
-        if (results.isNotEmpty) {
-          endCoords = LatLng(results.first.lat, results.first.lng);
-          notifier.setEndCoords(endCoords);
-        }
-      }
-
-      // Resolve stops
-      for (var i = 0; i < _stopControllers.length; i++) {
-        if (i < stopCoords.length &&
-            stopCoords[i] == null &&
-            _stopControllers[i].text.isNotEmpty) {
-          final results = await searchService.searchCities(
-            _stopControllers[i].text,
-          );
-          if (results.isNotEmpty) {
-            stopCoords[i] = LatLng(results.first.lat, results.first.lng);
-            notifier.setStopCoord(i, stopCoords[i]);
-          }
-        }
-      }
-
-      // #2872 — a required endpoint that is missing OR degenerate ((0,0),
-      // a one-axis-unacquired (lat,0), or out-of-range) must not reach
-      // OSRM: it would route from the Gulf of Guinea and centre the route
-      // map in the Sahara. Treat an unusable start/destination exactly
-      // like an unresolved one and ask the user for a manual entry.
-      if (startCoords == null ||
-          endCoords == null ||
-          !isUsableCoord(startCoords.latitude, startCoords.longitude) ||
-          !isUsableCoord(endCoords.latitude, endCoords.longitude)) {
+      final waypoints = buildRouteWaypoints(
+        start: startCoords,
+        startLabel: _startController.text,
+        end: endCoords,
+        endLabel: _endController.text,
+        stops: stopCoords,
+        stopLabels: [for (final c in _stopControllers) c.text],
+        originIsVehiclePosition: originIsVehicle,
+      );
+      // #2872 — a missing or degenerate anchor never reaches OSRM: it
+      // would route from the Gulf of Guinea and centre the route map in
+      // the Sahara. Ask for a manual entry instead.
+      if (waypoints == null) {
         if (mounted) {
           SnackBarHelper.showError(
             context,
@@ -237,32 +279,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
         return;
       }
 
-      final waypoints = <RouteWaypoint>[
-        RouteWaypoint(
-          lat: startCoords.latitude,
-          lng: startCoords.longitude,
-          label: _startController.text,
-        ),
-        // #2872 — silently drop a degenerate optional stop (a Nominatim
-        // geocode that fell back to (lat,0) via the `?? 0` default) rather
-        // than letting it bend the route to null island. Start/end are the
-        // anchors and are already validated above.
-        for (var i = 0; i < stopCoords.length; i++)
-          if (stopCoords[i] != null &&
-              isUsableCoord(stopCoords[i]!.latitude, stopCoords[i]!.longitude))
-            RouteWaypoint(
-              lat: stopCoords[i]!.latitude,
-              lng: stopCoords[i]!.longitude,
-              label: _stopControllers[i].text,
-            ),
-        RouteWaypoint(
-          lat: endCoords.latitude,
-          lng: endCoords.longitude,
-          label: _endController.text,
-        ),
-      ];
-
-      widget.onSearch(waypoints);
+      widget.onSearch(waypoints, originCapturedAt);
     } catch (e, st) {
       // #2146 — route to the exportable log; the snackbar is transient.
       logFailure(e, st, where: 'RouteInput.resolveAndSearch');

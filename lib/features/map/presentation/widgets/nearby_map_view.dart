@@ -143,6 +143,7 @@ class _NearbyMapViewState extends ConsumerState<NearbyMapView> {
               mapController: mapController,
               stations: stations,
               center: center,
+              originMarker: center,
               zoom: zoom,
               searchRadiusKm: searchRadiusKm,
               selectedFuel: selectedFuel as FuelType,

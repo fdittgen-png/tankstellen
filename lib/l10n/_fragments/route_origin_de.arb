@@ -1,0 +1,6 @@
+{
+  "routeOriginStaleCurrentLocation": "Aktuelle Position (vor {age})",
+  "routeStopOffRoute": "{distance} von der Route",
+  "routeStopOffRouteQualifier": "geometrische Schätzung",
+  "routeStopOffRouteTooltip": "Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde."
+}

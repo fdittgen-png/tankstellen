@@ -33,6 +33,7 @@ export 'providers/ev_search_provider.dart';
 // (Driving & consumption → Fuel Station Radar) next to its help-sheet
 // toggle, so the profile feature reads it through the barrel.
 export 'providers/radar_pin_provider.dart';
+export 'providers/refresh_active_search.dart';
 export 'providers/radar_search_provider.dart';
 export 'providers/search_filters_provider.dart';
 export 'providers/search_mode_provider.dart';

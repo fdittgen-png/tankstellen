@@ -65,7 +65,12 @@ class SearchCriteriaForm extends ConsumerWidget {
   final Future<void> Function() onGpsSearch;
   final void Function(String zip) onZipSearch;
   final void Function(ResolvedLocation city) onCitySearch;
-  final void Function(List<RouteWaypoint> waypoints) onRouteSearch;
+  /// #4432 — the waypoints plus the origin fix's measurement time, when
+  /// the start is the vehicle's own position.
+  final void Function(
+    List<RouteWaypoint> waypoints,
+    DateTime? originCapturedAt,
+  ) onRouteSearch;
 
   /// #3961 — restores the saved defaults. The Reset that used to sit in
   /// the sticky bar is the LAST thing in the criteria now: "start over"

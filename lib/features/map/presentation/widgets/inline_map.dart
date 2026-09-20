@@ -162,6 +162,7 @@ class _InlineMapState extends ConsumerState<InlineMap> {
       mapController: _mapController,
       stations: stations,
       center: center,
+      originMarker: center,
       zoom: StationMapGeometry.zoomForRadius(searchRadius),
       searchRadiusKm: searchRadius,
       selectedFuel: selectedFuel,
@@ -199,6 +200,9 @@ class _InlineMapState extends ConsumerState<InlineMap> {
       mapController: _mapController,
       stations: stations,
       center: center,
+      // #4432 — `center` here is the bounding-box centre of the found
+      // stations (#2782), which is nobody's position: no origin marker.
+      // The route's own start and destination are drawn from the polyline.
       // Pre-layout fallback only; `cameraFitBounds` drives the first paint.
       zoom: 6.0,
       searchRadiusKm: 5,
