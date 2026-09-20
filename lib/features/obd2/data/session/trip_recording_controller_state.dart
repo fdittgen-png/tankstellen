@@ -230,6 +230,10 @@ mixin _TripRecordingSessionState {
   /// is passive-waiting; surfaced into the UI for the calmer banner copy.
   bool get reconnectPassiveWaiting => _droppedSession.reconnectPassiveWaiting;
 
+  /// #4385 — true while the one recovery owner is parked as engine-off;
+  /// surfaced so the degraded banner says "waiting", not "reconnecting".
+  bool get linkOwnerParked => _droppedSession.ownerParked;
+
   /// Owns the trip's distance-resolution concern — the three-tier
   /// odometer-delta / GPS-track / virtual-odometer selection and the two
   /// rolling sample buffers it integrates over — extracted into a focused

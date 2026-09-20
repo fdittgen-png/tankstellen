@@ -378,8 +378,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     await _baselines.flushAndSync();
     // #1312 — clear the captured adapter identity once persisted.
     _adapterMac = _adapterName = _adapterFirmware = null;
-    // #3527 — keep-link: a supervisor-owned service stays connected at
-    // trip end (see obd2_supervised_teardown.dart for the rationale).
+    // #3527 keep-link (rationale in obd2_supervised_teardown.dart).
     await teardownServiceRespectingSupervisor(_ref, svc);
     _service = null;
     _host.state = _host.state.copyWith(
@@ -387,6 +386,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         clearSaveStage: true, // #4311 S2 — a save stage never outlives the save
         clearDropReason: true,
         reconnectPassiveWaiting: false,
+        linkOwnerParked: false, // #4385
         parkedPromptDue: false);
     return StoppedTripResult(
       summary: summary,

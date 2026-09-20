@@ -353,7 +353,10 @@ void main() {
     // state's one documented precedence instead of a second if-chain.
     // #4384 — 2476 → 2479: the silent-bus verdict gained its motion term,
     // so a mute ELM at road speed can no longer read as engine-off.
-    'lib/features/obd2/data/session/trip_recording_controller.dart': 2479,
+    // #4385 — 2479 → 2483: the owner's park is readable off the controller
+    // (`linkOwnerParked`) so the degraded banner can stop saying
+    // "reconnecting" over a supervisor that is not dialing.
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 2483,
     // #4035 — 1 541 → 1 517: the pure ELM AT grammar (the `ATI` command,
     // the firmware-string parse, the reset-command test) left the library.
     // #4315 — 1 517 → 1 368: the dead pull fuel-rate entry point, the
@@ -420,7 +423,10 @@ void main() {
     'lib/features/obd2/data/session/obd2_link_supervisor.dart': 610,
     'lib/features/obd2/presentation/widgets/obd2_adapter_picker.dart': 601,
     // #4068 — 586 → 581: both grace finalisers collapse their flag writes into `_host.finalise()`.
-    'lib/features/obd2/data/session/dropped_session_manager.dart': 579,
+    // #4385 — 579 → 611: the owner's park / stand-down reaches the session
+    // journal (#4195 invariant 8) and the banner, through the reattach
+    // source's existing level read — no new subscription, no new authority.
+    'lib/features/obd2/data/session/dropped_session_manager.dart': 611,
     'lib/features/driving_score/data/driving_score_calculator.dart': 556,
     'lib/features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart': 525,
     // #4073 — 523 → 502: the private percentile copy moved to core/utils/stats.dart.

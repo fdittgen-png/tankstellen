@@ -29,6 +29,8 @@ class _Scanner implements Obd2ReattachSource {
   Future<void> stop() async {}
   @override
   set onPassiveWait(VoidCallback? callback) {}
+  @override
+  set onOwnerState(Obd2RecoveryOwnerStateCallback? callback) {} // #4385
 
   @override
   set adoptionGate(Obd2AdoptionGate? gate) {}

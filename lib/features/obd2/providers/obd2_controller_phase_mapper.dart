@@ -43,6 +43,9 @@ TripRecordingState stateAfterControllerChange(
   // every other phase so a fresh recording / save never inherits a stale
   // flag.
   final passiveWaiting = dropping && ctl.reconnectPassiveWaiting;
+  // #4385 — and whether the ONE owner is parked rather than dialing;
+  // same scoping rule, so a fresh recording never inherits it.
+  final ownerParked = dropping && ctl.linkOwnerParked;
   // #1330 phase 3 — surface the controller's drop reason. Cleared when
   // leaving the drop state (#3859: the GPS-degraded phase too).
   return dropping
@@ -50,12 +53,14 @@ TripRecordingState stateAfterControllerChange(
           phase: newPhase,
           dropReason: ctl.dropReason,
           reconnectPassiveWaiting: passiveWaiting,
+          linkOwnerParked: ownerParked,
           parkedPromptDue: ctl.parkedPromptDue, // #3862
         )
       : current.copyWith(
           phase: newPhase,
           clearDropReason: true,
           reconnectPassiveWaiting: passiveWaiting,
+          linkOwnerParked: ownerParked,
           parkedPromptDue: false,
         );
 }

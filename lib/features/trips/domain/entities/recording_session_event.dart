@@ -24,6 +24,12 @@ enum RecordingSessionEventKind {
   /// The supervisor parked the link as engine-off.
   linkEngineOff,
 
+  /// #4385 — the one reconnect owner entered its stand-down (storm)
+  /// cadence while the trip was degraded: dials are minutes apart, not
+  /// seconds. Detail = the attempt + the wait, so the timeline says why
+  /// nothing happened for the next quarter hour.
+  linkStandDown,
+
   /// A quiet-window vehicle-protocol establishment/recovery began (#3783).
   protocolEstablish,
 

@@ -501,8 +501,9 @@ void main() {
     });
 
     test(
-        'REPRO: with the owner parked, the trip stays degradedGpsOnly for '
-        'the rest of the drive and the journal never says why', () {
+        'FIXED (#4385): with the owner parked, the trip stays '
+        'degradedGpsOnly for the rest of the drive — and the journal now '
+        'says why, so the banner can stop claiming a reconnect', () {
       fakeAsync((async) {
         final power = Obd2VehiclePower(now: () => clock.now);
         final sup = buildSupervisor(power: power);
@@ -540,11 +541,15 @@ void main() {
         expect(host.degradedGpsOnly, isTrue);
         expect(adopted, isEmpty, reason: 'nothing ever re-attaches');
         // #4195 invariant 8 — "every recovery episode is observable in
-        // the always-on recording journal". The owner parked; the trip
-        // does not know, so the journal (and the banner it drives) still
-        // reads as an in-progress transport recovery for 30 minutes.
-        expect(host.events(RecordingSessionEventKind.linkEngineOff), isEmpty,
-            reason: 'REPRO — the park is invisible to the session journal');
+        // the always-on recording journal". The reattach source reads the
+        // owner's disposition at its level tick (#3777) and the manager
+        // journals it, so 30 minutes of silence are explained instead of
+        // rendered as an in-progress transport recovery.
+        expect(host.events(RecordingSessionEventKind.linkEngineOff),
+            hasLength(1),
+            reason: '#4385 — the park reaches the session journal, once');
+        expect(mgr.ownerParked, isTrue,
+            reason: 'and the banner reads it: "waiting", not "reconnecting"');
         expect(mgr.dropReason, TripDropReason.silentFailure);
 
         mgr.cancelAllTimers();

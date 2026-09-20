@@ -838,6 +838,8 @@ class _FakeScanner implements Obd2ReattachSource {
 
   @override
   VoidCallback? onPassiveWait;
+  @override
+  Obd2RecoveryOwnerStateCallback? onOwnerState; // #4385
 
   @override
   Obd2AdoptionGate? adoptionGate;

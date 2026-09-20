@@ -20,6 +20,10 @@ extension DroppedSessionReattach on DroppedSessionManager {
     // calmer "passive-waiting" copy. Wired here (not via the factory
     // signature) so the `(mac, onReconnect)` factory contract stays untouched.
     scanner.onPassiveWait = _onScannerPassiveWait;
+    // #4385 — what the ONE owner is doing reaches the journal and the
+    // banner. Wired here for the same reason as the line above: the
+    // `(mac, onReconnect)` factory contract stays untouched.
+    scanner.onOwnerState = _onOwnerState;
     // #3915 — the source consults the cycle breaker before every fire
     // and reports each adoption back to it.
     scanner.adoptionGate = _adoptionGate;
@@ -36,6 +40,27 @@ extension DroppedSessionReattach on DroppedSessionManager {
   void _onScannerPassiveWait() {
     if (_host.stopped) return;
     _trace(AutoRecordEventKind.reconnectPassiveWaiting);
+    _host.emitState();
+  }
+
+  /// #4385 (Epic #4195, invariant 8) — the owner's disposition changed
+  /// while the trip records degraded. Journaled so the whole episode is
+  /// reconstructible from `sessionJournal` alone, and re-emitted so the
+  /// banner can stop saying "reconnecting" over a parked owner. No state
+  /// transition of our own: the trip keeps recording on GPS either way.
+  void _onOwnerState(Obd2RecoveryOwnerState state, String detail) {
+    if (_host.stopped) return;
+    final parked = state == Obd2RecoveryOwnerState.parked;
+    switch (state) {
+      case Obd2RecoveryOwnerState.parked:
+        _note(RecordingSessionEventKind.linkEngineOff, detail);
+      case Obd2RecoveryOwnerState.standingDown:
+        _note(RecordingSessionEventKind.linkStandDown, detail);
+      case Obd2RecoveryOwnerState.working:
+        if (_ownerParked) _note(RecordingSessionEventKind.linkReconnecting, detail);
+    }
+    if (parked == _ownerParked) return;
+    _ownerParked = parked;
     _host.emitState();
   }
 

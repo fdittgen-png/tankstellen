@@ -39,6 +39,13 @@ class TripRecordingState {
   /// or no drop is being recovered.
   final bool reconnectPassiveWaiting;
 
+  /// #4385 (Epic #4195) — the ONE reconnect owner is parked as engine-off
+  /// while the trip records on GPS. Distinct from [dropReason] ==
+  /// `engineOff`, which is the TRIP's own verdict: the owner can park
+  /// after a transport drop too (a silent bus on a parked car), and the
+  /// banner must then stop claiming a reconnect is in progress.
+  final bool linkOwnerParked;
+
   /// GPS-only live coaching hint (#2058) — derived from the rolling
   /// window of the last ~5 s of GPS samples on every recorder emit.
   /// Null when the trajet has OBD2 fuel-rate data (the standard
@@ -73,6 +80,7 @@ class TripRecordingState {
     this.liveDeltaFraction,
     this.dropReason,
     this.reconnectPassiveWaiting = false,
+    this.linkOwnerParked = false,
     this.gpsCoachingHint,
     this.connectStage,
     this.saveStage,
@@ -82,9 +90,12 @@ class TripRecordingState {
   /// #3859 — true while the trip records on GPS because the engine is
   /// off (started before the engine, or switched off mid-recording). The
   /// calm "waiting for the engine" state, distinct from a link failure.
+  /// #4385 — the owner parking while degraded is the same user-facing
+  /// state: nothing is broken, nothing is reconnecting, the app is
+  /// waiting for the engine.
   bool get awaitingEngine =>
       phase == TripRecordingPhase.degradedGpsOnly &&
-      dropReason == TripDropReason.engineOff;
+      (dropReason == TripDropReason.engineOff || linkOwnerParked);
 
   TripRecordingState copyWith({
     TripRecordingPhase? phase,
@@ -96,6 +107,7 @@ class TripRecordingState {
     TripDropReason? dropReason,
     bool clearDropReason = false,
     bool? reconnectPassiveWaiting,
+    bool? linkOwnerParked,
     DrivingCoachingHint? gpsCoachingHint,
     bool clearGpsCoachingHint = false,
     TripStartStage? connectStage,
@@ -117,6 +129,7 @@ class TripRecordingState {
             : (dropReason ?? this.dropReason),
         reconnectPassiveWaiting:
             reconnectPassiveWaiting ?? this.reconnectPassiveWaiting,
+        linkOwnerParked: linkOwnerParked ?? this.linkOwnerParked,
         gpsCoachingHint: clearGpsCoachingHint
             ? null
             : (gpsCoachingHint ?? this.gpsCoachingHint),

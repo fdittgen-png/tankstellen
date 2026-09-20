@@ -89,6 +89,33 @@ void main() {
           findsOneWidget);
       expect(find.byKey(const Key('gpsDegradedBannerReset')), findsOneWidget);
     });
+
+    testWidgets(
+        '#4385 — the ONE owner parked after a TRANSPORT drop: the calm copy '
+        'in German, because nothing is reconnecting', (tester) async {
+      final fake = _FakeTripRecording(const TripRecordingState(
+        phase: TripRecordingPhase.degradedGpsOnly,
+        // The trip's own verdict is a transport drop — before #4385 that
+        // alone decided the copy, so the pill said "reconnecting" over a
+        // supervisor that had parked and would not dial for 30 minutes.
+        dropReason: TripDropReason.transportError,
+        linkOwnerParked: true,
+      ));
+      await pumpApp(
+        tester,
+        const GpsDegradedBanner(),
+        overrides: [tripRecordingProvider.overrideWith(() => fake)],
+        locale: const Locale('de'),
+      );
+      await tester.pump(_pastDebounce);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Warte auf den Motor — Aufzeichnung per GPS'),
+          findsOneWidget,
+          reason: 'the calm engine-off copy, in the viewer\'s locale');
+      expect(find.byKey(const Key('gpsDegradedBannerReset')), findsNothing,
+          reason: 'a reset dials a sleeping adapter — the useless action');
+    });
   });
 
   group('Obd2PauseBanner — car asleep (#3860)', () {

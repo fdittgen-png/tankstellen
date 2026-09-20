@@ -105,6 +105,10 @@ class DroppedSessionManager {
   /// reconnect or the escalation to the visible drop.
   bool _silentlyReconnecting = false;
 
+  /// #4385 — the ONE reconnect owner is parked (`engineOff`): nothing is
+  /// reconnecting, so the banner must not say it is.
+  bool _ownerParked = false;
+
   /// Reason the most recent drop fired. Null when no drop has occurred
   /// or after a resume / silent recovery cleared it.
   TripDropReason? _dropReason;
@@ -144,6 +148,9 @@ class DroppedSessionManager {
   /// is wired / running. Exposed for the controller's
   /// `debugReconnectScanner` test hook.
   Obd2ReattachSource? get reconnectScanner => _reconnectScanner;
+
+  /// #4385 — true while the one recovery owner is parked (engine off).
+  bool get ownerParked => _ownerParked;
 
   /// #2767 — true while the reconnect scanner has given up active scanning
   /// and is passive-waiting for the adapter. Drives the calmer banner copy.
