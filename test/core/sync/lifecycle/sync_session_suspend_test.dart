@@ -179,6 +179,67 @@ void main() {
     s.trace.expectClean();
   });
 
+  test('an abandoned pull that answers with NO successor pass is still '
+      'refused — the timeout retires its generation on the spot, it is not '
+      'a side effect of the next pass minting a newer one (#4430)', () async {
+    // The S6 test above always has a second pass, and that pass mints
+    // generation 2 by itself. So it stays green even with the retirement
+    // line in `_pullOne` deleted: generation 1 is retired either way.
+    //
+    // This is the shape where the line is the ONLY thing standing between
+    // a late answer and a persist — the user backgrounds the app, the
+    // pass times out, nothing resumes, and the abandoned select finally
+    // comes back to a process that has moved on. Deleting
+    // `if (_generation[name] == generation) _generation[name] = ...`
+    // turns `persisted` into `[0]` and empties `refused`.
+    final abandonedWire = Completer<void>();
+    final persisted = <int>[];
+    final refused = <Object>[];
+    final entry = _PerPassBudgetEntry(
+      tables: const ['favorites'],
+      pull: () async {
+        final transport = SupabaseSyncTransport.currentOrNull()!;
+        try {
+          final rows = await transport.select('favorites', 'id');
+          persisted.add(rows.length);
+          return rows.length;
+        } catch (e, st) {
+          refused.add(e);
+          Error.throwWithStackTrace(e, st);
+        }
+      },
+    );
+    s = await SyncSession.start(entries: [entry]);
+    await s.connectConsented();
+    final wireBefore = _favoritesOnTheWire(s);
+    s.backend.hang = abandonedWire;
+
+    // One pass, no budget: the select reaches the wire and the pass
+    // abandons it. Nothing follows it — that is the point.
+    entry.budget = Duration.zero;
+    await SyncPullCoordinator.instance.pullAll(now: () => t0);
+    await SyncSession.settle();
+    expect(SyncPullCoordinator.instance.lastOutcome,
+        SyncPassOutcome.completedWithTimeouts);
+    expect(_favoritesOnTheWire(s) - wireBefore, 1,
+        reason: 'the abandoned select is parked on the fake wire');
+    expect(persisted, isEmpty);
+    expect(refused, isEmpty);
+
+    // The answer arrives into a process with no pass in flight.
+    abandonedWire.complete();
+    await SyncSession.settle();
+
+    expect(SyncPullCoordinator.instance.isRunning, isFalse,
+        reason: 'no successor pass exists to retire generation 1 — only '
+            'the timeout did');
+    expect(persisted, isEmpty,
+        reason: 'the late answer must not persist: the pass that asked for '
+            'it ended, and no later pass vouched for the snapshot');
+    expect(refused.single, isA<SyncPullAbandonedException>());
+    expect(SyncPullCoordinator.instance.discardedFor(const ['favorites']), 1);
+  });
+
   test('an init parked past its launch budget: the ladder arms while the '
       'pass is still in flight; the late success is ready, and the retry '
       'replays the launch pulls (S7)', () async {
