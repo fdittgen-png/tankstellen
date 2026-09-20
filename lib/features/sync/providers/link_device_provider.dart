@@ -118,10 +118,18 @@ class LinkDeviceController extends _$LinkDeviceController {
           await client.from('alerts').select().eq('user_id', trimmed);
 
       // 3. Merge favorites locally
+      //
+      // #4388 — DROP, here and at every guard below. Every step of this
+      // merge reaches back through `ref` into another provider, so the
+      // work cannot continue once this controller is disposed; and the
+      // only thing that reads the outcome is the link card that just went
+      // away. Each guard re-checks because each loop iteration awaits.
       int addedFavorites = 0;
+      if (!ref.mounted) return;
       final currentFavs = ref.read(favoritesProvider);
       for (final stationId in importedFavIds) {
         if (!currentFavs.contains(stationId)) {
+          if (!ref.mounted) return;
           await ref.read(favoritesProvider.notifier).add(stationId);
           addedFavorites++;
         }
@@ -129,6 +137,7 @@ class LinkDeviceController extends _$LinkDeviceController {
 
       // 4. Merge alerts locally
       int addedAlerts = 0;
+      if (!ref.mounted) return;
       final currentAlerts = ref.read(alertProvider);
       final currentAlertIds = currentAlerts.map((a) => a.id).toSet();
       for (final row in otherAlerts as List) {
@@ -144,6 +153,7 @@ class LinkDeviceController extends _$LinkDeviceController {
               'createdAt':
                   row['created_at'] ?? DateTime.now().toIso8601String(),
             });
+            if (!ref.mounted) return;
             await ref.read(alertProvider.notifier).addAlert(alert);
             addedAlerts++;
           } catch (e, st) {
@@ -174,6 +184,7 @@ class LinkDeviceController extends _$LinkDeviceController {
             })
             .whereType<VehicleProfile>()
             .toList();
+        if (!ref.mounted) return;
         addedVehicles = await ref
             .read(vehicleProfileListProvider.notifier)
             .mergeFrom(parsed);
@@ -203,6 +214,7 @@ class LinkDeviceController extends _$LinkDeviceController {
             })
             .whereType<FillUp>()
             .toList();
+        if (!ref.mounted) return;
         addedFillUps =
             await ref.read(fillUpListProvider.notifier).mergeFrom(parsed);
       } catch (e, st) {
@@ -212,12 +224,17 @@ class LinkDeviceController extends _$LinkDeviceController {
       // 7. Sync merged data back to our server account. Profile is NOT
       // synced — each device keeps its own local profile + defaulting.
       // #3452 — favorites upload as full records (fuel + EV, payloads).
+      if (!ref.mounted) return;
       await FavoritesSync.merge(
           FavoritesSync.localRecords(ref.read(storageRepositoryProvider)));
+      if (!ref.mounted) return;
       await AlertsSync.merge(ref.read(alertProvider));
+      if (!ref.mounted) return;
       await VehiclesSync.merge(ref.read(vehicleProfileListProvider));
+      if (!ref.mounted) return;
       await FillUpsSync.merge(ref.read(fillUpListProvider));
 
+      if (!ref.mounted) return;
       state = LinkDeviceState(
         outcome: LinkDeviceOutcome.linked,
         counts: (
@@ -233,6 +250,7 @@ class LinkDeviceController extends _$LinkDeviceController {
       }));
       // #3988 — the exception never reaches the user verbatim; the card
       // renders the localized reason.
+      if (!ref.mounted) return;
       state = LinkDeviceState(
         outcome: LinkDeviceOutcome.failed,
         errorDetail: e.toString(),

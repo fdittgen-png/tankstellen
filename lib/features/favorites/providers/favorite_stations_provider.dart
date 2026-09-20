@@ -107,6 +107,10 @@ class FavoriteStations extends _$FavoriteStations {
       }
 
       final connectivity = await Connectivity().checkConnectivity();
+      // #4388 — DROP. Everything below reads `ref` and writes `state`, and
+      // a favorites refresh has no value once the screen that asked for it
+      // is gone.
+      if (!ref.mounted) return;
       if (connectivity.contains(ConnectivityResult.none)) {
         state = AsyncValue.data(ServiceResult(
           data: stations,
@@ -150,13 +154,25 @@ class FavoriteStations extends _$FavoriteStations {
           idsByCountry.putIfAbsent(code, () => []).add(id);
         }
 
+        // #4388 — resolve every per-country service BEFORE the fetch loops
+        // below start awaiting. `serviceFor` reaches into `ref` for a
+        // non-active country, and from the second loop iteration onward
+        // that read sits after an await. Resolving up front keeps the
+        // loops ref-free, so the fetches COMPLETE (they still persist to
+        // storage, which outlives this provider) even if the favorites
+        // screen goes away mid-refresh; only the `state =` writes below
+        // are dropped.
+        final servicesByCountry = <String, StationService>{
+          for (final code in idsByCountry.keys) code: serviceFor(code),
+        };
+
         // Fetch missing details per-country.
         for (final entry in idsByCountry.entries) {
           final code = entry.key;
           final missingInCountry =
               entry.value.where(missingIds.contains).toList();
           if (missingInCountry.isEmpty) continue;
-          final service = serviceFor(code);
+          final service = servicesByCountry[code]!;
           for (final id in missingInCountry) {
             try {
               final detail = await service.getStationDetail(id);
@@ -178,7 +194,7 @@ class FavoriteStations extends _$FavoriteStations {
           final ids = entry.value;
           if (ids.isEmpty) continue;
           attemptedCountries++;
-          final service = serviceFor(entry.key);
+          final service = servicesByCountry[entry.key]!;
           try {
             final result = await service.getPrices(ids);
             freshPrices.addAll(result.data);
@@ -220,6 +236,9 @@ class FavoriteStations extends _$FavoriteStations {
         // stale-cache state so the user knows prices may be outdated.
         final allFailed =
             attemptedCountries > 0 && successCountries == 0;
+        // #4388 — the fetches above were allowed to finish; the result
+        // write is not, because there is nobody left to render it.
+        if (!ref.mounted) return;
         state = AsyncValue.data(ServiceResult(
           data: updated,
           source: lastResult?.source ?? ServiceSource.cache,
@@ -229,6 +248,7 @@ class FavoriteStations extends _$FavoriteStations {
         ));
       } on Exception catch (e, st) {
         unawaited(errorLogger.log(ErrorLayer.providers, e, st, context: const {'where': 'Favorites price refresh failed'}));
+        if (!ref.mounted) return;
         state = AsyncValue.data(ServiceResult(
           data: stations,
           source: ServiceSource.cache,
@@ -237,6 +257,13 @@ class FavoriteStations extends _$FavoriteStations {
         ));
       }
     } catch (e, st) {
+      // #4388 — trace BEFORE the mounted guard. The guard stops the error
+      // reaching a disposed `state =`, and without this line it would also
+      // stop it reaching anyone at all: a swallowed disposed-Ref
+      // `StateError` is exactly the silent no-op this issue is about.
+      unawaited(errorLogger.log(ErrorLayer.providers, e, st,
+          context: const {'where': 'FavoriteStations.loadAndRefresh'}));
+      if (!ref.mounted) return;
       state = AsyncValue.error(e, st);
     }
   }

@@ -183,6 +183,10 @@ class RadarSearch extends _$RadarSearch {
     // not a position minutes behind them, so wait for the (already in-flight)
     // fresh fix before the in-radius merge.
     final (:gpsError, :gpsStack) = await gpsRefresh;
+    // #4388 — DROP. The GPS fix can land after the radar screen is gone;
+    // everything below this line reads `ref` and writes `state`, and the
+    // only consumer of both is the screen that just went away.
+    if (!ref.mounted) return;
 
     final pos = ref.read(userPositionProvider);
     if (pos == null) {
