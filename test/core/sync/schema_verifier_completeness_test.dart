@@ -132,6 +132,34 @@ void main() {
       expect(sql, contains('FUNCTION public.claim_trip_share'));
     });
 
+    // The `.from()` scan below cannot see an RPC at all: a function is
+    // invoked through `rpc('name')`, so a fleet slice that shipped a
+    // SECURITY DEFINER read without its wizard twin would leave every
+    // self-host with a dashboard that 404s and a gate that stayed
+    // green. HARD RULE #5 covers RPCs as well as tables, so the fleet
+    // functions are named here one by one.
+    test('wizard SQL creates every fleet RPC the client calls (#4212, '
+        '#4215, #4216)', () {
+      final sql = SchemaVerifier.getMigrationSql(const {});
+      for (final fn in const [
+        'fleet_create_organization',
+        'fleet_upsert_vehicle',
+        'fleet_assign_vehicle',
+        'fleet_end_assignment',
+        'fleet_review_expense',
+        'fleet_log_document_access',
+        'fleet_period_metrics',
+        'fleet_log_export',
+      ]) {
+        expect(sql, contains('FUNCTION public.$fn'),
+            reason: 'wizard SQL is missing the "$fn" RPC — a self-hoster '
+                'who re-runs the setup SQL would still not have it');
+        expect(sql, contains('REVOKE EXECUTE ON FUNCTION public.$fn'),
+            reason: '"$fn" must lose EXECUTE for anon explicitly: the '
+                'PUBLIC revoke does not cover it');
+      }
+    });
+
     test('wizard SQL creates the server-only tables too (#3747 widened: '
         'not just the .from()-probed ones)', () {
       // `serverOnlyTables` are read by SQL functions/triggers, never

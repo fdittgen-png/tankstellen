@@ -9,7 +9,7 @@
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen on iOS, de.tankstellen.fuelprices on Android) &mdash; Version 3 &mdash; Last updated: 29 August 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen on iOS, de.tankstellen.fuelprices on Android) &mdash; Version 4 &mdash; Last updated: 20 September 2026</p>
 <p class="langs">Available languages: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Overview</h2>
@@ -52,6 +52,7 @@
     <tr><td>Address text or coordinates you type</td><td>Geocoding</td><td>Contract</td><td>Nominatim, or your phone's built-in geocoder (Apple / Google)</td><td>Not stored by us</td></tr>
     <tr><td>API keys you enter (Tankerkönig, OpenChargeMap)</td><td>Call those services on your behalf</td><td>Contract</td><td>Only to the provider the key belongs to</td><td>Encrypted on the device (Keystore / Keychain) until you delete them</td></tr>
     <tr><td>Wrong-name / wrong-address station reports, bad-scan reports</td><td>Fix the data</td><td>Consent (you confirm before sending; a personal GitHub token is required)</td><td>GitHub (a public issue in the project repository)</td><td>Public until the issue is deleted</td></tr>
+    <tr id="fleet-membership-row"><td>Fleet membership, role and vehicle assignment (fleet mode only)</td><td>Run a company fleet: aggregated cost, consumption and CO₂e reporting for your employer</td><td>Contract with your employer, who is the controller for fleet data</td><td>Your organisation's TankSync database. Managers see aggregates; per-vehicle rows below the organisation's threshold are suppressed, and no location or journey data is included.</td><td>Until you leave the organisation or delete your account; privileged-access audit records for the period your organisation configures</td></tr>
   </tbody>
 </table>
 <p>The app does not make automated decisions with legal or similarly significant effects about you. Price predictions are computed on the device from public price data.</p>
@@ -139,6 +140,7 @@
 <h2>10. Changes to this policy</h2>
 <p>Changes are published at this URL with a new version number and date; the app records the version you consented to and shows this page again when the version changes.</p>
 <ul>
+  <li><strong>v4 — 20 September 2026:</strong> fleet mode: organisation membership, role and vehicle assignment declared; manager reporting is aggregate-only and carries no location or journey data.</li>
   <li><strong>v3 — 29 August 2026:</strong> controller and per-mode roles, processing table with legal bases and retention, complete processor list (tile proxy, geocoder, routing, GitHub, brand logos), rights paths, complete erasure and export.</li>
   <li><strong>v2 — 15 August 2026:</strong> account deletion section; e-mail and TankSync account data declared.</li>
   <li><strong>v1 — 7 April 2026:</strong> first version.</li>

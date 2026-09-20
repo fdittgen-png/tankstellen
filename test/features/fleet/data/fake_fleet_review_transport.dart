@@ -49,6 +49,22 @@ class FakeFleetReviewTransport implements FleetReviewTransport {
   /// When set, every call throws it — the offline / refused path.
   Exception? failure;
 
+  /// #4216 — the `fleet_period_metrics` rows the fake serves, as the
+  /// RPC returns them (already suppressed, already role-checked; the
+  /// server does both and the client must not re-do either).
+  List<JsonRow> metricsRows = [];
+
+  /// Every metrics call, so a test can assert the period that went
+  /// over the wire.
+  final List<({String orgId, DateTime from, DateTime to})> metricsCalls = [];
+
+  /// Every audited export, in order.
+  final List<({String orgId, String kind})> exportCalls = [];
+
+  /// Whether `fleet_log_export` records the row. False models a server
+  /// that refused the audit — after which no file may be produced.
+  bool exportAudited = true;
+
   @override
   Future<List<JsonRow>> selectReviewQueue(String orgId) async {
     if (failure != null) throw failure!;
@@ -81,5 +97,30 @@ class FakeFleetReviewTransport implements FleetReviewTransport {
     if (row['status'] != 'submitted') throw Exception('not_submitted');
     row['status'] = decision.token;
     return decision.token;
+  }
+
+  @override
+  Future<List<JsonRow>> selectPeriodMetrics({
+    required String orgId,
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    if (failure != null) throw failure!;
+    // The RPC refuses a non-manager before it reads anything; so does
+    // the fake, or a client could learn to call it without the role.
+    if (!isManager) throw Exception('forbidden');
+    metricsCalls.add((orgId: orgId, from: from, to: to));
+    return [for (final row in metricsRows) Map<String, dynamic>.of(row)];
+  }
+
+  @override
+  Future<bool> logExport({
+    required String orgId,
+    required String kind,
+  }) async {
+    if (failure != null) throw failure!;
+    if (!isManager) return false;
+    exportCalls.add((orgId: orgId, kind: kind));
+    return exportAudited;
   }
 }

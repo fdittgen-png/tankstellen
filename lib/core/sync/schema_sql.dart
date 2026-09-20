@@ -19,6 +19,7 @@ library;
 
 import 'schema_sql_fleet.dart';
 import 'schema_sql_fleet_expenses.dart';
+import 'schema_sql_fleet_metrics.dart';
 import 'schema_sql_owner.dart';
 import 'schema_sql_policies.dart';
 import 'schema_table_specs.dart';
@@ -68,7 +69,15 @@ import 'schema_table_specs.dart';
 /// private `fleet-documents` Storage bucket with its two object
 /// policies, and an `erase_my_data()` that deletes the stored receipt
 /// BYTES as well as the rows that name them.
-const int kSupabaseSchemaVersion = 14;
+/// v15 (#4216, ADR 0025 D5.3/D5.4): the manager dashboard's read path —
+/// `fleet_period_metrics(p_org, p_from, p_to)`, a SECURITY DEFINER
+/// aggregate over `fleet_expenses` that re-checks the caller's role,
+/// audits every call and suppresses per-vehicle rows below the org's
+/// `aggregationMinSamples`, plus `fleet_log_export()` for the same
+/// trail on an export. No new table: an RPC alone still bumps the
+/// version, because a self-host that never re-runs the SQL has no
+/// function to call and the dashboard fails with nothing to say.
+const int kSupabaseSchemaVersion = 15;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -156,6 +165,9 @@ String buildMigrationSql(Map<String, bool> schema) {
     ..writeln(fleetAuditTableSql)
     ..writeln(fleetExpenseRpcSql)
     ..writeln(fleetDocumentStorageSql)
+    // #4216 (v15) — after the audit table it INSERTs into and after
+    // fleet_role(), which its body calls.
+    ..writeln(fleetMetricsRpcSql)
     ..writeln(_metaSql);
 
   return buffer.toString();

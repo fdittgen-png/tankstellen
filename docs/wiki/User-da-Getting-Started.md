@@ -51,7 +51,7 @@ Før nogen anden skærm viser appen en **GDPR-samtykkeskærm**. Det er ikke et c
 
 Før hver *system*-anmodning (kamera, Bluetooth, notifikationer) viser appen først sin egen korte forklaring, så du ved hvad du siger ja til, inden Android spørger.
 
-Fuld tekst: **[Privatlivspolitik v3, 29. august 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
+Fuld tekst: **[Privatlivspolitik v4, 20. september 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
 
 ---
 

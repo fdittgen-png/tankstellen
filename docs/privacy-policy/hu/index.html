@@ -9,7 +9,7 @@
 <body>
 
 <h1>Adatvédelmi tájékoztató</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS-en, de.tankstellen.fuelprices Androidon) &mdash; Version 3 &mdash; Utolsó frissítés: 2026. augusztus 29.</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS-en, de.tankstellen.fuelprices Androidon) &mdash; Version 4 &mdash; Utolsó frissítés: 2026. szeptember 20.</p>
 <p class="langs">Elérhető nyelvek: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Áttekintés</h2>
@@ -52,6 +52,7 @@
     <tr><td>Az Ön által beírt címszöveg vagy koordináták</td><td>Geokódolás</td><td>Szerződés</td><td>Nominatim, vagy a telefon beépített geokódolója (Apple / Google)</td><td>Mi nem tároljuk</td></tr>
     <tr><td>Az Ön által megadott API-kulcsok (Tankerkönig, OpenChargeMap)</td><td>E szolgáltatások meghívása az Ön nevében</td><td>Szerződés</td><td>Csak ahhoz a szolgáltatóhoz, amelyhez a kulcs tartozik</td><td>Titkosítva az eszközön (Keystore / Keychain), amíg Ön nem törli őket</td></tr>
     <tr><td>Hibás név / hibás cím töltőállomás-bejelentések, rossz beolvasás bejelentések</td><td>Az adatok javítása</td><td>Hozzájárulás (Ön küldés előtt megerősíti; személyes GitHub-token szükséges)</td><td>GitHub (nyilvános issue a projekt tárolójában)</td><td>Nyilvános, amíg az issue-t nem törlik</td></tr>
+    <tr id="fleet-membership-row"><td>Flottatagság, szerepkör és járműhozzárendelés (csak flottamódban)</td><td>Céges flotta üzemeltetése: összesített költség-, fogyasztás- és CO₂e-jelentés a munkáltatónak</td><td>Szerződés a munkáltatóval, aki a flottaadatok adatkezelője</td><td>A szervezet TankSync-adatbázisa. A vezetők csak összesítéseket látnak; a szervezet küszöbe alatti járműsorok rejtve maradnak, és nem tartalmaznak helyadatot vagy útvonaladatot.</td><td>A szervezetből való kilépésig vagy a fiók törléséig; a kiemelt hozzáférések naplói a szervezet által beállított ideig</td></tr>
   </tbody>
 </table>
 <p>Az alkalmazás nem hoz Önre nézve joghatással vagy hasonlóan jelentős hatással járó automatizált döntéseket. Az árelőrejelzéseket az eszköz nyilvános áradatokból számítja ki.</p>
@@ -139,6 +140,7 @@
 <h2>10. A tájékoztató módosításai</h2>
 <p>A módosításokat ezen az URL-en tesszük közzé új verziószámmal és dátummal; az alkalmazás rögzíti, hogy Ön melyik verzióhoz járult hozzá, és a verzió változásakor újra megjeleníti ezt az oldalt.</p>
 <ul>
+  <li><strong>v4 — 2026. szeptember 20.:</strong> flottamód: a szervezeti tagság, a szerepkör és a járműhozzárendelés deklarálva; a vezetői jelentés kizárólag összesített, hely- és útvonaladatot nem tartalmaz.</li>
   <li><strong>v3 — 2026. augusztus 29.:</strong> adatkezelő és módonkénti szerepek, adatkezelési táblázat jogalapokkal és megőrzési idővel, teljes adatfeldolgozói lista (csempeproxy, geokódoló, útvonaltervezés, GitHub, márkalogók), jogérvényesítési útvonalak, teljes törlés és exportálás.</li>
   <li><strong>v2 — 2026. augusztus 15.:</strong> fióktörlési szakasz; e-mail és TankSync-fiókadatok bejelentése.</li>
   <li><strong>v1 — 2026. április 7.:</strong> első verzió.</li>

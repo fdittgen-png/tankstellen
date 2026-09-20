@@ -28,6 +28,17 @@
 /// a leaf of the dependency graph and `fill_ups -> fleet` cannot close
 /// a cycle (`test/lint/feature_boundary_test.dart`, the #4346
 /// barrel-aware SCC gate).
+/// The F5 slice (#4215) contributes the expense / document domain: the
+/// state boundary between a receipt and an accounting record, the
+/// reconciler that refuses to invent a second fill-up, and the import
+/// boundary a structured e-invoice enters through. The F7 slice
+/// (#4215, schema v14) adds the server half — the user-owned sync
+/// config, the private-document store, the submit/review workflow and
+/// its transport seam. The F9 slice (#4216, #4214, schema v15) adds
+/// the manager half — the period aggregation, its reader over the
+/// widened transport seam and the location-free export. Later slices
+/// add their own exports to this list.
+
 library;
 
 export 'data/expense_intake.dart';
@@ -35,12 +46,16 @@ export 'data/fleet_document_store.dart';
 export 'data/fleet_expense_store.dart';
 export 'data/fleet_expense_workflow.dart';
 export 'data/fleet_expenses_sync.dart';
+export 'data/fleet_metrics_export.dart';
+export 'data/fleet_metrics_reader.dart';
 export 'data/fleet_review_transport.dart';
 export 'domain/document_meta.dart';
 export 'domain/expense.dart';
 export 'domain/expense_fields.dart';
 export 'domain/expense_reconciler.dart';
 export 'domain/expense_state_machine.dart';
+export 'domain/fleet_attention.dart';
+export 'domain/fleet_kpis.dart';
 export 'domain/fleet_scope.dart';
 export 'domain/fleet_vehicle.dart';
 export 'domain/money.dart';
@@ -51,4 +66,5 @@ export 'presentation/widgets/vehicle_switch_sheet.dart';
 export 'providers/current_fleet_vehicle_provider.dart';
 export 'providers/fleet_consent_provider.dart';
 export 'providers/fleet_expense_providers.dart';
+export 'providers/fleet_manager_providers.dart';
 export 'providers/fleet_scope_provider.dart';

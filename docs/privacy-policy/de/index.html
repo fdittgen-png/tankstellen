@@ -9,7 +9,7 @@
 <body>
 
 <h1>Datenschutzerklärung</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen unter iOS, de.tankstellen.fuelprices unter Android) &mdash; Version 3 &mdash; Zuletzt aktualisiert: 29. August 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen unter iOS, de.tankstellen.fuelprices unter Android) &mdash; Version 4 &mdash; Zuletzt aktualisiert: 20. September 2026</p>
 <p class="langs">Verfügbare Sprachen: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Überblick</h2>
@@ -52,6 +52,7 @@
     <tr><td>Adresstext oder Koordinaten, die Sie eingeben</td><td>Geokodierung</td><td>Vertrag</td><td>Nominatim oder der eingebaute Geokodierer Ihres Telefons (Apple / Google)</td><td>Von uns nicht gespeichert</td></tr>
     <tr><td>API-Schlüssel, die Sie eingeben (Tankerkönig, OpenChargeMap)</td><td>Diese Dienste in Ihrem Auftrag aufrufen</td><td>Vertrag</td><td>Nur an den Anbieter, zu dem der Schlüssel gehört</td><td>Verschlüsselt auf dem Gerät (Keystore / Keychain), bis Sie sie löschen</td></tr>
     <tr><td>Meldungen zu falschem Namen / falscher Adresse einer Tankstelle, Meldungen fehlerhafter Scans</td><td>Die Daten korrigieren</td><td>Einwilligung (Sie bestätigen vor dem Senden; ein persönliches GitHub-Token ist erforderlich)</td><td>GitHub (ein öffentliches Issue im Projekt-Repository)</td><td>Öffentlich, bis das Issue gelöscht wird</td></tr>
+    <tr id="fleet-membership-row"><td>Flottenzugehörigkeit, Rolle und Fahrzeugzuordnung (nur im Flottenmodus)</td><td>Betrieb einer Firmenflotte: aggregierte Auswertung von Kosten, Verbrauch und CO₂e für den Arbeitgeber</td><td>Vertrag mit dem Arbeitgeber, der für Flottendaten Verantwortlicher ist</td><td>Die TankSync-Datenbank Ihrer Organisation. Führungskräfte sehen Aggregate; Zeilen einzelner Fahrzeuge unterhalb der Schwelle der Organisation werden unterdrückt, Standort- und Fahrtdaten sind nie enthalten.</td><td>Bis zum Austritt aus der Organisation oder zur Löschung des Kontos; Protokolle privilegierter Zugriffe für den von der Organisation konfigurierten Zeitraum</td></tr>
   </tbody>
 </table>
 <p>Die App trifft keine automatisierten Entscheidungen mit rechtlicher oder ähnlich erheblicher Wirkung über Sie. Preisprognosen werden auf dem Gerät aus öffentlichen Preisdaten berechnet.</p>
@@ -139,6 +140,7 @@
 <h2>10. Änderungen dieser Erklärung</h2>
 <p>Änderungen werden unter dieser URL mit neuer Versionsnummer und neuem Datum veröffentlicht; die App speichert die Version, der Sie zugestimmt haben, und zeigt diese Seite erneut an, wenn sich die Version ändert.</p>
 <ul>
+  <li><strong>v4 — 20. September 2026:</strong> Flottenmodus: Organisationszugehörigkeit, Rolle und Fahrzeugzuordnung deklariert; die Auswertung für Führungskräfte ist rein aggregiert und enthält keine Standort- oder Fahrtdaten.</li>
   <li><strong>v3 — 29. August 2026:</strong> Verantwortlicher und Rollen je Modus, Verarbeitungstabelle mit Rechtsgrundlagen und Speicherdauer, vollständige Liste der Auftragsverarbeiter (Kachel-Proxy, Geokodierer, Routenberechnung, GitHub, Markenlogos), Wege zur Ausübung der Rechte, vollständige Löschung und vollständiger Export.</li>
   <li><strong>v2 — 15. August 2026:</strong> Abschnitt zur Kontolöschung; E-Mail- und TankSync-Kontodaten angegeben.</li>
   <li><strong>v1 — 7. April 2026:</strong> erste Version.</li>

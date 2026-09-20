@@ -280,3 +280,61 @@ class DataExporter {
     return result;
   }
 }
+
+/// Column names a **fleet** export may never carry (#4216, ADR 0025
+/// D5.2 / D5.1).
+///
+/// An ordinary personal export is the user's own data and rightly
+/// includes their journeys. A fleet export is somebody ELSE reading
+/// across an organisation, and raw location is the one thing the
+/// manager surface never gets — not a coordinate, not a geohash, not a
+/// trip id that resolves to a route. Matched case-insensitively on
+/// word parts, so `startLat` and `gps_trace` are caught as surely as
+/// `latitude`.
+const Set<String> kFleetExportForbiddenColumns = {
+  'lat',
+  'latitude',
+  'lon',
+  'lng',
+  'longitude',
+  'coord',
+  'coordinate',
+  'coordinates',
+  'geohash',
+  'position',
+  'route',
+  'path',
+  'journey',
+  'trip',
+  'gps',
+  'address',
+  'waypoint',
+};
+
+/// Encode a fleet export table, refusing any column that could carry a
+/// location (#4216).
+///
+/// The refusal is code rather than a review note on purpose. A fleet
+/// export is assembled from whatever columns the caller chose, and "we
+/// remembered not to include the route" is not a property a reviewer
+/// can check next year. Throws [ArgumentError] naming the offending
+/// header, so the mistake is a failing test rather than a file already
+/// in somebody's inbox.
+String encodeFleetCsv({
+  required List<String> header,
+  required List<List<Object?>> rows,
+}) {
+  final camel = RegExp('([a-z0-9])([A-Z])');
+  final nonWord = RegExp('[^a-z0-9]+');
+  for (final column in header) {
+    final spaced = column.replaceAllMapped(
+        camel, (m) => '${m.group(1)}_${m.group(2)}');
+    for (final part in spaced.toLowerCase().split(nonWord)) {
+      if (kFleetExportForbiddenColumns.contains(part)) {
+        throw ArgumentError.value(column, 'header',
+            'a fleet export may not carry raw location (ADR 0025 D5.2)');
+      }
+    }
+  }
+  return encodeCsv([header, ...rows]);
+}

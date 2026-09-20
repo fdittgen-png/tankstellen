@@ -16,11 +16,11 @@ import 'package:tankstellen/core/navigation/app_routes.dart';
 /// rather than losing coverage.
 void main() {
   group('fleetRoutes', () {
-    test('returns exactly 2 routes', () {
+    test('returns exactly 6 routes', () {
       // #4215 (F7) shipped the employee's two: the expense list and
-      // the review screen it pushes. F9's manager surfaces append
-      // LAST, so no index below moves.
-      expect(fleetRoutes.length, 2);
+      // the review screen it pushes. #4216 (F9) appended the
+      // manager's four LAST, so neither index below moved.
+      expect(fleetRoutes.length, 6);
     });
 
     test('route 0 path is "/fleet/expenses"', () {
@@ -33,6 +33,45 @@ void main() {
       final route = fleetRoutes[1] as GoRoute;
       expect(route.path, RoutePaths.fleetExpenseReview);
       expect(route.path, '/fleet/expenses/review');
+    });
+
+    test('the manager surfaces are routes 2..5, in dashboard order '
+        '(#4216)', () {
+      const expected = [
+        RoutePaths.fleetOverview,
+        RoutePaths.fleetVehicle,
+        RoutePaths.fleetQueue,
+        RoutePaths.fleetReports,
+      ];
+      for (var i = 0; i < expected.length; i++) {
+        expect((fleetRoutes[2 + i] as GoRoute).path, expected[i],
+            reason: 'manager route $i');
+      }
+    });
+
+    test('the vehicle route carries its fleet-vehicle id as the typed '
+        'extra — a company asset id is not a deep-link contract '
+        '(#4216)', () {
+      const route = FleetVehicleDetailRoute('veh-3');
+      expect(route.location, RoutePaths.fleetVehicle);
+      expect(route.extra, 'veh-3');
+    });
+
+    test('the queue and report routes carry no payload — they are '
+        'whole surfaces, not records (#4216)', () {
+      expect(const FleetExpenseQueueRoute().extra, isNull);
+      expect(const FleetReportsRoute().extra, isNull);
+    });
+
+    test('no fleet path mentions a trip, a journey or a location — '
+        'ADR 0025 D5.1 leaves the manager no route to one', () {
+      for (final route in fleetRoutes) {
+        final path = (route as GoRoute).path;
+        for (final forbidden in const ['trip', 'journey', 'map', 'location']) {
+          expect(path.contains(forbidden), isFalse,
+              reason: '$path must not offer $forbidden');
+        }
+      }
     });
 
     test('every entry is a GoRoute with a builder', () {

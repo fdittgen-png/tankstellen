@@ -5518,6 +5518,223 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fleetExpenseSubmitFailed => 'Could not submit this expense.';
 
   @override
+  String get fleetManagerOverviewTitle => 'Fleet overview';
+
+  @override
+  String get fleetManagerNoFleetTitle => 'No fleet on this device';
+
+  @override
+  String get fleetManagerNoFleetBody =>
+      'Join an organisation to see its vehicles, costs and expenses here.';
+
+  @override
+  String get fleetManagerUnavailableTitle => 'Figures not loaded';
+
+  @override
+  String get fleetManagerUnavailableBody =>
+      'The organisation\'s figures could not be read. Check your connection and try again.';
+
+  @override
+  String get fleetManagerEmptyPeriodTitle => 'Nothing reported in this period';
+
+  @override
+  String get fleetManagerEmptyPeriodBody =>
+      'No confirmed expenses fall inside the selected dates.';
+
+  @override
+  String get fleetManagerAttentionTitle => 'Needs attention';
+
+  @override
+  String get fleetManagerAttentionNone =>
+      'Nothing needs attention in this period.';
+
+  @override
+  String fleetManagerAttentionCostOutlier(String vehicle) {
+    return '$vehicle: cost per km well above the fleet\'s own median';
+  }
+
+  @override
+  String fleetManagerAttentionLowCoverage(String vehicle) {
+    return '$vehicle: less than half its fuel is backed by measured distance';
+  }
+
+  @override
+  String fleetManagerAttentionNoDistance(String vehicle) {
+    return '$vehicle: no odometer readings, so cost per km cannot be stated';
+  }
+
+  @override
+  String fleetManagerAttentionCo2(String vehicle) {
+    return '$vehicle: CO₂e not calculated — a grade in this period has no published factor';
+  }
+
+  @override
+  String get fleetManagerAttentionMixedCurrency =>
+      'This period mixes currencies, so there is no single total';
+
+  @override
+  String fleetManagerAttentionSuppressed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vehicles are hidden: too few expenses to report',
+      one: '1 vehicle is hidden: too few expenses to report',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fleetManagerKpiSpend => 'Fuel spend';
+
+  @override
+  String get fleetManagerKpiCostPerKm => 'Cost per km';
+
+  @override
+  String get fleetManagerKpiConsumption => 'Consumption';
+
+  @override
+  String get fleetManagerKpiCo2 => 'CO₂e';
+
+  @override
+  String get fleetManagerKpiMeasuredCoverage => 'Measured coverage';
+
+  @override
+  String get fleetManagerKpiLitres => 'Fuel volume';
+
+  @override
+  String get fleetManagerKpiDistance => 'Distance';
+
+  @override
+  String fleetManagerSamples(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count expenses',
+      one: '1 expense',
+      zero: 'no expenses',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fleetManagerNotCalculated => 'Not calculated';
+
+  @override
+  String get fleetManagerMultiCurrencyTotals => 'Totals by currency';
+
+  @override
+  String get fleetManagerVehiclesTitle => 'Vehicles';
+
+  @override
+  String fleetManagerVehicleSuppressed(int threshold) {
+    return 'Fewer than $threshold expenses — hidden to protect the people behind the numbers';
+  }
+
+  @override
+  String fleetManagerVehicleUnnamed(String code) {
+    return 'Vehicle $code';
+  }
+
+  @override
+  String get fleetManagerVehicleTitle => 'Vehicle';
+
+  @override
+  String get fleetManagerVehicleNotInPeriod =>
+      'This vehicle reported nothing in the selected period.';
+
+  @override
+  String get fleetManagerNoJourneys =>
+      'Journeys are not shown here. Fleet reporting reads confirmed expenses only — never GPS traces or engine telemetry.';
+
+  @override
+  String get fleetManagerQueueTitle => 'Expense queue';
+
+  @override
+  String get fleetManagerQueueEmptyTitle => 'Nothing to review';
+
+  @override
+  String get fleetManagerQueueEmptyBody =>
+      'Submitted expenses appear here. Drafts stay with the employee.';
+
+  @override
+  String get fleetManagerQueueApprove => 'Approve';
+
+  @override
+  String get fleetManagerQueueReject => 'Reject';
+
+  @override
+  String get fleetManagerQueueDecisionFailed =>
+      'The decision was not recorded. Nothing has changed.';
+
+  @override
+  String get fleetManagerQueueApproved => 'Approved';
+
+  @override
+  String get fleetManagerQueueRejected => 'Rejected';
+
+  @override
+  String get fleetManagerQueueNotAnApproval =>
+      'Approval is a company decision, not an accounting record.';
+
+  @override
+  String get fleetManagerReportsTitle => 'Reports';
+
+  @override
+  String get fleetManagerCo2ScopeLabel => 'Scope';
+
+  @override
+  String get fleetManagerCo2ScopeWtw =>
+      'Well-to-wheel (production, distribution and combustion)';
+
+  @override
+  String get fleetManagerCo2FactorLabel => 'Factor';
+
+  @override
+  String get fleetManagerCo2NotCalculatedBody =>
+      'A fuel grade in this period has no published emission factor, so no figure is given. No undocumented factor is substituted.';
+
+  @override
+  String get fleetManagerCo2MixedVersions =>
+      'This period used more than one factor version. Two methodologies are never added together.';
+
+  @override
+  String get fleetManagerExport => 'Export CSV';
+
+  @override
+  String get fleetManagerExportAudited =>
+      'Exports are recorded in your organisation\'s audit log. Location and telemetry are never included.';
+
+  @override
+  String get fleetManagerExportFailed =>
+      'The export was not recorded, so no file was produced.';
+
+  @override
+  String get fleetManagerExportReady => 'Export ready';
+
+  @override
+  String fleetManagerPeriod(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get fleetManagerClaimMeasured => 'Measured';
+
+  @override
+  String get fleetManagerClaimCalculated => 'Calculated';
+
+  @override
+  String get fleetManagerClaimEstimate => 'Estimate';
+
+  @override
+  String get fleetManagerClaimEnvironmental => 'Environmental estimate';
+
+  @override
+  String get fleetManagerOpenReports => 'Reports';
+
+  @override
+  String get fleetManagerOpenQueue => 'Expenses';
+
+  @override
   String get fleetVehicleCurrentLabel => 'Current vehicle';
 
   @override
@@ -16309,6 +16526,225 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get fleetExpenseSubmitFailed =>
       '⟦Çóúłđ ñóŧ šúƀɱîŧ ŧĥîš éẋƥéñšé. ···········⟧';
+
+  @override
+  String get fleetManagerOverviewTitle => '⟦Ƒłééŧ óṽéřṽîéŵ ······⟧';
+
+  @override
+  String get fleetManagerNoFleetTitle => '⟦Ñó ƒłééŧ óñ ŧĥîš đéṽîçé ·········⟧';
+
+  @override
+  String get fleetManagerNoFleetBody =>
+      '⟦Ĵóîñ áñ óřǧáñîšáŧîóñ ŧó šéé îŧš ṽéĥîçłéš, çóšŧš áñđ éẋƥéñšéš ĥéřé. ························⟧';
+
+  @override
+  String get fleetManagerUnavailableTitle => '⟦Ƒîǧúřéš ñóŧ łóáđéđ ·······⟧';
+
+  @override
+  String get fleetManagerUnavailableBody =>
+      '⟦Ŧĥé óřǧáñîšáŧîóñ\'š ƒîǧúřéš çóúłđ ñóŧ ƀé řéáđ. Çĥéçķ ýóúř çóññéçŧîóñ áñđ ŧřý áǧáîñ. ······························⟧';
+
+  @override
+  String get fleetManagerEmptyPeriodTitle =>
+      '⟦Ñóŧĥîñǧ řéƥóřŧéđ îñ ŧĥîš ƥéřîóđ ············⟧';
+
+  @override
+  String get fleetManagerEmptyPeriodBody =>
+      '⟦Ñó çóñƒîřɱéđ éẋƥéñšéš ƒáłł îñšîđé ŧĥé šéłéçŧéđ đáŧéš. ····················⟧';
+
+  @override
+  String get fleetManagerAttentionTitle => '⟦Ñééđš áŧŧéñŧîóñ ······⟧';
+
+  @override
+  String get fleetManagerAttentionNone =>
+      '⟦Ñóŧĥîñǧ ñééđš áŧŧéñŧîóñ îñ ŧĥîš ƥéřîóđ. ···············⟧';
+
+  @override
+  String fleetManagerAttentionCostOutlier(String vehicle) {
+    return '⟦$vehicle: çóšŧ ƥéř ķɱ ŵéłł áƀóṽé ŧĥé ƒłééŧ\'š óŵñ ɱéđîáñ ················⟧';
+  }
+
+  @override
+  String fleetManagerAttentionLowCoverage(String vehicle) {
+    return '⟦$vehicle: łéšš ŧĥáñ ĥáłƒ îŧš ƒúéł îš ƀáçķéđ ƀý ɱéášúřéđ đîšŧáñçé ····················⟧';
+  }
+
+  @override
+  String fleetManagerAttentionNoDistance(String vehicle) {
+    return '⟦$vehicle: ñó óđóɱéŧéř řéáđîñǧš, šó çóšŧ ƥéř ķɱ çáññóŧ ƀé šŧáŧéđ ···················⟧';
+  }
+
+  @override
+  String fleetManagerAttentionCo2(String vehicle) {
+    return '⟦$vehicle: ÇÓ₂é ñóŧ çáłçúłáŧéđ — á ǧřáđé îñ ŧĥîš ƥéřîóđ ĥáš ñó ƥúƀłîšĥéđ ƒáçŧóř ························⟧';
+  }
+
+  @override
+  String get fleetManagerAttentionMixedCurrency =>
+      '⟦Ŧĥîš ƥéřîóđ ɱîẋéš çúřřéñçîéš, šó ŧĥéřé îš ñó šîñǧłé ŧóŧáł ·····················⟧';
+
+  @override
+  String fleetManagerAttentionSuppressed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vehicles are hidden: too few expenses to report',
+      one: '1 vehicle is hidden: too few expenses to report',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get fleetManagerKpiSpend => '⟦Ƒúéł šƥéñđ ····⟧';
+
+  @override
+  String get fleetManagerKpiCostPerKm => '⟦Çóšŧ ƥéř ķɱ ····⟧';
+
+  @override
+  String get fleetManagerKpiConsumption => '⟦Çóñšúɱƥŧîóñ ·····⟧';
+
+  @override
+  String get fleetManagerKpiCo2 => '⟦ÇÓ₂é ·⟧';
+
+  @override
+  String get fleetManagerKpiMeasuredCoverage => '⟦Ṁéášúřéđ çóṽéřáǧé ·······⟧';
+
+  @override
+  String get fleetManagerKpiLitres => '⟦Ƒúéł ṽółúɱé ·····⟧';
+
+  @override
+  String get fleetManagerKpiDistance => '⟦Đîšŧáñçé ····⟧';
+
+  @override
+  String fleetManagerSamples(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count expenses',
+      one: '1 expense',
+      zero: 'no expenses',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get fleetManagerNotCalculated => '⟦Ñóŧ çáłçúłáŧéđ ······⟧';
+
+  @override
+  String get fleetManagerMultiCurrencyTotals => '⟦Ŧóŧáłš ƀý çúřřéñçý ·······⟧';
+
+  @override
+  String get fleetManagerVehiclesTitle => '⟦Ṽéĥîçłéš ····⟧';
+
+  @override
+  String fleetManagerVehicleSuppressed(int threshold) {
+    return '⟦Ƒéŵéř ŧĥáñ $threshold éẋƥéñšéš — ĥîđđéñ ŧó ƥřóŧéçŧ ŧĥé ƥéóƥłé ƀéĥîñđ ŧĥé ñúɱƀéřš ··························⟧';
+  }
+
+  @override
+  String fleetManagerVehicleUnnamed(String code) {
+    return '⟦Ṽéĥîçłé $code ···⟧';
+  }
+
+  @override
+  String get fleetManagerVehicleTitle => '⟦Ṽéĥîçłé ···⟧';
+
+  @override
+  String get fleetManagerVehicleNotInPeriod =>
+      '⟦Ŧĥîš ṽéĥîçłé řéƥóřŧéđ ñóŧĥîñǧ îñ ŧĥé šéłéçŧéđ ƥéřîóđ. ····················⟧';
+
+  @override
+  String get fleetManagerNoJourneys =>
+      '⟦Ĵóúřñéýš ářé ñóŧ šĥóŵñ ĥéřé. Ƒłééŧ řéƥóřŧîñǧ řéáđš çóñƒîřɱéđ éẋƥéñšéš óñłý — ñéṽéř ǦƤŠ ŧřáçéš óř éñǧîñé ŧéłéɱéŧřý. ··········································⟧';
+
+  @override
+  String get fleetManagerQueueTitle => '⟦Éẋƥéñšé ɋúéúé ·····⟧';
+
+  @override
+  String get fleetManagerQueueEmptyTitle => '⟦Ñóŧĥîñǧ ŧó řéṽîéŵ ·······⟧';
+
+  @override
+  String get fleetManagerQueueEmptyBody =>
+      '⟦Šúƀɱîŧŧéđ éẋƥéñšéš áƥƥéář ĥéřé. Đřáƒŧš šŧáý ŵîŧĥ ŧĥé éɱƥłóýéé. ·······················⟧';
+
+  @override
+  String get fleetManagerQueueApprove => '⟦Áƥƥřóṽé ···⟧';
+
+  @override
+  String get fleetManagerQueueReject => '⟦Řéĵéçŧ ···⟧';
+
+  @override
+  String get fleetManagerQueueDecisionFailed =>
+      '⟦Ŧĥé đéçîšîóñ ŵáš ñóŧ řéçóřđéđ. Ñóŧĥîñǧ ĥáš çĥáñǧéđ. ···················⟧';
+
+  @override
+  String get fleetManagerQueueApproved => '⟦Áƥƥřóṽéđ ····⟧';
+
+  @override
+  String get fleetManagerQueueRejected => '⟦Řéĵéçŧéđ ····⟧';
+
+  @override
+  String get fleetManagerQueueNotAnApproval =>
+      '⟦Áƥƥřóṽáł îš á çóɱƥáñý đéçîšîóñ, ñóŧ áñ áççóúñŧîñǧ řéçóřđ. ·····················⟧';
+
+  @override
+  String get fleetManagerReportsTitle => '⟦Řéƥóřŧš ···⟧';
+
+  @override
+  String get fleetManagerCo2ScopeLabel => '⟦Šçóƥé ··⟧';
+
+  @override
+  String get fleetManagerCo2ScopeWtw =>
+      '⟦Ŵéłł-ŧó-ŵĥééł (ƥřóđúçŧîóñ, đîšŧřîƀúŧîóñ áñđ çóɱƀúšŧîóñ) ·····················⟧';
+
+  @override
+  String get fleetManagerCo2FactorLabel => '⟦Ƒáçŧóř ···⟧';
+
+  @override
+  String get fleetManagerCo2NotCalculatedBody =>
+      '⟦Á ƒúéł ǧřáđé îñ ŧĥîš ƥéřîóđ ĥáš ñó ƥúƀłîšĥéđ éɱîššîóñ ƒáçŧóř, šó ñó ƒîǧúřé îš ǧîṽéñ. Ñó úñđóçúɱéñŧéđ ƒáçŧóř îš šúƀšŧîŧúŧéđ. ·············································⟧';
+
+  @override
+  String get fleetManagerCo2MixedVersions =>
+      '⟦Ŧĥîš ƥéřîóđ úšéđ ɱóřé ŧĥáñ óñé ƒáçŧóř ṽéřšîóñ. Ŧŵó ɱéŧĥóđółóǧîéš ářé ñéṽéř áđđéđ ŧóǧéŧĥéř. ··································⟧';
+
+  @override
+  String get fleetManagerExport => '⟦Éẋƥóřŧ ÇŠṼ ····⟧';
+
+  @override
+  String get fleetManagerExportAudited =>
+      '⟦Éẋƥóřŧš ářé řéçóřđéđ îñ ýóúř óřǧáñîšáŧîóñ\'š áúđîŧ łóǧ. Łóçáŧîóñ áñđ ŧéłéɱéŧřý ářé ñéṽéř îñçłúđéđ. ····································⟧';
+
+  @override
+  String get fleetManagerExportFailed =>
+      '⟦Ŧĥé éẋƥóřŧ ŵáš ñóŧ řéçóřđéđ, šó ñó ƒîłé ŵáš ƥřóđúçéđ. ···················⟧';
+
+  @override
+  String get fleetManagerExportReady => '⟦Éẋƥóřŧ řéáđý ·····⟧';
+
+  @override
+  String fleetManagerPeriod(String from, String to) {
+    return '⟦$from – $to⟧';
+  }
+
+  @override
+  String get fleetManagerClaimMeasured => '⟦Ṁéášúřéđ ····⟧';
+
+  @override
+  String get fleetManagerClaimCalculated => '⟦Çáłçúłáŧéđ ·····⟧';
+
+  @override
+  String get fleetManagerClaimEstimate => '⟦Éšŧîɱáŧé ····⟧';
+
+  @override
+  String get fleetManagerClaimEnvironmental =>
+      '⟦Éñṽîřóñɱéñŧáł éšŧîɱáŧé ·········⟧';
+
+  @override
+  String get fleetManagerOpenReports => '⟦Řéƥóřŧš ···⟧';
+
+  @override
+  String get fleetManagerOpenQueue => '⟦Éẋƥéñšéš ····⟧';
 
   @override
   String get fleetVehicleCurrentLabel => '⟦Çúřřéñŧ ṽéĥîçłé ······⟧';

@@ -9,7 +9,7 @@
 <body>
 
 <h1>Política de privacidad</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen en iOS, de.tankstellen.fuelprices en Android) &mdash; Version 3 &mdash; Última actualización: 29 de agosto de 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen en iOS, de.tankstellen.fuelprices en Android) &mdash; Version 4 &mdash; Última actualización: 20 de septiembre de 2026</p>
 <p class="langs">Idiomas disponibles: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Resumen</h2>
@@ -52,6 +52,7 @@
     <tr><td>Texto de dirección o coordenadas que usted escribe</td><td>Geocodificación</td><td>Contrato</td><td>Nominatim, o el geocodificador integrado de su teléfono (Apple / Google)</td><td>No los almacenamos</td></tr>
     <tr><td>Claves API que usted introduce (Tankerkönig, OpenChargeMap)</td><td>Llamar a esos servicios en su nombre</td><td>Contrato</td><td>Solo al proveedor al que pertenece la clave</td><td>Cifradas en el dispositivo (Keystore / Keychain) hasta que las elimine</td></tr>
     <tr><td>Reportes de estaciones con nombre o dirección incorrectos, reportes de escaneo incorrecto</td><td>Corregir los datos</td><td>Consentimiento (usted confirma antes del envío; se requiere un token personal de GitHub)</td><td>GitHub (una incidencia pública en el repositorio del proyecto)</td><td>Público hasta que se elimine la incidencia</td></tr>
+    <tr id="fleet-membership-row"><td>Pertenencia a una flota, rol y asignación de vehículo (solo en modo flota)</td><td>Gestionar una flota de empresa: informes agregados de coste, consumo y CO₂e para el empleador</td><td>Contrato con su empleador, que es el responsable del tratamiento de los datos de flota</td><td>La base de datos TankSync de su organización. Los gestores ven agregados; las filas por vehículo por debajo del umbral de la organización se ocultan y no se incluyen datos de ubicación ni de trayectos.</td><td>Hasta que abandone la organización o elimine su cuenta; los registros de acceso privilegiado durante el periodo que configure su organización</td></tr>
   </tbody>
 </table>
 <p>La aplicación no toma decisiones automatizadas que produzcan efectos jurídicos o que le afecten de manera significativa similar. Las predicciones de precios se calculan en el dispositivo a partir de datos públicos de precios.</p>
@@ -139,6 +140,7 @@
 <h2>10. Cambios en esta política</h2>
 <p>Los cambios se publican en esta URL con un nuevo número de versión y una nueva fecha; la aplicación registra la versión a la que usted dio su consentimiento y vuelve a mostrar esta página cuando la versión cambia.</p>
 <ul>
+  <li><strong>v4 — 20 de septiembre de 2026:</strong> modo flota: se declaran la pertenencia a una organización, el rol y la asignación de vehículo; los informes para gestores son solo agregados y no contienen datos de ubicación ni de trayectos.</li>
   <li><strong>v3 — 29 de agosto de 2026:</strong> responsable del tratamiento y roles por modo, tabla de tratamientos con bases jurídicas y plazos de conservación, lista completa de encargados del tratamiento (proxy de teselas, geocodificador, cálculo de rutas, GitHub, logotipos de marcas), vías para ejercer los derechos, supresión y exportación completas.</li>
   <li><strong>v2 — 15 de agosto de 2026:</strong> sección sobre la eliminación de la cuenta; declaración del correo electrónico y de los datos de la cuenta TankSync.</li>
   <li><strong>v1 — 7 de abril de 2026:</strong> primera versión.</li>

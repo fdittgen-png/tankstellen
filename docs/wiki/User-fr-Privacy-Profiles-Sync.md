@@ -230,7 +230,7 @@ Chaque droit des articles 15 à 22 a un bouton. Aucune demande d'assistance néc
 
 Si vous ne pouvez plus ouvrir l'application, demandez la suppression par e-mail depuis l'adresse liée au compte. **Un compte anonyme jamais lié à un e-mail ne peut être identifié par personne — y compris le développeur — sans l'appareil qui l'a créé.** C'est le prix de ne pas vous demander de vous inscrire.
 
-Texte intégral : **[Politique de confidentialité v3, 29 août 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/fr/)**, disponible dans les 23 langues de l'application ([Deutsch](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/), [English](https://fdittgen-png.github.io/tankstellen/privacy-policy/), …). L'application retient la version à laquelle vous avez consenti et la réaffiche à chaque changement.
+Texte intégral : **[Politique de confidentialité v4, 20 septembre 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/fr/)**, disponible dans les 23 langues de l'application ([Deutsch](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/), [English](https://fdittgen-png.github.io/tankstellen/privacy-policy/), …). L'application retient la version à laquelle vous avez consenti et la réaffiche à chaque changement.
 
 ---
 

@@ -8986,5 +8986,338 @@
   "@fleetExpenseSubmitFailed": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fleetManagerOverviewTitle": "Fleet overview",
+  "@fleetManagerOverviewTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerNoFleetTitle": "No fleet on this device",
+  "@fleetManagerNoFleetTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerNoFleetBody": "Join an organisation to see its vehicles, costs and expenses here.",
+  "@fleetManagerNoFleetBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerUnavailableTitle": "Figures not loaded",
+  "@fleetManagerUnavailableTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerUnavailableBody": "The organisation's figures could not be read. Check your connection and try again.",
+  "@fleetManagerUnavailableBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerEmptyPeriodTitle": "Nothing reported in this period",
+  "@fleetManagerEmptyPeriodTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerEmptyPeriodBody": "No confirmed expenses fall inside the selected dates.",
+  "@fleetManagerEmptyPeriodBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerAttentionTitle": "Needs attention",
+  "@fleetManagerAttentionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerAttentionNone": "Nothing needs attention in this period.",
+  "@fleetManagerAttentionNone": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerAttentionCostOutlier": "{vehicle}: cost per km well above the fleet's own median",
+  "@fleetManagerAttentionCostOutlier": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetManagerAttentionLowCoverage": "{vehicle}: less than half its fuel is backed by measured distance",
+  "@fleetManagerAttentionLowCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetManagerAttentionNoDistance": "{vehicle}: no odometer readings, so cost per km cannot be stated",
+  "@fleetManagerAttentionNoDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetManagerAttentionCo2": "{vehicle}: CO₂e not calculated — a grade in this period has no published factor",
+  "@fleetManagerAttentionCo2": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetManagerAttentionMixedCurrency": "This period mixes currencies, so there is no single total",
+  "@fleetManagerAttentionMixedCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerAttentionSuppressed": "{count, plural, =1{1 vehicle is hidden: too few expenses to report} other{{count} vehicles are hidden: too few expenses to report}}",
+  "@fleetManagerAttentionSuppressed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fleetManagerKpiSpend": "Fuel spend",
+  "@fleetManagerKpiSpend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerKpiCostPerKm": "Cost per km",
+  "@fleetManagerKpiCostPerKm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerKpiConsumption": "Consumption",
+  "@fleetManagerKpiConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerKpiCo2": "CO₂e",
+  "@fleetManagerKpiCo2": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerKpiMeasuredCoverage": "Measured coverage",
+  "@fleetManagerKpiMeasuredCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerKpiLitres": "Fuel volume",
+  "@fleetManagerKpiLitres": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerKpiDistance": "Distance",
+  "@fleetManagerKpiDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerSamples": "{count, plural, =0{no expenses} =1{1 expense} other{{count} expenses}}",
+  "@fleetManagerSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fleetManagerNotCalculated": "Not calculated",
+  "@fleetManagerNotCalculated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerMultiCurrencyTotals": "Totals by currency",
+  "@fleetManagerMultiCurrencyTotals": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerVehiclesTitle": "Vehicles",
+  "@fleetManagerVehiclesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerVehicleSuppressed": "Fewer than {threshold} expenses — hidden to protect the people behind the numbers",
+  "@fleetManagerVehicleSuppressed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "threshold": {
+        "type": "int"
+      }
+    }
+  },
+  "fleetManagerVehicleUnnamed": "Vehicle {code}",
+  "@fleetManagerVehicleUnnamed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetManagerVehicleTitle": "Vehicle",
+  "@fleetManagerVehicleTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerVehicleNotInPeriod": "This vehicle reported nothing in the selected period.",
+  "@fleetManagerVehicleNotInPeriod": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerNoJourneys": "Journeys are not shown here. Fleet reporting reads confirmed expenses only — never GPS traces or engine telemetry.",
+  "@fleetManagerNoJourneys": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueTitle": "Expense queue",
+  "@fleetManagerQueueTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueEmptyTitle": "Nothing to review",
+  "@fleetManagerQueueEmptyTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueEmptyBody": "Submitted expenses appear here. Drafts stay with the employee.",
+  "@fleetManagerQueueEmptyBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueApprove": "Approve",
+  "@fleetManagerQueueApprove": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueReject": "Reject",
+  "@fleetManagerQueueReject": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueDecisionFailed": "The decision was not recorded. Nothing has changed.",
+  "@fleetManagerQueueDecisionFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueApproved": "Approved",
+  "@fleetManagerQueueApproved": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueRejected": "Rejected",
+  "@fleetManagerQueueRejected": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerQueueNotAnApproval": "Approval is a company decision, not an accounting record.",
+  "@fleetManagerQueueNotAnApproval": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerReportsTitle": "Reports",
+  "@fleetManagerReportsTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerCo2ScopeLabel": "Scope",
+  "@fleetManagerCo2ScopeLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerCo2ScopeWtw": "Well-to-wheel (production, distribution and combustion)",
+  "@fleetManagerCo2ScopeWtw": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerCo2FactorLabel": "Factor",
+  "@fleetManagerCo2FactorLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerCo2NotCalculatedBody": "A fuel grade in this period has no published emission factor, so no figure is given. No undocumented factor is substituted.",
+  "@fleetManagerCo2NotCalculatedBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerCo2MixedVersions": "This period used more than one factor version. Two methodologies are never added together.",
+  "@fleetManagerCo2MixedVersions": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerExport": "Export CSV",
+  "@fleetManagerExport": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerExportAudited": "Exports are recorded in your organisation's audit log. Location and telemetry are never included.",
+  "@fleetManagerExportAudited": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerExportFailed": "The export was not recorded, so no file was produced.",
+  "@fleetManagerExportFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerExportReady": "Export ready",
+  "@fleetManagerExportReady": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerPeriod": "{from} – {to}",
+  "@fleetManagerPeriod": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetManagerClaimMeasured": "Measured",
+  "@fleetManagerClaimMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerClaimCalculated": "Calculated",
+  "@fleetManagerClaimCalculated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerClaimEstimate": "Estimate",
+  "@fleetManagerClaimEstimate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerClaimEnvironmental": "Environmental estimate",
+  "@fleetManagerClaimEnvironmental": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerOpenReports": "Reports",
+  "@fleetManagerOpenReports": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetManagerOpenQueue": "Expenses",
+  "@fleetManagerOpenQueue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -9,7 +9,7 @@
 <body>
 
 <h1>Zásady ochrany osobných údajov</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen v systéme iOS, de.tankstellen.fuelprices v systéme Android) &mdash; Version 3 &mdash; Posledná aktualizácia: 29. augusta 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen v systéme iOS, de.tankstellen.fuelprices v systéme Android) &mdash; Version 4 &mdash; Posledná aktualizácia: 20. septembra 2026</p>
 <p class="langs">Dostupné jazyky: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Prehľad</h2>
@@ -52,6 +52,7 @@
     <tr><td>Text adresy alebo súradnice, ktoré zadáte</td><td>Geokódovanie</td><td>Zmluva</td><td>Nominatim alebo vstavaný geokodér Vášho telefónu (Apple / Google)</td><td>Neukladáme</td></tr>
     <tr><td>Kľúče API, ktoré zadáte (Tankerkönig, OpenChargeMap)</td><td>Volanie týchto služieb vo Vašom mene</td><td>Zmluva</td><td>Iba poskytovateľovi, ktorému kľúč patrí</td><td>Šifrované v zariadení (Keystore / Keychain), kým ich nevymažete</td></tr>
     <tr><td>Hlásenia nesprávneho názvu / nesprávnej adresy stanice, hlásenia zlého skenovania</td><td>Oprava údajov</td><td>Súhlas (pred odoslaním potvrdíte; vyžaduje sa osobný token GitHub)</td><td>GitHub (verejné hlásenie v repozitári projektu)</td><td>Verejné, kým nie je hlásenie vymazané</td></tr>
+    <tr id="fleet-membership-row"><td>Členstvo vo vozovom parku, rola a priradenie vozidla (iba režim vozového parku)</td><td>Prevádzka firemného vozového parku: súhrnné vykazovanie nákladov, spotreby a CO₂e pre zamestnávateľa</td><td>Zmluva so zamestnávateľom, ktorý je prevádzkovateľom údajov o vozovom parku</td><td>Databáza TankSync vašej organizácie. Manažéri vidia len súhrny; riadky jednotlivých vozidiel pod prahom organizácie sa skryjú a neobsahujú údaje o polohe ani o jazdách.</td><td>Do odchodu z organizácie alebo zmazania účtu; záznamy o privilegovanom prístupe počas obdobia nastaveného organizáciou</td></tr>
   </tbody>
 </table>
 <p>Aplikácia o Vás neprijíma automatizované rozhodnutia s právnymi alebo obdobne významnými účinkami. Predpovede cien sa počítajú v zariadení z verejných cenových údajov.</p>
@@ -139,6 +140,7 @@
 <h2>10. Zmeny týchto zásad</h2>
 <p>Zmeny sa zverejňujú na tejto adrese URL s novým číslom verzie a dátumom; aplikácia zaznamenáva verziu, s ktorou ste súhlasili, a pri zmene verzie túto stránku znova zobrazí.</p>
 <ul>
+  <li><strong>v4 — 20. septembra 2026:</strong> režim vozového parku: deklarované členstvo v organizácii, rola a priradenie vozidla; manažérske výkazy sú iba súhrnné a neobsahujú údaje o polohe ani o jazdách.</li>
   <li><strong>v3 — 29. augusta 2026:</strong> prevádzkovateľ a roly v jednotlivých režimoch, tabuľka spracúvania s právnymi základmi a dobami uchovávania, úplný zoznam sprostredkovateľov (dlaždicová proxy, geokodér, plánovanie trás, GitHub, logá značiek), cesty k uplatneniu práv, úplné vymazanie a export.</li>
   <li><strong>v2 — 15. augusta 2026:</strong> oddiel o vymazaní účtu; deklarovaný e-mail a údaje účtu TankSync.</li>
   <li><strong>v1 — 7. apríla 2026:</strong> prvá verzia.</li>

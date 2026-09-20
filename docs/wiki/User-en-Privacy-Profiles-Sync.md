@@ -230,7 +230,7 @@ Every right in Articles 15–22 has a button. No support request needed.
 
 If you can no longer open the app, request deletion by e-mail from the address linked to your account. **An anonymous account never linked to an e-mail cannot be identified by anyone — including the developer — without the device that created it.** That is the price of not asking you to register.
 
-Full text: **[Privacy policy v3, 29 August 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, available in all 23 app languages ([Deutsch](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/), [Français](https://fdittgen-png.github.io/tankstellen/privacy-policy/fr/), …). The app records which version you consented to and shows the policy again whenever it changes.
+Full text: **[Privacy policy v4, 20 September 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, available in all 23 app languages ([Deutsch](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/), [Français](https://fdittgen-png.github.io/tankstellen/privacy-policy/fr/), …). The app records which version you consented to and shows the policy again whenever it changes.
 
 ---
 

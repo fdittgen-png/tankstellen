@@ -101,6 +101,12 @@ abstract final class RoutePaths {
   // Settings while the employee loop stays a push family of its own.
   static const fleetExpenses = '/fleet/expenses';
   static const fleetExpenseReview = '/fleet/expenses/review';
+  // Manager surfaces (#4216). Appended after the employee's two so no
+  // index in `fleet_routes_test.dart` moves.
+  static const fleetOverview = '/fleet/overview';
+  static const fleetVehicle = '/fleet/vehicle';
+  static const fleetQueue = '/fleet/queue';
+  static const fleetReports = '/fleet/reports';
 
   // TankSync.
   static const syncSetup = '/sync-setup';
@@ -241,4 +247,35 @@ final class FleetExpenseReviewRoute extends AppRoute {
   String get location => RoutePaths.fleetExpenseReview;
   @override
   Object? get extra => expenseId;
+}
+
+/// The manager's fleet vehicle page (`/fleet/vehicle`, #4216).
+///
+/// Same rule as the expense review above: the payload is the company
+/// asset's id, not a metrics record. The figures are re-read from the
+/// current period on every build, so a page left open across a period
+/// change cannot keep showing last quarter's numbers under this
+/// quarter's title — and a deep link with no payload lands on the
+/// "reported nothing" state rather than crashing.
+final class FleetVehicleDetailRoute extends AppRoute {
+  const FleetVehicleDetailRoute(this.fleetVehicleId);
+  final String fleetVehicleId;
+  @override
+  String get location => RoutePaths.fleetVehicle;
+  @override
+  Object? get extra => fleetVehicleId;
+}
+
+/// The org-wide expense review queue (`/fleet/queue`, #4216).
+final class FleetExpenseQueueRoute extends AppRoute {
+  const FleetExpenseQueueRoute();
+  @override
+  String get location => RoutePaths.fleetQueue;
+}
+
+/// The period report and its audited export (`/fleet/reports`, #4216).
+final class FleetReportsRoute extends AppRoute {
+  const FleetReportsRoute();
+  @override
+  String get location => RoutePaths.fleetReports;
 }

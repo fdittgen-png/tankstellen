@@ -51,7 +51,7 @@ Antes de qualquer outro ecrã, a aplicação mostra um **ecrã de consentimento 
 
 Antes de cada pedido *do sistema* (câmara, Bluetooth, notificações) a aplicação mostra primeiro a sua própria explicação, para saber a que consente antes de o Android perguntar.
 
-Texto integral: **[Política de privacidade v3, 29 de agosto de 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
+Texto integral: **[Política de privacidade v4, 20 de setembro de 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
 
 ---
 

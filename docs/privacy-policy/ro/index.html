@@ -9,7 +9,7 @@
 <body>
 
 <h1>Politica de confidențialitate</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen pe iOS, de.tankstellen.fuelprices pe Android) &mdash; Version 3 &mdash; Ultima actualizare: 29 august 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen pe iOS, de.tankstellen.fuelprices pe Android) &mdash; Version 4 &mdash; Ultima actualizare: 20 septembrie 2026</p>
 <p class="langs">Limbi disponibile: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Prezentare generală</h2>
@@ -52,6 +52,7 @@
     <tr><td>Textul adresei sau coordonatele pe care le introduceți</td><td>Geocodare</td><td>Contract</td><td>Nominatim sau geocodificatorul încorporat al telefonului dumneavoastră (Apple / Google)</td><td>Nu sunt stocate de noi</td></tr>
     <tr><td>Cheile API pe care le introduceți (Tankerkönig, OpenChargeMap)</td><td>Apelarea acestor servicii în numele dumneavoastră</td><td>Contract</td><td>Numai către furnizorul căruia îi aparține cheia</td><td>Criptate pe dispozitiv (Keystore / Keychain) până când le ștergeți</td></tr>
     <tr><td>Raportări de nume/adresă greșită a stației, rapoarte de scanare greșită</td><td>Corectarea datelor</td><td>Consimțământ (confirmați înainte de trimitere; este necesar un token GitHub personal)</td><td>GitHub (un issue public în depozitul proiectului)</td><td>Publice până când issue-ul este șters</td></tr>
+    <tr id="fleet-membership-row"><td>Apartenența la o flotă, rolul și alocarea vehiculului (doar în modul flotă)</td><td>Administrarea unei flote de companie: raportare agregată a costurilor, consumului și CO₂e pentru angajator</td><td>Contract cu angajatorul dumneavoastră, care este operatorul datelor de flotă</td><td>Baza de date TankSync a organizației dumneavoastră. Managerii văd doar agregate; rândurile pe vehicul sub pragul organizației sunt ascunse și nu includ date de localizare sau de călătorie.</td><td>Până când părăsiți organizația sau vă ștergeți contul; înregistrările accesului privilegiat pe perioada configurată de organizație</td></tr>
   </tbody>
 </table>
 <p>Aplicația nu ia decizii automatizate care produc efecte juridice sau efecte similare semnificative cu privire la dumneavoastră. Previziunile de preț sunt calculate pe dispozitiv din date publice privind prețurile.</p>
@@ -139,6 +140,7 @@
 <h2>10. Modificări ale acestei politici</h2>
 <p>Modificările sunt publicate la acest URL cu un nou număr de versiune și o nouă dată; aplicația reține versiunea pentru care v-ați dat consimțământul și afișează din nou această pagină atunci când versiunea se schimbă.</p>
 <ul>
+  <li><strong>v4 — 20 septembrie 2026:</strong> modul flotă: apartenența la o organizație, rolul și alocarea vehiculului sunt declarate; raportarea pentru manageri este exclusiv agregată și nu conține date de localizare sau de călătorie.</li>
   <li><strong>v3 — 29 august 2026:</strong> operatorul și rolurile pentru fiecare mod, tabel de prelucrare cu temeiuri juridice și perioade de păstrare, lista completă a persoanelor împuternicite (proxy de dale, geocodificator, rutare, GitHub, logouri ale mărcilor), căile de exercitare a drepturilor, ștergere și export complete.</li>
   <li><strong>v2 — 15 august 2026:</strong> secțiunea privind ștergerea contului; declararea datelor de e-mail și ale contului TankSync.</li>
   <li><strong>v1 — 7 aprilie 2026:</strong> prima versiune.</li>

@@ -6,8 +6,8 @@
 # Play Store Data Safety Form Responses
 
 > Reference document mirroring the Google Play Console Data Safety section.
-> Last updated: 29 August 2026 — reconciled with privacy policy **v3**
-> (29 August 2026, Epic #3865) and the machine-readable inventory
+> Last updated: 20 September 2026 — reconciled with privacy policy **v4**
+> (20 September 2026, Epic #3865) and the machine-readable inventory
 > `docs/privacy/data_inventory.json`, which is the source of truth for the
 > collected types below. The 15 August 2026 revision matched the corrected
 > declaration sent for review on 14 August 2026 (#3712). The April 2026
@@ -36,7 +36,8 @@ reports 90 days).
 
 Collected types, exactly as the inventory lists them: **Email address**,
 **User IDs**, **Precise location**, **Purchase history** (fill-ups), **Other
-user-generated content**, **Crash logs**, **Diagnostics**.
+user-generated content**, **Crash logs**, **Diagnostics**, and **Other info**
+(fleet membership, role and vehicle assignment — fleet mode only).
 
 ---
 
@@ -92,6 +93,26 @@ user-generated content**, **Crash logs**, **Diagnostics**.
 
 The Sentry SDK ships in the Play and iOS builds and stays dormant until the
 user opts in; the F-Droid flavor has it compiled out entirely.
+
+---
+
+### Other info
+
+Declared for **fleet mode** only (Epic #4211), which an employee turns on to
+join their employer's organisation.
+
+| Question | Answer |
+|----------|--------|
+| **Other info** | Yes — fleet membership and role, plus which company vehicle was assigned to the employee and when |
+| **Linked to the user's identity?** | Yes — the membership row names the user |
+| **Shared with third parties?** | No. The employer is the controller for this data; Sparkilo is the processor |
+| **Required or optional?** | Optional (fleet mode is off by default and requires joining an organisation) |
+| **Purpose** | App functionality (fleet administration and aggregate cost reporting) |
+
+Manager reporting is aggregate-first by design: per-vehicle rows below the
+organisation's configured threshold are suppressed, every privileged read and
+export is written to an audit log, and **no location or journey data is
+included in any fleet surface or export** (ADR 0025 D5).
 
 ---
 
@@ -170,6 +191,7 @@ After deletion the account cannot be recovered.
 4. **Financial info** → Purchase history: collected, optional, app functionality, not shared
 5. **App activity** → Other user-generated content: collected, optional, app functionality, not shared
 6. **App info and performance** → Crash logs + Diagnostics: collected, optional (Error reporting consent), analytics, not shared, not linked to identity
-7. Everything else → **Not collected**
-8. Encrypted in transit → Yes; deletion mechanism → Yes
-9. Privacy policy URL: `https://fdittgen-png.github.io/tankstellen/privacy-policy/` (policy v3, 29 August 2026)
+7. **Other info** → fleet membership, role and vehicle assignment: collected, optional (fleet mode), app functionality, not shared, linked to identity
+8. Everything else → **Not collected**
+9. Encrypted in transit → Yes; deletion mechanism → Yes
+10. Privacy policy URL: `https://fdittgen-png.github.io/tankstellen/privacy-policy/` (policy v4, 20 September 2026)

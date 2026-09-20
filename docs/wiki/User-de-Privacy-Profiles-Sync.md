@@ -230,7 +230,7 @@ Jedes Recht aus Art. 15–22 hat einen Knopf. Keine Supportanfrage nötig.
 
 Kannst du die App nicht mehr öffnen, fordere die Löschung per E-Mail von der mit dem Konto verknüpften Adresse an. **Ein anonymes Konto ohne verknüpfte E-Mail kann von niemandem identifiziert werden — auch nicht vom Entwickler — ohne das Gerät, das es erzeugt hat.** Das ist der Preis dafür, dass du dich nicht registrieren musst.
 
-Volltext: **[Datenschutzerklärung v3, 29. August 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/)**, in allen 23 App-Sprachen verfügbar. Die App merkt sich, welcher Fassung du zugestimmt hast, und zeigt die Richtlinie erneut, wenn sie sich ändert.
+Volltext: **[Datenschutzerklärung v4, 20. September 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/)**, in allen 23 App-Sprachen verfügbar. Die App merkt sich, welcher Fassung du zugestimmt hast, und zeigt die Richtlinie erneut, wenn sie sich ändert.
 
 ---
 

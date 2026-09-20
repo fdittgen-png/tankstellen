@@ -9,7 +9,7 @@
 <body>
 
 <h1>Tietosuojakäytäntö</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS:llä, de.tankstellen.fuelprices Androidilla) &mdash; Version 3 &mdash; Päivitetty viimeksi: 29.8.2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen iOS:llä, de.tankstellen.fuelprices Androidilla) &mdash; Version 4 &mdash; Päivitetty viimeksi: 20.9.2026</p>
 <p class="langs">Saatavilla olevat kielet: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Yleiskatsaus</h2>
@@ -52,6 +52,7 @@
     <tr><td>Kirjoittamasi osoiteteksti tai koordinaatit</td><td>Geokoodaus</td><td>Sopimus</td><td>Nominatim tai puhelimesi sisäänrakennettu geokooderi (Apple / Google)</td><td>Emme tallenna</td></tr>
     <tr><td>Syöttämäsi API-avaimet (Tankerkönig, OpenChargeMap)</td><td>Kyseisten palveluiden kutsuminen puolestasi</td><td>Sopimus</td><td>Vain sille palveluntarjoajalle, jolle avain kuuluu</td><td>Salattuna laitteella (Keystore / Keychain), kunnes poistat ne</td></tr>
     <tr><td>Ilmoitukset asemien virheellisestä nimestä / osoitteesta, huono skannaus -ilmoitukset</td><td>Tietojen korjaaminen</td><td>Suostumus (vahvistat ennen lähettämistä; henkilökohtainen GitHub-tunnus vaaditaan)</td><td>GitHub (julkinen issue projektin koodivarastossa)</td><td>Julkinen, kunnes issue poistetaan</td></tr>
+    <tr id="fleet-membership-row"><td>Kalustoon kuuluminen, rooli ja ajoneuvon osoitus (vain kalustotilassa)</td><td>Yrityskaluston hallinta: koostettu kustannusten, kulutuksen ja CO₂e:n raportointi työnantajalle</td><td>Sopimus työnantajasi kanssa, joka on kalustotietojen rekisterinpitäjä</td><td>Organisaatiosi TankSync-tietokanta. Esihenkilöt näkevät vain koosteet; organisaation kynnyksen alittavat ajoneuvokohtaiset rivit piilotetaan, eikä sijainti- tai matkatietoja sisällytetä.</td><td>Kunnes poistut organisaatiosta tai poistat tilisi; korotetun käyttöoikeuden lokit organisaation määrittämän ajan</td></tr>
   </tbody>
 </table>
 <p>Sovellus ei tee sinua koskevia automatisoituja päätöksiä, joilla on oikeudellisia tai vastaavia merkittäviä vaikutuksia. Hintaennusteet lasketaan laitteella julkisista hintatiedoista.</p>
@@ -139,6 +140,7 @@
 <h2>10. Muutokset tähän käytäntöön</h2>
 <p>Muutokset julkaistaan tässä URL-osoitteessa uudella versionumerolla ja päivämäärällä; sovellus tallentaa version, johon annoit suostumuksesi, ja näyttää tämän sivun uudelleen, kun versio muuttuu.</p>
 <ul>
+  <li><strong>v4 — 20.9.2026:</strong> kalustotila: organisaatioon kuuluminen, rooli ja ajoneuvon osoitus ilmoitettu; esihenkilöraportointi on pelkästään koostettua eikä sisällä sijainti- tai matkatietoja.</li>
   <li><strong>v3 — 29.8.2026:</strong> rekisterinpitäjä ja tilakohtaiset roolit, käsittelytaulukko oikeusperusteineen ja säilytysaikoineen, täydellinen käsittelijäluettelo (karttaruutujen välityspalvelin, geokooderi, reititys, GitHub, brändilogot), oikeuksien käyttöpolut, täydellinen poisto ja vienti.</li>
   <li><strong>v2 — 15.8.2026:</strong> tilin poistoa koskeva kohta; sähköposti- ja TankSync-tilitiedot ilmoitettu.</li>
   <li><strong>v1 — 7.4.2026:</strong> ensimmäinen versio.</li>
