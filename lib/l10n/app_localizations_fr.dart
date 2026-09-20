@@ -5447,6 +5447,56 @@ class AppLocalizationsFr extends AppLocalizations {
       'Véhicules de société, affectations et rapports pour les gestionnaires.';
 
   @override
+  String get fleetVehicleCurrentLabel => 'Véhicule actuel';
+
+  @override
+  String get fleetVehicleNoneAssigned => 'Aucun véhicule attribué';
+
+  @override
+  String get fleetVehicleSwitchTitle => 'Choisissez votre véhicule';
+
+  @override
+  String get fleetVehicleSwitchHelper =>
+      'Le changement s\'applique à partir de maintenant. Les saisies déjà enregistrées conservent le véhicule avec lequel elles ont été saisies.';
+
+  @override
+  String get fleetVehicleSearchLabel =>
+      'Code de flotte, modèle ou immatriculation';
+
+  @override
+  String get fleetVehicleSearchEmpty =>
+      'Aucun véhicule attribué ne correspond à votre recherche.';
+
+  @override
+  String get fleetVehicleCurrentBadge => 'Actuel';
+
+  @override
+  String get fleetVehicleStaleBadge => 'Copie hors ligne';
+
+  @override
+  String get fleetVehicleStaleNotice =>
+      'Voici la dernière liste de véhicules téléchargée par votre appareil. Une remise très récente peut y manquer.';
+
+  @override
+  String get fleetVehicleExpiredNotice =>
+      'Votre liste de véhicules est trop ancienne pour changer en toute sécurité. Connectez-vous à votre flotte pour l\'actualiser.';
+
+  @override
+  String get fleetVehicleNeedsConfirmationTitle => 'Véhicule à confirmer';
+
+  @override
+  String get fleetVehicleNeedsConfirmationBody =>
+      'L\'adaptateur et les données du véhicule désignent des voitures différentes. Choisissez la bonne — rien n\'est attribué tant que ce n\'est pas fait.';
+
+  @override
+  String fleetVehicleSemanticsCurrent(String vehicle) {
+    return 'Véhicule actuel : $vehicle';
+  }
+
+  @override
+  String get fleetVehicleSemanticsChange => 'Changer de véhicule actuel';
+
+  @override
   String get fillUpSectionWhatTitle => 'Votre plein';
 
   @override

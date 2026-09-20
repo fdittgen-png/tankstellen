@@ -5398,6 +5398,55 @@ class AppLocalizationsNb extends AppLocalizations {
       'Company vehicles, assignments and manager reporting.';
 
   @override
+  String get fleetVehicleCurrentLabel => 'Current vehicle';
+
+  @override
+  String get fleetVehicleNoneAssigned => 'No vehicle assigned';
+
+  @override
+  String get fleetVehicleSwitchTitle => 'Choose your vehicle';
+
+  @override
+  String get fleetVehicleSwitchHelper =>
+      'Switching applies from now on. Everything you already logged keeps the vehicle it was logged with.';
+
+  @override
+  String get fleetVehicleSearchLabel => 'Fleet code, model or registration';
+
+  @override
+  String get fleetVehicleSearchEmpty =>
+      'No assigned vehicle matches your search.';
+
+  @override
+  String get fleetVehicleCurrentBadge => 'Current';
+
+  @override
+  String get fleetVehicleStaleBadge => 'Offline copy';
+
+  @override
+  String get fleetVehicleStaleNotice =>
+      'This is the vehicle list your device downloaded last. It may not show a very recent handover.';
+
+  @override
+  String get fleetVehicleExpiredNotice =>
+      'Your vehicle list is too old to switch safely. Connect to your fleet to refresh it.';
+
+  @override
+  String get fleetVehicleNeedsConfirmationTitle => 'Vehicle needs confirmation';
+
+  @override
+  String get fleetVehicleNeedsConfirmationBody =>
+      'The adapter and the vehicle data point at different cars. Pick the right one — nothing is attributed until you do.';
+
+  @override
+  String fleetVehicleSemanticsCurrent(String vehicle) {
+    return 'Current vehicle: $vehicle';
+  }
+
+  @override
+  String get fleetVehicleSemanticsChange => 'Change current vehicle';
+
+  @override
   String get fillUpSectionWhatTitle => 'Hva du fylte';
 
   @override

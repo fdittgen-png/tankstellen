@@ -8690,5 +8690,81 @@
   "@fuelAndTankInsufficientMixedCurrencies": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fleetVehicleCurrentLabel": "Current vehicle",
+  "@fleetVehicleCurrentLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleNoneAssigned": "No vehicle assigned",
+  "@fleetVehicleNoneAssigned": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSwitchTitle": "Choose your vehicle",
+  "@fleetVehicleSwitchTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSwitchHelper": "Switching applies from now on. Everything you already logged keeps the vehicle it was logged with.",
+  "@fleetVehicleSwitchHelper": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSearchLabel": "Fleet code, model or registration",
+  "@fleetVehicleSearchLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSearchEmpty": "No assigned vehicle matches your search.",
+  "@fleetVehicleSearchEmpty": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleCurrentBadge": "Current",
+  "@fleetVehicleCurrentBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleStaleBadge": "Offline copy",
+  "@fleetVehicleStaleBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleStaleNotice": "This is the vehicle list your device downloaded last. It may not show a very recent handover.",
+  "@fleetVehicleStaleNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleExpiredNotice": "Your vehicle list is too old to switch safely. Connect to your fleet to refresh it.",
+  "@fleetVehicleExpiredNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleNeedsConfirmationTitle": "Vehicle needs confirmation",
+  "@fleetVehicleNeedsConfirmationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleNeedsConfirmationBody": "The adapter and the vehicle data point at different cars. Pick the right one — nothing is attributed until you do.",
+  "@fleetVehicleNeedsConfirmationBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSemanticsCurrent": "Current vehicle: {vehicle}",
+  "@fleetVehicleSemanticsCurrent": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String",
+        "example": "VAN-12 · VW Caddy"
+      }
+    }
+  },
+  "fleetVehicleSemanticsChange": "Change current vehicle",
+  "@fleetVehicleSemanticsChange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

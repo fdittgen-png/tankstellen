@@ -1,0 +1,16 @@
+{
+  "fleetVehicleCurrentLabel": "Véhicule actuel",
+  "fleetVehicleNoneAssigned": "Aucun véhicule attribué",
+  "fleetVehicleSwitchTitle": "Choisissez votre véhicule",
+  "fleetVehicleSwitchHelper": "Le changement s'applique à partir de maintenant. Les saisies déjà enregistrées conservent le véhicule avec lequel elles ont été saisies.",
+  "fleetVehicleSearchLabel": "Code de flotte, modèle ou immatriculation",
+  "fleetVehicleSearchEmpty": "Aucun véhicule attribué ne correspond à votre recherche.",
+  "fleetVehicleCurrentBadge": "Actuel",
+  "fleetVehicleStaleBadge": "Copie hors ligne",
+  "fleetVehicleStaleNotice": "Voici la dernière liste de véhicules téléchargée par votre appareil. Une remise très récente peut y manquer.",
+  "fleetVehicleExpiredNotice": "Votre liste de véhicules est trop ancienne pour changer en toute sécurité. Connectez-vous à votre flotte pour l'actualiser.",
+  "fleetVehicleNeedsConfirmationTitle": "Véhicule à confirmer",
+  "fleetVehicleNeedsConfirmationBody": "L'adaptateur et les données du véhicule désignent des voitures différentes. Choisissez la bonne — rien n'est attribué tant que ce n'est pas fait.",
+  "fleetVehicleSemanticsCurrent": "Véhicule actuel : {vehicle}",
+  "fleetVehicleSemanticsChange": "Changer de véhicule actuel"
+}

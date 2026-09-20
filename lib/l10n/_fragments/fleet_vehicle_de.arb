@@ -1,0 +1,16 @@
+{
+  "fleetVehicleCurrentLabel": "Aktuelles Fahrzeug",
+  "fleetVehicleNoneAssigned": "Kein Fahrzeug zugewiesen",
+  "fleetVehicleSwitchTitle": "Fahrzeug auswählen",
+  "fleetVehicleSwitchHelper": "Der Wechsel gilt ab jetzt. Bereits erfasste Einträge behalten das Fahrzeug, mit dem sie erfasst wurden.",
+  "fleetVehicleSearchLabel": "Flottencode, Modell oder Kennzeichen",
+  "fleetVehicleSearchEmpty": "Kein zugewiesenes Fahrzeug passt zu deiner Suche.",
+  "fleetVehicleCurrentBadge": "Aktuell",
+  "fleetVehicleStaleBadge": "Offline-Kopie",
+  "fleetVehicleStaleNotice": "Das ist die zuletzt heruntergeladene Fahrzeugliste. Eine ganz frische Übergabe fehlt darin möglicherweise.",
+  "fleetVehicleExpiredNotice": "Deine Fahrzeugliste ist zu alt für einen sicheren Wechsel. Verbinde dich mit deiner Flotte, um sie zu aktualisieren.",
+  "fleetVehicleNeedsConfirmationTitle": "Fahrzeug muss bestätigt werden",
+  "fleetVehicleNeedsConfirmationBody": "Adapter und Fahrzeugdaten deuten auf verschiedene Autos hin. Wähle das richtige aus — bis dahin wird nichts zugeordnet.",
+  "fleetVehicleSemanticsCurrent": "Aktuelles Fahrzeug: {vehicle}",
+  "fleetVehicleSemanticsChange": "Aktuelles Fahrzeug wechseln"
+}
