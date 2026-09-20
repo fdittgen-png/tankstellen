@@ -23,10 +23,10 @@ titles, user-facing error/exception messages — **must** come from
 `AppLocalizations` (ARB). Never inline a translatable literal, not even "just
 for now".
 
-- Add new strings to the matching `lib/l10n/_fragments/` fragment (en + de),
-  then run `dart tool/build_arb.dart`, `dart tool/gen_pseudo_arb.dart`
-  (regenerates the `en_XA` text-expansion pseudo-locale, #1699) and
-  `flutter gen-l10n`.
+- Add new strings to the matching `lib/l10n/_fragments/` fragment (en + de;
+  French too if you can write it — see below), then run
+  `dart tool/build_arb.dart`, `dart tool/gen_pseudo_arb.dart` (regenerates the
+  `en_XA` text-expansion pseudo-locale, #1699) and `flutter gen-l10n`.
 - The only exemptions are brand names / proper nouns (e.g. `GitHub`, `PayPal`,
   `TankSync`), URLs, and language-neutral format masks. Each exemption must
   carry an inline `// i18n-ignore: <reason>` comment.
@@ -82,6 +82,32 @@ git add -- lib/l10n/               # commit the full fan-out
   CI-fatal. The handful of core French-reachable surfaces that must carry real
   (not machine-filled) French translations are declared in
   `test/l10n/french_required_prefixes.dart`.
+
+### A locale is either REBUILT or OVERLAID — never hand-edited (#4402)
+
+`build_arb.dart` handles a locale in exactly one of two ways, and never any
+other:
+
+- **`en` and `de` are rebuilt** from `_fragments/_base_<locale>.arb` plus
+  their feature fragments. Anything not in a fragment does not survive.
+- **Every other locale is autofilled from English, then overlaid** with its
+  own fragments if it has any. Today that means French: write
+  `_fragments/<feature>_fr.arb` beside the en/de pair and the pipeline folds
+  it into `app_fr.arb`, clearing the machine-fill marker on those keys. The
+  thousands of French keys that were never fragmented are left alone.
+
+So **never hand-edit `lib/l10n/app_fr.arb`** — it is generated like every
+other `app_*.arb`. If its wording is better than the fragment's, port the
+wording *into the fragment*; the fragment is the source of truth. Adding
+`_fragments/<feature>_it.arb` starts overlaying Italian with no code change.
+
+This used to be a manual fold: `build_arb.dart` read a two-element locale
+list, so 55 French fragments were write-only and the correct French value had
+to be pasted into the generated file by hand, by whoever noticed. Nothing
+detected a miss, because a machine-filled English value is still a value and
+every coverage gate stayed green. `test/l10n/locale_fragments_test.dart` now
+fails if a fragment value is not what `app_<locale>.arb` ships, or if a
+fragment-owned key still claims it needs a native review.
 
 ## Install the local pre-push gate
 

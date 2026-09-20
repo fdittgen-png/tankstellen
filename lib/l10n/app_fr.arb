@@ -948,7 +948,7 @@
   "obd2DiagnosticShareLabel": "Partager le journal de diagnostic",
   "brokenMapChipDisclaimer": "Lectures MAP suspectes",
   "brokenMapSnackbarUnreliable": "Le capteur MAP donne des valeurs incorrectes — la consommation affichée peut être 50 à 80 % trop basse. Essayez un autre adaptateur.",
-  "brokenMapBannerHardDisable": "Capteur MAP non fiable. Affichage de la moyenne par plein au lieu du débit en direct.",
+  "brokenMapBannerHardDisable": "Capteur MAP non fiable. Affichage de la moyenne par plein au lieu de la consommation en direct.",
   "brokenMapOverlayPosterior": "Capteur MAP : {posterior} % ± {margin} %",
   "brokenMapOverlayPosteriorVerified": "Capteur MAP : {posterior} % ± {margin} % (vérifié)",
   "brokenMapRevPromptTitle": "Faites monter le régime moteur",
@@ -1042,6 +1042,13 @@
   "calibrationFuelDensityLabel": "Densité du carburant (g/L)",
   "calibrationSourceDetected": "(détecté depuis le VIN)",
   "calibrationSourceCatalog": "(catalogue : {makeModel})",
+  "@calibrationSourceCatalog": {
+    "placeholders": {
+      "makeModel": {
+        "type": "String"
+      }
+    }
+  },
   "calibrationSourceDefault": "(par défaut)",
   "calibrationSourceManual": "(manuel)",
   "calibrationResetToDetected": "Restaurer la valeur détectée",
@@ -3343,9 +3350,6 @@
     "description": "MT — needs native review"
   },
   "openingHoursAutomate24h": "Automate 24h/24 7j/7 (paiement par carte)",
-  "@openingHoursAutomate24h": {
-    "description": "MT — needs native review"
-  },
   "stopRadar": "Arrêter le radar",
   "@stopRadar": {
     "description": "Label on the extended floating-action button when the Fuel Station Radar is active: tapping it ends the radar session and hands the results list back to the regular search. Replaces the ambiguous shared 'stop' key (FR 'Étape') that read as a route-waypoint label, not a radar-off affordance (#2744)."
@@ -4118,7 +4122,7 @@
   "tankLevelSourceObd2": "Capteur de réservoir OBD2 · {date}",
   "catalogResetAction": "Réinitialiser depuis la base de véhicules",
   "catalogResetConfirmTitle": "Réinitialiser depuis la base de véhicules ?",
-  "catalogResetConfirmBody": "Cela remplace la capacité du réservoir, la puissance et la cylindrée de ce véhicule par les valeurs de la base pour {vehicle}. Les autres champs et votre historique de pleins ne sont pas modifiés.",
+  "catalogResetConfirmBody": "Cela remplace la capacité du réservoir, la puissance moteur et la cylindrée de ce véhicule par les valeurs de la base pour {vehicle}. Les autres champs et votre historique de pleins ne sont pas modifiés.",
   "@catalogResetConfirmBody": {
     "placeholders": {
       "vehicle": {
@@ -4126,7 +4130,7 @@
       }
     }
   },
-  "catalogResetNoMatchSnackbar": "Aucune entrée correspondante dans la base de véhicules.",
+  "catalogResetNoMatchSnackbar": "Aucune entrée correspondante dans la base de véhicules pour ce véhicule.",
   "catalogResetDoneSnackbar": "Données du véhicule réinitialisées depuis la base.",
   "tankMixCaption": "Mélange du réservoir : {mix}",
   "@tankMixCaption": {
@@ -4153,7 +4157,7 @@
     }
   },
   "confirmDeleteTitle": "Supprimer ?",
-  "confirmDeleteBody": "Voulez-vous vraiment supprimer ceci ?",
+  "confirmDeleteBody": "Voulez-vous vraiment supprimer cet élément ?",
   "trajetDetailChartBoost": "Pression de suralimentation (MAP − ambiante)",
   "trajetDetailChartIat": "Température d'air d'admission",
   "trajetDetailChartTiming": "Avance à l'allumage",
@@ -4432,8 +4436,8 @@
   },
   "minimalDriveBehaviour": "Comportement de conduite",
   "obd2WaitingForEngineBanner": "En attente du moteur — enregistrement par GPS",
-  "obd2StartEngineToReconnect": "Démarrez le moteur pour reconnecter",
-  "obd2ResetConnectionEngineOff": "Moteur éteint — démarrez-le pour reconnecter",
+  "obd2StartEngineToReconnect": "Démarrez le moteur pour vous reconnecter",
+  "obd2ResetConnectionEngineOff": "Moteur éteint — démarrez-le pour vous reconnecter",
   "obd2ParkedPromptTitle": "Moteur éteint depuis {minutes} min — arrêter l'enregistrement ?",
   "@obd2ParkedPromptTitle": {
     "placeholders": {
@@ -4774,7 +4778,7 @@
       },
       "mode": {
         "type": "String",
-        "example": "Rule-based"
+        "example": "Basé sur les règles"
       }
     }
   },
@@ -4948,31 +4952,36 @@
   "privacyDangerZoneBody": "Supprime définitivement tout ce que l'application stocke sur cet appareil. Avec la synchronisation activée, vos données sur le serveur TankSync sont aussi effacées.",
   "privacyDeleteAllMyData": "Supprimer toutes mes données",
   "fillInventoryTitle": "Bilan du plein",
+  "@fillInventoryTitle": {
+    "description": "#3917 — title of the post-fill inventory sheet / card (French: 'Bilan du plein')."
+  },
   "fillInventorySubtitleFull": "Plein complet du {date} · {fuel}",
   "@fillInventorySubtitleFull": {
     "placeholders": {
       "date": {
         "type": "String",
-        "example": "1 Sep 2026"
+        "example": "1 sept. 2026"
       },
       "fuel": {
         "type": "String",
         "example": "E85"
       }
-    }
+    },
+    "description": "#3917 — subtitle under the inventory title for a full tank."
   },
   "fillInventorySubtitlePartial": "Plein partiel du {date} · {fuel}",
   "@fillInventorySubtitlePartial": {
     "placeholders": {
       "date": {
         "type": "String",
-        "example": "1 Sep 2026"
+        "example": "1 sept. 2026"
       },
       "fuel": {
         "type": "String",
         "example": "E10"
       }
-    }
+    },
+    "description": "#3917 — subtitle under the inventory title for a partial fill."
   },
   "fillInventoryKmSinceLastFull": "{km} km depuis le dernier plein complet",
   "@fillInventoryKmSinceLastFull": {
@@ -4981,25 +4990,28 @@
         "type": "String",
         "example": "559"
       }
-    }
+    },
+    "description": "#3917 — odometer distance of the closed tank window."
   },
   "fillInventoryPumpLiters": "{liters} L à la pompe",
   "@fillInventoryPumpLiters": {
     "placeholders": {
       "liters": {
         "type": "String",
-        "example": "35.7"
+        "example": "35,7"
       }
-    }
+    },
+    "description": "#3917 — litres pumped over the tank window."
   },
   "fillInventoryPumpConsumption": "Consommation à la pompe : {value}",
   "@fillInventoryPumpConsumption": {
     "placeholders": {
       "value": {
         "type": "String",
-        "example": "6.4 L/100 km"
+        "example": "6,4 L/100 km"
       }
-    }
+    },
+    "description": "#3917 — the tank's true consumption, already unit-formatted."
   },
   "fillInventoryRecordedTrips": "Trajets enregistrés : {coverage} % du plein · {value} brut",
   "@fillInventoryRecordedTrips": {
@@ -5010,63 +5022,83 @@
       },
       "value": {
         "type": "String",
-        "example": "10.5 L/100 km"
+        "example": "10,5 L/100 km"
       }
-    }
+    },
+    "description": "#3917 — recorded-trip coverage of the window and their raw (uncalibrated) consumption, unit-formatted."
   },
   "fillInventoryNoRecordedTrips": "Aucun trajet enregistré sur ce plein",
+  "@fillInventoryNoRecordedTrips": {
+    "description": "#3917 — the closed window contains no OBD2 recording."
+  },
   "fillInventoryTankNow": "Réservoir maintenant : {liters} L · ≈ {km} km à la conso pompe",
   "@fillInventoryTankNow": {
     "placeholders": {
       "liters": {
         "type": "String",
-        "example": "35.0"
+        "example": "35,0"
       },
       "km": {
         "type": "String",
         "example": "547"
       }
-    }
+    },
+    "description": "#3917 — current tank content and the range it buys at the window's pump consumption."
   },
   "fillInventoryTankNowNoRange": "Réservoir maintenant : {liters} L",
   "@fillInventoryTankNowNoRange": {
     "placeholders": {
       "liters": {
         "type": "String",
-        "example": "35.0"
+        "example": "35,0"
       }
-    }
+    },
+    "description": "#3917 — current tank content when no range can be computed."
   },
   "fillInventoryCalibrationApplied": "Calibrage à la pompe : ×{before} → ×{after} ({percent} %)",
   "@fillInventoryCalibrationApplied": {
     "placeholders": {
       "before": {
         "type": "String",
-        "example": "0.93"
+        "example": "0,93"
       },
       "after": {
         "type": "String",
-        "example": "0.72"
+        "example": "0,72"
       },
       "percent": {
         "type": "String",
         "example": "-22"
       }
-    }
+    },
+    "description": "#3917 — the gain before and after this fill's calibration; {percent} is the signed change of the estimates."
   },
   "fillInventoryCalibrationSkipped": "Calibrage à la pompe : ignoré — {reason}",
   "@fillInventoryCalibrationSkipped": {
     "placeholders": {
       "reason": {
         "type": "String",
-        "example": "first full tank (no window closed yet)"
+        "example": "premier plein complet (aucune fenêtre fermée)"
       }
-    }
+    },
+    "description": "#3917 — the fill did not calibrate; {reason} is one of the fillInventorySkip* strings."
   },
   "fillInventorySkipNotFullTank": "plein partiel (la fenêtre reste ouverte)",
+  "@fillInventorySkipNotFullTank": {
+    "description": "#3917 — skip reason."
+  },
   "fillInventorySkipCorrection": "entrée de correction, pas un plein réel",
+  "@fillInventorySkipCorrection": {
+    "description": "#3917 — skip reason."
+  },
   "fillInventorySkipNoVehicle": "aucun véhicule sur ce plein",
+  "@fillInventorySkipNoVehicle": {
+    "description": "#3917 — skip reason."
+  },
   "fillInventorySkipNoWindow": "premier plein complet (aucune fenêtre fermée)",
+  "@fillInventorySkipNoWindow": {
+    "description": "#3917 — skip reason."
+  },
   "fillInventorySkipCoverageTooLow": "les trajets enregistrés couvrent {coverage} % du plein (60 % requis)",
   "@fillInventorySkipCoverageTooLow": {
     "placeholders": {
@@ -5074,7 +5106,8 @@
         "type": "int",
         "example": "42"
       }
-    }
+    },
+    "description": "#3917 — skip reason: recording coverage below the calibration bar."
   },
   "fillInventorySkipRecordedTooShort": "seulement {km} km enregistrés (40 km requis)",
   "@fillInventorySkipRecordedTooShort": {
@@ -5083,19 +5116,53 @@
         "type": "String",
         "example": "18"
       }
-    }
+    },
+    "description": "#3917 — skip reason: too little recorded distance."
   },
   "fillInventorySkipNoRecordedFuel": "les trajets enregistrés n’ont aucune donnée carburant",
+  "@fillInventorySkipNoRecordedFuel": {
+    "description": "#3917 — skip reason."
+  },
   "fillInventorySkipImplausible": "pompe et enregistrements trop éloignés — vérifiez le ticket",
+  "@fillInventorySkipImplausible": {
+    "description": "#3917 — skip reason: implausible pump/recorded ratio."
+  },
   "fillInventoryDismiss": "Compris",
+  "@fillInventoryDismiss": {
+    "description": "#3917 — dismiss button of the inventory sheet."
+  },
   "tripFuelSourceMeasured": "Mesuré",
+  "@tripFuelSourceMeasured": {
+    "description": "#3919 — trip fuel-source chip: fuel rate reported by the ECU."
+  },
   "tripFuelSourceEstimatedCalibrated": "Estimé · calibré",
+  "@tripFuelSourceEstimatedCalibrated": {
+    "description": "#3919 — trip fuel-source chip: estimated branch with a pump gain applied."
+  },
   "tripFuelSourceEstimated": "Estimé",
+  "@tripFuelSourceEstimated": {
+    "description": "#3919 — trip fuel-source chip: estimated branch, no pump calibration yet."
+  },
   "tripFuelSourceGps": "GPS",
+  "@tripFuelSourceGps": {
+    "description": "#3919 — trip fuel-source chip: GPS-physics estimate, no engine data."
+  },
   "tripFuelSourceMeasuredTooltip": "Débit carburant rapporté par le moteur (PID 5E / 9D / A2) — jamais recalé",
+  "@tripFuelSourceMeasuredTooltip": {
+    "description": "#3919 — tooltip of the Measured chip."
+  },
   "tripFuelSourceEstimatedTooltip": "Carburant estimé d’après la masse d’air — recalé par le calibrage à la pompe",
+  "@tripFuelSourceEstimatedTooltip": {
+    "description": "#3919 — tooltip of the Estimated chips."
+  },
   "tripFuelSourceGpsTooltip": "Estimation physique GPS — aucune donnée moteur",
+  "@tripFuelSourceGpsTooltip": {
+    "description": "#3919 — tooltip of the GPS chip."
+  },
   "tripFuelSourceRecalculated": "recalculé",
+  "@tripFuelSourceRecalculated": {
+    "description": "#3919 — suffix in the chip tooltip when the figure was re-expressed with the current pump calibration."
+  },
   "tripDetailGainApplied": "Gain appliqué : {percent} %",
   "@tripDetailGainApplied": {
     "placeholders": {
@@ -5103,16 +5170,18 @@
         "type": "String",
         "example": "-22"
       }
-    }
+    },
+    "description": "#3919 — trip detail header: the signed pump-gain correction the shown fuel figures carry."
   },
   "tripDetailRecalculatedAfterFill": "Recalculé après le plein du {date}",
   "@tripDetailRecalculatedAfterFill": {
     "placeholders": {
       "date": {
         "type": "String",
-        "example": "1 Sep 2026"
+        "example": "1 sept. 2026"
       }
-    }
+    },
+    "description": "#3919 — trip detail header: the shown figures were re-expressed with a calibration learned after the trip."
   },
   "tripRecordingScreenTitle": "Trajet en cours",
   "recordingObd2ChipLive": "En direct",
@@ -5333,8 +5402,7 @@
   "@searchSummaryAlongRoute": {
     "placeholders": {
       "km": {
-        "type": "String",
-        "example": "50"
+        "type": "String"
       }
     }
   },
@@ -5343,8 +5411,7 @@
   "@searchSummaryPricesMinutes": {
     "placeholders": {
       "minutes": {
-        "type": "int",
-        "example": "12"
+        "type": "int"
       }
     }
   },
@@ -5352,8 +5419,7 @@
   "@searchSummaryPricesHours": {
     "placeholders": {
       "hours": {
-        "type": "int",
-        "example": "2"
+        "type": "int"
       }
     }
   },
@@ -5361,8 +5427,7 @@
   "@searchSummaryPricesDays": {
     "placeholders": {
       "days": {
-        "type": "int",
-        "example": "3"
+        "type": "int"
       }
     }
   },
@@ -5371,8 +5436,7 @@
   "@searchResultsFilterActiveSemantic": {
     "placeholders": {
       "count": {
-        "type": "int",
-        "example": "2"
+        "type": "int"
       }
     }
   },
@@ -5385,8 +5449,7 @@
   "@priceHistoryFirstSeen": {
     "placeholders": {
       "date": {
-        "type": "String",
-        "example": "Aug 21, 2026"
+        "type": "String"
       }
     }
   },
@@ -5394,8 +5457,7 @@
   "@priceHistoryCurrentPriceLine": {
     "placeholders": {
       "price": {
-        "type": "String",
-        "example": "2.329 €"
+        "type": "String"
       }
     }
   },
@@ -5403,12 +5465,10 @@
   "@priceHistoryDeltaSince": {
     "placeholders": {
       "delta": {
-        "type": "String",
-        "example": "+0.03 €"
+        "type": "String"
       },
       "date": {
-        "type": "String",
-        "example": "Aug 21, 2026"
+        "type": "String"
       }
     }
   },
@@ -5416,8 +5476,7 @@
   "@priceHistoryUnchangedSince": {
     "placeholders": {
       "date": {
-        "type": "String",
-        "example": "Aug 21, 2026"
+        "type": "String"
       }
     }
   },
@@ -5429,8 +5488,7 @@
   "@amenitiesServicesShowMore": {
     "placeholders": {
       "count": {
-        "type": "int",
-        "example": "4"
+        "type": "int"
       }
     }
   },
@@ -5441,12 +5499,10 @@
   "@helpBubbleTipPosition": {
     "placeholders": {
       "index": {
-        "type": "int",
-        "example": "2"
+        "type": "int"
       },
       "total": {
-        "type": "int",
-        "example": "5"
+        "type": "int"
       }
     }
   },
@@ -5454,12 +5510,10 @@
   "@helpBubbleTipPositionSemantic": {
     "placeholders": {
       "index": {
-        "type": "int",
-        "example": "2"
+        "type": "int"
       },
       "total": {
-        "type": "int",
-        "example": "5"
+        "type": "int"
       }
     }
   },
@@ -5472,8 +5526,7 @@
   "@searchSummaryFuelTooltip": {
     "placeholders": {
       "fuel": {
-        "type": "String",
-        "example": "E85 / Bioethanol"
+        "type": "String"
       }
     }
   },
@@ -5481,8 +5534,7 @@
   "@searchSummaryRadiusValue": {
     "placeholders": {
       "km": {
-        "type": "String",
-        "example": "10"
+        "type": "String"
       }
     }
   },
@@ -5491,8 +5543,7 @@
   "@searchSummaryAgeMinutes": {
     "placeholders": {
       "minutes": {
-        "type": "int",
-        "example": "12"
+        "type": "int"
       }
     }
   },
@@ -5500,8 +5551,7 @@
   "@searchSummaryAgeHours": {
     "placeholders": {
       "hours": {
-        "type": "int",
-        "example": "2"
+        "type": "int"
       }
     }
   },
@@ -5509,8 +5559,7 @@
   "@searchSummaryAgeDays": {
     "placeholders": {
       "days": {
-        "type": "int",
-        "example": "3"
+        "type": "int"
       }
     }
   },
@@ -6910,101 +6959,38 @@
   "refuelPlanReferencePricesSkipped": "{count, plural, =1{1 prix de référence pour ce secteur n'est pas un endroit où s'arrêter} other{{count} prix de référence pour ce secteur ne sont pas des endroits où s'arrêter}}",
   "carbonCo2ScopeWellToWheel": "Du puits à la roue",
   "carbonCo2FactorSource": "Facteurs : {source}",
+  "@carbonCo2FactorSource": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
   "obd2AdapterNotRespondingBanner": "L'adaptateur ne répond pas — enregistrement GPS en cours",
-  "@obd2AdapterNotRespondingBanner": {
-    "description": "MT — needs native review"
-  },
   "featureLabel_fleetMode": "Mode flotte",
-  "@featureLabel_fleetMode": {
-    "description": "MT — needs native review"
-  },
   "featureDescription_fleetMode": "Mode véhicule de société : votre affectation de véhicule, l'annuaire des véhicules de l'organisation et un changement explicite du véhicule actuel.",
-  "@featureDescription_fleetMode": {
-    "description": "MT — needs native review"
-  },
   "featureBlockedEnable_fleetMode": "Activez d'abord TankSync — une flotte réside dans votre propre base de données.",
-  "@featureBlockedEnable_fleetMode": {
-    "description": "MT — needs native review"
-  },
   "featureLabel_fleetManagerTools": "Outils de gestionnaire de flotte",
-  "@featureLabel_fleetManagerTools": {
-    "description": "MT — needs native review"
-  },
   "featureDescription_fleetManagerTools": "Vues agrégées des coûts et de l'efficacité de la flotte — totaux et exceptions, jamais les trajets individuels des collaborateurs.",
-  "@featureDescription_fleetManagerTools": {
-    "description": "MT — needs native review"
-  },
   "featureBlockedEnable_fleetManagerTools": "Activez d'abord le mode flotte.",
-  "@featureBlockedEnable_fleetManagerTools": {
-    "description": "MT — needs native review"
-  },
   "featureGroupTitle_fleet": "Flotte",
-  "@featureGroupTitle_fleet": {
-    "description": "MT — needs native review"
-  },
   "featureGroupDescription_fleet": "Véhicules de société, affectations et rapports pour les gestionnaires.",
-  "@featureGroupDescription_fleet": {
-    "description": "MT — needs native review"
-  },
   "fuelAndTankInsufficientConditionCoverage": "Pas encore corrigé des conditions : le dénivelé et la circulation ne sont pas relevés",
-  "@fuelAndTankInsufficientConditionCoverage": {
-    "description": "MT — needs native review"
-  },
   "fuelAndTankInsufficientMixedCurrencies": "Plusieurs devises — aucun chiffre unique",
-  "@fuelAndTankInsufficientMixedCurrencies": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleCurrentLabel": "Véhicule actuel",
-  "@fleetVehicleCurrentLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleNoneAssigned": "Aucun véhicule attribué",
-  "@fleetVehicleNoneAssigned": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleSwitchTitle": "Choisissez votre véhicule",
-  "@fleetVehicleSwitchTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleSwitchHelper": "Le changement s'applique à partir de maintenant. Les saisies déjà enregistrées conservent le véhicule avec lequel elles ont été saisies.",
-  "@fleetVehicleSwitchHelper": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleSearchLabel": "Code de flotte, modèle ou immatriculation",
-  "@fleetVehicleSearchLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleSearchEmpty": "Aucun véhicule attribué ne correspond à votre recherche.",
-  "@fleetVehicleSearchEmpty": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleCurrentBadge": "Actuel",
-  "@fleetVehicleCurrentBadge": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleStaleBadge": "Copie hors ligne",
-  "@fleetVehicleStaleBadge": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleStaleNotice": "Voici la dernière liste de véhicules téléchargée par votre appareil. Une remise très récente peut y manquer.",
-  "@fleetVehicleStaleNotice": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleExpiredNotice": "Votre liste de véhicules est trop ancienne pour changer en toute sécurité. Connectez-vous à votre flotte pour l'actualiser.",
-  "@fleetVehicleExpiredNotice": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleNeedsConfirmationTitle": "Véhicule à confirmer",
-  "@fleetVehicleNeedsConfirmationTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleNeedsConfirmationBody": "L'adaptateur et les données du véhicule désignent des voitures différentes. Choisissez la bonne — rien n'est attribué tant que ce n'est pas fait.",
-  "@fleetVehicleNeedsConfirmationBody": {
-    "description": "MT — needs native review"
-  },
   "fleetVehicleSemanticsCurrent": "Véhicule actuel : {vehicle}",
   "@fleetVehicleSemanticsCurrent": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String",
@@ -7013,160 +6999,45 @@
     }
   },
   "fleetVehicleSemanticsChange": "Changer de véhicule actuel",
-  "@fleetVehicleSemanticsChange": {
-    "description": "MT — needs native review"
-  },
   "fleetExpensesTitle": "Frais de carburant",
-  "@fleetExpensesTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetExpensesEmptyTitle": "Aucun frais pour l'instant",
-  "@fleetExpensesEmptyTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetExpensesEmptyBody": "Scannez un ticket de carburant : il apparaîtra ici comme proposition, à vérifier avant de l'envoyer.",
-  "@fleetExpensesEmptyBody": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseStatusDraft": "Brouillon",
-  "@fleetExpenseStatusDraft": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseStatusNeedsReview": "À vérifier",
-  "@fleetExpenseStatusNeedsReview": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseStatusSubmitted": "Envoyé",
-  "@fleetExpenseStatusSubmitted": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseStatusApproved": "Approuvé",
-  "@fleetExpenseStatusApproved": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseStatusRejected": "Refusé",
-  "@fleetExpenseStatusRejected": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseStatusExported": "Exporté",
-  "@fleetExpenseStatusExported": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseStatusArchived": "Archivé",
-  "@fleetExpenseStatusArchived": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseUnknownStation": "Station non lue",
-  "@fleetExpenseUnknownStation": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseReviewTitle": "Vérifier ce ticket",
-  "@fleetExpenseReviewTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseNotFound": "Ce frais ne se trouve pas sur cet appareil.",
-  "@fleetExpenseNotFound": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseArithmeticOk": "Litres × prix au litre correspond au total imprimé.",
-  "@fleetExpenseArithmeticOk": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseArithmeticMismatch": "Litres × prix au litre ne correspond pas au total imprimé. Vérifiez les chiffres avant d'envoyer.",
-  "@fleetExpenseArithmeticMismatch": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseArithmeticIncomplete": "Un chiffre manque : le total ne peut pas être vérifié.",
-  "@fleetExpenseArithmeticIncomplete": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseNeedsConfirmationTitle": "À confirmer par vos soins",
-  "@fleetExpenseNeedsConfirmationTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseReadTitle": "Lu sur le document",
-  "@fleetExpenseReadTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldStation": "Station",
-  "@fleetExpenseFieldStation": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldDate": "Date",
-  "@fleetExpenseFieldDate": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldFuel": "Type de carburant",
-  "@fleetExpenseFieldFuel": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldLitres": "Volume",
-  "@fleetExpenseFieldLitres": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldPricePerLitre": "Prix au litre",
-  "@fleetExpenseFieldPricePerLitre": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldTotal": "Total",
-  "@fleetExpenseFieldTotal": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldVat": "TVA",
-  "@fleetExpenseFieldVat": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldVatRate": "Taux de TVA",
-  "@fleetExpenseFieldVatRate": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldPaymentReference": "Référence de paiement",
-  "@fleetExpenseFieldPaymentReference": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFieldOdometer": "Kilométrage",
-  "@fleetExpenseFieldOdometer": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseValueMissing": "Non lu",
-  "@fleetExpenseValueMissing": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseDocumentTitle": "Document",
-  "@fleetExpenseDocumentTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseSourceOcrPhoto": "Ticket photographié",
-  "@fleetExpenseSourceOcrPhoto": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseSourceOcrPdf": "Ticket PDF",
-  "@fleetExpenseSourceOcrPdf": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseSourceEReceipt": "Ticket numérique",
-  "@fleetExpenseSourceEReceipt": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseSourceStructuredInvoice": "Facture électronique",
-  "@fleetExpenseSourceStructuredInvoice": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseNotAuthoritative": "Une photo n'est pas un document probant, aussi bien lue soit-elle.",
-  "@fleetExpenseNotAuthoritative": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseAuthoritative": "L'entreprise traite ce document comme un justificatif probant.",
-  "@fleetExpenseAuthoritative": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseAttachedToFillUp": "Rattaché à un plein que vous avez déjà enregistré.",
-  "@fleetExpenseAttachedToFillUp": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseCorrections": "{count, plural, =0{Aucune correction} =1{1 champ corrigé} other{{count} champs corrigés}}",
   "@fleetExpenseCorrections": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7174,64 +7045,21 @@
     }
   },
   "fleetExpenseNotAnAccountingRecord": "En envoyant, vous transmettez une demande à votre entreprise. Ce n'est pas une pièce comptable et cela ne décide pas du remboursement.",
-  "@fleetExpenseNotAnAccountingRecord": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseConfirmAndSubmit": "Confirmer et envoyer",
-  "@fleetExpenseConfirmAndSubmit": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseFixFirst": "Confirmez d'abord les champs signalés",
-  "@fleetExpenseFixFirst": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseAlreadySubmitted": "Déjà envoyé",
-  "@fleetExpenseAlreadySubmitted": {
-    "description": "MT — needs native review"
-  },
   "fleetExpenseSubmitFailed": "Impossible d'envoyer ce frais.",
-  "@fleetExpenseSubmitFailed": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerOverviewTitle": "Vue d'ensemble de la flotte",
-  "@fleetManagerOverviewTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerNoFleetTitle": "Aucune flotte sur cet appareil",
-  "@fleetManagerNoFleetTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerNoFleetBody": "Rejoignez une organisation pour voir ici ses véhicules, ses coûts et ses frais.",
-  "@fleetManagerNoFleetBody": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerUnavailableTitle": "Chiffres non chargés",
-  "@fleetManagerUnavailableTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerUnavailableBody": "Les chiffres de l'organisation n'ont pas pu être lus. Vérifiez votre connexion et réessayez.",
-  "@fleetManagerUnavailableBody": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerEmptyPeriodTitle": "Rien de déclaré sur cette période",
-  "@fleetManagerEmptyPeriodTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerEmptyPeriodBody": "Aucun frais confirmé ne tombe dans les dates sélectionnées.",
-  "@fleetManagerEmptyPeriodBody": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerAttentionTitle": "À examiner",
-  "@fleetManagerAttentionTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerAttentionNone": "Rien à examiner sur cette période.",
-  "@fleetManagerAttentionNone": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerAttentionCostOutlier": "{vehicle} : coût au km nettement au-dessus de la médiane de la flotte",
   "@fleetManagerAttentionCostOutlier": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -7240,7 +7068,6 @@
   },
   "fleetManagerAttentionLowCoverage": "{vehicle} : moins de la moitié du carburant est adossée à une distance mesurée",
   "@fleetManagerAttentionLowCoverage": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -7249,7 +7076,6 @@
   },
   "fleetManagerAttentionNoDistance": "{vehicle} : aucun relevé de compteur, le coût au km ne peut pas être indiqué",
   "@fleetManagerAttentionNoDistance": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -7258,7 +7084,6 @@
   },
   "fleetManagerAttentionCo2": "{vehicle} : CO₂e non calculé — un carburant de cette période n'a pas de facteur publié",
   "@fleetManagerAttentionCo2": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -7266,12 +7091,8 @@
     }
   },
   "fleetManagerAttentionMixedCurrency": "Cette période mêle plusieurs devises : il n'y a donc pas de total unique",
-  "@fleetManagerAttentionMixedCurrency": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerAttentionSuppressed": "{count, plural, =1{1 véhicule est masqué : trop peu de frais pour être analysé} other{{count} véhicules sont masqués : trop peu de frais pour être analysés}}",
   "@fleetManagerAttentionSuppressed": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7279,36 +7100,14 @@
     }
   },
   "fleetManagerKpiSpend": "Dépense carburant",
-  "@fleetManagerKpiSpend": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerKpiCostPerKm": "Coût au km",
-  "@fleetManagerKpiCostPerKm": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerKpiConsumption": "Consommation",
-  "@fleetManagerKpiConsumption": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerKpiCo2": "CO₂e",
-  "@fleetManagerKpiCo2": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerKpiMeasuredCoverage": "Couverture mesurée",
-  "@fleetManagerKpiMeasuredCoverage": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerKpiLitres": "Volume de carburant",
-  "@fleetManagerKpiLitres": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerKpiDistance": "Distance",
-  "@fleetManagerKpiDistance": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerSamples": "{count, plural, =0{aucun frais} =1{1 frais} other{{count} frais}}",
   "@fleetManagerSamples": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7316,20 +7115,10 @@
     }
   },
   "fleetManagerNotCalculated": "Non calculé",
-  "@fleetManagerNotCalculated": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerMultiCurrencyTotals": "Totaux par devise",
-  "@fleetManagerMultiCurrencyTotals": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerVehiclesTitle": "Véhicules",
-  "@fleetManagerVehiclesTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerVehicleSuppressed": "Moins de {threshold} frais — masqué pour protéger les personnes derrière les chiffres",
   "@fleetManagerVehicleSuppressed": {
-    "description": "MT — needs native review",
     "placeholders": {
       "threshold": {
         "type": "int"
@@ -7338,7 +7127,6 @@
   },
   "fleetManagerVehicleUnnamed": "Véhicule {code}",
   "@fleetManagerVehicleUnnamed": {
-    "description": "MT — needs native review",
     "placeholders": {
       "code": {
         "type": "String"
@@ -7346,96 +7134,29 @@
     }
   },
   "fleetManagerVehicleTitle": "Véhicule",
-  "@fleetManagerVehicleTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerVehicleNotInPeriod": "Ce véhicule n'a rien déclaré sur la période sélectionnée.",
-  "@fleetManagerVehicleNotInPeriod": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerNoJourneys": "Les trajets ne sont pas affichés ici. Le reporting de flotte ne lit que les frais confirmés — jamais les traces GPS ni la télémétrie moteur.",
-  "@fleetManagerNoJourneys": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueTitle": "File des frais",
-  "@fleetManagerQueueTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueEmptyTitle": "Rien à examiner",
-  "@fleetManagerQueueEmptyTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueEmptyBody": "Les frais envoyés apparaissent ici. Les brouillons restent chez la personne qui les a saisis.",
-  "@fleetManagerQueueEmptyBody": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueApprove": "Approuver",
-  "@fleetManagerQueueApprove": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueReject": "Refuser",
-  "@fleetManagerQueueReject": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueDecisionFailed": "La décision n'a pas été enregistrée. Rien n'a changé.",
-  "@fleetManagerQueueDecisionFailed": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueApproved": "Approuvé",
-  "@fleetManagerQueueApproved": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueRejected": "Refusé",
-  "@fleetManagerQueueRejected": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerQueueNotAnApproval": "Une approbation est une décision de l'entreprise, pas une écriture comptable.",
-  "@fleetManagerQueueNotAnApproval": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerReportsTitle": "Rapports",
-  "@fleetManagerReportsTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerCo2ScopeLabel": "Périmètre",
-  "@fleetManagerCo2ScopeLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerCo2ScopeWtw": "Du puits à la roue (production, distribution et combustion)",
-  "@fleetManagerCo2ScopeWtw": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerCo2FactorLabel": "Facteur",
-  "@fleetManagerCo2FactorLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerCo2NotCalculatedBody": "Un carburant de cette période n'a pas de facteur d'émission publié : aucun chiffre n'est donc donné. Aucun facteur non documenté n'est substitué.",
-  "@fleetManagerCo2NotCalculatedBody": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerCo2MixedVersions": "Cette période utilise plusieurs versions de facteur. Deux méthodologies ne sont jamais additionnées.",
-  "@fleetManagerCo2MixedVersions": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerExport": "Exporter en CSV",
-  "@fleetManagerExport": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerExportAudited": "Les exports sont consignés dans le journal d'audit de votre organisation. La localisation et la télémétrie n'y figurent jamais.",
-  "@fleetManagerExportAudited": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerExportFailed": "L'export n'a pas été consigné : aucun fichier n'a donc été produit.",
-  "@fleetManagerExportFailed": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerExportReady": "Export prêt",
-  "@fleetManagerExportReady": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerPeriod": "{from} – {to}",
   "@fleetManagerPeriod": {
-    "description": "MT — needs native review",
     "placeholders": {
       "from": {
         "type": "String"
@@ -7446,102 +7167,36 @@
     }
   },
   "fleetManagerClaimMeasured": "Mesuré",
-  "@fleetManagerClaimMeasured": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerClaimCalculated": "Calculé",
-  "@fleetManagerClaimCalculated": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerClaimEstimate": "Estimation",
-  "@fleetManagerClaimEstimate": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerClaimEnvironmental": "Estimation environnementale",
-  "@fleetManagerClaimEnvironmental": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerOpenReports": "Rapports",
-  "@fleetManagerOpenReports": {
-    "description": "MT — needs native review"
-  },
   "fleetManagerOpenQueue": "Frais",
-  "@fleetManagerOpenQueue": {
-    "description": "MT — needs native review"
-  },
   "vehCompareTitle": "Comparer les véhicules",
-  "@vehCompareTitle": {
-    "description": "MT — needs native review"
-  },
   "vehCompareOpenTooltip": "Comparer les véhicules",
-  "@vehCompareOpenTooltip": {
-    "description": "MT — needs native review"
-  },
   "vehCompareSelectHint": "Choisis au moins deux véhicules à comparer.",
-  "@vehCompareSelectHint": {
-    "description": "MT — needs native review"
-  },
   "vehCompareNotEnoughVehicles": "Ajoute un deuxième profil de véhicule pour comparer les historiques.",
-  "@vehCompareNotEnoughVehicles": {
-    "description": "MT — needs native review"
-  },
   "vehCompareHonestyNote": "Ces chiffres viennent de tes propres relevés, aux prix que tu as réellement payés. Ils ne mesurent pas l'efficacité intrinsèque d'un véhicule, ne prédisent pas le coût d'un trajet futur et ne représentent pas une économie face à un prix que l'application n'a jamais vu.",
-  "@vehCompareHonestyNote": {
-    "description": "MT — needs native review"
-  },
   "vehComparePeriodLabel": "Période",
-  "@vehComparePeriodLabel": {
-    "description": "MT — needs native review"
-  },
   "vehComparePeriodAll": "Tout l'historique",
-  "@vehComparePeriodAll": {
-    "description": "MT — needs native review"
-  },
   "vehComparePeriodYear": "12 derniers mois",
-  "@vehComparePeriodYear": {
-    "description": "MT — needs native review"
-  },
   "vehComparePeriodQuarter": "90 derniers jours",
-  "@vehComparePeriodQuarter": {
-    "description": "MT — needs native review"
-  },
   "vehCompareBoundaryPolicyLabel": "Pleins à cheval sur la période",
-  "@vehCompareBoundaryPolicyLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareBoundaryClosing": "Compter le plein entier dans la période où il se termine",
-  "@vehCompareBoundaryClosing": {
-    "description": "MT — needs native review"
-  },
   "vehCompareBoundaryContained": "Seulement les pleins entièrement compris",
-  "@vehCompareBoundaryContained": {
-    "description": "MT — needs native review"
-  },
   "vehCompareBoundaryNote": "Un plein n'est jamais coupé à une date. Ses litres ont été mesurés sur le plein entier : il compte donc en entier, ou pas du tout.",
-  "@vehCompareBoundaryNote": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReferenceLabel": "Écarts affichés par rapport à {vehicle}",
   "@vehCompareReferenceLabel": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
-        "type": "String",
-        "example": "Clio"
+        "type": "String"
       }
     }
   },
   "vehCompareSetReference": "Utiliser comme référence",
-  "@vehCompareSetReference": {
-    "description": "MT — needs native review"
-  },
   "vehCompareEvidenceTitle": "Données disponibles",
-  "@vehCompareEvidenceTitle": {
-    "description": "MT — needs native review"
-  },
   "vehCompareWindowCount": "{count, plural, =0{Aucun plein complet} =1{1 plein complet} other{{count} pleins complets}}",
   "@vehCompareWindowCount": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7549,16 +7204,9 @@
     }
   },
   "vehCompareMatchedDistance": "Distance rattachée",
-  "@vehCompareMatchedDistance": {
-    "description": "MT — needs native review"
-  },
   "vehCompareRecordedDistance": "Distance enregistrée",
-  "@vehCompareRecordedDistance": {
-    "description": "MT — needs native review"
-  },
   "vehCompareTripCount": "{count, plural, =0{Aucun trajet enregistré} =1{1 trajet enregistré} other{{count} trajets enregistrés}}",
   "@vehCompareTripCount": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7566,52 +7214,18 @@
     }
   },
   "vehCompareConsumptionTitle": "Consommation observée",
-  "@vehCompareConsumptionTitle": {
-    "description": "MT — needs native review"
-  },
   "vehCompareCostTitle": "Coût",
-  "@vehCompareCostTitle": {
-    "description": "MT — needs native review"
-  },
   "vehCompareCostPerKmLabel": "Par km, achats du plein",
-  "@vehCompareCostPerKmLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareConsumedFuelLabel": "Par km, carburant brûlé (modélisé)",
-  "@vehCompareConsumedFuelLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareRecordedSpendLabel": "Payé à la pompe",
-  "@vehCompareRecordedSpendLabel": {
-    "description": "MT — needs native review"
-  },
   "vehComparePricePerUnitLabel": "Prix moyen payé",
-  "@vehComparePricePerUnitLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareRefuellingTitle": "Ravitaillement",
-  "@vehCompareRefuellingTitle": {
-    "description": "MT — needs native review"
-  },
   "vehCompareFillCountLabel": "Passages à la pompe",
-  "@vehCompareFillCountLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareTotalQuantityLabel": "Total pris à la pompe",
-  "@vehCompareTotalQuantityLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareTypicalQuantityLabel": "Plein typique",
-  "@vehCompareTypicalQuantityLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareFullPartialLabel": "Complets / partiels",
-  "@vehCompareFullPartialLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareFullPartialValue": "{full} complets, {partial} partiels",
   "@vehCompareFullPartialValue": {
-    "description": "MT — needs native review",
     "placeholders": {
       "full": {
         "type": "int"
@@ -7622,12 +7236,8 @@
     }
   },
   "vehCompareBetweenFillsLabel": "Entre deux pleins",
-  "@vehCompareBetweenFillsLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareBetweenFillsDays": "{days, plural, =1{1 jour} other{{days} jours}}",
   "@vehCompareBetweenFillsDays": {
-    "description": "MT — needs native review",
     "placeholders": {
       "days": {
         "type": "int"
@@ -7635,16 +7245,9 @@
     }
   },
   "vehCompareCorrectionsLabel": "Corrections",
-  "@vehCompareCorrectionsLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareStationsTitle": "Stations",
-  "@vehCompareStationsTitle": {
-    "description": "MT — needs native review"
-  },
   "vehCompareStationUnnamed": "{count, plural, =1{1 plein sans station enregistrée} other{{count} pleins sans station enregistrée}}",
   "@vehCompareStationUnnamed": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7653,11 +7256,9 @@
   },
   "vehCompareStationVisits": "{station} : {count}",
   "@vehCompareStationVisits": {
-    "description": "MT — needs native review",
     "placeholders": {
       "station": {
-        "type": "String",
-        "example": "Total Access"
+        "type": "String"
       },
       "count": {
         "type": "int"
@@ -7665,26 +7266,19 @@
     }
   },
   "vehCompareRangeLabel": "Autonomie estimée",
-  "@vehCompareRangeLabel": {
-    "description": "MT — needs native review"
-  },
   "vehCompareFuelShare": "{fuel} : {share}",
   "@vehCompareFuelShare": {
-    "description": "MT — needs native review",
     "placeholders": {
       "fuel": {
-        "type": "String",
-        "example": "E10"
+        "type": "String"
       },
       "share": {
-        "type": "String",
-        "example": "62 %"
+        "type": "String"
       }
     }
   },
   "vehCompareBoundaryIncluded": "{count, plural, =1{1 plein a commencé avant cette période et a été compté en entier.} other{{count} pleins ont commencé avant cette période et ont été comptés en entier.}}",
   "@vehCompareBoundaryIncluded": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7693,7 +7287,6 @@
   },
   "vehCompareBoundaryExcluded": "{count, plural, =1{1 plein a franchi la limite de la période et a été écarté.} other{{count} pleins ont franchi la limite de la période et ont été écartés.}}",
   "@vehCompareBoundaryExcluded": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7702,25 +7295,16 @@
   },
   "vehCompareOpeningCarried": "Le premier plein compté a été fait le {date}, avant cette période — son carburant est reporté, pas recompté.",
   "@vehCompareOpeningCarried": {
-    "description": "MT — needs native review",
     "placeholders": {
       "date": {
-        "type": "String",
-        "example": "1 Jan 2026"
+        "type": "String"
       }
     }
   },
   "vehCompareMissingVehicle": "Ce véhicule n'est plus enregistré, ses chiffres ne peuvent pas être recalculés. La sélection est conservée pour que tu puisses la rétablir.",
-  "@vehCompareMissingVehicle": {
-    "description": "MT — needs native review"
-  },
   "vehCompareRemoveFromSelection": "Retirer de la comparaison",
-  "@vehCompareRemoveFromSelection": {
-    "description": "MT — needs native review"
-  },
   "vehCompareUnassignedFills": "{count, plural, =1{1 plein n'appartient à aucun véhicule et ne compte pour aucune de ces colonnes.} other{{count} pleins n'appartiennent à aucun véhicule et ne comptent pour aucune de ces colonnes.}}",
   "@vehCompareUnassignedFills": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7729,7 +7313,6 @@
   },
   "vehCompareAmbiguousFills": "{count, plural, =1{1 plein pourrait appartenir à plusieurs de ces véhicules et ne compte pour aucun.} other{{count} pleins pourraient appartenir à plusieurs de ces véhicules et ne comptent pour aucun.}}",
   "@vehCompareAmbiguousFills": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7738,7 +7321,6 @@
   },
   "vehCompareUnassignedTrips": "{count, plural, =1{1 trajet enregistré n'appartient à aucun véhicule.} other{{count} trajets enregistrés n'appartiennent à aucun véhicule.}}",
   "@vehCompareUnassignedTrips": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7747,45 +7329,32 @@
   },
   "vehCompareWinnerConsumption": "Consommation observée la plus basse : {vehicle}",
   "@vehCompareWinnerConsumption": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
-        "type": "String",
-        "example": "Clio"
+        "type": "String"
       }
     }
   },
   "vehCompareWinnerCost": "Coût observé au km le plus bas : {vehicle}",
   "@vehCompareWinnerCost": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
-        "type": "String",
-        "example": "Clio"
+        "type": "String"
       }
     }
   },
   "vehCompareNoWinner": "Aucun véhicule ne peut être désigné ici : {reason}",
   "@vehCompareNoWinner": {
-    "description": "MT — needs native review",
     "placeholders": {
       "reason": {
-        "type": "String",
-        "example": "Too few closed tanks to compare."
+        "type": "String"
       }
     }
   },
   "vehCompareSourcesAction": "Afficher les enregistrements",
-  "@vehCompareSourcesAction": {
-    "description": "MT — needs native review"
-  },
   "vehCompareSourcesTitle": "Enregistrements derrière ce chiffre",
-  "@vehCompareSourcesTitle": {
-    "description": "MT — needs native review"
-  },
   "vehCompareSourcesFills": "{count, plural, =0{Aucun plein} =1{1 plein} other{{count} pleins}}",
   "@vehCompareSourcesFills": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7794,7 +7363,6 @@
   },
   "vehCompareSourcesWindows": "{count, plural, =0{Aucun plein complet} =1{1 plein complet} other{{count} pleins complets}}",
   "@vehCompareSourcesWindows": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7803,7 +7371,6 @@
   },
   "vehCompareSourcesTrips": "{count, plural, =0{Aucun trajet} =1{1 trajet} other{{count} trajets}}",
   "@vehCompareSourcesTrips": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
         "type": "int"
@@ -7811,20 +7378,12 @@
     }
   },
   "vehCompareUnavailableShort": "Non comparable",
-  "@vehCompareUnavailableShort": {
-    "description": "MT — needs native review"
-  },
   "vehCompareEstimateBadge": "Estimation",
-  "@vehCompareEstimateBadge": {
-    "description": "MT — needs native review"
-  },
   "vehCompareSemanticsColumn": "{vehicle}, véhicule {index} sur {total}",
   "@vehCompareSemanticsColumn": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
-        "type": "String",
-        "example": "Clio"
+        "type": "String"
       },
       "index": {
         "type": "int"
@@ -7836,475 +7395,230 @@
   },
   "vehCompareSemanticsMetric": "{label} : {value}, {vehicle}",
   "@vehCompareSemanticsMetric": {
-    "description": "MT — needs native review",
     "placeholders": {
       "label": {
-        "type": "String",
-        "example": "Observed consumption"
+        "type": "String"
       },
       "value": {
-        "type": "String",
-        "example": "6.4 L/100 km"
+        "type": "String"
       },
       "vehicle": {
-        "type": "String",
-        "example": "Clio"
+        "type": "String"
       }
     }
   },
   "vehCompareReasonNoEvidence": "Rien n'est enregistré pour ce chiffre.",
-  "@vehCompareReasonNoEvidence": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonTooFewSamples": "Trop peu de pleins complets pour comparer.",
-  "@vehCompareReasonTooFewSamples": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonNoMatchedDistance": "Aucune distance rattachée comme dénominateur.",
-  "@vehCompareReasonNoMatchedDistance": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonMixedCurrencies": "Montants dans plusieurs devises, et aucune conversion n'a été choisie.",
-  "@vehCompareReasonMixedCurrencies": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonUnknownCurrency": "La devise de certains montants n'a jamais été enregistrée.",
-  "@vehCompareReasonUnknownCurrency": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonExchangeRateUnavailable": "Aucun taux de change ne relie ces devises.",
-  "@vehCompareReasonExchangeRateUnavailable": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonExchangeRateStale": "Le taux de change est trop ancien pour trancher.",
-  "@vehCompareReasonExchangeRateStale": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonIncompatibleUnits": "Ces quantités sont mesurées dans des unités différentes.",
-  "@vehCompareReasonIncompatibleUnits": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonUnsupportedUnit": "Ce carburant n'est pas vendu au litre : il n'y a donc pas de valeur en L/100 km.",
-  "@vehCompareReasonUnsupportedUnit": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonAmbiguousAttribution": "Ces enregistrements ne peuvent pas être attribués à un seul véhicule.",
-  "@vehCompareReasonAmbiguousAttribution": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonMissingPrices": "Certains pleins des périodes comptées n'ont pas de prix.",
-  "@vehCompareReasonMissingPrices": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonNoExpectedConsumption": "Aucune consommation attendue n'est enregistrée : rien ne peut être normalisé.",
-  "@vehCompareReasonNoExpectedConsumption": {
-    "description": "MT — needs native review"
-  },
   "vehCompareReasonIncompleteConditionCoverage": "Toutes les conditions de conduite n'ont pas été évaluées.",
-  "@vehCompareReasonIncompleteConditionCoverage": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualUncontrolledConditions": "Les côtes, le froid et le trafic ne sont pas pris en compte.",
-  "@vehCompareQualUncontrolledConditions": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualPartialConditionCoverage": "Seuls les démarrages à froid sont enregistrés ; ni la pente ni les arrêts fréquents.",
-  "@vehCompareQualPartialConditionCoverage": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualUnequalSampleSizes": "Les véhicules reposent sur des volumes de données très différents.",
-  "@vehCompareQualUnequalSampleSizes": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualEstimatedBasis": "Modélisé, pas mesuré.",
-  "@vehCompareQualEstimatedBasis": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualStaleBasis": "Mesuré, mais trop ancien pour être présenté comme actuel.",
-  "@vehCompareQualStaleBasis": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualMixedProvenance": "Des données mesurées et modélisées coexistent ; elles sont présentées séparément.",
-  "@vehCompareQualMixedProvenance": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualConvertedCurrency": "Converti à un taux nommé et daté — une valorisation, pas le montant payé.",
-  "@vehCompareQualConvertedCurrency": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualExcludedRecords": "Certains enregistrements ne sont pas inclus dans ce total.",
-  "@vehCompareQualExcludedRecords": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualOpenWindowExcluded": "Le plein en cours n'est pas compté.",
-  "@vehCompareQualOpenWindowExcluded": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualUnknownBlendShare": "Une partie du réservoir ne peut être attribuée à un seul carburant.",
-  "@vehCompareQualUnknownBlendShare": {
-    "description": "MT — needs native review"
-  },
   "vehCompareQualReconstructedValuation": "Une valorisation reconstituée du carburant brûlé, pas de l'argent payé.",
-  "@vehCompareQualReconstructedValuation": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternComparisonTitle": "Styles de conduite",
-  "@drivingPatternComparisonTitle": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternComparisonSubtitle": "Ce qui a été observé au volant, avec la distance et le temps sur lesquels chaque chiffre repose.",
-  "@drivingPatternComparisonSubtitle": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternNotFuelNote": "Uniquement des observations de conduite. Aucun litre ni euro ne leur est attribué ici : cela exigerait une comparaison validée à part.",
-  "@drivingPatternNotFuelNote": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternInsufficient": "Pas encore assez de trajets enregistrés pour comparer les styles de conduite.",
-  "@drivingPatternInsufficient": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternMatchedOn": "Rapproché sur : {criteria}",
   "@drivingPatternMatchedOn": {
-    "description": "MT — needs native review",
     "placeholders": {
       "criteria": {
-        "type": "String",
-        "example": "trips of 5 to 30 km, warm start"
+        "type": "String"
       }
     }
   },
   "drivingPatternUnmatchedNotice": "Aucune condition de trajet commune : les chiffres ci-dessous sont des observations descriptives sur des parcours inégaux.",
-  "@drivingPatternUnmatchedNotice": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternMatchCounts": "{matched} trajets rapprochés, {unmatched} hors des conditions retenues",
   "@drivingPatternMatchCounts": {
-    "description": "MT — needs native review",
     "placeholders": {
       "matched": {
-        "type": "int",
-        "example": "24"
+        "type": "int"
       },
       "unmatched": {
-        "type": "int",
-        "example": "9"
+        "type": "int"
       }
     }
   },
   "drivingPatternUnassignedExcluded": "{count} trajets enregistrés n'appartiennent à aucun véhicule et ne comptent pour aucun.",
   "@drivingPatternUnassignedExcluded": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
-        "type": "int",
-        "example": "3"
+        "type": "int"
       }
     }
   },
   "drivingPatternNoAdjustedRanking": "Aucun classement corrigé des conditions : la consommation attendue par trajet n'est pas enregistrée, impossible donc de neutraliser le parcours, le relief et le trafic.",
-  "@drivingPatternNoAdjustedRanking": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternContextNote": "Un chiffre plus élevé peut venir de la route et non du conducteur : un freinage nécessaire, une montée, ou un moteur qui tourne simplement plus vite.",
-  "@drivingPatternContextNote": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternDifferencesTitle": "Plus grands écarts observés",
-  "@drivingPatternDifferencesTitle": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternDifferenceLine": "{measure} : {higher} pour {higherVehicle}, {lower} pour {lowerVehicle}",
   "@drivingPatternDifferenceLine": {
-    "description": "MT — needs native review",
     "placeholders": {
       "measure": {
-        "type": "String",
-        "example": "Hard accelerations"
+        "type": "String"
       },
       "higher": {
-        "type": "String",
-        "example": "12.0 per 100 km"
+        "type": "String"
       },
       "higherVehicle": {
-        "type": "String",
-        "example": "Van"
+        "type": "String"
       },
       "lower": {
-        "type": "String",
-        "example": "4.0 per 100 km"
+        "type": "String"
       },
       "lowerVehicle": {
-        "type": "String",
-        "example": "Estate"
+        "type": "String"
       }
     }
   },
   "drivingPatternUnavailableNoSignal": "Non enregistré : ces trajets ne portent aucun signal de ce type",
-  "@drivingPatternUnavailableNoSignal": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternUnavailableTooLittle": "Trop peu de conduite pour avancer un chiffre",
-  "@drivingPatternUnavailableTooLittle": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureEventsPer100Km": "{value} pour 100 km",
   "@drivingMeasureEventsPer100Km": {
-    "description": "MT — needs native review",
     "placeholders": {
       "value": {
-        "type": "String",
-        "example": "12.0"
+        "type": "String"
       }
     }
   },
   "drivingMeasureSharePercent": "{value} %",
   "@drivingMeasureSharePercent": {
-    "description": "MT — needs native review",
     "placeholders": {
       "value": {
-        "type": "String",
-        "example": "8.5"
+        "type": "String"
       }
     }
   },
   "drivingPatternEvidenceCaption": "{numerator} sur {denominator} · {trips} trajets",
   "@drivingPatternEvidenceCaption": {
-    "description": "MT — needs native review",
     "placeholders": {
       "numerator": {
-        "type": "String",
-        "example": "12 events"
+        "type": "String"
       },
       "denominator": {
-        "type": "String",
-        "example": "100 km"
+        "type": "String"
       },
       "trips": {
-        "type": "int",
-        "example": "8"
+        "type": "int"
       }
     }
   },
   "drivingPatternCountEvents": "{count} événements",
   "@drivingPatternCountEvents": {
-    "description": "MT — needs native review",
     "placeholders": {
       "count": {
-        "type": "String",
-        "example": "12"
+        "type": "String"
       }
     }
   },
   "drivingPatternCountMinutes": "{minutes} min",
   "@drivingPatternCountMinutes": {
-    "description": "MT — needs native review",
     "placeholders": {
       "minutes": {
-        "type": "String",
-        "example": "1.0"
+        "type": "String"
       }
     }
   },
   "drivingPatternCountKm": "{km} km",
   "@drivingPatternCountKm": {
-    "description": "MT — needs native review",
     "placeholders": {
       "km": {
-        "type": "String",
-        "example": "100"
+        "type": "String"
       }
     }
   },
   "drivingMeasureHardAccelRate": "Accélérations fortes",
-  "@drivingMeasureHardAccelRate": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureFullThrottleShare": "Temps pleins gaz",
-  "@drivingMeasureFullThrottleShare": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureHardBrakeRate": "Freinages appuyés",
-  "@drivingMeasureHardBrakeRate": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureAvoidableBrakeShare": "Freinages appuyés évitables",
-  "@drivingMeasureAvoidableBrakeShare": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureEngineIdleShare": "Ralenti moteur",
-  "@drivingMeasureEngineIdleShare": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureHighRpmShare": "Régime moteur élevé",
-  "@drivingMeasureHighRpmShare": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureSustainedHighSpeedShare": "Vitesse élevée prolongée",
-  "@drivingMeasureSustainedHighSpeedShare": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureEnergyOscillationRate": "Cycles accélération-freinage",
-  "@drivingMeasureEnergyOscillationRate": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureCoastingFuelCutShare": "Roue libre sans injection",
-  "@drivingMeasureCoastingFuelCutShare": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureLateCurveShare": "Freinage tardif en virage",
-  "@drivingMeasureLateCurveShare": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureClimbFullThrottleShare": "Pleins gaz en montée",
-  "@drivingMeasureClimbFullThrottleShare": {
-    "description": "MT — needs native review"
-  },
   "drivingMeasureFlatFullThrottleShare": "Pleins gaz sur le plat",
-  "@drivingMeasureFlatFullThrottleShare": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternQualUncontrolled": "conditions non maîtrisées",
-  "@drivingPatternQualUncontrolled": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternQualPartialConditions": "seuls les démarrages à froid ont été évalués",
-  "@drivingPatternQualPartialConditions": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternQualUnequalEvidence": "quantités de données très inégales",
-  "@drivingPatternQualUnequalEvidence": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternQualExcluded": "certains enregistrements exclus",
-  "@drivingPatternQualExcluded": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternBandShort": "trajets de moins de 5 km",
-  "@drivingPatternBandShort": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternBandMedium": "trajets de 5 à 30 km",
-  "@drivingPatternBandMedium": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternBandLong": "trajets de plus de 30 km",
-  "@drivingPatternBandLong": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternStartCold": "démarrage à froid",
-  "@drivingPatternStartCold": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternStartWarm": "démarrage à chaud",
-  "@drivingPatternStartWarm": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternStartUnknown": "température de départ non enregistrée",
-  "@drivingPatternStartUnknown": {
-    "description": "MT — needs native review"
-  },
   "drivingPatternCohortLabel": "{band}, {start}",
   "@drivingPatternCohortLabel": {
-    "description": "MT — needs native review",
     "placeholders": {
       "band": {
-        "type": "String",
-        "example": "trips of 5 to 30 km"
+        "type": "String"
       },
       "start": {
-        "type": "String",
-        "example": "warm start"
+        "type": "String"
       }
     }
   },
   "drivingPatternMeasureSemantics": "{measure} pour {vehicle} : {value}, {evidence}",
   "@drivingPatternMeasureSemantics": {
-    "description": "MT — needs native review",
     "placeholders": {
       "measure": {
-        "type": "String",
-        "example": "Hard accelerations"
+        "type": "String"
       },
       "vehicle": {
-        "type": "String",
-        "example": "Estate"
+        "type": "String"
       },
       "value": {
-        "type": "String",
-        "example": "12.0 per 100 km"
+        "type": "String"
       },
       "evidence": {
-        "type": "String",
-        "example": "12 events over 100 km · 8 trips"
+        "type": "String"
       }
     }
   },
   "drivingPatternUnavailableSemantics": "{measure} pour {vehicle} : {reason}",
   "@drivingPatternUnavailableSemantics": {
-    "description": "MT — needs native review",
     "placeholders": {
       "measure": {
-        "type": "String",
-        "example": "Engine idling"
+        "type": "String"
       },
       "vehicle": {
-        "type": "String",
-        "example": "Estate"
+        "type": "String"
       },
       "reason": {
-        "type": "String",
-        "example": "Not recorded — these trips carry no such signal"
+        "type": "String"
       }
     }
   },
   "wizardProfileFleetName": "Véhicule de société ou de flotte",
-  "@wizardProfileFleetName": {
-    "description": "MT — needs native review"
-  },
   "wizardProfileFleetDescription": "Je conduis la voiture de mon employeur. Affectation de flotte, dépenses, et une vue claire de ce que voit mon gestionnaire.",
-  "@wizardProfileFleetDescription": {
-    "description": "MT — needs native review"
-  },
   "fleetIdentityTitle": "Votre flotte",
-  "@fleetIdentityTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetIdentityIntro": "Saisissez le code d'invitation fourni par votre gestionnaire de flotte. Si c'est vous qui créez la flotte, créez-la plutôt ci-dessous.",
-  "@fleetIdentityIntro": {
-    "description": "MT — needs native review"
-  },
   "fleetInviteCodeLabel": "Code d'invitation",
-  "@fleetInviteCodeLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetScanQrCode": "Scanner le code QR",
-  "@fleetScanQrCode": {
-    "description": "MT — needs native review"
-  },
   "fleetJoinButton": "Rejoindre la flotte",
-  "@fleetJoinButton": {
-    "description": "MT — needs native review"
-  },
   "fleetCreateSectionTitle": "C'est moi qui crée cette flotte",
-  "@fleetCreateSectionTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetOrgNameLabel": "Nom de la flotte",
-  "@fleetOrgNameLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetCreateButton": "Créer la flotte",
-  "@fleetCreateButton": {
-    "description": "MT — needs native review"
-  },
   "fleetIdentityLater": "Vous pourrez aussi le faire plus tard dans Réglages, puis Flotte.",
-  "@fleetIdentityLater": {
-    "description": "MT — needs native review"
-  },
   "fleetMemberOf": "Vous faites partie de {org}.",
   "@fleetMemberOf": {
-    "description": "MT — needs native review",
     "placeholders": {
       "org": {
         "type": "String"
@@ -8313,7 +7627,6 @@
   },
   "fleetYourRole": "Votre rôle : {role}",
   "@fleetYourRole": {
-    "description": "MT — needs native review",
     "placeholders": {
       "role": {
         "type": "String"
@@ -8321,248 +7634,67 @@
     }
   },
   "fleetRoleEmployee": "Salarié",
-  "@fleetRoleEmployee": {
-    "description": "MT — needs native review"
-  },
   "fleetRoleManager": "Gestionnaire de flotte",
-  "@fleetRoleManager": {
-    "description": "MT — needs native review"
-  },
   "fleetRoleAdmin": "Administrateur de flotte",
-  "@fleetRoleAdmin": {
-    "description": "MT — needs native review"
-  },
   "fleetBlockedIdentityRequired": "Rejoindre une flotte exige un compte avec une adresse e-mail. Cet appareil utilise encore un compte anonyme, que personne ne peut rattacher à une entreprise — ajoutez d'abord une adresse e-mail dans Réglages, puis Sync.",
-  "@fleetBlockedIdentityRequired": {
-    "description": "MT — needs native review"
-  },
   "fleetBlockedCommunityBackend": "Une flotte ne peut pas vivre sur la base de données communautaire partagée. Il faut la base de votre employeur, ou une base à laquelle vous avez été invité.",
-  "@fleetBlockedCommunityBackend": {
-    "description": "MT — needs native review"
-  },
   "fleetBlockedSyncDisabled": "La synchronisation cloud est désactivée. Configurez d'abord la base de votre employeur dans Réglages, puis Sync.",
-  "@fleetBlockedSyncDisabled": {
-    "description": "MT — needs native review"
-  },
   "fleetBlockedEnterCode": "Saisissez le code d'invitation fourni par votre gestionnaire de flotte.",
-  "@fleetBlockedEnterCode": {
-    "description": "MT — needs native review"
-  },
   "fleetBlockedEnterName": "Donnez un nom à la flotte.",
-  "@fleetBlockedEnterName": {
-    "description": "MT — needs native review"
-  },
   "fleetJoinErrorInvalidCode": "Ce code d'invitation est invalide ou expiré. Demandez-en un nouveau à votre gestionnaire de flotte.",
-  "@fleetJoinErrorInvalidCode": {
-    "description": "MT — needs native review"
-  },
   "fleetJoinErrorAlreadyMember": "Ce compte appartient déjà à une flotte. Quittez-la avant d'en rejoindre une autre.",
-  "@fleetJoinErrorAlreadyMember": {
-    "description": "MT — needs native review"
-  },
   "fleetJoinErrorNotSupported": "Cette base de données ne propose pas l'adhésion à une flotte. Votre administrateur doit d'abord y activer le mode flotte.",
-  "@fleetJoinErrorNotSupported": {
-    "description": "MT — needs native review"
-  },
   "fleetJoinErrorUnavailable": "La flotte est injoignable. Vérifiez votre connexion et réessayez.",
-  "@fleetJoinErrorUnavailable": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacyTitle": "Ce qui est partagé, et ce qui ne l'est pas",
-  "@fleetPrivacyTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacyDeviceTitle": "Reste sur cet appareil",
-  "@fleetPrivacyDeviceTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacyDeviceBody": "Vos trajets, votre position et les données brutes lues sur l'adaptateur ne quittent jamais ce téléphone vers la flotte. Elles sont à vous, pour vos propres consommations et votre coaching.",
-  "@fleetPrivacyDeviceBody": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacySyncTitle": "Part vers la base de votre flotte",
-  "@fleetPrivacySyncTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacySyncBody": "Le véhicule de société qui vous est affecté et depuis quand, ainsi que les pleins et les dépenses que vous soumettez vous-même. Tant que le partage est désactivé, rien n'est envoyé.",
-  "@fleetPrivacySyncBody": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacyManagerTitle": "Ce que voit votre gestionnaire",
-  "@fleetPrivacyManagerTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacyManagerBody": "Les véhicules et les affectations, les dépenses soumises, et les coûts et consommations sous forme de totaux de flotte. Pas vos trajets, pas votre position en direct, et jamais un classement du style de conduite des salariés.",
-  "@fleetPrivacyManagerBody": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacyRetentionTitle": "Durée de conservation, et vos contrôles",
-  "@fleetPrivacyRetentionTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetPrivacyRetentionBody": "Votre employeur définit la durée de conservation des dépenses et de l'historique d'affectation. Vous pouvez à tout moment tout exporter, désactiver le partage et supprimer vos propres données dans Réglages, puis Confidentialité et données.",
-  "@fleetPrivacyRetentionBody": {
-    "description": "MT — needs native review"
-  },
   "settingsTopicFleetTitle": "Flotte",
-  "@settingsTopicFleetTitle": {
-    "description": "MT — needs native review"
-  },
   "settingsTopicFleetSubtitle": "Votre organisation, votre rôle et ce que voit votre gestionnaire.",
-  "@settingsTopicFleetSubtitle": {
-    "description": "MT — needs native review"
-  },
   "settingsTopicFleetKeywords": "flotte, voiture de société, employeur, organisation, gestionnaire, affectation, dépenses",
-  "@settingsTopicFleetKeywords": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsNoFleet": "Vous n'êtes encore dans aucune flotte. Rejoignez-en une avec un code d'invitation, ou créez-la si vous l'administrez.",
-  "@fleetSettingsNoFleet": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsOrgLabel": "Flotte",
-  "@fleetSettingsOrgLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsRoleLabel": "Votre rôle",
-  "@fleetSettingsRoleLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsSharingLabel": "Partage avec votre flotte",
-  "@fleetSettingsSharingLabel": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsSharingOn": "Activé. Les pleins et les dépenses que vous soumettez parviennent à votre flotte.",
-  "@fleetSettingsSharingOn": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsSharingOff": "Désactivé. Rien de lié à la flotte ne quitte cet appareil.",
-  "@fleetSettingsSharingOff": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsManagerSeesTitle": "Ce que voit mon gestionnaire",
-  "@fleetSettingsManagerSeesTitle": {
-    "description": "MT — needs native review"
-  },
   "fleetVisibilityVehicle": "Le véhicule de société qui vous est affecté, et pour quelle période.",
-  "@fleetVisibilityVehicle": {
-    "description": "MT — needs native review"
-  },
   "fleetVisibilityExpenses": "Les pleins et les dépenses que vous soumettez vous-même.",
-  "@fleetVisibilityExpenses": {
-    "description": "MT — needs native review"
-  },
   "fleetVisibilityCosts": "Le coût au kilomètre et la consommation, au sein des totaux de la flotte.",
-  "@fleetVisibilityCosts": {
-    "description": "MT — needs native review"
-  },
   "fleetVisibilityNeverJourneys": "Jamais vos trajets, votre position en direct ni les données brutes de l'adaptateur.",
-  "@fleetVisibilityNeverJourneys": {
-    "description": "MT — needs native review"
-  },
   "fleetVisibilityNeverBehaviour": "Jamais un classement du style de conduite des salariés.",
-  "@fleetVisibilityNeverBehaviour": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsStale": "Ces informations de flotte n'ont pas pu être actualisées récemment.",
-  "@fleetSettingsStale": {
-    "description": "MT — needs native review"
-  },
   "fleetSettingsExpired": "Ces informations de flotte sont périmées. Reconnectez-vous pour qu'elles soient actualisées avant de choisir un véhicule.",
-  "@fleetSettingsExpired": {
-    "description": "MT — needs native review"
-  },
   "vehTripTitle": "Comparer ce trajet",
-  "@vehTripTitle": {
-    "description": "MT — needs native review"
-  },
   "vehTripOpenTooltip": "Comparer ce trajet entre plusieurs véhicules",
-  "@vehTripOpenTooltip": {
-    "description": "MT — needs native review"
-  },
   "vehTripNoRoute": "Planifie d'abord un itinéraire — il n'y a pas encore de trajet à comparer.",
-  "@vehTripNoRoute": {
-    "description": "MT — needs native review"
-  },
   "vehTripNotEnoughVehicles": "Choisis au moins deux véhicules pour comparer ce trajet.",
-  "@vehTripNotEnoughVehicles": {
-    "description": "MT — needs native review"
-  },
   "vehTripForecastNote": "Ce sont des estimations pour un trajet que tu n'as pas encore fait, calculées à partir de la consommation constatée, du réservoir et du carburant compatible de chaque véhicule. Une prévision, pas l'historique que tu as enregistré.",
-  "@vehTripForecastNote": {
-    "description": "MT — needs native review"
-  },
   "vehTripScopeNote": "Carburant et ravitaillement uniquement. L'entretien, la dépréciation et l'assurance n'entrent dans aucun total de cet écran.",
-  "@vehTripScopeNote": {
-    "description": "MT — needs native review"
-  },
   "vehTripObjectiveLabel": "Comparer selon",
-  "@vehTripObjectiveLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripObjectiveCost": "Coût total le plus bas",
-  "@vehTripObjectiveCost": {
-    "description": "MT — needs native review"
-  },
   "vehTripObjectiveTime": "Durée prévue la plus courte",
-  "@vehTripObjectiveTime": {
-    "description": "MT — needs native review"
-  },
   "vehTripObjectiveDistance": "Détour le plus faible",
-  "@vehTripObjectiveDistance": {
-    "description": "MT — needs native review"
-  },
   "vehTripFuelUsedLabel": "Carburant consommé par ce trajet",
-  "@vehTripFuelUsedLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripCostToDriveLabel": "Coût en carburant du trajet",
-  "@vehTripCostToDriveLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripCostToDriveNote": "Le carburant que le trajet consomme, valorisé au meilleur prix disponible pour le carburant de ce véhicule sur cet itinéraire. Il ne change pas selon ce qui se trouve déjà dans le réservoir.",
-  "@vehTripCostToDriveNote": {
-    "description": "MT — needs native review"
-  },
   "vehTripCashRequiredLabel": "Dépense à la pompe",
-  "@vehTripCashRequiredLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripCashRequiredNote": "Ce que tu paierais sur ce trajet avec le réservoir tel qu'il est maintenant, frais d'arrêt connus inclus. Un réservoir plein coûte moins cher à remplir, pas moins cher à rouler.",
-  "@vehTripCashRequiredNote": {
-    "description": "MT — needs native review"
-  },
   "vehTripStopsLabel": "Arrêts carburant",
-  "@vehTripStopsLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripExtraKmLabel": "Kilomètres supplémentaires",
-  "@vehTripExtraKmLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripTimeLabel": "Durée prévue",
-  "@vehTripTimeLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripStartTankLabel": "Réservoir au départ",
-  "@vehTripStartTankLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripEndTankLabel": "Réservoir à l'arrivée",
-  "@vehTripEndTankLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripConsumptionLabel": "Consommation retenue",
-  "@vehTripConsumptionLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripNoStops": "Aucun arrêt carburant nécessaire.",
-  "@vehTripNoStops": {
-    "description": "MT — needs native review"
-  },
   "vehTripStopLine": "{station} : prendre {litres} pour {cost}",
   "@vehTripStopLine": {
-    "description": "MT — needs native review",
     "placeholders": {
       "station": {
         "type": "String"
@@ -8576,24 +7708,11 @@
     }
   },
   "vehTripSourceMeasured": "d'après tes relevés",
-  "@vehTripSourceMeasured": {
-    "description": "MT — needs native review"
-  },
   "vehTripSourceManual": "ton hypothèse",
-  "@vehTripSourceManual": {
-    "description": "MT — needs native review"
-  },
   "vehTripSourceEstimated": "estimé",
-  "@vehTripSourceEstimated": {
-    "description": "MT — needs native review"
-  },
   "vehTripSourceUnknown": "inconnu",
-  "@vehTripSourceUnknown": {
-    "description": "MT — needs native review"
-  },
   "vehTripGap": "Ce véhicule ne peut pas franchir le tronçon de {fromKm} à {toKm} avec un seul plein.",
   "@vehTripGap": {
-    "description": "MT — needs native review",
     "placeholders": {
       "fromKm": {
         "type": "String"
@@ -8605,7 +7724,6 @@
   },
   "vehTripWinnerCost": "{vehicle} roule au coût le plus bas",
   "@vehTripWinnerCost": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -8614,7 +7732,6 @@
   },
   "vehTripWinnerCash": "{vehicle} demande le moins à la pompe",
   "@vehTripWinnerCash": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -8623,7 +7740,6 @@
   },
   "vehTripWinnerTime": "{vehicle} devrait arriver en premier",
   "@vehTripWinnerTime": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -8631,16 +7747,9 @@
     }
   },
   "vehTripWinnerWithheld": "Pas de gagnant unique : tous les véhicules choisis n'étaient pas comparables sur ce point.",
-  "@vehTripWinnerWithheld": {
-    "description": "MT — needs native review"
-  },
   "vehTripApply": "Utiliser ce plan",
-  "@vehTripApply": {
-    "description": "MT — needs native review"
-  },
   "vehTripApplied": "Navigation lancée pour {vehicle}.",
   "@vehTripApplied": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -8648,32 +7757,13 @@
     }
   },
   "vehTripApplyRefused": "Ce plan n'a pas pu être transmis à la navigation.",
-  "@vehTripApplyRefused": {
-    "description": "MT — needs native review"
-  },
   "vehTripBoundedSearch": "Le meilleur des stations examinées, sans preuve qu'il n'existe rien de mieux.",
-  "@vehTripBoundedSearch": {
-    "description": "MT — needs native review"
-  },
   "vehTripCurrencyWithheld": "Certaines stations de cet itinéraire affichent une devise dans laquelle ce trajet ne peut pas s'exprimer. Leurs prix restent tels qu'ils sont affichés.",
-  "@vehTripCurrencyWithheld": {
-    "description": "MT — needs native review"
-  },
   "vehTripIncompleteEvidence": "Certaines stations manquent au plan de ce véhicule : il ne vaut que pour celles examinées.",
-  "@vehTripIncompleteEvidence": {
-    "description": "MT — needs native review"
-  },
   "vehTripAssumptionLabel": "Consommation pour ce trajet",
-  "@vehTripAssumptionLabel": {
-    "description": "MT — needs native review"
-  },
   "vehTripAssumptionClear": "Revenir à mes relevés",
-  "@vehTripAssumptionClear": {
-    "description": "MT — needs native review"
-  },
   "vehTripSemanticsColumn": "{vehicle}, véhicule {index} sur {total}",
   "@vehTripSemanticsColumn": {
-    "description": "MT — needs native review",
     "placeholders": {
       "vehicle": {
         "type": "String"
@@ -8687,23 +7777,8 @@
     }
   },
   "vehTripNoPriceForFuel": "Aucune station de cet itinéraire ne vend le carburant de ce véhicule : il n'y a donc pas de coût en carburant à afficher.",
-  "@vehTripNoPriceForFuel": {
-    "description": "MT — needs native review"
-  },
   "vehTripUnavailableShort": "Non comparable",
-  "@vehTripUnavailableShort": {
-    "description": "MT — needs native review"
-  },
   "refuelComparePickStations": "Comparer des stations",
-  "@refuelComparePickStations": {
-    "description": "MT — needs native review"
-  },
   "refuelComparePickingActive": "Comparer des stations, sélection active",
-  "@refuelComparePickingActive": {
-    "description": "MT — needs native review"
-  },
-  "refuelComparePickPrompt": "Appuyez sur le bouton Comparer d'une station pour l'ajouter à cette comparaison.",
-  "@refuelComparePickPrompt": {
-    "description": "MT — needs native review"
-  }
+  "refuelComparePickPrompt": "Appuyez sur le bouton Comparer d'une station pour l'ajouter à cette comparaison."
 }
