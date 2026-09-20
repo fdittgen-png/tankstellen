@@ -3830,6 +3830,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ce véhicule communique directement son débit de carburant (PID 5E), la calibration du rendement volumétrique n\'est donc pas utilisée — votre consommation est mesurée, pas modélisée.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Du puits à la roue';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Facteurs : $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Votre $makeModel est marqué comme diesel mais correspond à une entrée essence du catalogue. Touchez pour mettre à jour.';
   }

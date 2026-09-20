@@ -8619,5 +8619,21 @@
         "type": "int"
       }
     }
+  },
+  "carbonCo2ScopeWellToWheel": "Well-to-wheel",
+  "@carbonCo2ScopeWellToWheel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "carbonCo2FactorSource": "Factors: {source}",
+  "@carbonCo2FactorSource": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "ADEME Base Carbone v23.6 (2026)"
+      }
+    }
   }
 }

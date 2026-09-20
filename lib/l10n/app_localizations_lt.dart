@@ -3814,6 +3814,14 @@ class AppLocalizationsLt extends AppLocalizations {
       'Šis automobilis degalų sąnaudas praneša tiesiogiai (PID 5E), todėl tūrinio efektyvumo kalibravimas nenaudojamas — jūsų sąnaudos matuojamos, o ne modeliuojamos.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Jūsų $makeModel pažymėtas kaip dyzelinis, bet atitinka benzininio katalogo įrašą. Palieskite, kad atnaujintumėte.';
   }

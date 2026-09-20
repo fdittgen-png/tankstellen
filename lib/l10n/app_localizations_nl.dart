@@ -3807,6 +3807,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit voertuig meldt zijn brandstofverbruik rechtstreeks (PID 5E), dus de kalibratie van het volumetrisch rendement wordt niet gebruikt — je verbruik wordt gemeten, niet gemodelleerd.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Je $makeModel staat als diesel gemarkeerd maar komt overeen met een benzine-catalogusinvoer. Tik om bij te werken.';
   }

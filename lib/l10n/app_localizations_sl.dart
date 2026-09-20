@@ -3795,6 +3795,14 @@ class AppLocalizationsSl extends AppLocalizations {
       'To vozilo neposredno sporoča porabo goriva (PID 5E), zato se umerjanje volumetrične učinkovitosti ne uporablja — vaša poraba je izmerjena, ne modelirana.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Vaš $makeModel je označen kot diesel, a se ujema z bencin. vnosom v katalogu. Tapnite za posodobitev.';
   }

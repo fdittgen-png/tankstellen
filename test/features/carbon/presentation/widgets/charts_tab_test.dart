@@ -87,6 +87,17 @@ void main() {
         find.text('Monthly CO2 emissions', skipOffstage: false),
         findsOneWidget,
       );
+      // #4392 — the CO2 total never appears without the boundary it
+      // was computed over and the table it came from.
+      expect(find.text('Well-to-wheel'), findsOneWidget);
+      expect(
+        find.text('Factors: ADEME Base Carbone v23.6 (2026)'),
+        findsOneWidget,
+      );
+      expect(
+        tester.widget<Text>(find.byKey(const Key('carbon_co2_scope'))).data,
+        'Well-to-wheel',
+      );
     });
 
     testWidgets('builds without throwing when summaries are empty',

@@ -1,0 +1,9 @@
+{
+  "carbonCo2ScopeWellToWheel": "Du puits à la roue",
+  "carbonCo2FactorSource": "Facteurs : {source}",
+  "@carbonCo2FactorSource": {
+    "placeholders": {
+      "source": {"type": "String"}
+    }
+  }
+}

@@ -38,6 +38,7 @@ class FullDataExportInput {
     required this.obd2Caches,
     required this.inProgressTrips,
     required this.consent,
+    this.fleetDirectory = const {},
     this.server,
   });
 
@@ -62,6 +63,9 @@ class FullDataExportInput {
   /// The consent record (toggles, date, policy version).
   final Map<String, dynamic> consent;
 
+  /// #4212 — the cached org directory (`fleet_directory` box), decoded.
+  final Map<String, dynamic> fleetDirectory;
+
   /// `UserDataSync.fetchAll()` — null when not connected.
   final Map<String, dynamic>? server;
 }
@@ -81,6 +85,7 @@ const Map<String, String?> kBoxExportCoverage = {
   HiveBoxes.obd2NegotiatedProtocol: 'local/obd2_caches.json',
   HiveBoxes.obd2PausedTrips: 'local/trips_in_progress.json',
   HiveBoxes.obd2ActiveTrip: 'local/trips_in_progress.json',
+  HiveBoxes.fleetDirectory: 'local/fleet_directory.json', // #4212
   HiveBoxes.errorTraces: null, // exported by "Save error log" (scrubbed)
   HiveBoxes.isolateErrorSpool: null, // same, drained into error traces
   HiveBoxes.cache: null, // reconstructable API responses, no user input
@@ -125,6 +130,7 @@ Uint8List buildFullDataExportZip(FullDataExportInput input) {
   add('local/obd2_caches.json', enc.convert(input.obd2Caches));
   add('local/trips_in_progress.json', enc.convert(input.inProgressTrips));
   add('local/consent.json', enc.convert(input.consent));
+  add('local/fleet_directory.json', enc.convert(input.fleetDirectory));
   final server = input.server;
   if (server != null) {
     for (final entry in server.entries) {
@@ -144,7 +150,8 @@ Uint8List buildFullDataExportZip(FullDataExportInput input) {
 /// Number of entries [buildFullDataExportZip] writes for [input].
 int fullDataExportEntryCount(FullDataExportInput input) =>
     // #4252 — was 12; `local/achievements.json` went with gamification.
-    11 +
+    // #4212 — 11 → 12: `local/fleet_directory.json`.
+    12 +
     input.trips.length +
     (input.server?.values.whereType<List<dynamic>>().length ?? 0) +
     (input.server?['error'] != null ? 1 : 0);

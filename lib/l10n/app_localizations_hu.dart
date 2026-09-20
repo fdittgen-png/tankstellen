@@ -3820,6 +3820,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez a jármű közvetlenül jelenti az üzemanyag-átfolyást (PID 5E), ezért a volumetrikus hatásfok kalibrálása nincs használatban — a fogyasztásod mért, nem modellezett.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'A(z) $makeModel dízelnek van jelölve, de egy benzinkatalogus-bejegyzéssel egyezik meg. Érintsen a frissítéshez.';
   }

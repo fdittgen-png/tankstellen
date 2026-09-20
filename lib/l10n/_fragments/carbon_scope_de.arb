@@ -1,0 +1,9 @@
+{
+  "carbonCo2ScopeWellToWheel": "Well-to-Wheel",
+  "carbonCo2FactorSource": "Faktoren: {source}",
+  "@carbonCo2FactorSource": {
+    "placeholders": {
+      "source": {"type": "String"}
+    }
+  }
+}

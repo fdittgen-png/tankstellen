@@ -1,0 +1,16 @@
+{
+  "carbonCo2ScopeWellToWheel": "Well-to-wheel",
+  "@carbonCo2ScopeWellToWheel": {
+    "description": "Caption under the total-CO2 tile on the carbon dashboard naming the emission boundary the figure uses: fuel production and distribution AND burning (#4392)."
+  },
+  "carbonCo2FactorSource": "Factors: {source}",
+  "@carbonCo2FactorSource": {
+    "description": "Caption under the total-CO2 tile on the carbon dashboard citing the published emission-factor table the figure was computed from (#4392).",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "ADEME Base Carbone v23.6 (2026)"
+      }
+    }
+  }
+}

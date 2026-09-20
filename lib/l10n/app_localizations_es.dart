@@ -3814,6 +3814,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este vehículo informa directamente de su caudal de combustible (PID 5E), así que no se usa la calibración de eficiencia volumétrica: tu consumo se mide, no se modela.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Tu $makeModel está marcado como diésel pero coincide con una entrada de gasolina del catálogo. Toca para actualizar.';
   }

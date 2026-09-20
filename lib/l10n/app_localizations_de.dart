@@ -3815,6 +3815,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dieses Fahrzeug meldet seinen Verbrauch direkt (PID 5E), daher wird keine Kalibrierung der volumetrischen Effizienz verwendet – dein Verbrauch wird gemessen, nicht geschätzt.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-Wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Faktoren: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Dein $makeModel ist als Diesel markiert, passt aber zu einem Benziner-Eintrag im Katalog. Tippe zum Aktualisieren.';
   }

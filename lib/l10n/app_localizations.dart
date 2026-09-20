@@ -6686,6 +6686,18 @@ abstract class AppLocalizations {
   /// **'This vehicle reports its fuel rate directly (PID 5E), so volumetric-efficiency calibration is not used — your consumption is measured, not modelled.'**
   String get calibrationDirectFuelRateNote;
 
+  /// Caption under the total-CO2 tile on the carbon dashboard naming the emission boundary the figure uses: fuel production and distribution AND burning (#4392).
+  ///
+  /// In en, this message translates to:
+  /// **'Well-to-wheel'**
+  String get carbonCo2ScopeWellToWheel;
+
+  /// Caption under the total-CO2 tile on the carbon dashboard citing the published emission-factor table the figure was computed from (#4392).
+  ///
+  /// In en, this message translates to:
+  /// **'Factors: {source}'**
+  String carbonCo2FactorSource(String source);
+
   /// One-time snackbar (#1396) shown when a diesel-marked vehicle profile resolves to a non-diesel reference catalog row. The placeholder is the make + model, e.g. 'Dacia Duster'.
   ///
   /// In en, this message translates to:

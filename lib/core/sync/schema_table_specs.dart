@@ -25,9 +25,11 @@ library;
 
 import 'schema_table_specs_core.dart';
 import 'schema_table_specs_extended.dart';
+import 'schema_table_specs_fleet.dart';
 
 export 'schema_table_specs_core.dart';
 export 'schema_table_specs_extended.dart';
+export 'schema_table_specs_fleet.dart';
 
 /// One synced table of the TankSync schema.
 ///
@@ -48,8 +50,11 @@ typedef SyncedTableSpec = ({
 });
 
 /// Every synced table, in wizard-SQL emission order (required core
-/// tables first, then the optional feature tables).
+/// tables first, then the optional feature tables, then — #4212, v13 —
+/// the org-scoped fleet tables, appended so every earlier byte of the
+/// goldens is unchanged).
 const List<SyncedTableSpec> syncedTableSpecs = [
   ...coreTableSpecs,
   ...extendedTableSpecs,
+  ...fleetTableSpecs,
 ];

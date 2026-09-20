@@ -77,6 +77,11 @@ Legend:
 | `wait_time_pings`  | own          | own             | own        | own                | Single `wait_time_pings_own` `FOR ALL`. Aggregator runs as service_role and bypasses RLS. Wiped by the account-erasure path like every other own-row table. |
 | `wait_time_aggregates` | all      | (svc)           | (svc)      | (svc)              | Single `wait_aggregates_read` SELECT-only policy. Anonymized rolling-median rows are visible to every authenticated client; only Edge Functions write. |
 | `tanksync_meta`    | all          | (svc)           | (svc)      | (svc)              | Single `tanksync_meta_read` SELECT-only policy. Carries only the schema-version marker (#2929) the verifier probes; world-readable, written via the SQL editor / service_role. |
+| `fleet_organizations` | member (`is_fleet_member(id)`) | (rpc) | (rpc) | none | #4212 (schema v13, ADR 0025). SELECT-only `fleet_organizations_member_select` through the caller-bound SECURITY DEFINER oracle. No client write policy on any fleet table: writes are the `fleet_*` RPCs, which re-check role and org inside the definer body (D7). |
+| `fleet_members`    | own row + org roster for `manager`/`admin` (`fleet_role(org_id)`) | (rpc) | (rpc) | none | `fleet_members_select`. One org per user in v1 (unique on `user_id`). Erased by `erase_my_data()` (`user_id`). |
+| `fleet_vehicles`   | member       | (rpc)           | (rpc)      | none               | `fleet_vehicles_member_select` — every member sees the org's vehicle directory; nothing in it names a person. No location column (D5). |
+| `vehicle_assignments` | own rows + org-wide for `manager`/`admin` | (rpc) | (rpc: `effective_to` only) | none | `fleet_assignments_select`. Effective-dated; `fleet_end_assignment` stamps `effective_to`, never deletes. Erased by `erase_my_data()` (`user_id`). |
+| `fleet_policies`   | member       | (rpc)           | (rpc)      | none               | `fleet_policies_member_select`. JSONB thresholds / retention (D9), seeded by `fleet_create_organization`. |
 
 ## RPCs (SECURITY DEFINER functions)
 
@@ -95,6 +100,11 @@ explicitly, and is `REVOKE`d from `PUBLIC` and `anon` before being
 | `resolve_share_recipient(email)` | `service_role` only | Legacy e-mail → UUID lookup. | `REVOKE`d from `authenticated` in `20260818000002` — kept defined for idempotent re-runs and SQL-editor use. |
 | `is_database_owner()` / `auto_register_owner()` | policy / trigger internals | Owner gate on `users` DELETE; first-user registration into `database_owner`. | `search_path` pinned in `20260818000001`. |
 | `audit_rls_policies()` | `service_role` only | Lists every `public.*` table with its RLS state and policy count for the security test. | `REVOKE`d from `anon` and `authenticated`; `search_path` pinned in `20260916000001` (#4251). |
+| `is_fleet_member(p_org)` / `fleet_role(p_org)` | `authenticated` (policy internals) | Membership / role of `auth.uid()` in `p_org` — the oracles every fleet policy calls. | #4212 (v13). SECURITY DEFINER purely to break the RLS cycle; caller-bound (no user parameter) so they cannot probe other people's memberships; `search_path` pinned; revoked from `anon`. |
+| `fleet_create_organization(p_name)` | `authenticated` | Creates the org, the caller as `admin`, and the policy row. Refuses unless `tanksync_meta.fleet_enabled = 'true'` (operator switch, ADR 0025 D3), the JWT is not anonymous (D2), and the caller is in no fleet (D1). | #4212 (v13). |
+| `fleet_upsert_vehicle(p_org, p_id, p_fleet_code, p_display_name, p_plate_masked, p_data)` | `authenticated`, `manager`/`admin` of `p_org` | Inserts or updates one vehicle; `org_id` is in the UPDATE's WHERE so a foreign id updates nothing. | #4212 (v13). |
+| `fleet_assign_vehicle(p_org, p_fleet_vehicle_id, p_user, p_effective_from)` | `authenticated`, `manager`/`admin` of `p_org` | Opens an assignment; target must be an active member and the vehicle must belong to the org; idempotent on an already-open one. | #4212 (v13). |
+| `fleet_end_assignment(p_assignment_id, p_effective_to)` | `authenticated`, `manager`/`admin` of the row's org | Stamps `effective_to`; never deletes. Returns FALSE for "not found" and "not your org" alike. | #4212 (v13). |
 
 The migration source-of-truth lives in `supabase/migrations/`:
 
@@ -144,8 +154,19 @@ The migration source-of-truth lives in `supabase/migrations/`:
   `audit_rls_policies()` (#4251); no RLS change.
 - `20260818000002_share_trip_with_email.sql` — `share_trip_with_email()`
   RPC; revokes `resolve_share_recipient()` from `authenticated` (#3747).
-- *(Epic #3865, pending)* — `erase_my_data()` RPC; no public-table RLS
-  change.
+- `20260829000001_erase_my_data.sql` — `erase_my_data()` RPC (#3868); no
+  public-table RLS change.
+- `20260911000001_trip_share_ownership_binding.sql` — binds trip-share
+  grants to trip ownership (#4049): `owns_trip()` oracle, write policies
+  and shared-read policies on `trip_shares` / `trip_summaries` /
+  `trip_details`.
+- `20260911000002_share_trip_with_email_v2.sql` — `share_trip_with_email_v2()`
+  (#4060); no RLS change.
+- `20260918000001_fleet_tenancy.sql` — `fleet_organizations`,
+  `fleet_members`, `fleet_vehicles`, `vehicle_assignments`, `fleet_policies`
+  with SELECT-only policies through `is_fleet_member()` / `fleet_role()`;
+  the four `fleet_*` RPCs; `erase_my_data()` redefined to cover the two
+  user-linked fleet tables (#4212, schema v13, ADR 0025).
 
 If a migration not listed above is found in `supabase/migrations/`,
 this matrix is stale. See "How to update" below.

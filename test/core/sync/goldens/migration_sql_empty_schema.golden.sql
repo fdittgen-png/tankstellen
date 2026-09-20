@@ -1,4 +1,4 @@
--- TankSync Schema Setup (schema version 12)
+-- TankSync Schema Setup (schema version 13)
 -- Run this in your Supabase SQL Editor
 -- Dashboard → SQL Editor → New Query → Paste → Run
 
@@ -223,6 +223,67 @@ CREATE TABLE IF NOT EXISTS public.deletions (
 CREATE INDEX IF NOT EXISTS deletions_user_table_idx
   ON public.deletions(user_id, table_name);
 
+CREATE TABLE IF NOT EXISTS public.fleet_organizations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  created_by UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS fleet_organizations_created_by_idx
+  ON public.fleet_organizations(created_by);
+
+CREATE TABLE IF NOT EXISTS public.fleet_members (
+  org_id UUID NOT NULL REFERENCES public.fleet_organizations(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('employee', 'manager', 'admin')),
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'left')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (org_id, user_id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS fleet_members_single_org_idx
+  ON public.fleet_members(user_id);
+
+CREATE TABLE IF NOT EXISTS public.fleet_vehicles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id UUID NOT NULL REFERENCES public.fleet_organizations(id) ON DELETE CASCADE,
+  fleet_code TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  plate_masked TEXT,
+  data JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (org_id, fleet_code)
+);
+CREATE INDEX IF NOT EXISTS fleet_vehicles_org_idx
+  ON public.fleet_vehicles(org_id);
+
+CREATE TABLE IF NOT EXISTS public.vehicle_assignments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id UUID NOT NULL REFERENCES public.fleet_organizations(id) ON DELETE CASCADE,
+  fleet_vehicle_id UUID NOT NULL REFERENCES public.fleet_vehicles(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  effective_from TIMESTAMPTZ NOT NULL DEFAULT now(),
+  effective_to TIMESTAMPTZ,
+  created_by UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CHECK (effective_to IS NULL OR effective_to >= effective_from)
+);
+CREATE INDEX IF NOT EXISTS vehicle_assignments_org_idx
+  ON public.vehicle_assignments(org_id);
+CREATE INDEX IF NOT EXISTS vehicle_assignments_user_idx
+  ON public.vehicle_assignments(user_id);
+CREATE INDEX IF NOT EXISTS vehicle_assignments_vehicle_idx
+  ON public.vehicle_assignments(fleet_vehicle_id);
+CREATE INDEX IF NOT EXISTS vehicle_assignments_created_by_idx
+  ON public.vehicle_assignments(created_by);
+
+CREATE TABLE IF NOT EXISTS public.fleet_policies (
+  org_id UUID PRIMARY KEY REFERENCES public.fleet_organizations(id) ON DELETE CASCADE,
+  data JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 ALTER TABLE public.deletions
   ADD COLUMN IF NOT EXISTS device_id TEXT;
 ALTER TABLE public.deletions
@@ -255,6 +316,59 @@ GRANT EXECUTE ON FUNCTION public.owns_trip(TEXT, UUID) TO authenticated;
 -- and without this owns_trip() is an unauthenticated existence oracle.
 REVOKE EXECUTE ON FUNCTION public.owns_trip(TEXT, UUID) FROM anon;
 
+-- #4212 (v13) — fleet membership oracles for the fleet_* policies.
+-- SECURITY DEFINER purely to break an RLS cycle; caller-bound (no user
+-- parameter) so they cannot probe other people's memberships. Must
+-- exist BEFORE the fleet policies that call them.
+CREATE OR REPLACE FUNCTION public.is_fleet_member(p_org UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.fleet_members
+     WHERE org_id = p_org
+       AND user_id = auth.uid()
+       AND status = 'active'
+  );
+$$;
+REVOKE ALL ON FUNCTION public.is_fleet_member(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_fleet_member(UUID) TO authenticated;
+-- NOT redundant with the PUBLIC revoke: Supabase grants anon separately.
+REVOKE EXECUTE ON FUNCTION public.is_fleet_member(UUID) FROM anon;
+
+CREATE OR REPLACE FUNCTION public.fleet_role(p_org UUID)
+RETURNS TEXT
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+SET search_path = public
+AS $$
+  SELECT role FROM public.fleet_members
+   WHERE org_id = p_org
+     AND user_id = auth.uid()
+     AND status = 'active'
+   LIMIT 1;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_role(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_role(UUID) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_role(UUID) FROM anon;
+
+-- Advisor hygiene (#4212): Supabase's ALTER DEFAULT PRIVILEGES grants the
+-- full table ACL to anon and authenticated on every new public table.
+-- RLS already refuses anon every row (verified by the live matrix), so
+-- this REVOKE is behaviourally a no-op; it keeps the fleet tables off the
+-- pg_graphql_anon_table_exposed lint instead of adding five rows to it.
+REVOKE ALL ON TABLE
+  public.fleet_organizations,
+  public.fleet_members,
+  public.fleet_vehicles,
+  public.vehicle_assignments,
+  public.fleet_policies
+  FROM anon;
+
 -- ── Row Level Security ──────────────────────────────────────────────
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
@@ -275,6 +389,11 @@ ALTER TABLE public.trip_shares ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.content_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.wait_time_pings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.deletions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fleet_organizations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fleet_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fleet_vehicles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vehicle_assignments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fleet_policies ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_own ON public.users;
 CREATE POLICY users_own ON public.users FOR ALL USING (id = auth.uid());
@@ -416,6 +535,44 @@ CREATE POLICY wait_time_pings_own ON public.wait_time_pings
 DROP POLICY IF EXISTS deletions_own ON public.deletions;
 CREATE POLICY deletions_own ON public.deletions
   FOR ALL USING (user_id = auth.uid());
+
+-- Fleet (#4212, v13): SELECT-only, through the SECURITY DEFINER oracles
+-- emitted before this block. No client write policy exists on any
+-- fleet table — writes are the fleet_* RPCs (ADR 0025 D7).
+DROP POLICY IF EXISTS fleet_organizations_member_select ON public.fleet_organizations;
+CREATE POLICY fleet_organizations_member_select ON public.fleet_organizations
+  FOR SELECT TO authenticated
+  USING (public.is_fleet_member(id));
+
+-- Own row always; the whole roster for managers and admins.
+DROP POLICY IF EXISTS fleet_members_select ON public.fleet_members;
+CREATE POLICY fleet_members_select ON public.fleet_members
+  FOR SELECT TO authenticated
+  USING (
+    user_id = (SELECT auth.uid())
+    OR public.fleet_role(org_id) IN ('manager', 'admin')
+  );
+
+-- Every member sees the org's vehicle directory; nothing in it names a
+-- person.
+DROP POLICY IF EXISTS fleet_vehicles_member_select ON public.fleet_vehicles;
+CREATE POLICY fleet_vehicles_member_select ON public.fleet_vehicles
+  FOR SELECT TO authenticated
+  USING (public.is_fleet_member(org_id));
+
+-- An assignment names a person: own rows only, org-wide for managers.
+DROP POLICY IF EXISTS fleet_assignments_select ON public.vehicle_assignments;
+CREATE POLICY fleet_assignments_select ON public.vehicle_assignments
+  FOR SELECT TO authenticated
+  USING (
+    (user_id = (SELECT auth.uid()) AND public.is_fleet_member(org_id))
+    OR public.fleet_role(org_id) IN ('manager', 'admin')
+  );
+
+DROP POLICY IF EXISTS fleet_policies_member_select ON public.fleet_policies;
+CREATE POLICY fleet_policies_member_select ON public.fleet_policies
+  FOR SELECT TO authenticated
+  USING (public.is_fleet_member(org_id));
 
 -- ── Owner protection (#3747, v8) ────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.database_owner (
@@ -680,6 +837,8 @@ REVOKE EXECUTE ON FUNCTION public.delete_user() FROM anon;
 -- v9 (#3868, GDPR Art. 17) — erase every row the caller owns in ONE
 -- transaction, bypassing limit_bulk_delete for the caller's own rows;
 -- public.users, sync_settings, wait_time_pings and trip_shares included.
+-- v13 (#4212) — the two user-linked fleet tables join the list; the
+-- org's own rows (organisations, vehicles, policies) are not the user's.
 CREATE OR REPLACE FUNCTION public.erase_my_data()
 RETURNS TABLE(table_name TEXT, rows_deleted BIGINT)
 LANGUAGE plpgsql
@@ -699,6 +858,8 @@ BEGIN
                      json_build_object('role', 'service_role')::text, true);
 
   FOREACH spec SLICE 1 IN ARRAY ARRAY[
+    ARRAY['vehicle_assignments', 'user_id'],
+    ARRAY['fleet_members',    'user_id'],
     ARRAY['trip_shares',      'owner_id'],
     ARRAY['trip_shares',      'shared_with_id'],
     ARRAY['trip_details',     'user_id'],
@@ -737,6 +898,192 @@ REVOKE ALL ON FUNCTION public.erase_my_data() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.erase_my_data() TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.erase_my_data() FROM anon;
 
+-- ── Fleet RPCs (#4212, v13) — the only write path (ADR 0025 D7) ─────
+
+-- Refuses unless the operator set tanksync_meta.fleet_enabled = 'true'
+-- (ADR 0025 D3), the caller has the e-mail identity (D2) and is in no
+-- fleet yet (D1). Creates the org, the caller as admin, and the policy
+-- row with its placeholder defaults (D9).
+CREATE OR REPLACE FUNCTION public.fleet_create_organization(p_name TEXT)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  uid UUID := auth.uid();
+  org UUID;
+  enabled TEXT;
+BEGIN
+  IF uid IS NULL THEN
+    RAISE EXCEPTION 'not_authenticated' USING ERRCODE = '42501';
+  END IF;
+  IF coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) THEN
+    RAISE EXCEPTION 'identity_required' USING ERRCODE = '42501';
+  END IF;
+  SELECT value INTO enabled FROM public.tanksync_meta WHERE key = 'fleet_enabled';
+  IF enabled IS DISTINCT FROM 'true' THEN
+    RAISE EXCEPTION 'fleet_disabled' USING ERRCODE = '42501';
+  END IF;
+  IF p_name IS NULL OR length(trim(p_name)) = 0 THEN
+    RAISE EXCEPTION 'name_required' USING ERRCODE = '22023';
+  END IF;
+  IF EXISTS (SELECT 1 FROM public.fleet_members WHERE user_id = uid) THEN
+    RAISE EXCEPTION 'already_member' USING ERRCODE = '23505';
+  END IF;
+  INSERT INTO public.fleet_organizations (name, created_by)
+    VALUES (trim(p_name), uid)
+    RETURNING id INTO org;
+  INSERT INTO public.fleet_members (org_id, user_id, role)
+    VALUES (org, uid, 'admin');
+  INSERT INTO public.fleet_policies (org_id, data)
+    VALUES (org, '{"aggregationMinSamples": 5, "retention": {"expensesYears": 10, "attributionEventsMonths": 12, "auditYears": 3}}'::jsonb);
+  RETURN org;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_create_organization(TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_create_organization(TEXT) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_create_organization(TEXT) FROM anon;
+
+CREATE OR REPLACE FUNCTION public.fleet_upsert_vehicle(
+  p_org UUID,
+  p_id UUID,
+  p_fleet_code TEXT,
+  p_display_name TEXT,
+  p_plate_masked TEXT,
+  p_data JSONB
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  vid UUID;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'not_authenticated' USING ERRCODE = '42501';
+  END IF;
+  -- coalesce: NULL NOT IN (…) is NULL, which IF would treat as allowed.
+  IF coalesce(public.fleet_role(p_org), '') NOT IN ('manager', 'admin') THEN
+    RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501';
+  END IF;
+  IF p_fleet_code IS NULL OR length(trim(p_fleet_code)) = 0
+     OR p_display_name IS NULL OR length(trim(p_display_name)) = 0 THEN
+    RAISE EXCEPTION 'vehicle_fields_required' USING ERRCODE = '22023';
+  END IF;
+  IF p_id IS NULL THEN
+    INSERT INTO public.fleet_vehicles
+      (org_id, fleet_code, display_name, plate_masked, data)
+      VALUES (p_org, trim(p_fleet_code), trim(p_display_name), p_plate_masked,
+              coalesce(p_data, '{}'::jsonb))
+      RETURNING id INTO vid;
+  ELSE
+    UPDATE public.fleet_vehicles
+       SET fleet_code = trim(p_fleet_code),
+           display_name = trim(p_display_name),
+           plate_masked = p_plate_masked,
+           data = coalesce(p_data, '{}'::jsonb),
+           updated_at = now()
+     WHERE id = p_id AND org_id = p_org
+     RETURNING id INTO vid;
+    IF vid IS NULL THEN
+      RAISE EXCEPTION 'vehicle_not_found' USING ERRCODE = 'P0002';
+    END IF;
+  END IF;
+  RETURN vid;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_upsert_vehicle(UUID, UUID, TEXT, TEXT, TEXT, JSONB) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_upsert_vehicle(UUID, UUID, TEXT, TEXT, TEXT, JSONB) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_upsert_vehicle(UUID, UUID, TEXT, TEXT, TEXT, JSONB) FROM anon;
+
+CREATE OR REPLACE FUNCTION public.fleet_assign_vehicle(
+  p_org UUID,
+  p_fleet_vehicle_id UUID,
+  p_user UUID,
+  p_effective_from TIMESTAMPTZ DEFAULT now()
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  aid UUID;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'not_authenticated' USING ERRCODE = '42501';
+  END IF;
+  IF coalesce(public.fleet_role(p_org), '') NOT IN ('manager', 'admin') THEN
+    RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.fleet_vehicles
+                  WHERE id = p_fleet_vehicle_id AND org_id = p_org) THEN
+    RAISE EXCEPTION 'vehicle_not_found' USING ERRCODE = 'P0002';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM public.fleet_members
+                  WHERE org_id = p_org AND user_id = p_user
+                    AND status = 'active') THEN
+    RAISE EXCEPTION 'not_a_member' USING ERRCODE = 'P0002';
+  END IF;
+  SELECT id INTO aid FROM public.vehicle_assignments
+   WHERE org_id = p_org AND fleet_vehicle_id = p_fleet_vehicle_id
+     AND user_id = p_user AND effective_to IS NULL
+   LIMIT 1;
+  IF aid IS NOT NULL THEN
+    RETURN aid;
+  END IF;
+  INSERT INTO public.vehicle_assignments
+    (org_id, fleet_vehicle_id, user_id, effective_from, created_by)
+    VALUES (p_org, p_fleet_vehicle_id, p_user,
+            coalesce(p_effective_from, now()), auth.uid())
+    RETURNING id INTO aid;
+  RETURN aid;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_assign_vehicle(UUID, UUID, UUID, TIMESTAMPTZ) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_assign_vehicle(UUID, UUID, UUID, TIMESTAMPTZ) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_assign_vehicle(UUID, UUID, UUID, TIMESTAMPTZ) FROM anon;
+
+-- Stamps effective_to, never deletes. FALSE for "no such open
+-- assignment" AND for "not your org": not an existence oracle.
+CREATE OR REPLACE FUNCTION public.fleet_end_assignment(
+  p_assignment_id UUID,
+  p_effective_to TIMESTAMPTZ DEFAULT now()
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  org UUID;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  SELECT org_id INTO org FROM public.vehicle_assignments
+   WHERE id = p_assignment_id;
+  IF org IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  IF coalesce(public.fleet_role(org), '') NOT IN ('manager', 'admin') THEN
+    RETURN FALSE;
+  END IF;
+  UPDATE public.vehicle_assignments
+     SET effective_to = coalesce(p_effective_to, now()),
+         updated_at = now()
+   WHERE id = p_assignment_id
+     AND effective_to IS NULL
+     AND coalesce(p_effective_to, now()) >= effective_from;
+  RETURN FOUND;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_end_assignment(UUID, TIMESTAMPTZ) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_end_assignment(UUID, TIMESTAMPTZ) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_end_assignment(UUID, TIMESTAMPTZ) FROM anon;
+
 CREATE TABLE IF NOT EXISTS public.tanksync_meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
@@ -747,7 +1094,7 @@ DROP POLICY IF EXISTS tanksync_meta_read ON public.tanksync_meta;
 CREATE POLICY tanksync_meta_read ON public.tanksync_meta
   FOR SELECT USING (true);
 INSERT INTO public.tanksync_meta (key, value, updated_at)
-  VALUES ('schema_version', '12', now())
+  VALUES ('schema_version', '13', now())
   ON CONFLICT (key)
   DO UPDATE SET value = EXCLUDED.value, updated_at = now();
 

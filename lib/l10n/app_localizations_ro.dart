@@ -3818,6 +3818,14 @@ class AppLocalizationsRo extends AppLocalizations {
       'Acest vehicul raportează direct debitul de combustibil (PID 5E), așa că nu se folosește calibrarea eficienței volumetrice — consumul tău este măsurat, nu modelat.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Vehiculul dvs. $makeModel este marcat ca diesel, dar corespunde unei intrări din catalog pentru benzină. Apăsați pentru actualizare.';
   }

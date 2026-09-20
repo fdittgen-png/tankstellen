@@ -214,6 +214,8 @@ REVOKE EXECUTE ON FUNCTION public.delete_user() FROM anon;
 -- v9 (#3868, GDPR Art. 17) — erase every row the caller owns in ONE
 -- transaction, bypassing limit_bulk_delete for the caller's own rows;
 -- public.users, sync_settings, wait_time_pings and trip_shares included.
+-- v13 (#4212) — the two user-linked fleet tables join the list; the
+-- org's own rows (organisations, vehicles, policies) are not the user's.
 CREATE OR REPLACE FUNCTION public.erase_my_data()
 RETURNS TABLE(table_name TEXT, rows_deleted BIGINT)
 LANGUAGE plpgsql
@@ -233,6 +235,8 @@ BEGIN
                      json_build_object('role', 'service_role')::text, true);
 
   FOREACH spec SLICE 1 IN ARRAY ARRAY[
+    ARRAY['vehicle_assignments', 'user_id'],
+    ARRAY['fleet_members',    'user_id'],
     ARRAY['trip_shares',      'owner_id'],
     ARRAY['trip_shares',      'shared_with_id'],
     ARRAY['trip_details',     'user_id'],

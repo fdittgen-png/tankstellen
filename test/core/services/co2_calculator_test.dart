@@ -20,6 +20,43 @@ FillUp _f({
     );
 
 void main() {
+  // #4392 — the constants are the well-to-wheel TOTALS of ADEME Base
+  // Carbone v23.6 (France continentale), not the tank-to-wheel figures
+  // the file used to carry under a JEC label. Pinned by value because
+  // every one of them is a user-visible number on the carbon
+  // dashboard; a silent edit here re-states every user's history.
+  group('the published well-to-wheel factors (#4392)', () {
+    test('petrol grades come from ADEME elements 25763 / 13988', () {
+      expect(Co2Calculator.kgCo2PerLiterE5, 2.69);
+      expect(Co2Calculator.kgCo2PerLiterE10, 2.69);
+      expect(Co2Calculator.kgCo2PerLiterE98, 2.69);
+    });
+
+    test('diesel comes from ADEME element 25775 (Gazole routier B7)', () {
+      expect(Co2Calculator.kgCo2PerLiterDiesel, 3.10);
+      expect(Co2Calculator.kgCo2PerLiterDieselPremium, 3.10);
+    });
+
+    test('E85, LPG and CNG come from elements 25766 / 14031 / 27095', () {
+      expect(Co2Calculator.kgCo2PerLiterE85, 1.11);
+      expect(Co2Calculator.kgCo2PerLiterLpg, 1.86);
+      expect(Co2Calculator.kgCo2PerKgCng, 2.96);
+    });
+
+    test('every factor is above the tank-to-wheel figure it replaced: a '
+        'well-to-wheel total includes the upstream half', () {
+      expect(Co2Calculator.kgCo2PerLiterE5, greaterThan(2.31));
+      expect(Co2Calculator.kgCo2PerLiterDiesel, greaterThan(2.65));
+      expect(Co2Calculator.kgCo2PerLiterLpg, greaterThan(1.61));
+      expect(Co2Calculator.kgCo2PerKgCng, greaterThan(2.54));
+    });
+
+    test('the scope and citation the dashboard prints', () {
+      expect(Co2Calculator.scopeLabel, 'WtW');
+      expect(Co2Calculator.factorCitation, 'ADEME Base Carbone v23.6 (2026)');
+    });
+  });
+
   group('Co2Calculator.emissionFactorFor', () {
     test('returns E5 factor for E5', () {
       expect(Co2Calculator.emissionFactorFor(FuelType.e5),

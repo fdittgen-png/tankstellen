@@ -3791,6 +3791,14 @@ class AppLocalizationsEt extends AppLocalizations {
       'See sõiduk teatab kütusekulu otse (PID 5E), seega mahulise kasuteguri kalibreerimist ei kasutata — teie kulu on mõõdetud, mitte modelleeritud.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Sinu $makeModel on märgitud diislikütuseks, kuid vastab bensiinikataloogi kirjele. Puuduta uuendamiseks.';
   }

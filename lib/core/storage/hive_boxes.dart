@@ -126,6 +126,9 @@ class HiveBoxes {
   /// `app_profile_provider.dart`).
   static const String appProfile = 'app_profile';
 
+  /// #4212 — org directory per `SyncContextKey|orgId`; encrypted, deferred.
+  static const String fleetDirectory = 'fleet_directory';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -146,6 +149,7 @@ class HiveBoxes {
     obd2NegotiatedProtocol, serviceReminders, obd2PausedTrips,
     obd2ActiveTrip, priceSnapshots, isolateErrorSpool, trafficSignalsCache,
     featureFlags, appProfile, boxSchema, errorTraces, datasets,
+    fleetDirectory,
   };
 
   /// Meta box recording the schema version of each persistent box
@@ -204,6 +208,7 @@ class HiveBoxes {
     obd2ActiveTrip,
     priceSnapshots,
     trafficSignalsCache,
+    fleetDirectory,
   };
 
   /// Deferred boxes holding driving telemetry — AES-encrypted since
@@ -215,6 +220,7 @@ class HiveBoxes {
     // one-time migration. (`priceSnapshots` holds public station data
     // and is opened by the alert isolate — deliberately left as is.)
     obd2SupportedPids, obd2NegotiatedProtocol, serviceReminders,
+    fleetDirectory, // #4212 — assignments name the person
   };
 
   static Future<void>? _deferredInit;

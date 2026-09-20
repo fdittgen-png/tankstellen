@@ -24,7 +24,7 @@ import 'tank_report.dart';
 ///
 /// The blend each trip and window burned is replayed from the same event
 /// log `tankBlendProvider` folds (#4279), and the CO2e factors are
-/// [jecWtwV5Co2eFactor]'s.
+/// [ademeWtwCo2eFactor]'s.
 FuelBehaviourProfile deriveFuelBehaviourProfile({
   required String vehicleId,
   required VehicleProfile? vehicle,
@@ -44,7 +44,7 @@ FuelBehaviourProfile deriveFuelBehaviourProfile({
         vehicleId: vehicleId, vehicle: vehicle, trips: trips),
     windows: fillWindowEvidenceFor(vehicleId: vehicleId, fillUps: fillUps),
     tankCapacityLitres: usable ? capacity : null,
-    co2eFactors: jecWtwV5Co2eFactor,
+    co2eFactors: ademeWtwCo2eFactor,
   );
 }
 
@@ -144,18 +144,18 @@ List<FillWindowEvidence> fillWindowEvidenceFor({
   ];
 }
 
-/// The factors the app already ships in [Co2Calculator] (EU JEC
-/// Well-to-Wheels v5, 2020), stamped with that source, version and
-/// boundary so a CO2e figure is traceable (#4219). Null for a grade the
-/// calculator has no per-litre factor for.
-Co2eFactor? jecWtwV5Co2eFactor(FuelGrade grade) {
+/// The factors the app ships in [Co2Calculator] (ADEME Base Carbone
+/// v23.6, well-to-wheel), stamped with that source, version and
+/// boundary so a CO2e figure is traceable (#4219, #4392). Null for a
+/// grade the calculator has no per-litre factor for.
+Co2eFactor? ademeWtwCo2eFactor(FuelGrade grade) {
   if (!grade.isLiquid) return null;
   final factor = Co2Calculator.emissionFactorFor(FuelType.fromString(grade.key));
   if (factor == null) return null;
   return Co2eFactor(
     kgCo2ePerLitre: factor,
-    source: 'EU JEC Well-to-Wheels report',
-    version: 'v5-2020',
+    source: 'ADEME Base Carbone',
+    version: 'v23.6-2026',
     boundary: Co2eBoundary.wellToWheel,
   );
 }

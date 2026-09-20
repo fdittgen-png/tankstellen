@@ -212,8 +212,8 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
   /// Guessing one would be worse than omitting the number.
   ///
   /// This is the axis the comparison was missing: a fuel can cost more per km
-  /// and still be the better choice on emissions, which for E85 (1.40 kg/L
-  /// vs E5's 2.31) is the entire point of running it.
+  /// and still be the better choice on emissions, which for E85 (1.11 kg/L
+  /// WtW vs E5's 2.69) is the entire point of running it.
   double? co2PerKmWith(double? kgCo2PerLitre) {
     final l100 = avgL100km;
     if (kgCo2PerLitre == null || l100 == null) return null;

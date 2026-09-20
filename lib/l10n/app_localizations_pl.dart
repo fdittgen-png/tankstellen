@@ -3805,6 +3805,14 @@ class AppLocalizationsPl extends AppLocalizations {
       'Ten pojazd podaje zużycie paliwa bezpośrednio (PID 5E), więc kalibracja sprawności wolumetrycznej nie jest używana — Twoje spalanie jest mierzone, a nie modelowane.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Twój $makeModel jest oznaczony jako diesel, ale pasuje do katalogowej pozycji benzynowej. Dotknij, aby zaktualizować.';
   }
