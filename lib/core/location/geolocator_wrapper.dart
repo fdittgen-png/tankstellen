@@ -22,8 +22,7 @@ part 'geolocator_wrapper.g.dart';
 /// `FusedLocationClient` still leaves compile-time `com.google.android.gms.*`
 /// REFERENCES in the fdroid dex that `fdroid scanner` rejects. Plan (see
 /// `.local-docs/fdroid-gms-free-refactor-notes.md`): vendor + patch
-/// `geolocator_android` for the libre build (drop `FusedLocationClient` + the
-/// `GoogleApiAvailability` probe), swapped in via a libre-only
+/// `geolocator_android` for the libre build, swapped in via a libre-only
 /// `pubspec_overrides.yaml` — keeping this Dart API + all 11 call sites
 /// unchanged. Refactor TODO: extract `_SharedPositionSource` to its own file
 /// and split out a thin permissions seam.
@@ -39,15 +38,13 @@ class GeolocatorWrapper {
   /// `FusedLocationProviderClient`.
   ///
   /// The fdroid flavor excludes `com.google.android.gms` from the runtime
-  /// classpath, so the fused provider class is simply absent. geolocator_android
-  /// already falls back to the LocationManager when GMS is missing, but we set
-  /// [AndroidSettings.forceLocationManager] explicitly so the behaviour is
-  /// deterministic and does not depend on a runtime class-presence probe.
-  ///
-  /// Centralising the wrapping HERE keeps the call sites
-  /// (location_service.dart, approach_state_provider.dart,
-  /// trip_gps_stream_controller.dart) free of any
-  /// flavor branching — they keep passing a plain [LocationSettings].
+  /// classpath, so the fused provider class is simply absent.
+  /// geolocator_android already falls back to the LocationManager when GMS is
+  /// missing, but we set [AndroidSettings.forceLocationManager] explicitly so
+  /// the behaviour does not depend on a runtime class-presence probe.
+  /// Centralising the wrapping HERE keeps the call sites (location_service,
+  /// approach_state_provider, trip_gps_stream_controller) free of flavor
+  /// branching — they keep passing a plain [LocationSettings].
   static const bool forceLocationManager =
       bool.fromEnvironment('FORCE_LOCATION_MANAGER');
 
@@ -130,36 +127,33 @@ class GeolocatorWrapper {
   /// ## Why this exists
   ///
   /// `Geolocator.getPositionStream()` is backed by a single platform
-  /// EventChannel (`flutter.baseflow.com/geolocator_updates_android`).
-  /// Two independent listeners contend on
-  /// that one channel's onListen / onCancel lifecycle, and in GPS-only
-  /// recording the recorder + the detector each opened a fresh
-  /// [getPositionStream] in the SAME frame — the recorder won the channel and
-  /// the detector was starved of fixes, so it never left `ApproachIdle`, the
-  /// radar candidate list stayed empty, and swipe was a no-op.
-  ///
-  /// Routing both trip consumers through ONE underlying subscription,
-  /// multiplexed via a broadcast controller, removes the race: every
-  /// listener receives every fix the others receive.
+  /// EventChannel (`flutter.baseflow.com/geolocator_updates_android`), and
+  /// two independent listeners contend on that one channel's onListen /
+  /// onCancel lifecycle: in GPS-only recording the recorder + the detector
+  /// each opened a fresh [getPositionStream] in the SAME frame, the recorder
+  /// won the channel, and the starved detector never left `ApproachIdle` —
+  /// empty radar list, swipe a no-op. Routing both trip consumers through
+  /// ONE underlying subscription, multiplexed via a broadcast controller,
+  /// removes the race: every listener receives every fix.
   ///
   /// ## Lifecycle (refcounted)
   ///
-  /// The underlying platform subscription opens lazily on the FIRST listener
-  /// and is cancelled on the LAST — so the app only requests fixes while at
-  /// least one trip consumer is active, preserving the battery cost-bound the
-  /// per-consumer path had. The latest fix is replayed to late joiners so a
-  /// detector that subscribes a frame after the recorder still leaves
-  /// `ApproachIdle` on the most recent fix instead of waiting for the next.
+  /// The platform subscription opens lazily on the FIRST listener and is
+  /// cancelled on the LAST, preserving the per-consumer path's battery
+  /// cost-bound. The latest fix is replayed to late joiners so a detector
+  /// subscribing a frame after the recorder leaves `ApproachIdle` at once.
   ///
   /// [recording] marks the caller as the trip recorder, whose fine,
   /// foreground-service-promoted [locationSettings] must win the cadence on
-  /// the shared upstream (#2766). The underlying platform stream is opened
-  /// with the most recent recording subscriber's settings if one is present,
-  /// regardless of subscription order — so even when the live
-  /// [ApproachDetector] opens the channel first with its coarse settings,
-  /// the recorder's join re-opens the upstream at the fine ~1 s cadence.
-  /// Non-recording consumers (the detector) join with whatever settings the
-  /// upstream is already running.
+  /// the shared upstream (#2766) regardless of subscription order — so even
+  /// when the live [ApproachDetector] opens the channel first with its
+  /// coarse settings, the recorder's join re-opens the upstream at the fine
+  /// ~1 s cadence. Non-recording consumers join with whatever settings the
+  /// upstream already runs, and one *leaving* never re-configures a live
+  /// recording (#4353). That promotion is serialized and cancel-first (see
+  /// [_SharedPositionSource._replaceUpstream]); whether it actually took
+  /// effect is readable from [sharedPositionDiagnostics] — a request is not
+  /// an application.
   Stream<Position> sharedPositionStream({
     LocationSettings? locationSettings,
     bool recording = false,
@@ -176,13 +170,25 @@ class GeolocatorWrapper {
     );
   }
 
+  /// #4353 — one atomic read of what the shared upstream was ASKED for, what
+  /// is actually APPLIED, and whether a replacement is in flight. Distinct
+  /// because a request is not an application: `requested != null &&
+  /// effective == null` means the promotion failed (or the stream ended) and
+  /// the recording runs on nothing; a mismatch with `inFlight: true` is
+  /// mid-handover. The journal reports the APPLIED profile, only ever.
+  ({LocationSettings? requested, LocationSettings? effective, bool inFlight})
+      get sharedPositionDiagnostics => (
+            requested: _shared?.requestedSettings,
+            effective: _shared?.effectiveSettings,
+            inFlight: _shared?.transitionInFlight ?? false,
+          );
+
   _SharedPositionSource? _shared;
 }
 
 /// Refcounted broadcast multiplexer over a single underlying position
 /// stream (#2646). Owns the one platform subscription: opens it on the first
-/// listener, cancels it on the last, and replays the latest fix to late
-/// joiners. Constructed lazily by [GeolocatorWrapper.sharedPositionStream].
+/// listener, cancels it on the last, replays the latest fix to late joiners.
 class _SharedPositionSource {
   _SharedPositionSource({
     required this._open,
@@ -190,40 +196,49 @@ class _SharedPositionSource {
 
   final Stream<Position> Function(LocationSettings? settings) _open;
   // The shared bus lives for the wrapper's (keepAlive, app-lifetime)
-  // lifetime — it is reused across trips so the underlying platform
-  // subscription can re-open on the next first-listener without rebuilding
-  // the multiplexer. The underlying subscription it forwards IS torn down on
-  // the last listener (refcount → 0); the controller itself never needs
-  // closing.
+  // lifetime — reused across trips so the platform subscription can re-open
+  // on the next first-listener. The subscription it forwards IS torn down on
+  // the last listener; the controller itself never needs closing.
   // ignore: close_sinks
   final StreamController<Position> _out = StreamController<Position>.broadcast();
-  // The single underlying platform subscription. Cancelled in [_release]
-  // when the last consumer leaves (refcount → 0).
+  // The single underlying platform subscription.
   // ignore: cancel_subscriptions
   StreamSubscription<Position>? _upstream;
   Position? _last;
   int _refCount = 0;
-  // The settings the live [_upstream] was opened with, and the recorder's
-  // fine settings to prefer (#2766). The recorder marks itself `recording`,
-  // and we always (re)open the upstream with `_recordingSettings` when one is
-  // present — so the fine ~1 s cadence wins regardless of who opened the
-  // channel first.
-  LocationSettings? _activeSettings;
+  // The recorder's fine settings (#2766): the upstream is always (re)opened
+  // with these while a `recording` consumer is present.
   LocationSettings? _recordingSettings;
   int _recordingRefCount = 0;
 
+  // #4353 — three distinct facts, because a request is not an application:
+  // the live consumer set's aggregate requirement; what the LIVE upstream
+  // was actually opened with (null whenever nothing is applied — before the
+  // first open, mid-replacement, after a failed open, after the stream
+  // ended); and the single-flight replacement future.
+  LocationSettings? _requestedSettings;
+  LocationSettings? _effectiveSettings;
+  Future<void>? _transitionInFlight;
+  // Monotonic upstream generation: every listener callback captures the one
+  // it was opened at and drops the event unless it is still live, so a late
+  // data / error / done from a replaced (or still-cancelling) stream never
+  // reaches the bus or mutates this source.
+  int _generation = 0;
+
+  LocationSettings? get requestedSettings => _requestedSettings;
+  LocationSettings? get effectiveSettings => _effectiveSettings;
+  bool get transitionInFlight => _transitionInFlight != null;
+
   /// Hand a consumer a stream that seeds the latest fix (if any) then
-  /// forwards every subsequent fix from the shared broadcast. Opening the
-  /// underlying subscription on the first consumer and cancelling on the last
-  /// is driven off the refcount kept here rather than the broadcast
-  /// controller's own onListen / onCancel, so the seeded late-join replay
-  /// does not perturb the refcount.
+  /// forwards every subsequent fix from the shared broadcast. Open-on-first
+  /// / cancel-on-last is driven off the refcount kept here rather than the
+  /// broadcast controller's own onListen / onCancel, so the seeded late-join
+  /// replay does not perturb the refcount.
   Stream<Position> subscribe({
     LocationSettings? locationSettings,
     bool recording = false,
   }) {
-    // Per-consumer controller. Closed in its own `onCancel` once the
-    // consumer detaches, so there is no leak.
+    // Per-consumer controller, closed in its own `onCancel` — no leak.
     // ignore: close_sinks
     late final StreamController<Position> ctl;
     StreamSubscription<Position>? relay;
@@ -262,57 +277,103 @@ class _SharedPositionSource {
       _recordingRefCount++;
       _recordingSettings = locationSettings;
     }
-    // The effective settings: the recorder's fine settings always win while a
-    // recording consumer is present; otherwise the joining consumer's.
-    final wanted = _recordingRefCount > 0 ? _recordingSettings : locationSettings;
-    if (_refCount == 1) {
-      _openUpstream(wanted);
+    // The recorder's fine settings win while a recording consumer is
+    // present; otherwise the settings the channel was opened with. A coarse
+    // consumer joining an open channel never re-configures it (#2766/#4353).
+    _requestedSettings = _recordingRefCount > 0
+        ? _recordingSettings
+        : (_refCount == 1 ? locationSettings : _requestedSettings);
+    if (_refCount == 1 && _upstream == null && _transitionInFlight == null) {
+      _openUpstream(_requestedSettings);
       return;
     }
-    // Already open. If a recording consumer just joined a channel that was
-    // opened with coarser (non-recording) settings, re-open it at the fine
-    // cadence so the recorder's cadence wins even when the detector opened
-    // first (#2766). Identity compare is enough: the same settings object is
-    // never re-passed, and re-opening on every coarse join is harmless but
-    // unwanted, so we gate strictly on the recorder arriving.
-    if (recording && !identical(_activeSettings, wanted)) {
-      _reopenUpstream(wanted);
+    if (!identical(_effectiveSettings, _requestedSettings)) {
+      unawaited(_replaceUpstream());
     }
   }
 
-  void _openUpstream(LocationSettings? settings) {
-    _activeSettings = settings;
-    // Cancelled in [_release] when the refcount falls back to 0, or replaced
-    // by [_reopenUpstream] when the recorder upgrades the cadence.
-    _upstream = _open(settings).listen(
-      (p) {
-        _last = p;
-        if (!_out.isClosed) _out.add(p);
-      },
-      onError: (Object e, StackTrace st) {
-        if (!_out.isClosed) _out.addError(e, st);
-      },
-    );
+  /// #4353 — replace the live upstream so it actually runs at
+  /// [_requestedSettings]. Cancel-FIRST, and the cancel is **awaited**:
+  /// `geolocator_android` hands a cached `_positionStream` back verbatim,
+  /// dropping the new `locationSettings`, until the LAST listener's cancel
+  /// clears the cache (`geolocator_android-5.0.3/lib/src/
+  /// geolocator_android.dart:169-171`, `asBroadcastStream(onCancel:)` at
+  /// `:207-212`), so the old open-new-before-cancel-old ordering left the
+  /// recorder on the detector's coarse, foreground-service-LESS stream. The
+  /// brief fix gap cancel-first costs is bridged by the bus + `_last`.
+  ///
+  /// Single-flight: concurrent promotions coalesce onto the one in-flight
+  /// future, whose loop re-reads [_requestedSettings] after each cancel, so
+  /// there is only ever one upstream and it settles at the LATEST aggregate
+  /// requirement, never on an intermediate one. This never throws — a failed
+  /// cancel or open is surfaced on the shared bus and leaves
+  /// [_effectiveSettings] null (nothing applied) — so callers may fire it
+  /// with `unawaited`. Fault paths are pinned by
+  /// `test/core/location/geolocator_wrapper_test.dart`.
+  Future<void> _replaceUpstream() {
+    return _transitionInFlight ??=
+        _runReplacement().whenComplete(() => _transitionInFlight = null);
   }
 
-  void _reopenUpstream(LocationSettings? settings) {
-    final old = _upstream;
-    _upstream = null;
-    _openUpstream(settings);
-    // Cancel the superseded coarse subscription after the fine one is live so
-    // there is no gap in fixes; the broadcast bus + `_last` replay bridge it.
-    //
-    // #3249 — KNOWN LIMITATION (verified against geolocator 14.0.2): opening
-    // the new stream BEFORE cancelling the old means geolocator_android can
-    // hand back its CACHED first-caller stream (the coarse one), so the
-    // "recorder cadence wins on a late join" guarantee above is not reliable
-    // when a coarse consumer opened the channel first. The correct fix is
-    // cancel-THEN-reopen (accepting a brief fix gap that `_last` replay
-    // bridges), but it changes the live GPS continuity of every trip and so
-    // needs on-device validation before shipping — deliberately deferred (the
-    // #3249 primary fix routes the recorder to `recording: true`, which wins
-    // when it opens the channel first, the common case).
-    unawaited(old?.safeCancel());
+  Future<void> _runReplacement() async {
+    while (_refCount > 0 &&
+        !identical(_effectiveSettings, _requestedSettings)) {
+      final old = _upstream;
+      _upstream = null;
+      // Retire the generation BEFORE awaiting the cancel: the old stream
+      // stays live until the platform acknowledges, and none of its events
+      // may reach the bus or the next generation's state.
+      _generation++;
+      _effectiveSettings = null;
+      try {
+        await old?.safeCancel();
+      } catch (e, st) {
+        // Already fenced off by the retirement. Surface and carry on —
+        // refusing to re-open would strand the recording with no source.
+        if (!_out.isClosed) _out.addError(e, st);
+      }
+      // Stop-during-promotion: the last consumer left mid-cancel, so opening
+      // now would leak an upstream nobody listens to.
+      if (_refCount == 0) return;
+      // The requirement is re-read AFTER the cancel, so promotions that
+      // arrived mid-flight coalesce into this one open.
+      if (!_openUpstream(_requestedSettings)) return;
+    }
+  }
+
+  /// Opens the platform stream at [settings] and makes it the live
+  /// generation (cancelled by [_release], replaced by [_replaceUpstream]).
+  /// Returns false when the open failed: the error goes on the bus and
+  /// [_effectiveSettings] stays null — requested, but NOT applied.
+  bool _openUpstream(LocationSettings? settings) {
+    final gen = ++_generation;
+    try {
+      _upstream = _open(settings).listen(
+        (p) {
+          if (gen != _generation) return;
+          _last = p;
+          if (!_out.isClosed) _out.add(p);
+        },
+        onError: (Object e, StackTrace st) {
+          if (gen != _generation) return;
+          if (!_out.isClosed) _out.addError(e, st);
+        },
+        onDone: () {
+          if (gen != _generation) return;
+          // Ended (permission revoked, provider disabled, plugin teardown):
+          // nothing is applied any more, and diagnostics must say so.
+          _upstream = null;
+          _effectiveSettings = null;
+        },
+      );
+      _effectiveSettings = settings;
+      return true;
+    } catch (e, st) {
+      _upstream = null;
+      _effectiveSettings = null;
+      if (!_out.isClosed) _out.addError(e, st);
+      return false;
+    }
   }
 
   Future<void> _release({required bool recording}) async {
@@ -322,11 +383,15 @@ class _SharedPositionSource {
       _recordingRefCount--;
       if (_recordingRefCount == 0) _recordingSettings = null;
     }
+    // #4353 — a consumer leaving never re-configures the upstream, so
+    // dropping the radar can never downgrade a live recording.
     if (_refCount == 0) {
       final up = _upstream;
       _upstream = null;
       _last = null;
-      _activeSettings = null;
+      _generation++;
+      _requestedSettings = null;
+      _effectiveSettings = null;
       await up?.safeCancel();
     }
   }

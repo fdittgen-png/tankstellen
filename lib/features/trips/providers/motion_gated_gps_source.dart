@@ -13,13 +13,13 @@ import '../../../core/logging/app_log.dart';
 import '../domain/services/motion_gate.dart';
 import 'recording_gps_fix_provider.dart';
 
-/// #3319 — owns the recording GPS subscription and motion-gates its cadence:
-/// full-rate ([GpsProfile.fine]) while moving, backed off
-/// ([GpsProfile.coarse]) once the device has been stationary, re-fining on
-/// resumed motion. The cadence only changes in FGS-approved builds — where
-/// the recording stream actually runs in the background and the battery save
-/// is real; otherwise this just relays fixes at the fine cadence (backing a
-/// foreground-only stream off buys nothing and risks a trace gap).
+/// #3319 — owns the recording GPS subscription and evaluates the motion gate
+/// against every fix.
+///
+/// #4353 — the trip runs ONE stable, actually-applied profile
+/// ([GpsProfile.fine]) from start to stop. Adaptive sampling is deliberately
+/// disabled; see [onSpeed] for why, and [wouldBeProfile] for the gate's
+/// verdict, which is still computed for the recording journal.
 ///
 /// Extracted from [GpsOnlyRecordingPipeline] so the gate + subscription
 /// lifecycle is self-contained and independently testable, and so the
@@ -40,33 +40,49 @@ class MotionGatedGpsSource {
   final bool _fgsEnabled;
 
   StreamSubscription<Position>? _sub;
-  GpsProfile _profile = GpsProfile.fine;
+  GpsProfile _wouldBeProfile = GpsProfile.fine;
 
-  /// The cadence currently in effect (for diagnostics / tests).
-  GpsProfile get profile => _profile;
+  /// The cadence actually APPLIED to the recording stream. #4353 pins it to
+  /// [GpsProfile.fine] for the whole trip, so this reports what the platform
+  /// stream is really running — never a request dressed up as an outcome.
+  GpsProfile get profile => GpsProfile.fine;
+
+  /// #4353 — what the motion gate WOULD select right now, had adaptive
+  /// sampling been enabled. Journal-only: it never moves [profile].
+  GpsProfile get wouldBeProfile => _wouldBeProfile;
+
+  /// Whether this build could apply a coarse profile at all: the recording
+  /// foreground service is the un-throttle lever, so without it a backed-off
+  /// stream saves nothing. Journal context for [wouldBeProfile].
+  bool get adaptiveSamplingSupported => _fgsEnabled;
 
   /// Open the fine-cadence recording stream.
   void start() {
-    _sub = _open(coarse: false);
+    _sub = _open();
   }
 
   /// Feed the latest fix's ground speed (km/h) and the monotonic [elapsed]
-  /// since recording start. Swaps the subscription cadence when the motion
-  /// gate flips. No-op unless the recording FGS is enabled. Best-effort: a
-  /// failed swap leaves the existing subscription running (new-before-cancel,
-  /// so we never end up with no GPS).
+  /// since recording start, and record the gate's verdict in
+  /// [wouldBeProfile].
+  ///
+  /// #4353 — adaptive sampling is DELIBERATELY DISABLED; this no longer
+  /// swaps the subscription. The swap opened the new stream before
+  /// cancelling the old one, and `geolocator_android` hands back its cached
+  /// `_positionStream` until the LAST listener cancels, so the new settings
+  /// were silently discarded: the cadence never changed and `profile`
+  /// reported a battery saving that never happened. A swap that DID take
+  /// effect would be worse — it tears the recording foreground service down
+  /// and re-promotes it mid-trip, a background start Android may refuse,
+  /// losing the trip's protection outright.
+  ///
+  /// So a trip keeps one stable, actually-applied profile from start to
+  /// stop — the documented stable-profile option #4353 blesses. The gate is
+  /// still evaluated so the journal can show what adaptive sampling would
+  /// have done and the battery cost can be measured before it returns, and
+  /// it returns only through a verified transition API (a reconfiguration
+  /// the platform acknowledges), never by swapping streams.
   void onSpeed(double speedKmh, Duration elapsed) {
-    if (!_fgsEnabled) return;
-    final next = _gate.onFix(speedKmh: speedKmh, elapsed: elapsed);
-    if (next == _profile) return;
-    _profile = next;
-    try {
-      final old = _sub;
-      _sub = _open(coarse: next == GpsProfile.coarse);
-      unawaited(old?.cancel());
-    } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'MotionGatedGpsSource: profile swap'});
-    }
+    _wouldBeProfile = _gate.onFix(speedKmh: speedKmh, elapsed: elapsed);
   }
 
   /// Cancel the current subscription (end of trip).
@@ -87,13 +103,12 @@ class MotionGatedGpsSource {
     _onPosition(pos);
   }
 
-  StreamSubscription<Position> _open({required bool coarse}) {
+  StreamSubscription<Position> _open() {
     return _ref
         .read(geolocatorWrapperProvider)
         .sharedPositionStream(
           recording: true,
-          locationSettings:
-              recordingLocationSettingsForRef(_ref, coarse: coarse),
+          locationSettings: recordingLocationSettingsForRef(_ref),
         )
         .listen(
           _dispatch,
