@@ -2,7 +2,7 @@
   "vehicleTopicAdapterNone": "Aucun",
   "vehicleTopicCalibrationTitle": "Calibrage",
   "vehicleTopicAdvancedBadge": "Avancé",
-  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "vehicleTopicCalibrationStatus": "Référence {coverage} % · {mode}",
   "@vehicleTopicCalibrationStatus": {
     "placeholders": {
       "coverage": {"type": "int", "example": "78"},

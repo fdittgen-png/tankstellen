@@ -200,27 +200,85 @@ void main() {
       }
     });
 
-    // #2857 — the redesigned alerts screen's "Station alerts" header shipped
-    // as English-equal autofill placeholders in French (a primary locale).
-    // The presence-based coverage gates above can't catch this (the keys ARE
-    // present, just holding the English value), so assert value-distinctness
-    // for the alerts-screen section labels a French user reads.
-    test('French alerts-section labels are real translations, not English '
-        'placeholders (#2857)', () {
-      final frFile = arbFiles.firstWhere((f) => f.path.endsWith('app_fr.arb'));
-      final fr = jsonDecode(frFile.readAsStringSync()) as Map<String, dynamic>;
+    // #2857 shipped English on the alerts screen: the keys were PRESENT and
+    // held the English value, which every presence gate above accepts. The
+    // fix was a two-key special case here. #4436 found four more of the same
+    // thing — `onboardingTitle` was literally "Set up Sparkilo" on the first
+    // screen a French user ever sees — so the check is no longer scoped to
+    // the keys that happened to get reported. It covers every key under a
+    // declared French-reachable surface, which is what
+    // `french_required_prefixes.dart` already says it means.
+    group('French required surfaces are TRANSLATED, not just present '
+        '(#2857, #4436)', () {
+      // Both helpers read the enclosing group's `setUp`-initialised state,
+      // so they may only be called from inside a test body. A `setUpAll`
+      // here would run BEFORE that `setUp` and read an uninitialised
+      // `late` local — which passes locally, because an earlier test in
+      // the file has already assigned it, and fails the moment a CI shard
+      // hands this group its tests without the ones above.
+      Map<String, dynamic> frenchArb() => jsonDecode(
+            arbFiles
+                .firstWhere((f) => f.path.endsWith('app_fr.arb'))
+                .readAsStringSync(),
+          ) as Map<String, dynamic>;
 
-      for (final key in const [
-        'alertsStationSectionTitle',
-        'alertsStationAdd',
-      ]) {
-        expect(fr[key], isNotNull,
-            reason: 'app_fr.arb must contain $key');
-        expect(fr[key], isNot(equals(referenceArb[key])),
-            reason: 'French $key still equals the English value — it is an '
-                'untranslated autofill placeholder. Provide a real French '
-                'string in app_fr.arb (#2857).');
-      }
+      List<String> frenchRequiredKeys() => referenceArb.keys
+          .where((k) => !k.startsWith('@'))
+          .where((k) =>
+              kFrenchRequiredPrefixes.any((prefix) => k.startsWith(prefix)))
+          .toList()
+        ..sort();
+
+      test('the surface list actually matches keys — an empty match would '
+          'make every assertion below vacuous', () {
+        final requiredKeys = frenchRequiredKeys();
+        expect(requiredKeys, isNotEmpty);
+        expect(requiredKeys, contains('onboardingTitle'));
+        expect(requiredKeys, contains('alertsStationSectionTitle'));
+      });
+
+      test('no required key holds the English string', () {
+        final fr = frenchArb();
+        final english = <String>[];
+        for (final key in frenchRequiredKeys()) {
+          if (kFrenchEnglishIdentical.containsKey(key)) continue;
+          if (fr[key] == referenceArb[key]) english.add(key);
+        }
+        expect(english, isEmpty,
+            reason: 'these keys are on a surface `french_required_prefixes'
+                '.dart` declares must carry real French, and they hold the '
+                'English string — an untranslated autofill placeholder a '
+                'French user reads (#2857, #4436). Translate them in a '
+                '`lib/l10n/_fragments/<feature>_fr.arb` fragment so the '
+                'pipeline owns the value (#4402), or — if the string is '
+                'genuinely identical in both languages — add it to '
+                '`kFrenchEnglishIdentical` WITH the reason: '
+                '${english.join(', ')}');
+      });
+
+      test('the identical-by-design allow-list has no dead entries', () {
+        // An exemption that stopped applying is worse than no exemption: it
+        // silently covers whatever that key becomes next.
+        final fr = frenchArb();
+        final dead = <String>[];
+        for (final key in kFrenchEnglishIdentical.keys) {
+          if (!referenceArb.containsKey(key)) {
+            dead.add('$key (no longer exists in app_en.arb)');
+          } else if (fr[key] != referenceArb[key]) {
+            dead.add('$key (now differs from English — exemption unused)');
+          }
+        }
+        expect(dead, isEmpty,
+            reason: 'remove these from kFrenchEnglishIdentical: '
+                '${dead.join(', ')}');
+      });
+
+      test('every exemption carries a non-empty reason', () {
+        for (final entry in kFrenchEnglishIdentical.entries) {
+          expect(entry.value.trim(), isNotEmpty,
+              reason: '${entry.key} is exempt with no stated reason');
+        }
+      });
     });
   });
 }

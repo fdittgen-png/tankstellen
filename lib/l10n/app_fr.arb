@@ -4769,7 +4769,7 @@
   "vehicleTopicAdapterNone": "Aucun",
   "vehicleTopicCalibrationTitle": "Calibrage",
   "vehicleTopicAdvancedBadge": "Avancé",
-  "vehicleTopicCalibrationStatus": "Baseline {coverage} % · {mode}",
+  "vehicleTopicCalibrationStatus": "Référence {coverage} % · {mode}",
   "@vehicleTopicCalibrationStatus": {
     "placeholders": {
       "coverage": {
@@ -5758,15 +5758,9 @@
       }
     }
   },
-  "onboardingTitle": "Set up Sparkilo",
-  "@onboardingTitle": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review"
-  },
-  "onboardingStepOf": "Step {current} of {total}",
+  "onboardingTitle": "Configurer Sparkilo",
+  "onboardingStepOf": "Étape {current} sur {total}",
   "@onboardingStepOf": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "current": {
         "type": "int"
@@ -5781,10 +5775,8 @@
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   },
-  "loyaltyCardDeleted": "Deleted {card}",
+  "loyaltyCardDeleted": "Carte supprimée : {card}",
   "@loyaltyCardDeleted": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "card": {
         "type": "String"
@@ -6626,10 +6618,8 @@
       }
     }
   },
-  "insightUpshiftCruiseShare": "High-RPM cruising ({pctTime}% of trip): shifting up earlier uses less fuel",
+  "insightUpshiftCruiseShare": "Conduite à haut régime ({pctTime} % du trajet) : passer le rapport supérieur plus tôt consomme moins",
   "@insightUpshiftCruiseShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
     "placeholders": {
       "pctTime": {
         "type": "String"

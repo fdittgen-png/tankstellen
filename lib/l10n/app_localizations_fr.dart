@@ -1025,7 +1025,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String loyaltyCardDeleted(String card) {
-    return 'Deleted $card';
+    return 'Carte supprimée : $card';
   }
 
   @override
@@ -5029,7 +5029,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String insightUpshiftCruiseShare(String pctTime) {
-    return 'High-RPM cruising ($pctTime% of trip): shifting up earlier uses less fuel';
+    return 'Conduite à haut régime ($pctTime % du trajet) : passer le rapport supérieur plus tôt consomme moins';
   }
 
   @override
@@ -8390,11 +8390,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Vous pourrez appairer un adaptateur OBD2 Bluetooth plus tard depuis l\'écran du véhicule pour enregistrer des trajets et lire les données moteur.';
 
   @override
-  String get onboardingTitle => 'Set up Sparkilo';
+  String get onboardingTitle => 'Configurer Sparkilo';
 
   @override
   String onboardingStepOf(int current, int total) {
-    return 'Step $current of $total';
+    return 'Étape $current sur $total';
   }
 
   @override
@@ -11182,7 +11182,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String vehicleTopicCalibrationStatus(int coverage, String mode) {
-    return 'Baseline $coverage % · $mode';
+    return 'Référence $coverage % · $mode';
   }
 
   @override
