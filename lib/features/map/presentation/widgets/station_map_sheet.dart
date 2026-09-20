@@ -11,6 +11,7 @@ import '../../../../core/domain/price_freshness.dart';
 import '../../../../core/domain/station.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/station_offer.dart';
+import '../../../../core/widgets/refuel_compare_button.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/time/app_clock.dart';
@@ -169,6 +170,11 @@ class StationMapSheet extends ConsumerWidget {
                 ),
               ),
             const SizedBox(height: Spacing.sm),
+            // #4363 — the map is one of three doors into the SAME
+            // comparison. A reference price may be compared as a PRICE;
+            // the comparison itself says it has no drive.
+            RefuelCompareLabelledButton(station: station),
+            const SizedBox(height: Spacing.sm),
             // The deep answer, still one tap away.
             Align(
               alignment: Alignment.centerLeft,
@@ -198,3 +204,4 @@ class StationMapSheet extends ConsumerWidget {
     if (context.mounted) Navigator.of(context).pop();
   }
 }
+

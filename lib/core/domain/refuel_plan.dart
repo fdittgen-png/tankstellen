@@ -19,6 +19,11 @@ library;
 
 import 'package:meta/meta.dart';
 
+import 'money.dart';
+import 'refuel_itinerary.dart';
+
+export 'refuel_plan_set.dart';
+
 /// Litres kept in the tank as a buffer. A plan that runs the tank to zero
 /// is arithmetic, not advice — the driver has no margin for a closed
 /// forecourt, a queue, or a consumption figure that was 8 % optimistic.
@@ -36,9 +41,12 @@ class PlanCandidate {
     required this.stationId,
     required this.alongRouteKm,
     required this.pricePerLitre,
+    this.nativePrice,
+    this.countryCode,
     this.detourKm = 0,
     this.roadExtraKm,
     this.roadExtraMinutes,
+    this.incrementalCharge,
   });
 
   final String stationId;
@@ -47,8 +55,25 @@ class PlanCandidate {
   /// positions on a line; the caller projects stations onto the polyline.
   final double alongRouteKm;
 
-  /// Price of the fuel actually being bought.
+  /// Price of the fuel actually being bought, ALREADY EXPRESSED in
+  /// [RefuelPlanRequest.currencyCode] (#4361).
+  ///
+  /// Normalisation happens before planning, in the layer that holds the
+  /// rate snapshot, for one reason: a candidate whose price cannot be
+  /// converted at a stated, fresh rate must not reach the planner at all
+  /// — there is no honest way for an optimiser to rank a number whose
+  /// currency it does not know, and "drop it silently" and "convert it at
+  /// 1:1" are both wrong. See `refuel_plan_provider.dart`.
   final double pricePerLitre;
+
+  /// The pump price as the country quotes it, kept for display and for
+  /// the explanation of a converted total. Null when the caller stated
+  /// no currency.
+  final Money? nativePrice;
+
+  /// The SELLING country, so a plan can make a border crossing visible
+  /// and attribute a coverage or setup caveat to the right side of it.
+  final String? countryCode;
 
   /// Extra kilometres to leave the route and rejoin it. One-way
   /// deviation — the caller doubles it if the station is an errand rather
@@ -65,6 +90,13 @@ class PlanCandidate {
   /// The routed extra DRIVING minutes, stop overhead excluded. Null when
   /// unknown — the plan then states its detour time as approximate.
   final double? roadExtraMinutes;
+
+  /// A charge incurred ONLY by stopping here — a forecourt access toll,
+  /// a transaction fee (#4361), in the SAME currency as
+  /// [pricePerLitre], normalised by the same layer. Null is UNKNOWN,
+  /// never free; a charge every alternative pays belongs to the journey
+  /// and not to one stop, so it would change no comparison here.
+  final double? incrementalCharge;
 
   /// Extra kilometres a stop here adds: routed when known, else the
   /// approximate out-and-back deviation.
@@ -121,6 +153,8 @@ class RefuelPlan {
     this.startLitres = 0,
     this.consumedLitres = 0,
     this.endLitres = 0,
+    this.currencyCode,
+    this.chargesCost = 0,
   });
 
   /// Infeasible: the driver cannot cross [gap] on a full tank.
@@ -135,13 +169,25 @@ class RefuelPlan {
         approximateDetourKm = 0,
         startLitres = 0,
         consumedLitres = 0,
-        endLitres = 0;
+        endLitres = 0,
+        currencyCode = null,
+        chargesCost = 0;
 
   final List<PlannedStop> stops;
+
+  /// The one currency every figure in this plan is denominated in
+  /// (#4361). Null only when the caller stated none.
+  final String? currencyCode;
 
   /// Cash paid at the pumps — every purchased litre counted once,
   /// including the litres the detours burn (#4360).
   final double fuelCost;
+
+  /// KNOWN charges this plan incurs and an alternative might not — stop
+  /// access tolls, transaction fees (#4361). Zero means "none known", and
+  /// the surface says which charges could not be answered rather than
+  /// implying the journey is free of them.
+  final double chargesCost;
 
   /// The tank at the start of the route.
   final double startLitres;
@@ -186,10 +232,18 @@ class RefuelPlan {
   /// Litres bought across all stops.
   double get litresBought => stops.fold<double>(0, (s, x) => s + x.litres);
 
-  /// Cash at the pumps (#4360). It used to add a separately valued
-  /// detour cost on top — which, once the detour fuel is conserved in
-  /// the tank and bought at a pump, counted those litres twice.
-  double get totalCost => fuelCost;
+  /// Cash at the pumps plus known charges (#4360, #4361). It used to add
+  /// a separately valued detour cost on top — which, once the detour fuel
+  /// is conserved in the tank and bought at a pump, counted those litres
+  /// twice. A charge is not fuel, so it is added once and separately.
+  double get totalCost => fuelCost + chargesCost;
+
+  /// [totalCost] with its currency attached — the form a surface may
+  /// render or compare (#4361). Null when no currency was stated.
+  Money? get totalMoney {
+    final code = currencyCode;
+    return code == null ? null : Money(totalCost, code);
+  }
 
   /// Minutes the detours add, plus the fixed cost of stopping at all.
   double get detourMinutes =>
@@ -226,6 +280,8 @@ class RefuelPlanRequest {
     required this.consumptionLPer100km,
     required this.candidates,
     this.reserveLitres = kDefaultReserveLitres,
+    this.currencyCode,
+    this.limits = TravelLimits.none,
   });
 
   final double routeKm;
@@ -239,6 +295,15 @@ class RefuelPlanRequest {
 
   /// Litres the plan refuses to dip below.
   final double reserveLitres;
+
+  /// The currency every [PlanCandidate.pricePerLitre] is already
+  /// expressed in (#4361). Null for a caller that states none.
+  final String? currencyCode;
+
+  /// The driver's own ceiling on extra kilometres and extra minutes
+  /// (#4361/#4362). Applied identically to every objective, so a plan
+  /// none of them may recommend is never returned as one of them.
+  final TravelLimits limits;
 
   /// Whether the arithmetic can run at all.
   ///
@@ -271,55 +336,4 @@ class RefuelPlanRequest {
 
   /// Range on a full tank, down to the reserve.
   double get fullRangeKm => kmFor(tankCapacityL - reserveLitres);
-}
-
-/// The three plans a long trip has (#4146).
-///
-/// Three, for the same reason `refuel_economics.dart` ranks three ways:
-/// the question genuinely has three answers and the app does not get to
-/// pick for the driver. Any of them may be null when it cannot be
-/// computed honestly.
-@immutable
-class RefuelPlanSet {
-  const RefuelPlanSet({
-    this.cheapest,
-    this.fastest,
-    this.gap,
-    this.reserveLitres = kDefaultReserveLitres,
-    this.valuationPricePerLitre,
-  });
-
-  /// Minimum total money.
-  final RefuelPlan? cheapest;
-
-  /// Minimum total time — fewest stops, smallest detours.
-  final RefuelPlan? fastest;
-
-  /// Set when the route cannot be driven at all; then both plans are null.
-  final RefuelPlanGap? gap;
-
-  bool get isFeasible => gap == null;
-
-  /// The reserve both plans are compared at — the common target terminal
-  /// fuel state (#4360 rule 3).
-  final double reserveLitres;
-
-  /// The ONE price every plan's leftover fuel is valued at: the lowest
-  /// pump price among this route's candidates. Documented, common, and
-  /// conservative — surplus fuel is credited at the least it could have
-  /// been bought for on this journey, never at what a plan happened to
-  /// pay. Null when there were no candidates.
-  final double? valuationPricePerLitre;
-
-  /// [plan]'s pump cash with its fuel above the reserve at the destination
-  /// valued back at [valuationPricePerLitre] — the figure two plans with
-  /// different terminal inventories CAN be compared on (#4360 fixture
-  /// B: €4 ending at 5 L and €80 ending at 43 L are both €4 here).
-  ///
-  /// Null without a valuation basis: then only equal end states compare.
-  double? comparableCost(RefuelPlan plan) {
-    final basis = valuationPricePerLitre;
-    if (basis == null) return null;
-    return plan.fuelCost - (plan.endLitres - reserveLitres) * basis;
-  }
 }

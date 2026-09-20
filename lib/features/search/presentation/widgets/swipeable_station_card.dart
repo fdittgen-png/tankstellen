@@ -7,6 +7,7 @@ import '../../../../core/services/station_offer.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_tier.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
+import '../../../../core/widgets/refuel_compare_button.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../loyalty/providers/loyalty_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -118,23 +119,31 @@ class SwipeableStationCard extends ConsumerWidget {
           ],
         ),
       ),
-      child: StationCard(
-        station: station,
-        selectedFuelType: ref.watch(selectedFuelTypeProvider),
-        isFavorite: isFavorite,
-        onTap: onTap,
-        onFavoriteTap: onFavoriteTap,
-        priceTier: priceTier,
-        rating: rating,
-        profileFuelType: profileFuelType,
-        closenessRadiusMeters: closenessRadiusMeters,
-        // #1120 — collapse the loyalty-card map to canonical-brand
-        // strings so the StationCard widget stays decoupled from the
-        // [LoyaltyBrand] enum.
-        activeDiscountsByBrand: {
-          for (final entry in ref.watch(activeDiscountByBrandProvider).entries)
-            entry.key.canonicalBrand: entry.value,
-        },
+      // #4363 — the list's door into the shared comparison. A long press
+      // rather than a per-row button: the row is already at its
+      // structural budget (#4163), and once the comparison holds a
+      // station every row grows the explicit toggle anyway.
+      child: GestureDetector(
+        onLongPress: () => toggleRefuelComparison(context, ref, station),
+        child: StationCard(
+          station: station,
+          selectedFuelType: ref.watch(selectedFuelTypeProvider),
+          isFavorite: isFavorite,
+          onTap: onTap,
+          onFavoriteTap: onFavoriteTap,
+          priceTier: priceTier,
+          rating: rating,
+          profileFuelType: profileFuelType,
+          closenessRadiusMeters: closenessRadiusMeters,
+          // #1120 — collapse the loyalty-card map to canonical-brand
+          // strings so the StationCard widget stays decoupled from the
+          // [LoyaltyBrand] enum.
+          activeDiscountsByBrand: {
+            for (final entry
+                in ref.watch(activeDiscountByBrandProvider).entries)
+              entry.key.canonicalBrand: entry.value,
+          },
+        ),
       ),
     );
   }

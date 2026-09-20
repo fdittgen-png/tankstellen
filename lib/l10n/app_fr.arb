@@ -6084,17 +6084,6 @@
       }
     }
   },
-  "refuelPlanStopLine": "Faire {litres} — {cost}",
-  "@refuelPlanStopLine": {
-    "placeholders": {
-      "litres": {
-        "type": "String"
-      },
-      "cost": {
-        "type": "String"
-      }
-    }
-  },
   "refuelPlanGap": "Aucune station à portée entre {from} et {to}",
   "@refuelPlanGap": {
     "placeholders": {
@@ -6879,5 +6868,44 @@
   "decisionPartialCoverageNote": "La source de ce pays ne recense qu'une partie des stations : ces choix sont les meilleurs parmi les stations affichées.",
   "errorTitleProviderUnavailable": "Aucun prix pour ce pays",
   "errorProviderUnavailable": "La source de prix de ce pays ne publie actuellement aucun prix en direct. Réessayer n'y changera rien.",
-  "recoveryStillWorksProviderUnavailable": "Vos favoris, vos pleins et les recherches dans d'autres pays fonctionnent toujours."
+  "recoveryStillWorksProviderUnavailable": "Vos favoris, vos pleins et les recherches dans d'autres pays fonctionnent toujours.",
+  "refuelCompareAdd": "Comparer",
+  "refuelCompareRemove": "Retirer de la comparaison",
+  "refuelCompareTitle": "Votre comparaison",
+  "refuelCompareCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "refuelCompareClear": "Vider",
+  "refuelCompareFull": "Vous pouvez comparer jusqu'à {max} stations",
+  "refuelCompareContextLine": "{fuel} · {quantity} à prendre · {consumption}",
+  "refuelCompareConsumptionEstimated": "{consumption} (estimée)",
+  "refuelCompareConsumptionMissing": "pas encore de consommation — ajoutez quelques pleins pour voir les coûts",
+  "refuelCompareQuantityEdit": "Modifier la quantité",
+  "refuelCompareOriginMissing": "Les distances sont à vol d'oiseau tant qu'une recherche n'a pas fixé votre position.",
+  "refuelCompareRowCost": "Prendre {litres} · {cash} · {distance} aller-retour",
+  "refuelCompareRowStopCost": "Prendre {litres} · {cash} · {distance} de détour",
+  "refuelCompareBaseline": "La moins chère pour cette quantité",
+  "refuelCompareCostsMore": "{amount} de plus que {station}",
+  "refuelCompareDistanceApproximate": "distance à vol d'oiseau, estimée",
+  "refuelCompareDistancePending": "distance routière en cours de calcul",
+  "refuelCompareNoPrice": "Pas de prix pour {fuel} ici",
+  "refuelCompareOutOfRange": "Hors de portée avec ce qu'il reste dans le réservoir",
+  "refuelCompareExceedsCapacity": "Cette quantité ne tiendrait pas dans le réservoir",
+  "refuelCompareNotCosted": "Impossible à chiffrer avec les données actuelles",
+  "refuelCompareCurrencyWithheld": "Les prix sont dans des devises différentes et aucun taux de change n'est disponible : aucune station la moins chère n'est désignée.",
+  "refuelPlanApply": "Ajouter les arrêts à l'itinéraire",
+  "refuelPlanApplyOpened": "{count, plural, =1{1 arrêt ajouté à votre itinéraire} other{{count} arrêts ajoutés à votre itinéraire}}",
+  "refuelPlanApplyRefusedReference": "Un prix de référence n'est pas un endroit où s'arrêter : ce plan ne peut pas être transmis à la navigation.",
+  "refuelPlanApplyRefusedUnavailable": "La source de prix de ce pays est indisponible : ses arrêts ne peuvent pas être transmis à la navigation.",
+  "refuelPlanApplyFailed": "Impossible d'ouvrir la navigation",
+  "refuelPlanNeedsExchangeRate": "Ces prix sont dans une autre devise et aucun taux de change n'est disponible : aucun total comparable ne peut être affiché.",
+  "refuelPlanLeastDrivingTitle": "Détour le plus court",
+  "refuelPlanStopNamed": "{position}. {station}",
+  "refuelPlanStopDetail": "Prendre {litres} pour {cost} · arrivée avec {arrival}",
+  "refuelPlanStopNativePrice": "{price} à la pompe",
+  "refuelPlanJourneyTotals": "{distance} · {duration}",
+  "refuelPlanTradeOff": "Par rapport au moins cher : {cost} · {minutes} · {distance}",
+  "refuelPlanNoStopSummary": "Votre réservoir couvre ce trajet — environ {litres} consommés, rien à acheter.",
+  "refuelPlanDetourTimeApproximate": "Les temps de détour sont estimés à partir de la vitesse moyenne de l'itinéraire.",
+  "refuelPlanSearchBounded": "Le meilleur des itinéraires comparés — cet itinéraire compte plus de stations que le planificateur n'en combine.",
+  "refuelPlanEvidenceIncomplete": "Certaines stations ont été écartées — masquées par vous, ou absentes de la source de ce pays — c'est donc la meilleure parmi les autres.",
+  "refuelPlanReferencePricesSkipped": "{count, plural, =1{1 prix de référence pour ce secteur n'est pas un endroit où s'arrêter} other{{count} prix de référence pour ce secteur ne sont pas des endroits où s'arrêter}}"
 }

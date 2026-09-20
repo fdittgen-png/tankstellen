@@ -180,11 +180,21 @@ void main() {
       }
     });
 
-    test('#4360 — a fuller tank is not a saving', () {
+    test('#4360 — a fuller tank is not a saving, and #4362 no longer '
+        'buys one to be fast', () {
       // One station 5 km ahead at €2/L, 10 L in a 50 L tank, 120 km to
-      // go at 10 L/100 km. The fastest plan fills up (≈€81), the cheapest
-      // buys just enough (≈€14): the cash gap is fuel left in the tank at
-      // the destination, and at equal end states the plans cost the same.
+      // go at 10 L/100 km.
+      //
+      // This case used to assert a ≈€60 cash gap, because "fastest"
+      // meant filling the tank. #4362 made each objective a genuine
+      // minimum of the thing it names, and a fuller tank does not make
+      // a one-stop journey quicker — so the planner now answers every
+      // objective with the same plan and buys only what the journey
+      // needs. Both halves of #4360 are asserted here at the detector:
+      // the plans compare equal at one basis, and no saving is claimed.
+      // The economics-level pair that DOES differ in cash (a hand-built
+      // fill-up beside the cheapest, €76 apart, both €4 comparable) is
+      // pinned in test/core/domain/refuel_plan_conservation_test.dart.
       final r = detect(trip(
         remainingKm: 120,
         remainingMinutes: 80,
@@ -193,9 +203,11 @@ void main() {
         candidates: [at(5, 2.0)],
       ));
       final plans = r.plans!;
-      expect(plans.fastest!.fuelCost - plans.cheapest!.fuelCost,
-          greaterThan(60),
-          reason: 'the raw pump cash really does differ');
+      expect(plans.fastest!.litresBought,
+          closeTo(plans.cheapest!.litresBought, 1e-9),
+          reason: 'being fast is not a reason to buy fuel (#4362)');
+      expect(plans.fastest!.endLitres, lessThan(50),
+          reason: 'and the tank is not filled for its own sake');
       expect(plans.comparableCost(plans.fastest!),
           closeTo(plans.comparableCost(plans.cheapest!)!, 1e-9));
       final o = r.opportunity!;

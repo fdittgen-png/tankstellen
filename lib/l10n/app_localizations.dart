@@ -1107,12 +1107,6 @@ abstract class AppLocalizations {
   /// **'{cost} total · {perKm}/km'**
   String refuelPlanTotal(String cost, String perKm);
 
-  /// One stop of a plan: the litres to buy there and what they cost (#4146). 'Just enough to reach a cheaper station' is a real instruction, so this is often not a full tank.
-  ///
-  /// In en, this message translates to:
-  /// **'Buy {litres} — {cost}'**
-  String refuelPlanStopLine(String litres, String cost);
-
   /// The route cannot be driven on this tank (#4146). Names the stretch rather than returning a plan that would strand the driver.
   ///
   /// In en, this message translates to:
@@ -13315,6 +13309,244 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'/session'**
   String get refuelUnitPerSession;
+
+  /// Tooltip/label of the toggle that adds a station to the driver's shared refuelling comparison, on the list row, the detail screen and the map sheet (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare'**
+  String get refuelCompareAdd;
+
+  /// Tooltip/label of the same toggle when the station is already in the comparison (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from comparison'**
+  String get refuelCompareRemove;
+
+  /// Title of the card comparing the stations the driver picked (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Your comparison'**
+  String get refuelCompareTitle;
+
+  /// How many stations are in the comparison (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 station} other{{count} stations}}'**
+  String refuelCompareCount(int count);
+
+  /// Button that empties the comparison (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get refuelCompareClear;
+
+  /// Snackbar when the driver tries to add more stations than the comparison holds (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'You can compare up to {max} stations'**
+  String refuelCompareFull(int max);
+
+  /// The assumptions every row of the comparison rests on: the fuel, the net quantity bought and the vehicle's consumption (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel} · buying {quantity} · {consumption}'**
+  String refuelCompareContextLine(
+    String fuel,
+    String quantity,
+    String consumption,
+  );
+
+  /// A consumption figure that is modelled rather than measured from fill-ups, marked as such (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{consumption} (estimated)'**
+  String refuelCompareConsumptionEstimated(String consumption);
+
+  /// Context line fragment when the vehicle has no consumption figure at all, so no row can be costed (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'no consumption yet — add a few fill-ups to see costs'**
+  String get refuelCompareConsumptionMissing;
+
+  /// Tooltip of the button that opens the refuel quantity sheet from the comparison's context row (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Change the quantity'**
+  String get refuelCompareQuantityEdit;
+
+  /// Caveat when no search has published the driver's position, so no row can be road-routed (#4359/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Distances are straight-line until a search sets where you are.'**
+  String get refuelCompareOriginMissing;
+
+  /// One costed row of the comparison: the litres the pump delivers, the cash, and the round-trip distance (#4360/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {litres} · {cash} · {distance} there and back'**
+  String refuelCompareRowCost(String litres, String cash, String distance);
+
+  /// The same row when the station is a stop on the active route rather than an errand: the distance is the detour (#4359/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {litres} · {cash} · {distance} off your route'**
+  String refuelCompareRowStopCost(String litres, String cash, String distance);
+
+  /// Badge on the comparison row with the lowest comparable cash for the same net refill (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Cheapest for this quantity'**
+  String get refuelCompareBaseline;
+
+  /// What a row costs over the named baseline station for the same net refill (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} more than {station}'**
+  String refuelCompareCostsMore(String amount, String station);
+
+  /// Row caveat when no road quote exists and the distance is crow-flies with the documented road factor (#4359/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'straight-line distance, estimated'**
+  String get refuelCompareDistanceApproximate;
+
+  /// Row caveat while the router has not answered yet; the approximate figure is shown meanwhile (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'road distance on its way'**
+  String get refuelCompareDistancePending;
+
+  /// Row state when the station publishes no price for the vehicle's fuel (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'No price for {fuel} here'**
+  String refuelCompareNoPrice(String fuel);
+
+  /// Row state when the outbound leg would run the tank dry before the station (#4360/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Out of reach on what is in the tank'**
+  String get refuelCompareOutOfRange;
+
+  /// Row state when the chosen quantity plus what is in the tank exceeds its capacity (#4360/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'That quantity would not fit in the tank'**
+  String get refuelCompareExceedsCapacity;
+
+  /// Row state for any other blocker of the trip ledger (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot be costed with the current inputs'**
+  String get refuelCompareNotCosted;
+
+  /// Caveat when at least one row could not be converted into the comparison currency (#4361/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Prices are in different currencies and no exchange rate is available, so no cheapest is named.'**
+  String get refuelCompareCurrencyWithheld;
+
+  /// Button under a refuelling plan that hands its stops to navigation together with the driver's existing route stops (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Add stops to route'**
+  String get refuelPlanApply;
+
+  /// Confirmation after a plan's stops were handed to navigation (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 stop added to your route} other{{count} stops added to your route}}'**
+  String refuelPlanApplyOpened(int count);
+
+  /// Refusal when a plan stop is a reference/aggregate price pinned at a stand-in point (#4348/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'A reference price is not a place to stop at, so this plan cannot be sent to navigation.'**
+  String get refuelPlanApplyRefusedReference;
+
+  /// Refusal when a plan stop's country provider is declared unavailable (#4348/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'This country\'s price source is unavailable, so its stops cannot be sent to navigation.'**
+  String get refuelPlanApplyRefusedUnavailable;
+
+  /// The platform refused to launch the route, or there is no active route to apply the plan to (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open navigation'**
+  String get refuelPlanApplyFailed;
+
+  /// Blocked state of the route refuelling plan when every priced station quotes a currency that cannot be converted into the driver's own at a stated, fresh rate (#4361).
+  ///
+  /// In en, this message translates to:
+  /// **'These prices are in another currency and no exchange rate is available, so no comparable total can be shown.'**
+  String get refuelPlanNeedsExchangeRate;
+
+  /// Title of the refuelling plan that adds the fewest extra road kilometres to the journey (#4362/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Least extra driving'**
+  String get refuelPlanLeastDrivingTitle;
+
+  /// One ordered stop in a refuelling plan, named by the real station (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{position}. {station}'**
+  String refuelPlanStopNamed(int position, String station);
+
+  /// What to do at one plan stop: the quantity, its cost and the tank level on arrival (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Buy {litres} for {cost} · arrive with {arrival}'**
+  String refuelPlanStopDetail(String litres, String cost, String arrival);
+
+  /// A cross-border stop's pump price in the selling country's own currency, shown beside the converted total (#4361/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{price} at the pump'**
+  String refuelPlanStopNativePrice(String price);
+
+  /// Distance and time of a whole refuelling plan, stops included (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} · {duration}'**
+  String refuelPlanJourneyTotals(String distance, String duration);
+
+  /// What an alternative plan sacrifices or saves against the lowest-cost plan, as three separate signed figures rather than one score (#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Against the cheapest: {cost} · {minutes} · {distance}'**
+  String refuelPlanTradeOff(String cost, String minutes, String distance);
+
+  /// A plan with no stop at all. Zero pump spend is not zero consumption, so the fuel used is still stated (#4362/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Your tank covers this journey — about {litres} used, nothing to buy.'**
+  String refuelPlanNoStopSummary(String litres);
+
+  /// Caveat when at least one stop has no routed duration, so its detour time is an approximation rather than a road answer (#4359/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Detour times are estimated from the route\'s average speed.'**
+  String get refuelPlanDetourTimeApproximate;
+
+  /// Caveat when the planner's documented candidate limit was reached, so the result is the best found rather than provably the best (#4362/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'The best of the itineraries compared — this route has more stations than the planner combines.'**
+  String get refuelPlanSearchBounded;
+
+  /// Caveat when the candidate set is incomplete: an ignored station or a partial-coverage provider. Distinguishes a gap in the candidates from proof that no station exists (#4348/#4362/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'Some stations were left out — hidden by you, or not listed by this country\'s source — so this is the best among the rest.'**
+  String get refuelPlanEvidenceIncomplete;
+
+  /// Explains why a regulated or aggregate price on this route (Luxembourg decree, Greek prefecture average) is not among the plan's stops (#4348/#4363).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 reference price for this area is not a place you can stop at} other{{count} reference prices for this area are not places you can stop at}}'**
+  String refuelPlanReferencePricesSkipped(int count);
 
   /// Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').
   ///

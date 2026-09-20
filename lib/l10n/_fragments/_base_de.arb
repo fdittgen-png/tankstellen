@@ -254,7 +254,6 @@
   "refuelPlanFastestTitle": "Schnellste Fahrt",
   "refuelPlanStopCount": "{count, plural, =0{Kein Stopp nötig} =1{1 Stopp} other{{count} Stopps}}",
   "refuelPlanTotal": "{cost} gesamt · {perKm}/km",
-  "refuelPlanStopLine": "{litres} tanken — {cost}",
   "refuelPlanGap": "Keine Station in Reichweite zwischen {from} und {to}",
   "refuelPlanNeedsConsumption": "Trage ein paar Tankvorgänge ein, dann plant Sparkilo deine Stopps",
   "refuelPlanNeedsTank": "Hinterlege deine Tankgröße, um Tankstopps zu planen",

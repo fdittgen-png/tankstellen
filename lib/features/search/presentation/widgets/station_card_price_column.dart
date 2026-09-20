@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/domain/station.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -16,6 +17,8 @@ import '../../../../core/utils/price_tier.dart';
 import '../../../../core/widgets/animated_favorite_star.dart';
 import '../../../../core/widgets/animated_price_text.dart';
 import '../../../../core/widgets/brand_logo.dart';
+import '../../../../core/domain/refuel_comparison_selection.dart';
+import '../../../../core/widgets/refuel_compare_button.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'station_card_badges.dart';
 import 'station_presentation.dart';
@@ -31,7 +34,7 @@ import 'station_presentation.dart';
 /// down whole (a `FittedBox`) rather than ellipsising to `1,7…`. The
 /// Cheapest badge is width-capped and ellipsises first under an expanded
 /// translation; the 32×32 star keeps its tap target.
-class StationCardHeadlineRow extends StatelessWidget {
+class StationCardHeadlineRow extends ConsumerWidget {
   final Station station;
 
   /// #4133 — everything this row shows, derived once by
@@ -56,10 +59,19 @@ class StationCardHeadlineRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final p = presentation;
     final hasDiscount = p.hasDiscount;
+    // #4363 — the comparison toggle joins the row only once a comparison
+    // exists. The row sits exactly on its structural widget budget
+    // (#4163, `station_row_budget_test.dart`), and a control that every
+    // visible station pays for on every filter change so that some
+    // drivers can compare is the wrong trade. A long press on the row
+    // opens the comparison (`SwipeableStationCard`); from then on each
+    // row carries the explicit toggle and its selected state.
+    final comparing = ref.watch(refuelComparisonSelectionProvider
+        .select((selection) => selection.isNotEmpty));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,6 +123,8 @@ class StationCardHeadlineRow extends StatelessWidget {
               ),
               const SizedBox(width: Spacing.sm),
             ],
+            if (comparing)
+              RefuelCompareButton(station: station, compact: true),
             // #2622 — the favourite star keeps its 32×32 tap target +
             // tooltip; #3949 moves it onto the headline row's trailing
             // edge so the price owns the row's leading edge.

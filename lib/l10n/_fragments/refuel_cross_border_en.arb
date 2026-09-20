@@ -1,0 +1,6 @@
+{
+  "refuelPlanNeedsExchangeRate": "These prices are in another currency and no exchange rate is available, so no comparable total can be shown.",
+  "@refuelPlanNeedsExchangeRate": {
+    "description": "Blocked state of the route refuelling plan when every priced station quotes a currency that cannot be converted into the driver's own at a stated, fresh rate (#4361)."
+  }
+}

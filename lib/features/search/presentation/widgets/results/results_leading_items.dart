@@ -7,6 +7,7 @@ import '../../../../../core/domain/search_result_item.dart';
 import '../../../../../core/storage/storage_keys.dart';
 import '../../../../../core/widgets/help_banner.dart';
 import 'decision_header.dart';
+import 'refuel_comparison_card.dart';
 
 /// What rides above the station cards INSIDE the results list.
 ///
@@ -30,20 +31,32 @@ class ResultsLeadingItems {
   });
 
   /// #4090 — the three answers, above the list they speak for.
+  ///
+  /// #4363 — the same flag also opens the slot the driver's OWN
+  /// comparison leads with: what they chose to weigh comes before what
+  /// the app suggests, and the two appear and disappear together with
+  /// the list's chrome. The card renders nothing while the comparison is
+  /// empty, so the slot costs a zero-height item and this class stays
+  /// free of a provider read.
   final bool showDecision;
 
   /// #3937 — the paged help bubble the user reads once.
   final bool showHelp;
 
   /// How many list slots these occupy.
-  int get count => (showDecision ? 1 : 0) + (showHelp ? 1 : 0);
+  int get count => (showDecision ? 2 : 0) + (showHelp ? 1 : 0);
 
   /// The widget for [rawIndex], or `null` when that index is a station
   /// row — in which case the caller subtracts [count] to get the
   /// station's own index.
   Widget? itemAt(int rawIndex, List<SearchResultItem> sorted) {
-    if (showDecision && rawIndex == 0) return DecisionHeader(items: sorted);
-    if (showHelp && rawIndex == (showDecision ? 1 : 0)) {
+    var index = rawIndex;
+    if (showDecision) {
+      if (index == 0) return const RefuelComparisonCard();
+      if (index == 1) return DecisionHeader(items: sorted);
+      index -= 2;
+    }
+    if (showHelp && index == 0) {
       return const HelpBanner(
         storageKey: StorageKeys.helpBannerSearchResults,
         icon: Icons.lightbulb_outline,

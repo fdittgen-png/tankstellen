@@ -3,18 +3,17 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/domain/exchange_rate_provider.dart';
 import '../../../core/domain/refuel_plan.dart';
 import '../../../core/domain/refuel_planner.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
-import '../../../core/domain/search_result_item.dart';
-import '../../../core/domain/station.dart';
 import '../../../core/domain/travel_estimate.dart';
-import '../../../core/services/station_offer.dart';
 import '../../../core/time/app_clock.dart';
-import '../../../core/utils/station_extensions.dart';
 import '../../../core/domain/tank_state_provider.dart';
 import '../../../core/utils/route_projection.dart';
 import '../../route_search/api.dart';
+import 'ignored_stations_provider.dart';
+import 'refuel_plan_candidates.dart';
 import 'search_provider.dart';
 import 'station_travel_estimates_provider.dart';
 
@@ -29,17 +28,41 @@ enum RefuelPlanBlocker {
   noTankCapacity,
   noTankLevel,
   noPricedStations,
+
+  /// Every priced station on this route quotes a currency the plan
+  /// cannot express in the driver's own, at a stated and fresh rate
+  /// (#4361). The prices are real and stay on screen; what is missing is
+  /// a comparison, and inventing a 1:1 rate would manufacture a winner.
+  noComparableCurrency,
 }
 
-/// A plan, or the reason there is none.
+/// A plan, or the reason there is none — with what was left out of the
+/// candidate set and why (#4362).
 class RefuelPlanState {
-  const RefuelPlanState.ready(this.plans) : blocker = null;
-  const RefuelPlanState.blocked(this.blocker) : plans = null;
+  const RefuelPlanState.ready(this.plans, {this.candidates = PlanCandidateSet.empty})
+      : blocker = null;
+  const RefuelPlanState.blocked(this.blocker,
+      {this.candidates = PlanCandidateSet.empty})
+      : plans = null;
 
   final RefuelPlanSet? plans;
   final RefuelPlanBlocker? blocker;
 
+  /// The allowed stops and the stations excluded from them. A gap is only
+  /// as meaningful as the set it was computed over, so the exclusions
+  /// travel with the answer rather than being reconstructed by the UI.
+  final PlanCandidateSet candidates;
+
   bool get isReady => plans != null;
+
+  /// True when the evidence behind this answer is partial: a source that
+  /// lists only some of its country's stations, or a station the driver
+  /// hid. "This candidate graph has a gap" is not "no usable station
+  /// exists on the road", and the surface must not conflate them.
+  bool get evidenceIncomplete =>
+      candidates.coverageIncomplete ||
+      candidates.exclusions.values
+          .contains(PlanCandidateExclusion.ignoredByUser);
 }
 
 /// Plan the active route's refuelling stops.
@@ -72,35 +95,30 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
 
   final fuelType = ref.watch(selectedFuelTypeProvider);
   final projection = RouteProjection(result.route.geometry);
+  // #4361 — one currency for the whole plan, reached by a stated rate or
+  // not reached at all.
+  final currency = ref.watch(comparisonCurrencyProvider);
+  final rates = ref.watch(exchangeRatesProvider);
+  final now = ref.watch(appClockProvider).now();
 
   final geometry = result.route.geometry;
-  final priced = <({Station station, double price, double along, double off})>[];
-  for (final item in result.stations) {
-    if (item is! FuelStationResult) continue;
-    final station = item.station;
-    // #4348 — a reference price is not a stop anyone can make.
-    if (!StationOffer.forStation(
-            stationId: station.id, lat: station.lat, lng: station.lng)
-        .canRouteTo) {
-      continue;
-    }
-    // #2631 — each station is priced by its own country's profile fuel
-    // on a cross-border route, exactly as the list and the map do.
-    final fuel = fuelForStation(station, result.profileFuelByCountry, fuelType);
-    final price = station.priceFor(fuel);
-    if (price == null || price <= 0) continue;
-
-    final at = projection.project(station.lat, station.lng);
-    priced.add(
-        (station: station, price: price, along: at.alongKm, off: at.offRouteKm));
-  }
+  // #4362 — the plan is built from the ROUTE RESULT, never from the
+  // filtered, sorted list the view renders. Hard exclusions are applied
+  // here and recorded; soft display filters do not reach this far.
+  final set = buildPlanCandidates(
+    stations: result.stations,
+    profileFuelByCountry: result.profileFuelByCountry,
+    fuelType: fuelType,
+    projection: projection,
+    ignoredStationIds: ref.watch(ignoredStationsProvider).toSet(),
+    currency: currency,
+    rates: rates,
+    now: now,
+  );
 
   // #4359 — the exit/rejoin cost of each stop, routed as origin → station
   // → destination against origin → destination in ONE budgeted request,
-  // nearest-to-route first. A current road quote replaces the projection
-  // (the crow-flies gap to the nearest sampled vertex); anything else
-  // keeps the projection, and the plan says its detour time is
-  // approximate.
+  // nearest-to-route first.
   final context = TravelContext(
     origin: TravelPoint(geometry.first.latitude, geometry.first.longitude),
     destination: TravelPoint(geometry.last.latitude, geometry.last.longitude),
@@ -108,47 +126,41 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
     // A recomputed route with the same endpoints is still a new journey.
     routeRevision: Object.hash(geometry.length, result.route.distanceKm),
   );
-  final request = TravelQuoteRequest.budgeted(context, [
-    for (final p in [...priced]..sort((a, b) => a.off.compareTo(b.off)))
-      (id: p.station.id, lat: p.station.lat, lng: p.station.lng),
-  ]);
+  final request = TravelQuoteRequest.budgeted(context, set.travelStops);
   final estimates = ref.watch(stationTravelEstimatesProvider(request));
-  final now = ref.watch(appClockProvider).now();
 
-  final candidates = <PlanCandidate>[
-    for (final p in priced)
-      if (actionableTravelEstimate(estimates, request, p.station.id, now)
-          case final road?)
-        PlanCandidate(
-          stationId: p.station.id,
-          alongRouteKm: p.along,
-          pricePerLitre: p.price,
-          detourKm: p.off,
-          roadExtraKm: road.extraKm,
-          roadExtraMinutes: road.extraDrivingMinutes,
-        )
-      else
-        PlanCandidate(
-          stationId: p.station.id,
-          alongRouteKm: p.along,
-          pricePerLitre: p.price,
-          detourKm: p.off,
-        ),
-  ];
-
-  if (candidates.isEmpty) {
-    return const RefuelPlanState.blocked(RefuelPlanBlocker.noPricedStations);
-  }
-
-  return RefuelPlanState.ready(RefuelPlanner.plan(RefuelPlanRequest(
-    // The polyline's own length, not the routing service's reported
-    // distance: positions and total must come from one measurement or a
-    // stop can land past the end of the route.
+  // The polyline's own length, not the routing service's reported
+  // distance: positions and total must come from one measurement or a
+  // stop can land past the end of the route.
+  final plans = RefuelPlanner.plan(RefuelPlanRequest(
     routeKm: projection.totalKm,
     drivingMinutes: result.route.durationMinutes,
     tankCapacityL: tank.capacityL!,
     startLitres: startLitres,
     consumptionLPer100km: consumption,
-    candidates: candidates,
-  )));
+    candidates: withRoadEstimates(
+      set.candidates,
+      (id) => actionableTravelEstimate(estimates, request, id, now),
+    ),
+    currencyCode: currency,
+  ));
+
+  // An empty candidate set is not automatically a blocker: a tank that
+  // already covers the journey is a real answer, and #4362 requires it
+  // even when no priced station came back at all.
+  //
+  // Nor is it a GAP. A gap is a claim about the road — "you cannot cross
+  // this stretch" — and it may only be made over a candidate set that
+  // actually held stations. With none, what is missing is evidence, and
+  // the blocker says so instead.
+  if (plans.cheapest == null &&
+      (set.candidates.isEmpty || plans.gap == null)) {
+    return RefuelPlanState.blocked(
+      set.excludedForCurrency
+          ? RefuelPlanBlocker.noComparableCurrency
+          : RefuelPlanBlocker.noPricedStations,
+      candidates: set,
+    );
+  }
+  return RefuelPlanState.ready(plans, candidates: set);
 });

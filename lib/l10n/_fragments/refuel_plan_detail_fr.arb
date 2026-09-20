@@ -1,0 +1,13 @@
+{
+  "refuelPlanLeastDrivingTitle": "Détour le plus court",
+  "refuelPlanStopNamed": "{position}. {station}",
+  "refuelPlanStopDetail": "Prendre {litres} pour {cost} · arrivée avec {arrival}",
+  "refuelPlanStopNativePrice": "{price} à la pompe",
+  "refuelPlanJourneyTotals": "{distance} · {duration}",
+  "refuelPlanTradeOff": "Par rapport au moins cher : {cost} · {minutes} · {distance}",
+  "refuelPlanNoStopSummary": "Votre réservoir couvre ce trajet — environ {litres} consommés, rien à acheter.",
+  "refuelPlanDetourTimeApproximate": "Les temps de détour sont estimés à partir de la vitesse moyenne de l'itinéraire.",
+  "refuelPlanSearchBounded": "Le meilleur des itinéraires comparés — cet itinéraire compte plus de stations que le planificateur n'en combine.",
+  "refuelPlanEvidenceIncomplete": "Certaines stations ont été écartées — masquées par vous, ou absentes de la source de ce pays — c'est donc la meilleure parmi les autres.",
+  "refuelPlanReferencePricesSkipped": "{count, plural, =1{1 prix de référence pour ce secteur n'est pas un endroit où s'arrêter} other{{count} prix de référence pour ce secteur ne sont pas des endroits où s'arrêter}}"
+}

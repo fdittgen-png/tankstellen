@@ -6976,19 +6976,6 @@
       }
     }
   },
-  "refuelPlanStopLine": "Buy {litres} — {cost}",
-  "@refuelPlanStopLine": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "litres": {
-        "type": "String"
-      },
-      "cost": {
-        "type": "String"
-      }
-    }
-  },
   "refuelPlanGap": "No station in range between {from} and {to}",
   "@refuelPlanGap": {
     "x-mt": "needs-native-review",
@@ -8810,5 +8797,319 @@
   "@recoveryStillWorksProviderUnavailable": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "refuelCompareAdd": "Compare",
+  "@refuelCompareAdd": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareRemove": "Remove from comparison",
+  "@refuelCompareRemove": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareTitle": "Your comparison",
+  "@refuelCompareTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareCount": "{count, plural, =1{1 station} other{{count} stations}}",
+  "@refuelCompareCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "refuelCompareClear": "Clear",
+  "@refuelCompareClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareFull": "You can compare up to {max} stations",
+  "@refuelCompareFull": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "refuelCompareContextLine": "{fuel} · buying {quantity} · {consumption}",
+  "@refuelCompareContextLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "consumption": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelCompareConsumptionEstimated": "{consumption} (estimated)",
+  "@refuelCompareConsumptionEstimated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "consumption": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelCompareConsumptionMissing": "no consumption yet — add a few fill-ups to see costs",
+  "@refuelCompareConsumptionMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareQuantityEdit": "Change the quantity",
+  "@refuelCompareQuantityEdit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareOriginMissing": "Distances are straight-line until a search sets where you are.",
+  "@refuelCompareOriginMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareRowCost": "Buy {litres} · {cash} · {distance} there and back",
+  "@refuelCompareRowCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "cash": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelCompareRowStopCost": "Buy {litres} · {cash} · {distance} off your route",
+  "@refuelCompareRowStopCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "cash": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelCompareBaseline": "Cheapest for this quantity",
+  "@refuelCompareBaseline": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareCostsMore": "{amount} more than {station}",
+  "@refuelCompareCostsMore": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "station": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelCompareDistanceApproximate": "straight-line distance, estimated",
+  "@refuelCompareDistanceApproximate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareDistancePending": "road distance on its way",
+  "@refuelCompareDistancePending": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareNoPrice": "No price for {fuel} here",
+  "@refuelCompareNoPrice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelCompareOutOfRange": "Out of reach on what is in the tank",
+  "@refuelCompareOutOfRange": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareExceedsCapacity": "That quantity would not fit in the tank",
+  "@refuelCompareExceedsCapacity": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareNotCosted": "Cannot be costed with the current inputs",
+  "@refuelCompareNotCosted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelCompareCurrencyWithheld": "Prices are in different currencies and no exchange rate is available, so no cheapest is named.",
+  "@refuelCompareCurrencyWithheld": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanApply": "Add stops to route",
+  "@refuelPlanApply": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanApplyOpened": "{count, plural, =1{1 stop added to your route} other{{count} stops added to your route}}",
+  "@refuelPlanApplyOpened": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "refuelPlanApplyRefusedReference": "A reference price is not a place to stop at, so this plan cannot be sent to navigation.",
+  "@refuelPlanApplyRefusedReference": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanApplyRefusedUnavailable": "This country's price source is unavailable, so its stops cannot be sent to navigation.",
+  "@refuelPlanApplyRefusedUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanApplyFailed": "Could not open navigation",
+  "@refuelPlanApplyFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanNeedsExchangeRate": "These prices are in another currency and no exchange rate is available, so no comparable total can be shown.",
+  "@refuelPlanNeedsExchangeRate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanLeastDrivingTitle": "Least extra driving",
+  "@refuelPlanLeastDrivingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanStopNamed": "{position}. {station}",
+  "@refuelPlanStopNamed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "position": {
+        "type": "int"
+      },
+      "station": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanStopDetail": "Buy {litres} for {cost} · arrive with {arrival}",
+  "@refuelPlanStopDetail": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      },
+      "cost": {
+        "type": "String"
+      },
+      "arrival": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanStopNativePrice": "{price} at the pump",
+  "@refuelPlanStopNativePrice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanJourneyTotals": "{distance} · {duration}",
+  "@refuelPlanJourneyTotals": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanTradeOff": "Against the cheapest: {cost} · {minutes} · {distance}",
+  "@refuelPlanTradeOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanNoStopSummary": "Your tank covers this journey — about {litres} used, nothing to buy.",
+  "@refuelPlanNoStopSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "litres": {
+        "type": "String"
+      }
+    }
+  },
+  "refuelPlanDetourTimeApproximate": "Detour times are estimated from the route's average speed.",
+  "@refuelPlanDetourTimeApproximate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanSearchBounded": "The best of the itineraries compared — this route has more stations than the planner combines.",
+  "@refuelPlanSearchBounded": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanEvidenceIncomplete": "Some stations were left out — hidden by you, or not listed by this country's source — so this is the best among the rest.",
+  "@refuelPlanEvidenceIncomplete": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelPlanReferencePricesSkipped": "{count, plural, =1{1 reference price for this area is not a place you can stop at} other{{count} reference prices for this area are not places you can stop at}}",
+  "@refuelPlanReferencePricesSkipped": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

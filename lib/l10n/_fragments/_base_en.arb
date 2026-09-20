@@ -308,18 +308,6 @@
       }
     }
   },
-  "refuelPlanStopLine": "Buy {litres} — {cost}",
-  "@refuelPlanStopLine": {
-    "description": "One stop of a plan: the litres to buy there and what they cost (#4146). 'Just enough to reach a cheaper station' is a real instruction, so this is often not a full tank.",
-    "placeholders": {
-      "litres": {
-        "type": "String"
-      },
-      "cost": {
-        "type": "String"
-      }
-    }
-  },
   "refuelPlanGap": "No station in range between {from} and {to}",
   "@refuelPlanGap": {
     "description": "The route cannot be driven on this tank (#4146). Names the stretch rather than returning a plan that would strand the driver.",
@@ -716,7 +704,10 @@
   "@activeCountryChangedTo": {
     "description": "Snackbar after deleting the ACTIVE country profile, naming the country that took over the active context (#4280/#4267).",
     "placeholders": {
-      "country": { "type": "String", "example": "France" }
+      "country": {
+        "type": "String",
+        "example": "France"
+      }
     }
   },
   "errorNetwork": "Network error. Check your connection.",
