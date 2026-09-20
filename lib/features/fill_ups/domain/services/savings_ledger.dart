@@ -2,8 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/money_tally.dart';
 import '../entities/fill_up.dart';
 import 'price_baseline.dart';
+
+// #4364 — `kUnknownCurrency` moved to `core/domain/money_tally.dart`
+// when currency segregation became the app-wide rule; re-exported so the
+// #4136 callers of this library keep resolving it.
+export '../../../../core/domain/money_tally.dart' show kUnknownCurrency;
 
 /// One fill that beat — or missed — what this driver normally pays.
 class SavingsEntry {
@@ -80,17 +86,19 @@ class SavingsLedger {
   bool get isAvailable => baseline != null;
 
   /// Net across every counted fill — wins and misses.
+  ///
+  /// #4364 — accumulated by the canonical [MoneyTally], the one
+  /// currency-segregating aggregator, so this ledger and the
+  /// consumption/per-fuel summaries can never disagree about what "one
+  /// currency" means.
+  MoneyTally get tally => MoneyTally.of([
+        for (final e in entries) (e.amount, e.currency),
+      ]);
+
   /// Every currency present, with its own net. The key is the ISO code,
   /// or [kUnknownCurrency] for fills logged before the currency was
   /// recorded (#4136).
-  Map<String, double> get totalsByCurrency {
-    final out = <String, double>{};
-    for (final e in entries) {
-      final key = e.currency ?? kUnknownCurrency;
-      out[key] = (out[key] ?? 0) + e.amount;
-    }
-    return out;
-  }
+  Map<String, double> get totalsByCurrency => tally.byCurrency;
 
   /// Whether every counted fill is in the same currency.
   ///
@@ -98,7 +106,7 @@ class SavingsLedger {
   /// country has exactly one currency and simply logged before the field
   /// existed. A history that mixes a KNOWN currency with unknowns does
   /// not, because the unknowns cannot be placed.
-  bool get isSingleCurrency => totalsByCurrency.length <= 1;
+  bool get isSingleCurrency => tally.isSingleDenomination;
 
   /// Net across every counted fill — wins and misses.
   ///
@@ -119,13 +127,6 @@ class SavingsLedger {
           .fold<double>(0, (s, e) => s + e.amount)
       : null;
 }
-
-/// The bucket unrecorded currencies fall into (#4136).
-///
-/// Its own key rather than a guess at the active currency: assuming
-/// today's is precisely the silent cross-currency sum this exists to
-/// prevent.
-const String kUnknownCurrency = '?';
 
 /// Build the ledger for one fuel from the driver's own history.
 SavingsLedger savingsLedgerFor(

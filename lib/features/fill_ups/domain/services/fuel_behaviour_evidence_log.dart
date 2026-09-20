@@ -10,6 +10,7 @@ import '../../../../core/domain/fuel/fuel_behaviour_profile.dart';
 import '../../../../core/domain/fuel/fuel_grade.dart';
 import '../../../../core/domain/fuel/tank_blend_engine.dart';
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/money_tally.dart';
 import '../../../../core/domain/pump_gain_resolution.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../../core/services/co2_calculator.dart';
@@ -64,7 +65,11 @@ FuelBehaviourProfile deriveFuelBehaviourProfile({
 ///  * versions — legacy trip figures carry none, and none is invented.
 ///
 /// Conditions: only [DrivingCondition.coldStart] is on the summary
-/// (`coldStartSurcharge`); grade and stop-and-go are not.
+/// (`coldStartSurcharge`); grade and stop-and-go are not. Since #4364
+/// that gap is STATED — `observedConditions` names the one condition
+/// production evaluates — so the analyzer withholds any
+/// condition-adjusted claim instead of implying hills and traffic were
+/// accounted for. The uncontrolled observation still ships.
 List<TripFuelEvidence> tripFuelEvidenceFor({
   required String vehicleId,
   required VehicleProfile? vehicle,
@@ -102,6 +107,10 @@ List<TripFuelEvidence> tripFuelEvidenceFor({
       conditions: {
         if (summary.coldStartSurcharge) DrivingCondition.coldStart,
       },
+      // #4364 — what production actually LOOKED AT. Not the same as the
+      // empty set above: "no hills recorded" and "hills never evaluated"
+      // must not read alike.
+      observedConditions: const {DrivingCondition.coldStart},
     ));
   }
   return out;
@@ -111,6 +120,13 @@ List<TripFuelEvidence> tripFuelEvidenceFor({
 /// the tank report's own walk ([closedTankPeriods]), kept only when the
 /// window OPENS on a real full tank — a window opening on the first,
 /// partial fill does not know what was already in the tank.
+///
+/// Strictly attributed: a fill with no vehicle belongs to no vehicle's
+/// windows, so one legacy record can never open a window for two cars.
+///
+/// #4364 — the window's money is SEGREGATED by the currency each fill
+/// recorded. A window whose fills span two denominations has no single
+/// cost, exactly as a window with a missing price has none.
 List<FillWindowEvidence> fillWindowEvidenceFor({
   required String vehicleId,
   required Iterable<FillUp> fillUps,
@@ -120,28 +136,41 @@ List<FillWindowEvidence> fillWindowEvidenceFor({
     for (final f in fillUps)
       if (f.vehicleId == vehicleId && seen.add(f.id)) f,
   ];
+  bool inside(FillUp f, TankPeriod p) =>
+      !f.isCorrection &&
+      f.date.isAfter(p.opening.date) &&
+      !f.date.isAfter(p.closing.date);
   // A fill without a price makes the window's cost a partial sum, which
   // would read as a cheap tank. Its cost is unknown instead.
-  bool fullyPriced(TankPeriod p) => scoped.every((f) =>
-      f.isCorrection ||
-      !f.date.isAfter(p.opening.date) ||
-      f.date.isAfter(p.closing.date) ||
-      f.totalCost > 0);
+  bool fullyPriced(TankPeriod p) =>
+      scoped.every((f) => !inside(f, p) || f.totalCost > 0);
+  MoneyTally tallyOf(TankPeriod p) => MoneyTally.of([
+        for (final f in scoped)
+          if (inside(f, p) && f.totalCost > 0) (f.totalCost, f.currency),
+      ]);
   return [
     for (final p in closedTankPeriods(scoped))
       if (p.opening.isFullTank &&
           !p.opening.isCorrection &&
           p.closing.date.isAfter(p.opening.date) &&
           p.liters > 0)
-        FillWindowEvidence(
-          id: p.closing.id,
-          openedAt: p.opening.date,
-          closedAt: p.closing.date,
-          litres: p.liters,
-          distanceKm: p.distanceKm,
-          pumpedCost: fullyPriced(p) ? p.pumpedCost : null,
-        ),
+        _windowEvidence(p, fullyPriced(p) ? tallyOf(p) : null),
   ];
+}
+
+/// One window, with a cost only when [tally] names a single denomination
+/// — never a cross-currency sum and never today's currency assumed.
+FillWindowEvidence _windowEvidence(TankPeriod p, MoneyTally? tally) {
+  final denominable = tally != null && tally.isSingleDenomination;
+  return FillWindowEvidence(
+    id: p.closing.id,
+    openedAt: p.opening.date,
+    closedAt: p.closing.date,
+    litres: p.liters,
+    distanceKm: p.distanceKm,
+    pumpedCost: denominable ? tally.soleAmount : null,
+    costCurrency: denominable ? (tally.soleCurrency ?? kUnknownCurrency) : null,
+  );
 }
 
 /// The factors the app ships in [Co2Calculator] (ADEME Base Carbone

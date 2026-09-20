@@ -3,7 +3,10 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../../core/domain/comparison_eligibility.dart';
+import '../../../../core/domain/fuel/fuel_quantity_unit.dart';
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/money_tally.dart';
 
 part 'fuel_type_efficiency_stats.freezed.dart';
 
@@ -106,17 +109,48 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
     required FuelEfficiencyBucket bucket,
 
     /// Average litres / 100 km over the closed intervals classified into this
-    /// bucket. `null` when [attributedIntervalCount] is 0 or every such
-    /// interval had zero usable distance (odometer reset / open tail only).
+    /// bucket. `null` when [attributedIntervalCount] is 0, every such
+    /// interval had zero usable distance (odometer reset / open tail only),
+    /// or the bucket's fuel is not sold by the litre (#4364 — a kg or kWh
+    /// quantity does not become litres by relabelling the suffix).
     double? avgL100km,
 
-    /// Average cost per km (store currency) over this bucket's intervals.
-    /// `null` under the same condition as [avgL100km].
+    /// Average cost per km over this bucket's intervals, in
+    /// [recordedSpend]'s single denomination. `null` under the same
+    /// conditions as [avgL100km], and also whenever the bucket's money
+    /// spans more than one currency or a contributing fill carried no
+    /// price at all (#4364).
+    ///
+    /// Its valuation basis is [MoneyValuationBasis.modelledConsumedFuel] —
+    /// see [intervalCost]. It is an OBSERVED cost, not the vehicle's
+    /// intrinsic efficiency and not a total cost of ownership.
     double? avgCostPerKm,
 
-    /// Σ `totalCost` of every non-correction fill folded into this bucket's
-    /// intervals — "how much the tanks of this composition cost in total".
-    required double totalSpent,
+    /// What the fills folded into this bucket ACTUALLY cost at the pump
+    /// (#4364) — [MoneyValuationBasis.recordedPurchaseSpend].
+    ///
+    /// This is the field that answers "how much did the tanks of this
+    /// composition cost". It is NOT [intervalCost]: that one values the
+    /// fuel the engine burned, which a fuel switch makes a visibly
+    /// different number. `null` when the bucket's fills span more than
+    /// one denomination — 30 EUR and 225 DKK have no common total.
+    double? recordedPurchaseSpend,
+
+    /// [recordedPurchaseSpend] segregated by the currency each fill
+    /// recorded, unknown currencies in their own bucket (#4364).
+    @Default(MoneyTally.empty) MoneyTally recordedSpend,
+
+    /// Non-correction fills folded into this bucket that carried no
+    /// recorded cost (#4364). Non-zero withholds every money figure: a
+    /// missing price shrinks a numerator while its distance stays in the
+    /// denominator, which manufactures a cheaper fuel.
+    @Default(0) int unpricedFillCount,
+
+    /// The unit this bucket's quantities are measured in (#4364).
+    /// Litre-based buckets get consumption figures; kg (CNG, hydrogen)
+    /// and kWh (electric) buckets keep their native spend and report no
+    /// L/100 km at all.
+    @Default(FuelQuantityUnit.litre) FuelQuantityUnit quantityUnit,
 
     /// Count of non-correction fills folded into this bucket's intervals.
     required int fillCount,
@@ -146,13 +180,21 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
     /// Says how much driving a row's verdict rests on.
     @Default(0) double totalDistanceKm,
 
-    /// Σ cost over this bucket's attributed intervals (#3828).
+    /// The MODELLED value of the fuel this bucket's intervals burned
+    /// ([MoneyValuationBasis.modelledConsumedFuel]) — the burned volume
+    /// split over the interval's composition and priced at what each
+    /// grade cost (#3846).
     ///
-    /// NOT the same as [totalSpent]: that is every non-correction fill folded
-    /// into the bucket, while this counts only the closed intervals the
-    /// averages are computed from. Mixing them would produce a price per
-    /// litre that disagrees with [avgCostPerKm].
-    @Default(0) double intervalCost,
+    /// NOT recorded purchase spend (#4364): that is
+    /// [recordedPurchaseSpend]. A field named `totalSpent` used to carry
+    /// exactly this number, which made a reconstruction read as a bank
+    /// statement. Only prices from fills inside the counted closed
+    /// windows feed it, so appending a later expensive purchase cannot
+    /// retroactively revalue an earlier period.
+    ///
+    /// `null` when the money is not denominable (mixed currencies, or a
+    /// contributing fill with no price).
+    double? intervalCost,
   }) = _FuelTypeEfficiencyStats;
 
   /// The bucket's dominant fuel (the only fuel for a pure bucket, the
@@ -174,8 +216,9 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
   /// This is the number that drives the whole comparison and was previously
   /// invisible: a fuel can burn FEWER litres per 100 km and still cost more
   /// per km, which reads as a contradiction until the pump price is shown.
-  double? get avgPricePerLitre =>
-      totalLitres > 0 ? intervalCost / totalLitres : null;
+  double? get avgPricePerLitre => totalLitres > 0 && intervalCost != null
+      ? intervalCost! / totalLitres
+      : null;
 
   /// [avgCostPerKm] in the unit people actually reason in. A per-km figure
   /// like 0.057 is hard to feel; per 100 km is not.
@@ -226,6 +269,12 @@ abstract class FuelTypeEfficiencyStats with _$FuelTypeEfficiencyStats {
     final perKm = co2PerKmWith(kgCo2PerLitre);
     return perKm == null ? null : perKm * 1000;
   }
+
+  /// The valuation [avgCostPerKm] and [intervalCost] rest on. Stated so
+  /// a consumer can never present a reconstruction as recorded spend
+  /// (#4364).
+  MoneyValuationBasis get costValuationBasis =>
+      MoneyValuationBasis.modelledConsumedFuel;
 
   /// True when this row rests on at least two closed full-tank intervals —
   /// the same bar the existing "record at least two full tanks" guard uses

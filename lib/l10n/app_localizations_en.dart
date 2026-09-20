@@ -5592,6 +5592,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fuelAndTankInsufficientTooUncertain => 'Too uncertain to show';
 
   @override
+  String get fuelAndTankInsufficientConditionCoverage =>
+      'Can\'t be adjusted for conditions yet — hills and traffic aren\'t recorded';
+
+  @override
+  String get fuelAndTankInsufficientMixedCurrencies =>
+      'Several currencies — no single figure';
+
+  @override
   String get fuelAndTankUncontrolled =>
       'Not adjusted for driving conditions yet — hills, cold starts and traffic are still in these figures.';
 
@@ -16182,6 +16190,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get fuelAndTankInsufficientTooUncertain =>
       '⟦Ŧóó úñçéřŧáîñ ŧó šĥóŵ ········⟧';
+
+  @override
+  String get fuelAndTankInsufficientConditionCoverage =>
+      '⟦Çáñ\'ŧ ƀé áđĵúšŧéđ ƒóř çóñđîŧîóñš ýéŧ — ĥîłłš áñđ ŧřáƒƒîç ářéñ\'ŧ řéçóřđéđ ··························⟧';
+
+  @override
+  String get fuelAndTankInsufficientMixedCurrencies =>
+      '⟦Šéṽéřáł çúřřéñçîéš — ñó šîñǧłé ƒîǧúřé ··············⟧';
 
   @override
   String get fuelAndTankUncontrolled =>

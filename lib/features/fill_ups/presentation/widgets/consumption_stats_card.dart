@@ -216,7 +216,11 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   icon: Icons.payments_outlined,
                   label: l.statTotalSpent,
                   // #2491 — locale-aware 2 dp + currency symbol.
-                  value: PriceFormatter.formatTotal(stats.totalSpent),
+                  // #4364 — withheld across denominations rather than
+                  // stamped with today's country's symbol.
+                  value: stats.totalSpent != null
+                      ? PriceFormatter.formatTotal(stats.totalSpent!)
+                      : '—',
                 ),
               ),
             ],

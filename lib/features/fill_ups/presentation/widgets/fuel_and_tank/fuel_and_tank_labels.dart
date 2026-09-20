@@ -119,6 +119,12 @@ abstract final class FuelAndTankLabels {
           l.fuelAndTankInsufficientContextNotPure,
         InsufficientReason.uncertaintyTooWide =>
           l.fuelAndTankInsufficientTooUncertain,
+        // #4364 — an adjusted figure claims conditions were controlled;
+        // production evaluates cold starts alone, so it says so instead.
+        InsufficientReason.incompleteConditionCoverage =>
+          l.fuelAndTankInsufficientConditionCoverage,
+        InsufficientReason.mixedCurrencies =>
+          l.fuelAndTankInsufficientMixedCurrencies,
       };
 
   /// The general technical fact for one grade, or null when the standard

@@ -28,6 +28,10 @@ part 'trip_history_provider.g.dart';
 /// A null [vehicleId] keeps every trip: the tab must not go silently
 /// empty just because the profile selector has never been used (#889).
 ///
+/// **Not for comparisons** (#4364): an unassigned trip matches EVERY
+/// vehicle here, which is right for a browser and wrong the moment two
+/// vehicles are totalled side by side. Use [tripsAttributedToVehicle].
+///
 /// The sort is defensive. `TripHistoryRepository.loadAll` already
 /// returns newest-first, but the list may be populated by another path
 /// (tests, a future sync source), so the ordering contract lives here
@@ -47,6 +51,46 @@ List<TripHistoryEntry> tripsForVehicle(Ref ref, String? vehicleId) {
       return bx.compareTo(ax);
     });
 }
+
+/// Whether [trip] is STRICTLY attributed to [vehicleId] (#4364).
+///
+/// The one attribution predicate personal and fleet comparisons share.
+/// `tripsForVehicle` above deliberately also keeps `vehicleId == null`
+/// trips so the history browser never goes empty (#889) — correct for a
+/// list the driver reads, fatal for a comparison, where the same legacy
+/// trip would be counted once for EVERY selected vehicle and its
+/// distance would inflate both sides. Mirrors the strict test
+/// `tripFuelEvidenceFor` already applies to behaviour evidence.
+bool tripIsAttributedTo(TripHistoryEntry trip, String vehicleId) =>
+    trip.vehicleId == vehicleId;
+
+/// Trips STRICTLY attributed to [vehicleId], newest first (#4364).
+///
+/// Never includes an unassigned trip. Consumers that need to tell the
+/// driver why a total looks short read [unattributedTripCountProvider] —
+/// the excluded records are reported, not hidden.
+@riverpod
+List<TripHistoryEntry> tripsAttributedToVehicle(Ref ref, String vehicleId) {
+  final trips = ref
+      .watch(tripHistoryListProvider)
+      .where((t) => tripIsAttributedTo(t, vehicleId))
+      .toList();
+  return trips
+    ..sort((a, b) {
+      final ax = a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final bx = b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return bx.compareTo(ax);
+    });
+}
+
+/// How many recorded trips carry no vehicle at all (#4364).
+///
+/// Reported once, beside a multi-vehicle comparison, instead of being
+/// silently credited to every vehicle. Assigning such a trip moves it
+/// into exactly one vehicle's totals and leaves the others untouched.
+@riverpod
+int unattributedTripCount(Ref ref) =>
+    ref.watch(tripHistoryListProvider).where((t) => t.vehicleId == null).length;
 
 /// App-wide access to the [TripHistoryRepository] (#726).
 ///

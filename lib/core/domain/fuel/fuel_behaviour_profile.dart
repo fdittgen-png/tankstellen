@@ -53,6 +53,8 @@ final class FuelContextBehaviour {
     required this.tripDistanceKm,
     required this.windowDistanceKm,
     required this.residualCoverage,
+    required this.conditionCoverage,
+    required this.costCurrency,
     required Map<DrivingCondition, double> conditionShares,
   })  : provenance = Map.unmodifiable(provenance),
         exclusions = Map.unmodifiable(exclusions),
@@ -72,9 +74,21 @@ final class FuelContextBehaviour {
 
   /// [residualRatio] × the vehicle's typical expected consumption: this
   /// context's L/100 km under the conditions the car usually drives in.
+  ///
+  /// #4364 — an ADJUSTED figure claims the confounders were controlled,
+  /// so it is withheld ([InsufficientReason.incompleteConditionCoverage])
+  /// unless the evidence actually evaluated every condition over enough
+  /// of the distance and carries expected-consumption inputs for it.
+  /// Production evaluates cold starts alone and stamps no
+  /// blend-independent expectation, so today this is insufficient and
+  /// the qualified observation [lPer100Km] is what survives — the whole
+  /// point of keeping the two apart.
   final BehaviourMetric conditionAdjustedLPer100Km;
 
-  /// From the prices actually paid over reference windows.
+  /// From the prices actually paid over reference windows, in
+  /// [costCurrency]. Insufficient with
+  /// [InsufficientReason.mixedCurrencies] when the windows span more
+  /// than one denomination (#4364).
   final BehaviourMetric costPerKm;
   final BehaviourMetric costPer100Km;
 
@@ -100,6 +114,16 @@ final class FuelContextBehaviour {
 
   /// Share of trip distance driven under each confounding condition.
   final Map<DrivingCondition, double> conditionShares;
+
+  /// Share of trip distance whose FULL condition context was evaluated
+  /// (#4364) — not the share that HAD a condition. 0 when the producer
+  /// only ever looks at some of them.
+  final double conditionCoverage;
+
+  /// The denomination [costPerKm] / [costPer100Km] are in — an ISO code,
+  /// or `kUnknownCurrency` when the fills recorded none. Null when there
+  /// is no cost figure (#4364). Never today's country's currency.
+  final String? costCurrency;
 
   /// Whether the comparison figures are condition controlled.
   ConfounderControl get confounderControl {
@@ -129,6 +153,8 @@ final class FuelContextBehaviour {
         'tripDistanceKm': tripDistanceKm,
         'windowDistanceKm': windowDistanceKm,
         'residualCoverage': residualCoverage,
+        'conditionCoverage': conditionCoverage,
+        'costCurrency': costCurrency,
         'conditionShares': {
           for (final c in DrivingCondition.values)
             if (conditionShares[c] case final double s) c.name: s,

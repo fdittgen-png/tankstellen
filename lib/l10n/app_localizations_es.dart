@@ -5655,6 +5655,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get fuelAndTankInsufficientTooUncertain => 'Too uncertain to show';
 
   @override
+  String get fuelAndTankInsufficientConditionCoverage =>
+      'Can\'t be adjusted for conditions yet — hills and traffic aren\'t recorded';
+
+  @override
+  String get fuelAndTankInsufficientMixedCurrencies =>
+      'Several currencies — no single figure';
+
+  @override
   String get fuelAndTankUncontrolled =>
       'Not adjusted for driving conditions yet — hills, cold starts and traffic are still in these figures.';
 

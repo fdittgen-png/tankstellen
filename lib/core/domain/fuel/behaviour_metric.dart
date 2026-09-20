@@ -50,6 +50,15 @@ enum InsufficientReason {
 
   /// The interval reaches a physically meaningless value.
   uncertaintyTooWide,
+
+  /// Not every confounding condition was evaluated over enough of the
+  /// distance, so an "adjusted" figure would claim a control that does
+  /// not exist (#4364).
+  incompleteConditionCoverage,
+
+  /// The evidence's money spans more than one currency (#4364). Two
+  /// honest amounts, no single figure.
+  mixedCurrencies,
 }
 
 /// A learned value with its uncertainty, or an explicit "insufficient"

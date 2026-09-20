@@ -92,11 +92,18 @@ class FuelTypeEfficiencyAggregator {
     final sorted = [...fills]..sort((a, b) => a.date.compareTo(b.date));
 
     // #3846 — what each fuel actually COST per litre, volume-weighted over
-    // every real fill of that fuel. The interval's money must come from the
+    // the real fills of that fuel. The interval's money must come from the
     // fuel that was BURNED; before this, it came from the fill that CLOSED
     // the interval, i.e. the next tank — so E5 was priced with E85's money
     // and vice versa, and the "cheapest to drive on" verdict inverted.
-    final pricePerLitre = weightedPricePerLitre(sorted);
+    //
+    // #4364 — bounded to the fills up to and including the LAST CLOSING
+    // plein. Priced over the whole list, a purchase logged after every
+    // counted window moved the volume-weighted mean and silently
+    // revalued periods that had already closed: the same history plus one
+    // expensive top-up produced a different past. A report must be
+    // reproducible from the windows it names.
+    final prices = weightedPricePerLitre(_upToLastClose(sorted));
 
     // Per-bucket accumulators, keyed by FuelEfficiencyBucket.key.
     final acc = <String, BucketAcc>{};
@@ -135,7 +142,7 @@ class FuelTypeEfficiencyAggregator {
         accFor,
         openingContent:
             _openingContentAt(sorted[openingIndex], blendAfter, tankCapacityL),
-        pricePerLitre: pricePerLitre,
+        prices: prices,
       );
 
       openingIndex = i;
@@ -162,6 +169,19 @@ class FuelTypeEfficiencyAggregator {
       return x.bucket.key.compareTo(y.bucket.key);
     });
     return result;
+  }
+
+  /// The prefix of [sorted] the counted closed intervals actually cover:
+  /// everything up to and including the LAST full-tank fill (#4364).
+  ///
+  /// Fills after it are the in-progress window, which the walker never
+  /// attributes. Letting their prices into the pricing table is how an
+  /// unrelated later purchase rewrote a closed period's cost.
+  static List<FillUp> _upToLastClose(List<FillUp> sorted) {
+    for (var i = sorted.length - 1; i >= 1; i--) {
+      if (sorted[i].isFullTank) return sorted.sublist(0, i + 1);
+    }
+    return const [];
   }
 
   /// The lowest-`avgCostPerKm` bucket — but ONLY when every entry that has
@@ -226,7 +246,7 @@ class FuelTypeEfficiencyAggregator {
     double distance,
     BucketAcc Function(FuelEfficiencyBucket) accFor, {
     required OpeningContent? openingContent,
-    required Map<String, double> pricePerLitre,
+    required FuelPriceTable prices,
   }) {
     if (contributing.isEmpty) return;
 
@@ -262,6 +282,10 @@ class FuelTypeEfficiencyAggregator {
     var intervalLitres = 0.0;
     var pricedLitres = 0.0;
     var intervalFills = 0;
+    // #4364 — what the pump ACTUALLY charged for this interval's fills,
+    // kept per denomination and apart from the modelled valuation below.
+    final recorded = <(double, String?)>[];
+    var unpriced = 0;
     for (final f in contributing) {
       // Litres stay the plein-to-plein REFILL volume — that is what was
       // burned over the interval, and it is what avgL100km must use.
@@ -275,6 +299,11 @@ class FuelTypeEfficiencyAggregator {
       // the fuel's rate produced 2.57 EUR/km in the #3846 first draft.
       pricedLitres += f.liters;
       intervalFills += 1;
+      if (f.totalCost > 0) {
+        recorded.add((f.totalCost, f.currency));
+      } else {
+        unpriced += 1;
+      }
     }
 
     // #3846 — money follows the fuel BURNED. Split the burned volume across
@@ -289,7 +318,7 @@ class FuelTypeEfficiencyAggregator {
     var intervalCost = 0.0;
     if (compositionLitres > 0) {
       for (final entry in litresByFuel.entries) {
-        final price = pricePerLitre[entry.key];
+        final price = prices.pricePerLitre[entry.key];
         if (price == null) continue; // never invent a price
         final burnedShare = entry.value / compositionLitres;
         intervalCost += pricedLitres * burnedShare * price;
@@ -303,7 +332,11 @@ class FuelTypeEfficiencyAggregator {
     a.attributedIntervalCount += 1;
     if (legacy) a.legacyAttributedIntervalCount += 1;
     a.fillCount += intervalFills;
-    a.totalSpent += intervalCost;
+    for (final (amount, currency) in recorded) {
+      a.recordedSpend = a.recordedSpend.plus(amount, currency);
+    }
+    a.unpricedFillCount += unpriced;
+    if (prices.mixedCurrencies) a.pricingDenominable = false;
   }
 
   /// Litres per fuel of [fills] (corrections never enter a composition

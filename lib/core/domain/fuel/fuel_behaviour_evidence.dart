@@ -48,7 +48,9 @@ final class TripFuelEvidence {
     this.expectedLPer100Km,
     this.calibrationGrade,
     Set<DrivingCondition> conditions = const {},
-  }) : conditions = Set.unmodifiable(conditions) {
+    Set<DrivingCondition> observedConditions = const {...DrivingCondition.values},
+  })  : conditions = Set.unmodifiable(conditions),
+        observedConditions = Set.unmodifiable(observedConditions) {
     if (id.isEmpty) throw ArgumentError.value(id, 'id');
     if (!distanceKm.isFinite || distanceKm < 0) {
       throw ArgumentError.value(distanceKm, 'distanceKm');
@@ -68,6 +70,8 @@ final class TripFuelEvidence {
     double? expectedLPer100Km,
     FuelGrade? calibrationGrade,
     Set<DrivingCondition> conditions = const {},
+    Set<DrivingCondition> observedConditions =
+        const {...DrivingCondition.values},
   }) =>
       TripFuelEvidence(
         id: id,
@@ -79,6 +83,7 @@ final class TripFuelEvidence {
         expectedLPer100Km: expectedLPer100Km,
         calibrationGrade: calibrationGrade,
         conditions: conditions,
+        observedConditions: observedConditions,
       );
 
   /// Stable identity (the trip id).
@@ -114,7 +119,27 @@ final class TripFuelEvidence {
   /// from a pure context — that is how E10 learning would leak into E85.
   final FuelGrade? calibrationGrade;
 
+  /// The conditions that were TRUE of this drive, among those the
+  /// producer evaluated.
   final Set<DrivingCondition> conditions;
+
+  /// The conditions the producer actually EVALUATED (#4364).
+  ///
+  /// Not the same question as [conditions]: "no hills were recorded" and
+  /// "hills were never looked at" produce the same empty set, and only
+  /// one of them supports a condition-adjusted claim. Production today
+  /// evaluates cold starts alone — no grade, no stop-and-go — so a
+  /// profile built from it may report an observation and must not report
+  /// an *adjusted* efficiency.
+  ///
+  /// Defaults to the full set for a caller that constructs complete
+  /// evidence (tests, a future full-context pipeline); a producer that
+  /// knows less must say so.
+  final Set<DrivingCondition> observedConditions;
+
+  /// True when every confounding condition was evaluated for this drive.
+  bool get hasFullConditionContext =>
+      observedConditions.length == DrivingCondition.values.length;
 
   /// The evidence tier of [litresPer100Km].
   EvidenceTier get tier {
@@ -152,6 +177,7 @@ final class FillWindowEvidence {
     required this.litres,
     required this.distanceKm,
     this.pumpedCost,
+    this.costCurrency,
   }) {
     if (id.isEmpty) throw ArgumentError.value(id, 'id');
     if (!closedAt.isAfter(openedAt)) {
@@ -181,8 +207,15 @@ final class FillWindowEvidence {
   /// Odometer delta.
   final double distanceKm;
 
-  /// What was actually paid for [litres], or null when a price is missing.
+  /// What was actually paid for [litres], or null when a price is
+  /// missing — or, since #4364, when the window's fills spanned more
+  /// than one currency and no single amount is true of it.
   final double? pumpedCost;
+
+  /// The denomination [pumpedCost] is in: an ISO code, or
+  /// `kUnknownCurrency` when the fills recorded none (#4364). Null
+  /// exactly when [pumpedCost] is. Never inferred from today's country.
+  final String? costCurrency;
 
   double get lPer100Km => litres / distanceKm * 100;
 }

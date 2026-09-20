@@ -5336,6 +5336,14 @@
   "@fuelAndTankInsufficientTooUncertain": {
     "description": "Why a figure is missing (#4278)."
   },
+  "fuelAndTankInsufficientConditionCoverage": "Can't be adjusted for conditions yet — hills and traffic aren't recorded",
+  "@fuelAndTankInsufficientConditionCoverage": {
+    "description": "Why a condition-adjusted figure is missing: not every confounding condition was evaluated over enough distance (#4364)."
+  },
+  "fuelAndTankInsufficientMixedCurrencies": "Several currencies — no single figure",
+  "@fuelAndTankInsufficientMixedCurrencies": {
+    "description": "Why a money figure is missing: the fill-ups behind it were paid in more than one currency (#4364)."
+  },
   "fuelAndTankUncontrolled": "Not adjusted for driving conditions yet — hills, cold starts and traffic are still in these figures.",
   "@fuelAndTankUncontrolled": {
     "description": "Disclosure when a figure is not condition-controlled (#4278)."

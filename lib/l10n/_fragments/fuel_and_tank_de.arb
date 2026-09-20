@@ -45,6 +45,8 @@
   "fuelAndTankInsufficientNoCo2eFactor": "Kein CO2e-Faktor für diesen Kraftstoff hinterlegt",
   "fuelAndTankInsufficientContextNotPure": "Für eine Tankmischung nicht verfügbar",
   "fuelAndTankInsufficientTooUncertain": "Zu unsicher für eine Anzeige",
+  "fuelAndTankInsufficientConditionCoverage": "Noch nicht um Bedingungen bereinigt – Steigungen und Verkehr werden nicht erfasst",
+  "fuelAndTankInsufficientMixedCurrencies": "Mehrere Währungen – kein einzelner Wert",
   "fuelAndTankUncontrolled": "Noch nicht um Fahrbedingungen bereinigt – Steigungen, Kaltstarts und Verkehr stecken noch in diesen Werten.",
   "fuelAndTankBasisReferenceWindows": "Aus Volltank-zu-Volltank-Tankvorgängen",
   "fuelAndTankBasisMeasuredTrips": "Aus Motordaten deiner Fahrten",

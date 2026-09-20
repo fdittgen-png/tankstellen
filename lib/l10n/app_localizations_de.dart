@@ -5656,6 +5656,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Zu unsicher für eine Anzeige';
 
   @override
+  String get fuelAndTankInsufficientConditionCoverage =>
+      'Noch nicht um Bedingungen bereinigt – Steigungen und Verkehr werden nicht erfasst';
+
+  @override
+  String get fuelAndTankInsufficientMixedCurrencies =>
+      'Mehrere Währungen – kein einzelner Wert';
+
+  @override
   String get fuelAndTankUncontrolled =>
       'Noch nicht um Fahrbedingungen bereinigt – Steigungen, Kaltstarts und Verkehr stecken noch in diesen Werten.';
 

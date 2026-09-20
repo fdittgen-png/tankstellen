@@ -28,7 +28,7 @@ FuelTypeEfficiencyStats _stats({
       bucket: FuelEfficiencyBucket(dominant: fuel),
       avgL100km: distanceKm > 0 ? (litres / distanceKm) * 100 : null,
       avgCostPerKm: distanceKm > 0 ? cost / distanceKm : null,
-      totalSpent: cost,
+      recordedPurchaseSpend: cost,
       fillCount: intervals,
       attributedIntervalCount: intervals,
       totalLitres: litres,
@@ -45,13 +45,16 @@ void main() {
       expect(s.avgPricePerLitre, closeTo(1.60, 1e-9));
     });
 
-    test('price per litre uses intervalCost, NOT totalSpent', () {
-      // totalSpent counts every non-correction fill; intervalCost counts only
-      // the closed intervals the averages come from. Mixing them would give a
-      // per-litre price that contradicts the per-km cost on the same row.
+    test('price per litre uses intervalCost, NOT recorded purchase spend',
+        () {
+      // #4364 — the two are different quantities: recordedPurchaseSpend is
+      // what the pump charged over every non-correction fill, intervalCost
+      // is the MODELLED value of the fuel the closed intervals burned.
+      // Mixing them gives a per-litre price that contradicts the per-km
+      // cost on the same row.
       const s = FuelTypeEfficiencyStats(
         bucket: FuelEfficiencyBucket(dominant: FuelType.e85),
-        totalSpent: 130.09, // includes fills outside the closed intervals
+        recordedPurchaseSpend: 130.09, // includes fills outside the closed intervals
         fillCount: 3,
         attributedIntervalCount: 2,
         totalLitres: 50,
@@ -74,7 +77,7 @@ void main() {
     test('derived metrics are null rather than guessed when unmeasured', () {
       const empty = FuelTypeEfficiencyStats(
         bucket: FuelEfficiencyBucket(dominant: FuelType.diesel),
-        totalSpent: 0,
+        recordedPurchaseSpend: 0,
         fillCount: 0,
         attributedIntervalCount: 0,
       );
@@ -126,7 +129,7 @@ void main() {
     test('null when either side has no measured consumption', () {
       const noData = FuelTypeEfficiencyStats(
         bucket: FuelEfficiencyBucket(dominant: FuelType.lpg),
-        totalSpent: 0,
+        recordedPurchaseSpend: 0,
         fillCount: 0,
         attributedIntervalCount: 0,
       );
@@ -170,7 +173,7 @@ void main() {
       expect(e85.co2PerKmWith(null), isNull);
       const noConsumption = FuelTypeEfficiencyStats(
         bucket: FuelEfficiencyBucket(dominant: FuelType.e85),
-        totalSpent: 0,
+        recordedPurchaseSpend: 0,
         fillCount: 0,
         attributedIntervalCount: 0,
       );

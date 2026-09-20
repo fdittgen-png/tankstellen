@@ -31,6 +31,22 @@ const int kMinResidualSamples = kMinTripSamples;
 /// See [kMinResidualSamples].
 const double kMinResidualDistanceKm = kMinTripDistanceKm;
 
+/// Share of a context's trip distance whose FULL confounding-condition
+/// context must have been evaluated before a CONDITION-ADJUSTED figure
+/// may be claimed (#4364).
+///
+/// Four fifths, not all of it: a handful of unevaluated kilometres does
+/// not invalidate the control, and demanding perfection would make the
+/// metric unreachable forever. Below it the analyzer reports the
+/// uncontrolled observation and says the adjustment is unavailable
+/// rather than implying hills and traffic were accounted for.
+const double kMinConditionCoverage = 0.8;
+
+/// Share of a context's trip distance that must carry an
+/// expected-consumption figure before residuals may be presented as an
+/// adjustment. Same bar, same reason (#4364).
+const double kMinResidualCoverage = kMinConditionCoverage;
+
 /// Learns a [FuelBehaviourProfile] from canonical evidence (#4276).
 ///
 /// ## No competing estimator
@@ -165,10 +181,17 @@ abstract final class FuelBehaviourAnalyzer {
       _mean(residuals(any), kMinResidualSamples, kMinResidualDistanceKm,
           MetricBasis.estimatedResiduals),
     ]);
-    final costPerKm = _mean([
-      for (final w in b.windows)
-        if (w.pumpedCost case final double cost) (cost / w.distanceKm, w.distanceKm),
-    ], kMinReferenceWindows, 0, MetricBasis.referenceWindows);
+    // #4364 — money never crosses a denomination. Windows priced in two
+    // currencies produce no €/km at all; the caller shows the native
+    // figures side by side.
+    final priced = [for (final w in b.windows) if (w.pumpedCost != null) w];
+    final currencies = {for (final w in priced) w.costCurrency};
+    final costCurrency = currencies.length == 1 ? currencies.first : null;
+    final costPerKm = currencies.length > 1
+        ? const BehaviourMetric.insufficient(InsufficientReason.mixedCurrencies)
+        : _mean([
+            for (final w in priced) (w.pumpedCost! / w.distanceKm, w.distanceKm),
+          ], kMinReferenceWindows, 0, MetricBasis.referenceWindows);
 
     final grade = context.pureGrade;
     final factor = grade == null ? null : factors(grade);
@@ -176,11 +199,14 @@ abstract final class FuelBehaviourAnalyzer {
     double share(bool Function(TripFuelEvidence) keep) => tripKm <= 0
         ? 0
         : b.trips.where(keep).fold(0.0, (s, t) => s + t.distanceKm) / tripKm;
+    final residualCoverage = share((t) => t.expectedLPer100Km != null);
+    final conditionCoverage = share((t) => t.hasFullConditionContext);
     return FuelContextBehaviour(
       context: context,
       lPer100Km: lPer100Km,
       residualRatio: residualRatio,
-      conditionAdjustedLPer100Km: residualRatio.times(typical),
+      conditionAdjustedLPer100Km: _adjusted(
+          residualRatio, typical, residualCoverage, conditionCoverage),
       costPerKm: costPerKm,
       costPer100Km: costPerKm.scaled(100),
       rangeKm: capacity == null
@@ -199,7 +225,9 @@ abstract final class FuelBehaviourAnalyzer {
       exclusions: b.exclusions,
       tripDistanceKm: tripKm,
       windowDistanceKm: b.windows.fold(0.0, (s, w) => s + w.distanceKm),
-      residualCoverage: share((t) => t.expectedLPer100Km != null),
+      residualCoverage: residualCoverage,
+      conditionCoverage: conditionCoverage,
+      costCurrency: costPerKm.isKnown ? costCurrency : null,
       conditionShares: {
         for (final c in DrivingCondition.values)
           if (share((t) => t.conditions.contains(c)) case final double s
@@ -207,6 +235,29 @@ abstract final class FuelBehaviourAnalyzer {
             c: s,
       },
     );
+  }
+
+  /// The CONDITION-ADJUSTED figure, or the precise reason there is none
+  /// (#4364).
+  ///
+  /// "Adjusted" asserts that hills, cold starts and traffic were
+  /// accounted for. That assertion needs two things the residual alone
+  /// does not prove: expected-consumption inputs over most of the
+  /// distance, and a producer that actually evaluated every condition.
+  /// Missing either, the observation stands and the adjustment does not
+  /// — an unqualified adjusted claim on partial evidence is how a
+  /// heavier car driven up a hill becomes "worse driving".
+  static BehaviourMetric _adjusted(BehaviourMetric residualRatio,
+      BehaviourMetric typical, double residualCoverage, double conditionCoverage) {
+    final combined = residualRatio.times(typical);
+    if (!combined.isKnown) return combined;
+    if (residualCoverage < kMinResidualCoverage ||
+        conditionCoverage < kMinConditionCoverage) {
+      return BehaviourMetric.insufficient(
+          InsufficientReason.incompleteConditionCoverage,
+          sampleCount: combined.sampleCount);
+    }
+    return combined;
   }
 
   /// A weighted mean, or the precise reason it is not one.
