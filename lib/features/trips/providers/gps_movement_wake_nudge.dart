@@ -13,6 +13,7 @@
 class GpsMovementWakeNudge {
   GpsMovementWakeNudge({
     required this.wake,
+    this.onSustainedMovement,
     this.speedThresholdKmh = 10,
     this.consecutiveSamples = 5,
     this.nudgeInterval = const Duration(minutes: 2),
@@ -22,6 +23,12 @@ class GpsMovementWakeNudge {
   /// Invoked on a sustained-movement window. The caller wires this to
   /// `Obd2LinkSupervisor.wake()`, which no-ops unless parked.
   final void Function() wake;
+
+  /// #4383 — invoked on EVERY sample inside a sustained-movement window,
+  /// before the [nudgeInterval] throttle. The movement evidence itself
+  /// (the vehicle power model's motion stamp, a 30 s window) must stay
+  /// fresh for the whole drive; only the dial nudge is rate-limited.
+  final void Function()? onSustainedMovement;
 
   final double speedThresholdKmh;
   final int consecutiveSamples;
@@ -38,6 +45,7 @@ class GpsMovementWakeNudge {
       return;
     }
     if (++_supraCount < consecutiveSamples) return;
+    onSustainedMovement?.call();
     final now = _now();
     final last = _lastNudge;
     if (last != null && now.difference(last) < nudgeInterval) return;

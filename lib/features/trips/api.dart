@@ -87,6 +87,7 @@ export 'presentation/widgets/trip_recording_banner.dart';
 export 'presentation/widgets/vehicle_adapter_section.dart';
 export 'presentation/widgets/vehicle_baseline_section.dart';
 export 'providers/auto_record_orchestrator.dart';
+export 'providers/gps_movement_wake_nudge.dart'; // #4383
 export 'providers/pip_mode_provider.dart';
 export 'providers/reconnect_scanner_factory.dart';
 export 'providers/recording_pipeline.dart';

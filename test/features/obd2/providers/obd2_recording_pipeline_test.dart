@@ -12,6 +12,8 @@ import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic.dart';
 import 'package:tankstellen/features/trips/domain/entities/trip_save_stage.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
+import 'package:tankstellen/features/obd2/domain/vehicle_power_state.dart';
+import 'package:tankstellen/features/obd2/providers/obd2_recording_movement_wake.dart';
 import 'package:tankstellen/features/obd2/providers/obd2_recording_pipeline.dart';
 import 'package:tankstellen/features/trips/providers/recording_pipeline.dart';
 import 'package:tankstellen/features/trips/providers/trip_baseline_recorder.dart';
@@ -160,6 +162,60 @@ void main() {
     });
 
     test(
+        '#4383 (Epic #4195) — every live reading feeds the recording\'s '
+        'movement evidence: five samples at road speed nudge the owner\'s '
+        'wake() once, and the nudge is throttled after that', () async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final host = _FakeWalHost();
+      var clock = DateTime(2026, 9, 18, 8);
+      final power = Obd2VehiclePower(now: () => clock);
+      var wakes = 0;
+      final movement = Obd2RecordingMovementWake(
+        wake: () => wakes++,
+        power: power,
+        now: () => clock,
+      );
+      final service = Obd2Service(FakeObd2Transport(_elmOk()))
+        ..adapterMac = _Harness.fakeMac;
+      await service.connect();
+      service.adapterMac = _Harness.fakeMac;
+      final pipeline = container.read(
+        _movementWakePipelineProvider((host: host, movement: movement)),
+      );
+      await pipeline.start(service);
+      addTearDown(pipeline.stop);
+      final ctl = pipeline.controller!;
+
+      // The recording's GPS fixes, exactly as TripGpsStreamController
+      // delivers them; with no speed PID the live reading carries the
+      // GPS latch — the same value it carries while degraded (the
+      // degraded emit tick publishes `speedKmh: latestGpsSpeedKmh` on
+      // the same `live` stream, pinned by
+      // test/features/obd2/data/trip_recording_controller_gps_degrade_test.dart).
+      void fix() {
+        clock = clock.add(const Duration(seconds: 1));
+        ctl.updateGpsFix(
+            latitude: 48.1, longitude: 11.5, speedKmh: 95, fixAt: clock);
+        ctl.debugEmitNow();
+      }
+
+      for (var i = 0; i < 5; i++) {
+        fix();
+        await _pump();
+      }
+      expect(wakes, 1,
+          reason: 'the fifth consecutive supra-threshold reading is '
+              'sustained movement — one nudge to the ONE owner');
+      expect(power.movingWithoutEngine, isTrue,
+          reason: 'noteMotion() has its production caller: the pipeline');
+
+      fix();
+      await _pump();
+      expect(wakes, 1, reason: 'throttled — one nudge per 2 min');
+    });
+
+    test(
         'a stalled blocking init aborts trip-start cleanly — throws + '
         'disconnects the link, no infinite "initializing" (#3382)', () async {
       final container = ProviderContainer();
@@ -226,6 +282,27 @@ final _hangingBaselinesPipelineProvider = Provider.family<Obd2RecordingPipeline,
     readDiagnosticCaptureFlag: () => false,
     baselinesBudget: const Duration(milliseconds: 50),
     startWatchdog: const Duration(milliseconds: 50),
+  ),
+);
+
+/// #4383 — a pipeline with an injected movement-evidence collaborator, so
+/// the test counts wakes without a supervisor graph.
+final _movementWakePipelineProvider = Provider.family<Obd2RecordingPipeline,
+    ({Obd2RecordingPipelineHost host, Obd2RecordingMovementWake movement})>(
+  (ref, args) => Obd2RecordingPipeline(
+    ref: ref,
+    host: args.host,
+    haptics: TripHapticController(),
+    gps: TripGpsStreamController(
+      ref: ref,
+      lifecycleState: () => AppLifecycleState.resumed,
+    ),
+    baselines: TripBaselineRecorder(ref),
+    oemFuel: TripOemFuelLevelController(),
+    readActiveVehicle: () => null,
+    readOemPidsFlag: () => false,
+    readDiagnosticCaptureFlag: () => false,
+    movementWake: args.movement,
   ),
 );
 

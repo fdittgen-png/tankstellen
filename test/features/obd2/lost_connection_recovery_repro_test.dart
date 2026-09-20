@@ -15,18 +15,22 @@
 //   * **REPRO** — asserts the CURRENT (wrong) behaviour and names the
 //     #4195 invariant it violates. It flips red the day the seam is
 //     fixed; that is the signal, not a regression.
+//   * **FIXED (#nnnn)** — a former REPRO, promoted in the commit that
+//     closed its seam: it now asserts the fixed behaviour through the
+//     production collaborator, and names the fix.
 //   * **SEAM** — drives the smallest production change that would fix
 //     the matching REPRO, through the EXISTING single authority
 //     (`Obd2LinkSupervisor.wake()`), proving no second reconnect
 //     controller is needed.
 //
-// The one seam all three REPROs share: the app already owns proof that
+// The one seam all three REPROs shared: the app already owns proof that
 // the vehicle is running while a recording is degraded — sustained GPS
-// ground speed — and never publishes it. `GpsMovementWakeNudge` (#3570)
-// does exactly that, but it is wired ONLY into `GpsOnlyRecordingPipeline`;
-// an OBD2 recording that fell back to GPS has no movement wake, and
+// ground speed — and never published it. `GpsMovementWakeNudge` (#3570)
+// does exactly that, but it was wired ONLY into `GpsOnlyRecordingPipeline`;
+// an OBD2 recording that fell back to GPS had no movement wake, and
 // `Obd2VehiclePower.noteMotion()` — rung 5 of that class's own documented
-// evidence ladder — has zero production callers.
+// evidence ladder — had zero production callers. #4383 closed it with
+// `Obd2RecordingMovementWake`, the OBD2 pipeline's owner of both.
 
 import 'dart:async';
 import 'dart:math';
@@ -42,6 +46,7 @@ import 'package:tankstellen/features/obd2/data/transport/obd2_link_drop_signal.d
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/domain/obd2_engine_evidence.dart';
 import 'package:tankstellen/features/obd2/domain/vehicle_power_state.dart';
+import 'package:tankstellen/features/obd2/providers/obd2_recording_movement_wake.dart';
 import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic.dart';
 import 'package:tankstellen/features/trips/domain/entities/recording_session_event.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
@@ -143,14 +148,23 @@ void main() {
     });
 
     test(
-        'REPRO: an outage longer than the engine-evidence window drops the '
-        'loop into the storm hold, and the adapter coming back mid-hold is '
-        'not dialed for the rest of it', () {
+        'FIXED (#4383): an outage longer than the engine-evidence window '
+        'drops the loop into the storm hold — and the adapter coming back '
+        'mid-hold is dialed within the movement-nudge interval, because the '
+        'recording publishes its own GPS movement', () {
       fakeAsync((async) {
         final evidence = Obd2EngineEvidence(now: () => clock.now)
           ..noteEngineOn();
-        final sup = buildSupervisor(evidence: evidence);
+        final power = Obd2VehiclePower(now: () => clock.now);
+        final sup = buildSupervisor(evidence: evidence, power: power);
         adapter.powered = null;
+        // The OBD2 pipeline's own movement evidence (#4383): the live
+        // reading's GPS speed while degraded, at the GPS-only throttle.
+        final movement = Obd2RecordingMovementWake(
+          wake: sup.wake,
+          power: power,
+          now: () => clock.now,
+        );
 
         drops.add(_drop);
         async.flushMicrotasks();
@@ -158,42 +172,83 @@ void main() {
         // The car keeps driving; the adapter stays dark. Nothing can
         // stamp engine evidence, because stamping it needs the very link
         // that is gone — so the 10 min window expires by construction.
-        clock.advance(async, Obd2EngineEvidence.defaultWindow);
-        expect(evidence.isFresh(), isFalse);
-
-        // Past that point the identical-miss streak holds the storm
-        // cadence (5 min, escalating to 15).
-        clock.advance(async, const Duration(minutes: 10));
-        expect(sup.inStandDown, isTrue);
-
-        // Step to the instant a hold-cadence dial misses, so the window
-        // below starts at the top of a hold whatever the jitter drew.
-        final before = adapter.dials;
-        for (var step = 0; step < 200 && adapter.dials == before; step++) {
-          clock.advance(async, const Duration(seconds: 10));
+        // The recording keeps feeding road speed the whole time.
+        void drive(Duration d) {
+          for (var s = 0; s < d.inSeconds; s++) {
+            movement.onSpeed(95);
+            clock.advance(async, const Duration(seconds: 1));
+          }
         }
-        expect(adapter.dials, before + 1);
+
+        drive(Obd2EngineEvidence.defaultWindow);
+        expect(evidence.isFresh(), isFalse);
+        // Past that point the identical-miss streak WOULD hold the storm
+        // cadence (5 min, escalating to 15) — but movement is a positive
+        // signal: the nudge breaks every hold within its 2 min interval.
+        drive(const Duration(minutes: 10));
 
         // The driver reseats the dongle. It answers every dial from now on.
         final dialsAtRestore = adapter.dials;
         adapter.powered = _liveService();
-        clock.advance(async, const Duration(minutes: 4));
+        drive(const Duration(minutes: 4));
 
-        // #4195 invariant 7 — "engine-off is not treated as a broken
-        // adapter; retry is permitted only when there is fresh evidence
-        // that the vehicle is running". The converse fails here: the
-        // vehicle IS demonstrably running (the recording is still laying
-        // down GPS samples at road speed) and the supervisor cannot see
-        // it, because the ONLY producers of engine evidence — rpm and
-        // ATRV voltage — need the dead link. So a restored adapter waits
-        // out a hold of up to 15 minutes. On a commute that is the
-        // #4195 headline: "the driver finishes the trip with GPS-only
-        // data even though the adapter became reachable again".
-        expect(adapter.dials, dialsAtRestore,
-            reason: 'REPRO — no dial at all while the hold runs');
-        expect(sup.state.value, Obd2LinkState.reconnecting);
-        expect(sup.service, isNull,
-            reason: 'the link is back on the wire and unused');
+        // #4195 invariant 7, the converse: the vehicle IS demonstrably
+        // running (the recording lays down GPS samples at road speed),
+        // and the supervisor now sees it — through the ONE owner's
+        // existing wake(), no second dial authority.
+        expect(adapter.dials, greaterThan(dialsAtRestore),
+            reason: 'the restored adapter is dialed within the nudge '
+                'interval, not after a 15 min hold');
+        expect(sup.state.value, Obd2LinkState.ready);
+        expect(sup.service, isNotNull,
+            reason: 'the link is back on the wire and IN USE');
+        unawaited(sup.dispose());
+        async.flushMicrotasks();
+      });
+    });
+
+    test(
+        '#4383 — at most one dial ladder per 2 min: ten minutes of road '
+        'speed against a dark adapter cost five wakes, not one per fix', () {
+      fakeAsync((async) {
+        final evidence = Obd2EngineEvidence(now: () => clock.now)
+          ..noteEngineOn();
+        final power = Obd2VehiclePower(now: () => clock.now);
+        final sup = buildSupervisor(evidence: evidence, power: power);
+        adapter.powered = null;
+        var wakes = 0;
+        final movement = Obd2RecordingMovementWake(
+          wake: () {
+            wakes++;
+            sup.wake();
+          },
+          power: power,
+          now: () => clock.now,
+        );
+
+        drops.add(_drop);
+        async.flushMicrotasks();
+        // Age the evidence out and let the loop stand down first, so
+        // every wake below is a real "break the hold" (a ready link or a
+        // fast ladder would make wake() a no-op and hide the throttle).
+        clock.advance(async, Obd2EngineEvidence.defaultWindow);
+        clock.advance(async, const Duration(minutes: 10));
+        expect(sup.inStandDown, isTrue);
+
+        final dialsBefore = adapter.dials;
+        for (var s = 0; s < 600; s++) {
+          movement.onSpeed(95); // 1 Hz GPS at road speed
+          clock.advance(async, const Duration(seconds: 1));
+        }
+
+        // Sustained after 5 samples (t = 4 s), then once per 2 min:
+        // t = 4, 124, 244, 364, 484 s — five, the sixth is due at 604 s.
+        expect(wakes, 5, reason: 'one nudge per 2 min, not one per fix');
+        // Each wake re-arms the fast ladder (0.5 → … → 30 s, capped) until
+        // the next stand-down; the cost is bounded by the interval.
+        expect(adapter.dials - dialsBefore, greaterThan(5));
+        expect(power.movingWithoutEngine, isTrue,
+            reason: 'the motion rung stays fresh across the whole drive');
         unawaited(sup.dispose());
         async.flushMicrotasks();
       });
@@ -385,13 +440,18 @@ void main() {
   // ==========================================================================
   group('#4229 class 3 — adapter reachable, ELM/protocol unresponsive', () {
     test(
-        'REPRO: a mute ELM makes the power model read "asleep" on a moving '
-        'car, and the drop parks the ONE reconnect owner with zero dials',
-        () {
+        'FIXED (#4383): a mute ELM makes the power model read "asleep" on a '
+        'moving car and the drop parks the ONE owner — and the recording\'s '
+        'own movement wakes that park with exactly one dial', () {
       fakeAsync((async) {
         final power = Obd2VehiclePower(now: () => clock.now);
         final evidence = Obd2EngineEvidence(now: () => clock.now);
         final sup = buildSupervisor(evidence: evidence, power: power);
+        final movement = Obd2RecordingMovementWake(
+          wake: sup.wake,
+          power: power,
+          now: () => clock.now,
+        );
 
         adapter.powered = _liveService();
         unawaited(sup.connect());
@@ -411,26 +471,30 @@ void main() {
 
         // #4195 invariant 7. The car is doing road speed, but with the
         // link mute EVERY engine-evidence producer is mute too, so the
-        // fused model reads `asleep` from the silent bus alone.
-        expect(power.asleep, isTrue, reason: 'REPRO — on a moving car');
+        // fused model still reads `asleep` from the silent bus alone
+        // (#4384 adds the motion term to the park verdicts themselves).
+        expect(power.asleep, isTrue);
 
         final dialsBefore = adapter.dials;
         sup.reportServiceDead(held, reason: 'trip-drop');
         async.flushMicrotasks();
-
-        // `_dropTail` sees `asleep` and parks instead of dialing.
         expect(sup.state.value, Obd2LinkState.engineOff,
-            reason: 'REPRO — a broken adapter classified as engine-off');
-        // `obd2_link_supervisor_asleep_park_test` pins the complement:
-        // the engine transition DOES wake this park. That transition is
-        // produced by an rpm parse or an `ATRV` read — both of which need
-        // the very link that is mute here, so on this path it can never
-        // arrive.
-        clock.advance(async, const Duration(minutes: 20));
-        expect(adapter.dials, dialsBefore,
-            reason: 'REPRO — the parked loop never re-arms: the wake '
-                'sources (rpm, ATRV voltage, ACL hint, app resume) are '
-                'all unavailable to a driver with the screen off');
+            reason: '`_dropTail` sees `asleep` and parks instead of dialing');
+
+        // The degraded recording keeps laying down GPS samples at road
+        // speed — the evidence the app already had, now published.
+        for (var i = 0; i < 5; i++) {
+          movement.onSpeed(95);
+        }
+        async.flushMicrotasks();
+
+        expect(adapter.dials, dialsBefore + 1,
+            reason: 'one dial, immediately — movement is the documented '
+                'exit of the park, through the existing wake()');
+        expect(sup.state.value, Obd2LinkState.ready);
+        // #3599 — motion is a nudge, never engine evidence.
+        expect(power.movingWithoutEngine, isTrue);
+        expect(power.engineRunning, isFalse);
         unawaited(sup.dispose());
         async.flushMicrotasks();
       });
@@ -528,14 +592,16 @@ void main() {
         async.flushMicrotasks();
         expect(sup.state.value, Obd2LinkState.engineOff);
 
-        final nudge = GpsMovementWakeNudge(
+        // #4383 — the OBD2 pipeline's own movement evidence.
+        final movement = Obd2RecordingMovementWake(
           wake: sup.wake,
+          power: power,
           now: () => clock.now,
         );
         // The degraded recording is still laying down GPS samples at
         // road speed — the evidence the app already has.
         for (var i = 0; i < 5; i++) {
-          nudge.onSpeed(95);
+          movement.onSpeed(95);
         }
         clock.advance(async, const Duration(seconds: 10));
 
@@ -555,18 +621,43 @@ void main() {
     });
 
     test(
-        'REPRO: Obd2VehiclePower rung 5 (GPS motion) is a complete, tested '
-        'predicate with no production producer', () {
+        'FIXED (#4383): Obd2VehiclePower rung 5 (GPS motion) has a '
+        'production producer — the OBD2 recording\'s movement evidence — '
+        'and the #3599 tow semantics hold: motion is never engine evidence',
+        () {
       final power = Obd2VehiclePower(now: () => clock.now);
       power.noteBusSilent();
       expect(power.movingWithoutEngine, isFalse,
-          reason: 'REPRO — nothing in production ever calls noteMotion(), '
-              'so the ladder rung the class documents can never fire');
+          reason: 'no motion stamped yet');
+      final movement = Obd2RecordingMovementWake(
+        wake: () {},
+        power: power,
+        now: () => clock.now,
+      );
 
-      // What the seam would publish, and what it buys: the model can
-      // then tell "parked, adapter asleep" from "moving, link broken".
-      power.noteMotion();
+      // Below the sustained-movement threshold nothing is stamped: four
+      // supra-10 km/h samples, then a standstill, then four more.
+      for (var i = 0; i < 4; i++) {
+        movement.onSpeed(95);
+      }
+      movement.onSpeed(0);
+      for (var i = 0; i < 4; i++) {
+        movement.onSpeed(95);
+      }
+      expect(power.movingWithoutEngine, isFalse,
+          reason: 'the rung fires at the nudge threshold, not on a blip');
+
+      // The fifth consecutive sample is sustained movement: what the
+      // pipeline publishes, and what it buys — the model can now tell
+      // "parked, adapter asleep" from "moving, link broken".
+      movement.onSpeed(95);
       expect(power.movingWithoutEngine, isTrue);
+      expect(power.state, isNot(VehiclePowerState.engineRunning),
+          reason: '#3599 — a towed car moves; motion alone never maps to '
+              'engineRunning');
+      expect(power.asleep, isTrue,
+          reason: 'the fused STATE is unchanged by motion; the park '
+              'verdicts gain their motion term in #4384');
     });
   });
 }
