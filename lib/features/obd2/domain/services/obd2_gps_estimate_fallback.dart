@@ -99,6 +99,11 @@ class Obd2GpsEstimateFallback {
         // #4233 — the figure went through the fuzzy stage; a GPS road-load
         // figure carries no pump gain, so no calibration generation.
         consumptionVersion: tripConsumptionVersion(),
+        // #4330 (F4) — say where the figure came from. Without this the
+        // trip classified as `none` ("no per-distance fuel figure
+        // exists") while showing one, so the badge and the canonical
+        // contract both mislabelled a perfectly honest GPS estimate.
+        dominantFuelSource: kGpsPhysicsFuelSourceTag,
       ),
       samples: est.samples,
     );

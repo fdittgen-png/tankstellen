@@ -174,6 +174,11 @@ void main() {
           'tripConsumptionVersion(',
       'lib/features/trips/providers/gps_trip_fuel_backfill.dart':
           'tripConsumptionVersion(',
+      // #4330 — the finalise path the #4233 note called "the documented
+      // follow-up": OBD2 measured/estimated trips, grace-window expiry,
+      // recovered snapshots and paused recovery all come through here.
+      'lib/features/obd2/data/session/trip_recording_controller_summary.dart':
+          'tripConsumptionVersion(',
     };
 
     /// Files in [sources] that no longer call their site (comments ignored).

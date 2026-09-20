@@ -307,6 +307,21 @@
       <xs:element name="ColdStartSurcharge" type="xs:boolean"/>
       <xs:element name="SecondsBelowOptimalGear" type="xs:decimal"
                   minOccurs="0"/>
+      <!-- #4330 — the figure's provenance: the pump gain its litres
+           carry, the fuel key that gain was resolved for, the branch
+           that produced them, and the consumption model version. All
+           optional: a trip without provenance omits them, exactly as
+           every backup written before #4330 does. -->
+      <xs:element name="PumpGainApplied" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="PumpGainFuelKey" type="xs:string" minOccurs="0"/>
+      <xs:element name="DominantFuelSource" type="xs:string" minOccurs="0"/>
+      <xs:element name="ConsumptionVersion" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="model" type="xs:int" use="required"/>
+          <xs:attribute name="rules" type="xs:int" use="required"/>
+          <xs:attribute name="calibration" type="xs:int"/>
+        </xs:complexType>
+      </xs:element>
     </xs:sequence>
   </xs:complexType>
 

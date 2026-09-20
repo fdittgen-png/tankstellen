@@ -8,6 +8,7 @@ import '../../../../../core/domain/vehicle_profile.dart';
 import '../../../domain/entities/fill_up.dart';
 import '../../../../trips/api.dart';
 import 'backup_xml_pump_gain.dart';
+import 'backup_xml_trip_provenance.dart';
 
 /// Pure-Dart writer for the v1 Tankstellen backup XML
 /// (see `assets/schemas/tankstellen_backup_v1.xsd`).
@@ -295,6 +296,10 @@ class BackupXmlWriter {
           'SecondsBelowOptimalGear',
           t.summary.secondsBelowOptimalGear,
         );
+        // #4330 — the figure's provenance (gain, its fuel key, the branch
+        // and the model version). Each element is omitted when null, so a
+        // trip without provenance is byte-identical to the old golden.
+        writeTripProvenance(builder, t.summary);
         // #2025 — trajet kind. Emitted on every trip; legacy reads of
         // older backups (where the tag is missing) default to
         // `gpsPlusObd2` via `TripKind.fromWireName`.

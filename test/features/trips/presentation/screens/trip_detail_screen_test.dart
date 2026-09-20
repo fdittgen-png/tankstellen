@@ -215,7 +215,11 @@ void main() {
       expect(find.text('Peugeot 308'), findsOneWidget);
       expect(find.text('52,5 km'), findsOneWidget);
       expect(find.text('1 h 0 min'), findsOneWidget);
-      expect(find.text('6.4 L/100 km'), findsOneWidget);
+      // #4330 — the seeded trip carries a figure with NO provenance tag
+      // (a legacy row: no `dfs`, no VE), which the canonical contract
+      // classes `estimated`, so the card marks it. Only a figure we can
+      // attest the ECU reported is rendered bare.
+      expect(find.text('≈ 6.4 L/100 km'), findsOneWidget);
       expect(find.text('3,36 L'), findsOneWidget);
       // Avg speed of 0..99 => 49.5 km/h; max speed => 99.0 km/h.
       expect(find.text('49,5 km/h'), findsOneWidget);

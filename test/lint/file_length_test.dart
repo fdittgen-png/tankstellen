@@ -357,7 +357,9 @@ void main() {
     // (`linkOwnerParked`) so the degraded banner can stop saying
     // "reconnecting" over a supervisor that is not dialing.
     // #4386 — 2483 → 2488: and whether automatic recovery is exhausted.
-    'lib/features/obd2/data/session/trip_recording_controller.dart': 2488,
+    // #4330 — 2488 → 2501: `_finaliseSummary` stamps the consumption model
+    // version, so an OBD2 trip stops persisting `cmv: null`.
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 2501,
     // #4035 — 1 541 → 1 517: the pure ELM AT grammar (the `ATI` command,
     // the firmware-string parse, the reset-command test) left the library.
     // #4315 — 1 517 → 1 368: the dead pull fuel-rate entry point, the

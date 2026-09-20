@@ -159,12 +159,20 @@ adapter reuses that single classification rather than inventing a second one.
 The trip summary card, the trip row and the driving-analysis trace read the
 L/100 km through `tripConsumptionEstimate`. The adapter's value is exactly
 the number shown before (`figures.lPer100Km ?? estimatedAvgLPer100Km`), and
-the `~` prefix keeps its old rule: only when there is no stored
+the `~` prefix kept its old rule: only when there is no stored
 `avgLPer100Km`.
 
 A GPS-only trip's **batch** figure is classed `estimated`, so a DataValue-driven
-renderer would add `≈`. Today it renders plain. That glyph is a visible
-change needing a product decision, so the plain rendering is **kept**.
+renderer would add `≈`, and at the time of writing it rendered plain — a
+visible change needing a product decision.
+
+**Superseded by #4330:** the decision is taken. The card and the row render
+through the contract's own provenance (`DataValue.qualify`), so every
+estimated figure — GPS batch, GPS live, MAF / speed-density — carries the
+one `≈` of `dataApproximate`, and only a measured figure is left bare. The
+old rule marked a figure by the accident of a null stored `avgLPer100Km`,
+which hid the estimate in exactly the cases the contract exists to name.
+`trip_consumption_rendering_test.dart` pins the new rendering case by case.
 
 The trace export gains `consumptionSource` and `consumptionVersion` beside
 the unchanged `avgLPer100Km`. The change is additive, so the schema stays

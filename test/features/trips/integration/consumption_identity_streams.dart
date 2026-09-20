@@ -336,8 +336,17 @@ Map<String, String> _flattenJson(Object? json, String prefix) {
   return out;
 }
 
+/// The FIGURES of a summary — provenance stamps are deliberately not
+/// among them. `cmv` (#4233) and `dfs` (#4330) say where a number came
+/// from; this harness exists to prove the numbers themselves never
+/// moved, and a stamp landing on a figure that is bit-identical is
+/// exactly the change it must not flag.
 Map<String, String> _summaryFigures(TripSummary s, String prefix) =>
-    _flattenJson(tripSummaryToJson(s)..remove('cmv'), prefix);
+    _flattenJson(
+        tripSummaryToJson(s)
+          ..remove('cmv')
+          ..remove('dfs'),
+        prefix);
 
 void _collectGpsConsumers(Map<String, String> out) {
   final climb = _samples(

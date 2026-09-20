@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/domain/services/obd2_gps_estimate_fallback.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
+import 'package:tankstellen/features/trips/domain/trip_fuel_source.dart';
 
 /// #2431 — the OBD2 GPS-estimate fallback. When an adapter+ECU supported
 /// no fuel PID (every captured sample's `fuelRateLPerHour` is null), this
@@ -131,6 +132,38 @@ void main() {
         filled.samples.every((s) => s.estimatedFuelRateLPerHour == null),
         isTrue,
       );
+    });
+  });
+
+  group('#4330 F4 — the back-filled trip says where its figure came from',
+      () {
+    test('a no-fuel-PID OBD2 trip classifies as gps, not none', () {
+      final filled = Obd2GpsEstimateFallback.fillWhenNoFuelPid(
+        summary: _blankSummary(),
+        samples: _gpsOnlyCruise(30),
+        vehicle: petrolCar,
+      );
+      expect(filled.summary.avgLPer100Km, isNotNull,
+          reason: 'precondition: the fallback produced a figure');
+      expect(filled.summary.dominantFuelSource, kGpsPhysicsFuelSourceTag);
+      expect(tripFuelSourceKind(filled.summary), TripFuelSourceKind.gps,
+          reason: 'the trip SHOWS a figure — calling it `none` ("no '
+              'per-distance fuel figure exists") mislabels it');
+    });
+
+    test('a trip the fallback left alone keeps its own provenance', () {
+      final measured = _blankSummary().copyWith(
+        avgLPer100Km: 6.1,
+        fuelLitersConsumed: 1.1,
+        dominantFuelSource: 'pid5E',
+      );
+      final filled = Obd2GpsEstimateFallback.fillWhenNoFuelPid(
+        summary: measured,
+        samples: _gpsOnlyCruise(30),
+        vehicle: petrolCar,
+      );
+      expect(filled.summary.dominantFuelSource, 'pid5E');
+      expect(tripFuelSourceKind(filled.summary), TripFuelSourceKind.measured);
     });
   });
 
