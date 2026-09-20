@@ -1,0 +1,234 @@
+{
+  "drivingPatternComparisonTitle": "Driving patterns",
+  "@drivingPatternComparisonTitle": {
+    "description": "Title of the card comparing how the driver behaved at the wheel of each selected vehicle (#4366)."
+  },
+  "drivingPatternComparisonSubtitle": "What was observed at the wheel, with the driving each figure rests on.",
+  "@drivingPatternComparisonSubtitle": {
+    "description": "Subtitle of the driving-pattern comparison card, stressing that every rate is shown together with its exposure (#4366)."
+  },
+  "drivingPatternNotFuelNote": "Behaviour observations only. No litres and no money are attributed to them here — that would need its own validated comparison.",
+  "@drivingPatternNotFuelNote": {
+    "description": "Footer note on the driving-pattern comparison refusing to convert a behaviour difference into claimed fuel or money savings (#4366 acceptance 8)."
+  },
+  "drivingPatternInsufficient": "Not enough recorded driving to compare patterns yet.",
+  "@drivingPatternInsufficient": {
+    "description": "Shown instead of the comparison rows when no selected vehicle has enough recorded evidence for any dimension (#4366)."
+  },
+  "drivingPatternMatchedOn": "Matched on: {criteria}",
+  "@drivingPatternMatchedOn": {
+    "description": "States the trip conditions the compared subsets were matched on, so the reader knows which history took part (#4366).",
+    "placeholders": {
+      "criteria": {"type": "String", "example": "trips of 5 to 30 km, warm start"}
+    }
+  },
+  "drivingPatternUnmatchedNotice": "No trip conditions in common, so the figures below are descriptive observations over unequal routes.",
+  "@drivingPatternUnmatchedNotice": {
+    "description": "Qualification shown when the selected vehicles share no comparable trip cohort, so nothing was matched (#4366)."
+  },
+  "drivingPatternMatchCounts": "{matched} trips matched, {unmatched} outside the matched conditions",
+  "@drivingPatternMatchCounts": {
+    "description": "How much recorded history took part in the matched comparison and how much was left out (#4366).",
+    "placeholders": {
+      "matched": {"type": "int", "example": "24"},
+      "unmatched": {"type": "int", "example": "9"}
+    }
+  },
+  "drivingPatternUnassignedExcluded": "{count} recorded trips belong to no vehicle and are counted for none.",
+  "@drivingPatternUnassignedExcluded": {
+    "description": "Reports trips with no vehicle assigned, which are excluded from every vehicle's totals rather than credited to each (#4366, #4364).",
+    "placeholders": {
+      "count": {"type": "int", "example": "3"}
+    }
+  },
+  "drivingPatternNoAdjustedRanking": "No condition-adjusted ranking: expected consumption per trip is not recorded, so route, terrain and traffic cannot be taken out of these figures.",
+  "@drivingPatternNoAdjustedRanking": {
+    "description": "States why no 'who drives better, conditions equal' verdict is offered (#4366 acceptance 5)."
+  },
+  "drivingPatternContextNote": "A higher figure here can be the road rather than the driver — necessary braking, a climb, or an engine that simply turns faster.",
+  "@drivingPatternContextNote": {
+    "description": "Caption under a context-dependent dimension, stating that more of it is not automatically worse driving (#4366 acceptance 2)."
+  },
+  "drivingPatternDifferencesTitle": "Largest observed differences",
+  "@drivingPatternDifferencesTitle": {
+    "description": "Heading over the widest supported differences between the compared vehicles (#4366)."
+  },
+  "drivingPatternDifferenceLine": "{measure}: {higher} for {higherVehicle}, {lower} for {lowerVehicle}",
+  "@drivingPatternDifferenceLine": {
+    "description": "One observed difference between two vehicles on one behaviour dimension (#4366).",
+    "placeholders": {
+      "measure": {"type": "String", "example": "Hard accelerations"},
+      "higher": {"type": "String", "example": "12.0 per 100 km"},
+      "higherVehicle": {"type": "String", "example": "Van"},
+      "lower": {"type": "String", "example": "4.0 per 100 km"},
+      "lowerVehicle": {"type": "String", "example": "Estate"}
+    }
+  },
+  "drivingPatternUnavailableNoSignal": "Not recorded — these trips carry no such signal",
+  "@drivingPatternUnavailableNoSignal": {
+    "description": "Why a dimension is blank for one vehicle: the sensor evidence it needs was never present, which is unknown and not zero (#4366 acceptance 4)."
+  },
+  "drivingPatternUnavailableTooLittle": "Too little driving to state a figure",
+  "@drivingPatternUnavailableTooLittle": {
+    "description": "Why a dimension is blank for one vehicle: some evidence exists but less than the dimension's stated minimum (#4366)."
+  },
+  "drivingMeasureEventsPer100Km": "{value} per 100 km",
+  "@drivingMeasureEventsPer100Km": {
+    "description": "A behaviour rate expressed per 100 km, so histories of very different length stay comparable (#4366 acceptance 1).",
+    "placeholders": {
+      "value": {"type": "String", "example": "12.0"}
+    }
+  },
+  "drivingMeasureSharePercent": "{value} %",
+  "@drivingMeasureSharePercent": {
+    "description": "A behaviour share of the eligible recorded time or events, as a percentage (#4366).",
+    "placeholders": {
+      "value": {"type": "String", "example": "8.5"}
+    }
+  },
+  "drivingPatternEvidenceCaption": "{numerator} over {denominator} · {trips} trips",
+  "@drivingPatternEvidenceCaption": {
+    "description": "Traces a displayed rate back to the raw numerator and the eligible denominator it was divided by (#4366 acceptance 7).",
+    "placeholders": {
+      "numerator": {"type": "String", "example": "12 events"},
+      "denominator": {"type": "String", "example": "100 km"},
+      "trips": {"type": "int", "example": "8"}
+    }
+  },
+  "drivingPatternCountEvents": "{count} events",
+  "@drivingPatternCountEvents": {
+    "description": "A count of discrete driving events, kept typed apart from a duration so the two are never added together (#4366 acceptance 1).",
+    "placeholders": {
+      "count": {"type": "String", "example": "12"}
+    }
+  },
+  "drivingPatternCountMinutes": "{minutes} min",
+  "@drivingPatternCountMinutes": {
+    "description": "A recorded duration in minutes, kept typed apart from an event count (#4366 acceptance 1).",
+    "placeholders": {
+      "minutes": {"type": "String", "example": "1.0"}
+    }
+  },
+  "drivingPatternCountKm": "{km} km",
+  "@drivingPatternCountKm": {
+    "description": "The eligible distance a rate was divided by (#4366).",
+    "placeholders": {
+      "km": {"type": "String", "example": "100"}
+    }
+  },
+  "drivingMeasureHardAccelRate": "Hard accelerations",
+  "@drivingMeasureHardAccelRate": {
+    "description": "Name of the behaviour dimension counting confirmed hard acceleration episodes (#4366)."
+  },
+  "drivingMeasureFullThrottleShare": "Full-throttle time",
+  "@drivingMeasureFullThrottleShare": {
+    "description": "Name of the behaviour dimension measuring the share of pedal-known time spent at full demand (#4366)."
+  },
+  "drivingMeasureHardBrakeRate": "Hard braking",
+  "@drivingMeasureHardBrakeRate": {
+    "description": "Name of the behaviour dimension counting hard braking episodes (#4366)."
+  },
+  "drivingMeasureAvoidableBrakeShare": "Avoidable hard braking",
+  "@drivingMeasureAvoidableBrakeShare": {
+    "description": "Name of the behaviour dimension measuring which share of hard brakes did not end at a stop and followed a late approach (#4366)."
+  },
+  "drivingMeasureEngineIdleShare": "Engine idling",
+  "@drivingMeasureEngineIdleShare": {
+    "description": "Name of the behaviour dimension measuring long idles as a share of the time the engine state was actually known (#4366)."
+  },
+  "drivingMeasureHighRpmShare": "High engine speed",
+  "@drivingMeasureHighRpmShare": {
+    "description": "Name of the behaviour dimension measuring the share of engine-speed-known driving above the high threshold (#4366)."
+  },
+  "drivingMeasureSustainedHighSpeedShare": "Sustained high speed",
+  "@drivingMeasureSustainedHighSpeedShare": {
+    "description": "Name of the behaviour dimension measuring the share of moving time spent in long high-speed runs (#4366)."
+  },
+  "drivingMeasureEnergyOscillationRate": "Accelerate and brake cycles",
+  "@drivingMeasureEnergyOscillationRate": {
+    "description": "Name of the behaviour dimension counting accelerate-brake-accelerate episodes per distance (#4366)."
+  },
+  "drivingMeasureCoastingFuelCutShare": "Coasting without fuel",
+  "@drivingMeasureCoastingFuelCutShare": {
+    "description": "Name of the behaviour dimension measuring the share of slowing-down time taken with the injection cut (#4366)."
+  },
+  "drivingMeasureLateCurveShare": "Late braking into curves",
+  "@drivingMeasureLateCurveShare": {
+    "description": "Name of the behaviour dimension measuring the share of judged curves approached late and exited hard (#4366)."
+  },
+  "drivingMeasureClimbFullThrottleShare": "Full throttle climbing",
+  "@drivingMeasureClimbFullThrottleShare": {
+    "description": "Name of the behaviour dimension measuring full demand during confidently measured climbs (#4366)."
+  },
+  "drivingMeasureFlatFullThrottleShare": "Full throttle on the flat",
+  "@drivingMeasureFlatFullThrottleShare": {
+    "description": "Name of the behaviour dimension measuring full demand on confidently measured flat road, the reference the climbing figure is read against (#4366)."
+  },
+  "drivingPatternQualUncontrolled": "conditions not controlled",
+  "@drivingPatternQualUncontrolled": {
+    "description": "Qualification chip: the compared histories were driven under different conditions (#4366, #4364)."
+  },
+  "drivingPatternQualPartialConditions": "only cold starts were evaluated",
+  "@drivingPatternQualPartialConditions": {
+    "description": "Qualification chip: of all the confounding conditions, recording evaluates the cold start and nothing else (#4366, #4364)."
+  },
+  "drivingPatternQualUnequalEvidence": "very unequal amounts of evidence",
+  "@drivingPatternQualUnequalEvidence": {
+    "description": "Qualification chip: one side rests on at least twice the exposure of the other (#4366 acceptance 1)."
+  },
+  "drivingPatternQualExcluded": "some records were excluded",
+  "@drivingPatternQualExcluded": {
+    "description": "Qualification chip: records were left out of the totals and their count is reported (#4366, #4364)."
+  },
+  "drivingPatternBandShort": "trips under 5 km",
+  "@drivingPatternBandShort": {
+    "description": "Matching criterion naming the short trip-length band (#4366)."
+  },
+  "drivingPatternBandMedium": "trips of 5 to 30 km",
+  "@drivingPatternBandMedium": {
+    "description": "Matching criterion naming the medium trip-length band (#4366)."
+  },
+  "drivingPatternBandLong": "trips over 30 km",
+  "@drivingPatternBandLong": {
+    "description": "Matching criterion naming the long trip-length band (#4366)."
+  },
+  "drivingPatternStartCold": "cold start",
+  "@drivingPatternStartCold": {
+    "description": "Matching criterion: coolant telemetry showed the engine warming up during the trip (#4366)."
+  },
+  "drivingPatternStartWarm": "warm start",
+  "@drivingPatternStartWarm": {
+    "description": "Matching criterion: coolant telemetry existed and showed no cold start. Distinct from the case where no coolant was ever read (#4366 acceptance 5)."
+  },
+  "drivingPatternStartUnknown": "start temperature not recorded",
+  "@drivingPatternStartUnknown": {
+    "description": "Matching criterion: no coolant evidence at all, so the trip is neither cold nor verified warm (#4366 acceptance 5)."
+  },
+  "drivingPatternCohortLabel": "{band}, {start}",
+  "@drivingPatternCohortLabel": {
+    "description": "One matching criterion, combining the trip-length band with what is known about the engine start (#4366).",
+    "placeholders": {
+      "band": {"type": "String", "example": "trips of 5 to 30 km"},
+      "start": {"type": "String", "example": "warm start"}
+    }
+  },
+  "drivingPatternMeasureSemantics": "{measure} for {vehicle}: {value}, {evidence}",
+  "@drivingPatternMeasureSemantics": {
+    "description": "Screen-reader label for one vehicle's figure on one behaviour dimension, including the evidence it rests on (#4366).",
+    "placeholders": {
+      "measure": {"type": "String", "example": "Hard accelerations"},
+      "vehicle": {"type": "String", "example": "Estate"},
+      "value": {"type": "String", "example": "12.0 per 100 km"},
+      "evidence": {"type": "String", "example": "12 events over 100 km · 8 trips"}
+    }
+  },
+  "drivingPatternUnavailableSemantics": "{measure} for {vehicle}: {reason}",
+  "@drivingPatternUnavailableSemantics": {
+    "description": "Screen-reader label for a behaviour dimension one vehicle's recordings cannot support (#4366).",
+    "placeholders": {
+      "measure": {"type": "String", "example": "Engine idling"},
+      "vehicle": {"type": "String", "example": "Estate"},
+      "reason": {"type": "String", "example": "Not recorded — these trips carry no such signal"}
+    }
+  }
+}

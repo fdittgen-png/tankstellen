@@ -4655,6 +4655,197 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String get drivingPatternComparisonTitle => 'Driving patterns';
+
+  @override
+  String get drivingPatternComparisonSubtitle =>
+      'What was observed at the wheel, with the driving each figure rests on.';
+
+  @override
+  String get drivingPatternNotFuelNote =>
+      'Behaviour observations only. No litres and no money are attributed to them here — that would need its own validated comparison.';
+
+  @override
+  String get drivingPatternInsufficient =>
+      'Not enough recorded driving to compare patterns yet.';
+
+  @override
+  String drivingPatternMatchedOn(String criteria) {
+    return 'Matched on: $criteria';
+  }
+
+  @override
+  String get drivingPatternUnmatchedNotice =>
+      'No trip conditions in common, so the figures below are descriptive observations over unequal routes.';
+
+  @override
+  String drivingPatternMatchCounts(int matched, int unmatched) {
+    return '$matched trips matched, $unmatched outside the matched conditions';
+  }
+
+  @override
+  String drivingPatternUnassignedExcluded(int count) {
+    return '$count recorded trips belong to no vehicle and are counted for none.';
+  }
+
+  @override
+  String get drivingPatternNoAdjustedRanking =>
+      'No condition-adjusted ranking: expected consumption per trip is not recorded, so route, terrain and traffic cannot be taken out of these figures.';
+
+  @override
+  String get drivingPatternContextNote =>
+      'A higher figure here can be the road rather than the driver — necessary braking, a climb, or an engine that simply turns faster.';
+
+  @override
+  String get drivingPatternDifferencesTitle => 'Largest observed differences';
+
+  @override
+  String drivingPatternDifferenceLine(
+    String measure,
+    String higher,
+    String higherVehicle,
+    String lower,
+    String lowerVehicle,
+  ) {
+    return '$measure: $higher for $higherVehicle, $lower for $lowerVehicle';
+  }
+
+  @override
+  String get drivingPatternUnavailableNoSignal =>
+      'Not recorded — these trips carry no such signal';
+
+  @override
+  String get drivingPatternUnavailableTooLittle =>
+      'Too little driving to state a figure';
+
+  @override
+  String drivingMeasureEventsPer100Km(String value) {
+    return '$value per 100 km';
+  }
+
+  @override
+  String drivingMeasureSharePercent(String value) {
+    return '$value %';
+  }
+
+  @override
+  String drivingPatternEvidenceCaption(
+    String numerator,
+    String denominator,
+    int trips,
+  ) {
+    return '$numerator over $denominator · $trips trips';
+  }
+
+  @override
+  String drivingPatternCountEvents(String count) {
+    return '$count events';
+  }
+
+  @override
+  String drivingPatternCountMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String drivingPatternCountKm(String km) {
+    return '$km km';
+  }
+
+  @override
+  String get drivingMeasureHardAccelRate => 'Hard accelerations';
+
+  @override
+  String get drivingMeasureFullThrottleShare => 'Full-throttle time';
+
+  @override
+  String get drivingMeasureHardBrakeRate => 'Hard braking';
+
+  @override
+  String get drivingMeasureAvoidableBrakeShare => 'Avoidable hard braking';
+
+  @override
+  String get drivingMeasureEngineIdleShare => 'Engine idling';
+
+  @override
+  String get drivingMeasureHighRpmShare => 'High engine speed';
+
+  @override
+  String get drivingMeasureSustainedHighSpeedShare => 'Sustained high speed';
+
+  @override
+  String get drivingMeasureEnergyOscillationRate =>
+      'Accelerate and brake cycles';
+
+  @override
+  String get drivingMeasureCoastingFuelCutShare => 'Coasting without fuel';
+
+  @override
+  String get drivingMeasureLateCurveShare => 'Late braking into curves';
+
+  @override
+  String get drivingMeasureClimbFullThrottleShare => 'Full throttle climbing';
+
+  @override
+  String get drivingMeasureFlatFullThrottleShare => 'Full throttle on the flat';
+
+  @override
+  String get drivingPatternQualUncontrolled => 'conditions not controlled';
+
+  @override
+  String get drivingPatternQualPartialConditions =>
+      'only cold starts were evaluated';
+
+  @override
+  String get drivingPatternQualUnequalEvidence =>
+      'very unequal amounts of evidence';
+
+  @override
+  String get drivingPatternQualExcluded => 'some records were excluded';
+
+  @override
+  String get drivingPatternBandShort => 'trips under 5 km';
+
+  @override
+  String get drivingPatternBandMedium => 'trips of 5 to 30 km';
+
+  @override
+  String get drivingPatternBandLong => 'trips over 30 km';
+
+  @override
+  String get drivingPatternStartCold => 'cold start';
+
+  @override
+  String get drivingPatternStartWarm => 'warm start';
+
+  @override
+  String get drivingPatternStartUnknown => 'start temperature not recorded';
+
+  @override
+  String drivingPatternCohortLabel(String band, String start) {
+    return '$band, $start';
+  }
+
+  @override
+  String drivingPatternMeasureSemantics(
+    String measure,
+    String vehicle,
+    String value,
+    String evidence,
+  ) {
+    return '$measure for $vehicle: $value, $evidence';
+  }
+
+  @override
+  String drivingPatternUnavailableSemantics(
+    String measure,
+    String vehicle,
+    String reason,
+  ) {
+    return '$measure for $vehicle: $reason';
+  }
+
+  @override
   String get drivingScoreCardTitle => 'Vairavimo balas';
 
   @override

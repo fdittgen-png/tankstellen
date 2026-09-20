@@ -1,0 +1,125 @@
+{
+  "drivingPatternComparisonTitle": "Styles de conduite",
+  "drivingPatternComparisonSubtitle": "Ce qui a été observé au volant, avec la distance et le temps sur lesquels chaque chiffre repose.",
+  "drivingPatternNotFuelNote": "Uniquement des observations de conduite. Aucun litre ni euro ne leur est attribué ici : cela exigerait une comparaison validée à part.",
+  "drivingPatternInsufficient": "Pas encore assez de trajets enregistrés pour comparer les styles de conduite.",
+  "drivingPatternMatchedOn": "Rapproché sur : {criteria}",
+  "@drivingPatternMatchedOn": {
+    "placeholders": {
+      "criteria": {"type": "String"}
+    }
+  },
+  "drivingPatternUnmatchedNotice": "Aucune condition de trajet commune : les chiffres ci-dessous sont des observations descriptives sur des parcours inégaux.",
+  "drivingPatternMatchCounts": "{matched} trajets rapprochés, {unmatched} hors des conditions retenues",
+  "@drivingPatternMatchCounts": {
+    "placeholders": {
+      "matched": {"type": "int"},
+      "unmatched": {"type": "int"}
+    }
+  },
+  "drivingPatternUnassignedExcluded": "{count} trajets enregistrés n'appartiennent à aucun véhicule et ne comptent pour aucun.",
+  "@drivingPatternUnassignedExcluded": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "drivingPatternNoAdjustedRanking": "Aucun classement corrigé des conditions : la consommation attendue par trajet n'est pas enregistrée, impossible donc de neutraliser le parcours, le relief et le trafic.",
+  "drivingPatternContextNote": "Un chiffre plus élevé peut venir de la route et non du conducteur : un freinage nécessaire, une montée, ou un moteur qui tourne simplement plus vite.",
+  "drivingPatternDifferencesTitle": "Plus grands écarts observés",
+  "drivingPatternDifferenceLine": "{measure} : {higher} pour {higherVehicle}, {lower} pour {lowerVehicle}",
+  "@drivingPatternDifferenceLine": {
+    "placeholders": {
+      "measure": {"type": "String"},
+      "higher": {"type": "String"},
+      "higherVehicle": {"type": "String"},
+      "lower": {"type": "String"},
+      "lowerVehicle": {"type": "String"}
+    }
+  },
+  "drivingPatternUnavailableNoSignal": "Non enregistré : ces trajets ne portent aucun signal de ce type",
+  "drivingPatternUnavailableTooLittle": "Trop peu de conduite pour avancer un chiffre",
+  "drivingMeasureEventsPer100Km": "{value} pour 100 km",
+  "@drivingMeasureEventsPer100Km": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "drivingMeasureSharePercent": "{value} %",
+  "@drivingMeasureSharePercent": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "drivingPatternEvidenceCaption": "{numerator} sur {denominator} · {trips} trajets",
+  "@drivingPatternEvidenceCaption": {
+    "placeholders": {
+      "numerator": {"type": "String"},
+      "denominator": {"type": "String"},
+      "trips": {"type": "int"}
+    }
+  },
+  "drivingPatternCountEvents": "{count} événements",
+  "@drivingPatternCountEvents": {
+    "placeholders": {
+      "count": {"type": "String"}
+    }
+  },
+  "drivingPatternCountMinutes": "{minutes} min",
+  "@drivingPatternCountMinutes": {
+    "placeholders": {
+      "minutes": {"type": "String"}
+    }
+  },
+  "drivingPatternCountKm": "{km} km",
+  "@drivingPatternCountKm": {
+    "placeholders": {
+      "km": {"type": "String"}
+    }
+  },
+  "drivingMeasureHardAccelRate": "Accélérations fortes",
+  "drivingMeasureFullThrottleShare": "Temps pleins gaz",
+  "drivingMeasureHardBrakeRate": "Freinages appuyés",
+  "drivingMeasureAvoidableBrakeShare": "Freinages appuyés évitables",
+  "drivingMeasureEngineIdleShare": "Ralenti moteur",
+  "drivingMeasureHighRpmShare": "Régime moteur élevé",
+  "drivingMeasureSustainedHighSpeedShare": "Vitesse élevée prolongée",
+  "drivingMeasureEnergyOscillationRate": "Cycles accélération-freinage",
+  "drivingMeasureCoastingFuelCutShare": "Roue libre sans injection",
+  "drivingMeasureLateCurveShare": "Freinage tardif en virage",
+  "drivingMeasureClimbFullThrottleShare": "Pleins gaz en montée",
+  "drivingMeasureFlatFullThrottleShare": "Pleins gaz sur le plat",
+  "drivingPatternQualUncontrolled": "conditions non maîtrisées",
+  "drivingPatternQualPartialConditions": "seuls les démarrages à froid ont été évalués",
+  "drivingPatternQualUnequalEvidence": "quantités de données très inégales",
+  "drivingPatternQualExcluded": "certains enregistrements exclus",
+  "drivingPatternBandShort": "trajets de moins de 5 km",
+  "drivingPatternBandMedium": "trajets de 5 à 30 km",
+  "drivingPatternBandLong": "trajets de plus de 30 km",
+  "drivingPatternStartCold": "démarrage à froid",
+  "drivingPatternStartWarm": "démarrage à chaud",
+  "drivingPatternStartUnknown": "température de départ non enregistrée",
+  "drivingPatternCohortLabel": "{band}, {start}",
+  "@drivingPatternCohortLabel": {
+    "placeholders": {
+      "band": {"type": "String"},
+      "start": {"type": "String"}
+    }
+  },
+  "drivingPatternMeasureSemantics": "{measure} pour {vehicle} : {value}, {evidence}",
+  "@drivingPatternMeasureSemantics": {
+    "placeholders": {
+      "measure": {"type": "String"},
+      "vehicle": {"type": "String"},
+      "value": {"type": "String"},
+      "evidence": {"type": "String"}
+    }
+  },
+  "drivingPatternUnavailableSemantics": "{measure} pour {vehicle} : {reason}",
+  "@drivingPatternUnavailableSemantics": {
+    "placeholders": {
+      "measure": {"type": "String"},
+      "vehicle": {"type": "String"},
+      "reason": {"type": "String"}
+    }
+  }
+}

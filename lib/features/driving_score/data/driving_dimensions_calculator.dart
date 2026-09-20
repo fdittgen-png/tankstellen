@@ -52,6 +52,11 @@ DrivingDimensions computeDrivingDimensions(
   final cruiseSpeeds = <double>[];
   final idle = AvoidableIdle(fallbackRateLPerHour: 0);
   var engineKnown = false;
+  // #4366 — eligible exposure: seconds in which the signal was PRESENT,
+  // moving or not. A GPS-only trip accrues none of these, so the
+  // measures they denominate come back unavailable rather than zero.
+  var engineKnownSec = 0.0, coolantKnownSec = 0.0;
+  var avoidableBrakes = 0, judgedCurves = 0, lateCurves = 0;
 
   for (var i = 1; i < sorted.length && i < points.length; i++) {
     final prev = sorted[i - 1];
@@ -59,7 +64,11 @@ DrivingDimensions computeDrivingDimensions(
         Duration.microsecondsPerSecond;
     if (dt <= 0) continue;
     final moving = prev.speedKmh > 1.8;
-    if (prev.rpm != null) engineKnown = true;
+    if (prev.rpm != null) {
+      engineKnown = true;
+      engineKnownSec += dt;
+    }
+    if (prev.coolantTempC != null) coolantKnownSec += dt;
     if (!moving && (prev.rpm ?? 0) > 0) {
       idle.addIdle(dt, prev.fuelRateLPerHour);
     } else {
@@ -149,7 +158,7 @@ DrivingDimensions computeDrivingDimensions(
       context: 'no hard braking',
     ));
   } else {
-    final avoidable = brakes.where((t) {
+    avoidableBrakes = brakes.where((t) {
       final endsInStop = road.stops.any((s) =>
           !s.start.isBefore(t) && s.start.difference(t) <= kBrakeToStopWindow);
       if (endsInStop) return false;
@@ -163,10 +172,10 @@ DrivingDimensions computeDrivingDimensions(
     }).length;
     put(DrivingDimension(
       kind: DrivingDimensionKind.brakingAnticipation,
-      value: _clamp01(1 - avoidable / brakes.length),
+      value: _clamp01(1 - avoidableBrakes / brakes.length),
       confidence: _byEvidence(brakes.length),
       evidenceCount: brakes.length,
-      context: '$avoidable of ${brakes.length} avoidable',
+      context: '$avoidableBrakes of ${brakes.length} avoidable',
     ));
   }
 
@@ -220,15 +229,16 @@ DrivingDimensions computeDrivingDimensions(
             ? 'bearing not trustworthy'
             : 'no curves'));
   } else {
-    final late = judged
+    lateCurves = judged
         .where((c) => c.approach == CurveApproach.lateBrakeHardExit)
         .length;
+    judgedCurves = judged.length;
     put(DrivingDimension(
       kind: DrivingDimensionKind.curveApproach,
-      value: 1 - late / judged.length,
-      confidence: _byEvidence(judged.length, medium: 2, high: 6),
-      evidenceCount: judged.length,
-      context: '$late late of ${judged.length}',
+      value: 1 - lateCurves / judgedCurves,
+      confidence: _byEvidence(judgedCurves, medium: 2, high: 6),
+      evidenceCount: judgedCurves,
+      context: '$lateCurves late of $judgedCurves',
     ));
   }
 
@@ -301,7 +311,42 @@ DrivingDimensions computeDrivingDimensions(
     ));
   }
 
-  return DrivingDimensions(dims);
+  return DrivingDimensions(
+    dims,
+    rawTotals: DrivingPatternTotals(
+      events: {
+        DrivingEventCounter.hardAccelEvents: accel.accelEvents,
+        DrivingEventCounter.hardBrakeEvents: brakes.length,
+        DrivingEventCounter.avoidableHardBrakeEvents: avoidableBrakes,
+        DrivingEventCounter.energyOscillationEpisodes: road.oscillations.length,
+        DrivingEventCounter.judgedCurves: judgedCurves,
+        DrivingEventCounter.lateBrakeCurves: lateCurves,
+        DrivingEventCounter.longIdleEpisodes: idle.episodes,
+      },
+      seconds: {
+        DrivingDurationCounter.fullThrottleSeconds: fullThrottleSec,
+        DrivingDurationCounter.longIdleSeconds: idle.seconds,
+        DrivingDurationCounter.highRpmSeconds: highRpmSec,
+        DrivingDurationCounter.sustainedHighSpeedSeconds: sustainedHighSec,
+        DrivingDurationCounter.fuelCutSeconds: fuelCutSec,
+        DrivingDurationCounter.climbFullThrottleSeconds: climbFullSec,
+        DrivingDurationCounter.flatFullThrottleSeconds: flatFullSec,
+      },
+      exposure: {
+        DrivingExposureBasis.movingDistanceKm: distanceKm,
+        DrivingExposureBasis.movingSeconds: movingSec,
+        DrivingExposureBasis.pedalKnownSeconds: demandSec,
+        DrivingExposureBasis.engineKnownSeconds: engineKnownSec,
+        DrivingExposureBasis.rpmKnownMovingSeconds: rpmSec,
+        DrivingExposureBasis.hardBrakeEvents: brakes.length.toDouble(),
+        DrivingExposureBasis.judgedCurves: judgedCurves.toDouble(),
+        DrivingExposureBasis.decelWithFuelRateSeconds: fuelRateDecelSec,
+        DrivingExposureBasis.confidentClimbSeconds: climbSec,
+        DrivingExposureBasis.confidentFlatSeconds: flatSec,
+        DrivingExposureBasis.coolantKnownSeconds: coolantKnownSec,
+      },
+    ),
+  );
 }
 
 /// Start moments of hard-brake runs on the track.

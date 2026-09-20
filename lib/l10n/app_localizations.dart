@@ -7981,6 +7981,295 @@ abstract class AppLocalizations {
   /// **'≈ +{liters} L'**
   String insightTrailingLitersApprox(String liters);
 
+  /// Title of the card comparing how the driver behaved at the wheel of each selected vehicle (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Driving patterns'**
+  String get drivingPatternComparisonTitle;
+
+  /// Subtitle of the driving-pattern comparison card, stressing that every rate is shown together with its exposure (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'What was observed at the wheel, with the driving each figure rests on.'**
+  String get drivingPatternComparisonSubtitle;
+
+  /// Footer note on the driving-pattern comparison refusing to convert a behaviour difference into claimed fuel or money savings (#4366 acceptance 8).
+  ///
+  /// In en, this message translates to:
+  /// **'Behaviour observations only. No litres and no money are attributed to them here — that would need its own validated comparison.'**
+  String get drivingPatternNotFuelNote;
+
+  /// Shown instead of the comparison rows when no selected vehicle has enough recorded evidence for any dimension (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough recorded driving to compare patterns yet.'**
+  String get drivingPatternInsufficient;
+
+  /// States the trip conditions the compared subsets were matched on, so the reader knows which history took part (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Matched on: {criteria}'**
+  String drivingPatternMatchedOn(String criteria);
+
+  /// Qualification shown when the selected vehicles share no comparable trip cohort, so nothing was matched (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'No trip conditions in common, so the figures below are descriptive observations over unequal routes.'**
+  String get drivingPatternUnmatchedNotice;
+
+  /// How much recorded history took part in the matched comparison and how much was left out (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'{matched} trips matched, {unmatched} outside the matched conditions'**
+  String drivingPatternMatchCounts(int matched, int unmatched);
+
+  /// Reports trips with no vehicle assigned, which are excluded from every vehicle's totals rather than credited to each (#4366, #4364).
+  ///
+  /// In en, this message translates to:
+  /// **'{count} recorded trips belong to no vehicle and are counted for none.'**
+  String drivingPatternUnassignedExcluded(int count);
+
+  /// States why no 'who drives better, conditions equal' verdict is offered (#4366 acceptance 5).
+  ///
+  /// In en, this message translates to:
+  /// **'No condition-adjusted ranking: expected consumption per trip is not recorded, so route, terrain and traffic cannot be taken out of these figures.'**
+  String get drivingPatternNoAdjustedRanking;
+
+  /// Caption under a context-dependent dimension, stating that more of it is not automatically worse driving (#4366 acceptance 2).
+  ///
+  /// In en, this message translates to:
+  /// **'A higher figure here can be the road rather than the driver — necessary braking, a climb, or an engine that simply turns faster.'**
+  String get drivingPatternContextNote;
+
+  /// Heading over the widest supported differences between the compared vehicles (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Largest observed differences'**
+  String get drivingPatternDifferencesTitle;
+
+  /// One observed difference between two vehicles on one behaviour dimension (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'{measure}: {higher} for {higherVehicle}, {lower} for {lowerVehicle}'**
+  String drivingPatternDifferenceLine(
+    String measure,
+    String higher,
+    String higherVehicle,
+    String lower,
+    String lowerVehicle,
+  );
+
+  /// Why a dimension is blank for one vehicle: the sensor evidence it needs was never present, which is unknown and not zero (#4366 acceptance 4).
+  ///
+  /// In en, this message translates to:
+  /// **'Not recorded — these trips carry no such signal'**
+  String get drivingPatternUnavailableNoSignal;
+
+  /// Why a dimension is blank for one vehicle: some evidence exists but less than the dimension's stated minimum (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Too little driving to state a figure'**
+  String get drivingPatternUnavailableTooLittle;
+
+  /// A behaviour rate expressed per 100 km, so histories of very different length stay comparable (#4366 acceptance 1).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} per 100 km'**
+  String drivingMeasureEventsPer100Km(String value);
+
+  /// A behaviour share of the eligible recorded time or events, as a percentage (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'{value} %'**
+  String drivingMeasureSharePercent(String value);
+
+  /// Traces a displayed rate back to the raw numerator and the eligible denominator it was divided by (#4366 acceptance 7).
+  ///
+  /// In en, this message translates to:
+  /// **'{numerator} over {denominator} · {trips} trips'**
+  String drivingPatternEvidenceCaption(
+    String numerator,
+    String denominator,
+    int trips,
+  );
+
+  /// A count of discrete driving events, kept typed apart from a duration so the two are never added together (#4366 acceptance 1).
+  ///
+  /// In en, this message translates to:
+  /// **'{count} events'**
+  String drivingPatternCountEvents(String count);
+
+  /// A recorded duration in minutes, kept typed apart from an event count (#4366 acceptance 1).
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String drivingPatternCountMinutes(String minutes);
+
+  /// The eligible distance a rate was divided by (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String drivingPatternCountKm(String km);
+
+  /// Name of the behaviour dimension counting confirmed hard acceleration episodes (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Hard accelerations'**
+  String get drivingMeasureHardAccelRate;
+
+  /// Name of the behaviour dimension measuring the share of pedal-known time spent at full demand (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Full-throttle time'**
+  String get drivingMeasureFullThrottleShare;
+
+  /// Name of the behaviour dimension counting hard braking episodes (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Hard braking'**
+  String get drivingMeasureHardBrakeRate;
+
+  /// Name of the behaviour dimension measuring which share of hard brakes did not end at a stop and followed a late approach (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Avoidable hard braking'**
+  String get drivingMeasureAvoidableBrakeShare;
+
+  /// Name of the behaviour dimension measuring long idles as a share of the time the engine state was actually known (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Engine idling'**
+  String get drivingMeasureEngineIdleShare;
+
+  /// Name of the behaviour dimension measuring the share of engine-speed-known driving above the high threshold (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'High engine speed'**
+  String get drivingMeasureHighRpmShare;
+
+  /// Name of the behaviour dimension measuring the share of moving time spent in long high-speed runs (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Sustained high speed'**
+  String get drivingMeasureSustainedHighSpeedShare;
+
+  /// Name of the behaviour dimension counting accelerate-brake-accelerate episodes per distance (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Accelerate and brake cycles'**
+  String get drivingMeasureEnergyOscillationRate;
+
+  /// Name of the behaviour dimension measuring the share of slowing-down time taken with the injection cut (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Coasting without fuel'**
+  String get drivingMeasureCoastingFuelCutShare;
+
+  /// Name of the behaviour dimension measuring the share of judged curves approached late and exited hard (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Late braking into curves'**
+  String get drivingMeasureLateCurveShare;
+
+  /// Name of the behaviour dimension measuring full demand during confidently measured climbs (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Full throttle climbing'**
+  String get drivingMeasureClimbFullThrottleShare;
+
+  /// Name of the behaviour dimension measuring full demand on confidently measured flat road, the reference the climbing figure is read against (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'Full throttle on the flat'**
+  String get drivingMeasureFlatFullThrottleShare;
+
+  /// Qualification chip: the compared histories were driven under different conditions (#4366, #4364).
+  ///
+  /// In en, this message translates to:
+  /// **'conditions not controlled'**
+  String get drivingPatternQualUncontrolled;
+
+  /// Qualification chip: of all the confounding conditions, recording evaluates the cold start and nothing else (#4366, #4364).
+  ///
+  /// In en, this message translates to:
+  /// **'only cold starts were evaluated'**
+  String get drivingPatternQualPartialConditions;
+
+  /// Qualification chip: one side rests on at least twice the exposure of the other (#4366 acceptance 1).
+  ///
+  /// In en, this message translates to:
+  /// **'very unequal amounts of evidence'**
+  String get drivingPatternQualUnequalEvidence;
+
+  /// Qualification chip: records were left out of the totals and their count is reported (#4366, #4364).
+  ///
+  /// In en, this message translates to:
+  /// **'some records were excluded'**
+  String get drivingPatternQualExcluded;
+
+  /// Matching criterion naming the short trip-length band (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'trips under 5 km'**
+  String get drivingPatternBandShort;
+
+  /// Matching criterion naming the medium trip-length band (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'trips of 5 to 30 km'**
+  String get drivingPatternBandMedium;
+
+  /// Matching criterion naming the long trip-length band (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'trips over 30 km'**
+  String get drivingPatternBandLong;
+
+  /// Matching criterion: coolant telemetry showed the engine warming up during the trip (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'cold start'**
+  String get drivingPatternStartCold;
+
+  /// Matching criterion: coolant telemetry existed and showed no cold start. Distinct from the case where no coolant was ever read (#4366 acceptance 5).
+  ///
+  /// In en, this message translates to:
+  /// **'warm start'**
+  String get drivingPatternStartWarm;
+
+  /// Matching criterion: no coolant evidence at all, so the trip is neither cold nor verified warm (#4366 acceptance 5).
+  ///
+  /// In en, this message translates to:
+  /// **'start temperature not recorded'**
+  String get drivingPatternStartUnknown;
+
+  /// One matching criterion, combining the trip-length band with what is known about the engine start (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'{band}, {start}'**
+  String drivingPatternCohortLabel(String band, String start);
+
+  /// Screen-reader label for one vehicle's figure on one behaviour dimension, including the evidence it rests on (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'{measure} for {vehicle}: {value}, {evidence}'**
+  String drivingPatternMeasureSemantics(
+    String measure,
+    String vehicle,
+    String value,
+    String evidence,
+  );
+
+  /// Screen-reader label for a behaviour dimension one vehicle's recordings cannot support (#4366).
+  ///
+  /// In en, this message translates to:
+  /// **'{measure} for {vehicle}: {reason}'**
+  String drivingPatternUnavailableSemantics(
+    String measure,
+    String vehicle,
+    String reason,
+  );
+
   /// Title of the composite driving-score card on the Trip detail screen — sits at the top of the Insights group above the cost-line card (#1041 phase 5a Card A).
   ///
   /// In en, this message translates to:

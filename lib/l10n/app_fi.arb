@@ -10374,5 +10374,360 @@
   "@vehCompareQualReconstructedValuation": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "drivingPatternComparisonTitle": "Driving patterns",
+  "@drivingPatternComparisonTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternComparisonSubtitle": "What was observed at the wheel, with the driving each figure rests on.",
+  "@drivingPatternComparisonSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternNotFuelNote": "Behaviour observations only. No litres and no money are attributed to them here — that would need its own validated comparison.",
+  "@drivingPatternNotFuelNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternInsufficient": "Not enough recorded driving to compare patterns yet.",
+  "@drivingPatternInsufficient": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternMatchedOn": "Matched on: {criteria}",
+  "@drivingPatternMatchedOn": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "criteria": {
+        "type": "String",
+        "example": "trips of 5 to 30 km, warm start"
+      }
+    }
+  },
+  "drivingPatternUnmatchedNotice": "No trip conditions in common, so the figures below are descriptive observations over unequal routes.",
+  "@drivingPatternUnmatchedNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternMatchCounts": "{matched} trips matched, {unmatched} outside the matched conditions",
+  "@drivingPatternMatchCounts": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "matched": {
+        "type": "int",
+        "example": "24"
+      },
+      "unmatched": {
+        "type": "int",
+        "example": "9"
+      }
+    }
+  },
+  "drivingPatternUnassignedExcluded": "{count} recorded trips belong to no vehicle and are counted for none.",
+  "@drivingPatternUnassignedExcluded": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "drivingPatternNoAdjustedRanking": "No condition-adjusted ranking: expected consumption per trip is not recorded, so route, terrain and traffic cannot be taken out of these figures.",
+  "@drivingPatternNoAdjustedRanking": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternContextNote": "A higher figure here can be the road rather than the driver — necessary braking, a climb, or an engine that simply turns faster.",
+  "@drivingPatternContextNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternDifferencesTitle": "Largest observed differences",
+  "@drivingPatternDifferencesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternDifferenceLine": "{measure}: {higher} for {higherVehicle}, {lower} for {lowerVehicle}",
+  "@drivingPatternDifferenceLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "measure": {
+        "type": "String",
+        "example": "Hard accelerations"
+      },
+      "higher": {
+        "type": "String",
+        "example": "12.0 per 100 km"
+      },
+      "higherVehicle": {
+        "type": "String",
+        "example": "Van"
+      },
+      "lower": {
+        "type": "String",
+        "example": "4.0 per 100 km"
+      },
+      "lowerVehicle": {
+        "type": "String",
+        "example": "Estate"
+      }
+    }
+  },
+  "drivingPatternUnavailableNoSignal": "Not recorded — these trips carry no such signal",
+  "@drivingPatternUnavailableNoSignal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternUnavailableTooLittle": "Too little driving to state a figure",
+  "@drivingPatternUnavailableTooLittle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureEventsPer100Km": "{value} per 100 km",
+  "@drivingMeasureEventsPer100Km": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "12.0"
+      }
+    }
+  },
+  "drivingMeasureSharePercent": "{value} %",
+  "@drivingMeasureSharePercent": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "8.5"
+      }
+    }
+  },
+  "drivingPatternEvidenceCaption": "{numerator} over {denominator} · {trips} trips",
+  "@drivingPatternEvidenceCaption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "numerator": {
+        "type": "String",
+        "example": "12 events"
+      },
+      "denominator": {
+        "type": "String",
+        "example": "100 km"
+      },
+      "trips": {
+        "type": "int",
+        "example": "8"
+      }
+    }
+  },
+  "drivingPatternCountEvents": "{count} events",
+  "@drivingPatternCountEvents": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "12"
+      }
+    }
+  },
+  "drivingPatternCountMinutes": "{minutes} min",
+  "@drivingPatternCountMinutes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "String",
+        "example": "1.0"
+      }
+    }
+  },
+  "drivingPatternCountKm": "{km} km",
+  "@drivingPatternCountKm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "100"
+      }
+    }
+  },
+  "drivingMeasureHardAccelRate": "Hard accelerations",
+  "@drivingMeasureHardAccelRate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureFullThrottleShare": "Full-throttle time",
+  "@drivingMeasureFullThrottleShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureHardBrakeRate": "Hard braking",
+  "@drivingMeasureHardBrakeRate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureAvoidableBrakeShare": "Avoidable hard braking",
+  "@drivingMeasureAvoidableBrakeShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureEngineIdleShare": "Engine idling",
+  "@drivingMeasureEngineIdleShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureHighRpmShare": "High engine speed",
+  "@drivingMeasureHighRpmShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureSustainedHighSpeedShare": "Sustained high speed",
+  "@drivingMeasureSustainedHighSpeedShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureEnergyOscillationRate": "Accelerate and brake cycles",
+  "@drivingMeasureEnergyOscillationRate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureCoastingFuelCutShare": "Coasting without fuel",
+  "@drivingMeasureCoastingFuelCutShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureLateCurveShare": "Late braking into curves",
+  "@drivingMeasureLateCurveShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureClimbFullThrottleShare": "Full throttle climbing",
+  "@drivingMeasureClimbFullThrottleShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingMeasureFlatFullThrottleShare": "Full throttle on the flat",
+  "@drivingMeasureFlatFullThrottleShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternQualUncontrolled": "conditions not controlled",
+  "@drivingPatternQualUncontrolled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternQualPartialConditions": "only cold starts were evaluated",
+  "@drivingPatternQualPartialConditions": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternQualUnequalEvidence": "very unequal amounts of evidence",
+  "@drivingPatternQualUnequalEvidence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternQualExcluded": "some records were excluded",
+  "@drivingPatternQualExcluded": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternBandShort": "trips under 5 km",
+  "@drivingPatternBandShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternBandMedium": "trips of 5 to 30 km",
+  "@drivingPatternBandMedium": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternBandLong": "trips over 30 km",
+  "@drivingPatternBandLong": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternStartCold": "cold start",
+  "@drivingPatternStartCold": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternStartWarm": "warm start",
+  "@drivingPatternStartWarm": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternStartUnknown": "start temperature not recorded",
+  "@drivingPatternStartUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "drivingPatternCohortLabel": "{band}, {start}",
+  "@drivingPatternCohortLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "band": {
+        "type": "String",
+        "example": "trips of 5 to 30 km"
+      },
+      "start": {
+        "type": "String",
+        "example": "warm start"
+      }
+    }
+  },
+  "drivingPatternMeasureSemantics": "{measure} for {vehicle}: {value}, {evidence}",
+  "@drivingPatternMeasureSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "measure": {
+        "type": "String",
+        "example": "Hard accelerations"
+      },
+      "vehicle": {
+        "type": "String",
+        "example": "Estate"
+      },
+      "value": {
+        "type": "String",
+        "example": "12.0 per 100 km"
+      },
+      "evidence": {
+        "type": "String",
+        "example": "12 events over 100 km · 8 trips"
+      }
+    }
+  },
+  "drivingPatternUnavailableSemantics": "{measure} for {vehicle}: {reason}",
+  "@drivingPatternUnavailableSemantics": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "measure": {
+        "type": "String",
+        "example": "Engine idling"
+      },
+      "vehicle": {
+        "type": "String",
+        "example": "Estate"
+      },
+      "reason": {
+        "type": "String",
+        "example": "Not recorded — these trips carry no such signal"
+      }
+    }
   }
 }
