@@ -997,19 +997,32 @@ jobs:
       # Open-Testing upload. Mirrors the fdroid no-GMS gate pattern. The PR
       # build produces playDebug's merged manifest; the master/tag build
       # produces playRelease's. Audit whichever exists.
-      - name: Audit — zero FOREGROUND_SERVICE permissions (play)
+      #
+      # #4352 (Epic #4351) — the same step now also audits the CHECKED-IN
+      # FGS-approved overlays with expect-EXACTLY. `FGS_FORM_APPROVED` is not
+      # set on this repository, so the Play artifact ships WITHOUT the
+      # foreground service while F-Droid and dev APKs ship with it; those
+      # overlays are the only statement of what a capable artifact would
+      # declare, and they are what `RecordingProtectionBuild.supports()`
+      # claims in Dart. Auditing source-set files needs no build, no emulator
+      # and no new matrix job — deliberately extra invocations in this ONE
+      # step, because a job-level skip of a matrix job blocks required checks
+      # forever.
+      - name: Audit — FOREGROUND_SERVICE declarations per artifact (play)
         if: always()
         run: |
           DEBUG_MANIFEST="build/app/intermediates/merged_manifests/playDebug/processPlayDebugManifest/AndroidManifest.xml"
           RELEASE_MANIFEST="build/app/intermediates/merged_manifests/playRelease/processPlayReleaseManifest/AndroidManifest.xml"
           if [ -f "$RELEASE_MANIFEST" ]; then
-            bash scripts/audit_no_fgs.sh "$RELEASE_MANIFEST"
+            bash scripts/audit_fgs_declarations.sh --expect-zero --merged "$RELEASE_MANIFEST"
           elif [ -f "$DEBUG_MANIFEST" ]; then
-            bash scripts/audit_no_fgs.sh "$DEBUG_MANIFEST"
+            bash scripts/audit_fgs_declarations.sh --expect-zero --merged "$DEBUG_MANIFEST"
           else
             echo "::error::No merged play manifest found to audit for FGS permissions." >&2
             exit 1
           fi
+          bash scripts/audit_fgs_declarations.sh --profile play-fgs-approved
+          bash scripts/audit_fgs_declarations.sh --profile fdroid-fgs-approved
       - name: Clean up decoded keystore
         if: always()
         run: rm -f "$RUNNER_TEMP/tankstellen-release.jks"

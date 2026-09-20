@@ -992,7 +992,10 @@ store-metadata-only PR can still satisfy branch protection and auto-merge (#2568
   "Foreground Service Use" form (#1498). One flag flips both halves in lockstep:
   `--dart-define=FGS_FORM_APPROVED=true` turns on
   `kGpsRecordingForegroundServiceEnabled` in Dart *and* swaps the flavor manifest to the
-  `*FgsApproved` overlay in Gradle. `scripts/audit_no_fgs.sh` guards the default shape;
+  `*FgsApproved` overlay in Gradle. `scripts/audit_fgs_declarations.sh` guards both
+  shapes — expect-zero on the merged default Play manifest, expect-exactly on each
+  checked-in `*FgsApproved` overlay (#4352), so the capability
+  `RecordingProtectionBuild.supports()` claims in Dart cannot drift from the manifest;
   the repo variable `vars.FGS_FORM_APPROVED` flips it in `daily-beta.yml` once approved.
   See `docs/guides/play-fgs-declaration.md`.
 
@@ -1173,8 +1176,9 @@ The audit must run on a **release** APK: only R8 strips Flutter's dead
 the 0-reference bar. The build is keyless-unsigned, which is the sanctioned F-Droid
 shape.
 
-`scripts/audit_no_fgs.sh` is the sibling audit for the foreground-service permission
-shape.
+`scripts/audit_fgs_declarations.sh` is the sibling audit for the foreground-service
+permission shape (per artifact: expect-zero for a default Play build, expect-exactly
+for an `FGS_FORM_APPROVED` build).
 
 ---
 
