@@ -26,7 +26,8 @@ enum FleetReviewDecision {
       : ExpenseStatus.rejected;
 }
 
-/// The manager's read-and-review seam over `fleet_expenses` (#4215).
+/// The manager's read-and-review seam over the org's server data
+/// (#4215; widened for the dashboard by #4216).
 ///
 /// Separate from `SyncTransport` on purpose: that seam is scoped to
 /// `user_id = auth.uid()` by construction ("a fake can't model
@@ -35,9 +36,15 @@ enum FleetReviewDecision {
 /// `FleetTransport` (#4212), whose closed table set is the five
 /// org-owned tables and whose contract is pull-only.
 ///
-/// Both operations are RLS- and RPC-gated server-side; this interface
+/// Every operation is RLS- and RPC-gated server-side; this interface
 /// exists so the workflow above it is testable without a live session,
 /// and so production has exactly one place that names the table.
+///
+/// #4216 widened it rather than adding a fourth seam. The dashboard's
+/// read is the same KIND of call as the review queue — a manager
+/// reading across an organisation's users, audited server-side — and
+/// splitting it off would have left two fakes that could disagree
+/// about what a manager is allowed to see.
 abstract class FleetReviewTransport {
   /// The authenticated caller.
   String get userId;
@@ -59,6 +66,26 @@ abstract class FleetReviewTransport {
     required String ownerUserId,
     required FleetReviewDecision decision,
   });
+
+  /// `fleet_period_metrics(p_org, p_from, p_to)` — the aggregate-first
+  /// manager read (#4216).
+  ///
+  /// There is no client-side alternative to this call and there must
+  /// not be one: the suppression threshold, the role check and the
+  /// audit row all live inside the SECURITY DEFINER body, so a
+  /// dashboard that assembled the same figures from a table read would
+  /// be a dashboard with none of the three.
+  Future<List<JsonRow>> selectPeriodMetrics({
+    required String orgId,
+    required DateTime from,
+    required DateTime to,
+  });
+
+  /// `fleet_log_export(p_org, p_kind)` — the audit row an export
+  /// leaves behind (ADR 0025 D5.4). Returns whether the server
+  /// recorded it; an export the trail did not record is an export the
+  /// caller must not make.
+  Future<bool> logExport({required String orgId, required String kind});
 }
 
 /// The production [FleetReviewTransport] over the live
@@ -108,6 +135,43 @@ class SupabaseFleetReviewTransport implements FleetReviewTransport {
       },
     );
     return '$result';
+  }
+
+  @override
+  Future<List<JsonRow>> selectPeriodMetrics({
+    required String orgId,
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    _fence();
+    final rows = await _client.rpc<dynamic>(
+      'fleet_period_metrics',
+      params: {
+        'p_org': orgId,
+        // UTC on the wire, always (#2478's rule for every synced
+        // timestamp): a period boundary in local time would move the
+        // report by an hour twice a year.
+        'p_from': from.toUtc().toIso8601String(),
+        'p_to': to.toUtc().toIso8601String(),
+      },
+    );
+    return [
+      for (final row in rows as List<dynamic>)
+        Map<String, dynamic>.from(row as Map),
+    ];
+  }
+
+  @override
+  Future<bool> logExport({
+    required String orgId,
+    required String kind,
+  }) async {
+    _fence();
+    final result = await _client.rpc<dynamic>(
+      'fleet_log_export',
+      params: {'p_org': orgId, 'p_kind': kind},
+    );
+    return result == true;
   }
 
   /// #4337 — refuse to touch a client that is no longer the live one.

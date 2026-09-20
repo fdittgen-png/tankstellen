@@ -56,7 +56,9 @@ void main() {
     // `catch (e, st)` with the stack forwarded to the error log.
     '// ignore: catch_no_st': 13,
     '// ignore: log_raw_debugprint': 0,
-    '// i18n-ignore:': 122,
+    // #4216 — two language-neutral unit masks (kg, %) in the fleet
+    // manager's figure formatter.
+    '// i18n-ignore:': 124,
   };
 
   bool isScanned(String path) {
