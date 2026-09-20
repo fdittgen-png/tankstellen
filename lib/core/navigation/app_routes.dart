@@ -44,6 +44,9 @@ abstract final class RoutePaths {
   // Profile / settings sub-screens.
   static const vehicles = '/vehicles';
   static const editVehicle = '/vehicles/edit';
+  // #4365 — side-by-side observed consumption and refuelling for two or
+  // more of the driver's own vehicles. Never switches the active one.
+  static const compareVehicles = '/vehicles/compare';
   static const itineraries = '/itineraries';
   static const privacyDashboard = '/privacy-dashboard';
   static const themeSettings = '/theme-settings';
@@ -220,6 +223,16 @@ final class EditVehicleRoute extends AppRoute {
   String get location => RoutePaths.editVehicle;
   @override
   Object? get extra => vehicleId;
+}
+
+/// Side-by-side comparison of the driver's own vehicles
+/// (`/vehicles/compare`, #4365). Carries no payload: the selection is
+/// provider state, so the screen survives a deep link and an edit
+/// without the active vehicle ever changing.
+final class CompareVehiclesRoute extends AppRoute {
+  const CompareVehiclesRoute();
+  @override
+  String get location => RoutePaths.compareVehicles;
 }
 
 /// Fuel-cost calculator (`/calculator`), optionally pre-filled with the

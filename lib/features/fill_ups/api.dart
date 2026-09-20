@@ -30,6 +30,11 @@ export 'domain/services/monthly_insights_aggregator.dart';
 // #4364 — the shared historical-comparison contract #4365/#4366/#4367
 // and the fleet comparison (#4214) consume.
 export 'domain/services/vehicle_cost_comparison.dart';
+// #4365 — the period-scoped historical comparison and its surface.
+export 'domain/services/vehicle_history_comparison.dart';
+export 'domain/services/vehicle_history_comparison_builder.dart';
+export 'presentation/screens/vehicle_comparison_screen.dart';
+export 'providers/vehicle_comparison_provider.dart';
 export 'presentation/screens/add_fill_up_screen.dart';
 export 'presentation/screens/consumption_statistics_screen.dart';
 export 'presentation/screens/fuel_and_tank_screen.dart';

@@ -26,6 +26,17 @@ class VehicleListScreen extends ConsumerWidget {
     return PageScaffold(
       title: l.vehiclesTitle,
       bodyPadding: EdgeInsets.zero,
+      actions: [
+        // #4365 — compare two vehicles' recorded histories. Opening the
+        // comparison never changes which vehicle is active.
+        if (vehicles.length >= 2)
+          IconButton(
+            key: const Key('vehicles_compare_action'),
+            icon: const Icon(Icons.compare_arrows),
+            tooltip: l.vehCompareOpenTooltip,
+            onPressed: () => const CompareVehiclesRoute().push<void>(context),
+          ),
+      ],
       body: vehicles.isEmpty
           ? Column(
               children: [

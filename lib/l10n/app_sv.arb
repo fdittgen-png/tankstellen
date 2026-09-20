@@ -9811,5 +9811,568 @@
   "@fleetManagerOpenQueue": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "vehCompareTitle": "Compare vehicles",
+  "@vehCompareTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareOpenTooltip": "Compare vehicles",
+  "@vehCompareOpenTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareSelectHint": "Pick at least two vehicles to compare.",
+  "@vehCompareSelectHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareNotEnoughVehicles": "Add a second vehicle profile before comparing histories.",
+  "@vehCompareNotEnoughVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareHonestyNote": "These figures come from your own records, at the prices you actually paid. They do not measure how efficient a vehicle is in itself, they do not predict what a future trip will cost, and they are not savings against a price this app never saw.",
+  "@vehCompareHonestyNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehComparePeriodLabel": "Period",
+  "@vehComparePeriodLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehComparePeriodAll": "All history",
+  "@vehComparePeriodAll": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehComparePeriodYear": "Last 12 months",
+  "@vehComparePeriodYear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehComparePeriodQuarter": "Last 90 days",
+  "@vehComparePeriodQuarter": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareBoundaryPolicyLabel": "Tanks crossing the period edge",
+  "@vehCompareBoundaryPolicyLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareBoundaryClosing": "Count the whole tank it ended in",
+  "@vehCompareBoundaryClosing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareBoundaryContained": "Only tanks entirely inside",
+  "@vehCompareBoundaryContained": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareBoundaryNote": "A tank is never split at a date. Its litres were measured over the whole tank, so the whole tank is counted or none of it is.",
+  "@vehCompareBoundaryNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReferenceLabel": "Differences shown against {vehicle}",
+  "@vehCompareReferenceLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String",
+        "example": "Clio"
+      }
+    }
+  },
+  "vehCompareSetReference": "Use as reference",
+  "@vehCompareSetReference": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareEvidenceTitle": "Evidence",
+  "@vehCompareEvidenceTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareWindowCount": "{count, plural, =0{No closed tank} =1{1 closed tank} other{{count} closed tanks}}",
+  "@vehCompareWindowCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareMatchedDistance": "Matched distance",
+  "@vehCompareMatchedDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareRecordedDistance": "Recorded distance",
+  "@vehCompareRecordedDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareTripCount": "{count, plural, =0{No recorded drive} =1{1 recorded drive} other{{count} recorded drives}}",
+  "@vehCompareTripCount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareConsumptionTitle": "Observed consumption",
+  "@vehCompareConsumptionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareCostTitle": "Cost",
+  "@vehCompareCostTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareCostPerKmLabel": "Per km, tank purchases",
+  "@vehCompareCostPerKmLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareConsumedFuelLabel": "Per km, fuel burned (modelled)",
+  "@vehCompareConsumedFuelLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareRecordedSpendLabel": "Paid at the pump",
+  "@vehCompareRecordedSpendLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehComparePricePerUnitLabel": "Average price paid",
+  "@vehComparePricePerUnitLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareRefuellingTitle": "Refuelling",
+  "@vehCompareRefuellingTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareFillCountLabel": "Pump visits",
+  "@vehCompareFillCountLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareTotalQuantityLabel": "Total pumped",
+  "@vehCompareTotalQuantityLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareTypicalQuantityLabel": "Typical fill",
+  "@vehCompareTypicalQuantityLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareFullPartialLabel": "Full / partial",
+  "@vehCompareFullPartialLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareFullPartialValue": "{full} full, {partial} partial",
+  "@vehCompareFullPartialValue": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareBetweenFillsLabel": "Between refuels",
+  "@vehCompareBetweenFillsLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareBetweenFillsDays": "{days, plural, =1{1 day} other{{days} days}}",
+  "@vehCompareBetweenFillsDays": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareCorrectionsLabel": "Corrections",
+  "@vehCompareCorrectionsLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareStationsTitle": "Stations",
+  "@vehCompareStationsTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareStationUnnamed": "{count, plural, =1{1 fill with no station recorded} other{{count} fills with no station recorded}}",
+  "@vehCompareStationUnnamed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareStationVisits": "{station}: {count}",
+  "@vehCompareStationVisits": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "station": {
+        "type": "String",
+        "example": "Total Access"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareRangeLabel": "Estimated range",
+  "@vehCompareRangeLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareFuelShare": "{fuel}: {share}",
+  "@vehCompareFuelShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fuel": {
+        "type": "String",
+        "example": "E10"
+      },
+      "share": {
+        "type": "String",
+        "example": "62 %"
+      }
+    }
+  },
+  "vehCompareBoundaryIncluded": "{count, plural, =1{1 tank opened before this period and was counted whole.} other{{count} tanks opened before this period and were counted whole.}}",
+  "@vehCompareBoundaryIncluded": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareBoundaryExcluded": "{count, plural, =1{1 tank crossed the period edge and was left out.} other{{count} tanks crossed the period edge and were left out.}}",
+  "@vehCompareBoundaryExcluded": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareOpeningCarried": "The first counted tank was filled on {date}, before this period — its fuel is carried forward, not re-counted.",
+  "@vehCompareOpeningCarried": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "1 Jan 2026"
+      }
+    }
+  },
+  "vehCompareMissingVehicle": "This vehicle is no longer on record, so its figures cannot be recomputed. The selection is kept so you can restore it.",
+  "@vehCompareMissingVehicle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareRemoveFromSelection": "Remove from the comparison",
+  "@vehCompareRemoveFromSelection": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareUnassignedFills": "{count, plural, =1{1 fill-up belongs to no vehicle and counts for none of these columns.} other{{count} fill-ups belong to no vehicle and count for none of these columns.}}",
+  "@vehCompareUnassignedFills": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareAmbiguousFills": "{count, plural, =1{1 fill-up could belong to more than one of these vehicles and counts for none.} other{{count} fill-ups could belong to more than one of these vehicles and count for none.}}",
+  "@vehCompareAmbiguousFills": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareUnassignedTrips": "{count, plural, =1{1 recorded drive belongs to no vehicle.} other{{count} recorded drives belong to no vehicle.}}",
+  "@vehCompareUnassignedTrips": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareWinnerConsumption": "Lowest observed consumption: {vehicle}",
+  "@vehCompareWinnerConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String",
+        "example": "Clio"
+      }
+    }
+  },
+  "vehCompareWinnerCost": "Lowest observed cost per km: {vehicle}",
+  "@vehCompareWinnerCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String",
+        "example": "Clio"
+      }
+    }
+  },
+  "vehCompareNoWinner": "No vehicle can be named here: {reason}",
+  "@vehCompareNoWinner": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "reason": {
+        "type": "String",
+        "example": "Too few closed tanks to compare."
+      }
+    }
+  },
+  "vehCompareSourcesAction": "Show the records",
+  "@vehCompareSourcesAction": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareSourcesTitle": "Records behind this figure",
+  "@vehCompareSourcesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareSourcesFills": "{count, plural, =0{No fill-up} =1{1 fill-up} other{{count} fill-ups}}",
+  "@vehCompareSourcesFills": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareSourcesWindows": "{count, plural, =0{No closed tank} =1{1 closed tank} other{{count} closed tanks}}",
+  "@vehCompareSourcesWindows": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareSourcesTrips": "{count, plural, =0{No drive} =1{1 drive} other{{count} drives}}",
+  "@vehCompareSourcesTrips": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareUnavailableShort": "Not comparable",
+  "@vehCompareUnavailableShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareEstimateBadge": "Estimate",
+  "@vehCompareEstimateBadge": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareSemanticsColumn": "{vehicle}, vehicle {index} of {total}",
+  "@vehCompareSemanticsColumn": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String",
+        "example": "Clio"
+      },
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareSemanticsMetric": "{label}: {value}, {vehicle}",
+  "@vehCompareSemanticsMetric": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "label": {
+        "type": "String",
+        "example": "Observed consumption"
+      },
+      "value": {
+        "type": "String",
+        "example": "6.4 L/100 km"
+      },
+      "vehicle": {
+        "type": "String",
+        "example": "Clio"
+      }
+    }
+  },
+  "vehCompareReasonNoEvidence": "Nothing on record for this figure.",
+  "@vehCompareReasonNoEvidence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonTooFewSamples": "Too few closed tanks to compare.",
+  "@vehCompareReasonTooFewSamples": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonNoMatchedDistance": "No matched distance to divide by.",
+  "@vehCompareReasonNoMatchedDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonMixedCurrencies": "Amounts in more than one currency, and no conversion was chosen.",
+  "@vehCompareReasonMixedCurrencies": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonUnknownCurrency": "Some amounts have no recorded currency.",
+  "@vehCompareReasonUnknownCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonExchangeRateUnavailable": "No exchange rate relates these currencies.",
+  "@vehCompareReasonExchangeRateUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonExchangeRateStale": "The exchange rate is too old to decide this.",
+  "@vehCompareReasonExchangeRateStale": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonIncompatibleUnits": "These quantities are measured in different units.",
+  "@vehCompareReasonIncompatibleUnits": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonUnsupportedUnit": "This fuel is not sold by the litre, so there is no L/100 km figure.",
+  "@vehCompareReasonUnsupportedUnit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonAmbiguousAttribution": "These records cannot be attributed to exactly one vehicle.",
+  "@vehCompareReasonAmbiguousAttribution": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonMissingPrices": "Some fills in the counted tanks carry no price.",
+  "@vehCompareReasonMissingPrices": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonNoExpectedConsumption": "No expected consumption is recorded, so nothing can be adjusted against it.",
+  "@vehCompareReasonNoExpectedConsumption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareReasonIncompleteConditionCoverage": "Not every driving condition was evaluated.",
+  "@vehCompareReasonIncompleteConditionCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualUncontrolledConditions": "Hills, cold and traffic are not accounted for.",
+  "@vehCompareQualUncontrolledConditions": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualPartialConditionCoverage": "Only cold starts are recorded; gradient and stop-and-go are not.",
+  "@vehCompareQualPartialConditionCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualUnequalSampleSizes": "The vehicles rest on very different amounts of evidence.",
+  "@vehCompareQualUnequalSampleSizes": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualEstimatedBasis": "Modelled, not measured.",
+  "@vehCompareQualEstimatedBasis": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualStaleBasis": "Measured, but too old to read as current.",
+  "@vehCompareQualStaleBasis": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualMixedProvenance": "Measured and modelled evidence both exist; they are reported apart.",
+  "@vehCompareQualMixedProvenance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualConvertedCurrency": "Converted at a named, dated rate — a valuation, not the amount paid.",
+  "@vehCompareQualConvertedCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualExcludedRecords": "Some records were left out of this total.",
+  "@vehCompareQualExcludedRecords": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualOpenWindowExcluded": "The tank in progress is not counted.",
+  "@vehCompareQualOpenWindowExcluded": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualUnknownBlendShare": "Part of the tank cannot be attributed to one grade.",
+  "@vehCompareQualUnknownBlendShare": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehCompareQualReconstructedValuation": "A reconstructed valuation of the fuel burned, not money paid.",
+  "@vehCompareQualReconstructedValuation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

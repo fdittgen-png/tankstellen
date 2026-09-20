@@ -17,7 +17,7 @@ void main() {
       // #3884 added the twelve Settings topic screens + the radar
       // sub-screen (/settings/...); #4007 added /help, appended LAST so
       // that no existing index in the tests below moves.
-      expect(profileRoutes.length, 25);
+      expect(profileRoutes.length, 26);
     });
 
     test('route 0 path is "/vehicles"', () {
@@ -103,6 +103,11 @@ void main() {
         expect(route.path, expected[i], reason: 'route ${11 + i}');
         expect(route.path, startsWith('/settings/'));
       }
+    });
+
+    test('route 25 path is "/vehicles/compare" (#4365)', () {
+      final route = profileRoutes[25] as GoRoute;
+      expect(route.path, RoutePaths.compareVehicles);
     });
 
     test('every entry is a GoRoute', () {
