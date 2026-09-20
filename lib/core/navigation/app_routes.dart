@@ -47,6 +47,9 @@ abstract final class RoutePaths {
   // #4365 — side-by-side observed consumption and refuelling for two or
   // more of the driver's own vehicles. Never switches the active one.
   static const compareVehicles = '/vehicles/compare';
+  // #4367 — the same proposed journey, forecast once per selected
+  // vehicle. A sibling of the history comparison, never a replacement.
+  static const compareVehicleTrip = '/vehicles/compare-trip';
   static const itineraries = '/itineraries';
   static const privacyDashboard = '/privacy-dashboard';
   static const themeSettings = '/theme-settings';
@@ -238,6 +241,16 @@ final class CompareVehiclesRoute extends AppRoute {
   const CompareVehiclesRoute();
   @override
   String get location => RoutePaths.compareVehicles;
+}
+
+/// The same proposed journey, forecast for each selected vehicle
+/// (`/vehicles/compare-trip`, #4367). Carries no payload either: the
+/// selection, the assumptions and the objective are provider state, so
+/// a deep link lands on exactly what the driver last set up.
+final class CompareVehicleTripRoute extends AppRoute {
+  const CompareVehicleTripRoute();
+  @override
+  String get location => RoutePaths.compareVehicleTrip;
 }
 
 /// Fuel-cost calculator (`/calculator`), optionally pre-filled with the

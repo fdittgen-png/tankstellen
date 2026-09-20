@@ -29,6 +29,7 @@ import '../../features/profile/presentation/screens/settings/vehicles_obd2_scree
 import '../../features/help/api.dart';
 import '../../features/profile/presentation/screens/theme_settings_screen.dart';
 import '../../features/fill_ups/presentation/screens/vehicle_comparison_screen.dart';
+import '../../features/search/presentation/screens/vehicle_trip_comparison_screen.dart';
 import '../../features/vehicle/presentation/screens/edit_vehicle_screen.dart';
 import '../../features/vehicle/presentation/screens/vehicle_list_screen.dart';
 
@@ -177,13 +178,19 @@ List<RouteBase> get profileRoutes => [
         path: RoutePaths.compareVehicles,
         builder: (context, state) => const VehicleComparisonScreen(),
       ),
-      // #4217 (Epic #4211) — Settings → Fleet, appended LAST so no
-      // existing index in `profile_routes_test.dart` moves. The tile
-      // that reaches it is gated on `Feature.fleetMode`; the screen
-      // itself renders the "not in a fleet" explanation for a stale
-      // deep link rather than an empty page.
+      // #4217 (Epic #4211) — Settings → Fleet. The tile that reaches it
+      // is gated on `Feature.fleetMode`; the screen itself renders the
+      // "not in a fleet" explanation for a stale deep link rather than
+      // an empty page.
       GoRoute(
         path: RoutePaths.settingsFleet,
         builder: (context, state) => const FleetScreen(),
+      ),
+      // #4367 (epic #4358, work package H) — the same-trip forecast.
+      // Appended LAST, for the same reason as #4365's route: the
+      // index-pinned order in `profile_routes_test.dart` stays stable.
+      GoRoute(
+        path: RoutePaths.compareVehicleTrip,
+        builder: (context, state) => const VehicleTripComparisonScreen(),
       ),
     ];

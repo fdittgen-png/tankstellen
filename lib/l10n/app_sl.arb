@@ -10999,5 +10999,270 @@
   "@fleetSettingsExpired": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "vehTripTitle": "Compare this trip",
+  "@vehTripTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripOpenTooltip": "Compare this trip across vehicles",
+  "@vehTripOpenTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripNoRoute": "Plan a route first — there is no journey to compare yet.",
+  "@vehTripNoRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripNotEnoughVehicles": "Pick at least two vehicles to compare this trip.",
+  "@vehTripNotEnoughVehicles": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripForecastNote": "These are estimates for a journey you have not driven yet, built from each vehicle's own consumption evidence, tank and compatible fuel. They are a forecast, not the history you recorded.",
+  "@vehTripForecastNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripScopeNote": "Fuel and refuelling only. Maintenance, depreciation and insurance are in no total on this screen.",
+  "@vehTripScopeNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripObjectiveLabel": "Compare on",
+  "@vehTripObjectiveLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripObjectiveCost": "Lowest total cost",
+  "@vehTripObjectiveCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripObjectiveTime": "Shortest expected time",
+  "@vehTripObjectiveTime": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripObjectiveDistance": "Least extra driving",
+  "@vehTripObjectiveDistance": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripFuelUsedLabel": "Fuel this trip burns",
+  "@vehTripFuelUsedLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripCostToDriveLabel": "Fuel cost to drive",
+  "@vehTripCostToDriveLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripCostToDriveNote": "The fuel the journey burns, valued at the best price for this vehicle's fuel on this route. It does not change with what is already in the tank.",
+  "@vehTripCostToDriveNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripCashRequiredLabel": "Cash at the pump",
+  "@vehTripCashRequiredLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripCashRequiredNote": "What you would pay on this trip with the tank as it is now, known stop charges included. A full tank is cheaper to refuel, not cheaper to drive.",
+  "@vehTripCashRequiredNote": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripStopsLabel": "Refuelling stops",
+  "@vehTripStopsLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripExtraKmLabel": "Extra kilometres",
+  "@vehTripExtraKmLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripTimeLabel": "Expected time",
+  "@vehTripTimeLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripStartTankLabel": "Tank at departure",
+  "@vehTripStartTankLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripEndTankLabel": "Tank at arrival",
+  "@vehTripEndTankLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripConsumptionLabel": "Consumption assumed",
+  "@vehTripConsumptionLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripNoStops": "No refuelling stop needed.",
+  "@vehTripNoStops": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripStopLine": "{station}: buy {litres} for {cost}",
+  "@vehTripStopLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "station": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      },
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripSourceMeasured": "from your records",
+  "@vehTripSourceMeasured": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripSourceManual": "your own assumption",
+  "@vehTripSourceManual": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripSourceEstimated": "estimated",
+  "@vehTripSourceEstimated": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripSourceUnknown": "not known",
+  "@vehTripSourceUnknown": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripGap": "This vehicle cannot cross from {fromKm} to {toKm} on one tank.",
+  "@vehTripGap": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fromKm": {
+        "type": "String"
+      },
+      "toKm": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripWinnerCost": "{vehicle} costs the least to drive",
+  "@vehTripWinnerCost": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripWinnerCash": "{vehicle} needs the least cash at the pump",
+  "@vehTripWinnerCash": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripWinnerTime": "{vehicle} is expected to arrive first",
+  "@vehTripWinnerTime": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripWinnerWithheld": "No single winner: not every selected vehicle could be compared on this figure.",
+  "@vehTripWinnerWithheld": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripApply": "Use this plan",
+  "@vehTripApply": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripApplied": "Navigation started for {vehicle}.",
+  "@vehTripApplied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripApplyRefused": "This plan could not be handed to navigation.",
+  "@vehTripApplyRefused": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripBoundedSearch": "The best of the stations searched, not proof that nothing better exists.",
+  "@vehTripBoundedSearch": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripCurrencyWithheld": "Some stations on this route quote a currency this trip cannot be expressed in. Their prices stay as quoted.",
+  "@vehTripCurrencyWithheld": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripIncompleteEvidence": "Some stations were left out of this vehicle's plan, so it speaks only for the ones searched.",
+  "@vehTripIncompleteEvidence": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripAssumptionLabel": "Consumption for this trip",
+  "@vehTripAssumptionLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripAssumptionClear": "Use my records again",
+  "@vehTripAssumptionClear": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripSemanticsColumn": "{vehicle}, vehicle {index} of {total}",
+  "@vehTripSemanticsColumn": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      },
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "vehTripNoPriceForFuel": "No station on this route sells this vehicle's fuel, so there is no fuel cost to show.",
+  "@vehTripNoPriceForFuel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "vehTripUnavailableShort": "Not comparable",
+  "@vehTripUnavailableShort": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

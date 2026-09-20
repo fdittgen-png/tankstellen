@@ -10,6 +10,7 @@ import '../../../core/domain/refuel_profile_provider.dart';
 import '../../../core/domain/travel_estimate.dart';
 import '../../../core/time/app_clock.dart';
 import '../../../core/domain/tank_state_provider.dart';
+import '../../../core/domain/vehicle_trip_basis.dart';
 import '../../../core/utils/route_projection.dart';
 import '../../route_search/api.dart';
 import 'ignored_stations_provider.dart';
@@ -129,21 +130,34 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
   final request = TravelQuoteRequest.budgeted(context, set.travelStops);
   final estimates = ref.watch(stationTravelEstimatesProvider(request));
 
-  // The polyline's own length, not the routing service's reported
-  // distance: positions and total must come from one measurement or a
-  // stop can land past the end of the route.
-  final plans = RefuelPlanner.plan(RefuelPlanRequest(
-    routeKm: projection.totalKm,
-    drivingMinutes: result.route.durationMinutes,
-    tankCapacityL: tank.capacityL!,
-    startLitres: startLitres,
-    consumptionLPer100km: consumption,
-    candidates: withRoadEstimates(
+  // #4367 — the request is assembled by the ONE builder the
+  // multi-vehicle comparison also uses, so the same inputs cannot give
+  // two answers on the two surfaces. The polyline's own length, not the
+  // routing service's reported distance: positions and total must come
+  // from one measurement or a stop can land past the end of the route.
+  final planRequest = tripPlanRequestFor(
+    VehicleTripJourney(
+      routeKm: projection.totalKm,
+      drivingMinutes: result.route.durationMinutes,
+      currencyCode: currency,
+      departAt: now,
+    ),
+    VehicleTripBasis(
+      vehicleId: '',
+      vehicleName: '',
+      fuel: fuelType,
+      capacityL: tank.capacityL,
+      startLitres: startLitres,
+      consumptionLPer100km: consumption,
+    ),
+    withRoadEstimates(
       set.candidates,
       (id) => actionableTravelEstimate(estimates, request, id, now),
     ),
-    currencyCode: currency,
-  ));
+  );
+  final plans = planRequest == null
+      ? const RefuelPlanSet()
+      : RefuelPlanner.plan(planRequest);
 
   // An empty candidate set is not automatically a blocker: a tank that
   // already covers the journey is a real answer, and #4362 requires it

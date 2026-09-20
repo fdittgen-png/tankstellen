@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/misc.dart';
 import '../profile_language_binding.dart';
 import '../../features/fill_ups/providers/refuel_profile_override.dart';
 import '../../features/fill_ups/providers/tank_state_override.dart';
+import '../../features/fill_ups/providers/vehicle_trip_basis_override.dart';
 
 /// Every provider override the real app boots with (#4089).
 ///
@@ -22,8 +23,14 @@ import '../../features/fill_ups/providers/tank_state_override.dart';
 ///  * **tank state** (#4146) — capacity and current level from the
 ///    level-v2 estimate, for the same reason: the route screen plans
 ///    stops around the tank without reaching into `fill_ups`.
+///  * **compared vehicle bases** (#4367) — one capacity, level,
+///    reserve and consumption per COMPARED vehicle, read by id, so the
+///    same-trip comparison can plan a column per car without the
+///    planning side importing `fill_ups` and without the active
+///    vehicle having a privileged column.
 List<Override> startupOverrides() => [
       ...profileLanguageOverrides(),
       ...refuelProfileOverrides(),
       ...tankStateOverrides(),
+      ...vehicleTripBasisOverrides(),
     ];

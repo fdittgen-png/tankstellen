@@ -11651,6 +11651,162 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pickerLoading => 'Katalog wird geladen…';
 
   @override
+  String get vehTripTitle => 'Diese Fahrt vergleichen';
+
+  @override
+  String get vehTripOpenTooltip =>
+      'Diese Fahrt über mehrere Fahrzeuge vergleichen';
+
+  @override
+  String get vehTripNoRoute =>
+      'Plane zuerst eine Route — es gibt noch keine Fahrt zum Vergleichen.';
+
+  @override
+  String get vehTripNotEnoughVehicles =>
+      'Wähle mindestens zwei Fahrzeuge, um diese Fahrt zu vergleichen.';
+
+  @override
+  String get vehTripForecastNote =>
+      'Das sind Schätzungen für eine Fahrt, die du noch nicht gefahren bist — gebildet aus dem Verbrauchsnachweis, dem Tank und dem passenden Kraftstoff jedes einzelnen Fahrzeugs. Eine Prognose, nicht dein aufgezeichneter Verlauf.';
+
+  @override
+  String get vehTripScopeNote =>
+      'Nur Kraftstoff und Tanken. Wartung, Wertverlust und Versicherung stecken in keiner Summe auf diesem Bildschirm.';
+
+  @override
+  String get vehTripObjectiveLabel => 'Vergleichen nach';
+
+  @override
+  String get vehTripObjectiveCost => 'Niedrigste Gesamtkosten';
+
+  @override
+  String get vehTripObjectiveTime => 'Kürzeste erwartete Zeit';
+
+  @override
+  String get vehTripObjectiveDistance => 'Geringster Umweg';
+
+  @override
+  String get vehTripFuelUsedLabel => 'Verbrauch dieser Fahrt';
+
+  @override
+  String get vehTripCostToDriveLabel => 'Kraftstoffkosten der Fahrt';
+
+  @override
+  String get vehTripCostToDriveNote =>
+      'Der Kraftstoff, den die Fahrt verbraucht, bewertet zum besten Preis für den Kraftstoff dieses Fahrzeugs auf dieser Route. Er ändert sich nicht dadurch, was schon im Tank ist.';
+
+  @override
+  String get vehTripCashRequiredLabel => 'Bargeld an der Zapfsäule';
+
+  @override
+  String get vehTripCashRequiredNote =>
+      'Was du auf dieser Fahrt mit dem aktuellen Tankinhalt zahlen würdest, bekannte Gebühren am Halt eingeschlossen. Ein voller Tank ist billiger zu füllen, nicht billiger zu fahren.';
+
+  @override
+  String get vehTripStopsLabel => 'Tankstopps';
+
+  @override
+  String get vehTripExtraKmLabel => 'Zusätzliche Kilometer';
+
+  @override
+  String get vehTripTimeLabel => 'Erwartete Dauer';
+
+  @override
+  String get vehTripStartTankLabel => 'Tank bei Abfahrt';
+
+  @override
+  String get vehTripEndTankLabel => 'Tank bei Ankunft';
+
+  @override
+  String get vehTripConsumptionLabel => 'Angenommener Verbrauch';
+
+  @override
+  String get vehTripNoStops => 'Kein Tankstopp nötig.';
+
+  @override
+  String vehTripStopLine(String station, String litres, String cost) {
+    return '$station: $litres tanken für $cost';
+  }
+
+  @override
+  String get vehTripSourceMeasured => 'aus deinen Aufzeichnungen';
+
+  @override
+  String get vehTripSourceManual => 'deine eigene Annahme';
+
+  @override
+  String get vehTripSourceEstimated => 'geschätzt';
+
+  @override
+  String get vehTripSourceUnknown => 'nicht bekannt';
+
+  @override
+  String vehTripGap(String fromKm, String toKm) {
+    return 'Dieses Fahrzeug schafft die Strecke von $fromKm bis $toKm nicht mit einer Tankfüllung.';
+  }
+
+  @override
+  String vehTripWinnerCost(String vehicle) {
+    return '$vehicle fährt am günstigsten';
+  }
+
+  @override
+  String vehTripWinnerCash(String vehicle) {
+    return '$vehicle braucht am wenigsten Bargeld an der Zapfsäule';
+  }
+
+  @override
+  String vehTripWinnerTime(String vehicle) {
+    return '$vehicle kommt voraussichtlich zuerst an';
+  }
+
+  @override
+  String get vehTripWinnerWithheld =>
+      'Kein eindeutiger Sieger: Nicht jedes gewählte Fahrzeug ließ sich bei dieser Größe vergleichen.';
+
+  @override
+  String get vehTripApply => 'Diesen Plan verwenden';
+
+  @override
+  String vehTripApplied(String vehicle) {
+    return 'Navigation für $vehicle gestartet.';
+  }
+
+  @override
+  String get vehTripApplyRefused =>
+      'Dieser Plan konnte nicht an die Navigation übergeben werden.';
+
+  @override
+  String get vehTripBoundedSearch =>
+      'Das Beste der durchsuchten Tankstellen — kein Beweis, dass es nichts Besseres gibt.';
+
+  @override
+  String get vehTripCurrencyWithheld =>
+      'Einige Tankstellen auf dieser Route nennen eine Währung, in der sich diese Fahrt nicht ausdrücken lässt. Ihre Preise bleiben so stehen, wie sie ausgezeichnet sind.';
+
+  @override
+  String get vehTripIncompleteEvidence =>
+      'Einige Tankstellen fehlen im Plan dieses Fahrzeugs — er gilt nur für die durchsuchten.';
+
+  @override
+  String get vehTripAssumptionLabel => 'Verbrauch für diese Fahrt';
+
+  @override
+  String get vehTripAssumptionClear => 'Wieder meine Aufzeichnungen verwenden';
+
+  @override
+  String vehTripSemanticsColumn(String vehicle, int index, int total) {
+    return '$vehicle, Fahrzeug $index von $total';
+  }
+
+  @override
+  String get vehTripNoPriceForFuel =>
+      'Keine Tankstelle auf dieser Route verkauft den Kraftstoff dieses Fahrzeugs — deshalb gibt es keine Kraftstoffkosten zu zeigen.';
+
+  @override
+  String get vehTripUnavailableShort => 'Nicht vergleichbar';
+
+  @override
   String get vinInfoTooltip => 'Was ist eine FIN?';
 
   @override

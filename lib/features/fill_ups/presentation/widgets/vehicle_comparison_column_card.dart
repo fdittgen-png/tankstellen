@@ -19,13 +19,13 @@ import 'package:flutter/material.dart';
 import '../../../../core/domain/comparison_eligibility.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/spacing.dart';
+import '../../../../core/utils/comparison_labels.dart';
 import '../../../../core/utils/localized_fuel_name.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/vehicle_history_comparison.dart';
-import 'vehicle_comparison_labels.dart';
 
 /// One comparison column.
 class VehicleComparisonColumnCard extends StatelessWidget {

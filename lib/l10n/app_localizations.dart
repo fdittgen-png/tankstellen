@@ -18866,6 +18866,264 @@ abstract class AppLocalizations {
   /// **'Loading catalog…'**
   String get pickerLoading;
 
+  /// Title of the screen that forecasts the same proposed journey for two or more of the driver's vehicles (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare this trip'**
+  String get vehTripTitle;
+
+  /// Tooltip of the action that opens the same-trip vehicle comparison from the history comparison screen (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare this trip across vehicles'**
+  String get vehTripOpenTooltip;
+
+  /// Shown when no route is active, so the same-trip comparison has no journey to forecast (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Plan a route first — there is no journey to compare yet.'**
+  String get vehTripNoRoute;
+
+  /// Shown when fewer than two vehicles are selected for the same-trip comparison (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least two vehicles to compare this trip.'**
+  String get vehTripNotEnoughVehicles;
+
+  /// Standing caveat on the same-trip comparison stating that it is a forecast rather than recorded history (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'These are estimates for a journey you have not driven yet, built from each vehicle\'s own consumption evidence, tank and compatible fuel. They are a forecast, not the history you recorded.'**
+  String get vehTripForecastNote;
+
+  /// Standing note stating the economic boundary: the comparison is not a total cost of ownership (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel and refuelling only. Maintenance, depreciation and insurance are in no total on this screen.'**
+  String get vehTripScopeNote;
+
+  /// Label of the control choosing which objective every vehicle's plan is reported on (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare on'**
+  String get vehTripObjectiveLabel;
+
+  /// Objective option: each vehicle's cheapest plan (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest total cost'**
+  String get vehTripObjectiveCost;
+
+  /// Objective option: each vehicle's quickest plan (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Shortest expected time'**
+  String get vehTripObjectiveTime;
+
+  /// Objective option: each vehicle's plan with the fewest extra road kilometres (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Least extra driving'**
+  String get vehTripObjectiveDistance;
+
+  /// Row label for the litres the whole journey consumes, detours included (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel this trip burns'**
+  String get vehTripFuelUsedLabel;
+
+  /// Row label for the standardised cost of the fuel the journey burns (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel cost to drive'**
+  String get vehTripCostToDriveLabel;
+
+  /// Explanation of the cost-to-drive figure and why it is independent of the starting tank (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'The fuel the journey burns, valued at the best price for this vehicle\'s fuel on this route. It does not change with what is already in the tank.'**
+  String get vehTripCostToDriveNote;
+
+  /// Row label for the new pump spend this trip needs with the tank as it is now (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Cash at the pump'**
+  String get vehTripCashRequiredLabel;
+
+  /// Explanation separating cash required from cost to drive (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'What you would pay on this trip with the tank as it is now, known stop charges included. A full tank is cheaper to refuel, not cheaper to drive.'**
+  String get vehTripCashRequiredNote;
+
+  /// Row label for how many stops the plan makes (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Refuelling stops'**
+  String get vehTripStopsLabel;
+
+  /// Row label for the extra road distance the stops add (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Extra kilometres'**
+  String get vehTripExtraKmLabel;
+
+  /// Row label for the expected total journey time, stop overheads included (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Expected time'**
+  String get vehTripTimeLabel;
+
+  /// Row label for the litres in this vehicle's tank when the journey starts (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Tank at departure'**
+  String get vehTripStartTankLabel;
+
+  /// Row label for the litres left in the tank at the destination (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Tank at arrival'**
+  String get vehTripEndTankLabel;
+
+  /// Row label for the consumption figure the forecast used for this vehicle (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption assumed'**
+  String get vehTripConsumptionLabel;
+
+  /// Shown for a plan the current tank already covers (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'No refuelling stop needed.'**
+  String get vehTripNoStops;
+
+  /// One ordered stop of a vehicle's plan: the station, the quantity to buy and what it costs (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'{station}: buy {litres} for {cost}'**
+  String vehTripStopLine(String station, String litres, String cost);
+
+  /// Provenance label for a planning input derived from the driver's own records (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'from your records'**
+  String get vehTripSourceMeasured;
+
+  /// Provenance label for a planning input the driver typed themselves (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'your own assumption'**
+  String get vehTripSourceManual;
+
+  /// Provenance label for a modelled planning input (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'estimated'**
+  String get vehTripSourceEstimated;
+
+  /// Provenance label for a planning input nothing on record supplies (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'not known'**
+  String get vehTripSourceUnknown;
+
+  /// Explanation of the stretch of road a vehicle's range cannot cover (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle cannot cross from {fromKm} to {toKm} on one tank.'**
+  String vehTripGap(String fromKm, String toKm);
+
+  /// Verdict naming the vehicle whose fuel cost for this journey is lowest (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle} costs the least to drive'**
+  String vehTripWinnerCost(String vehicle);
+
+  /// Verdict naming the vehicle needing the least new pump spend on this journey (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle} needs the least cash at the pump'**
+  String vehTripWinnerCash(String vehicle);
+
+  /// Verdict naming the vehicle with the shortest expected journey time (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle} is expected to arrive first'**
+  String vehTripWinnerTime(String vehicle);
+
+  /// Shown instead of a verdict when fewer than two vehicles have a comparable figure (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'No single winner: not every selected vehicle could be compared on this figure.'**
+  String get vehTripWinnerWithheld;
+
+  /// Button that hands one vehicle's chosen plan and its ordered stops to navigation (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Use this plan'**
+  String get vehTripApply;
+
+  /// Confirmation that the chosen vehicle's plan was handed to navigation (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation started for {vehicle}.'**
+  String vehTripApplied(String vehicle);
+
+  /// Shown when applying a plan was refused — no route, a reference location, a dead price source or a failed launch (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'This plan could not be handed to navigation.'**
+  String get vehTripApplyRefused;
+
+  /// Caveat shown when the planner hit its documented work limit for this vehicle (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'The best of the stations searched, not proof that nothing better exists.'**
+  String get vehTripBoundedSearch;
+
+  /// Caveat shown when a station's price could not be normalised into the comparison currency (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Some stations on this route quote a currency this trip cannot be expressed in. Their prices stay as quoted.'**
+  String get vehTripCurrencyWithheld;
+
+  /// Caveat shown when partial country coverage or a hidden station shaped this vehicle's candidate set (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Some stations were left out of this vehicle\'s plan, so it speaks only for the ones searched.'**
+  String get vehTripIncompleteEvidence;
+
+  /// Label of the field where the driver types their own consumption assumption for one vehicle (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption for this trip'**
+  String get vehTripAssumptionLabel;
+
+  /// Button that drops the driver's typed consumption assumption for one vehicle (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Use my records again'**
+  String get vehTripAssumptionClear;
+
+  /// Screen-reader label naming one vehicle's column in the same-trip comparison (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle}, vehicle {index} of {total}'**
+  String vehTripSemanticsColumn(String vehicle, int index, int total);
+
+  /// Shown in place of a fuel cost when no candidate station on the route prices the vehicle's grade (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'No station on this route sells this vehicle\'s fuel, so there is no fuel cost to show.'**
+  String get vehTripNoPriceForFuel;
+
+  /// Shown in place of a figure that has no comparable value, never a dash that could read as zero (#4367).
+  ///
+  /// In en, this message translates to:
+  /// **'Not comparable'**
+  String get vehTripUnavailableShort;
+
   /// Tooltip + Semantics label for the info icon next to the VIN field on EditVehicleScreen (#895).
   ///
   /// In en, this message translates to:
