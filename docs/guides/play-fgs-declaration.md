@@ -107,6 +107,24 @@ preset list.
 - [ ] Declaration approved in App content.
 - [ ] Repo variable `FGS_FORM_APPROVED=true` set (this is the ONLY switch).
 - [ ] Next daily-beta upload succeeds (the 403 disappears).
+- [ ] **Audit the first FGS-approved MERGED artifact** (#4415) — the
+      `--profile play-fgs-approved` gate CI runs today reads the checked-in
+      source-set overlay, which by construction contains none of the
+      libraries' own services. The thing that ships is the merged manifest,
+      so point the same profile at it with `--merged`:
+
+      ```
+      MANIFEST=build/app/intermediates/merged_manifests/playRelease/processPlayReleaseManifest/AndroidManifest.xml
+      bash scripts/audit_fgs_declarations.sh --profile play-fgs-approved --merged "$MANIFEST"
+      ```
+
+      `--merged` adds WorkManager's `SystemForegroundService=shortService`
+      and geolocator's `GeolocatorLocationService=location` to the expected
+      set — the same two `--expect-zero --merged` already pins — so a
+      library that starts or stops contributing one is caught before the
+      upload rather than after. A MISSING
+      `AutoRecordForegroundService=connectedDevice` here means the approved
+      artifact silently lost the protection the approval was for.
 - [ ] #3439 on-device matrix run on the beta build.
 - [ ] Discard the draft internal-track release if unused.
 

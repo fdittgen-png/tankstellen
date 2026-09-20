@@ -54,6 +54,7 @@
 #   scripts/audit_fgs_declarations.sh --profile play-default [MANIFEST]
 #   scripts/audit_fgs_declarations.sh --profile play-overlay-default
 #   scripts/audit_fgs_declarations.sh --profile play-fgs-approved
+#   scripts/audit_fgs_declarations.sh --profile play-fgs-approved --merged AAB_MANIFEST
 #   scripts/audit_fgs_declarations.sh --profile fdroid-fgs-approved
 #   scripts/audit_fgs_declarations.sh --expect-zero MANIFEST
 #   scripts/audit_fgs_declarations.sh --expect-exactly \
@@ -64,6 +65,13 @@
 # first so the MERGED manifest exists (the pre-#4352 behaviour). Every other
 # profile audits a checked-in source-set overlay and needs no build at all —
 # which is what makes this a real CI assertion with no emulator and no matrix.
+#
+# `--merged` says the manifest is a MERGED one, so the library-contributed
+# foreground services belong in the expected set. It composes in BOTH modes:
+# in zero mode the libraries' two entries ARE the expected set, and in exact
+# mode they are added to the profile's own. Without it, exact mode expects
+# only our own services — the right answer for a source-set overlay and the
+# wrong one for a built artifact (#4415).
 #
 # Exit codes: 0 = the declared set matches, 1 = it does not, 2 = usage/setup.
 
@@ -132,7 +140,7 @@ while [[ $# -gt 0 ]]; do
     --expect-exactly) MODE="exact"; shift ;;
     --permissions)  EXPECT_PERMS="${2:-}"; shift 2 ;;
     --services)     EXPECT_SERVICES="${2:-}"; shift 2 ;;
-    -h|--help)      sed -n '5,70p' "${BASH_SOURCE[0]}"; exit 0 ;;
+    -h|--help)      sed -n '5,76p' "${BASH_SOURCE[0]}"; exit 0 ;;
     -*)             die "unknown option '$1'" ;;
     *)              [[ -z "${MANIFEST}" ]] || die "more than one manifest given"; MANIFEST="$1"; shift ;;
   esac
@@ -228,10 +236,29 @@ ACTUAL_SERVICES="$(extract "${MANIFEST}" services)"
 #
 # Note what the pin records: the default Play artifact declares two
 # foreground-service TYPES while requesting none of the matching
-# FOREGROUND_SERVICE_* permissions. On Android 14+ that combination cannot
-# be promoted — `startForeground` on the location service throws — which is
-# exactly failure mode M1 in the #4351 analysis. Tracked separately; this
-# audit's job is to state the fact, not to change the artifact.
+# FOREGROUND_SERVICE_* permissions. #4415 asked whether that is a latent
+# Android-14 crash. Traced end to end, it is not — and the distinction is
+# worth writing down, because "declares a type it cannot use" reads like a
+# crash and behaves like a downgrade:
+#
+#   * geolocator's service is BOUND at plugin attach (`bindService`,
+#     BIND_AUTO_CREATE) for every position stream. `startForeground` lives
+#     only in `enableBackgroundMode`, reached only when the stream carries a
+#     `foregroundNotificationConfig` — and `recordingLocationSettings` passes
+#     `null` unless `kGpsRecordingForegroundServiceEnabled`, i.e. unless the
+#     artifact was built with `FGS_FORM_APPROVED`. A bound, never-promoted
+#     service needs no typed permission. The cost is the ~5 s background
+#     batching the default artifact already documents, not a SecurityException.
+#   * WorkManager's `SystemForegroundService` starts only for expedited /
+#     `setForegroundAsync` work. Every enqueue in this repo is a plain
+#     periodic task or a plain `OneTimeWorkRequest` (see
+#     `android_background_price_fetcher.dart` and `BackgroundScanEnqueuer.kt`),
+#     so it is inert. `FOREGROUND_SERVICE_SHORT_SERVICE` is stripped anyway.
+#
+# So neither entry may be removed and neither needs to be: stripping
+# geolocator's would break the bind the plain (non-FGS) stream also uses,
+# to prevent a call that is never made. This audit's job is to state the
+# fact, not to change the artifact.
 ZERO_BASELINE_SERVICES="androidx.work.impl.foreground.SystemForegroundService=shortService,com.baseflow.geolocator.GeolocatorLocationService=location"
 
 if [[ "${MODE}" == "zero" ]]; then
@@ -247,7 +274,17 @@ if [[ "${MODE}" == "zero" ]]; then
   fi
 else
   WANT_PERMS="$(as_lines "${EXPECT_PERMS}")"
-  WANT_SERVICES="$(as_lines "${EXPECT_SERVICES}")"
+  # #4415 — a MERGED FGS-approved artifact carries the libraries' services
+  # too. Composing them here (rather than hard-coding a fourth profile) is
+  # what makes `--profile play-fgs-approved --merged <aab manifest>` the
+  # gate for the day the #1498 form clears: the expected set is then our
+  # declaration PLUS the same two entries expect-zero already pins, so a
+  # library that starts or stops contributing one is caught in both modes.
+  if [[ "${MERGED}" == "yes" ]]; then
+    WANT_SERVICES="$(as_lines "${EXPECT_SERVICES}${EXPECT_SERVICES:+,}${ZERO_BASELINE_SERVICES}")"
+  else
+    WANT_SERVICES="$(as_lines "${EXPECT_SERVICES}")"
+  fi
 fi
 
 echo "==> Auditing FOREGROUND_SERVICE declarations (${MODE}${PROFILE:+, profile ${PROFILE}}):"
@@ -314,6 +351,10 @@ if [[ "${FAILED}" -ne 0 ]]; then
     echo "type nobody declared to Play. Fix the manifest overlay, or — if the" >&2
     echo "change is intended — update this script's expected set AND" >&2
     echo "RecordingProtectionBuild.supports() in the same commit." >&2
+    if [[ "${MERGED}" != "yes" ]]; then
+      echo "If this manifest is a MERGED one, pass --merged: the libraries'" >&2
+      echo "own foreground services are then expected too (#4415)." >&2
+    fi
   fi
   exit 1
 fi
