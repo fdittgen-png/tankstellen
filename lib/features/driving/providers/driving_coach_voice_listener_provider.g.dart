@@ -119,7 +119,7 @@ final class DrivingCoachVoiceListenerProvider
 }
 
 String _$drivingCoachVoiceListenerHash() =>
-    r'13c0702391c2e18d1c64fa3f29e0f52c0b7a34be';
+    r'274a5f3cde045ebd5798a3d44db50d545051e313';
 
 /// The dead-link fix (#2663): wires the driving coach into TTS.
 ///
