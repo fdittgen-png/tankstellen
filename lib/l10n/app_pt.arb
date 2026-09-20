@@ -8641,5 +8641,45 @@
   "@obd2AdapterNotRespondingBanner": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "featureLabel_fleetMode": "Fleet mode",
+  "@featureLabel_fleetMode": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureDescription_fleetMode": "Company-vehicle mode: your fleet assignment, the org vehicle directory, and an explicit current-vehicle switcher.",
+  "@featureDescription_fleetMode": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureBlockedEnable_fleetMode": "Turn TankSync on first — a fleet lives in your own database.",
+  "@featureBlockedEnable_fleetMode": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureLabel_fleetManagerTools": "Fleet manager tools",
+  "@featureLabel_fleetManagerTools": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureDescription_fleetManagerTools": "Aggregate fleet cost and efficiency views for a manager — totals and exceptions, never per-employee journeys.",
+  "@featureDescription_fleetManagerTools": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureBlockedEnable_fleetManagerTools": "Turn fleet mode on first.",
+  "@featureBlockedEnable_fleetManagerTools": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupTitle_fleet": "Fleet",
+  "@featureGroupTitle_fleet": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "featureGroupDescription_fleet": "Company vehicles, assignments and manager reporting.",
+  "@featureGroupDescription_fleet": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

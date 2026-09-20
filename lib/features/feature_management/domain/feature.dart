@@ -216,4 +216,21 @@ enum Feature {
   /// across every channel; the panel only surfaces inside the (debugMode-
   /// gated) Developer tools section, so this flag is the per-tool switch.
   startupTrace,
+
+  /// Fleet mode (#4212, Epic #4211). The employee half of Sparkilo
+  /// Fleet: an organisation membership, the org vehicle directory, and
+  /// the explicit current-vehicle switcher that rides on it. Default-off
+  /// and, until the manager dashboard lands (#4217/#4218), available on
+  /// the **beta** channel only — a capability the app cannot yet deliver
+  /// must not be offerable in production. Requires [tankSync]: a fleet
+  /// with no backend is a contradiction (ADR 0025 D2/D3 — the org lives
+  /// in the user's own Supabase project, never the community one).
+  fleetMode,
+
+  /// Fleet manager tools (#4212, Epic #4211). The aggregate-first
+  /// manager surfaces: org cost/km, fuel spend and expense completeness
+  /// — never a per-employee journey (ADR 0025 D5). Default-off,
+  /// beta-only like [fleetMode], and requires it: the manager views read
+  /// the very org directory fleet mode pulls.
+  fleetManagerTools,
 }

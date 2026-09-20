@@ -6913,5 +6913,37 @@
   "obd2AdapterNotRespondingBanner": "L'adaptateur ne répond pas — enregistrement GPS en cours",
   "@obd2AdapterNotRespondingBanner": {
     "description": "MT — needs native review"
+  },
+  "featureLabel_fleetMode": "Mode flotte",
+  "@featureLabel_fleetMode": {
+    "description": "MT — needs native review"
+  },
+  "featureDescription_fleetMode": "Mode véhicule de société : votre affectation de véhicule, l'annuaire des véhicules de l'organisation et un changement explicite du véhicule actuel.",
+  "@featureDescription_fleetMode": {
+    "description": "MT — needs native review"
+  },
+  "featureBlockedEnable_fleetMode": "Activez d'abord TankSync — une flotte réside dans votre propre base de données.",
+  "@featureBlockedEnable_fleetMode": {
+    "description": "MT — needs native review"
+  },
+  "featureLabel_fleetManagerTools": "Outils de gestionnaire de flotte",
+  "@featureLabel_fleetManagerTools": {
+    "description": "MT — needs native review"
+  },
+  "featureDescription_fleetManagerTools": "Vues agrégées des coûts et de l'efficacité de la flotte — totaux et exceptions, jamais les trajets individuels des collaborateurs.",
+  "@featureDescription_fleetManagerTools": {
+    "description": "MT — needs native review"
+  },
+  "featureBlockedEnable_fleetManagerTools": "Activez d'abord le mode flotte.",
+  "@featureBlockedEnable_fleetManagerTools": {
+    "description": "MT — needs native review"
+  },
+  "featureGroupTitle_fleet": "Flotte",
+  "@featureGroupTitle_fleet": {
+    "description": "MT — needs native review"
+  },
+  "featureGroupDescription_fleet": "Véhicules de société, affectations et rapports pour les gestionnaires.",
+  "@featureGroupDescription_fleet": {
+    "description": "MT — needs native review"
   }
 }

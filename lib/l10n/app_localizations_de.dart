@@ -5400,6 +5400,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fillUpWarningSaveAnyway => 'Trotzdem speichern';
 
   @override
+  String get featureLabel_fleetMode => 'Flottenmodus';
+
+  @override
+  String get featureDescription_fleetMode =>
+      'Modus für Firmenfahrzeuge: deine Fahrzeugzuweisung, das Fahrzeugverzeichnis der Organisation und ein ausdrücklicher Wechsel des aktuellen Fahrzeugs.';
+
+  @override
+  String get featureBlockedEnable_fleetMode =>
+      'Schalte zuerst TankSync ein — eine Flotte liegt in deiner eigenen Datenbank.';
+
+  @override
+  String get featureLabel_fleetManagerTools =>
+      'Werkzeuge für Flottenverantwortliche';
+
+  @override
+  String get featureDescription_fleetManagerTools =>
+      'Aggregierte Kosten- und Verbrauchsansichten der Flotte — Summen und Ausreißer, niemals einzelne Fahrten von Mitarbeitenden.';
+
+  @override
+  String get featureBlockedEnable_fleetManagerTools =>
+      'Schalte zuerst den Flottenmodus ein.';
+
+  @override
+  String get featureGroupTitle_fleet => 'Flotte';
+
+  @override
+  String get featureGroupDescription_fleet =>
+      'Firmenfahrzeuge, Zuweisungen und Auswertungen für Flottenverantwortliche.';
+
+  @override
   String get fillUpSectionWhatTitle => 'Was du getankt hast';
 
   @override

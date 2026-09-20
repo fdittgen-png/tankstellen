@@ -5343,6 +5343,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fillUpWarningSaveAnyway => 'Save anyway';
 
   @override
+  String get featureLabel_fleetMode => 'Fleet mode';
+
+  @override
+  String get featureDescription_fleetMode =>
+      'Company-vehicle mode: your fleet assignment, the org vehicle directory, and an explicit current-vehicle switcher.';
+
+  @override
+  String get featureBlockedEnable_fleetMode =>
+      'Turn TankSync on first — a fleet lives in your own database.';
+
+  @override
+  String get featureLabel_fleetManagerTools => 'Fleet manager tools';
+
+  @override
+  String get featureDescription_fleetManagerTools =>
+      'Aggregate fleet cost and efficiency views for a manager — totals and exceptions, never per-employee journeys.';
+
+  @override
+  String get featureBlockedEnable_fleetManagerTools =>
+      'Turn fleet mode on first.';
+
+  @override
+  String get featureGroupTitle_fleet => 'Fleet';
+
+  @override
+  String get featureGroupDescription_fleet =>
+      'Company vehicles, assignments and manager reporting.';
+
+  @override
   String get fillUpSectionWhatTitle => 'What you filled';
 
   @override
@@ -15897,6 +15926,35 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fillUpWarningSaveAnyway => '⟦Šáṽé áñýŵáý ·····⟧';
+
+  @override
+  String get featureLabel_fleetMode => '⟦Ƒłééŧ ɱóđé ····⟧';
+
+  @override
+  String get featureDescription_fleetMode =>
+      '⟦Çóɱƥáñý-ṽéĥîçłé ɱóđé: ýóúř ƒłééŧ áššîǧñɱéñŧ, ŧĥé óřǧ ṽéĥîçłé đîřéçŧóřý, áñđ áñ éẋƥłîçîŧ çúřřéñŧ-ṽéĥîçłé šŵîŧçĥéř. ··········································⟧';
+
+  @override
+  String get featureBlockedEnable_fleetMode =>
+      '⟦Ŧúřñ ŦáñķŠýñç óñ ƒîřšŧ — á ƒłééŧ łîṽéš îñ ýóúř óŵñ đáŧáƀášé. ·····················⟧';
+
+  @override
+  String get featureLabel_fleetManagerTools => '⟦Ƒłééŧ ɱáñáǧéř ŧóółš ········⟧';
+
+  @override
+  String get featureDescription_fleetManagerTools =>
+      '⟦Áǧǧřéǧáŧé ƒłééŧ çóšŧ áñđ éƒƒîçîéñçý ṽîéŵš ƒóř á ɱáñáǧéř — ŧóŧáłš áñđ éẋçéƥŧîóñš, ñéṽéř ƥéř-éɱƥłóýéé ĵóúřñéýš. ·········································⟧';
+
+  @override
+  String get featureBlockedEnable_fleetManagerTools =>
+      '⟦Ŧúřñ ƒłééŧ ɱóđé óñ ƒîřšŧ. ·········⟧';
+
+  @override
+  String get featureGroupTitle_fleet => '⟦Ƒłééŧ ··⟧';
+
+  @override
+  String get featureGroupDescription_fleet =>
+      '⟦Çóɱƥáñý ṽéĥîçłéš, áššîǧñɱéñŧš áñđ ɱáñáǧéř řéƥóřŧîñǧ. ····················⟧';
 
   @override
   String get fillUpSectionWhatTitle => '⟦Ŵĥáŧ ýóú ƒîłłéđ ······⟧';

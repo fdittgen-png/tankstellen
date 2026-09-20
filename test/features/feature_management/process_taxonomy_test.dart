@@ -68,27 +68,31 @@ void main() {
     });
   });
 
-  group('the two empty processes are empty ON PURPOSE', () {
-    // Encoded so nobody "completes" them by inventing flags.
-    test('manageVehicle owns no Feature — vehicle identity and adapter '
-        'pairing are screens, not toggles', () {
-      expect(capabilitiesOf(SparkiloProcess.manageVehicle), isEmpty);
+  group('#4212 filled the two formerly empty processes', () {
+    // They were empty ON PURPOSE until the fleet epic; the entries
+    // below are the two the epic adds, and no more.
+    test('manageVehicle owns exactly fleetMode — vehicle identity and '
+        'adapter pairing are still screens, not toggles', () {
+      expect(capabilitiesOf(SparkiloProcess.manageVehicle),
+          <Feature>[Feature.fleetMode]);
       expect(subprocessesOf(SparkiloProcess.manageVehicle), isNotEmpty,
           reason: 'the process exists in the taxonomy either way');
+      expect(ownerOf(Feature.fleetMode),
+          SparkiloSubprocess.switchCurrentVehicle,
+          reason: 'what the employee turning fleet mode on is DOING is '
+              'picking the right company car');
     });
 
-    test('manageFleet owns no Feature — the fleet does not exist yet '
-        '(#4212-#4219 is where it gains capabilities)', () {
-      expect(capabilitiesOf(SparkiloProcess.manageFleet), isEmpty);
+    test('manageFleet owns exactly fleetManagerTools — the manager half '
+        'of #4212, aggregate-only (ADR 0025 D5)', () {
+      expect(capabilitiesOf(SparkiloProcess.manageFleet),
+          <Feature>[Feature.fleetManagerTools]);
+      expect(ownerOf(Feature.fleetManagerTools),
+          SparkiloSubprocess.monitorAggregateCosts);
     });
 
-    test('every OTHER process owns at least one capability', () {
-      const knownEmpty = {
-        SparkiloProcess.manageVehicle,
-        SparkiloProcess.manageFleet,
-      };
+    test('every process owns at least one capability', () {
       for (final p in SparkiloProcess.values) {
-        if (knownEmpty.contains(p)) continue;
         expect(capabilitiesOf(p), isNotEmpty, reason: '${p.name} is empty');
       }
     });

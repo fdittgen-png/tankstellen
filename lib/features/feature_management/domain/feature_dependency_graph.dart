@@ -28,6 +28,31 @@ bool canEnable(
   return true;
 }
 
+/// Every prerequisite of [feature], transitively — the set that must be
+/// enabled alongside it for [canEnable] to hold at every level (#4212).
+///
+/// `requires` is one edge; the graph is not necessarily one level deep
+/// (fleet manager tools require fleet mode, which requires TankSync).
+/// A caller that promotes a feature by writing
+/// `{...current, ...feature.requires, feature}` would leave the
+/// grandparent disabled and persist exactly the inconsistent state the
+/// manifest forbids, so promotion spreads THIS instead.
+///
+/// [feature] itself is never in the result. Terminates on a manifest
+/// with a cycle (`assertNoCycles` rejects those anyway) because a node
+/// is walked at most once.
+Set<Feature> requiredClosure(Feature feature, FeatureManifest manifest) {
+  final closure = <Feature>{};
+  void walk(Feature node) {
+    for (final parent in manifest.entries[node]?.requires ?? const <Feature>{}) {
+      if (closure.add(parent)) walk(parent);
+    }
+  }
+
+  walk(feature);
+  return closure..remove(feature);
+}
+
 /// Returns `true` when [feature] is **effectively** enabled given
 /// [currentlyEnabled] (#1447).
 ///

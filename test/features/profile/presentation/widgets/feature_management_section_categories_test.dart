@@ -49,30 +49,44 @@ void main() {
     return container;
   }
 
+  /// #4212 — the Fleet section exists in [categoryOrder] but holds only
+  /// beta-only capabilities, and these tests pump the default
+  /// (production) channel, so its header does not render here. Listing
+  /// it keeps the absence deliberate rather than a silent gap.
+  const hiddenInProduction = <FeatureCategory>{FeatureCategory.fleet};
+  final visibleCategories = [
+    for (final c in categoryOrder)
+      if (!hiddenInProduction.contains(c)) c,
+  ];
+
   group('FeatureManagementSection — ordered category sections (#2681)', () {
-    testWidgets('renders all 7 section headers in categoryOrder', (tester) async {
+    testWidgets('renders every production-visible section header in '
+        'categoryOrder', (tester) async {
       await pumpSection(tester);
 
-      // Every category header renders exactly once.
       for (final c in categoryOrder) {
         expect(
           find.byKey(Key('featureSectionHeader_${c.name}')),
-          findsOneWidget,
-          reason: 'expected a section header for ${c.name}',
+          hiddenInProduction.contains(c) ? findsNothing : findsOneWidget,
+          reason: 'section header for ${c.name} — '
+              '${hiddenInProduction.contains(c) ? "beta-only, must not "
+                  "render in production" : "expected"}',
         );
       }
-      expect(categoryOrder.length, 7,
-          reason: '#2681 ships 7 ordered category sections');
+      expect(categoryOrder.length, 8,
+          reason: '#2681 shipped 7 ordered category sections; #4212 added '
+              'Fleet (8), production-hidden until the manager dashboard');
+      expect(visibleCategories, hasLength(7));
 
       // Header rects must be ordered top-to-bottom in categoryOrder.
       double topOf(FeatureCategory c) =>
           tester.getRect(find.byKey(Key('featureSectionHeader_${c.name}'))).top;
-      for (var i = 0; i < categoryOrder.length - 1; i++) {
+      for (var i = 0; i < visibleCategories.length - 1; i++) {
         expect(
-          topOf(categoryOrder[i]),
-          lessThan(topOf(categoryOrder[i + 1])),
-          reason: '${categoryOrder[i].name} header must render above '
-              '${categoryOrder[i + 1].name}',
+          topOf(visibleCategories[i]),
+          lessThan(topOf(visibleCategories[i + 1])),
+          reason: '${visibleCategories[i].name} header must render above '
+              '${visibleCategories[i + 1].name}',
         );
       }
     });
@@ -105,16 +119,16 @@ void main() {
             reason: '${feature.name} must render below its '
                 '${category.name} section header');
 
-        // Below the *next* header too (when there is one).
-        final idx = categoryOrder.indexOf(category);
-        if (idx < categoryOrder.length - 1) {
+        // Below the *next rendered* header too (when there is one).
+        final idx = visibleCategories.indexOf(category);
+        if (idx < visibleCategories.length - 1) {
+          final next = visibleCategories[idx + 1];
           final nextHeaderTop = tester
-              .getRect(find.byKey(
-                  Key('featureSectionHeader_${categoryOrder[idx + 1].name}')))
+              .getRect(find.byKey(Key('featureSectionHeader_${next.name}')))
               .top;
           expect(toggleTop, lessThan(nextHeaderTop),
               reason: '${feature.name} must render above the next section '
-                  '(${categoryOrder[idx + 1].name}) header');
+                  '(${next.name}) header');
         }
       }
     });

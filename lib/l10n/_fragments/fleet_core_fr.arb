@@ -1,0 +1,10 @@
+{
+  "featureLabel_fleetMode": "Mode flotte",
+  "featureDescription_fleetMode": "Mode véhicule de société : votre affectation de véhicule, l'annuaire des véhicules de l'organisation et un changement explicite du véhicule actuel.",
+  "featureBlockedEnable_fleetMode": "Activez d'abord TankSync — une flotte réside dans votre propre base de données.",
+  "featureLabel_fleetManagerTools": "Outils de gestionnaire de flotte",
+  "featureDescription_fleetManagerTools": "Vues agrégées des coûts et de l'efficacité de la flotte — totaux et exceptions, jamais les trajets individuels des collaborateurs.",
+  "featureBlockedEnable_fleetManagerTools": "Activez d'abord le mode flotte.",
+  "featureGroupTitle_fleet": "Flotte",
+  "featureGroupDescription_fleet": "Véhicules de société, affectations et rapports pour les gestionnaires."
+}
