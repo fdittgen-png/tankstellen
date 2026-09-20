@@ -3791,6 +3791,14 @@ class AppLocalizationsSv extends AppLocalizations {
       'Det här fordonet rapporterar sin bränsleförbrukning direkt (PID 5E), så kalibrering av volymetrisk verkningsgrad används inte — din förbrukning mäts, den modelleras inte.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Din $makeModel är markerad som diesel men matchar en bensinpost i katalogen. Tryck för att uppdatera.';
   }

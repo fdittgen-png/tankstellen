@@ -3808,6 +3808,14 @@ class AppLocalizationsSk extends AppLocalizations {
       'Toto vozidlo hlási spotrebu paliva priamo (PID 5E), takže kalibrácia objemovej účinnosti sa nepoužíva — vaša spotreba je meraná, nie modelovaná.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Váš $makeModel je označený ako diesel, ale zodpovedá katalógovej položke benzín. Klepnutím aktualizujte.';
   }

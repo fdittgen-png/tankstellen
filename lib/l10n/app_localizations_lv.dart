@@ -3817,6 +3817,14 @@ class AppLocalizationsLv extends AppLocalizations {
       'Šis transportlīdzeklis degvielas patēriņu ziņo tieši (PID 5E), tāpēc tilpuma efektivitātes kalibrēšana netiek izmantota — jūsu patēriņš tiek mērīts, nevis modelēts.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Jūsu $makeModel ir atzīmēts kā dīzelis, bet atbilst benzīna kataloga ierakstam. Pieskarieties, lai atjauninātu.';
   }

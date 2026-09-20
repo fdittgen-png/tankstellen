@@ -136,7 +136,8 @@ void main() {
   });
 
   group('#3828 the emissions axis', () {
-    // Real WTW factors from Co2Calculator: E85 1.40 kg/L, E5 2.31 kg/L.
+    // Real WtW factors from Co2Calculator (#4392): E85 1.11 kg/L,
+    // E5 2.69 kg/L — ADEME Base Carbone v23.6 elements 25766 / 25763.
     // This is the case the cost-only comparison could not express — E85 is
     // dearer per km here and still much cleaner.
     final e5 = _stats(
@@ -183,7 +184,7 @@ void main() {
       for (final f in [FuelType.e5, FuelType.e10, FuelType.e85,
                        FuelType.diesel, FuelType.lpg]) {
         expect(Co2Calculator.emissionFactorFor(f), isNotNull,
-            reason: 'no WTW factor for $f');
+            reason: 'no WtW factor for $f');
       }
       expect(Co2Calculator.emissionFactorFor(FuelType.e85)!
           < Co2Calculator.emissionFactorFor(FuelType.e5)!, isTrue);

@@ -117,13 +117,18 @@ void main() {
     expect(b.residualCoverage, 0);
   });
 
-  test('CO2e uses the shipped JEC factor, stamped with its version', () {
+  test('CO2e uses the shipped ADEME factor, stamped with its version', () {
+    // #4392 — E85 is 1.11 kg CO2e/L well-to-wheel (ADEME Base Carbone
+    // v23.6 element 25766). It was 1.40 under a JEC label that no JEC
+    // table publishes per litre.
     final b = derive(fills, trips).behaviourOf(e85)!;
-    expect(b.co2eFactor!.kgCo2ePerLitre, 1.40);
-    expect(b.co2eFactor!.version, 'v5-2020');
-    expect(b.co2eKgPerKm.value, closeTo(8.1 / 100 * 1.40, 1e-12));
-    expect(jecWtwV5Co2eFactor(FuelGrade.electric), isNull);
-    expect(jecWtwV5Co2eFactor(FuelGrade.unknown), isNull);
+    expect(b.co2eFactor!.kgCo2ePerLitre, 1.11);
+    expect(b.co2eFactor!.source, 'ADEME Base Carbone');
+    expect(b.co2eFactor!.version, 'v23.6-2026');
+    expect(b.co2eFactor!.boundary, Co2eBoundary.wellToWheel);
+    expect(b.co2eKgPerKm.value, closeTo(8.1 / 100 * 1.11, 1e-12));
+    expect(ademeWtwCo2eFactor(FuelGrade.electric), isNull);
+    expect(ademeWtwCo2eFactor(FuelGrade.unknown), isNull);
   });
 
   test('an estimate calibrated on the E10 gain never teaches E85', () {

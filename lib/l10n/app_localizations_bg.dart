@@ -3819,6 +3819,14 @@ class AppLocalizationsBg extends AppLocalizations {
       'Този автомобил докладва разхода на гориво директно (PID 5E), затова калибрирането на обемната ефективност не се използва — разходът ви е измерен, а не моделиран.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Вашият $makeModel е маркиран като дизел, но съответства на каталожен запис за бензин. Докоснете за актуализиране.';
   }

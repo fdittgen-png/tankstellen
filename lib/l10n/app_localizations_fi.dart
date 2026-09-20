@@ -3795,6 +3795,14 @@ class AppLocalizationsFi extends AppLocalizations {
       'Tämä ajoneuvo ilmoittaa polttoaineen virtauksen suoraan (PID 5E), joten tilavuushyötysuhteen kalibrointia ei käytetä — kulutuksesi mitataan, ei mallinneta.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return '$makeModel on merkitty dieseliksi mutta vastaa bensiinimerkinnän katalogiin. Napauta päivittääksesi.';
   }

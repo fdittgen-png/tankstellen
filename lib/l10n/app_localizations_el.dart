@@ -3820,6 +3820,14 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αυτό το όχημα αναφέρει την κατανάλωση καυσίμου απευθείας (PID 5E), οπότε η βαθμονόμηση ογκομετρικής απόδοσης δεν χρησιμοποιείται — η κατανάλωσή σας μετριέται, δεν μοντελοποιείται.';
 
   @override
+  String get carbonCo2ScopeWellToWheel => 'Well-to-wheel';
+
+  @override
+  String carbonCo2FactorSource(String source) {
+    return 'Factors: $source';
+  }
+
+  @override
   String catalogReresolveSnackbarMessage(String makeModel) {
     return 'Το $makeModel σας επισημαίνεται ως diesel αλλά αντιστοιχεί σε καταχώρηση βενζίνης. Πατήστε για ενημέρωση.';
   }

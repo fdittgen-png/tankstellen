@@ -216,11 +216,63 @@ neighbour's factor. Fleet reports label the scope and default to
 **well-to-wheel** so they agree with the personal carbon dashboard,
 which `Co2Calculator` computes unchanged.
 
-The v1 seed publishes exactly the eight WtW values `Co2Calculator`
-already ships, tagged "EU JEC WTW v5 (2020)", and **no TtW values**:
-the app can cite none today, and inventing them is what this ADR
-forbids. TtW lookups therefore say "not calculated" until a cited table
-is added. See Consequences for the review this inherits.
+The v1 seed published exactly the eight WtW values `Co2Calculator`
+shipped, tagged "EU JEC WTW v5 (2020)", and no TtW values, on the
+grounds that a provenance slice records a claim rather than correcting
+it.
+
+**#4392 completed that review and re-seeded the registry (v2).** The
+factor contract is now:
+
+| app fuel | source row | TtW (kg CO2e) | WtW (kg CO2e) |
+|---|---|---|---|
+| `e5`, `e98` | ADEME element 25763 `Supercarburant sans plomb (95, 95-E10, 98)` | 2.20 /L | 2.69 /L |
+| `e10` | ADEME element 13988 `Essence E10` | 2.19 /L | 2.69 /L |
+| `diesel`, `diesel_premium` | ADEME element 25775 `Gazole routier B7` | 2.49 /L | 3.10 /L |
+| `e85` | ADEME element 25766 `Essence E85` | 0.366 /L | 1.11 /L |
+| `lpg` | ADEME element 14031 `GPL pour véhicule routier` | 1.60 /L | 1.86 /L |
+| `cng` | ADEME element 27095 `GNC pour véhicule routier` | 2.41 /kg | 2.96 /kg |
+| electricity, hydrogen | — | **not published** | **not published** |
+
+Source: **ADEME Base Carbone® v23.6** (updated 2026-06-30, Licence
+Ouverte / Open Licence), boundary *France continentale*, category
+`Combustibles > Fossiles > Liquides > Usage sources mobiles > Usage
+routier`. Every element publishes a total and a two-poste split; the
+registry reads the `Combustion` poste as TtW and the element total
+(`Amont` + `Combustion`) as WtW, so both rows come from one
+publication and one methodology.
+
+Three rules fall out and are enforced by
+`test/core/domain/fleet/emission_factor_registry_test.dart`:
+
+1. **One row, one source.** Every seeded factor carries the same
+   citation. Two independent figures are recorded in the seed's doc
+   comment as order-of-magnitude cross-checks **only** — neither is
+   seeded, and they are never averaged in: Directive (EU) 2018/2001
+   (RED II) Annex V Part C point 19's 94 gCO2eq/MJ fossil comparator,
+   which at Annex III's 32 and 36 MJ/l is 3.01 and 3.38 kg CO2e/L; and
+   UK DESNZ 2026's 2.96 and 3.29 kg CO2e/L for 100% mineral petrol and
+   diesel (Scope 1 + Scope 3 "WTT-"). The Fuel Quality Directive's own
+   per-fuel defaults (93.3 / 95.1 gCO2eq/MJ) agree, but Council
+   Directive (EU) 2015/652 was repealed with effect from 2025-01-01 by
+   Directive (EU) 2023/2413 Art. 6, so it is cited as history, not as a
+   source. Per-country rows, if they are ever wanted, arrive through
+   the `geography` axis as whole cited tables — never as a blend of
+   several.
+2. **Both boundaries or neither.** A fuel is published at TtW *and*
+   WtW, or not at all — a half-published fuel would make the scope
+   selector silently turn a figure into "not calculated".
+3. **Electricity and hydrogen stay unpublished.** The registry models
+   `kgCo2ePerKilowattHour`, so the unit is not the obstacle: the app
+   records no kWh and no kg of H2, so a factor would be a citation with
+   nothing to multiply. Both refuse at both boundaries.
+
+`Co2Calculator` keeps computing the personal carbon dashboard, now from
+the **WtW column of the same rows** — so D8's "fleet reports default to
+WtW so they agree with the personal carbon dashboard" is true by
+construction and pinned by a test in both directions. The dashboard
+names the boundary and the citation beside the figure
+(`carbonCo2ScopeWellToWheel`, `carbonCo2FactorSource`).
 
 ### D9 — Thresholds and retention are deployment configuration
 
@@ -351,14 +403,19 @@ VAT and reimbursement amount are three fields, never one.
   CASCADE` from `public.users`, anything else keyed on them) but leaves
   the organisation's vehicles and policies. The org's controller
   obligations for accounting copies are its own (D9 matrix).
-- **The inherited CO2 values are owed a source review.** `Co2Calculator`
-  labels its constants WTW, yet 2.31 kg/L (petrol) and 2.65 kg/L
-  (diesel) coincide with the widely published *tank-to-wheel* combustion
-  factors, and E85 at 1.40 reads like a biogenic-credited pathway. The
-  registry records the label the app currently asserts; it does not
-  correct it. Verifying each value against the cited JEC tables — and
-  adding cited TtW entries — is a follow-up issue, not something a
-  provenance slice may do by fiat.
+- **The inherited CO2 values were owed a source review; #4392 did it
+  and the numbers moved.** `Co2Calculator` labelled its constants WTW,
+  yet 2.31 kg/L (petrol) and 2.65 kg/L (diesel) were tank-to-wheel
+  magnitudes and E85 at 1.40 was neither boundary — and no JEC table
+  publishes any of them per litre (JEC reports gCO2eq/MJ). The label
+  described what the app wants to show, so the label stayed and the
+  constants moved onto ADEME Base Carbone v23.6 (D8). **This is a
+  user-visible change**: a litre of E10 now counts 2.69 kg CO2e instead
+  of 2.27 (+18.5%), diesel 3.10 instead of 2.65 (+17.0%), E85 1.11
+  instead of 1.40 (−20.7%), LPG 1.86 instead of 1.61 (+15.5%), CNG 2.96
+  instead of 2.54 per kg (+16.5%). Every historical total on the carbon
+  dashboard is restated, because the old totals were understated
+  against the boundary they claimed.
 - **RPC-only writes mean no offline org edits.** A manager without
   connectivity cannot assign a vehicle; that is accepted for v1 (D4 has
   no write cache).

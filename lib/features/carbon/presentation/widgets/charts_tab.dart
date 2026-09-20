@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/services/co2_calculator.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -210,6 +211,27 @@ class _SummaryRow extends StatelessWidget {
                   Text(
                     '${UnitFormatter.formatDecimal(totalCo2, fractionDigits: 0)} kg',
                     style: theme.textTheme.titleLarge,
+                  ),
+                  // #4392 — a CO2e figure never appears without the
+                  // boundary it was computed over and the table it came
+                  // from. `Co2Calculator`'s constants are the
+                  // well-to-wheel totals of ADEME Base Carbone; the
+                  // scope word is translated, the publication name is
+                  // a proper noun.
+                  const SizedBox(height: 4),
+                  Text(
+                    l.carbonCo2ScopeWellToWheel,
+                    key: const Key('carbon_co2_scope'),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  Text(
+                    l.carbonCo2FactorSource(Co2Calculator.factorCitation),
+                    key: const Key('carbon_co2_factor_source'),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),

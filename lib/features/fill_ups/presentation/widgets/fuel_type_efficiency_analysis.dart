@@ -93,7 +93,7 @@ class _EfficiencyAnalysis extends StatelessWidget {
 
     // #3828 — the emissions axis, and the trade-off it creates. Cheapest and
     // cleanest are NOT the same fuel in general: E85 costs more per km here
-    // and emits far less (1.40 kg/L vs E5's 2.31), which is the whole reason
+    // and emits far less (1.11 kg/L WtW vs E5's 2.69), the whole reason
     // to run it. A comparison that only prices fuel cannot say that.
     double? co2PerKmOf(FuelTypeEfficiencyStats s) => s.isMix
         ? null

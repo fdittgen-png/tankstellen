@@ -68,8 +68,11 @@ void main() {
         ),
       ];
       final summaries = MonthlyAggregator.byMonth(fillUps);
-      // Diesel factor ~2.65 kg/L
-      expect(summaries.single.totalCo2Kg, closeTo(265, 1));
+      // #4392 — diesel is 3.10 kg CO2e/L well-to-wheel (ADEME Base
+      // Carbone v23.6 element 25775, Gazole routier B7). It was 2.65,
+      // a tank-to-wheel magnitude mislabelled WtW, so this dashboard
+      // figure restates upward by 17%.
+      expect(summaries.single.totalCo2Kg, closeTo(310, 1));
     });
   });
 
