@@ -245,6 +245,14 @@ class Obd2VehiclePower {
       state != VehiclePowerState.engineRunning &&
       !_evMode;
 
+  /// #4384 — sustained motion was stamped within [motionWindow], whatever
+  /// the fused [state] says. The raw rung, not a verdict: a park decision
+  /// ("asleep, stop dialing") needs "the car is not moving" as its own
+  /// term, and [movingWithoutEngine] cannot serve — it is false for an EV
+  /// and false the moment the fused state reads `engineRunning`, so a
+  /// moving car could still be parked as asleep.
+  bool get motionFresh => _fresh(_motionAt, motionWindow);
+
   /// One-line diagnostic payload for breadcrumbs / exports.
   String get detail {
     final v = _lastVoltageV;

@@ -351,7 +351,9 @@ void main() {
     // #4068 — 2483 → 2481: the two dead `stopped`/`started` setters left the drop-host adapter; one `finalise()` forwarder replaced them.
     // #4162 — 2481 → 2476: `currentState` is a projection of the run
     // state's one documented precedence instead of a second if-chain.
-    'lib/features/obd2/data/session/trip_recording_controller.dart': 2476,
+    // #4384 — 2476 → 2479: the silent-bus verdict gained its motion term,
+    // so a mute ELM at road speed can no longer read as engine-off.
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 2479,
     // #4035 — 1 541 → 1 517: the pure ELM AT grammar (the `ATI` command,
     // the firmware-string parse, the reset-command test) left the library.
     // #4315 — 1 517 → 1 368: the dead pull fuel-rate entry point, the
@@ -412,7 +414,10 @@ void main() {
     'lib/features/vehicle/presentation/screens/edit_vehicle_screen.dart': 714,
     'lib/features/obd2/data/protocol/adapter_registry.dart': 706,
     'lib/features/obd2/data/obd2_connect_trace_log.dart': 627,
-    'lib/features/obd2/data/session/obd2_link_supervisor.dart': 604,
+    // #4384 — 604 → 610: the `asleep` park in `_dropTail` gained its
+    // motion term (a mute bus on a moving car is a broken link, not a
+    // parked car) plus the comment that says why.
+    'lib/features/obd2/data/session/obd2_link_supervisor.dart': 610,
     'lib/features/obd2/presentation/widgets/obd2_adapter_picker.dart': 601,
     // #4068 — 586 → 581: both grace finalisers collapse their flag writes into `_host.finalise()`.
     'lib/features/obd2/data/session/dropped_session_manager.dart': 579,

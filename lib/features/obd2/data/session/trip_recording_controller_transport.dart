@@ -307,9 +307,12 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
     // (a real silent failure), or the driver switched the engine off. The
     // classification needs voltage evidence (the ~10 s `ATRV` watch) to
     // call it engine-off — without any, the old verdict stands.
+    // #4384 — and only when the car is not demonstrably moving: at road
+    // speed a mute bus is a broken adapter, never an engine-off.
     final power = Obd2VehiclePower.instance;
     power.noteBusSilent();
-    final engineOff = power.asleep && power.lastVoltageV != null;
+    final engineOff =
+        power.asleep && power.lastVoltageV != null && !power.motionFresh;
     BreadcrumbCollector.add(
       'OBD2 recording: silent bus',
       detail: engineOff
