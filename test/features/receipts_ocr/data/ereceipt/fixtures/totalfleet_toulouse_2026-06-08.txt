@@ -1,0 +1,20 @@
+TOTALENERGIES
+STATION FLEET TOULOUSE OUEST
+31200 TOULOUSE
+
+Recu carte carburant
+Date 08/06/2026 06:52
+Pompe 7
+GAZOLE
+
+Volume : 62,40 L
+Prix / L : 1,749 €
+MONTANT TTC : 109,14 €
+
+Net HT : 90,95 €
+TVA 20,00 % : 18,19 €
+
+Carte carburant **** 4417
+Kilometrage : 128450 km
+
+Merci de votre visite

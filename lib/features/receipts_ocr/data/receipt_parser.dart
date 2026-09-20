@@ -10,6 +10,7 @@ import 'receipt_override_registry.dart';
 import 'receipt_parser/brand_detection.dart';
 import 'receipt_parser/brand_layouts.dart';
 import 'receipt_parser/receipt_field_extractors.dart';
+import 'receipt_parser/receipt_fiscal_extractors.dart';
 import 'receipt_parser/receipt_orchestrator.dart';
 import 'receipt_parser/receipt_parse_result.dart';
 
@@ -17,6 +18,12 @@ import 'receipt_parser/receipt_parse_result.dart';
 // `import 'receipt_parser.dart'` continues to see `ReceiptParseResult`
 // without touching its own import list (#563 phase: file split only).
 export 'receipt_parser/receipt_parse_result.dart' show ReceiptParseResult;
+
+// #4215 — the fiscal half of a receipt (VAT, ISO currency, masked
+// payment reference, odometer) travels on the same result object, so
+// the fleet expense intake sees one contract, not two.
+export 'receipt_parser/receipt_fiscal_extractors.dart'
+    show ReceiptFiscalFields;
 
 /// Parses raw OCR text from a fuel station receipt into a
 /// [ReceiptParseResult].
@@ -90,7 +97,10 @@ class ReceiptParser {
       liters: reconciled.liters,
       pricePerLiter: reconciled.pricePerLiter,
     );
-    return reconciled;
+    // #4215 — the fiscal pass runs LAST, over the same text, so neither
+    // the override merge nor the reconciliation can drop it.
+    return reconciled
+        .withFiscal(extractReceiptFiscalFields(lines, profile: profile));
   }
 
   /// Geometry-aware parse for the receipt OCR path (#2848, rewritten by
@@ -131,7 +141,9 @@ class ReceiptParser {
                   .where((v) => v != null)
                   .length >=
               2) {
-        return _applyOverrides(anchored, text, stationId, trace);
+        return _applyOverrides(anchored, text, stationId, trace)
+            .withFiscal(
+                extractReceiptFiscalFields(lines, profile: profile));
       }
     }
     return parse(text, stationId: stationId, profile: profile, trace: trace);

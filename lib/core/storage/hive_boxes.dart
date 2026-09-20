@@ -13,6 +13,7 @@ import 'hive_isolate_boxes.dart';
 import 'hive_isolate_ownership.dart';
 import 'hive_legacy_migration.dart';
 import 'hive_schema_migration.dart';
+import 'hive_test_boxes.dart';
 import 'hive_trip_box_encryption.dart';
 
 /// Thrown by [HiveBoxes.init] when a persistent box cannot be opened —
@@ -129,6 +130,13 @@ class HiveBoxes {
   /// #4212 — org directory per `SyncContextKey|orgId`; encrypted, deferred.
   static const String fleetDirectory = 'fleet_directory';
 
+  /// #4215 — fleet expenses built from scanned receipts and imported
+  /// invoices, one JSON payload per expense id. Encrypted (a receipt
+  /// names a person, a place, a time and a payment reference — ADR
+  /// 0025 D9 files it as an accounting document) and deferred (the
+  /// landing search screen needs nothing from it).
+  static const String fleetExpenses = 'fleet_expenses';
+
   static const _encryptedBoxes = {
     settings,
     profiles,
@@ -149,7 +157,7 @@ class HiveBoxes {
     obd2NegotiatedProtocol, serviceReminders, obd2PausedTrips,
     obd2ActiveTrip, priceSnapshots, isolateErrorSpool, trafficSignalsCache,
     featureFlags, appProfile, boxSchema, errorTraces, datasets,
-    fleetDirectory,
+    fleetDirectory, fleetExpenses,
   };
 
   /// Meta box recording the schema version of each persistent box
@@ -209,6 +217,7 @@ class HiveBoxes {
     priceSnapshots,
     trafficSignalsCache,
     fleetDirectory,
+    fleetExpenses,
   };
 
   /// Deferred boxes holding driving telemetry — AES-encrypted since
@@ -221,6 +230,7 @@ class HiveBoxes {
     // and is opened by the alert isolate — deliberately left as is.)
     obd2SupportedPids, obd2NegotiatedProtocol, serviceReminders,
     fleetDirectory, // #4212 — assignments name the person
+    fleetExpenses, // #4215 — a receipt names the person who paid
   };
 
   static Future<void>? _deferredInit;
@@ -367,35 +377,8 @@ class HiveBoxes {
   static Future<void> closeIsolateBoxes() =>
       HiveIsolateBoxes.closeIsolateBoxes();
 
+  /// Test stand-in for [init] — the opens live in [HiveTestBoxes]
+  /// since #4215, so this file stays under the 400-line norm.
   @visibleForTesting
-  static Future<void> initForTest() async {
-    await Hive.openBox<dynamic>(settings);
-    await Hive.openBox<dynamic>(favorites);
-    await Hive.openBox<dynamic>(cache);
-    await Hive.openBox<dynamic>(profiles);
-    await Hive.openBox<dynamic>(priceHistory);
-    await Hive.openBox<dynamic>(alerts);
-    // #584 — service reminders live in their own box so tests that
-    // exercise the vehicle feature can open it without pulling in the
-    // rest of the app. String-typed to match runtime.
-    await Hive.openBox<String>(serviceReminders);
-    // #797 — paused trips box, string-typed JSON, matches runtime.
-    await Hive.openBox<String>(obd2PausedTrips);
-    await Hive.openBox<String>(obd2NegotiatedProtocol); // #2261
-    // #1303 — active-trip snapshot box, string-typed JSON.
-    await Hive.openBox<String>(obd2ActiveTrip);
-    // #579 — velocity detector snapshots. String-typed JSON so the
-    // same one-adapter pattern covers unit tests + runtime.
-    await Hive.openBox<String>(priceSnapshots);
-    // #1686 — schema-version meta box, mirrors the runtime open.
-    await Hive.openBox<int>(boxSchema);
-    // #2670 — initForTest stands in for the main isolate's init(): the boxes
-    // it opens are main-isolate-owned, so closeIsolateBoxes() leaves them open
-    // (mirroring the production foreground-isolate scenario).
-    HiveIsolateOwnership.markOwned(const [
-      settings, favorites, cache, profiles, priceHistory, alerts,
-      serviceReminders, obd2PausedTrips, obd2NegotiatedProtocol,
-      obd2ActiveTrip, priceSnapshots, boxSchema,
-    ]);
-  }
+  static Future<void> initForTest() => HiveTestBoxes.openAll();
 }

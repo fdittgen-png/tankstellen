@@ -4,7 +4,7 @@
 /// Public API barrel of the `fleet` feature (#3132, Epic #4211).
 ///
 /// Cross-feature consumers must import THIS file — never a path under
-/// `providers/`, `domain/` or `presentation/`. Enforced by
+/// `data/`, `domain/`, `providers/` or `presentation/`. Enforced by
 /// `test/lint/feature_boundary_test.dart` with an only-decreasing
 /// baseline (epic #3129).
 ///
@@ -14,6 +14,12 @@
 /// is stamped with at creation, the explicit-selection provider and the
 /// two context widgets other surfaces embed.
 ///
+/// The F5 slice (#4215) adds the expense / document domain: the state
+/// boundary between a receipt and an accounting record, the reconciler
+/// that refuses to invent a second fill-up, and the import boundary a
+/// structured e-invoice enters through. Later slices add their own
+/// exports to this list.
+///
 /// The fleet feature imports NO other feature — signals arrive as
 /// primitives (an adapter device id, a VIN string) — so this barrel is
 /// a leaf of the dependency graph and `fill_ups -> fleet` cannot close
@@ -21,8 +27,16 @@
 /// barrel-aware SCC gate).
 library;
 
+export 'data/expense_intake.dart';
+export 'data/fleet_expense_store.dart';
+export 'domain/document_meta.dart';
+export 'domain/expense.dart';
+export 'domain/expense_fields.dart';
+export 'domain/expense_reconciler.dart';
+export 'domain/expense_state_machine.dart';
 export 'domain/fleet_scope.dart';
 export 'domain/fleet_vehicle.dart';
+export 'domain/money.dart';
 export 'domain/vehicle_attribution.dart';
 export 'domain/vehicle_attribution_resolver.dart';
 export 'presentation/widgets/current_vehicle_control.dart';
