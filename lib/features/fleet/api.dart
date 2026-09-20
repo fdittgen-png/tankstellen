@@ -41,6 +41,10 @@
 
 library;
 
+/// #4217 adds the join half: the outcome types, the controller the
+/// onboarding step and Settings → Fleet drive, and the one place a
+/// role / block / refusal becomes a sentence.
+export 'application/fleet_join_service.dart';
 export 'data/expense_intake.dart';
 export 'data/fleet_document_store.dart';
 export 'data/fleet_expense_store.dart';
@@ -61,10 +65,12 @@ export 'domain/fleet_vehicle.dart';
 export 'domain/money.dart';
 export 'domain/vehicle_attribution.dart';
 export 'domain/vehicle_attribution_resolver.dart';
+export 'presentation/fleet_labels.dart';
 export 'presentation/widgets/current_vehicle_control.dart';
 export 'presentation/widgets/vehicle_switch_sheet.dart';
 export 'providers/current_fleet_vehicle_provider.dart';
 export 'providers/fleet_consent_provider.dart';
 export 'providers/fleet_expense_providers.dart';
+export 'providers/fleet_join_provider.dart';
 export 'providers/fleet_manager_providers.dart';
 export 'providers/fleet_scope_provider.dart';

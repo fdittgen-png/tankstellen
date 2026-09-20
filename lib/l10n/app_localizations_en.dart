@@ -5926,6 +5926,191 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fleetManagerOpenQueue => 'Expenses';
 
   @override
+  String get wizardProfileFleetName => 'Company or fleet vehicle';
+
+  @override
+  String get wizardProfileFleetDescription =>
+      'I drive my employer\'s car. Fleet assignment, expenses, and a clear view of what my manager can see.';
+
+  @override
+  String get fleetIdentityTitle => 'Your fleet';
+
+  @override
+  String get fleetIdentityIntro =>
+      'Enter the invite code your fleet administrator gave you. If you are setting the fleet up yourself, create it below instead.';
+
+  @override
+  String get fleetInviteCodeLabel => 'Invite code';
+
+  @override
+  String get fleetScanQrCode => 'Scan QR code';
+
+  @override
+  String get fleetJoinButton => 'Join fleet';
+
+  @override
+  String get fleetCreateSectionTitle => 'I am setting up this fleet';
+
+  @override
+  String get fleetOrgNameLabel => 'Fleet name';
+
+  @override
+  String get fleetCreateButton => 'Create fleet';
+
+  @override
+  String get fleetIdentityLater =>
+      'You can also do this later under Settings, then Fleet.';
+
+  @override
+  String fleetMemberOf(String org) {
+    return 'You are in $org.';
+  }
+
+  @override
+  String fleetYourRole(String role) {
+    return 'Your role: $role';
+  }
+
+  @override
+  String get fleetRoleEmployee => 'Employee';
+
+  @override
+  String get fleetRoleManager => 'Fleet manager';
+
+  @override
+  String get fleetRoleAdmin => 'Fleet administrator';
+
+  @override
+  String get fleetBlockedIdentityRequired =>
+      'Joining a fleet needs an account with an e-mail address. This device still uses an anonymous account, which nobody can assign to a company — add an e-mail address in Settings, then Sync, first.';
+
+  @override
+  String get fleetBlockedCommunityBackend =>
+      'A fleet cannot live on the shared community database. Your employer\'s own database, or one you were invited to, is required.';
+
+  @override
+  String get fleetBlockedSyncDisabled =>
+      'Cloud sync is switched off. Set up your employer\'s database in Settings, then Sync, before joining a fleet.';
+
+  @override
+  String get fleetBlockedEnterCode =>
+      'Enter the invite code your fleet administrator gave you.';
+
+  @override
+  String get fleetBlockedEnterName => 'Enter a name for the fleet.';
+
+  @override
+  String get fleetJoinErrorInvalidCode =>
+      'That invite code is not valid or has expired. Ask your fleet administrator for a new one.';
+
+  @override
+  String get fleetJoinErrorAlreadyMember =>
+      'This account already belongs to a fleet. Leave it before joining another one.';
+
+  @override
+  String get fleetJoinErrorNotSupported =>
+      'This database does not offer fleet joining. Your administrator has to enable fleet mode on it first.';
+
+  @override
+  String get fleetJoinErrorUnavailable =>
+      'The fleet could not be reached. Check your connection and try again.';
+
+  @override
+  String get fleetPrivacyTitle => 'What is shared, and what is not';
+
+  @override
+  String get fleetPrivacyDeviceTitle => 'Stays on this device';
+
+  @override
+  String get fleetPrivacyDeviceBody =>
+      'Your journeys, your position and the raw data read from the adapter never leave this phone for your fleet. They are yours, for your own consumption figures and coaching.';
+
+  @override
+  String get fleetPrivacySyncTitle => 'Goes to your fleet\'s database';
+
+  @override
+  String get fleetPrivacySyncBody =>
+      'Which company vehicle you are assigned to and when, plus the fill-ups and expenses you submit yourself. Nothing is sent while fleet sharing is switched off.';
+
+  @override
+  String get fleetPrivacyManagerTitle => 'What your manager can see';
+
+  @override
+  String get fleetPrivacyManagerBody =>
+      'Vehicles and assignments, submitted expenses, and cost and consumption figures as fleet totals. Not your journeys, not your live position, and never a driving-style ranking of individual employees.';
+
+  @override
+  String get fleetPrivacyRetentionTitle =>
+      'How long it is kept, and your controls';
+
+  @override
+  String get fleetPrivacyRetentionBody =>
+      'Your employer configures how long expenses and assignment history are kept. You can export everything, switch sharing off, and delete your own data at any time in Settings, then Privacy and data.';
+
+  @override
+  String get settingsTopicFleetTitle => 'Fleet';
+
+  @override
+  String get settingsTopicFleetSubtitle =>
+      'Your organisation, your role and what your manager can see.';
+
+  @override
+  String get settingsTopicFleetKeywords =>
+      'fleet, company car, employer, organisation, manager, assignment, expenses';
+
+  @override
+  String get fleetSettingsNoFleet =>
+      'You are not in a fleet yet. Join one with an invite code, or create one if you administer it.';
+
+  @override
+  String get fleetSettingsOrgLabel => 'Fleet';
+
+  @override
+  String get fleetSettingsRoleLabel => 'Your role';
+
+  @override
+  String get fleetSettingsSharingLabel => 'Sharing with your fleet';
+
+  @override
+  String get fleetSettingsSharingOn =>
+      'On. The fill-ups and expenses you submit reach your fleet.';
+
+  @override
+  String get fleetSettingsSharingOff =>
+      'Off. Nothing fleet-related leaves this device.';
+
+  @override
+  String get fleetSettingsManagerSeesTitle => 'What my manager can see';
+
+  @override
+  String get fleetVisibilityVehicle =>
+      'Which company vehicle you are assigned to, and for which period.';
+
+  @override
+  String get fleetVisibilityExpenses =>
+      'The fill-ups and expenses you submit yourself.';
+
+  @override
+  String get fleetVisibilityCosts =>
+      'Cost per kilometre and consumption, as part of fleet totals.';
+
+  @override
+  String get fleetVisibilityNeverJourneys =>
+      'Never your journeys, your live position or raw adapter data.';
+
+  @override
+  String get fleetVisibilityNeverBehaviour =>
+      'Never a driving-style ranking of individual employees.';
+
+  @override
+  String get fleetSettingsStale =>
+      'These fleet details could not be refreshed recently.';
+
+  @override
+  String get fleetSettingsExpired =>
+      'These fleet details are out of date. Reconnect so they can be refreshed before you choose a vehicle.';
+
+  @override
   String get fleetVehicleCurrentLabel => 'Current vehicle';
 
   @override
@@ -17540,6 +17725,196 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get fleetManagerOpenQueue => '⟦Éẋƥéñšéš ····⟧';
+
+  @override
+  String get wizardProfileFleetName => '⟦Çóɱƥáñý óř ƒłééŧ ṽéĥîçłé ·········⟧';
+
+  @override
+  String get wizardProfileFleetDescription =>
+      '⟦Î đřîṽé ɱý éɱƥłóýéř\'š çář. Ƒłééŧ áššîǧñɱéñŧ, éẋƥéñšéš, áñđ á çłéář ṽîéŵ óƒ ŵĥáŧ ɱý ɱáñáǧéř çáñ šéé. ···································⟧';
+
+  @override
+  String get fleetIdentityTitle => '⟦Ýóúř ƒłééŧ ····⟧';
+
+  @override
+  String get fleetIdentityIntro =>
+      '⟦Éñŧéř ŧĥé îñṽîŧé çóđé ýóúř ƒłééŧ áđɱîñîšŧřáŧóř ǧáṽé ýóú. Îƒ ýóú ářé šéŧŧîñǧ ŧĥé ƒłééŧ úƥ ýóúřšéłƒ, çřéáŧé îŧ ƀéłóŵ îñšŧéáđ. ·············································⟧';
+
+  @override
+  String get fleetInviteCodeLabel => '⟦Îñṽîŧé çóđé ·····⟧';
+
+  @override
+  String get fleetScanQrCode => '⟦Šçáñ ɊŘ çóđé ·····⟧';
+
+  @override
+  String get fleetJoinButton => '⟦Ĵóîñ ƒłééŧ ····⟧';
+
+  @override
+  String get fleetCreateSectionTitle =>
+      '⟦Î áɱ šéŧŧîñǧ úƥ ŧĥîš ƒłééŧ ·········⟧';
+
+  @override
+  String get fleetOrgNameLabel => '⟦Ƒłééŧ ñáɱé ····⟧';
+
+  @override
+  String get fleetCreateButton => '⟦Çřéáŧé ƒłééŧ ·····⟧';
+
+  @override
+  String get fleetIdentityLater =>
+      '⟦Ýóú çáñ áłšó đó ŧĥîš łáŧéř úñđéř Šéŧŧîñǧš, ŧĥéñ Ƒłééŧ. ···················⟧';
+
+  @override
+  String fleetMemberOf(String org) {
+    return '⟦Ýóú ářé îñ $org. ····⟧';
+  }
+
+  @override
+  String fleetYourRole(String role) {
+    return '⟦Ýóúř řółé: $role ····⟧';
+  }
+
+  @override
+  String get fleetRoleEmployee => '⟦Éɱƥłóýéé ····⟧';
+
+  @override
+  String get fleetRoleManager => '⟦Ƒłééŧ ɱáñáǧéř ·····⟧';
+
+  @override
+  String get fleetRoleAdmin => '⟦Ƒłééŧ áđɱîñîšŧřáŧóř ········⟧';
+
+  @override
+  String get fleetBlockedIdentityRequired =>
+      '⟦Ĵóîñîñǧ á ƒłééŧ ñééđš áñ áççóúñŧ ŵîŧĥ áñ é-ɱáîł áđđřéšš. Ŧĥîš đéṽîçé šŧîłł úšéš áñ áñóñýɱóúš áççóúñŧ, ŵĥîçĥ ñóƀóđý çáñ áššîǧñ ŧó á çóɱƥáñý — áđđ áñ é-ɱáîł áđđřéšš îñ Šéŧŧîñǧš, ŧĥéñ Šýñç, ƒîřšŧ. ····································································⟧';
+
+  @override
+  String get fleetBlockedCommunityBackend =>
+      '⟦Á ƒłééŧ çáññóŧ łîṽé óñ ŧĥé šĥářéđ çóɱɱúñîŧý đáŧáƀášé. Ýóúř éɱƥłóýéř\'š óŵñ đáŧáƀášé, óř óñé ýóú ŵéřé îñṽîŧéđ ŧó, îš řéɋúîřéđ. ·············································⟧';
+
+  @override
+  String get fleetBlockedSyncDisabled =>
+      '⟦Çłóúđ šýñç îš šŵîŧçĥéđ óƒƒ. Šéŧ úƥ ýóúř éɱƥłóýéř\'š đáŧáƀášé îñ Šéŧŧîñǧš, ŧĥéñ Šýñç, ƀéƒóřé ĵóîñîñǧ á ƒłééŧ. ······································⟧';
+
+  @override
+  String get fleetBlockedEnterCode =>
+      '⟦Éñŧéř ŧĥé îñṽîŧé çóđé ýóúř ƒłééŧ áđɱîñîšŧřáŧóř ǧáṽé ýóú. ·····················⟧';
+
+  @override
+  String get fleetBlockedEnterName => '⟦Éñŧéř á ñáɱé ƒóř ŧĥé ƒłééŧ. ·········⟧';
+
+  @override
+  String get fleetJoinErrorInvalidCode =>
+      '⟦Ŧĥáŧ îñṽîŧé çóđé îš ñóŧ ṽáłîđ óř ĥáš éẋƥîřéđ. Ášķ ýóúř ƒłééŧ áđɱîñîšŧřáŧóř ƒóř á ñéŵ óñé. ································⟧';
+
+  @override
+  String get fleetJoinErrorAlreadyMember =>
+      '⟦Ŧĥîš áççóúñŧ áłřéáđý ƀéłóñǧš ŧó á ƒłééŧ. Łéáṽé îŧ ƀéƒóřé ĵóîñîñǧ áñóŧĥéř óñé. ····························⟧';
+
+  @override
+  String get fleetJoinErrorNotSupported =>
+      '⟦Ŧĥîš đáŧáƀášé đóéš ñóŧ óƒƒéř ƒłééŧ ĵóîñîñǧ. Ýóúř áđɱîñîšŧřáŧóř ĥáš ŧó éñáƀłé ƒłééŧ ɱóđé óñ îŧ ƒîřšŧ. ·····································⟧';
+
+  @override
+  String get fleetJoinErrorUnavailable =>
+      '⟦Ŧĥé ƒłééŧ çóúłđ ñóŧ ƀé řéáçĥéđ. Çĥéçķ ýóúř çóññéçŧîóñ áñđ ŧřý áǧáîñ. ·························⟧';
+
+  @override
+  String get fleetPrivacyTitle =>
+      '⟦Ŵĥáŧ îš šĥářéđ, áñđ ŵĥáŧ îš ñóŧ ···········⟧';
+
+  @override
+  String get fleetPrivacyDeviceTitle => '⟦Šŧáýš óñ ŧĥîš đéṽîçé ········⟧';
+
+  @override
+  String get fleetPrivacyDeviceBody =>
+      '⟦Ýóúř ĵóúřñéýš, ýóúř ƥóšîŧîóñ áñđ ŧĥé řáŵ đáŧá řéáđ ƒřóɱ ŧĥé áđáƥŧéř ñéṽéř łéáṽé ŧĥîš ƥĥóñé ƒóř ýóúř ƒłééŧ. Ŧĥéý ářé ýóúřš, ƒóř ýóúř óŵñ çóñšúɱƥŧîóñ ƒîǧúřéš áñđ çóáçĥîñǧ. ······························································⟧';
+
+  @override
+  String get fleetPrivacySyncTitle =>
+      '⟦Ǧóéš ŧó ýóúř ƒłééŧ\'š đáŧáƀášé ···········⟧';
+
+  @override
+  String get fleetPrivacySyncBody =>
+      '⟦Ŵĥîçĥ çóɱƥáñý ṽéĥîçłé ýóú ářé áššîǧñéđ ŧó áñđ ŵĥéñ, ƥłúš ŧĥé ƒîłł-úƥš áñđ éẋƥéñšéš ýóú šúƀɱîŧ ýóúřšéłƒ. Ñóŧĥîñǧ îš šéñŧ ŵĥîłé ƒłééŧ šĥářîñǧ îš šŵîŧçĥéđ óƒƒ. ·························································⟧';
+
+  @override
+  String get fleetPrivacyManagerTitle =>
+      '⟦Ŵĥáŧ ýóúř ɱáñáǧéř çáñ šéé ·········⟧';
+
+  @override
+  String get fleetPrivacyManagerBody =>
+      '⟦Ṽéĥîçłéš áñđ áššîǧñɱéñŧš, šúƀɱîŧŧéđ éẋƥéñšéš, áñđ çóšŧ áñđ çóñšúɱƥŧîóñ ƒîǧúřéš áš ƒłééŧ ŧóŧáłš. Ñóŧ ýóúř ĵóúřñéýš, ñóŧ ýóúř łîṽé ƥóšîŧîóñ, áñđ ñéṽéř á đřîṽîñǧ-šŧýłé řáñķîñǧ óƒ îñđîṽîđúáł éɱƥłóýééš. ·········································································⟧';
+
+  @override
+  String get fleetPrivacyRetentionTitle =>
+      '⟦Ĥóŵ łóñǧ îŧ îš ķéƥŧ, áñđ ýóúř çóñŧřółš ··············⟧';
+
+  @override
+  String get fleetPrivacyRetentionBody =>
+      '⟦Ýóúř éɱƥłóýéř çóñƒîǧúřéš ĥóŵ łóñǧ éẋƥéñšéš áñđ áššîǧñɱéñŧ ĥîšŧóřý ářé ķéƥŧ. Ýóú çáñ éẋƥóřŧ éṽéřýŧĥîñǧ, šŵîŧçĥ šĥářîñǧ óƒƒ, áñđ đéłéŧé ýóúř óŵñ đáŧá áŧ áñý ŧîɱé îñ Šéŧŧîñǧš, ŧĥéñ Ƥřîṽáçý áñđ đáŧá. ········································································⟧';
+
+  @override
+  String get settingsTopicFleetTitle => '⟦Ƒłééŧ ··⟧';
+
+  @override
+  String get settingsTopicFleetSubtitle =>
+      '⟦Ýóúř óřǧáñîšáŧîóñ, ýóúř řółé áñđ ŵĥáŧ ýóúř ɱáñáǧéř çáñ šéé. ······················⟧';
+
+  @override
+  String get settingsTopicFleetKeywords =>
+      '⟦ƒłééŧ, çóɱƥáñý çář, éɱƥłóýéř, óřǧáñîšáŧîóñ, ɱáñáǧéř, áššîǧñɱéñŧ, éẋƥéñšéš ···························⟧';
+
+  @override
+  String get fleetSettingsNoFleet =>
+      '⟦Ýóú ářé ñóŧ îñ á ƒłééŧ ýéŧ. Ĵóîñ óñé ŵîŧĥ áñ îñṽîŧé çóđé, óř çřéáŧé óñé îƒ ýóú áđɱîñîšŧéř îŧ. ································⟧';
+
+  @override
+  String get fleetSettingsOrgLabel => '⟦Ƒłééŧ ··⟧';
+
+  @override
+  String get fleetSettingsRoleLabel => '⟦Ýóúř řółé ····⟧';
+
+  @override
+  String get fleetSettingsSharingLabel => '⟦Šĥářîñǧ ŵîŧĥ ýóúř ƒłééŧ ·········⟧';
+
+  @override
+  String get fleetSettingsSharingOn =>
+      '⟦Óñ. Ŧĥé ƒîłł-úƥš áñđ éẋƥéñšéš ýóú šúƀɱîŧ řéáçĥ ýóúř ƒłééŧ. ·····················⟧';
+
+  @override
+  String get fleetSettingsSharingOff =>
+      '⟦Óƒƒ. Ñóŧĥîñǧ ƒłééŧ-řéłáŧéđ łéáṽéš ŧĥîš đéṽîçé. ·················⟧';
+
+  @override
+  String get fleetSettingsManagerSeesTitle =>
+      '⟦Ŵĥáŧ ɱý ɱáñáǧéř çáñ šéé ·········⟧';
+
+  @override
+  String get fleetVisibilityVehicle =>
+      '⟦Ŵĥîçĥ çóɱƥáñý ṽéĥîçłé ýóú ářé áššîǧñéđ ŧó, áñđ ƒóř ŵĥîçĥ ƥéřîóđ. ·······················⟧';
+
+  @override
+  String get fleetVisibilityExpenses =>
+      '⟦Ŧĥé ƒîłł-úƥš áñđ éẋƥéñšéš ýóú šúƀɱîŧ ýóúřšéłƒ. ·················⟧';
+
+  @override
+  String get fleetVisibilityCosts =>
+      '⟦Çóšŧ ƥéř ķîłóɱéŧřé áñđ çóñšúɱƥŧîóñ, áš ƥářŧ óƒ ƒłééŧ ŧóŧáłš. ······················⟧';
+
+  @override
+  String get fleetVisibilityNeverJourneys =>
+      '⟦Ñéṽéř ýóúř ĵóúřñéýš, ýóúř łîṽé ƥóšîŧîóñ óř řáŵ áđáƥŧéř đáŧá. ······················⟧';
+
+  @override
+  String get fleetVisibilityNeverBehaviour =>
+      '⟦Ñéṽéř á đřîṽîñǧ-šŧýłé řáñķîñǧ óƒ îñđîṽîđúáł éɱƥłóýééš. ·····················⟧';
+
+  @override
+  String get fleetSettingsStale =>
+      '⟦Ŧĥéšé ƒłééŧ đéŧáîłš çóúłđ ñóŧ ƀé řéƒřéšĥéđ řéçéñŧłý. ····················⟧';
+
+  @override
+  String get fleetSettingsExpired =>
+      '⟦Ŧĥéšé ƒłééŧ đéŧáîłš ářé óúŧ óƒ đáŧé. Řéçóññéçŧ šó ŧĥéý çáñ ƀé řéƒřéšĥéđ ƀéƒóřé ýóú çĥóóšé á ṽéĥîçłé. ····································⟧';
 
   @override
   String get fleetVehicleCurrentLabel => '⟦Çúřřéñŧ ṽéĥîçłé ······⟧';

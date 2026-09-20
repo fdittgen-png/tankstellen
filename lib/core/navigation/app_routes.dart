@@ -77,6 +77,11 @@ abstract final class RoutePaths {
   static const settingsAdvanced = '/settings/advanced';
   static const settingsAbout = '/settings/about';
 
+  /// #4217 (Epic #4211) — Settings → Fleet. Reached only when
+  /// `Feature.fleetMode` is on; ADR 0025 D10 keeps fleet surfaces a
+  /// route family under Settings rather than a shell branch.
+  static const settingsFleet = '/settings/fleet';
+
   // Consumption / trips.
   static const consumption = '/consumption';
   static const carbon = '/carbon';

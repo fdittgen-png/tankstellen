@@ -18,6 +18,7 @@ import '../../features/profile/presentation/screens/settings/backup_restore_scre
 import '../../features/profile/presentation/screens/settings/data_sources_location_screen.dart';
 import '../../features/profile/presentation/screens/settings/driving_consumption_screen.dart';
 import '../../features/profile/presentation/screens/settings/features_use_mode_screen.dart';
+import '../../features/profile/presentation/screens/settings/fleet_screen.dart';
 import '../../features/profile/presentation/screens/settings/prices_alerts_screen.dart';
 import '../../features/profile/presentation/screens/settings/privacy_data_screen.dart';
 import '../../features/profile/presentation/screens/settings/profiles_region_screen.dart';
@@ -170,10 +171,19 @@ List<RouteBase> get profileRoutes => [
             HelpScreen(anchor: state.uri.queryParameters['anchor']),
       ),
       // #4365 (epic #4358, work package F) — the personal-vehicle
-      // comparison. Appended last so the index-pinned route order in
+      // comparison. Appended so the index-pinned route order in
       // `test/app/routes/profile_routes_test.dart` stays stable.
       GoRoute(
         path: RoutePaths.compareVehicles,
         builder: (context, state) => const VehicleComparisonScreen(),
+      ),
+      // #4217 (Epic #4211) — Settings → Fleet, appended LAST so no
+      // existing index in `profile_routes_test.dart` moves. The tile
+      // that reaches it is gated on `Feature.fleetMode`; the screen
+      // itself renders the "not in a fleet" explanation for a stale
+      // deep link rather than an empty page.
+      GoRoute(
+        path: RoutePaths.settingsFleet,
+        builder: (context, state) => const FleetScreen(),
       ),
     ];

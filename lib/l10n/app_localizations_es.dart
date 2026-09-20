@@ -5989,6 +5989,191 @@ class AppLocalizationsEs extends AppLocalizations {
   String get fleetManagerOpenQueue => 'Expenses';
 
   @override
+  String get wizardProfileFleetName => 'Company or fleet vehicle';
+
+  @override
+  String get wizardProfileFleetDescription =>
+      'I drive my employer\'s car. Fleet assignment, expenses, and a clear view of what my manager can see.';
+
+  @override
+  String get fleetIdentityTitle => 'Your fleet';
+
+  @override
+  String get fleetIdentityIntro =>
+      'Enter the invite code your fleet administrator gave you. If you are setting the fleet up yourself, create it below instead.';
+
+  @override
+  String get fleetInviteCodeLabel => 'Invite code';
+
+  @override
+  String get fleetScanQrCode => 'Scan QR code';
+
+  @override
+  String get fleetJoinButton => 'Join fleet';
+
+  @override
+  String get fleetCreateSectionTitle => 'I am setting up this fleet';
+
+  @override
+  String get fleetOrgNameLabel => 'Fleet name';
+
+  @override
+  String get fleetCreateButton => 'Create fleet';
+
+  @override
+  String get fleetIdentityLater =>
+      'You can also do this later under Settings, then Fleet.';
+
+  @override
+  String fleetMemberOf(String org) {
+    return 'You are in $org.';
+  }
+
+  @override
+  String fleetYourRole(String role) {
+    return 'Your role: $role';
+  }
+
+  @override
+  String get fleetRoleEmployee => 'Employee';
+
+  @override
+  String get fleetRoleManager => 'Fleet manager';
+
+  @override
+  String get fleetRoleAdmin => 'Fleet administrator';
+
+  @override
+  String get fleetBlockedIdentityRequired =>
+      'Joining a fleet needs an account with an e-mail address. This device still uses an anonymous account, which nobody can assign to a company — add an e-mail address in Settings, then Sync, first.';
+
+  @override
+  String get fleetBlockedCommunityBackend =>
+      'A fleet cannot live on the shared community database. Your employer\'s own database, or one you were invited to, is required.';
+
+  @override
+  String get fleetBlockedSyncDisabled =>
+      'Cloud sync is switched off. Set up your employer\'s database in Settings, then Sync, before joining a fleet.';
+
+  @override
+  String get fleetBlockedEnterCode =>
+      'Enter the invite code your fleet administrator gave you.';
+
+  @override
+  String get fleetBlockedEnterName => 'Enter a name for the fleet.';
+
+  @override
+  String get fleetJoinErrorInvalidCode =>
+      'That invite code is not valid or has expired. Ask your fleet administrator for a new one.';
+
+  @override
+  String get fleetJoinErrorAlreadyMember =>
+      'This account already belongs to a fleet. Leave it before joining another one.';
+
+  @override
+  String get fleetJoinErrorNotSupported =>
+      'This database does not offer fleet joining. Your administrator has to enable fleet mode on it first.';
+
+  @override
+  String get fleetJoinErrorUnavailable =>
+      'The fleet could not be reached. Check your connection and try again.';
+
+  @override
+  String get fleetPrivacyTitle => 'What is shared, and what is not';
+
+  @override
+  String get fleetPrivacyDeviceTitle => 'Stays on this device';
+
+  @override
+  String get fleetPrivacyDeviceBody =>
+      'Your journeys, your position and the raw data read from the adapter never leave this phone for your fleet. They are yours, for your own consumption figures and coaching.';
+
+  @override
+  String get fleetPrivacySyncTitle => 'Goes to your fleet\'s database';
+
+  @override
+  String get fleetPrivacySyncBody =>
+      'Which company vehicle you are assigned to and when, plus the fill-ups and expenses you submit yourself. Nothing is sent while fleet sharing is switched off.';
+
+  @override
+  String get fleetPrivacyManagerTitle => 'What your manager can see';
+
+  @override
+  String get fleetPrivacyManagerBody =>
+      'Vehicles and assignments, submitted expenses, and cost and consumption figures as fleet totals. Not your journeys, not your live position, and never a driving-style ranking of individual employees.';
+
+  @override
+  String get fleetPrivacyRetentionTitle =>
+      'How long it is kept, and your controls';
+
+  @override
+  String get fleetPrivacyRetentionBody =>
+      'Your employer configures how long expenses and assignment history are kept. You can export everything, switch sharing off, and delete your own data at any time in Settings, then Privacy and data.';
+
+  @override
+  String get settingsTopicFleetTitle => 'Fleet';
+
+  @override
+  String get settingsTopicFleetSubtitle =>
+      'Your organisation, your role and what your manager can see.';
+
+  @override
+  String get settingsTopicFleetKeywords =>
+      'fleet, company car, employer, organisation, manager, assignment, expenses';
+
+  @override
+  String get fleetSettingsNoFleet =>
+      'You are not in a fleet yet. Join one with an invite code, or create one if you administer it.';
+
+  @override
+  String get fleetSettingsOrgLabel => 'Fleet';
+
+  @override
+  String get fleetSettingsRoleLabel => 'Your role';
+
+  @override
+  String get fleetSettingsSharingLabel => 'Sharing with your fleet';
+
+  @override
+  String get fleetSettingsSharingOn =>
+      'On. The fill-ups and expenses you submit reach your fleet.';
+
+  @override
+  String get fleetSettingsSharingOff =>
+      'Off. Nothing fleet-related leaves this device.';
+
+  @override
+  String get fleetSettingsManagerSeesTitle => 'What my manager can see';
+
+  @override
+  String get fleetVisibilityVehicle =>
+      'Which company vehicle you are assigned to, and for which period.';
+
+  @override
+  String get fleetVisibilityExpenses =>
+      'The fill-ups and expenses you submit yourself.';
+
+  @override
+  String get fleetVisibilityCosts =>
+      'Cost per kilometre and consumption, as part of fleet totals.';
+
+  @override
+  String get fleetVisibilityNeverJourneys =>
+      'Never your journeys, your live position or raw adapter data.';
+
+  @override
+  String get fleetVisibilityNeverBehaviour =>
+      'Never a driving-style ranking of individual employees.';
+
+  @override
+  String get fleetSettingsStale =>
+      'These fleet details could not be refreshed recently.';
+
+  @override
+  String get fleetSettingsExpired =>
+      'These fleet details are out of date. Reconnect so they can be refreshed before you choose a vehicle.';
+
+  @override
   String get fleetVehicleCurrentLabel => 'Current vehicle';
 
   @override

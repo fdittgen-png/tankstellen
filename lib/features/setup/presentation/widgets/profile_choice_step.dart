@@ -6,8 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../feature_management/application/app_profile_provider.dart';
-import '../../../feature_management/domain/app_profile.dart';
+import '../../../feature_management/api.dart';
+import '../../providers/onboarding_wizard_provider.dart';
 
 /// First-page wizard step (#1518) where the user picks a use-mode
 /// profile that drives which features and which subsequent wizard
@@ -19,6 +19,15 @@ import '../../../feature_management/domain/app_profile.dart';
 /// [ActiveAppProfile.select] (which also applies the corresponding
 /// feature-flag bundle) and calls [onProfilePicked] so the wizard can
 /// advance.
+///
+/// #4217 adds a fourth card — *company or fleet vehicle*. It picks the
+/// same [AppProfile.medium] preset (a fleet driver logs fill-ups and
+/// expenses; the OBD2 stack is not implied) and additionally switches
+/// `Feature.fleetMode` on, which inserts the fleet identity and
+/// privacy-summary pages into the wizard. The card renders only where
+/// that capability is available at all — beta channel today
+/// (ADR 0025 D6) — so a production user sees exactly the three cards
+/// they saw before, with unchanged behaviour.
 class ProfileChoiceStep extends ConsumerWidget {
   /// Called once the user has tapped a card (after the bundle has
   /// been applied). The wizard moves to the next step.
@@ -31,6 +40,12 @@ class ProfileChoiceStep extends ConsumerWidget {
     final theme = Theme.of(context);
     final l = AppLocalizations.of(context);
     final activeProfile = ref.watch(activeAppProfileProvider);
+    final fleetPicked = ref.watch(onboardingWizardControllerProvider
+        .select((s) => s.fleetIntent));
+    final fleetOffered = ref
+        .watch(featureManifestProvider)
+        .entryFor(Feature.fleetMode)
+        .isAvailableIn(ref.watch(buildChannelProvider));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -58,31 +73,42 @@ class ProfileChoiceStep extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           _ProfileCard(
-            profile: AppProfile.basic,
+            cardKey: AppProfile.basic.name,
             icon: Icons.local_gas_station_outlined,
             title: l.wizardProfileBasicName,
             description: l.wizardProfileBasicDescription,
-            isActive: activeProfile == AppProfile.basic,
+            isActive: activeProfile == AppProfile.basic && !fleetPicked,
             onTap: () => _pick(ref, AppProfile.basic),
           ),
           const SizedBox(height: 12),
           _ProfileCard(
-            profile: AppProfile.medium,
+            cardKey: AppProfile.medium.name,
             icon: Icons.analytics_outlined,
             title: l.wizardProfileMediumName,
             description: l.wizardProfileMediumDescription,
-            isActive: activeProfile == AppProfile.medium,
+            isActive: activeProfile == AppProfile.medium && !fleetPicked,
             onTap: () => _pick(ref, AppProfile.medium),
           ),
           const SizedBox(height: 12),
           _ProfileCard(
-            profile: AppProfile.full,
+            cardKey: AppProfile.full.name,
             icon: Icons.directions_car_filled,
             title: l.wizardProfileFullName,
             description: l.wizardProfileFullDescription,
-            isActive: activeProfile == AppProfile.full,
+            isActive: activeProfile == AppProfile.full && !fleetPicked,
             onTap: () => _pick(ref, AppProfile.full),
           ),
+          if (fleetOffered) ...[
+            const SizedBox(height: 12),
+            _ProfileCard(
+              cardKey: 'fleet',
+              icon: Icons.business_center_outlined,
+              title: l.wizardProfileFleetName,
+              description: l.wizardProfileFleetDescription,
+              isActive: fleetPicked,
+              onTap: () => _pick(ref, AppProfile.medium, fleet: true),
+            ),
+          ],
           const SizedBox(height: 16),
           Text(
             l.wizardProfileChoiceFooter,
@@ -97,18 +123,32 @@ class ProfileChoiceStep extends ConsumerWidget {
     );
   }
 
-  Future<void> _pick(WidgetRef ref, AppProfile profile) async {
-    await ref.read(activeAppProfileProvider.notifier).select(profile);
+  /// Applies the tapped card. Both halves (the preset bundle and the
+  /// fleet-mode flag) run inside the wizard controller so the order is
+  /// fixed and this widget never touches `ref` after an await (#3159).
+  Future<void> _pick(
+    WidgetRef ref,
+    AppProfile profile, {
+    bool fleet = false,
+  }) async {
+    await ref
+        .read(onboardingWizardControllerProvider.notifier)
+        .applyProfileChoice(profile, fleet: fleet);
     onProfilePicked();
   }
 }
 
-/// One large card per [AppProfile] — icon on the left, title +
+/// One large card per use-mode intent — icon on the left, title +
 /// description on the right. Active card shows a brand-green border
 /// and a check badge so the choice is visible after a tap (or when the
 /// user revisits the wizard with a profile already set).
+///
+/// [cardKey] names the intent rather than the profile, because two
+/// cards (personal *Track my consumption* and *Company or fleet
+/// vehicle*) select the same [AppProfile.medium] preset and still have
+/// to be addressable — and distinguishable — separately.
 class _ProfileCard extends StatelessWidget {
-  final AppProfile profile;
+  final String cardKey;
   final IconData icon;
   final String title;
   final String description;
@@ -116,7 +156,7 @@ class _ProfileCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const _ProfileCard({
-    required this.profile,
+    required this.cardKey,
     required this.icon,
     required this.title,
     required this.description,
@@ -133,7 +173,7 @@ class _ProfileCard extends StatelessWidget {
     final brandGreen = DarkModeColors.brandGreen(context);
     final borderColor = isActive ? brandGreen : theme.dividerColor;
     return Card(
-      key: Key('profileCard_${profile.name}'),
+      key: Key('profileCard_$cardKey'),
       elevation: isActive ? 3 : 1,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

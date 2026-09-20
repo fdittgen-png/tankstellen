@@ -18,6 +18,7 @@ enum SettingsTopicId {
   features,
   dataSources,
   sync,
+  fleet,
   privacy,
   backup,
   advanced,
@@ -59,11 +60,14 @@ class SettingsTopic {
 /// The ordered topic list for the Settings root. Gated topics are
 /// dropped here so the root never shows a tile whose screen would be
 /// empty: Sync & account needs `Feature.tankSync`, Advanced & developer
-/// needs the PAT or debug flag (#3884).
+/// needs the PAT or debug flag (#3884), and Fleet needs
+/// `Feature.fleetMode` — a personal user must see no fleet
+/// administration clutter at all (#4218).
 List<SettingsTopic> buildSettingsTopics(
   AppLocalizations l, {
   required bool tankSyncOn,
   required bool advancedOn,
+  bool fleetOn = false,
 }) {
   return [
     SettingsTopic(
@@ -131,6 +135,15 @@ List<SettingsTopic> buildSettingsTopics(
         subtitle: l.tankSyncSectionSubtitle,
         keywords: l.settingsTopicSyncKeywords,
         route: RoutePaths.settingsSync,
+      ),
+    if (fleetOn)
+      SettingsTopic(
+        id: SettingsTopicId.fleet,
+        icon: Icons.business_center_outlined,
+        title: l.settingsTopicFleetTitle,
+        subtitle: l.settingsTopicFleetSubtitle,
+        keywords: l.settingsTopicFleetKeywords,
+        route: RoutePaths.settingsFleet,
       ),
     SettingsTopic(
       id: SettingsTopicId.privacy,

@@ -18,17 +18,9 @@ import '../../../profile/providers/profile_provider.dart';
 import '../../providers/api_key_validator_provider.dart';
 import '../../providers/onboarding_platform_steps_provider.dart';
 import '../../providers/onboarding_wizard_provider.dart';
-import '../widgets/api_key_step.dart';
-import '../widgets/completion_step.dart';
-import '../widgets/country_language_step.dart';
-import '../widgets/landing_screen_step.dart';
-import '../widgets/onboarding_ios_standby_step.dart';
 import '../widgets/onboarding_navigation_buttons.dart';
-import '../widgets/onboarding_obd2_step.dart';
 import '../widgets/onboarding_progress_indicator.dart';
-import '../widgets/preferences_step.dart';
-import '../widgets/profile_choice_step.dart';
-import '../widgets/vehicles_step.dart';
+import 'onboarding_step_list.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 
 /// Multi-step onboarding wizard with progress indicator.
@@ -36,21 +28,17 @@ import '../../../../core/widgets/page_scaffold.dart';
 /// Step layout depends on the user's [AppProfile] choice on the first
 /// page (#1517 / #1518):
 ///
-/// | Step | Basic | Medium | Full |
-/// | --- | :-: | :-: | :-: |
-/// | 0 — Profile choice (Welcome + Sparkilo brand + 3 cards) | ✓ | ✓ | ✓ |
-/// | 1 — Country & Language | ✓ | ✓ | ✓ |
-/// | 2 — Vehicle | — | ✓ | ✓ |
-/// | 3 — OBD2 adapter (paired with the vehicle from step 2) | — | — | ✓ |
-/// | 4 — Preferences | ✓ | ✓ | ✓ |
-/// | 5 — Landing screen | ✓ | ✓ | ✓ |
-/// | 6 — API key (only if country requires) | cond | cond | cond |
-/// | 7 — Done | ✓ | ✓ | ✓ |
+/// The composition itself lives in `onboarding_step_list.dart`
+/// ([buildOnboardingSteps]) — see its table for which page appears
+/// under which profile. Vehicle is shown for Medium because manual
+/// fill-up logging needs a vehicle to attach to; OBD2 is Full only
+/// because the rest of the OBD2 stack (auto-record, consumption
+/// analytics) is also Full-only.
 ///
-/// Vehicle is shown for Medium because manual fill-up logging needs a
-/// vehicle to attach to. OBD2 is Full only because the rest of the
-/// OBD2 stack (auto-record, consumption analytics) is
-/// also Full-only.
+/// #4217 — the per-step indices below are **lookups into the built
+/// list**, not arithmetic. Two conditional fleet pages now sit before
+/// Vehicle and before Done, so any hard-coded "Vehicle is index 2"
+/// would be wrong for a fleet driver.
 ///
 /// Wizard progress and loading flag live in
 /// [onboardingWizardControllerProvider]; the API-key [TextEditingController]
@@ -75,35 +63,21 @@ class _OnboardingWizardScreenState
   /// automatically.
   int get _stepCount => _buildSteps().length;
 
-  /// Zero-based index of the Vehicles step under the active profile,
-  /// or -1 when the profile doesn't include it (Basic).
-  int get _vehiclesStepIndex {
-    final profile = ref.read(activeAppProfileProvider);
-    if (profile == AppProfile.basic || profile == null) return -1;
-    return 2; // Welcome+Profile (0), Country (1), Vehicle (2)
-  }
+  /// Zero-based index of [id] in the current composition, or -1 when
+  /// this profile / platform / country does not include that step.
+  int _indexOf(OnboardingStepId id) => indexOfStep(_buildSteps(), id);
 
-  /// Zero-based index of the OBD2 adapter step under the active
-  /// profile, or -1 when the profile doesn't include it
-  /// (Basic + Medium). On iOS the index shifts by one because the
-  /// iOS-only standby explainer (#1542 phase 6) sits between Vehicle
-  /// and OBD2.
-  int get _obd2StepIndex {
-    final profile = ref.read(activeAppProfileProvider);
-    if (profile != AppProfile.full && profile != AppProfile.custom) return -1;
-    // Welcome+Profile (0), Country (1), Vehicle (2), [iOS standby (3)],
-    // OBD2 (3 or 4 depending on platform).
-    return ref.read(onboardingIncludesIosStandbyStepProvider) ? 4 : 3;
-  }
+  /// Zero-based index of the Vehicles step, or -1 (Basic).
+  int get _vehiclesStepIndex => _indexOf(OnboardingStepId.vehicles);
 
-  /// Zero-based index of the optional API key step.
-  int get _apiKeyStepIndex {
-    final country = ref.read(activeCountryProvider);
-    if (!country.requiresApiKey) return -1;
-    // API-key sits just before the Done step. Compute it relative to
-    // _stepCount so we don't drift when other steps come and go.
-    return _stepCount - 2;
-  }
+  /// Zero-based index of the OBD2 adapter step, or -1 (Basic +
+  /// Medium). On iOS the iOS-only standby explainer (#1542 phase 6)
+  /// sits between Vehicle and OBD2 — the lookup absorbs that, and the
+  /// fleet identity page, without arithmetic.
+  int get _obd2StepIndex => _indexOf(OnboardingStepId.obd2);
+
+  /// Zero-based index of the optional API key step, or -1.
+  int get _apiKeyStepIndex => _indexOf(OnboardingStepId.apiKey);
 
   bool _isLastStep(int currentStep) => currentStep == _stepCount - 1;
 
@@ -281,7 +255,7 @@ class _OnboardingWizardScreenState
           ? l10n.onboardingPickUseMode
           : null;
 
-  List<Widget> _buildSteps() {
+  List<OnboardingStep> _buildSteps() {
     final country = ref.watch(activeCountryProvider);
     final profile = ref.watch(activeAppProfileProvider);
     final showVehicle =
@@ -299,28 +273,23 @@ class _OnboardingWizardScreenState
     // inline `defaultTargetPlatform` branching.
     final showIosStandby =
         showObd2 && ref.watch(onboardingIncludesIosStandbyStepProvider);
-    return [
-      ProfileChoiceStep(onProfilePicked: _onProfilePicked),
-      const CountryLanguageStep(),
-      if (showVehicle) const VehiclesStep(),
-      if (showIosStandby) const OnboardingIosStandbyStep(),
-      if (showObd2)
-        OnboardingObd2Step(
-          onProceed: _advanceFromObd2,
-          onAutoFillSuccess: _advanceAfterObd2AutoFill,
-        ),
-      const PreferencesStep(),
-      const LandingScreenStep(),
-      if (country.requiresApiKey)
-        ApiKeyStep(
-          apiKeyController: _apiKeyController,
-          onUseDemoData: () {
-            _apiKeyController.clear();
-            _skip(_apiKeyStepIndex);
-          },
-        ),
-      const CompletionStep(),
-    ];
+    return buildOnboardingSteps(
+      showFleet: ref.watch(
+        onboardingWizardControllerProvider.select((s) => s.fleetIntent),
+      ),
+      showVehicle: showVehicle,
+      showIosStandby: showIosStandby,
+      showObd2: showObd2,
+      requiresApiKey: country.requiresApiKey,
+      onProfilePicked: _onProfilePicked,
+      onObd2Proceed: _advanceFromObd2,
+      onObd2AutoFillSuccess: _advanceAfterObd2AutoFill,
+      apiKeyController: _apiKeyController,
+      onUseDemoData: () {
+        _apiKeyController.clear();
+        _skip(_apiKeyStepIndex);
+      },
+    );
   }
 
   @override
@@ -358,7 +327,7 @@ class _OnboardingWizardScreenState
                       .read(onboardingWizardControllerProvider.notifier)
                       .setStep(index);
                 },
-                children: steps,
+                children: [for (final step in steps) step.child],
               ),
             ),
             // Navigation buttons

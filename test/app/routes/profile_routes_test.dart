@@ -8,7 +8,7 @@ import 'package:tankstellen/core/navigation/app_routes.dart';
 
 void main() {
   group('profileRoutes', () {
-    test('returns exactly 25 routes', () {
+    test('returns exactly 27 routes', () {
       // Guards against accidental insert/delete — the Profile shell
       // branch pushes onto these sub-screens. #2248 added the three
       // Developer-tools routes (/developer-tools[/error-log|/flags]);
@@ -16,8 +16,17 @@ void main() {
       // #2518 added the gated /developer-tools/ocr-tester screen;
       // #3884 added the twelve Settings topic screens + the radar
       // sub-screen (/settings/...); #4007 added /help, appended LAST so
-      // that no existing index in the tests below moves.
-      expect(profileRoutes.length, 26);
+      // that no existing index in the tests below moves; #4365 appended
+      // /compare-vehicles and #4217 appended /settings/fleet after it,
+      // each for the same reason. The count is the SUM of both — each
+      // branch said 26 on its own, and 26 is what neither of them is.
+      expect(profileRoutes.length, 27);
+    });
+
+    test('route 26 path is "/settings/fleet" (#4217) — appended last', () {
+      final route = profileRoutes[26] as GoRoute;
+      expect(route.path, RoutePaths.settingsFleet);
+      expect(route.builder, isNotNull);
     });
 
     test('route 0 path is "/vehicles"', () {

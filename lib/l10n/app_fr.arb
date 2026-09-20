@@ -8257,5 +8257,219 @@
         "example": "Not recorded — these trips carry no such signal"
       }
     }
+  },
+  "wizardProfileFleetName": "Véhicule de société ou de flotte",
+  "@wizardProfileFleetName": {
+    "description": "MT — needs native review"
+  },
+  "wizardProfileFleetDescription": "Je conduis la voiture de mon employeur. Affectation de flotte, dépenses, et une vue claire de ce que voit mon gestionnaire.",
+  "@wizardProfileFleetDescription": {
+    "description": "MT — needs native review"
+  },
+  "fleetIdentityTitle": "Votre flotte",
+  "@fleetIdentityTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetIdentityIntro": "Saisissez le code d'invitation fourni par votre gestionnaire de flotte. Si c'est vous qui créez la flotte, créez-la plutôt ci-dessous.",
+  "@fleetIdentityIntro": {
+    "description": "MT — needs native review"
+  },
+  "fleetInviteCodeLabel": "Code d'invitation",
+  "@fleetInviteCodeLabel": {
+    "description": "MT — needs native review"
+  },
+  "fleetScanQrCode": "Scanner le code QR",
+  "@fleetScanQrCode": {
+    "description": "MT — needs native review"
+  },
+  "fleetJoinButton": "Rejoindre la flotte",
+  "@fleetJoinButton": {
+    "description": "MT — needs native review"
+  },
+  "fleetCreateSectionTitle": "C'est moi qui crée cette flotte",
+  "@fleetCreateSectionTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetOrgNameLabel": "Nom de la flotte",
+  "@fleetOrgNameLabel": {
+    "description": "MT — needs native review"
+  },
+  "fleetCreateButton": "Créer la flotte",
+  "@fleetCreateButton": {
+    "description": "MT — needs native review"
+  },
+  "fleetIdentityLater": "Vous pourrez aussi le faire plus tard dans Réglages, puis Flotte.",
+  "@fleetIdentityLater": {
+    "description": "MT — needs native review"
+  },
+  "fleetMemberOf": "Vous faites partie de {org}.",
+  "@fleetMemberOf": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "org": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetYourRole": "Votre rôle : {role}",
+  "@fleetYourRole": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetRoleEmployee": "Salarié",
+  "@fleetRoleEmployee": {
+    "description": "MT — needs native review"
+  },
+  "fleetRoleManager": "Gestionnaire de flotte",
+  "@fleetRoleManager": {
+    "description": "MT — needs native review"
+  },
+  "fleetRoleAdmin": "Administrateur de flotte",
+  "@fleetRoleAdmin": {
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedIdentityRequired": "Rejoindre une flotte exige un compte avec une adresse e-mail. Cet appareil utilise encore un compte anonyme, que personne ne peut rattacher à une entreprise — ajoutez d'abord une adresse e-mail dans Réglages, puis Sync.",
+  "@fleetBlockedIdentityRequired": {
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedCommunityBackend": "Une flotte ne peut pas vivre sur la base de données communautaire partagée. Il faut la base de votre employeur, ou une base à laquelle vous avez été invité.",
+  "@fleetBlockedCommunityBackend": {
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedSyncDisabled": "La synchronisation cloud est désactivée. Configurez d'abord la base de votre employeur dans Réglages, puis Sync.",
+  "@fleetBlockedSyncDisabled": {
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedEnterCode": "Saisissez le code d'invitation fourni par votre gestionnaire de flotte.",
+  "@fleetBlockedEnterCode": {
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedEnterName": "Donnez un nom à la flotte.",
+  "@fleetBlockedEnterName": {
+    "description": "MT — needs native review"
+  },
+  "fleetJoinErrorInvalidCode": "Ce code d'invitation est invalide ou expiré. Demandez-en un nouveau à votre gestionnaire de flotte.",
+  "@fleetJoinErrorInvalidCode": {
+    "description": "MT — needs native review"
+  },
+  "fleetJoinErrorAlreadyMember": "Ce compte appartient déjà à une flotte. Quittez-la avant d'en rejoindre une autre.",
+  "@fleetJoinErrorAlreadyMember": {
+    "description": "MT — needs native review"
+  },
+  "fleetJoinErrorNotSupported": "Cette base de données ne propose pas l'adhésion à une flotte. Votre administrateur doit d'abord y activer le mode flotte.",
+  "@fleetJoinErrorNotSupported": {
+    "description": "MT — needs native review"
+  },
+  "fleetJoinErrorUnavailable": "La flotte est injoignable. Vérifiez votre connexion et réessayez.",
+  "@fleetJoinErrorUnavailable": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyTitle": "Ce qui est partagé, et ce qui ne l'est pas",
+  "@fleetPrivacyTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyDeviceTitle": "Reste sur cet appareil",
+  "@fleetPrivacyDeviceTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyDeviceBody": "Vos trajets, votre position et les données brutes lues sur l'adaptateur ne quittent jamais ce téléphone vers la flotte. Elles sont à vous, pour vos propres consommations et votre coaching.",
+  "@fleetPrivacyDeviceBody": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacySyncTitle": "Part vers la base de votre flotte",
+  "@fleetPrivacySyncTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacySyncBody": "Le véhicule de société qui vous est affecté et depuis quand, ainsi que les pleins et les dépenses que vous soumettez vous-même. Tant que le partage est désactivé, rien n'est envoyé.",
+  "@fleetPrivacySyncBody": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyManagerTitle": "Ce que voit votre gestionnaire",
+  "@fleetPrivacyManagerTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyManagerBody": "Les véhicules et les affectations, les dépenses soumises, et les coûts et consommations sous forme de totaux de flotte. Pas vos trajets, pas votre position en direct, et jamais un classement du style de conduite des salariés.",
+  "@fleetPrivacyManagerBody": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyRetentionTitle": "Durée de conservation, et vos contrôles",
+  "@fleetPrivacyRetentionTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyRetentionBody": "Votre employeur définit la durée de conservation des dépenses et de l'historique d'affectation. Vous pouvez à tout moment tout exporter, désactiver le partage et supprimer vos propres données dans Réglages, puis Confidentialité et données.",
+  "@fleetPrivacyRetentionBody": {
+    "description": "MT — needs native review"
+  },
+  "settingsTopicFleetTitle": "Flotte",
+  "@settingsTopicFleetTitle": {
+    "description": "MT — needs native review"
+  },
+  "settingsTopicFleetSubtitle": "Votre organisation, votre rôle et ce que voit votre gestionnaire.",
+  "@settingsTopicFleetSubtitle": {
+    "description": "MT — needs native review"
+  },
+  "settingsTopicFleetKeywords": "flotte, voiture de société, employeur, organisation, gestionnaire, affectation, dépenses",
+  "@settingsTopicFleetKeywords": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsNoFleet": "Vous n'êtes encore dans aucune flotte. Rejoignez-en une avec un code d'invitation, ou créez-la si vous l'administrez.",
+  "@fleetSettingsNoFleet": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsOrgLabel": "Flotte",
+  "@fleetSettingsOrgLabel": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsRoleLabel": "Votre rôle",
+  "@fleetSettingsRoleLabel": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsSharingLabel": "Partage avec votre flotte",
+  "@fleetSettingsSharingLabel": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsSharingOn": "Activé. Les pleins et les dépenses que vous soumettez parviennent à votre flotte.",
+  "@fleetSettingsSharingOn": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsSharingOff": "Désactivé. Rien de lié à la flotte ne quitte cet appareil.",
+  "@fleetSettingsSharingOff": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsManagerSeesTitle": "Ce que voit mon gestionnaire",
+  "@fleetSettingsManagerSeesTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityVehicle": "Le véhicule de société qui vous est affecté, et pour quelle période.",
+  "@fleetVisibilityVehicle": {
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityExpenses": "Les pleins et les dépenses que vous soumettez vous-même.",
+  "@fleetVisibilityExpenses": {
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityCosts": "Le coût au kilomètre et la consommation, au sein des totaux de la flotte.",
+  "@fleetVisibilityCosts": {
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityNeverJourneys": "Jamais vos trajets, votre position en direct ni les données brutes de l'adaptateur.",
+  "@fleetVisibilityNeverJourneys": {
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityNeverBehaviour": "Jamais un classement du style de conduite des salariés.",
+  "@fleetVisibilityNeverBehaviour": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsStale": "Ces informations de flotte n'ont pas pu être actualisées récemment.",
+  "@fleetSettingsStale": {
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsExpired": "Ces informations de flotte sont périmées. Reconnectez-vous pour qu'elles soient actualisées avant de choisir un véhicule.",
+  "@fleetSettingsExpired": {
+    "description": "MT — needs native review"
   }
 }

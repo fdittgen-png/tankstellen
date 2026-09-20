@@ -61,11 +61,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
     final patOn = enabledFlags.contains(Feature.developerPatToken);
     final debugOn = enabledFlags.contains(Feature.debugMode);
+    // #4217 / #4218 — Fleet is a topic only for a fleet user; the same
+    // cascading gate as Sync, so withdrawing TankSync takes the fleet
+    // tile with it.
+    final fleetOn = isEffectivelyEnabled(
+      Feature.fleetMode,
+      manifest,
+      enabledFlags,
+    );
 
     final topics = buildSettingsTopics(
       l,
       tankSyncOn: tankSyncOn,
       advancedOn: patOn || debugOn,
+      fleetOn: fleetOn,
     );
     final query = _query.text;
     final visible = topics.where((t) => t.matches(query)).toList();
