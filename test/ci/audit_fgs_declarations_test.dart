@@ -58,11 +58,16 @@ void main() {
     // add their own `foregroundServiceType` entries that no `tools:node`
     // in our manifest removes. CI audits the merged artifact with
     // `--merged`, which pins those two EXACTLY rather than ignoring
-    // services — so the gate still catches an app-declared one. (What the
-    // pin records is uncomfortable and deliberate: the default Play
-    // artifact declares two service *types* while requesting none of the
-    // matching FOREGROUND_SERVICE_* permissions, which on Android 14+
-    // cannot be promoted at all — failure mode M1 of #4351.)
+    // services — so the gate still catches an app-declared one.
+    //
+    // The pin records that the default Play artifact declares two service
+    // *types* while requesting none of the matching FOREGROUND_SERVICE_*
+    // permissions. #4415 traced what that actually costs: neither service
+    // is ever promoted in a default build (geolocator's is bound-only
+    // without a `foregroundNotificationConfig`; WorkManager's starts only
+    // for expedited work, which nothing here enqueues), so it is the
+    // documented ~5 s batching downgrade and not an Android-14
+    // `startForeground` crash. The script's own comment carries the trace.
     group('--merged — the real Play artifact', () {
       File? tmp;
 
@@ -205,6 +210,119 @@ void main() {
       ]);
       expect(r.exitCode, 1, reason: out(r));
       expect(out(r), contains('MISSING expected'));
+    });
+  });
+
+  group('--merged composes the library baseline into exact mode too (#4415)',
+      () {
+    // The day the #1498 form clears, the thing that ships is a MERGED
+    // artifact, not the source-set overlay the two expect-exactly profiles
+    // read. Its declared set is our own PLUS the same two library entries
+    // expect-zero already pins — and before this, nothing checked that:
+    // `--profile play-fgs-approved` against a built manifest failed on the
+    // libraries as though they were rogue. One flag, so the gate exists
+    // before the artifact does.
+    const ours = '<service android:name='
+        '".autorecord.AutoRecordForegroundService" '
+        'android:foregroundServiceType="connectedDevice"/>';
+    const work = '<service android:name='
+        '"androidx.work.impl.foreground.SystemForegroundService" '
+        'android:foregroundServiceType="shortService"/>';
+    const geo = '<service android:name='
+        '"com.baseflow.geolocator.GeolocatorLocationService" '
+        'android:foregroundServiceType="location"/>';
+    const perms = '<uses-permission android:name='
+        '"android.permission.FOREGROUND_SERVICE"/>'
+        '<uses-permission android:name='
+        '"android.permission.FOREGROUND_SERVICE_LOCATION"/>'
+        '<uses-permission android:name='
+        '"android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"/>';
+
+    String write(String services, {String permissions = perms}) {
+      final dir = Directory.systemTemp.createTempSync('fgs_exact_merged_');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      return (File('${dir.path}/AndroidManifest.xml')
+            ..writeAsStringSync('<manifest>$permissions<application>'
+                '$services</application></manifest>'))
+          .path;
+    }
+
+    test('an FGS-approved MERGED Play artifact passes', () {
+      final r = run([
+        '--profile',
+        'play-fgs-approved',
+        '--merged',
+        write('$ours$work$geo'),
+      ]);
+      expect(r.exitCode, 0, reason: out(r));
+      expect(out(r), contains('GeolocatorLocationService=location'));
+      expect(out(r), contains('AutoRecordForegroundService=connectedDevice'));
+    });
+
+    test('NEGATIVE — without --merged the SAME manifest fails, and the '
+        'failure says which flag it wanted', () {
+      final r =
+          run(['--profile', 'play-fgs-approved', write('$ours$work$geo')]);
+      expect(r.exitCode, 1, reason: out(r));
+      expect(out(r), contains('UNEXPECTED'));
+      expect(out(r), contains('pass --merged'));
+    });
+
+    test('NEGATIVE — our own service missing from a merged artifact still '
+        'fails: that is the silent screen-off mode, and --merged must not '
+        'hide it', () {
+      final r = run([
+        '--profile',
+        'play-fgs-approved',
+        '--merged',
+        write('$work$geo'),
+      ]);
+      expect(r.exitCode, 1, reason: out(r));
+      expect(out(r), contains('MISSING expected'));
+      expect(out(r),
+          contains('.autorecord.AutoRecordForegroundService=connectedDevice'));
+    });
+
+    test('NEGATIVE — a library service vanishing from a merged artifact '
+        'fails too', () {
+      final r = run([
+        '--profile',
+        'play-fgs-approved',
+        '--merged',
+        write('$ours$work'),
+      ]);
+      expect(r.exitCode, 1, reason: out(r));
+      expect(out(r), contains('MISSING expected'));
+      expect(out(r), contains('GeolocatorLocationService=location'));
+    });
+
+    test('an APP-declared extra service fails even in merged exact mode', () {
+      const rogue = '<service android:name=".recording.RogueService" '
+          'android:foregroundServiceType="location"/>';
+      final r = run([
+        '--profile',
+        'play-fgs-approved',
+        '--merged',
+        write('$ours$work$geo$rogue'),
+      ]);
+      expect(r.exitCode, 1, reason: out(r));
+      expect(out(r), contains('UNEXPECTED'));
+      expect(out(r), contains('RogueService'));
+    });
+
+    test('the F-Droid profile composes the same way — location-only plus '
+        'the two libraries', () {
+      final r = run([
+        '--profile',
+        'fdroid-fgs-approved',
+        '--merged',
+        write('$work$geo',
+            permissions: '<uses-permission android:name='
+                '"android.permission.FOREGROUND_SERVICE"/>'
+                '<uses-permission android:name='
+                '"android.permission.FOREGROUND_SERVICE_LOCATION"/>'),
+      ]);
+      expect(r.exitCode, 0, reason: out(r));
     });
   });
 
