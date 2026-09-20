@@ -15,6 +15,8 @@ import 'package:tankstellen/features/trips/providers/trip_ve_recompute_provider.
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Coverage for the #1858 retroactive η_v recompute trigger — the
 /// keep-alive listener that rescales a vehicle's trips when its η_v is
 /// edited.
@@ -32,7 +34,7 @@ void main() {
 
   tearDown(() async {
     await Hive.deleteFromDisk();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   TripHistoryEntry trip({

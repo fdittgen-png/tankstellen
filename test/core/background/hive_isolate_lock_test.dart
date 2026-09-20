@@ -8,6 +8,7 @@ import 'dart:isolate';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/background/hive_isolate_lock.dart';
 
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/silence_error_logger.dart';
 
 /// A fixed instant every owner stamp in the #4333 cases is written at.
@@ -50,9 +51,7 @@ void main() {
   });
 
   tearDown(() async {
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('HiveIsolateLock', () {

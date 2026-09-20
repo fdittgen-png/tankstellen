@@ -13,6 +13,8 @@ import 'package:tankstellen/core/storage/hive_deferred_user_boxes.dart';
 import 'package:tankstellen/core/storage/hive_isolate_ownership.dart';
 import 'package:tankstellen/core/storage/impl/hive_directory_resolver.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4118 — a restored install must not be told its data is damaged.
 ///
 /// Android Auto-Backup and device-to-device transfer copy the app's
@@ -104,8 +106,7 @@ void main() {
 
   tearDown(() async {
     await Hive.deleteFromDisk();
-    await Hive.close();
-    dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, null);
     HiveCipherLoader.resetCipherLoaderForTest();

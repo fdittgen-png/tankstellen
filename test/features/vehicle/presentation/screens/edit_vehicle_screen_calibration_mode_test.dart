@@ -17,6 +17,8 @@ import 'package:tankstellen/features/vehicle/providers/calibration_mode_provider
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Widget tests for the #894 calibration-mode segmented button on the
 /// edit-vehicle screen. Covers: both segments render, tapping Fuzzy
 /// persists the change through the profile repository and enqueues a
@@ -32,10 +34,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('EditVehicleScreen — calibration mode (#894)', () {

@@ -13,6 +13,8 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/alerts/background/background_alert_scan_coordinator.dart';
 import 'package:tankstellen/features/alerts/background/background_scan_body.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// What a process kill leaves of a background scan (#4162): the rows of
 /// the boxes the scan writes, at one instant.
 class ScanDiskImage {
@@ -110,7 +112,6 @@ class ScanDisk {
       );
 
   Future<void> close() async {
-    await Hive.close();
-    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   }
 }

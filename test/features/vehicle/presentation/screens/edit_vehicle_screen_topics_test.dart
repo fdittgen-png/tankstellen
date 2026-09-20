@@ -23,6 +23,8 @@ import 'package:tankstellen/features/vehicle/presentation/widgets/vehicle_topic_
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// #3900 (Epic #3897) — the Edit-vehicle editor is a topic tree: identity
 /// & engine stay inline, everything a saved vehicle grows sits behind one
 /// tappable tile per topic, each with a one-line status, each opening its
@@ -38,8 +40,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('EditVehicleScreen — topic tree (#3900)', () {

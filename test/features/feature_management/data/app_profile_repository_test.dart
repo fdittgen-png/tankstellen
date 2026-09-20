@@ -8,6 +8,8 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/features/feature_management/data/app_profile_repository.dart';
 import 'package:tankstellen/features/feature_management/domain/app_profile.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Unit tests for [AppProfileRepository] (epic #1612, child #1629).
 ///
 /// Pins the single-entry persistence contract: an empty box means "no
@@ -31,8 +33,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('empty box', () {

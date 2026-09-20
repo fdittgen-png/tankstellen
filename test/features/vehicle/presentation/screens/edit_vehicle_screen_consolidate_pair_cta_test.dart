@@ -17,6 +17,8 @@ import 'package:tankstellen/features/vehicle/presentation/screens/topics/vehicle
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Integration tests for #1400 in the #3900 topic tree: the auto-record
 /// card's passive "Pair an adapter" link must lead to the ONE pair entry
 /// point — the OBD2 adapter card's "Pair adapter" button. Pre-#1400 the
@@ -36,10 +38,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('EditVehicleScreen — consolidate pair CTA (#1400 / #3900)', () {

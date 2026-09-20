@@ -9,6 +9,7 @@ import 'package:tankstellen/app/startup/launch_sync_pulls.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/silence_error_logger.dart';
 import 'package:tankstellen/features/trips/data/trips_sync_rows.dart';
 
@@ -40,8 +41,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   TripHistoryEntry entry(String id, {int day = 1}) => TripHistoryEntry(

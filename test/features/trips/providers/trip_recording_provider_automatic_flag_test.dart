@@ -13,6 +13,7 @@ import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Tests for the public `automatic` flag plumbing through the trip
@@ -44,8 +45,7 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2TripHistory).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   Future<TripHistoryEntry> runOnce(

@@ -9,6 +9,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_cache_recovery.dart';
 import 'package:tankstellen/core/storage/hive_cipher_loader.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #3689 — [HiveCacheRecovery] reopens the cache box after its handle died.
 void main() {
   late Directory tmp;
@@ -23,7 +25,7 @@ void main() {
   tearDown(() async {
     HiveCipherLoader.resetCipherLoaderForTest();
     await Hive.deleteFromDisk();
-    await tmp.delete(recursive: true);
+    await closeHiveAndDeleteTemp(tmp);
   });
 
   test('recover reopens the box with the cipher — data intact', () async {

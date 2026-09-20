@@ -13,6 +13,8 @@ import 'package:tankstellen/features/alerts/data/radius_alert_store.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/providers/radius_alerts_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// [RadiusAlertStore] that always throws on [upsert] and [remove], used to
 /// verify that write failures surface as AsyncError rather than false success
 /// (#2314). [list] returns an empty list so build() succeeds.
@@ -96,10 +98,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('radiusAlertsProvider', () {

@@ -10,6 +10,8 @@ import 'package:tankstellen/core/storage/hive_isolate_boxes.dart';
 import 'package:tankstellen/core/storage/hive_isolate_ownership.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// HiveStorage tests use real Hive boxes initialized with a temp directory.
 /// This avoids mocking Hive internals and tests actual read/write behavior.
 void main() {
@@ -24,10 +26,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   // ---------------------------------------------------------------------------

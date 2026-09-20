@@ -12,6 +12,8 @@ import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Integration test for #726 — every `stop()` writes an entry into
 /// the trip history Hive box. Without this path, the history list
 /// stays empty forever and the feature does nothing.
@@ -28,8 +30,7 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2TripHistory).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test('TripRecording.stop() persists a TripHistoryEntry readable '

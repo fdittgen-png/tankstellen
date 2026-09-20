@@ -11,6 +11,7 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/trips/data/baseline_store.dart';
 import 'package:tankstellen/features/trips/domain/situation_classifier.dart';
 import 'package:tankstellen/features/trips/providers/vehicle_baseline_summary_provider.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 void main() {
@@ -27,8 +28,7 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2Baselines).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('vehicleBaselineSummaryProvider (#779)', () {

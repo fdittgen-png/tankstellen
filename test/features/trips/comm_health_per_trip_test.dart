@@ -16,6 +16,7 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/silence_error_logger.dart';
 
 /// Synchronous fake of the [FeatureFlags] async notifier so the widget pump
@@ -66,8 +67,7 @@ void main() {
     Obd2CommDiagnostics.instance.enabled = false;
     Obd2CommDiagnostics.instance.reset();
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   TripSummary mkSummary(DateTime start) => TripSummary(

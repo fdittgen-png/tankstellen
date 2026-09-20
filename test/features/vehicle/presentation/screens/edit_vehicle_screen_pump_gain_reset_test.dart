@@ -19,6 +19,8 @@ import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_s
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Widget tests for the pump-calibration reset action on
 /// [EditVehicleScreen] (#3901, replacing the #815 η_v reset).
 ///
@@ -37,10 +39,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   VehicleProfile calibrated() => VehicleProfile(

@@ -25,6 +25,7 @@ import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/fake_settings_storage.dart';
+import '../../../../helpers/hive_temp_dir.dart';
 
 /// #2960 — adding or removing the OBD2 adapter on the Edit-vehicle
 /// screen must update the adapter section IN PLACE and keep the form
@@ -48,10 +49,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   testWidgets(

@@ -18,6 +18,8 @@ import 'package:tankstellen/features/alerts/data/opportunity_feed_store.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity_budget.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #4183 — the whole chain, driven end to end.
 ///
 /// A price observation in, a notification decision out, with the clock
@@ -74,8 +76,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   final templates = BackgroundNotificationTemplates.resolveForLanguage('en');

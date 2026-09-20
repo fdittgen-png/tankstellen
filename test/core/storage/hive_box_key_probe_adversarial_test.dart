@@ -16,6 +16,8 @@ import 'package:hive/src/registry/type_registry_impl.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tankstellen/core/storage/hive_box_key_probe.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4341 adversarial verification, part 1 of 3 (CRC parity, healthy
 /// boxes, empty files, compaction, torn writes) — every file is produced
 /// by the REAL Hive 2.2.3 writer, and each verdict is cross-checked
@@ -57,8 +59,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   group('CRC implementation parity', () {

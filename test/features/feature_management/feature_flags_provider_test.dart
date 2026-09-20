@@ -16,6 +16,8 @@ import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_dependency_graph.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// A [FeatureFlagsRepository] whose [loadEnabled] always throws — used to
 /// exercise the #1681 AsyncNotifier error path (the Hive read failing).
 class _ThrowingRepo extends FeatureFlagsRepository {
@@ -63,8 +65,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   ProviderContainer makeContainer({

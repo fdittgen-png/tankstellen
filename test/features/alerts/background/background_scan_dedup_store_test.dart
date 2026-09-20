@@ -8,6 +8,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tankstellen/features/alerts/background/background_scan_dedup_store.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #2415 — cross-trigger scan cooldown. Verifies two background triggers
 /// firing close together can't both run a scan, while a legitimately-spaced
 /// scan still proceeds.
@@ -28,10 +30,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('BackgroundScanDedupStore', () {

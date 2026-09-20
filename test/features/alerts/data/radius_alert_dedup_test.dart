@@ -8,6 +8,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/alerts/data/radius_alert_dedup.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Covers the per-alert-per-station rate limit that keeps the BG
 /// isolate from re-notifying every 1 h cycle while a station is
 /// below the user's threshold (#578 phase 3).
@@ -28,10 +30,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('RadiusAlertDedup', () {

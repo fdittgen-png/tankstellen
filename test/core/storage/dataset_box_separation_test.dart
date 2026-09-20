@@ -11,6 +11,8 @@ import 'package:tankstellen/core/storage/hive_first_frame_boxes.dart';
 import 'package:tankstellen/core/storage/hive_open_timing.dart';
 import 'package:tankstellen/core/storage/hive_schema_migration.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4110 — the whole-country datasets are not first-frame work.
 ///
 /// `Hive.openBox` DESERIALIZES every value it reads: `framesFromFile`
@@ -33,8 +35,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test('the first-frame batch leaves the datasets box CLOSED', () async {

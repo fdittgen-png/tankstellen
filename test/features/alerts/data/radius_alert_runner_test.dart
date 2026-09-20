@@ -14,6 +14,8 @@ import 'package:tankstellen/features/alerts/data/radius_alert_store.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/domain/radius_alert_evaluator.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Captures every notification the runner emits. Stand-in for
 /// [LocalNotificationService] — the service layer only needs
 /// `showPriceAlert` to reach it.
@@ -130,10 +132,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('RadiusAlertRunner', () {

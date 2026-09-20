@@ -9,6 +9,8 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/providers/app_state_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// Regression test for issue #565 (and root-cause #555).
 ///
 /// `isSetupComplete` MUST be `false` on a freshly opened empty Hive.
@@ -34,10 +36,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('HiveStorage.isSetupComplete — empty-Hive invariant (#565 / #555)', () {

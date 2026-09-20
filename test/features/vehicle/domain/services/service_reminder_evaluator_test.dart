@@ -15,6 +15,8 @@ import 'package:tankstellen/features/vehicle/domain/entities/service_reminder.da
 import 'package:tankstellen/features/vehicle/domain/services/service_reminder_evaluator.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Local fake that mirrors `test/core/notifications/notification_service_test.dart`.
 /// Duplicated on purpose so this test file stays self-contained and
 /// doesn't reach into another test file at import time.
@@ -94,10 +96,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('ServiceReminderEvaluator (#584)', () {

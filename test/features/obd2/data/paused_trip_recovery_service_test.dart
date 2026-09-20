@@ -10,6 +10,8 @@ import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Direct unit tests for [PausedTripRecoveryService]
 /// (#1004 phase 4-WAL).
 ///
@@ -49,8 +51,7 @@ void main() {
     tearDown(() async {
       await pausedBox.deleteFromDisk();
       await historyBox.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     // -------- Helpers ----------------------------------------------------

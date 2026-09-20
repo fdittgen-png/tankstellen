@@ -11,6 +11,8 @@ import 'package:tankstellen/features/charging/data/charging_log_store.dart';
 import 'package:tankstellen/features/charging/providers/charging_logs_provider.dart';
 import 'package:tankstellen/features/ev/domain/entities/charging_log.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   late Directory tempDir;
 
@@ -46,10 +48,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('chargingLogsProvider', () {

@@ -11,6 +11,8 @@ import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Unit tests for the two providers in `trip_history_provider.dart`
 /// (Refs #561). The repository accessor swallows a closed Hive box
 /// instead of throwing — widget tests rely on that, so we pin both the
@@ -54,10 +56,7 @@ void main() {
     if (Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) {
       await Hive.box<String>(HiveBoxes.obd2TripHistory).deleteFromDisk();
     }
-    await Hive.close();
-    if (tmpDir.existsSync()) {
-      tmpDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('tripHistoryRepositoryProvider (#726)', () {

@@ -16,6 +16,8 @@ import 'package:tankstellen/features/alerts/domain/station_price_sample.dart';
 import 'package:tankstellen/features/alerts/domain/velocity_alert_detector.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Captures every notification the runner fires. Stand-in for
 /// [LocalNotificationService] — the BG-isolate hook just needs
 /// `showPriceAlert` to reach it.
@@ -86,10 +88,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   // User sits at this point; stations are clustered within ~2 km.

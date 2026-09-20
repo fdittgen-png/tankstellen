@@ -17,6 +17,8 @@ import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 import 'package:tankstellen/features/trips/domain/trip_verdict.dart';
 import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 final _t0 = DateTime(2026, 8, 30, 9);
 
 TripHistoryEntry _entry(String id, int n) => TripHistoryEntry(
@@ -66,8 +68,7 @@ void main() {
     tearDown(() async {
       container.dispose();
       await Hive.box<String>(HiveBoxes.obd2TripHistory).deleteFromDisk();
-      await Hive.close();
-      dir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(dir);
     });
 
     test('loading → full entry; an unrelated list refresh does not '

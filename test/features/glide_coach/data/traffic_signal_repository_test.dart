@@ -10,6 +10,8 @@ import 'package:tankstellen/features/glide_coach/data/osm_traffic_signal_client.
 import 'package:tankstellen/features/glide_coach/data/traffic_signal_repository.dart';
 import 'package:tankstellen/features/glide_coach/domain/entities/traffic_signal.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Hand-rolled fake of [OsmTrafficSignalClient] (#1125 phase 1).
 ///
 /// Records every call so the cache-hit tests can assert "client was
@@ -63,8 +65,7 @@ void main() {
 
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     TrafficSignal makeSignal(String id, double lat, double lng) =>
@@ -253,8 +254,7 @@ void main() {
     });
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('a failed Overpass call opens the breaker: no redial for 5 min, '
@@ -324,8 +324,7 @@ void main() {
     });
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('a second caller while a probe is in flight gets the stale answer '

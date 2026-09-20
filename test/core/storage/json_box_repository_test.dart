@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/json_box_repository.dart';
 
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/silence_error_logger.dart';
 
 class _Thing {
@@ -50,10 +51,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('JsonBoxRepository', () {

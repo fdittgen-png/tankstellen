@@ -14,6 +14,7 @@ import 'package:tankstellen/features/trips/domain/trip_verdict.dart';
 import 'package:tankstellen/features/trips/presentation/widgets/trip_verdict_prompt_card.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
 import '../../../../helpers/silence_error_logger.dart';
 
 /// #3501 (epic #3498) — the 3-tap post-trip verdict prompt + persistence.
@@ -34,8 +35,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   TripHistoryEntry entry({String? verdict}) => TripHistoryEntry(

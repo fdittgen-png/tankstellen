@@ -11,6 +11,7 @@ import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/core/sync/sync_pull_lease.dart';
 import 'package:tankstellen/core/sync/sync_transport.dart';
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/silence_error_logger.dart';
 import 'fake_sync_transport.dart';
 import 'package:tankstellen/features/trips/data/trips_sync_rows.dart';
@@ -359,8 +360,7 @@ void main() {
         );
         addTearDown(() async {
           await box.deleteFromDisk();
-          await Hive.close();
-          tmpDir.deleteSync(recursive: true);
+          await closeHiveAndDeleteTemp(tmpDir);
         });
 
         final repo = TripHistoryRepository(box: box);

@@ -24,6 +24,7 @@ import 'package:tankstellen/features/alerts/data/repositories/alert_repository.d
 import 'package:tankstellen/features/alerts/domain/opportunity_budget.dart';
 
 import '../../../fakes/fake_storage_repository.dart';
+import '../../../helpers/hive_temp_dir.dart';
 
 /// #4183 — a price observation in, a notification decision out.
 ///
@@ -62,8 +63,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test('three tripped alerts trip three times — detection is unchanged',

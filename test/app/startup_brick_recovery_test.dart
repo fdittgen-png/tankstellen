@@ -11,6 +11,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_cipher_loader.dart';
 import 'package:tankstellen/core/telemetry/storage/startup_failure_store.dart';
 
+import '../helpers/hive_temp_dir.dart';
+
 /// #3149 — the startup-brick gap around #2294: `run()` caught ONLY
 /// HiveCorruptionException, while `_loadCipher()` (FlutterSecureStorage)
 /// sat outside the HiveError re-tag, and TraceStorage.init / loadApiKey /
@@ -81,9 +83,9 @@ void main() {
       StartupFailureStore.directoryProvider = () async => tmp;
     });
 
-    tearDown(() {
+    tearDown(() async {
       StartupFailureStore.resetForTest();
-      tmp.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmp);
     });
 
     /// Drives the gate with a storage phase that throws [fault] and

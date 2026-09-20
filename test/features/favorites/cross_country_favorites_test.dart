@@ -12,6 +12,8 @@ import 'package:tankstellen/core/storage/storage_providers.dart';
 import 'package:tankstellen/features/favorites/providers/favorites_provider.dart';
 import 'package:tankstellen/core/domain/station.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #695 — Favorites from countries other than the active profile's country
 /// must still be visible and refreshable. The provider groups favorites
 /// by `Countries.countryForStation(...)` and refreshes each group using
@@ -27,8 +29,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   test('favorites from multiple countries all appear in the state', () async {

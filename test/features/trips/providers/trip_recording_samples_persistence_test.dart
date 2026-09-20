@@ -13,6 +13,8 @@ import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Regression test for #1040 — the per-second OBD2 sample buffer must
 /// land in the persisted [TripHistoryEntry] so the trip-detail charts
 /// have data to plot.
@@ -33,8 +35,7 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2TripHistory).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test('TripHistoryEntry persists per-tick samples through save+load', () {

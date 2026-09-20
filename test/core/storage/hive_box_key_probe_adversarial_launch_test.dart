@@ -19,6 +19,8 @@ import 'package:tankstellen/core/storage/hive_isolate_ownership.dart';
 import 'package:tankstellen/core/storage/hive_trip_box_encryption.dart';
 import 'package:tankstellen/core/storage/impl/hive_directory_resolver.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4341 adversarial verification, part 3 of 3 — the real app launch
 /// path: `HiveBoxes.init` over every box the app opens, the background
 /// isolate entry, and upgrades from a master-built install. Part 1:
@@ -47,8 +49,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   // ---------------------------------------------------------------------

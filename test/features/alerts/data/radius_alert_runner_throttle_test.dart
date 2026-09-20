@@ -13,6 +13,8 @@ import 'package:tankstellen/features/alerts/data/radius_alert_store.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 import 'package:tankstellen/features/alerts/domain/radius_alert_evaluator.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Per-alert frequency throttling tests for the radius-alerts runner
 /// (#1012 phase 1). Today every active alert is evaluated on every
 /// WorkManager cycle — phase 1 lets the user cap that to 1/2/3/4
@@ -115,10 +117,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('RadiusAlertRunner per-alert frequency throttling (#1012 phase 1)',

@@ -11,6 +11,7 @@ import 'package:tankstellen/features/trips/data/trip_column_chunk.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/data/trip_history_store_v2.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #3882 — the per-sample codec maps of a stored trip, read back from its
@@ -42,8 +43,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   TripSummary mkSummary({required DateTime startedAt, double km = 10}) {

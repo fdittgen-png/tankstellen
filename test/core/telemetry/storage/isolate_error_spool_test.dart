@@ -13,6 +13,8 @@ import 'package:tankstellen/core/telemetry/storage/isolate_error_spool.dart';
 import 'package:tankstellen/core/telemetry/storage/isolate_error_spool_entry.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Top-level entry point spawned by [Isolate.spawn]. Runs in a fresh
 /// isolate where Hive was never `init`ed — the exact orphaned-completer
 /// scenario fixed in #2321: `Hive.openBox` rethrows AND completes its
@@ -73,10 +75,7 @@ void main() {
 
   tearDown(() async {
     IsolateErrorSpool.resetBoxFactoryForTest();
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('IsolateErrorSpool round-trip', () {

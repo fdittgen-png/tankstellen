@@ -12,6 +12,7 @@ import 'package:tankstellen/features/trips/providers/recording_pipeline.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 import 'package:tankstellen/features/obd2/data/obd2_comm_diagnostics.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #3573 — the per-trip OBD2 comm-health capture reads a PROCESS-WIDE
@@ -38,8 +39,7 @@ void main() {
     Obd2CommDiagnostics.instance.enabled = false;
     Obd2CommDiagnostics.instance.reset();
     await Hive.box<String>(HiveBoxes.obd2TripHistory).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   TripSummary mkSummary(DateTime start) => TripSummary(

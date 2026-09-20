@@ -13,6 +13,7 @@ import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/providers/trip_recording_provider.dart';
 
+import '../helpers/hive_temp_dir.dart';
 import '../helpers/silence_error_logger.dart';
 
 /// End-to-end integration coverage for the OBD2 trip-recording journey
@@ -55,7 +56,7 @@ void main() {
 
   tearDown(() async {
     await Hive.deleteFromDisk();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test(

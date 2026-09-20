@@ -12,6 +12,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_legacy_migration.dart';
 import 'package:tankstellen/core/storage/impl/hive_directory_resolver.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4341 adversarial verification, part 2 of 3 (large first values, lazy
 /// boxes and key encodings, plaintext boxes, mixed directories, a probe
 /// racing compaction in another isolate, directory shape) — every file is
@@ -42,8 +44,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   group('5 — very large first values', () {

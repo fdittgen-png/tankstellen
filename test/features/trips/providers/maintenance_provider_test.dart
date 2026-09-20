@@ -14,6 +14,8 @@ import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/fill_ups/providers/maintenance_provider.dart';
 import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Provider-layer coverage for the predictive-maintenance pipeline
 /// (#1124).
 ///
@@ -50,10 +52,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('maintenanceSuggestionsProvider', () {

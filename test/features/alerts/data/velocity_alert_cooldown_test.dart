@@ -9,6 +9,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/alerts/data/velocity_alert_cooldown.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   late Directory tempDir;
 
@@ -26,10 +28,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('VelocityAlertCooldown', () {

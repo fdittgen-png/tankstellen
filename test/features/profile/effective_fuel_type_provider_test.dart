@@ -14,6 +14,8 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #705 — Effective fuel type contract.
 ///
 /// Pins the vehicle-driven derivation so every app surface (search
@@ -29,8 +31,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   ProviderContainer containerWith({

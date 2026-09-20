@@ -14,6 +14,8 @@ import 'package:tankstellen/features/feature_management/data/legacy_toggle_migra
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Runtime coverage for the post-#1421 follow-up that wires
 /// [legacyToggleMigrationProvider] into `AppInitializer` so the legacy-toggle
 /// migrators fire on every cold start.
@@ -55,8 +57,7 @@ void main() {
   tearDown(() async {
     await settings.deleteFromDisk();
     await flagsBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test(

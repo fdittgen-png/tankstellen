@@ -18,6 +18,7 @@ import 'package:tankstellen/features/search/presentation/screens/ev_station_deta
 import 'package:tankstellen/l10n/app_localizations.dart';
 import 'package:tankstellen/core/widgets/animated_favorite_star.dart';
 
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/silence_error_logger.dart';
 
 /// End-to-end TDD test for #566: tapping the star on the EV station
@@ -47,10 +48,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   // Mirrors what EVChargingService returns: an OpenChargeMap-prefixed id.

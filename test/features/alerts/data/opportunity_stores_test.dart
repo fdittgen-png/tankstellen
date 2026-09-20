@@ -13,6 +13,8 @@ import 'package:tankstellen/features/alerts/data/opportunity_feed_store.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity_budget.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #4183 — the two stores that make the budget a budget and the feed a
 /// feed.
 ///
@@ -53,8 +55,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('OpportunityFeedStore', () {

@@ -11,6 +11,8 @@ import 'package:tankstellen/features/profile/data/repositories/profile_repositor
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station_amenity.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Uses a real [HiveStorage] wired to a temp Hive dir so the repository's
 /// JSON round-trips exercise the real serialisation path.
 void main() {
@@ -27,10 +29,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('createProfile', () {

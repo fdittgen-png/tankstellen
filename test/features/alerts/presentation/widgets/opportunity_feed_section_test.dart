@@ -17,6 +17,8 @@ import 'package:tankstellen/features/alerts/domain/opportunity_budget.dart';
 import 'package:tankstellen/features/alerts/presentation/widgets/opportunity_feed_section.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// #4154 — the feed that makes "suppressed is not discarded" something a
 /// user can open.
 void main() {
@@ -57,8 +59,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   /// Hive writes are real file I/O, and a `testWidgets` body runs in a

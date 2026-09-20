@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tankstellen/core/storage/hive_box_key_probe.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4341 — the probe reads Hive's own frame checksums to say which key a
 /// box file was written with, without opening (and so without
 /// truncating) anything. Real Hive files throughout: the probe's whole
@@ -31,8 +33,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   test('no box files: consistent with any key, or none', () {

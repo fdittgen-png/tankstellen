@@ -19,6 +19,7 @@ import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/domain/vehicle_power_state.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 class _Scanner implements Obd2ReattachSource {
@@ -62,8 +63,7 @@ void main() {
     Obd2VehiclePower.instance.reset();
     await pausedBox.deleteFromDisk();
     await historyBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   /// The parked car: every AT answers, the bus never does, 12.4 V at rest.

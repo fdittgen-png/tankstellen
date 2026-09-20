@@ -11,6 +11,8 @@ import 'package:tankstellen/features/feature_management/data/feature_flags_repos
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/profile/providers/show_consumption_tab_enabled_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Provider-layer coverage for [showConsumptionTabEnabledProvider]
 /// (#1373 phase 3c).
 ///
@@ -39,8 +41,7 @@ void main() {
 
   tearDown(() async {
     await flagsBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   ProviderContainer makeContainer({List<Object> extraOverrides = const []}) {

@@ -12,6 +12,8 @@ import 'package:tankstellen/core/sharing/public_file_exporter.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #2933 (error-log #25) part B — the background tracer's Downloads export
 /// must NOT crash / spool an ERROR when the `tankstellen/public_files` platform
 /// channel is unavailable in a WorkManager background isolate.
@@ -67,8 +69,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   test('forScan with developer mode on yields a tracing tracer', () {

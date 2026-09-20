@@ -10,6 +10,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/stores/settings_hive_store.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// The secure-storage portion of SettingsHiveStore talks to the platform
 /// keychain via method channels. Tests mock that channel so setApiKey/
 /// deleteApiKey run through without touching the real device. The in-
@@ -60,10 +62,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('Settings key/value', () {

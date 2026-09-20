@@ -37,6 +37,8 @@ import 'package:tankstellen/features/station_detail/presentation/screens/station
 import 'package:tankstellen/features/widget/providers/pending_widget_uri_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4318 — the first-frame box contract, EXECUTED route by route.
 ///
 /// Real Hive files, real `HiveStorage`, the real router and real screens.
@@ -109,20 +111,9 @@ void main() {
 
   tearDown(() async {
     HiveDeferredUserBoxes.resetForTest();
-    // A widget test can leave a Hive write pending on the fake clock; a
-    // hung close must not hang the suite.
-    try {
-      await Hive.close().timeout(const Duration(seconds: 2));
-    } on TimeoutException catch (e) {
-      debugPrint('first_frame_route_matrix: close timed out ($e)');
-    }
-    if (dir.existsSync()) {
-      try {
-        dir.deleteSync(recursive: true);
-      } on FileSystemException catch (e) {
-        debugPrint('first_frame_route_matrix: temp cleanup skipped ($e)');
-      }
-    }
+    // A widget test can leave a Hive write pending on the fake clock; the
+    // helper's bounded close keeps a hung close from hanging the suite.
+    await closeHiveAndDeleteTemp(dir, closeTimeout: const Duration(seconds: 2));
   });
 
   final storage = HiveStorage();
