@@ -1,0 +1,64 @@
+{
+  "fleetVehicleCurrentLabel": "Current vehicle",
+  "@fleetVehicleCurrentLabel": {
+    "description": "Label of the compact current-vehicle context chip shown on fleet-enabled surfaces (#4213)."
+  },
+  "fleetVehicleNoneAssigned": "No vehicle assigned",
+  "@fleetVehicleNoneAssigned": {
+    "description": "Shown on the current-vehicle chip when no assignment is effective right now (#4213)."
+  },
+  "fleetVehicleSwitchTitle": "Choose your vehicle",
+  "@fleetVehicleSwitchTitle": {
+    "description": "Title of the vehicle switch bottom sheet (#4213)."
+  },
+  "fleetVehicleSwitchHelper": "Switching applies from now on. Everything you already logged keeps the vehicle it was logged with.",
+  "@fleetVehicleSwitchHelper": {
+    "description": "Helper text in the vehicle switch sheet explaining that switching never rewrites history (#4213)."
+  },
+  "fleetVehicleSearchLabel": "Fleet code, model or registration",
+  "@fleetVehicleSearchLabel": {
+    "description": "Label of the search field in the vehicle switch sheet (#4213)."
+  },
+  "fleetVehicleSearchEmpty": "No assigned vehicle matches your search.",
+  "@fleetVehicleSearchEmpty": {
+    "description": "Empty state of the vehicle switch sheet when the search matches none of the driver's assigned vehicles (#4213)."
+  },
+  "fleetVehicleCurrentBadge": "Current",
+  "@fleetVehicleCurrentBadge": {
+    "description": "Badge marking the currently selected vehicle in the switch sheet (#4213)."
+  },
+  "fleetVehicleStaleBadge": "Offline copy",
+  "@fleetVehicleStaleBadge": {
+    "description": "Badge on the current-vehicle chip when the org vehicle directory on the device is between 24 hours and 7 days old (#4213, ADR 0025 D4)."
+  },
+  "fleetVehicleStaleNotice": "This is the vehicle list your device downloaded last. It may not show a very recent handover.",
+  "@fleetVehicleStaleNotice": {
+    "description": "Notice in the vehicle switch sheet when the directory is stale but still usable (#4213)."
+  },
+  "fleetVehicleExpiredNotice": "Your vehicle list is too old to switch safely. Connect to your fleet to refresh it.",
+  "@fleetVehicleExpiredNotice": {
+    "description": "Notice shown instead of the vehicle list when the cached directory has expired and switching is disabled (#4213, ADR 0025 D4)."
+  },
+  "fleetVehicleNeedsConfirmationTitle": "Vehicle needs confirmation",
+  "@fleetVehicleNeedsConfirmationTitle": {
+    "description": "Title of the state shown when automatic vehicle signals disagree (#4213)."
+  },
+  "fleetVehicleNeedsConfirmationBody": "The adapter and the vehicle data point at different cars. Pick the right one — nothing is attributed until you do.",
+  "@fleetVehicleNeedsConfirmationBody": {
+    "description": "Body of the vehicle-needs-confirmation state (#4213)."
+  },
+  "fleetVehicleSemanticsCurrent": "Current vehicle: {vehicle}",
+  "@fleetVehicleSemanticsCurrent": {
+    "description": "Screen-reader label of the current-vehicle chip (#4213).",
+    "placeholders": {
+      "vehicle": {
+        "type": "String",
+        "example": "VAN-12 · VW Caddy"
+      }
+    }
+  },
+  "fleetVehicleSemanticsChange": "Change current vehicle",
+  "@fleetVehicleSemanticsChange": {
+    "description": "Screen-reader hint on the tappable current-vehicle chip (#4213)."
+  }
+}

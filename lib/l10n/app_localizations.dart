@@ -9265,6 +9265,90 @@ abstract class AppLocalizations {
   /// **'Company vehicles, assignments and manager reporting.'**
   String get featureGroupDescription_fleet;
 
+  /// Label of the compact current-vehicle context chip shown on fleet-enabled surfaces (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'Current vehicle'**
+  String get fleetVehicleCurrentLabel;
+
+  /// Shown on the current-vehicle chip when no assignment is effective right now (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicle assigned'**
+  String get fleetVehicleNoneAssigned;
+
+  /// Title of the vehicle switch bottom sheet (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your vehicle'**
+  String get fleetVehicleSwitchTitle;
+
+  /// Helper text in the vehicle switch sheet explaining that switching never rewrites history (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'Switching applies from now on. Everything you already logged keeps the vehicle it was logged with.'**
+  String get fleetVehicleSwitchHelper;
+
+  /// Label of the search field in the vehicle switch sheet (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet code, model or registration'**
+  String get fleetVehicleSearchLabel;
+
+  /// Empty state of the vehicle switch sheet when the search matches none of the driver's assigned vehicles (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'No assigned vehicle matches your search.'**
+  String get fleetVehicleSearchEmpty;
+
+  /// Badge marking the currently selected vehicle in the switch sheet (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get fleetVehicleCurrentBadge;
+
+  /// Badge on the current-vehicle chip when the org vehicle directory on the device is between 24 hours and 7 days old (#4213, ADR 0025 D4).
+  ///
+  /// In en, this message translates to:
+  /// **'Offline copy'**
+  String get fleetVehicleStaleBadge;
+
+  /// Notice in the vehicle switch sheet when the directory is stale but still usable (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'This is the vehicle list your device downloaded last. It may not show a very recent handover.'**
+  String get fleetVehicleStaleNotice;
+
+  /// Notice shown instead of the vehicle list when the cached directory has expired and switching is disabled (#4213, ADR 0025 D4).
+  ///
+  /// In en, this message translates to:
+  /// **'Your vehicle list is too old to switch safely. Connect to your fleet to refresh it.'**
+  String get fleetVehicleExpiredNotice;
+
+  /// Title of the state shown when automatic vehicle signals disagree (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle needs confirmation'**
+  String get fleetVehicleNeedsConfirmationTitle;
+
+  /// Body of the vehicle-needs-confirmation state (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'The adapter and the vehicle data point at different cars. Pick the right one — nothing is attributed until you do.'**
+  String get fleetVehicleNeedsConfirmationBody;
+
+  /// Screen-reader label of the current-vehicle chip (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'Current vehicle: {vehicle}'**
+  String fleetVehicleSemanticsCurrent(String vehicle);
+
+  /// Screen-reader hint on the tappable current-vehicle chip (#4213).
+  ///
+  /// In en, this message translates to:
+  /// **'Change current vehicle'**
+  String get fleetVehicleSemanticsChange;
+
   /// Card title grouping date, fuel and quantity inputs on the Add-Fill-up form (#751 phase 2).
   ///
   /// In en, this message translates to:

@@ -5372,6 +5372,55 @@ class AppLocalizationsEn extends AppLocalizations {
       'Company vehicles, assignments and manager reporting.';
 
   @override
+  String get fleetVehicleCurrentLabel => 'Current vehicle';
+
+  @override
+  String get fleetVehicleNoneAssigned => 'No vehicle assigned';
+
+  @override
+  String get fleetVehicleSwitchTitle => 'Choose your vehicle';
+
+  @override
+  String get fleetVehicleSwitchHelper =>
+      'Switching applies from now on. Everything you already logged keeps the vehicle it was logged with.';
+
+  @override
+  String get fleetVehicleSearchLabel => 'Fleet code, model or registration';
+
+  @override
+  String get fleetVehicleSearchEmpty =>
+      'No assigned vehicle matches your search.';
+
+  @override
+  String get fleetVehicleCurrentBadge => 'Current';
+
+  @override
+  String get fleetVehicleStaleBadge => 'Offline copy';
+
+  @override
+  String get fleetVehicleStaleNotice =>
+      'This is the vehicle list your device downloaded last. It may not show a very recent handover.';
+
+  @override
+  String get fleetVehicleExpiredNotice =>
+      'Your vehicle list is too old to switch safely. Connect to your fleet to refresh it.';
+
+  @override
+  String get fleetVehicleNeedsConfirmationTitle => 'Vehicle needs confirmation';
+
+  @override
+  String get fleetVehicleNeedsConfirmationBody =>
+      'The adapter and the vehicle data point at different cars. Pick the right one — nothing is attributed until you do.';
+
+  @override
+  String fleetVehicleSemanticsCurrent(String vehicle) {
+    return 'Current vehicle: $vehicle';
+  }
+
+  @override
+  String get fleetVehicleSemanticsChange => 'Change current vehicle';
+
+  @override
   String get fillUpSectionWhatTitle => 'What you filled';
 
   @override
@@ -15963,6 +16012,58 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureGroupDescription_fleet =>
       '⟦Çóɱƥáñý ṽéĥîçłéš, áššîǧñɱéñŧš áñđ ɱáñáǧéř řéƥóřŧîñǧ. ····················⟧';
+
+  @override
+  String get fleetVehicleCurrentLabel => '⟦Çúřřéñŧ ṽéĥîçłé ······⟧';
+
+  @override
+  String get fleetVehicleNoneAssigned => '⟦Ñó ṽéĥîçłé áššîǧñéđ ········⟧';
+
+  @override
+  String get fleetVehicleSwitchTitle => '⟦Çĥóóšé ýóúř ṽéĥîçłé ········⟧';
+
+  @override
+  String get fleetVehicleSwitchHelper =>
+      '⟦Šŵîŧçĥîñǧ áƥƥłîéš ƒřóɱ ñóŵ óñ. Éṽéřýŧĥîñǧ ýóú áłřéáđý łóǧǧéđ ķééƥš ŧĥé ṽéĥîçłé îŧ ŵáš łóǧǧéđ ŵîŧĥ. ····································⟧';
+
+  @override
+  String get fleetVehicleSearchLabel =>
+      '⟦Ƒłééŧ çóđé, ɱóđéł óř řéǧîšŧřáŧîóñ ·············⟧';
+
+  @override
+  String get fleetVehicleSearchEmpty =>
+      '⟦Ñó áššîǧñéđ ṽéĥîçłé ɱáŧçĥéš ýóúř šéářçĥ. ···············⟧';
+
+  @override
+  String get fleetVehicleCurrentBadge => '⟦Çúřřéñŧ ···⟧';
+
+  @override
+  String get fleetVehicleStaleBadge => '⟦Óƒƒłîñé çóƥý ·····⟧';
+
+  @override
+  String get fleetVehicleStaleNotice =>
+      '⟦Ŧĥîš îš ŧĥé ṽéĥîçłé łîšŧ ýóúř đéṽîçé đóŵñłóáđéđ łášŧ. Îŧ ɱáý ñóŧ šĥóŵ á ṽéřý řéçéñŧ ĥáñđóṽéř. ··································⟧';
+
+  @override
+  String get fleetVehicleExpiredNotice =>
+      '⟦Ýóúř ṽéĥîçłé łîšŧ îš ŧóó ółđ ŧó šŵîŧçĥ šáƒéłý. Çóññéçŧ ŧó ýóúř ƒłééŧ ŧó řéƒřéšĥ îŧ. ······························⟧';
+
+  @override
+  String get fleetVehicleNeedsConfirmationTitle =>
+      '⟦Ṽéĥîçłé ñééđš çóñƒîřɱáŧîóñ ···········⟧';
+
+  @override
+  String get fleetVehicleNeedsConfirmationBody =>
+      '⟦Ŧĥé áđáƥŧéř áñđ ŧĥé ṽéĥîçłé đáŧá ƥóîñŧ áŧ đîƒƒéřéñŧ çářš. Ƥîçķ ŧĥé řîǧĥŧ óñé — ñóŧĥîñǧ îš áŧŧřîƀúŧéđ úñŧîł ýóú đó. ·········································⟧';
+
+  @override
+  String fleetVehicleSemanticsCurrent(String vehicle) {
+    return '⟦Çúřřéñŧ ṽéĥîçłé: $vehicle ······⟧';
+  }
+
+  @override
+  String get fleetVehicleSemanticsChange =>
+      '⟦Çĥáñǧé çúřřéñŧ ṽéĥîçłé ·········⟧';
 
   @override
   String get fillUpSectionWhatTitle => '⟦Ŵĥáŧ ýóú ƒîłłéđ ······⟧';

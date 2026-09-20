@@ -5,6 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../core/services/co2_calculator.dart';
 import '../../../../core/domain/fuel_type.dart';
+import '../../../fleet/api.dart';
 
 part 'fill_up.freezed.dart';
 part 'fill_up.g.dart';
@@ -111,6 +112,24 @@ abstract class FillUp with _$FillUp {
     /// next edit stamps it. Travels inside the JSONB `data` blob, so no
     /// server schema change is needed.
     DateTime? updatedAt,
+
+    /// Which fleet vehicle this fill-up was logged against, and how
+    /// that was decided (#4213, Epic #4211).
+    ///
+    /// Stamped ONCE, at creation, by whatever surface created the
+    /// record — it is the fleet's answer to "whose fuel was this".
+    /// Switching the current vehicle afterwards must never rewrite it:
+    /// a tank filled into VAN-12 stays VAN-12's cost whoever drives
+    /// tomorrow (#4213, "Data integrity"). Null on every personal
+    /// (non-fleet) fill-up and on every fill logged before this field
+    /// existed — null means *not a fleet record*, never "the current
+    /// fleet vehicle".
+    ///
+    /// The whole model rides in the `fill_ups.data` JSONB column, so a
+    /// field-add is transparent to TankSync and needs no Supabase
+    /// change (CLAUDE.md HARD RULE #5; `schema_table_specs_core.dart`
+    /// declares `data JSONB NOT NULL` and no per-field column).
+    @VehicleAttributionJsonConverter() VehicleAttribution? fleetAttribution,
   }) = _FillUp;
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);

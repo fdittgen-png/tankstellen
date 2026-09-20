@@ -6953,5 +6953,67 @@
   "fuelAndTankInsufficientMixedCurrencies": "Plusieurs devises — aucun chiffre unique",
   "@fuelAndTankInsufficientMixedCurrencies": {
     "description": "MT — needs native review"
+  },
+  "fleetVehicleCurrentLabel": "Véhicule actuel",
+  "@fleetVehicleCurrentLabel": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleNoneAssigned": "Aucun véhicule attribué",
+  "@fleetVehicleNoneAssigned": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSwitchTitle": "Choisissez votre véhicule",
+  "@fleetVehicleSwitchTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSwitchHelper": "Le changement s'applique à partir de maintenant. Les saisies déjà enregistrées conservent le véhicule avec lequel elles ont été saisies.",
+  "@fleetVehicleSwitchHelper": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSearchLabel": "Code de flotte, modèle ou immatriculation",
+  "@fleetVehicleSearchLabel": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSearchEmpty": "Aucun véhicule attribué ne correspond à votre recherche.",
+  "@fleetVehicleSearchEmpty": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleCurrentBadge": "Actuel",
+  "@fleetVehicleCurrentBadge": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleStaleBadge": "Copie hors ligne",
+  "@fleetVehicleStaleBadge": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleStaleNotice": "Voici la dernière liste de véhicules téléchargée par votre appareil. Une remise très récente peut y manquer.",
+  "@fleetVehicleStaleNotice": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleExpiredNotice": "Votre liste de véhicules est trop ancienne pour changer en toute sécurité. Connectez-vous à votre flotte pour l'actualiser.",
+  "@fleetVehicleExpiredNotice": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleNeedsConfirmationTitle": "Véhicule à confirmer",
+  "@fleetVehicleNeedsConfirmationTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleNeedsConfirmationBody": "L'adaptateur et les données du véhicule désignent des voitures différentes. Choisissez la bonne — rien n'est attribué tant que ce n'est pas fait.",
+  "@fleetVehicleNeedsConfirmationBody": {
+    "description": "MT — needs native review"
+  },
+  "fleetVehicleSemanticsCurrent": "Véhicule actuel : {vehicle}",
+  "@fleetVehicleSemanticsCurrent": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String",
+        "example": "VAN-12 · VW Caddy"
+      }
+    }
+  },
+  "fleetVehicleSemanticsChange": "Changer de véhicule actuel",
+  "@fleetVehicleSemanticsChange": {
+    "description": "MT — needs native review"
   }
 }

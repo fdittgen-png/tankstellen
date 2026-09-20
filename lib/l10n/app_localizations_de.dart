@@ -5430,6 +5430,56 @@ class AppLocalizationsDe extends AppLocalizations {
       'Firmenfahrzeuge, Zuweisungen und Auswertungen für Flottenverantwortliche.';
 
   @override
+  String get fleetVehicleCurrentLabel => 'Aktuelles Fahrzeug';
+
+  @override
+  String get fleetVehicleNoneAssigned => 'Kein Fahrzeug zugewiesen';
+
+  @override
+  String get fleetVehicleSwitchTitle => 'Fahrzeug auswählen';
+
+  @override
+  String get fleetVehicleSwitchHelper =>
+      'Der Wechsel gilt ab jetzt. Bereits erfasste Einträge behalten das Fahrzeug, mit dem sie erfasst wurden.';
+
+  @override
+  String get fleetVehicleSearchLabel => 'Flottencode, Modell oder Kennzeichen';
+
+  @override
+  String get fleetVehicleSearchEmpty =>
+      'Kein zugewiesenes Fahrzeug passt zu deiner Suche.';
+
+  @override
+  String get fleetVehicleCurrentBadge => 'Aktuell';
+
+  @override
+  String get fleetVehicleStaleBadge => 'Offline-Kopie';
+
+  @override
+  String get fleetVehicleStaleNotice =>
+      'Das ist die zuletzt heruntergeladene Fahrzeugliste. Eine ganz frische Übergabe fehlt darin möglicherweise.';
+
+  @override
+  String get fleetVehicleExpiredNotice =>
+      'Deine Fahrzeugliste ist zu alt für einen sicheren Wechsel. Verbinde dich mit deiner Flotte, um sie zu aktualisieren.';
+
+  @override
+  String get fleetVehicleNeedsConfirmationTitle =>
+      'Fahrzeug muss bestätigt werden';
+
+  @override
+  String get fleetVehicleNeedsConfirmationBody =>
+      'Adapter und Fahrzeugdaten deuten auf verschiedene Autos hin. Wähle das richtige aus — bis dahin wird nichts zugeordnet.';
+
+  @override
+  String fleetVehicleSemanticsCurrent(String vehicle) {
+    return 'Aktuelles Fahrzeug: $vehicle';
+  }
+
+  @override
+  String get fleetVehicleSemanticsChange => 'Aktuelles Fahrzeug wechseln';
+
+  @override
   String get fillUpSectionWhatTitle => 'Was du getankt hast';
 
   @override

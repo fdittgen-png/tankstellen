@@ -56,6 +56,17 @@ class StorageKeys {
   static const String fleetOrgId = 'fleet_org_id';
   static const String fleetRole = 'fleet_role';
 
+  /// #4213 — the fleet vehicle the driver last **explicitly** picked,
+  /// and the fleet vehicle ids they picked before that (most recent
+  /// first, JSON list) so the switch sheet can offer recents first.
+  ///
+  /// The selection is only ever written by an explicit switch: no
+  /// adapter, VIN or QR signal reaches this key. A stored id that is no
+  /// longer assigned to the driver is ignored on read — the handover
+  /// rule — never repaired into a neighbouring vehicle.
+  static const String fleetCurrentVehicleId = 'fleet_current_vehicle_id';
+  static const String fleetRecentVehicleIds = 'fleet_recent_vehicle_ids';
+
   /// #3866 (Epic #3865) — the consent record: ISO-8601 instant of the last
   /// save and the privacy-policy version the user was shown. A version
   /// bump re-surfaces the consent screen once (`ConsentRecord.isCurrent`).
