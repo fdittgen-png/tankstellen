@@ -60,6 +60,13 @@ void applyReceiptOutcome(
   if (result.pricePerLiter != null) {
     state.setScannedPricePerLiter(result.pricePerLiter!);
   }
+  // #4428 — the ISO code the paper printed. A CHF receipt scanned on an
+  // EUR profile must record CHF: the repository's fallback stamp is for
+  // records with no evidence, and this one has the strongest there is.
+  final currency = result.currency?.trim();
+  if (currency != null && currency.isNotEmpty) {
+    state.setScannedCurrency?.call(currency.toUpperCase());
+  }
   // Only pre-select the fuel when there is no vehicle bound — the
   // vehicle's configured fuel always wins (#698 single source of
   // truth for fuel).

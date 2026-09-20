@@ -399,7 +399,10 @@ void main() {
     'lib/features/trips/presentation/screens/trip_recording_screen.dart': 747,
     // #4322 — 973 → 967: the tankFuelKey rule left for the domain
     // `tankFuelKeyOf`, read from the evidence-only tank blend.
-    'lib/features/fill_ups/providers/consumption_providers.dart': 967,
+    // #4428 — 967 → 984: `add` is the one save whose device location is
+    // evidence about the record being written, so it reads the detected
+    // country (guarded) and hands it to the repository's currency rule.
+    'lib/features/fill_ups/providers/consumption_providers.dart': 984,
     'lib/features/obd2/data/transport/flutter_blue_plus_elm_channel.dart': 948,
     // #4233 — 910 → 900: the profile-η_v rule moved to a pure domain
     // function (then shared with the pull reader); the fuzzy stage call
@@ -409,7 +412,10 @@ void main() {
     'lib/features/obd2/data/session/live_sample_snapshot.dart': 893,
     'lib/features/profile/presentation/widgets/profile_edit_sheet.dart': 855,
     'lib/features/obd2/data/session/obd2_self_test_driver.dart': 828,
-    'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 824,
+    // #4428 — 824 → 836: the form carries the ISO code a scanned
+    // receipt printed through to the saved record, so a CHF fill is
+    // not stored under the profile's currency.
+    'lib/features/fill_ups/presentation/screens/add_fill_up_screen.dart': 836,
     'lib/features/fill_ups/presentation/widgets/fuel_type_efficiency_card.dart': 810,
     // #4317 — 746 → 731: the pre-launch service batch and its error shield
     // left; the runtime services are a library of their own.

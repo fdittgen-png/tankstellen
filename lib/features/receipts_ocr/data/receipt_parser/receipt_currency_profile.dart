@@ -58,6 +58,22 @@ class ReceiptCurrencyProfile {
 
   bool get hasMinorUnit => minorUnitPattern.isNotEmpty;
 
+  /// Regex alternation of the ISO 4217 codes a fuel receipt may print
+  /// beside an amount, whatever the active profile is (#4428).
+  ///
+  /// A receipt paid abroad prints the code of the currency the driver
+  /// was actually CHARGED in — `Total CHF 51,73` on a Swiss forecourt
+  /// under an EUR profile. [majorUnitPattern] only knows the profile's
+  /// own markers, so without this the total goes unread and the record
+  /// is saved without the very figure the driver paid.
+  ///
+  /// Used only as an OPTIONAL token between an explicit total label and
+  /// the amount, so it can never turn some unrelated three-letter word
+  /// into a total. Codes only, never symbols: `$` alone names four
+  /// currencies in this app's country table.
+  static const String isoCodePattern =
+      'EUR|GBP|USD|CHF|DKK|SEK|NOK|PLN|CZK|HUF|RON|ISK|BGN|HRK';
+
   /// `true` when [price] is a plausible per-litre unit price (major unit).
   bool priceInRange(double price) => price >= priceMin && price <= priceMax;
 

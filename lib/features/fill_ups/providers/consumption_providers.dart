@@ -8,7 +8,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/country/country_detection_provider.dart';
 import '../../../core/data/storage_repository.dart';
+import '../../../core/error/guarded.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/storage/storage_providers.dart';
 import '../data/fill_ups_sync.dart';
@@ -172,8 +174,14 @@ class FillUpList extends _$FillUpList
   /// the closing one). When the new fill is itself a plein the
   /// window closes and we re-link backwards across the closed window
   /// so the partials see the full trip set.
+  ///
+  /// #4428 — a fresh entry is the one save where the device's own
+  /// location is evidence about the record. Every other path (import,
+  /// merge, edit) withholds it: today's country says nothing about a
+  /// fill from last year.
   Future<void> add(FillUp fillUp) async {
     final repo = ref.read(fillUpRepositoryProvider);
+    final observedCountry = _observedCountryCode();
     final linkedIds = _linkedTripIdsForWholeWindow(fillUp);
     // #3122 — stamp the local edit time (UTC) so the LWW sync merge can
     // propagate this record to other devices.
@@ -181,7 +189,7 @@ class FillUpList extends _$FillUpList
             ? fillUp.copyWith(linkedTripIds: linkedIds)
             : fillUp)
         .copyWith(updatedAt: DateTime.now().toUtc());
-    await repo.save(linked);
+    await repo.save(linked, observedCountryCode: observedCountry);
     // Re-link any partials in the open window so they share the
     // closing plein's trip set. No-op when [linked] is itself a
     // partial (the next plein will cover this), or when the vehicle
@@ -211,6 +219,15 @@ class FillUpList extends _$FillUpList
       proposedEta: gainOutcome?.result?.proposedEta,
     );
   }
+
+  /// The country the device believes it is in, or null when none has
+  /// resolved yet (#4428). Guarded: a container without the geocoding
+  /// chain degrades to "no opinion" — the profile-currency status quo.
+  String? _observedCountryCode() => guard<String?>(
+        () => ref.read(detectedCountryProvider),
+        where: 'FillUpList: detected country unavailable',
+        fallback: null,
+      );
 
   /// Path A of the guided reconciliation workflow (#2443) — persist a
   /// CONSENTED correction fill-up. Called by the workflow ONLY after

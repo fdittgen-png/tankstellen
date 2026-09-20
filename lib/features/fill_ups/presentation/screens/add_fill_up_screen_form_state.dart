@@ -41,6 +41,13 @@ mixin _AddFillUpFormState on ConsumerState<AddFillUpScreen> {
   /// Null until a scan reads a price; manual entries leave it null.
   double? _scannedPricePerLiter;
 
+  /// ISO 4217 code read off the last receipt scan (#4428). The paper is
+  /// the transaction: a Swiss receipt printing `CHF` says what the
+  /// driver was charged, and stamping the profile's currency over it is
+  /// the mislabel this evidence exists to prevent. Null for a manual
+  /// entry — the repository then decides from the rest.
+  String? _scannedCurrency;
+
   /// Adapter-captured tank level (litres) snapshotted at form-open
   /// (#1434). Closes the producer-wiring gap from #1401 — paired with
   /// [_fuelLevelAfterL] (captured at save) so the persisted [FillUp]

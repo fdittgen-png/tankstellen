@@ -7,6 +7,7 @@ import 'package:tankstellen/core/storage/storage_keys.dart';
 import 'package:tankstellen/features/fill_ups/data/repositories/fill_up_repository.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 
 /// In-memory fake [SettingsStorage] for repository tests.
 class _FakeSettingsStorage implements SettingsStorage {
@@ -154,6 +155,80 @@ void main() {
       final stored = repo.getAll().single;
       await repo.save(stored);
       expect(repo.getAll().single.currency, 'CLP');
+    });
+  });
+
+  group('#4428 — the stamp follows the evidence, not the profile', () {
+    setUp(() => PriceFormatter.setCountry('DE'));
+    tearDown(() => PriceFormatter.setCountry('FR'));
+
+    test('a fill at a Swiss forecourt is NOT stored as EUR', () async {
+      // The field report: EUR profile, CHF 51,73 paid by card. The
+      // receipt scan supplies the currency, and the repository must
+      // leave it alone instead of stamping the profile's over it.
+      await repo.save(
+        _make(id: 'gandria', cost: 51.73, liters: 25.61)
+            .copyWith(currency: 'CHF'),
+      );
+      expect(repo.getAll().single.currency, 'CHF');
+      expect(repo.getAll().single.totalCost, 51.73);
+    });
+
+    test('a station in another country decides the currency', () async {
+      await repo.save(_make(id: 'abroad').copyWith(stationId: 'uk-7'));
+      expect(repo.getAll().single.currency, 'GBP');
+    });
+
+    test('a domestic station still gets the profile currency', () async {
+      await repo.save(_make(id: 'home').copyWith(stationId: 'de-7'));
+      expect(repo.getAll().single.currency, 'EUR');
+    });
+
+    test('logged while the device is in an unnameable country → unknown',
+        () async {
+      await repo.save(_make(id: 'ch'), observedCountryCode: 'CH');
+      expect(
+        repo.getAll().single.currency,
+        isNull,
+        reason: 'unknown beats a confident wrong label',
+      );
+    });
+
+    test('the observation is ignored without one (import, merge, edit)',
+        () async {
+      // `save` defaults to no observation on purpose: today's location
+      // says nothing about a record being restored or merged.
+      await repo.save(_make(id: 'restored'));
+      expect(repo.getAll().single.currency, 'EUR');
+    });
+
+    test('an observation in a same-currency country changes nothing',
+        () async {
+      await repo.save(_make(id: 'fr'), observedCountryCode: 'FR');
+      expect(repo.getAll().single.currency, 'EUR');
+    });
+
+    test('a deliberate unknown survives the next save', () async {
+      // The trip re-linker, a swipe-undo and the correction editor all
+      // re-save an existing row. None of them may quietly convert an
+      // unknown into the profile's currency.
+      await repo.save(_make(id: 'ch'), observedCountryCode: 'CH');
+      final stored = repo.getAll().single;
+      expect(stored.currency, isNull);
+      await repo.save(stored.copyWith(liters: 26));
+      expect(repo.getAll().single.currency, isNull);
+      expect(repo.getAll().single.liters, 26);
+    });
+
+    test('a pre-#4136 legacy record is not labelled by an edit', () async {
+      // Same fact as above: no currency was ever recorded. `FillUp
+      // .currency` documents null as unknown, so stamping today's on
+      // an incidental re-save is the very mislabel #4136 fought.
+      await storage.putSetting(StorageKeys.consumptionLog, [
+        _make(id: 'legacy').toJson()..remove('currency'),
+      ]);
+      await repo.save(repo.getAll().single.copyWith(odometerKm: 11000));
+      expect(repo.getAll().single.currency, isNull);
     });
   });
 
