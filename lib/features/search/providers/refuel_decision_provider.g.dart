@@ -32,9 +32,15 @@ part of 'refuel_decision_provider.dart';
 ///
 /// Distances are the crow-flies figures the result carries, so
 /// [RefuelCandidate.isRoadDistance] stays false and the spec's 1.3
-/// road factor applies. When #3633-style road distances are available
-/// for a row, passing them here with the flag set is the only change
-/// needed — the arithmetic below does not move.
+/// road factor applies — until #4359's road estimates land.
+///
+/// #4359 — once a search has published its origin
+/// ([refuelTravelOriginProvider]), the result set is quoted as return
+/// errands from that origin in ONE budgeted router request, in the
+/// list's own order (so a station outside the radar's top eight is
+/// quoted too). A current, road-verified quote replaces the crow-flies
+/// figure; anything else — loading, failed, unreachable, stale, another
+/// context — leaves the row explicitly approximate.
 
 @ProviderFor(refuelDecision)
 final refuelDecisionProvider = RefuelDecisionFamily._();
@@ -61,9 +67,15 @@ final refuelDecisionProvider = RefuelDecisionFamily._();
 ///
 /// Distances are the crow-flies figures the result carries, so
 /// [RefuelCandidate.isRoadDistance] stays false and the spec's 1.3
-/// road factor applies. When #3633-style road distances are available
-/// for a row, passing them here with the flag set is the only change
-/// needed — the arithmetic below does not move.
+/// road factor applies — until #4359's road estimates land.
+///
+/// #4359 — once a search has published its origin
+/// ([refuelTravelOriginProvider]), the result set is quoted as return
+/// errands from that origin in ONE budgeted router request, in the
+/// list's own order (so a station outside the radar's top eight is
+/// quoted too). A current, road-verified quote replaces the crow-flies
+/// figure; anything else — loading, failed, unreachable, stale, another
+/// context — leaves the row explicitly approximate.
 
 final class RefuelDecisionProvider
     extends $FunctionalProvider<RefuelDecision, RefuelDecision, RefuelDecision>
@@ -90,9 +102,15 @@ final class RefuelDecisionProvider
   ///
   /// Distances are the crow-flies figures the result carries, so
   /// [RefuelCandidate.isRoadDistance] stays false and the spec's 1.3
-  /// road factor applies. When #3633-style road distances are available
-  /// for a row, passing them here with the flag set is the only change
-  /// needed — the arithmetic below does not move.
+  /// road factor applies — until #4359's road estimates land.
+  ///
+  /// #4359 — once a search has published its origin
+  /// ([refuelTravelOriginProvider]), the result set is quoted as return
+  /// errands from that origin in ONE budgeted router request, in the
+  /// list's own order (so a station outside the radar's top eight is
+  /// quoted too). A current, road-verified quote replaces the crow-flies
+  /// figure; anything else — loading, failed, unreachable, stale, another
+  /// context — leaves the row explicitly approximate.
   RefuelDecisionProvider._({
     required RefuelDecisionFamily super.from,
     required List<SearchResultItem> super.argument,
@@ -144,7 +162,7 @@ final class RefuelDecisionProvider
   }
 }
 
-String _$refuelDecisionHash() => r'751d5183b5c52c642ffdb8696bf323ba82a49656';
+String _$refuelDecisionHash() => r'178b802879a4091fdc7366eef5eef86193d80288';
 
 /// The three answers for the current result set (#4090, epic #4087).
 ///
@@ -168,9 +186,15 @@ String _$refuelDecisionHash() => r'751d5183b5c52c642ffdb8696bf323ba82a49656';
 ///
 /// Distances are the crow-flies figures the result carries, so
 /// [RefuelCandidate.isRoadDistance] stays false and the spec's 1.3
-/// road factor applies. When #3633-style road distances are available
-/// for a row, passing them here with the flag set is the only change
-/// needed — the arithmetic below does not move.
+/// road factor applies — until #4359's road estimates land.
+///
+/// #4359 — once a search has published its origin
+/// ([refuelTravelOriginProvider]), the result set is quoted as return
+/// errands from that origin in ONE budgeted router request, in the
+/// list's own order (so a station outside the radar's top eight is
+/// quoted too). A current, road-verified quote replaces the crow-flies
+/// figure; anything else — loading, failed, unreachable, stale, another
+/// context — leaves the row explicitly approximate.
 
 final class RefuelDecisionFamily extends $Family
     with $FunctionalFamilyOverride<RefuelDecision, List<SearchResultItem>> {
@@ -205,9 +229,15 @@ final class RefuelDecisionFamily extends $Family
   ///
   /// Distances are the crow-flies figures the result carries, so
   /// [RefuelCandidate.isRoadDistance] stays false and the spec's 1.3
-  /// road factor applies. When #3633-style road distances are available
-  /// for a row, passing them here with the flag set is the only change
-  /// needed — the arithmetic below does not move.
+  /// road factor applies — until #4359's road estimates land.
+  ///
+  /// #4359 — once a search has published its origin
+  /// ([refuelTravelOriginProvider]), the result set is quoted as return
+  /// errands from that origin in ONE budgeted router request, in the
+  /// list's own order (so a station outside the radar's top eight is
+  /// quoted too). A current, road-verified quote replaces the crow-flies
+  /// figure; anything else — loading, failed, unreachable, stale, another
+  /// context — leaves the row explicitly approximate.
 
   RefuelDecisionProvider call(List<SearchResultItem> items) =>
       RefuelDecisionProvider._(argument: items, from: this);

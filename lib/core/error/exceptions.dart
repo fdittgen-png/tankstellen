@@ -156,6 +156,29 @@ class NonFuelStationIdException extends AppException {
   String toString() => 'NonFuelStationIdException: $message';
 }
 
+/// Thrown when a country's provider has nothing to fetch — retired, or
+/// publishing no prices at all (#4348, #804 Australia).
+///
+/// Structural, NOT transient: the chain raises it from the country's
+/// declared `ProviderCapability` before any cache read or request, so a
+/// retry costs nothing and a search loop cannot hammer a dead endpoint.
+/// It is deliberately a different type from a network failure — "try
+/// again later" would be a false promise here.
+class ProviderUnavailableException extends AppException {
+  /// ISO code of the unavailable provider's country (e.g. `AU`).
+  final String countryCode;
+
+  const ProviderUnavailableException(this.countryCode);
+
+  @override
+  String get message =>
+      'The $countryCode price provider publishes no prices (declared '
+      'unavailable by its capability, #4348).';
+
+  @override
+  String toString() => 'ProviderUnavailableException: $message';
+}
+
 /// Thrown when every service in a fallback chain has failed,
 /// including the cache. Carries accumulated errors from each step
 /// so the UI can report exactly what went wrong.

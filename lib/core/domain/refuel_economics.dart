@@ -27,10 +27,13 @@ library;
 import 'package:meta/meta.dart';
 
 import 'data_value.dart';
+import 'refuel_candidate.dart';
 import 'refuel_decision.dart';
+import 'refuel_trip_cost.dart';
 
 // Re-exported so every existing caller keeps one import: the split
 // (#4139) is an internal seam, not a change to this layer's contract.
+export 'refuel_candidate.dart';
 export 'refuel_decision.dart';
 
 /// The default litres a refuel is assumed to buy when the user has no
@@ -98,77 +101,6 @@ const Duration kConfidentPickMaxPriceAge = Duration(hours: 24);
 /// deviation as a road distance.
 const double kEnRouteTripFactor = 1;
 
-/// One station, reduced to what the economics needs.
-@immutable
-class RefuelCandidate {
-  const RefuelCandidate({
-    required this.stationId,
-    required this.oneWayKm,
-    this.pricePerLitre,
-    this.isRoadDistance = false,
-    this.openState = const DataValue.unknown(
-      reason: DataUnknownReason.notPublishedForThisItem,
-    ),
-    this.priceAge = const DataValue.unknown(
-      reason: DataUnknownReason.notPublishedForThisItem,
-    ),
-  });
-
-  final String stationId;
-
-  /// Distance to the station, one way. Crow-flies unless
-  /// [isRoadDistance]; see [kCrowFliesRoadFactor].
-  final double oneWayKm;
-
-  /// Price of the SELECTED fuel, or null when this station does not
-  /// publish one. A candidate without a price can still be the closest;
-  /// it can never hold an economic ranking (spec §4.3).
-  final double? pricePerLitre;
-
-  /// True when [oneWayKm] is a real road distance, so no correction
-  /// factor applies.
-  final bool isRoadDistance;
-
-  /// Whether the station is open right now (#4139), as far as the
-  /// country's provider can say (#4156).
-  ///
-  /// Never used in the ARITHMETIC — it gates whether Best Value may LEAD
-  /// (spec §3.1). A confident recommendation at a closed forecourt is the
-  /// failure §5 named as costing more trust than the optimisation buys.
-  ///
-  /// Was a `bool?`, which conflated two different absences and read both
-  /// as "closed": eleven of the seventeen registered countries publish no
-  /// opening hours for anyone, so the conditional lead could not fire in
-  /// any of them and nothing said why.
-  /// `ProviderCapability.openState` produces this, and the difference
-  /// between the two unknowns is what the gate now reads.
-  final DataValue<bool> openState;
-
-  /// How old the price is (#4139), as far as the country's provider can
-  /// say (#4156). Gates the lead for the same reason; never enters the
-  /// cost.
-  ///
-  /// [DataUnknownReason.notPublishedByProvider] means the source stamps
-  /// no prices at all — the age we could compute would be our own
-  /// download clock. See `ProviderCapability.priceAge`.
-  final DataValue<Duration> priceAge;
-
-  @override
-  bool operator ==(Object other) =>
-      other is RefuelCandidate &&
-      other.stationId == stationId &&
-      other.oneWayKm == oneWayKm &&
-      other.pricePerLitre == pricePerLitre &&
-      other.isRoadDistance == isRoadDistance &&
-      other.openState == openState &&
-      other.priceAge == priceAge;
-
-  @override
-  int get hashCode =>
-      Object.hash(stationId, oneWayKm, pricePerLitre, isRoadDistance,
-          openState, priceAge);
-}
-
 /// The vehicle and intent side of the calculation.
 ///
 /// [consumptionLPer100km] is nullable ON PURPOSE: no consumption means
@@ -192,9 +124,13 @@ class RefuelProfile {
   /// Whether [consumptionLPer100km] is modelled rather than measured.
   final bool consumptionIsEstimated;
 
-  /// Litres this refuel is assumed to buy. The user's own median
-  /// fill-up when known — the whole point of [kDefaultRefuelLitres]
-  /// being a fallback and not a question.
+  /// The NET refill this decision is priced for — the fuel the driver is
+  /// better off by after the trip (#4360, `RefuelPurchaseQuantity.netIncrease`).
+  /// The user's own median fill-up when known — the whole point of
+  /// [kDefaultRefuelLitres] being a fallback and not a question.
+  ///
+  /// Not the litres dispensed: the pump delivers this plus the fuel the
+  /// trip burns ([RefuelQuote.litresToDispense]).
   final double litresIntended;
 
   /// 2 there-and-back, 1 en route. See [kRoundTripFactor].
@@ -256,10 +192,16 @@ class RefuelCost {
   /// [detourLitres] priced at this station — you are replacing it here.
   final double detourCost;
 
-  /// `litresIntended × pricePerLitre`.
+  /// `litresIntended × pricePerLitre` — the price of the net refill.
   final double purchaseCost;
 
-  /// What the refuel costs in total.
+  /// CASH AT THE PUMP for a net refill of `litresIntended` (#4360).
+  ///
+  /// `(litresIntended + detourLitres) × price`: the pump delivers the
+  /// refill plus what the trip burns, each litre paid once. Not "litres
+  /// bought plus a travel charge" — and because every candidate is priced
+  /// for the same net refill, every candidate ends in the same tank state
+  /// and these totals compare directly.
   double get totalCost => purchaseCost + detourCost;
 }
 
@@ -272,8 +214,13 @@ class RefuelQuote {
   final RefuelCandidate candidate;
   final RefuelCost? cost;
 
-  /// Cost per litre BOUGHT, detour included — the quantity Best Value
-  /// ranks on. Null when [cost] is.
+  /// The litres the pump actually delivers for the net refill (#4360).
+  /// Null when [cost] is.
+  double? get litresToDispense =>
+      cost == null ? null : _litres + cost!.detourLitres;
+
+  /// Cash per NET litre gained, detour included — the quantity Best
+  /// Value ranks on. Null when [cost] is.
   double? get effectivePricePerLitre => cost == null
       ? null
       : cost!.totalCost / _litres;
@@ -291,13 +238,13 @@ abstract final class RefuelEconomics {
   static RefuelCost? cost(RefuelCandidate candidate, RefuelProfile profile) {
     final price = candidate.pricePerLitre;
     final consumption = profile.consumptionLPer100km;
+    // #4348 — no drive to a reference point, so no detour to cost.
+    if (!candidate.isPhysicalStation) return null;
     if (price == null || price <= 0) return null;
     if (consumption == null || consumption <= 0) return null;
     if (profile.litresIntended <= 0) return null;
 
-    final travelKm = candidate.oneWayKm *
-        profile.tripFactor *
-        (candidate.isRoadDistance ? 1 : profile.roadFactor);
+    final travelKm = RefuelEconomics.travelKm(candidate, profile);
     final detourLitres = travelKm * consumption / 100;
     return RefuelCost(
       travelKm: travelKm,
@@ -306,6 +253,31 @@ abstract final class RefuelEconomics {
       purchaseCost: profile.litresIntended * price,
     );
   }
+
+  /// Kilometres driven for this refuel (#4359).
+  ///
+  /// The routed itinerary when the candidate carries an actionable road
+  /// estimate — both real legs, from the driver's own origin — else the
+  /// approximate `tripFactor × oneWayKm × roadFactor`. The same figure
+  /// costs the detour and ranks "closest", so the two can never disagree
+  /// about which station is nearer.
+  static double travelKm(RefuelCandidate candidate, RefuelProfile profile) {
+    final road = candidate.roadTravel;
+    final routed = road != null && road.isActionable
+        ? road.itinerary.distanceKm
+        : null;
+    if (routed != null) return routed;
+    return candidate.oneWayKm *
+        profile.tripFactor *
+        (candidate.isRoadDistance ? 1 : profile.roadFactor);
+  }
+
+  /// One refuelling TRIP with fuel conserved on its outbound and return
+  /// legs, a purchase quantity whose meaning is kept, and cash counted
+  /// once (#4360). The ledger lives in `refuel_trip_cost.dart`; this is
+  /// the single calculator's entry point for it.
+  static RefuelTripOutcome tripCost(RefuelTripInput input) =>
+      computeRefuelTrip(input);
 
   /// Rank [candidates] three ways under [profile].
   ///
@@ -326,6 +298,9 @@ abstract final class RefuelEconomics {
       RefuelQuote? winner;
       double? winning;
       for (final q in quotes) {
+        // #4348 — a reference price never poses as the cheapest or
+        // closest STATION.
+        if (!q.candidate.isPhysicalStation) continue;
         final v = key(q);
         if (v == null) continue;
         if (winning == null ||
@@ -345,7 +320,7 @@ abstract final class RefuelEconomics {
       profile: profile,
       quotes: quotes,
       cheapest: best((q) => q.candidate.pricePerLitre),
-      closest: best((q) => q.candidate.oneWayKm),
+      closest: best((q) => travelKm(q.candidate, profile)),
       bestValue:
           profile.canRankByValue ? best((q) => q.effectivePricePerLitre) : null,
     );

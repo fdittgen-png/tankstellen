@@ -139,7 +139,7 @@ class _StationDetailLoaded extends StatelessWidget {
         // small AppBar icon users struggled to find. #3902 — it is the ONE
         // navigate affordance on the screen (the header's round button went).
         floatingActionButton:
-            StationDirectionsFab(station: station, extended: !scrolling),
+            StationDirectionsFab.forStation(station, extended: !scrolling),
         body: CustomScrollView(
           slivers: [
             SliverAppBar(

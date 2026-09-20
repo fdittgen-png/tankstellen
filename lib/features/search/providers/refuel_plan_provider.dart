@@ -7,11 +7,16 @@ import '../../../core/domain/refuel_plan.dart';
 import '../../../core/domain/refuel_planner.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
 import '../../../core/domain/search_result_item.dart';
+import '../../../core/domain/station.dart';
+import '../../../core/domain/travel_estimate.dart';
+import '../../../core/services/station_offer.dart';
+import '../../../core/time/app_clock.dart';
 import '../../../core/utils/station_extensions.dart';
 import '../../../core/domain/tank_state_provider.dart';
 import '../../../core/utils/route_projection.dart';
 import '../../route_search/api.dart';
 import 'search_provider.dart';
+import 'station_travel_estimates_provider.dart';
 
 /// Why a trip cannot be planned, in terms the UI can explain (#4146).
 ///
@@ -68,10 +73,17 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
   final fuelType = ref.watch(selectedFuelTypeProvider);
   final projection = RouteProjection(result.route.geometry);
 
-  final candidates = <PlanCandidate>[];
+  final geometry = result.route.geometry;
+  final priced = <({Station station, double price, double along, double off})>[];
   for (final item in result.stations) {
     if (item is! FuelStationResult) continue;
     final station = item.station;
+    // #4348 — a reference price is not a stop anyone can make.
+    if (!StationOffer.forStation(
+            stationId: station.id, lat: station.lat, lng: station.lng)
+        .canRouteTo) {
+      continue;
+    }
     // #2631 — each station is priced by its own country's profile fuel
     // on a cross-border route, exactly as the list and the map do.
     final fuel = fuelForStation(station, result.profileFuelByCountry, fuelType);
@@ -79,13 +91,50 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
     if (price == null || price <= 0) continue;
 
     final at = projection.project(station.lat, station.lng);
-    candidates.add(PlanCandidate(
-      stationId: station.id,
-      alongRouteKm: at.alongKm,
-      pricePerLitre: price,
-      detourKm: at.offRouteKm,
-    ));
+    priced.add(
+        (station: station, price: price, along: at.alongKm, off: at.offRouteKm));
   }
+
+  // #4359 — the exit/rejoin cost of each stop, routed as origin → station
+  // → destination against origin → destination in ONE budgeted request,
+  // nearest-to-route first. A current road quote replaces the projection
+  // (the crow-flies gap to the nearest sampled vertex); anything else
+  // keeps the projection, and the plan says its detour time is
+  // approximate.
+  final context = TravelContext(
+    origin: TravelPoint(geometry.first.latitude, geometry.first.longitude),
+    destination: TravelPoint(geometry.last.latitude, geometry.last.longitude),
+    purpose: TravelPurpose.stopOnJourney,
+    // A recomputed route with the same endpoints is still a new journey.
+    routeRevision: Object.hash(geometry.length, result.route.distanceKm),
+  );
+  final request = TravelQuoteRequest.budgeted(context, [
+    for (final p in [...priced]..sort((a, b) => a.off.compareTo(b.off)))
+      (id: p.station.id, lat: p.station.lat, lng: p.station.lng),
+  ]);
+  final estimates = ref.watch(stationTravelEstimatesProvider(request));
+  final now = ref.watch(appClockProvider).now();
+
+  final candidates = <PlanCandidate>[
+    for (final p in priced)
+      if (actionableTravelEstimate(estimates, request, p.station.id, now)
+          case final road?)
+        PlanCandidate(
+          stationId: p.station.id,
+          alongRouteKm: p.along,
+          pricePerLitre: p.price,
+          detourKm: p.off,
+          roadExtraKm: road.extraKm,
+          roadExtraMinutes: road.extraDrivingMinutes,
+        )
+      else
+        PlanCandidate(
+          stationId: p.station.id,
+          alongRouteKm: p.along,
+          pricePerLitre: p.price,
+          detourKm: p.off,
+        ),
+  ];
 
   if (candidates.isEmpty) {
     return const RefuelPlanState.blocked(RefuelPlanBlocker.noPricedStations);

@@ -8358,6 +8358,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get splashLoadingLabel => 'Sparkilo wird geladen';
 
   @override
+  String get stationReferencePriceNotice =>
+      'Referenzpreis für diese Gegend, kein Tankstellenstandort – es gibt kein Navigationsziel.';
+
+  @override
+  String get decisionPartialCoverageNote =>
+      'Die Quelle dieses Landes führt nur einen Teil der Tankstellen, daher sind dies die besten unter den angezeigten.';
+
+  @override
+  String get errorTitleProviderUnavailable => 'Keine Preise für dieses Land';
+
+  @override
+  String get errorProviderUnavailable =>
+      'Die Preisquelle dieses Landes veröffentlicht derzeit keine Live-Preise. Ein erneuter Versuch ändert daran nichts.';
+
+  @override
+  String get recoveryStillWorksProviderUnavailable =>
+      'Favoriten, Tankvorgänge und Suchen in anderen Ländern funktionieren weiterhin.';
+
+  @override
   String get storageRecoveryTitle => 'Speicherproblem';
 
   @override

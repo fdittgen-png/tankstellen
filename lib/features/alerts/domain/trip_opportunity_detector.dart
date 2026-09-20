@@ -229,21 +229,16 @@ abstract final class TripOpportunityDetector {
     // the money is the difference between the two plans, which is
     // reproducible from the stops each one shows.
     final fastest = plans.fastest;
-    // The money is the difference between the two plans, decomposed the
-    // way trust rule 4 requires: gross at the pumps, detour as the extra
-    // driving the cheaper plan asks for.
-    //
-    // NOT `fastest.totalCost - cheapest.totalCost` as the gross —
-    // `totalCost` already includes each plan's own detour cost, so
-    // handing that in as `gross` and a detour beside it would subtract
-    // the driving twice. Decomposed like this, `net` comes out exactly
-    // equal to the difference of the two totals, which is the figure a
-    // user could check against the two plans on screen.
-    final money = (fastest != null && fastest.totalCost > cheapest.totalCost)
-        ? Money(
-            gross: fastest.fuelCost - cheapest.fuelCost,
-            detour: cheapest.detourCost - fastest.detourCost,
-          )
+    // #4360 — the money is the difference between the two plans at the
+    // SAME terminal fuel state: the fastest plan fills the tank and the
+    // cheapest ends near the reserve, so their raw pump cash differs by
+    // fuel still in the tank, not by journey savings. Each plan's pump
+    // cash already pays for its own detour fuel (conserved in the tank),
+    // so no separate detour is subtracted — that would count it twice.
+    final fast = fastest == null ? null : plans.comparableCost(fastest);
+    final cheap = plans.comparableCost(cheapest);
+    final money = (fast != null && cheap != null && fast > cheap)
+        ? Money(gross: fast - cheap, detour: 0)
         : null;
 
     return TripOpportunityResult.found(

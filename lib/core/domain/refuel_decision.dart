@@ -77,6 +77,13 @@ class RefuelDecision {
   final RefuelQuote? closest;
   final RefuelQuote? bestValue;
 
+  /// True when any ranked station comes from a source that covers only
+  /// part of its country (#4348). The picks are then the best among the
+  /// stations listed, and the UI qualifies them rather than implying a
+  /// national answer.
+  bool get coverageIncomplete => quotes.any((q) =>
+      q.candidate.isPhysicalStation && !q.candidate.coverageComplete);
+
   /// False when no Best Value could be computed — the UI states why
   /// instead of showing a recommendation it cannot justify.
   bool get valueRankingAvailable => bestValue != null;

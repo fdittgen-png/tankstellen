@@ -210,6 +210,14 @@ class ProviderCapability {
     return DataValue.measured(age);
   }
 
+  /// Whether this provider has nothing to fetch — retired, or publishing
+  /// no prices at all (#4348, #804 Australia).
+  ///
+  /// Structural, not transient: a request would fail the same way every
+  /// time, so the search chain refuses before spending one and the UI
+  /// names the state instead of offering a retry that cannot help.
+  bool get isUnavailable => !price || coverage == ProviderCoverage.none;
+
   /// Whether an amenity claim may be made at all. A country whose source
   /// publishes none must not render an amenities filter that silently
   /// matches nothing — #3308 was exactly this class of bug.

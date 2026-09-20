@@ -9,9 +9,12 @@ import '../../../core/domain/refuel_economics.dart';
 import '../../../core/time/app_clock.dart';
 import '../../../core/domain/refuel_profile_provider.dart';
 import '../../../core/domain/search_result_item.dart';
-import '../../../core/services/country_service_registry.dart';
+import '../../../core/domain/travel_estimate.dart';
+import '../../../core/services/station_offer.dart';
 import '../../../core/utils/station_extensions.dart';
+import 'refuel_travel_origin_provider.dart';
 import 'search_filters_provider.dart';
+import 'station_travel_estimates_provider.dart';
 
 part 'refuel_decision_provider.g.dart';
 
@@ -37,9 +40,15 @@ part 'refuel_decision_provider.g.dart';
 ///
 /// Distances are the crow-flies figures the result carries, so
 /// [RefuelCandidate.isRoadDistance] stays false and the spec's 1.3
-/// road factor applies. When #3633-style road distances are available
-/// for a row, passing them here with the flag set is the only change
-/// needed — the arithmetic below does not move.
+/// road factor applies — until #4359's road estimates land.
+///
+/// #4359 — once a search has published its origin
+/// ([refuelTravelOriginProvider]), the result set is quoted as return
+/// errands from that origin in ONE budgeted router request, in the
+/// list's own order (so a station outside the radar's top eight is
+/// quoted too). A current, road-verified quote replaces the crow-flies
+/// figure; anything else — loading, failed, unreachable, stale, another
+/// context — leaves the row explicitly approximate.
 @riverpod
 RefuelDecision refuelDecision(Ref ref, List<SearchResultItem> items) {
   final fuelType = ref.watch(selectedFuelTypeProvider);
@@ -48,10 +57,34 @@ RefuelDecision refuelDecision(Ref ref, List<SearchResultItem> items) {
   // enters the arithmetic; both decide whether Best Value is confident
   // enough to be stated as THE answer rather than one of three.
   final now = ref.watch(appClockProvider).now();
+  final fuelItems = items.whereType<FuelStationResult>().toList();
+  final origin = ref.watch(refuelTravelOriginProvider);
+  final request = origin == null || fuelItems.isEmpty
+      ? null
+      : TravelQuoteRequest.budgeted(
+          TravelContext(origin: origin, purpose: TravelPurpose.errandReturn),
+          [
+            for (final item in fuelItems)
+              if (item.station.priceFor(fuelType) != null)
+                (id: item.station.id, lat: item.station.lat,
+                    lng: item.station.lng),
+          ],
+        );
+  final estimates = request == null
+      ? null
+      : ref.watch(stationTravelEstimatesProvider(request));
   return RefuelEconomics.decide(
     [
-      for (final item in items.whereType<FuelStationResult>())
-        _candidate(item, fuelType, now),
+      for (final item in fuelItems)
+        _candidate(
+          item,
+          fuelType,
+          now,
+          request == null || estimates == null
+              ? null
+              : actionableTravelEstimate(
+                  estimates, request, item.station.id, now),
+        ),
     ],
     profile,
   );
@@ -61,6 +94,7 @@ RefuelCandidate _candidate(
   FuelStationResult item,
   FuelType fuelType,
   DateTime now,
+  StationTravelEstimate? road,
 ) {
   // #4156 — the gates are only as good as the provider behind them, and
   // a cross-border result set mixes providers, so the capability is
@@ -71,16 +105,25 @@ RefuelCandidate _candidate(
   // active country instead would have pulled the profile box into a
   // provider whose whole job is arithmetic over a list it was handed —
   // and it is the wrong answer anyway for a station across the border.
-  final code = CountryServiceRegistry.countryForStationId(item.station.id) ??
-      CountryServiceRegistry.countryForLatLng(item.station.lat,
-          item.station.lng);
-  final capability =
-      code == null ? null : CountryServiceRegistry.capabilityFor(code);
+  //
+  // #4348 — the same per-station resolution also answers what the result
+  // IS: a reference price holds no ranking, and a partial source
+  // qualifies every pick drawn from it.
+  final offer = StationOffer.forStation(
+    stationId: item.station.id,
+    lat: item.station.lat,
+    lng: item.station.lng,
+  );
+  final capability = offer.capability;
   final age = _priceAge(item.station.priceUpdatedAt, now);
   return RefuelCandidate(
     stationId: item.station.id,
-    oneWayKm: item.dist,
+    oneWayKm: road?.toStation.distanceKm ?? item.dist,
+    isRoadDistance: road != null,
+    roadTravel: road,
     pricePerLitre: item.station.priceFor(fuelType),
+    isPhysicalStation: offer.canHoldStationRanking,
+    coverageComplete: offer.coverageComplete,
     // An unregistered country gets the candidate's own defaults, which
     // block both gates. That is the honest answer: we do not know what
     // this source publishes, so we cannot stand a gate down over it.

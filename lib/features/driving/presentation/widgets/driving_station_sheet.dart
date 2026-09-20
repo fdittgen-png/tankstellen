@@ -4,7 +4,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/services/station_offer.dart';
+import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/utils/unit_formatter.dart';
@@ -85,34 +86,42 @@ class DrivingStationSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          // Navigate button — 72dp height
-          SizedBox(
-            width: double.infinity,
-            height: 72,
-            child: FilledButton.icon(
-              onPressed: () => _launchNavigation(context),
-              icon: const Icon(Icons.navigation, size: 28),
-              // #3994 — a type role, not a literal, so the in-car primary
-              // action grows with the text-size setting. headlineMedium is
-              // the big-glanceable role (headlineSmall is a heading role).
-              label: Text(
-                l10n.navigate,
-                style: theme.textTheme.headlineMedium!.copyWith(
-                  fontWeight: FontWeight.w600,
+          // Navigate button — 72dp height. #4348 — never for a reference
+          // price pinned at a stand-in point: there is nowhere to drive.
+          if (StationOffer.forStation(
+            stationId: station.id,
+            lat: station.lat,
+            lng: station.lng,
+          ).canNavigate)
+            SizedBox(
+              width: double.infinity,
+              height: 72,
+              child: FilledButton.icon(
+                onPressed: () => _launchNavigation(context),
+                icon: const Icon(Icons.navigation, size: 28),
+                // #3994 — a type role, not a literal, so the in-car primary
+                // action grows with the text-size setting. headlineMedium is
+                // the big-glanceable role (headlineSmall is a heading role).
+                label: Text(
+                  l10n.navigate,
+                  style: theme.textTheme.headlineMedium!.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
   }
 
   void _launchNavigation(BuildContext context) {
-    final uri = Uri.parse(
-      'geo:${station.lat},${station.lng}?q=${station.lat},${station.lng}(${Uri.encodeComponent(station.displayName)})',
-    );
-    unawaited(launchUrl(uri));
+    unawaited(NavigationUtils.openStation(
+      stationId: station.id,
+      lat: station.lat,
+      lng: station.lng,
+      label: station.displayName,
+    ));
     if (context.mounted) {
       Navigator.of(context).pop();
     }

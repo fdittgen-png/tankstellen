@@ -5,15 +5,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/price_freshness.dart';
 import '../../../../core/domain/station.dart';
 import '../../../../core/navigation/app_routes.dart';
+import '../../../../core/services/station_offer.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/time/app_clock.dart';
+import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/price_freshness_words.dart';
@@ -143,14 +144,30 @@ class StationMapSheet extends ConsumerWidget {
               AmenitySummary(amenities: station.amenities, maxNamed: 3),
             ],
             const SizedBox(height: Spacing.lg),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => _navigate(context),
-                icon: const Icon(Icons.navigation_outlined),
-                label: Text(l10n.navigate),
+            // #4348 — a reference price (LU's decree, GR's prefecture
+            // average) is pinned at a stand-in point, not a forecourt.
+            // It keeps its price and loses the drive-there action.
+            if (StationOffer.forStation(
+              stationId: station.id,
+              lat: station.lat,
+              lng: station.lng,
+            ).canNavigate)
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => _navigate(context),
+                  icon: const Icon(Icons.navigation_outlined),
+                  label: Text(l10n.navigate),
+                ),
+              )
+            else
+              Text(
+                l10n.stationReferencePriceNotice,
+                key: const Key('station_reference_price_notice'),
+                style: AppText.body(context).copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
             const SizedBox(height: Spacing.sm),
             // The deep answer, still one tap away.
             Align(
@@ -171,12 +188,13 @@ class StationMapSheet extends ConsumerWidget {
   }
 
   void _navigate(BuildContext context) {
-    final uri = Uri.parse(
-      'geo:${station.lat},${station.lng}'
-      '?q=${station.lat},${station.lng}'
-      '(${Uri.encodeComponent(station.displayName)})',
-    );
-    unawaited(launchUrl(uri));
+    // #4348 — the one gated launcher every station surface shares.
+    unawaited(NavigationUtils.openStation(
+      stationId: station.id,
+      lat: station.lat,
+      lng: station.lng,
+      label: station.displayName,
+    ));
     if (context.mounted) Navigator.of(context).pop();
   }
 }

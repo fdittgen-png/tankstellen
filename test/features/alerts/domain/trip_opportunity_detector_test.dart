@@ -162,14 +162,45 @@ void main() {
       // two plans on screen. `totalCost` already contains each plan's
       // own detour, so using the difference of totals AS the gross would
       // subtract the driving twice.
+      //
+      // #4360 — at the SAME terminal state: each plan's pump cash already
+      // pays for its own detour fuel, and the fastest plan's fuller tank
+      // is valued back at the set's one basis before any difference is
+      // called a saving.
       final r = detect(trip(candidates: [at(8, 1.60), at(300, 1.85)]));
       final o = r.opportunity!;
-      final cheapest = r.plans!.cheapest!;
-      final fastest = r.plans!.fastest!;
-      if (o.netSaving != null) {
-        expect(o.netSaving,
-            closeTo(fastest.totalCost - cheapest.totalCost, 0.0001));
+      final plans = r.plans!;
+      final diff = plans.comparableCost(plans.fastest!)! -
+          plans.comparableCost(plans.cheapest!)!;
+      if (diff > 0) {
+        expect(o.netSaving, closeTo(diff, 0.0001));
+        expect(o.detourCost, 0, reason: 'never a second charge');
+      } else {
+        expect(o.netSaving, isNull);
       }
+    });
+
+    test('#4360 — a fuller tank is not a saving', () {
+      // One station 5 km ahead at €2/L, 10 L in a 50 L tank, 120 km to
+      // go at 10 L/100 km. The fastest plan fills up (≈€81), the cheapest
+      // buys just enough (≈€14): the cash gap is fuel left in the tank at
+      // the destination, and at equal end states the plans cost the same.
+      final r = detect(trip(
+        remainingKm: 120,
+        remainingMinutes: 80,
+        litres: const DataValue.measured(10),
+        consumption: 10,
+        candidates: [at(5, 2.0)],
+      ));
+      final plans = r.plans!;
+      expect(plans.fastest!.fuelCost - plans.cheapest!.fuelCost,
+          greaterThan(60),
+          reason: 'the raw pump cash really does differ');
+      expect(plans.comparableCost(plans.fastest!),
+          closeTo(plans.comparableCost(plans.cheapest!)!, 1e-9));
+      final o = r.opportunity!;
+      expect(o.grossSaving, isNull);
+      expect(o.netSaving, isNull);
     });
 
     test('a cheaper station further on means no alert at the near one',

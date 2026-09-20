@@ -3892,6 +3892,11 @@
   "@splashLoadingLabel": {
     "description": "Barrierefreiheits-Label, das TalkBack/VoiceOver während des animierten Splash-Screens ansagt. Wird nicht sichtbar gerendert; kurz und sprechbar halten."
   },
+  "stationReferencePriceNotice": "Referenzpreis für diese Gegend, kein Tankstellenstandort – es gibt kein Navigationsziel.",
+  "decisionPartialCoverageNote": "Die Quelle dieses Landes führt nur einen Teil der Tankstellen, daher sind dies die besten unter den angezeigten.",
+  "errorTitleProviderUnavailable": "Keine Preise für dieses Land",
+  "errorProviderUnavailable": "Die Preisquelle dieses Landes veröffentlicht derzeit keine Live-Preise. Ein erneuter Versuch ändert daran nichts.",
+  "recoveryStillWorksProviderUnavailable": "Favoriten, Tankvorgänge und Suchen in anderen Ländern funktionieren weiterhin.",
   "storageRecoveryTitle": "Speicherproblem",
   "storageRecoveryMessage": "Sparkilo konnte seinen lokalen Datenspeicher nicht öffnen. Die Speicherdatei scheint beschädigt zu sein.",
   "storageRecoveryGuidance": "Zur Wiederherstellung leere den App-Speicher in den Geräteeinstellungen oder installiere die App neu. Deine Favoriten und dein Verlauf werden nur auf diesem Gerät gespeichert und können nicht automatisch wiederhergestellt werden.",
