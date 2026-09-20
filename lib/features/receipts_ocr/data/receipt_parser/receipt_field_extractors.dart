@@ -170,7 +170,12 @@ double? extractTotalCost(String text, {OcrLocaleProfile? profile}) {
       r'(?:totale(?:\s*documento)?|total|tot\s*ttc|'
       r'montant(?:\s*(?:ttc|reel|r[eé]el))?|ttc|'
       r'betrag|summe|gesamt|importo)'
-      '\\s*[:=]?\\s*(?:$sym)?\\s*(\\d+[.,]\\d+)',
+      // #4428 — the marker after the label may be a FOREIGN ISO code
+      // (`Total CHF 51,73` under an EUR profile). Optional, and only
+      // ever between an explicit total label and the amount.
+      '\\s*[:=]?\\s*'
+      '(?:$sym|${ReceiptCurrencyProfile.isoCodePattern})?'
+      '\\s*(\\d+[.,]\\d+)',
       caseSensitive: false,
     ),
   ]);

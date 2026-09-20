@@ -8,6 +8,7 @@ import '../../../../core/data/storage_repository.dart';
 import '../../../../core/storage/hive_map_coercion.dart';
 import '../../../../core/storage/storage_keys.dart';
 import '../../domain/entities/fill_up.dart';
+import '../../domain/fill_up_currency.dart';
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/utils/price_formatter.dart';
 
@@ -45,26 +46,61 @@ class FillUpRepository {
 
   /// Add or update a single fill-up (matched by id).
   ///
-  /// #4136 — stamps the active currency on a record that has none, so a
-  /// history that later spans two can be told apart instead of silently
-  /// summed. Done HERE rather than in the form: the currency is a
-  /// property of the record, not of one screen, and every creation path
-  /// (manual entry, receipt scan, a future importer) goes through this.
+  /// #4136 — labels a record that has none, so a history that later
+  /// spans two currencies can be told apart instead of silently summed.
+  /// Done HERE rather than in the form: the currency is a property of
+  /// the record, not of one screen, and every creation path (manual
+  /// entry, receipt scan, a future importer) goes through this.
   ///
   /// A record that ALREADY carries one keeps it — a backup restored in
   /// another country must not be relabelled with today's currency.
-  Future<void> save(FillUp rawFillUp) async {
-    final fillUp = rawFillUp.currency == null
-        ? rawFillUp.copyWith(currency: PriceFormatter.currencyCode)
-        : rawFillUp;
+  ///
+  /// #4428 — the label is now decided from the fill's own evidence by
+  /// [resolveFillUpCurrency], not from wherever the profile points. The
+  /// active currency used to be stamped unconditionally, which stored a
+  /// CHF 51,73 Swiss fill as EUR 51,73 under an EUR profile. When the
+  /// evidence says the driver was somewhere else and gives no way to
+  /// name the currency, the record stays **unknown** (null) rather than
+  /// carrying a confident wrong label.
+  ///
+  /// [observedCountryCode] is where the device believes it is right
+  /// now. Pass it only where that is evidence about THIS record — a
+  /// fresh entry the driver is logging. An import, a sync merge or a
+  /// re-save of an old row must leave it null: today's location says
+  /// nothing about a fill from last year.
+  ///
+  /// The label is decided ONCE, when the record is first written. A
+  /// row that is already in the log keeps whatever it has, **null
+  /// included**: a deliberate unknown (#4428) and a pre-#4136 legacy
+  /// record are the same fact — no currency was ever recorded — and an
+  /// incidental re-save (a trip re-link, a swipe-undo, an edit) is not
+  /// the moment to invent one.
+  Future<void> save(FillUp rawFillUp, {String? observedCountryCode}) async {
     final all = [...getAll()];
-    final index = all.indexWhere((f) => f.id == fillUp.id);
+    final index = all.indexWhere((f) => f.id == rawFillUp.id);
+    final fillUp = index >= 0
+        ? rawFillUp
+        : _labelled(rawFillUp, observedCountryCode: observedCountryCode);
     if (index >= 0) {
       all[index] = fillUp;
     } else {
       all.add(fillUp);
     }
     await _writeAll(all);
+  }
+
+  /// [fillUp] with the currency its own evidence supports, or unchanged
+  /// when that evidence names none — freezed's `copyWith` cannot write
+  /// null, and leaving the field alone is exactly the right outcome.
+  FillUp _labelled(FillUp fillUp, {String? observedCountryCode}) {
+    final resolved = resolveFillUpCurrency(
+      recordedCurrency: fillUp.currency,
+      stationId: fillUp.stationId,
+      observedCountryCode: observedCountryCode,
+      profileCountryCode: PriceFormatter.activeCountry,
+      profileCurrency: PriceFormatter.currencyCode,
+    );
+    return resolved == null ? fillUp : fillUp.copyWith(currency: resolved);
   }
 
   /// Delete a fill-up by id.

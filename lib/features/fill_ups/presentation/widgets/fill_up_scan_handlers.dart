@@ -57,6 +57,13 @@ class FillUpScanHostState {
   /// saved [FillUp] carries the exact quoted price (#2689) instead of
   /// only the `totalCost / liters` quotient.
   final void Function(double) setScannedPricePerLiter;
+
+  /// Stores the ISO 4217 code the receipt printed (#4428) so the saved
+  /// [FillUp] records the currency the driver was actually charged in,
+  /// instead of having the active profile's stamped over it. Optional:
+  /// a host that does not care (a test harness) simply omits it.
+  final void Function(String)? setScannedCurrency;
+
   final void Function(ReceiptScanOutcome) setLastScan;
 
   /// `mounted` predicate from the host state — checked after every
@@ -82,6 +89,7 @@ class FillUpScanHostState {
     required this.setDate,
     required this.setFuelType,
     required this.setScannedPricePerLiter,
+    this.setScannedCurrency,
     required this.setLastScan,
     required this.isMounted,
     this.activeCountry,

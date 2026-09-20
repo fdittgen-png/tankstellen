@@ -57,6 +57,10 @@ mixin _AddFillUpSaveFlow on _AddFillUpFormState {
       // was read; null for manual entries falls back to the computed
       // pricePerLiter getter.
       scannedPricePerLiter: _scannedPricePerLiter,
+      // #4428 — the currency the receipt printed. Null for a manual
+      // entry: the repository then decides from the station and the
+      // driver's whereabouts, recording *unknown* over a wrong label.
+      currency: _scannedCurrency,
     );
 
     // #1401 phase 7b — when both adapter fuel-level captures are

@@ -22,6 +22,7 @@ mixin _AddFillUpScanFlow on _AddFillUpFormState {
         setFuelType: (f) => setState(() => _fuelType = f),
         setScannedPricePerLiter: (p) =>
             setState(() => _scannedPricePerLiter = p),
+        setScannedCurrency: (c) => setState(() => _scannedCurrency = c),
         setLastScan: (o) => setState(() => _lastScan = o),
         isMounted: () => mounted,
         // #2275 — the active country drives the per-country validation
