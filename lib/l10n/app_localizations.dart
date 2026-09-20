@@ -10154,6 +10154,312 @@ abstract class AppLocalizations {
   /// **'Expenses'**
   String get fleetManagerOpenQueue;
 
+  /// No description provided for @wizardProfileFleetName.
+  ///
+  /// In en, this message translates to:
+  /// **'Company or fleet vehicle'**
+  String get wizardProfileFleetName;
+
+  /// No description provided for @wizardProfileFleetDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'I drive my employer\'s car. Fleet assignment, expenses, and a clear view of what my manager can see.'**
+  String get wizardProfileFleetDescription;
+
+  /// No description provided for @fleetIdentityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your fleet'**
+  String get fleetIdentityTitle;
+
+  /// No description provided for @fleetIdentityIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the invite code your fleet administrator gave you. If you are setting the fleet up yourself, create it below instead.'**
+  String get fleetIdentityIntro;
+
+  /// No description provided for @fleetInviteCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite code'**
+  String get fleetInviteCodeLabel;
+
+  /// No description provided for @fleetScanQrCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get fleetScanQrCode;
+
+  /// No description provided for @fleetJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join fleet'**
+  String get fleetJoinButton;
+
+  /// No description provided for @fleetCreateSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'I am setting up this fleet'**
+  String get fleetCreateSectionTitle;
+
+  /// No description provided for @fleetOrgNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet name'**
+  String get fleetOrgNameLabel;
+
+  /// No description provided for @fleetCreateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create fleet'**
+  String get fleetCreateButton;
+
+  /// No description provided for @fleetIdentityLater.
+  ///
+  /// In en, this message translates to:
+  /// **'You can also do this later under Settings, then Fleet.'**
+  String get fleetIdentityLater;
+
+  /// No description provided for @fleetMemberOf.
+  ///
+  /// In en, this message translates to:
+  /// **'You are in {org}.'**
+  String fleetMemberOf(String org);
+
+  /// No description provided for @fleetYourRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role: {role}'**
+  String fleetYourRole(String role);
+
+  /// No description provided for @fleetRoleEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee'**
+  String get fleetRoleEmployee;
+
+  /// No description provided for @fleetRoleManager.
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet manager'**
+  String get fleetRoleManager;
+
+  /// No description provided for @fleetRoleAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet administrator'**
+  String get fleetRoleAdmin;
+
+  /// No description provided for @fleetBlockedIdentityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Joining a fleet needs an account with an e-mail address. This device still uses an anonymous account, which nobody can assign to a company — add an e-mail address in Settings, then Sync, first.'**
+  String get fleetBlockedIdentityRequired;
+
+  /// No description provided for @fleetBlockedCommunityBackend.
+  ///
+  /// In en, this message translates to:
+  /// **'A fleet cannot live on the shared community database. Your employer\'s own database, or one you were invited to, is required.'**
+  String get fleetBlockedCommunityBackend;
+
+  /// No description provided for @fleetBlockedSyncDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync is switched off. Set up your employer\'s database in Settings, then Sync, before joining a fleet.'**
+  String get fleetBlockedSyncDisabled;
+
+  /// No description provided for @fleetBlockedEnterCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the invite code your fleet administrator gave you.'**
+  String get fleetBlockedEnterCode;
+
+  /// No description provided for @fleetBlockedEnterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name for the fleet.'**
+  String get fleetBlockedEnterName;
+
+  /// No description provided for @fleetJoinErrorInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That invite code is not valid or has expired. Ask your fleet administrator for a new one.'**
+  String get fleetJoinErrorInvalidCode;
+
+  /// No description provided for @fleetJoinErrorAlreadyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'This account already belongs to a fleet. Leave it before joining another one.'**
+  String get fleetJoinErrorAlreadyMember;
+
+  /// No description provided for @fleetJoinErrorNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This database does not offer fleet joining. Your administrator has to enable fleet mode on it first.'**
+  String get fleetJoinErrorNotSupported;
+
+  /// No description provided for @fleetJoinErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The fleet could not be reached. Check your connection and try again.'**
+  String get fleetJoinErrorUnavailable;
+
+  /// No description provided for @fleetPrivacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What is shared, and what is not'**
+  String get fleetPrivacyTitle;
+
+  /// No description provided for @fleetPrivacyDeviceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stays on this device'**
+  String get fleetPrivacyDeviceTitle;
+
+  /// No description provided for @fleetPrivacyDeviceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your journeys, your position and the raw data read from the adapter never leave this phone for your fleet. They are yours, for your own consumption figures and coaching.'**
+  String get fleetPrivacyDeviceBody;
+
+  /// No description provided for @fleetPrivacySyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Goes to your fleet\'s database'**
+  String get fleetPrivacySyncTitle;
+
+  /// No description provided for @fleetPrivacySyncBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Which company vehicle you are assigned to and when, plus the fill-ups and expenses you submit yourself. Nothing is sent while fleet sharing is switched off.'**
+  String get fleetPrivacySyncBody;
+
+  /// No description provided for @fleetPrivacyManagerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What your manager can see'**
+  String get fleetPrivacyManagerTitle;
+
+  /// No description provided for @fleetPrivacyManagerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicles and assignments, submitted expenses, and cost and consumption figures as fleet totals. Not your journeys, not your live position, and never a driving-style ranking of individual employees.'**
+  String get fleetPrivacyManagerBody;
+
+  /// No description provided for @fleetPrivacyRetentionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How long it is kept, and your controls'**
+  String get fleetPrivacyRetentionTitle;
+
+  /// No description provided for @fleetPrivacyRetentionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your employer configures how long expenses and assignment history are kept. You can export everything, switch sharing off, and delete your own data at any time in Settings, then Privacy and data.'**
+  String get fleetPrivacyRetentionBody;
+
+  /// No description provided for @settingsTopicFleetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet'**
+  String get settingsTopicFleetTitle;
+
+  /// No description provided for @settingsTopicFleetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your organisation, your role and what your manager can see.'**
+  String get settingsTopicFleetSubtitle;
+
+  /// No description provided for @settingsTopicFleetKeywords.
+  ///
+  /// In en, this message translates to:
+  /// **'fleet, company car, employer, organisation, manager, assignment, expenses'**
+  String get settingsTopicFleetKeywords;
+
+  /// No description provided for @fleetSettingsNoFleet.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not in a fleet yet. Join one with an invite code, or create one if you administer it.'**
+  String get fleetSettingsNoFleet;
+
+  /// No description provided for @fleetSettingsOrgLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet'**
+  String get fleetSettingsOrgLabel;
+
+  /// No description provided for @fleetSettingsRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your role'**
+  String get fleetSettingsRoleLabel;
+
+  /// No description provided for @fleetSettingsSharingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing with your fleet'**
+  String get fleetSettingsSharingLabel;
+
+  /// No description provided for @fleetSettingsSharingOn.
+  ///
+  /// In en, this message translates to:
+  /// **'On. The fill-ups and expenses you submit reach your fleet.'**
+  String get fleetSettingsSharingOn;
+
+  /// No description provided for @fleetSettingsSharingOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off. Nothing fleet-related leaves this device.'**
+  String get fleetSettingsSharingOff;
+
+  /// No description provided for @fleetSettingsManagerSeesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What my manager can see'**
+  String get fleetSettingsManagerSeesTitle;
+
+  /// No description provided for @fleetVisibilityVehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which company vehicle you are assigned to, and for which period.'**
+  String get fleetVisibilityVehicle;
+
+  /// No description provided for @fleetVisibilityExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'The fill-ups and expenses you submit yourself.'**
+  String get fleetVisibilityExpenses;
+
+  /// No description provided for @fleetVisibilityCosts.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per kilometre and consumption, as part of fleet totals.'**
+  String get fleetVisibilityCosts;
+
+  /// No description provided for @fleetVisibilityNeverJourneys.
+  ///
+  /// In en, this message translates to:
+  /// **'Never your journeys, your live position or raw adapter data.'**
+  String get fleetVisibilityNeverJourneys;
+
+  /// No description provided for @fleetVisibilityNeverBehaviour.
+  ///
+  /// In en, this message translates to:
+  /// **'Never a driving-style ranking of individual employees.'**
+  String get fleetVisibilityNeverBehaviour;
+
+  /// No description provided for @fleetSettingsStale.
+  ///
+  /// In en, this message translates to:
+  /// **'These fleet details could not be refreshed recently.'**
+  String get fleetSettingsStale;
+
+  /// No description provided for @fleetSettingsExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'These fleet details are out of date. Reconnect so they can be refreshed before you choose a vehicle.'**
+  String get fleetSettingsExpired;
+
   /// Label of the compact current-vehicle context chip shown on fleet-enabled surfaces (#4213).
   ///
   /// In en, this message translates to:

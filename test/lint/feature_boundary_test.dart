@@ -372,7 +372,11 @@ const _featurePairBaseline = <String, int>{
   'search -> route_search': 14,
   'search -> station_detail': 3,
   'search -> widget': 2,
-  'setup -> feature_management': 4,
+  // #4217 — 4 → 2: `profile_choice_step.dart` needed the manifest and
+  // the build channel for the fleet card, so its two reach-ins were
+  // replaced by the `feature_management/api.dart` barrel. Locked in
+  // here, per the house rule that a win is recorded in the same PR.
+  'setup -> feature_management': 2,
   'setup -> profile': 3,
   'setup -> vehicle': 7,
   'station_detail -> alerts': 2,

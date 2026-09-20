@@ -1,0 +1,63 @@
+{
+  "wizardProfileFleetName": "Company or fleet vehicle",
+  "wizardProfileFleetDescription": "I drive my employer's car. Fleet assignment, expenses, and a clear view of what my manager can see.",
+  "fleetIdentityTitle": "Your fleet",
+  "fleetIdentityIntro": "Enter the invite code your fleet administrator gave you. If you are setting the fleet up yourself, create it below instead.",
+  "fleetInviteCodeLabel": "Invite code",
+  "fleetScanQrCode": "Scan QR code",
+  "fleetJoinButton": "Join fleet",
+  "fleetCreateSectionTitle": "I am setting up this fleet",
+  "fleetOrgNameLabel": "Fleet name",
+  "fleetCreateButton": "Create fleet",
+  "fleetIdentityLater": "You can also do this later under Settings, then Fleet.",
+  "fleetMemberOf": "You are in {org}.",
+  "@fleetMemberOf": {
+    "placeholders": {
+      "org": {"type": "String"}
+    }
+  },
+  "fleetYourRole": "Your role: {role}",
+  "@fleetYourRole": {
+    "placeholders": {
+      "role": {"type": "String"}
+    }
+  },
+  "fleetRoleEmployee": "Employee",
+  "fleetRoleManager": "Fleet manager",
+  "fleetRoleAdmin": "Fleet administrator",
+  "fleetBlockedIdentityRequired": "Joining a fleet needs an account with an e-mail address. This device still uses an anonymous account, which nobody can assign to a company — add an e-mail address in Settings, then Sync, first.",
+  "fleetBlockedCommunityBackend": "A fleet cannot live on the shared community database. Your employer's own database, or one you were invited to, is required.",
+  "fleetBlockedSyncDisabled": "Cloud sync is switched off. Set up your employer's database in Settings, then Sync, before joining a fleet.",
+  "fleetBlockedEnterCode": "Enter the invite code your fleet administrator gave you.",
+  "fleetBlockedEnterName": "Enter a name for the fleet.",
+  "fleetJoinErrorInvalidCode": "That invite code is not valid or has expired. Ask your fleet administrator for a new one.",
+  "fleetJoinErrorAlreadyMember": "This account already belongs to a fleet. Leave it before joining another one.",
+  "fleetJoinErrorNotSupported": "This database does not offer fleet joining. Your administrator has to enable fleet mode on it first.",
+  "fleetJoinErrorUnavailable": "The fleet could not be reached. Check your connection and try again.",
+  "fleetPrivacyTitle": "What is shared, and what is not",
+  "fleetPrivacyDeviceTitle": "Stays on this device",
+  "fleetPrivacyDeviceBody": "Your journeys, your position and the raw data read from the adapter never leave this phone for your fleet. They are yours, for your own consumption figures and coaching.",
+  "fleetPrivacySyncTitle": "Goes to your fleet's database",
+  "fleetPrivacySyncBody": "Which company vehicle you are assigned to and when, plus the fill-ups and expenses you submit yourself. Nothing is sent while fleet sharing is switched off.",
+  "fleetPrivacyManagerTitle": "What your manager can see",
+  "fleetPrivacyManagerBody": "Vehicles and assignments, submitted expenses, and cost and consumption figures as fleet totals. Not your journeys, not your live position, and never a driving-style ranking of individual employees.",
+  "fleetPrivacyRetentionTitle": "How long it is kept, and your controls",
+  "fleetPrivacyRetentionBody": "Your employer configures how long expenses and assignment history are kept. You can export everything, switch sharing off, and delete your own data at any time in Settings, then Privacy and data.",
+  "settingsTopicFleetTitle": "Fleet",
+  "settingsTopicFleetSubtitle": "Your organisation, your role and what your manager can see.",
+  "settingsTopicFleetKeywords": "fleet, company car, employer, organisation, manager, assignment, expenses",
+  "fleetSettingsNoFleet": "You are not in a fleet yet. Join one with an invite code, or create one if you administer it.",
+  "fleetSettingsOrgLabel": "Fleet",
+  "fleetSettingsRoleLabel": "Your role",
+  "fleetSettingsSharingLabel": "Sharing with your fleet",
+  "fleetSettingsSharingOn": "On. The fill-ups and expenses you submit reach your fleet.",
+  "fleetSettingsSharingOff": "Off. Nothing fleet-related leaves this device.",
+  "fleetSettingsManagerSeesTitle": "What my manager can see",
+  "fleetVisibilityVehicle": "Which company vehicle you are assigned to, and for which period.",
+  "fleetVisibilityExpenses": "The fill-ups and expenses you submit yourself.",
+  "fleetVisibilityCosts": "Cost per kilometre and consumption, as part of fleet totals.",
+  "fleetVisibilityNeverJourneys": "Never your journeys, your live position or raw adapter data.",
+  "fleetVisibilityNeverBehaviour": "Never a driving-style ranking of individual employees.",
+  "fleetSettingsStale": "These fleet details could not be refreshed recently.",
+  "fleetSettingsExpired": "These fleet details are out of date. Reconnect so they can be refreshed before you choose a vehicle."
+}

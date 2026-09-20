@@ -10238,5 +10238,270 @@
         "example": "Not recorded — these trips carry no such signal"
       }
     }
+  },
+  "wizardProfileFleetName": "Company or fleet vehicle",
+  "@wizardProfileFleetName": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "wizardProfileFleetDescription": "I drive my employer's car. Fleet assignment, expenses, and a clear view of what my manager can see.",
+  "@wizardProfileFleetDescription": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetIdentityTitle": "Your fleet",
+  "@fleetIdentityTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetIdentityIntro": "Enter the invite code your fleet administrator gave you. If you are setting the fleet up yourself, create it below instead.",
+  "@fleetIdentityIntro": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetInviteCodeLabel": "Invite code",
+  "@fleetInviteCodeLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetScanQrCode": "Scan QR code",
+  "@fleetScanQrCode": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetJoinButton": "Join fleet",
+  "@fleetJoinButton": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetCreateSectionTitle": "I am setting up this fleet",
+  "@fleetCreateSectionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetOrgNameLabel": "Fleet name",
+  "@fleetOrgNameLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetCreateButton": "Create fleet",
+  "@fleetCreateButton": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetIdentityLater": "You can also do this later under Settings, then Fleet.",
+  "@fleetIdentityLater": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetMemberOf": "You are in {org}.",
+  "@fleetMemberOf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "org": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetYourRole": "Your role: {role}",
+  "@fleetYourRole": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "fleetRoleEmployee": "Employee",
+  "@fleetRoleEmployee": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetRoleManager": "Fleet manager",
+  "@fleetRoleManager": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetRoleAdmin": "Fleet administrator",
+  "@fleetRoleAdmin": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedIdentityRequired": "Joining a fleet needs an account with an e-mail address. This device still uses an anonymous account, which nobody can assign to a company — add an e-mail address in Settings, then Sync, first.",
+  "@fleetBlockedIdentityRequired": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedCommunityBackend": "A fleet cannot live on the shared community database. Your employer's own database, or one you were invited to, is required.",
+  "@fleetBlockedCommunityBackend": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedSyncDisabled": "Cloud sync is switched off. Set up your employer's database in Settings, then Sync, before joining a fleet.",
+  "@fleetBlockedSyncDisabled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedEnterCode": "Enter the invite code your fleet administrator gave you.",
+  "@fleetBlockedEnterCode": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetBlockedEnterName": "Enter a name for the fleet.",
+  "@fleetBlockedEnterName": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetJoinErrorInvalidCode": "That invite code is not valid or has expired. Ask your fleet administrator for a new one.",
+  "@fleetJoinErrorInvalidCode": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetJoinErrorAlreadyMember": "This account already belongs to a fleet. Leave it before joining another one.",
+  "@fleetJoinErrorAlreadyMember": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetJoinErrorNotSupported": "This database does not offer fleet joining. Your administrator has to enable fleet mode on it first.",
+  "@fleetJoinErrorNotSupported": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetJoinErrorUnavailable": "The fleet could not be reached. Check your connection and try again.",
+  "@fleetJoinErrorUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyTitle": "What is shared, and what is not",
+  "@fleetPrivacyTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyDeviceTitle": "Stays on this device",
+  "@fleetPrivacyDeviceTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyDeviceBody": "Your journeys, your position and the raw data read from the adapter never leave this phone for your fleet. They are yours, for your own consumption figures and coaching.",
+  "@fleetPrivacyDeviceBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacySyncTitle": "Goes to your fleet's database",
+  "@fleetPrivacySyncTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacySyncBody": "Which company vehicle you are assigned to and when, plus the fill-ups and expenses you submit yourself. Nothing is sent while fleet sharing is switched off.",
+  "@fleetPrivacySyncBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyManagerTitle": "What your manager can see",
+  "@fleetPrivacyManagerTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyManagerBody": "Vehicles and assignments, submitted expenses, and cost and consumption figures as fleet totals. Not your journeys, not your live position, and never a driving-style ranking of individual employees.",
+  "@fleetPrivacyManagerBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyRetentionTitle": "How long it is kept, and your controls",
+  "@fleetPrivacyRetentionTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetPrivacyRetentionBody": "Your employer configures how long expenses and assignment history are kept. You can export everything, switch sharing off, and delete your own data at any time in Settings, then Privacy and data.",
+  "@fleetPrivacyRetentionBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settingsTopicFleetTitle": "Fleet",
+  "@settingsTopicFleetTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settingsTopicFleetSubtitle": "Your organisation, your role and what your manager can see.",
+  "@settingsTopicFleetSubtitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settingsTopicFleetKeywords": "fleet, company car, employer, organisation, manager, assignment, expenses",
+  "@settingsTopicFleetKeywords": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsNoFleet": "You are not in a fleet yet. Join one with an invite code, or create one if you administer it.",
+  "@fleetSettingsNoFleet": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsOrgLabel": "Fleet",
+  "@fleetSettingsOrgLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsRoleLabel": "Your role",
+  "@fleetSettingsRoleLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsSharingLabel": "Sharing with your fleet",
+  "@fleetSettingsSharingLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsSharingOn": "On. The fill-ups and expenses you submit reach your fleet.",
+  "@fleetSettingsSharingOn": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsSharingOff": "Off. Nothing fleet-related leaves this device.",
+  "@fleetSettingsSharingOff": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsManagerSeesTitle": "What my manager can see",
+  "@fleetSettingsManagerSeesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityVehicle": "Which company vehicle you are assigned to, and for which period.",
+  "@fleetVisibilityVehicle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityExpenses": "The fill-ups and expenses you submit yourself.",
+  "@fleetVisibilityExpenses": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityCosts": "Cost per kilometre and consumption, as part of fleet totals.",
+  "@fleetVisibilityCosts": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityNeverJourneys": "Never your journeys, your live position or raw adapter data.",
+  "@fleetVisibilityNeverJourneys": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetVisibilityNeverBehaviour": "Never a driving-style ranking of individual employees.",
+  "@fleetVisibilityNeverBehaviour": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsStale": "These fleet details could not be refreshed recently.",
+  "@fleetSettingsStale": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetSettingsExpired": "These fleet details are out of date. Reconnect so they can be refreshed before you choose a vehicle.",
+  "@fleetSettingsExpired": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

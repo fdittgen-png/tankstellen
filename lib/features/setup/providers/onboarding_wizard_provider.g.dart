@@ -46,7 +46,7 @@ final class OnboardingWizardControllerProvider
 }
 
 String _$onboardingWizardControllerHash() =>
-    r'4fc8defaee287f3bdd83c1a0e8126590809c79a1';
+    r'76d67357fad8cea53f8a624399b0a0012940a0b1';
 
 abstract class _$OnboardingWizardController
     extends $Notifier<OnboardingWizardState> {

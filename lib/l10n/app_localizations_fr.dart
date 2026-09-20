@@ -6005,6 +6005,191 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fleetManagerOpenQueue => 'Frais';
 
   @override
+  String get wizardProfileFleetName => 'Véhicule de société ou de flotte';
+
+  @override
+  String get wizardProfileFleetDescription =>
+      'Je conduis la voiture de mon employeur. Affectation de flotte, dépenses, et une vue claire de ce que voit mon gestionnaire.';
+
+  @override
+  String get fleetIdentityTitle => 'Votre flotte';
+
+  @override
+  String get fleetIdentityIntro =>
+      'Saisissez le code d\'invitation fourni par votre gestionnaire de flotte. Si c\'est vous qui créez la flotte, créez-la plutôt ci-dessous.';
+
+  @override
+  String get fleetInviteCodeLabel => 'Code d\'invitation';
+
+  @override
+  String get fleetScanQrCode => 'Scanner le code QR';
+
+  @override
+  String get fleetJoinButton => 'Rejoindre la flotte';
+
+  @override
+  String get fleetCreateSectionTitle => 'C\'est moi qui crée cette flotte';
+
+  @override
+  String get fleetOrgNameLabel => 'Nom de la flotte';
+
+  @override
+  String get fleetCreateButton => 'Créer la flotte';
+
+  @override
+  String get fleetIdentityLater =>
+      'Vous pourrez aussi le faire plus tard dans Réglages, puis Flotte.';
+
+  @override
+  String fleetMemberOf(String org) {
+    return 'Vous faites partie de $org.';
+  }
+
+  @override
+  String fleetYourRole(String role) {
+    return 'Votre rôle : $role';
+  }
+
+  @override
+  String get fleetRoleEmployee => 'Salarié';
+
+  @override
+  String get fleetRoleManager => 'Gestionnaire de flotte';
+
+  @override
+  String get fleetRoleAdmin => 'Administrateur de flotte';
+
+  @override
+  String get fleetBlockedIdentityRequired =>
+      'Rejoindre une flotte exige un compte avec une adresse e-mail. Cet appareil utilise encore un compte anonyme, que personne ne peut rattacher à une entreprise — ajoutez d\'abord une adresse e-mail dans Réglages, puis Sync.';
+
+  @override
+  String get fleetBlockedCommunityBackend =>
+      'Une flotte ne peut pas vivre sur la base de données communautaire partagée. Il faut la base de votre employeur, ou une base à laquelle vous avez été invité.';
+
+  @override
+  String get fleetBlockedSyncDisabled =>
+      'La synchronisation cloud est désactivée. Configurez d\'abord la base de votre employeur dans Réglages, puis Sync.';
+
+  @override
+  String get fleetBlockedEnterCode =>
+      'Saisissez le code d\'invitation fourni par votre gestionnaire de flotte.';
+
+  @override
+  String get fleetBlockedEnterName => 'Donnez un nom à la flotte.';
+
+  @override
+  String get fleetJoinErrorInvalidCode =>
+      'Ce code d\'invitation est invalide ou expiré. Demandez-en un nouveau à votre gestionnaire de flotte.';
+
+  @override
+  String get fleetJoinErrorAlreadyMember =>
+      'Ce compte appartient déjà à une flotte. Quittez-la avant d\'en rejoindre une autre.';
+
+  @override
+  String get fleetJoinErrorNotSupported =>
+      'Cette base de données ne propose pas l\'adhésion à une flotte. Votre administrateur doit d\'abord y activer le mode flotte.';
+
+  @override
+  String get fleetJoinErrorUnavailable =>
+      'La flotte est injoignable. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String get fleetPrivacyTitle => 'Ce qui est partagé, et ce qui ne l\'est pas';
+
+  @override
+  String get fleetPrivacyDeviceTitle => 'Reste sur cet appareil';
+
+  @override
+  String get fleetPrivacyDeviceBody =>
+      'Vos trajets, votre position et les données brutes lues sur l\'adaptateur ne quittent jamais ce téléphone vers la flotte. Elles sont à vous, pour vos propres consommations et votre coaching.';
+
+  @override
+  String get fleetPrivacySyncTitle => 'Part vers la base de votre flotte';
+
+  @override
+  String get fleetPrivacySyncBody =>
+      'Le véhicule de société qui vous est affecté et depuis quand, ainsi que les pleins et les dépenses que vous soumettez vous-même. Tant que le partage est désactivé, rien n\'est envoyé.';
+
+  @override
+  String get fleetPrivacyManagerTitle => 'Ce que voit votre gestionnaire';
+
+  @override
+  String get fleetPrivacyManagerBody =>
+      'Les véhicules et les affectations, les dépenses soumises, et les coûts et consommations sous forme de totaux de flotte. Pas vos trajets, pas votre position en direct, et jamais un classement du style de conduite des salariés.';
+
+  @override
+  String get fleetPrivacyRetentionTitle =>
+      'Durée de conservation, et vos contrôles';
+
+  @override
+  String get fleetPrivacyRetentionBody =>
+      'Votre employeur définit la durée de conservation des dépenses et de l\'historique d\'affectation. Vous pouvez à tout moment tout exporter, désactiver le partage et supprimer vos propres données dans Réglages, puis Confidentialité et données.';
+
+  @override
+  String get settingsTopicFleetTitle => 'Flotte';
+
+  @override
+  String get settingsTopicFleetSubtitle =>
+      'Votre organisation, votre rôle et ce que voit votre gestionnaire.';
+
+  @override
+  String get settingsTopicFleetKeywords =>
+      'flotte, voiture de société, employeur, organisation, gestionnaire, affectation, dépenses';
+
+  @override
+  String get fleetSettingsNoFleet =>
+      'Vous n\'êtes encore dans aucune flotte. Rejoignez-en une avec un code d\'invitation, ou créez-la si vous l\'administrez.';
+
+  @override
+  String get fleetSettingsOrgLabel => 'Flotte';
+
+  @override
+  String get fleetSettingsRoleLabel => 'Votre rôle';
+
+  @override
+  String get fleetSettingsSharingLabel => 'Partage avec votre flotte';
+
+  @override
+  String get fleetSettingsSharingOn =>
+      'Activé. Les pleins et les dépenses que vous soumettez parviennent à votre flotte.';
+
+  @override
+  String get fleetSettingsSharingOff =>
+      'Désactivé. Rien de lié à la flotte ne quitte cet appareil.';
+
+  @override
+  String get fleetSettingsManagerSeesTitle => 'Ce que voit mon gestionnaire';
+
+  @override
+  String get fleetVisibilityVehicle =>
+      'Le véhicule de société qui vous est affecté, et pour quelle période.';
+
+  @override
+  String get fleetVisibilityExpenses =>
+      'Les pleins et les dépenses que vous soumettez vous-même.';
+
+  @override
+  String get fleetVisibilityCosts =>
+      'Le coût au kilomètre et la consommation, au sein des totaux de la flotte.';
+
+  @override
+  String get fleetVisibilityNeverJourneys =>
+      'Jamais vos trajets, votre position en direct ni les données brutes de l\'adaptateur.';
+
+  @override
+  String get fleetVisibilityNeverBehaviour =>
+      'Jamais un classement du style de conduite des salariés.';
+
+  @override
+  String get fleetSettingsStale =>
+      'Ces informations de flotte n\'ont pas pu être actualisées récemment.';
+
+  @override
+  String get fleetSettingsExpired =>
+      'Ces informations de flotte sont périmées. Reconnectez-vous pour qu\'elles soient actualisées avant de choisir un véhicule.';
+
+  @override
   String get fleetVehicleCurrentLabel => 'Véhicule actuel';
 
   @override
