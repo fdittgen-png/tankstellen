@@ -2,28 +2,19 @@
 // SPDX-License-Identifier: MIT
 
 
-import 'package:flutter/foundation.dart';
-
-import '../data/repositories/alert_repository.dart';
-import '../../widget/api.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
+import '../../../core/notifications/notification_service.dart';
 import '../../../core/storage/hive_storage.dart';
-import '../../../core/cache/cache_manager.dart';
 import '../../../core/background/alert_scan_journal.dart';
-import 'background_price_history_writer.dart';
 import '../../../core/background/background_scan_trigger.dart';
-import 'background_price_source.dart';
+import '../../../core/background/scan_run_gate.dart';
+import '../../../core/background/scan_run_phase.dart';
+import 'background_scan_body.dart';
 import 'background_scan_dedup_store.dart';
 import 'background_scan_runners.dart';
-import 'background_scan_tracer.dart';
-import 'bulk_alert_price_merge.dart';
-import 'country_alert_strategy_resolver.dart';
-import 'daily_collection.dart';
-import '../../../core/background/hive_isolate_lock.dart';
-import 'notification_templates.dart';
 import 'scan_opportunity_dispatch.dart';
-import '../../../core/background/provider_request_budget.dart';
+import '../../../core/background/hive_isolate_lock.dart';
 import '../../../core/logging/run_scope.dart';
 
 // The trigger taxonomy lives in its own file since #3169 (file-length cap);
@@ -44,9 +35,15 @@ export '../../../core/background/background_scan_trigger.dart';
 ///   2. enforces a coarse cross-trigger cooldown ([scanCooldown]) via
 ///      [BackgroundScanDedupStore] so two wakeups seconds apart can't
 ///      double-fetch or double-notify, and
-///   3. runs the scan body (price fetch, daily history collection via
-///      [BackgroundPriceHistoryWriter], the per-station / velocity / radius
-///      alert runners in [BackgroundScanRunners], widget refresh).
+///   3. sequences the scan body's stages ([ScanBody]: price fetch + daily
+///      history, detect → budget → notify, widget refresh).
+///
+/// ## The run's lifecycle (#4162)
+///
+/// This class is the ONLY writer of the run's [ScanRunPhase]; every change
+/// walks through a [ScanRunGate] that checks it against
+/// [kScanRunTransitions], and ends in exactly one [ScanOutcome] — the
+/// journal row. The body and the dispatcher report nothing themselves.
 ///
 /// The per-alert throttles are untouched and still own "don't re-notify the
 /// same alert too often": [RadiusAlertRunner]'s frequency gate, the price-
@@ -79,8 +76,8 @@ class BackgroundAlertScanCoordinator {
       BackgroundScanRunners.priceAlertRetriggerCooldown;
 
   /// Connect / receive timeouts for the BG-isolate Dio client.
-  static const bgConnectTimeout = Duration(seconds: 10);
-  static const bgReceiveTimeout = Duration(seconds: 15);
+  static const bgConnectTimeout = BackgroundScanBody.connectTimeout;
+  static const bgReceiveTimeout = BackgroundScanBody.receiveTimeout;
 
   /// Max retry attempts + base backoff for transient network failures.
   static const maxRetryAttempts = 3;
@@ -88,14 +85,39 @@ class BackgroundAlertScanCoordinator {
 
   final BackgroundScanDedupStore _dedup;
   final AlertScanJournal _journal;
+  final Future<HiveIsolateLock> Function() _lockFactory;
+  final Future<void> Function() _openBoxes;
+  final Future<void> Function() _closeBoxes;
+  final Future<NotificationService> Function() _notifierFactory;
+  final ScanBody Function(HiveStorage storage, DateTime at) _bodyFactory;
+  final ScanPhaseSink? _sink;
 
-  /// Creates a coordinator. [dedup] and [journal] are injectable so unit
-  /// tests can drive the cooldown gate / journal with fakes.
+  /// Creates a coordinator. Every collaborator is injectable so the run's
+  /// lifecycle is testable without platform channels (#4162):
+  ///
+  /// * [dedup] / [journal] — the cooldown gate and the journal;
+  /// * [lockFactory] — the cross-isolate lock (a temp-file lock in tests);
+  /// * [openBoxes] / [closeBoxes] — the isolate's Hive boxes;
+  /// * [notifierFactory] — the initialized notifier the dispatch stage
+  ///   posts through;
+  /// * [body] — the stages themselves;
+  /// * [sink] — told every phase change and the outcome.
   BackgroundAlertScanCoordinator({
     BackgroundScanDedupStore? dedup,
     AlertScanJournal? journal,
+    Future<HiveIsolateLock> Function()? lockFactory,
+    Future<void> Function()? openBoxes,
+    Future<void> Function()? closeBoxes,
+    Future<NotificationService> Function()? notifierFactory,
+    ScanBody Function(HiveStorage storage, DateTime at)? body,
+    this._sink,
   })  : _dedup = dedup ?? BackgroundScanDedupStore(),
-        _journal = journal ?? AlertScanJournal();
+        _journal = journal ?? AlertScanJournal(),
+        _lockFactory = lockFactory ?? HiveIsolateLock.create,
+        _openBoxes = openBoxes ?? HiveStorage.initInIsolate,
+        _closeBoxes = closeBoxes ?? HiveStorage.closeIsolateBoxes,
+        _notifierFactory = notifierFactory ?? initializedLocalNotifier,
+        _bodyFactory = body ?? BackgroundScanBody.new;
 
   /// Run one background scan on behalf of [trigger].
   ///
@@ -119,59 +141,106 @@ class BackgroundAlertScanCoordinator {
     DateTime? now,
     Duration cooldown = scanCooldown,
   }) =>
-      RunScope.run('background-scan', () => _scanImpl(trigger: trigger, now: now, cooldown: cooldown));
+      RunScope.run('background-scan', () => _ScanRun(this, trigger,
+              at: now ?? DateTime.now(), cooldown: cooldown)
+          .run());
+}
 
-  Future<bool> _scanImpl({
-    required BackgroundScanTrigger trigger,
-    DateTime? now,
-    Duration cooldown = scanCooldown,
+/// One call to [BackgroundAlertScanCoordinator.scan]: the phase it is in
+/// and the gate that checks each change (#4162).
+class _ScanRun {
+  _ScanRun(this._c, this.trigger, {required this.at, required this.cooldown})
+      : _gate = ScanRunGate(sink: _c._sink);
+
+  final BackgroundAlertScanCoordinator _c;
+  final BackgroundScanTrigger trigger;
+  final DateTime at;
+  final Duration cooldown;
+  final ScanRunGate _gate;
+  ScanRunPhase _phase = ScanRunPhase.idle;
+
+  void _advance(ScanRunPhase to) {
+    _gate.change(_phase, to);
+    _phase = to;
+  }
+
+  Future<void> _end(
+    ScanOutcome outcome, {
+    int? stationsScanned,
+    ScanDispatchResult? dispatched,
+    String? error,
   }) async {
-    final at = now ?? DateTime.now();
+    _gate.end(outcome, _phase);
+    await _c._journal.record(
+      outcome,
+      at: at,
+      trigger: trigger.tag,
+      stationsScanned: stationsScanned,
+      alertsFired: dispatched?.alertsFired,
+      undelivered: dispatched?.undelivered,
+      error: error,
+    );
+  }
+
+  Future<bool> run() async {
     HiveIsolateLock? lock;
+    _advance(ScanRunPhase.locking);
     try {
-      lock = await HiveIsolateLock.create();
+      lock = await _c._lockFactory();
       final acquired = await lock.acquire();
       if (!acquired) {
-        debugPrint(
-            'BackgroundAlertScanCoordinator: could not acquire Hive lock '
-            '(${trigger.tag}), skipping');
+        log.debug('could not acquire Hive lock (${trigger.tag}), skipping',
+            tag: 'BackgroundAlertScanCoordinator');
         // #3147 — best-effort: the alerts box is usually NOT open on this
         // path (the lock holder owns it), so the append may no-op; the
         // concurrent holder journals its own completed row.
-        await _journal.append(
-            at: at, trigger: trigger.tag, skippedReason: 'hive_lock');
+        await _end(ScanOutcome.skippedLock);
         return false;
       }
 
-      await HiveStorage.initInIsolate();
+      _advance(ScanRunPhase.opening);
+      await _c._openBoxes();
 
       // Cross-trigger cooldown — read it *after* the lock + box open so the
       // dedup row is consistent with whatever the previous scan wrote.
-      final allowed = await _dedup.shouldScan(now: at, cooldown: cooldown);
+      _advance(ScanRunPhase.gated);
+      // #4333 — a run the OS ended left its marker; this run holds the lock,
+      // so no live run can own one. Resolve them into `interrupted` rows.
+      await _c._journal.resolveInterrupted();
+      final allowed = await _c._dedup.shouldScan(now: at, cooldown: cooldown);
       if (!allowed) {
-        final last = await _dedup.lastScanAt();
-        debugPrint(
-            'BackgroundAlertScanCoordinator: scan skipped (${trigger.tag}) '
-            '— last scan $last is within ${cooldown.inMinutes}m cooldown');
-        await _journal.append(
-            at: at, trigger: trigger.tag, skippedReason: 'cooldown');
+        final last = await _c._dedup.lastScanAt();
+        log.debug(
+            'scan skipped (${trigger.tag}) — last scan $last is within '
+            '${cooldown.inMinutes}m cooldown',
+            tag: 'BackgroundAlertScanCoordinator');
+        await _end(ScanOutcome.skippedCooldown);
         return false;
       }
 
-      final summary = await _runScanBody(HiveStorage());
+      // #4333 — from here on the run owes the journal a row even if the OS
+      // ends it: the marker is that row until the outcome replaces it.
+      await _c._journal.markInFlight(at: at, trigger: trigger.tag);
+      final body = _c._bodyFactory(HiveStorage(), at);
+      _advance(ScanRunPhase.collecting);
+      await body.collect();
+      ScanDispatchResult dispatched = (alertsFired: 0, undelivered: null);
+      if (!body.isEmpty) {
+        _advance(ScanRunPhase.dispatching);
+        dispatched = await body.dispatch(_c._notifierFactory);
+      }
+      _advance(ScanRunPhase.refreshingWidgets);
+      await body.refreshWidgets();
 
       // Stamp completion only after the body finishes so a crash mid-scan
       // leaves the door open for the next trigger to retry.
-      await _dedup.recordScan(now: at, trigger: trigger.tag);
+      _advance(ScanRunPhase.stamping);
+      await _c._dedup.recordScan(now: at, trigger: trigger.tag);
       // #3147 — persisted audit row: when, what trigger, how many stations
       // were fetched, how many notifications fired. Rides in the export so
       // "why didn't I get an alert?" is answerable in the field.
-      await _journal.append(
-        at: at,
-        trigger: trigger.tag,
-        stationsScanned: summary.stationsScanned,
-        alertsFired: summary.alertsFired,
-      );
+      await _end(ScanOutcome.completed,
+          stationsScanned: body.stationsScanned, dispatched: dispatched);
       return true;
     } catch (e, st) {
       // #3150 — single log call. `errorLogger.log` already routes to the
@@ -184,197 +253,18 @@ class BackgroundAlertScanCoordinator {
       });
       // #3147 — the error TYPE only (PII-safe), so the journal shows a
       // failed run distinctly from "no scan ran at all".
-      await _journal.append(
-          at: at, trigger: trigger.tag, error: e.runtimeType.toString());
+      await _end(ScanOutcome.failed, error: e.runtimeType.toString());
       return false;
     } finally {
       try {
-        await HiveStorage.closeIsolateBoxes();
+        await _c._closeBoxes();
       } catch (e, st) {
         log.error(e, st, layer: ErrorLayer.other, context: const {
           'where': 'BackgroundAlertScanCoordinator: failed to close Hive boxes'
         });
       }
       lock?.release();
-    }
-  }
-
-  /// The scan body: fetch prices for favourites + alert stations (plus
-  /// once-a-day viewed stations, #2212), record history, evaluate per-
-  /// station / velocity / radius alerts, refresh the home widgets. Assumes
-  /// Hive is already initialised in this isolate and the lock is held.
-  /// Returns the journal counts (#3147): stations with fetched prices +
-  /// total notifications fired across the three runners.
-  Future<({int stationsScanned, int alertsFired})> _runScanBody(
-      HiveStorage storage) async {
-    await HiveStorage.loadApiKey();
-    // #3746 — the threaded key only builds the DE Tankerkönig Dio; every
-    // other country's polled strategy reads its own slot via `storage`.
-    final apiKey = storage.getApiKey('de');
-
-    // #2306 — load the localized notification templates the main isolate
-    // stashed at reconcile() time. If absent (e.g. a task that outran the
-    // first reconcile, or a storage hiccup) resolve live from the persisted
-    // active language code so we still localize, never English.
-    final templates = BackgroundNotificationTemplates.tryDecode(
-          storage.getSetting(BackgroundNotificationTemplates.storageKey)
-              as String?,
-        ) ??
-        BackgroundNotificationTemplates.resolveForLanguage(
-          storage.getSetting('active_language_code') as String?,
-        );
-
-    // 1. Build the station-id set to fetch. Favorites + active-alert
-    //    stations are always refreshed; #2212 — every previously-viewed
-    //    ("collected") station is also gathered ONCE PER DAY so its price
-    //    history keeps growing even if it isn't a favorite.
-    final now = DateTime.now();
-    final favoriteIds = storage.getFavoriteIds();
-    final repo = AlertRepository(storage);
-    final alerts = repo.getAlerts();
-    final alertStationIds =
-        alerts.where((a) => a.isActive).map((a) => a.stationId).toSet();
-    bool collectedToday(String id) {
-      final recs = storage.getPriceRecords(id);
-      if (recs.isEmpty) return false;
-      final last = DateTime.tryParse(recs.last['recordedAt']?.toString() ?? '');
-      return last != null && isSameDay(last, now);
-    }
-
-    final allStationIds = stationsToCollect(
-      favorites: favoriteIds,
-      alerts: alertStationIds.toList(),
-      viewed: storage.getPriceHistoryKeys(),
-      collectedToday: collectedToday,
-    );
-    debugPrint('BackgroundAlertScanCoordinator: ${favoriteIds.length} '
-        'favorites, ${alertStationIds.length} alert stations, '
-        '${allStationIds.length} total (incl. once-a-day viewed)');
-
-    if (allStationIds.isEmpty) {
-      // #609 — users without favorites still need a populated nearest widget.
-      await _refreshNearestWidgetFromSearch(storage);
-      return (stationsScanned: 0, alertsFired: 0);
-    }
-
-    // 2. Fetch prices via the registry-driven per-country source (#2862): the
-    //    source groups the mixed-country id set by derived country and queries
-    //    each polled provider at most once, within its minInterval; a
-    //    prefix-less id falls back to the active country. Bulk-dataset
-    //    countries (ES/IT/AR/DK) are scanned below (#2863), not here.
-    final activeCountry =
-        storage.getSetting('active_country_code') as String? ?? 'DE';
-
-    // #2866 EXIT GATE: the shared per-provider budget (foreground + background
-    // share one minInterval gate; skip a provider the foreground just hit) +
-    // the dev-gated #2824 tracer (count + export the multi-country scan's
-    // traffic, compliant per provider). Both threaded into every service built.
-    final budget = ProviderRequestBudget(storage);
-    final tracer = BackgroundScanTracer.forScan();
-
-    final source = BackgroundPriceSource(
-      storage: storage,
-      connectTimeout: bgConnectTimeout,
-      receiveTimeout: bgReceiveTimeout,
-      recorder: tracer.recorder,
-      budget: budget,
-    );
-    final prices = await source.fetchPricesGrouped(
-      stationIds: allStationIds,
-      fallbackCountryCode: activeCountry,
-      apiKey: apiKey,
-    );
-
-    // #2863 — bulk-dataset countries (ES/IT/AR/DK + flag-gated FR/GB) flow
-    // through a [BulkDatasetAlertStrategy] resolved per country: ≤1 dataset
-    // download per scan (per datasetTtl) then local-filter, merged into the
-    // same Tankerkönig-shaped map the evaluator consumes. (Radius alerts in
-    // bulk countries run below via the strategy-aware runRadiusAlerts.)
-    final resolver = CountryAlertStrategyResolver(
-      storage: storage,
-      cache: CacheManager(storage),
-      apiKey: apiKey,
-      recorder: tracer.recorder,
-      budget: budget,
-    );
-    prices.addAll(await fetchBulkAlertPrices(
-      alertStationIds: alertStationIds,
-      fallbackCountryCode: activeCountry,
-      resolver: resolver,
-    ));
-
-    debugPrint('BackgroundAlertScanCoordinator: fetched prices for '
-        '${prices.length} stations');
-
-    if (prices.isNotEmpty) {
-      await BackgroundPriceHistoryWriter.recordHistory(storage, prices, now);
-      await BackgroundPriceHistoryWriter.updateCachedStations(storage, prices);
-    }
-
-    // #4183 — the three paths DETECT; one dispatcher decides. See
-    // `scan_opportunity_dispatch.dart` for what that replaced.
-    final alertsFired = await detectAndDispatch(
-      repo: repo,
-      alerts: alerts,
-      prices: prices,
-      now: now,
-      templates: templates,
-      storage: storage,
-      resolver: resolver,
-      activeCountry: activeCountry,
-    );
-
-    await HomeWidgetService.updateWidget(
-      storage,
-      profileStorage: storage,
-      settingsStorage: storage,
-    );
-    await _refreshNearestWidgetFromSearch(storage, source: source);
-
-    // #2866 — dev-gated: snapshot + export this scan's data-access trace so the
-    // maintainer reads `aggregates().compliant` per provider (no-op otherwise).
-    await tracer.exportIfEnabled();
-
-    return (stationsScanned: prices.length, alertsFired: alertsFired);
-  }
-
-  /// #609 — nearest-widget refresh from a real search (or legacy fallback).
-  ///
-  /// #2862 — the nearest-widget search now goes through the registry-driven
-  /// [BackgroundPriceSource] for the active country instead of a hardcoded
-  /// Tankerkönig service, so a non-DE user's widget shows nearby stations
-  /// from their own country's provider. A [source] is reused when the scan
-  /// body already built one (so its per-country services are shared); the
-  /// empty-favorites early-return builds a throwaway one.
-  Future<void> _refreshNearestWidgetFromSearch(
-    HiveStorage storage, {
-    BackgroundPriceSource? source,
-  }) async {
-    try {
-      final apiKey = storage.getApiKey('de'); // #3746 — DE Dio key only.
-      final activeCountry =
-          storage.getSetting('active_country_code') as String? ?? 'DE';
-      final priceSource = source ??
-          BackgroundPriceSource(
-            storage: storage,
-            connectTimeout: bgConnectTimeout,
-            receiveTimeout: bgReceiveTimeout,
-          );
-      final service =
-          priceSource.serviceFor(activeCountry, apiKey: apiKey);
-      // A null service means the active country is not a polled provider
-      // (e.g. a bulk-dataset country — child #2863) or has no configured key;
-      // fall back to the cache-only nearest-widget path.
-      await HomeWidgetService.updateNearestWidget(
-        storage,
-        storage,
-        profileStorage: storage,
-        stationService: service,
-      );
-    } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.other, context: const {
-        'where': 'BackgroundAlertScanCoordinator: nearest widget refresh failed'
-      });
+      _advance(ScanRunPhase.idle);
     }
   }
 }

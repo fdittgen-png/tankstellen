@@ -55,6 +55,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../core/logging/app_log.dart';
 import '../../../core/logging/error_logger.dart';
+import '../../../core/notifications/notification_delivery.dart';
 import '../../../core/notifications/notification_service.dart';
 import '../data/budget_state_store.dart';
 import '../data/opportunity_feed_store.dart';
@@ -65,17 +66,39 @@ import '../domain/opportunity_confidence.dart';
 import 'notification_templates.dart';
 import 'opportunity_notification_copy.dart';
 
+/// Where a notification goes and what it opens (#4334): the id that
+/// decides whether it replaces an earlier one on the shade, and the
+/// payload its tap deep-links through.
+typedef NotificationEnvelope = ({int id, String? payload});
+
 /// One candidate, plus the copy its detector already built when it has
 /// better copy than a single opportunity can produce. See the library
 /// doc for the radius case this exists for.
 @immutable
 class OpportunityCandidate {
-  const OpportunityCandidate(this.opportunity, {this.copy, this.onNotified});
+  const OpportunityCandidate(
+    this.opportunity, {
+    this.copy,
+    this.onNotified,
+    this.envelope,
+  });
 
   final Opportunity opportunity;
 
   /// Used verbatim when non-null. Null means "render me from the kind".
   final NotificationCopy? copy;
+
+  /// #4334 — the id and payload the detector built, posted as they are.
+  /// Null means the per-station id scheme and no deep link
+  /// ([OpportunityDispatcher.notificationIdFor]).
+  ///
+  /// The radius runner's notification is one per ALERT
+  /// (`'radius:<alertId>'`) and its tap opens the cheapest station. #4183
+  /// dropped both on the way through the budget: taps stopped opening the
+  /// station, the same alert with a new cheapest station stacked a second
+  /// notification, and two alerts sharing a cheapest station overwrote
+  /// each other.
+  final NotificationEnvelope? envelope;
 
   /// #4185 — run ONLY for the candidate whose notification actually went
   /// out, and only after it did. This is where a detector's dedup /
@@ -88,15 +111,19 @@ class OpportunityCandidate {
 @immutable
 class DispatchOutcome {
   const DispatchOutcome({
-    required this.notified,
+    this.delivery,
     required this.recorded,
     required this.demotions,
     this.notifiedOpportunity,
   });
 
-  /// Whether a notification actually went out. False when the budget
-  /// refused everything AND when the winner could not be rendered.
-  final bool notified;
+  /// What became of the winner's notification (#4162) — null when nothing
+  /// was attempted: the budget refused everything, or the winner could not
+  /// be rendered.
+  final NotificationDelivery? delivery;
+
+  /// Whether a notification actually went out.
+  bool get notified => delivery?.wasPosted ?? false;
 
   /// The one that was sent, when one was. Callers need it to record
   /// what they told the user about — `PriceAlert.lastTriggeredAt` is
@@ -152,9 +179,18 @@ class OpportunityDispatcher {
     String? Function(Opportunity)? currencyOf,
     ConfidenceInputs Function(Opportunity)? confidenceInputs,
   }) async {
+    // #4333 — a reservation a killed run never committed. Ambiguous: the
+    // OS may have shown it. Its slot stays spent (at most once).
+    final ambiguous = await budgetState.resolvePending(now);
+    if (ambiguous != null) {
+      log.info(
+          'a delivery reserved at ${ambiguous.at.toIso8601String()} was '
+          'never committed; its slot stays spent',
+          tag: 'OpportunityDispatcher');
+    }
+
     if (candidates.isEmpty) {
-      return const DispatchOutcome(
-          notified: false, recorded: 0, demotions: []);
+      return const DispatchOutcome(recorded: 0, demotions: []);
     }
 
     final prebuilt = <Opportunity, NotificationCopy>{
@@ -177,7 +213,7 @@ class OpportunityDispatcher {
       watched: watched.contains,
     );
 
-    var notified = false;
+    NotificationDelivery? delivery;
     if (outcome.notify case final winner?) {
       final copy = prebuilt[winner] ??
           OpportunityNotificationCopy.render(
@@ -200,17 +236,41 @@ class OpportunityDispatcher {
           DemotedOpportunity(winner, BudgetRefusal.ineligible),
           ...outcome.demoted,
         ]);
+      } else if (await _blocked(notifier) case final blocked?) {
+        // #4335 — the OS would show nothing: a revoked permission or a
+        // disabled channel, where `show` returns normally anyway. No slot
+        // is reserved, no detector cooldown written, and `lastTriggeredAt`
+        // is not told — but the finding stays in the feed.
+        delivery = blocked;
+        outcome = BudgetOutcome(demoted: [
+          DemotedOpportunity(winner, BudgetRefusal.ineligible),
+          ...outcome.demoted,
+        ]);
       } else {
-        notified = await _notify(winner, copy, notifier);
-        if (notified) {
-          await budgetState.write(state.recording(winner, now), now);
+        // #4333 — the slot is on disk BEFORE the post, with a marker that
+        // says so. A process killed after the post can no longer leave the
+        // budget unaware and re-notify on the next wake (B4).
+        final reserved = state.recording(winner, now);
+        final envelope = byOpportunity[winner]?.envelope ??
+            (id: notificationIdFor(winner), payload: null);
+        await budgetState.write(reserved, now, pending: (
+          id: envelope.id,
+          key: BudgetState.keyFor(winner),
+          at: now,
+        ));
+        delivery = await _notify(winner, copy, envelope, notifier);
+        if (delivery.wasPosted) {
+          await budgetState.write(reserved, now); // commit
           // #4185 — the dedup / cooldown write, now that a notification
           // really went out. Never for a refused candidate: that is the
-          // suppression this issue exists to remove.
+          // suppression this issue exists to remove. It stays after the
+          // post: a detector's rows cannot be released, and a kill between
+          // the post and here is covered by the reserved slot above.
           await byOpportunity[winner]?.onNotified?.call();
         } else {
           // The channel refused it. Not a budget decision, so the slot is
-          // not spent — but the finding is still real and still recorded.
+          // released — but the finding is still real and still recorded.
+          await budgetState.write(state, now); // release
           outcome = BudgetOutcome(demoted: [
             DemotedOpportunity(winner, BudgetRefusal.ineligible),
             ...outcome.demoted,
@@ -221,38 +281,62 @@ class OpportunityDispatcher {
 
     await feed.recordScan(outcome, now);
 
+    final posted = delivery?.wasPosted ?? false;
     return DispatchOutcome(
-      notified: notified,
-      notifiedOpportunity: notified ? outcome.notify : null,
-      recorded: outcome.demoted.length + (notified ? 1 : 0),
+      delivery: delivery,
+      notifiedOpportunity: posted ? outcome.notify : null,
+      recorded: outcome.demoted.length + (posted ? 1 : 0),
       demotions: outcome.demoted,
     );
   }
 
-  /// Show one notification. Returns whether it went out.
+  /// The notification id for [o]: the id scheme the per-station runner
+  /// used, so an existing notification for a station is replaced rather
+  /// than stacked.
+  static int notificationIdFor(Opportunity o) =>
+      (o.stationId ?? o.kind.name).hashCode;
+
+  /// Ask the notifier's OS whether a price alert would reach the user
+  /// (#4335). A notifier that cannot answer is not a probe and is treated
+  /// as clear; a probe that throws is [NotificationDelivery.failed].
+  Future<NotificationDelivery?> _blocked(NotificationService notifier) async {
+    if (notifier is! NotificationDeliveryProbe) return null;
+    final NotificationDeliveryProbe probe = notifier as NotificationDeliveryProbe;
+    try {
+      return await probe.blockedDelivery(NotificationChannelKind.priceAlerts);
+    } on Object catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.background, context: const {
+        'where': 'OpportunityDispatcher._blocked',
+      });
+      return NotificationDelivery.failed;
+    }
+  }
+
+  /// Show one notification and say what became of it — the one producer of
+  /// [NotificationDelivery] for price alerts (#4162).
   ///
   /// Never throws: a notification channel that rejects a post must not
   /// take the scan down with it, and the finding is recorded either way.
-  Future<bool> _notify(
+  Future<NotificationDelivery> _notify(
     Opportunity o,
     NotificationCopy copy,
+    NotificationEnvelope envelope,
     NotificationService notifier,
   ) async {
     try {
       await notifier.showPriceAlert(
-        // Same id scheme the per-station runner used, so an existing
-        // notification for a station is replaced rather than stacked.
-        id: (o.stationId ?? o.kind.name).hashCode,
+        id: envelope.id,
         title: copy.title,
         body: copy.body,
+        payload: envelope.payload,
       );
-      return true;
+      return NotificationDelivery.posted;
     } on Object catch (e, st) {
       log.error(e, st, layer: ErrorLayer.background, context: {
         'where': 'OpportunityDispatcher._notify',
         'kind': o.kind.name,
       });
-      return false;
+      return NotificationDelivery.failed;
     }
   }
 }

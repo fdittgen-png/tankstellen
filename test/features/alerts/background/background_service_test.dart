@@ -4,6 +4,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/alerts/background/alert_schedule_reconciler.dart';
 import 'package:tankstellen/features/alerts/background/background_alert_scan_coordinator.dart';
 import 'package:tankstellen/core/background/background_price_fetcher.dart';
 import 'package:tankstellen/features/alerts/background/background_service.dart';
@@ -12,7 +13,11 @@ import 'package:tankstellen/core/notifications/local_notification_service.dart';
 import 'package:tankstellen/core/notifications/notification_service.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/utils/json_extensions.dart';
+import 'package:tankstellen/features/alerts/background/slc_wake_monitor.dart';
 import 'package:workmanager/workmanager.dart';
+
+import 'support/delivery_trace.dart';
+import 'support/scan_session_driver.dart';
 
 /// Recording [BackgroundPriceFetcher] for the #3169 opportunistic-wake
 /// decision table.
@@ -36,6 +41,41 @@ class _ThrowingFetcher extends _RecordingFetcher {
   @override
   Future<void> scheduleOpportunisticScan() =>
       throw StateError('scheduler backend unavailable');
+}
+
+/// Records the Workmanager calls the dispatcher makes.
+class _RecordingWorkmanager implements Workmanager {
+  _RecordingWorkmanager(this.calls);
+  final List<String> calls;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    calls.add(invocation.memberName.toString().split('"')[1]);
+    return Future<void>.value();
+  }
+}
+
+/// A coordinator that records the trigger it was asked to scan.
+class _ScanRecorder extends BackgroundAlertScanCoordinator {
+  _ScanRecorder(this.calls);
+  final List<String> calls;
+
+  @override
+  Future<bool> scan({
+    required BackgroundScanTrigger trigger,
+    DateTime? now,
+    Duration cooldown = BackgroundAlertScanCoordinator.scanCooldown,
+  }) async {
+    calls.add('scan ${trigger.tag}');
+    return true;
+  }
+}
+
+class _RecordingSlc implements SlcWakeMonitor {
+  _RecordingSlc(this.calls);
+  final List<bool> calls;
+  @override
+  Future<void> setEnabled(bool enabled) async => calls.add(enabled);
 }
 
 void main() {
@@ -130,10 +170,13 @@ void main() {
       );
     });
 
-    test('scan coordinator contains no unsafe as-casts', () {
-      final source = File(
+    test('scan coordinator and body contain no unsafe as-casts', () {
+      // #4162 — the body moved into background_scan_body.dart; the guard
+      // reads both halves.
+      final source = [
         'lib/features/alerts/background/background_alert_scan_coordinator.dart',
-      ).readAsStringSync();
+        'lib/features/alerts/background/background_scan_body.dart',
+      ].map((p) => File(p).readAsStringSync()).join('\n');
 
       // Should NOT contain unsafe 'as Map<String, dynamic>' casts
       // (safe patterns: 'is Map', 'as Map?' with null check, getMap())
@@ -408,71 +451,79 @@ void main() {
   });
 
   group('Hive isolate safety', () {
-    // #2415 — the scan body (lock + Hive init + close) moved into
-    // BackgroundAlertScanCoordinator. The serialisation invariants still
-    // hold; the assertions now read the coordinator source.
-    test('scan coordinator acquires lock before Hive access', () {
-      final source = File(
-        'lib/features/alerts/background/background_alert_scan_coordinator.dart',
-      ).readAsStringSync();
+    // #2415 — the scan body (lock + Hive init + close) lives in
+    // BackgroundAlertScanCoordinator. #4162 — these used to be asserted by
+    // reading the coordinator's SOURCE for `lock.acquire()` before
+    // `initInIsolate()`; the lifecycle seams let them run instead.
+    late Directory dir;
+    late HiveIsolateLock lock;
+    late List<String> events;
 
-      // Must import hive_isolate_lock
-      expect(
-        source.contains('hive_isolate_lock.dart'),
-        isTrue,
-        reason: 'Coordinator must import HiveIsolateLock',
-      );
-
-      // Must acquire lock before initInIsolate
-      final lockAcquireIndex = source.indexOf('lock.acquire()');
-      final initIndex = source.indexOf('initInIsolate()');
-      expect(
-        lockAcquireIndex,
-        lessThan(initIndex),
-        reason: 'Lock must be acquired before Hive initialization',
-      );
+    setUp(() {
+      dir = Directory.systemTemp.createTempSync('bg_service_lock_');
+      lock = HiveIsolateLock.fromFile(File('${dir.path}/hive_bg.lock'));
+      events = [];
+    });
+    tearDown(() {
+      lock.release();
+      dir.deleteSync(recursive: true);
     });
 
-    test('scan coordinator closes Hive boxes in finally block', () {
-      final source = File(
-        'lib/features/alerts/background/background_alert_scan_coordinator.dart',
-      ).readAsStringSync();
+    BackgroundAlertScanCoordinator coordinator({
+      String? throwIn,
+      HiveIsolateLock? withLock,
+    }) =>
+        BackgroundAlertScanCoordinator(
+          lockFactory: () async => withLock ?? lock,
+          openBoxes: () async =>
+              events.add('open (locked: ${(withLock ?? lock).isLocked})'),
+          closeBoxes: () async =>
+              events.add('close (locked: ${(withLock ?? lock).isLocked})'),
+          notifierFactory: () async => DeliveryTrace(),
+          body: (_, at) {
+            events.add('body');
+            return ScriptedScanBody(at, throwIn: throwIn);
+          },
+        );
 
-      // Must call closeIsolateBoxes
+    test('the lock is held before the boxes open and until they close',
+        () async {
       expect(
-        source.contains('closeIsolateBoxes'),
-        isTrue,
-        reason: 'Coordinator must close Hive boxes after use',
-      );
-
-      // Must release lock
-      expect(
-        source.contains('lock?.release()'),
-        isTrue,
-        reason: 'Coordinator must release lock in finally block',
-      );
-
-      // closeIsolateBoxes and release must be in a finally block
-      final finallyIndex = source.indexOf('} finally {');
-      final closeIndex = source.indexOf('closeIsolateBoxes');
-      expect(
-        finallyIndex,
-        lessThan(closeIndex),
-        reason: 'Box closing must happen in a finally block',
-      );
+          await coordinator()
+              .scan(trigger: BackgroundScanTrigger.workManagerPeriodic),
+          isTrue);
+      expect(events,
+          ['open (locked: true)', 'body', 'close (locked: true)']);
+      expect(lock.isLocked, isFalse, reason: 'released after the close');
     });
 
-    test('scan coordinator skips scan when lock is unavailable', () {
-      final source = File(
-        'lib/features/alerts/background/background_alert_scan_coordinator.dart',
-      ).readAsStringSync();
-
-      // Must check lock acquisition result and return early if failed
+    test('a failing body still closes the boxes and releases the lock',
+        () async {
       expect(
-        source.contains('if (!acquired)'),
-        isTrue,
-        reason: 'Coordinator must check lock acquisition and skip if failed',
-      );
+          await coordinator(throwIn: 'dispatch')
+              .scan(trigger: BackgroundScanTrigger.workManagerPeriodic),
+          isFalse);
+      expect(events.last, 'close (locked: true)');
+      expect(lock.isLocked, isFalse);
+    });
+
+    test('a lock held elsewhere skips the scan: no box opened, no body',
+        () async {
+      final holder = HiveIsolateLock.fromFile(File('${dir.path}/hive_bg.lock'));
+      expect(await holder.acquire(), isTrue);
+      var t = DateTime.utc(2026, 9, 16);
+      final contended = HiveIsolateLock.fromFile(
+          File('${dir.path}/hive_bg.lock'),
+          clock: () => t = t.add(const Duration(seconds: 20)));
+
+      expect(
+          await coordinator(withLock: contended)
+              .scan(trigger: BackgroundScanTrigger.androidWidget),
+          isFalse);
+      expect(events, ['close (locked: false)'],
+          reason: 'pinned: the finally closes (nothing) even when the '
+              'lock was never acquired');
+      holder.release();
     });
 
     test('HiveStorage.closeIsolateBoxes method exists', () {
@@ -518,6 +569,9 @@ void main() {
     final runners =
         File('lib/features/alerts/background/background_scan_runners.dart')
             .readAsStringSync();
+    final body =
+        File('lib/features/alerts/background/background_scan_body.dart')
+            .readAsStringSync();
 
     test('routes every Dio through DioFactory', () {
       expect(
@@ -534,7 +588,9 @@ void main() {
     });
 
     test('constructs no raw Dio(BaseOptions(...)) instances', () {
-      for (final source in [polledStrategy, priceSource, coordinator, runners]) {
+      for (final source in [
+        polledStrategy, priceSource, coordinator, runners, body,
+      ]) {
         expect(
           source.contains('Dio(BaseOptions('),
           isFalse,
@@ -562,19 +618,26 @@ void main() {
       );
     });
 
-    test('callbackDispatcher re-registers on the boot task', () {
-      final source = File(
-        'lib/features/alerts/background/background_service.dart',
-      ).readAsStringSync();
-      // The boot branch must re-register (init), not run a scan.
-      final idx = source.indexOf('BackgroundService.bootReregisterTask');
-      expect(idx, greaterThan(0),
-          reason: 'dispatcher must special-case the boot re-register task');
-      final initIdx = source.indexOf('BackgroundService.init()', idx);
-      final scanIdx = source.indexOf('.scan(', idx);
-      expect(initIdx, greaterThan(0));
-      expect(initIdx, lessThan(scanIdx),
-          reason: 'boot task must re-register before the scan branch');
+    test('the boot task re-registers through the schedule owner and never '
+        'scans', () async {
+      final fetcher = _RecordingFetcher();
+      var scans = 0;
+      final handled = await runBackgroundTask(
+        BackgroundService.bootReregisterTask,
+        schedule: AlertScheduleReconciler(
+          gate: () async => true,
+          fetcher: () => fetcher,
+          slc: NoopSlcWakeMonitor.new,
+          persistTemplates: () async {},
+        ),
+        coordinator: () {
+          scans++;
+          return BackgroundAlertScanCoordinator();
+        },
+      );
+      expect(handled, isTrue);
+      expect(fetcher.initCalls, 1);
+      expect(scans, 0, reason: 'boot re-arms; it does not scan');
     });
 
     test('manifest declares RECEIVE_BOOT_COMPLETED + the BootReceiver', () {
@@ -627,23 +690,28 @@ void main() {
           isNull);
     });
 
-    test('dispatcher re-arms the one-shot BGProcessingTask after a run', () {
+    test('dispatcher re-arms the one-shot BGProcessingTask after a run',
+        () async {
       // A BGProcessingTask submission is one-shot (the plugin's native
       // handler only re-submits the BGAppRefresh lane) — the dispatcher
-      // must re-arm it or the lane dies after one wake.
-      final source = File(
-        'lib/features/alerts/background/background_service.dart',
-      ).readAsStringSync();
-      final idx = source.indexOf('IosBackgroundTaskIds.processing)',
-          source.indexOf('void callbackDispatcher()'));
-      expect(idx, greaterThan(0),
-          reason: 'dispatcher must special-case the processing task');
-      expect(
-        source.contains('scheduleIosProcessingTask(Workmanager())'),
-        isTrue,
-        reason: 'dispatcher must re-submit the processing request after '
-            'the scan',
-      );
+      // must re-arm it or the lane dies after one wake. #4162 — executed
+      // through runBackgroundTask instead of read from the source.
+      Future<List<String>> run(String task) async {
+        final calls = <String>[];
+        await runBackgroundTask(
+          task,
+          coordinator: () => _ScanRecorder(calls),
+          workmanager: _RecordingWorkmanager(calls),
+        );
+        return calls;
+      }
+
+      expect(await run(IosBackgroundTaskIds.processing),
+          ['scan bgProcessing', 'registerProcessingTask']);
+      expect(await run(IosBackgroundTaskIds.appRefresh),
+          ['scan ios_bg_refresh'],
+          reason: 'only the processing lane is one-shot');
+      expect(await run('some-stray-task'), isEmpty);
     });
   });
 
@@ -726,16 +794,25 @@ void main() {
 
   // #3169 — SLC wake monitoring follows the alert lifecycle.
   group('SLC wake reconcile wiring (#3169)', () {
-    test('reconcile arms/disarms the SLC monitor with the alert state', () {
-      final source = File(
-        'lib/features/alerts/background/background_service.dart',
-      ).readAsStringSync();
-      expect(
-        source.contains('createSlcWakeMonitor().setEnabled(active)'),
-        isTrue,
-        reason: 'reconcile must mirror the alert-active state into the '
-            'SLC monitor (on with alerts, off without)',
+    test('reconcile arms/disarms the SLC monitor with the alert state '
+        'through the schedule owner', () async {
+      final original = BackgroundService.schedule;
+      addTearDown(() => BackgroundService.schedule = original);
+      final slcCalls = <bool>[];
+      var active = true;
+      BackgroundService.schedule = AlertScheduleReconciler(
+        gate: () async => active,
+        fetcher: _RecordingFetcher.new,
+        slc: () => _RecordingSlc(slcCalls),
+        persistTemplates: () async {},
       );
+
+      await BackgroundService.reconcile();
+      active = false;
+      await BackgroundService.reconcile();
+
+      expect(slcCalls, [true, false],
+          reason: 'on with alerts, off without');
     });
   });
 

@@ -43,7 +43,6 @@ void main() {
   final raw = RegExp(r'DateTime\.now\(\)');
 
   const baseline = <String, int>{
-    'lib/core/background/hive_isolate_lock.dart': 4,
     'lib/core/background/provider_request_budget.dart': 3,
     'lib/core/cache/cache_manager.dart': 3,
     'lib/core/country/country_switch_listener.dart': 2,
@@ -91,7 +90,7 @@ void main() {
     'lib/core/telemetry/storage/startup_failure_store.dart': 1,
     'lib/core/telemetry/storage/trace_storage.dart': 2,
     'lib/core/telemetry/trace_recorder.dart': 1,
-    'lib/features/alerts/background/background_alert_scan_coordinator.dart': 2,
+    'lib/features/alerts/background/background_alert_scan_coordinator.dart': 1,
     'lib/features/alerts/data/repositories/alert_repository.dart': 1,
     'lib/features/alerts/data/test_alert_runner.dart': 1,
     'lib/features/alerts/presentation/widgets/station_alert_create_sheet.dart': 1,

@@ -5945,6 +5945,30 @@ abstract class AppLocalizations {
   /// **'+ {count} more'**
   String radiusAlertGroupedMore(String count);
 
+  /// Title of the banner on the alerts screen shown when the phone does not let the app post notifications, so price alerts cannot reach the user (#4335).
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off'**
+  String get alertsNotificationsOffTitle;
+
+  /// Body of the notifications-off banner when the app-level notification permission is revoked (#4335). Must not claim alerts stopped: the checks still run.
+  ///
+  /// In en, this message translates to:
+  /// **'Your price alerts are still checked, but they can\'t notify you: notifications for this app are turned off in your phone\'s settings.'**
+  String get alertsNotificationsOffPermissionBody;
+
+  /// Body of the notifications-off banner when only the price-alert notification category (Android channel) is disabled (#4335).
+  ///
+  /// In en, this message translates to:
+  /// **'Your price alerts are still checked, but they can\'t notify you: price alert notifications are turned off in your phone\'s settings.'**
+  String get alertsNotificationsOffChannelBody;
+
+  /// Button on the notifications-off banner that opens the system notification settings for this app (#4335).
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get alertsNotificationsOffOpenSettings;
+
   /// Why-this-alert line: what acting on it is worth in money, net of the detour (#4152).
   ///
   /// In en, this message translates to:

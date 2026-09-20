@@ -1,0 +1,18 @@
+{
+  "alertsNotificationsOffTitle": "Notifications are off",
+  "@alertsNotificationsOffTitle": {
+    "description": "Title of the banner on the alerts screen shown when the phone does not let the app post notifications, so price alerts cannot reach the user (#4335)."
+  },
+  "alertsNotificationsOffPermissionBody": "Your price alerts are still checked, but they can't notify you: notifications for this app are turned off in your phone's settings.",
+  "@alertsNotificationsOffPermissionBody": {
+    "description": "Body of the notifications-off banner when the app-level notification permission is revoked (#4335). Must not claim alerts stopped: the checks still run."
+  },
+  "alertsNotificationsOffChannelBody": "Your price alerts are still checked, but they can't notify you: price alert notifications are turned off in your phone's settings.",
+  "@alertsNotificationsOffChannelBody": {
+    "description": "Body of the notifications-off banner when only the price-alert notification category (Android channel) is disabled (#4335)."
+  },
+  "alertsNotificationsOffOpenSettings": "Open settings",
+  "@alertsNotificationsOffOpenSettings": {
+    "description": "Button on the notifications-off banner that opens the system notification settings for this app (#4335)."
+  }
+}

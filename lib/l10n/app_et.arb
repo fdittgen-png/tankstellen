@@ -8756,5 +8756,25 @@
         "type": "int"
       }
     }
+  },
+  "alertsNotificationsOffTitle": "Notifications are off",
+  "@alertsNotificationsOffTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "alertsNotificationsOffPermissionBody": "Your price alerts are still checked, but they can't notify you: notifications for this app are turned off in your phone's settings.",
+  "@alertsNotificationsOffPermissionBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "alertsNotificationsOffChannelBody": "Your price alerts are still checked, but they can't notify you: price alert notifications are turned off in your phone's settings.",
+  "@alertsNotificationsOffChannelBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "alertsNotificationsOffOpenSettings": "Open settings",
+  "@alertsNotificationsOffOpenSettings": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

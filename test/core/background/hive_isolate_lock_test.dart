@@ -1,12 +1,46 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/background/hive_isolate_lock.dart';
 
+import '../../helpers/silence_error_logger.dart';
+
+/// A fixed instant every owner stamp in the #4333 cases is written at.
+final DateTime _t0 = DateTime.utc(2026, 9, 16, 9);
+
+/// A lock clock starting at [start] that runs 20 s per reading, so a
+/// contended acquire gives up after two attempts instead of 30 s.
+DateTime Function() _fastClock([DateTime? start]) {
+  var t = start ?? _t0;
+  return () => t = t.add(const Duration(seconds: 20));
+}
+
+/// Runs in a spawned isolate of THIS process: try the lock file, report,
+/// and — when told to — hold it until asked to release.
+Future<void> _contendInIsolate((SendPort, String) message) async {
+  final (reply, path) = message;
+  final lock = HiveIsolateLock.fromFile(File(path), clock: _fastClock());
+  final acquired = await lock.acquire();
+  if (acquired) lock.release();
+  reply.send(acquired);
+}
+
+Future<bool> _acquiredByAnotherIsolate(File lockFile) async {
+  final port = ReceivePort();
+  await Isolate.spawn(_contendInIsolate, (port.sendPort, lockFile.path));
+  final acquired = await port.first as bool;
+  port.close();
+  return acquired;
+}
+
 void main() {
+  silenceErrorLoggerSpool();
+
   late Directory tempDir;
   late File lockFile;
 
@@ -29,6 +63,19 @@ void main() {
 
       expect(acquired, isTrue);
       expect(lockFile.existsSync(), isTrue);
+    });
+
+    test('release is safe when the lock was never held — and leaves a '
+        'claim someone else holds alone (#4333)', () async {
+      final holder = HiveIsolateLock.fromFile(lockFile, clock: () => _t0);
+      expect(await holder.acquire(), isTrue);
+
+      HiveIsolateLock.fromFile(lockFile).release();
+
+      expect(lockFile.existsSync(), isTrue,
+          reason: 'releasing a lock you do not hold must never unlink the '
+              'holder\'s claim');
+      holder.release();
     });
 
     test('release deletes lock file', () async {
@@ -128,6 +175,112 @@ void main() {
       final lock = HiveIsolateLock.fromFile(customFile);
 
       expect(lock.isLocked, isFalse);
+    });
+  });
+
+  // #4333 B3 — exclusion must hold across ISOLATES of one process (the
+  // WorkManager periodic run and a widget one-off, or an iOS refresh and an
+  // SLC wake) and across a process that died holding the claim.
+  group('cross-isolate and cross-process exclusion (#4333)', () {
+    test('a second isolate of this process cannot acquire while this one '
+        'holds the lock', () async {
+      final holder = HiveIsolateLock.fromFile(lockFile, clock: () => _t0);
+      expect(await holder.acquire(), isTrue);
+
+      expect(await _acquiredByAnotherIsolate(lockFile), isFalse,
+          reason: 'B3: a per-isolate claim is invisible to another isolate, '
+              'and fcntl locks are per process');
+
+      holder.release();
+      expect(await _acquiredByAnotherIsolate(lockFile), isTrue,
+          reason: 'released, the other isolate gets it');
+    });
+
+    test('the other isolate does not delete the holder\'s file', () async {
+      final holder = HiveIsolateLock.fromFile(lockFile, clock: () => _t0);
+      expect(await holder.acquire(), isTrue);
+      final before = lockFile.readAsStringSync();
+
+      await _acquiredByAnotherIsolate(lockFile);
+
+      expect(lockFile.existsSync(), isTrue);
+      expect(lockFile.readAsStringSync(), before,
+          reason: 'the holder\'s claim is untouched');
+      holder.release();
+    });
+
+    test("a holder's release never deletes a claim that is no longer its "
+        'own', () async {
+      final holder = HiveIsolateLock.fromFile(lockFile, clock: () => _t0);
+      expect(await holder.acquire(), isTrue);
+      // Its claim was reaped and re-created by another owner meanwhile.
+      lockFile.writeAsStringSync(
+          '${_t0.toIso8601String()}\npid:$pid\ntoken:someone-else');
+
+      holder.release();
+
+      expect(lockFile.readAsStringSync(), contains('token:someone-else'),
+          reason: "unlinking another owner's claim is exactly B3");
+    });
+
+    test('a claim whose process died is reaped at once', () async {
+      // What a killed process leaves: its owner line, and no fcntl holder.
+      lockFile.writeAsStringSync(
+          '${_t0.toIso8601String()}\npid:${pid + 100000}\ntoken:dead');
+
+      final lock = HiveIsolateLock.fromFile(lockFile, clock: _fastClock());
+      expect(await lock.acquire(), isTrue);
+      expect(lockFile.readAsStringSync(), contains('pid:$pid'));
+      lock.release();
+    });
+
+    test('a claim held by a LIVE foreign process is respected until that '
+        'process dies', () async {
+      final python = await Process.start('python3', [
+        '-c',
+        ('import fcntl, os, sys, time\n'
+            'p = sys.argv[1]\n'
+            'fd = os.open(p, os.O_CREAT | os.O_EXCL | os.O_WRONLY)\n'
+            'os.write(fd, ("2026-09-16T09:00:00.000Z\\npid:%d\\ntoken:py" '
+            '% os.getpid()).encode())\n'
+            'fcntl.lockf(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)\n'
+            'print("held", flush=True)\n'
+            'time.sleep(60)\n'),
+        lockFile.path,
+      ]);
+      addTearDown(python.kill);
+      await python.stdout.transform(utf8.decoder).firstWhere(
+          (line) => line.contains('held'));
+
+      final contender =
+          HiveIsolateLock.fromFile(lockFile, clock: _fastClock());
+      expect(await contender.acquire(), isFalse,
+          reason: 'the owner is alive: its fcntl lock is held');
+
+      python.kill();
+      await python.exitCode;
+      expect(await contender.acquire(), isTrue,
+          reason: 'the OS dropped the dead owner\'s lock');
+      contender.release();
+    },
+        skip: Process.runSync('which', ['python3']).exitCode == 0
+            ? false
+            : 'python3 is needed to hold a lock from another process');
+
+    test('a claim this process\'s dead isolate left is reaped only past the '
+        'WorkManager stop window', () async {
+      lockFile.writeAsStringSync(
+          '${_t0.toIso8601String()}\npid:$pid\ntoken:dead-isolate');
+
+      final early = HiveIsolateLock.fromFile(lockFile,
+          clock: _fastClock(_t0.add(const Duration(minutes: 5))));
+      expect(await early.acquire(), isFalse,
+          reason: 'five minutes in, it may be a live, slow scan');
+
+      final late = HiveIsolateLock.fromFile(lockFile,
+          clock: _fastClock(_t0.add(const Duration(minutes: 11))));
+      expect(await late.acquire(), isTrue);
+      late.release();
     });
   });
 

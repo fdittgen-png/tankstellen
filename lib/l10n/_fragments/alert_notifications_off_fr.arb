@@ -1,0 +1,6 @@
+{
+  "alertsNotificationsOffTitle": "Les notifications sont désactivées",
+  "alertsNotificationsOffPermissionBody": "Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications de cette application sont désactivées dans les réglages de votre téléphone.",
+  "alertsNotificationsOffChannelBody": "Vos alertes de prix sont toujours vérifiées, mais elles ne peuvent pas vous prévenir : les notifications d'alertes de prix sont désactivées dans les réglages de votre téléphone.",
+  "alertsNotificationsOffOpenSettings": "Ouvrir les réglages"
+}

@@ -263,6 +263,10 @@ class BackgroundScanRunners {
           copy: i < notifier.captured.length
               ? notifier.captured[i].copy
               : null,
+          // #4334 — the per-alert id and the cheapest station's deep link.
+          envelope: i < notifier.captured.length
+              ? notifier.captured[i].envelope
+              : null,
           // #4185 — this alert's dedup rows, written only if the budget
           // sends THIS finding.
           onNotified: pending == null

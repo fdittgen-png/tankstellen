@@ -22,9 +22,11 @@ import dev.fluttercommunity.workmanager.SharedPreferenceHelper
  *
  * Each enqueue routes through the workmanager plugin's [BackgroundWorker],
  * which resolves the Dart callback handle persisted by `Workmanager()
- * .initialize`. We only enqueue when that handle exists — i.e. the app
- * previously registered background work because the user had an active
- * alert. Without it, there is nothing to scan and polling would be
+ * .initialize`. We only enqueue when that handle exists AND the Dart side
+ * stamped it for this build (below). The stamp is also the CONSENT gate
+ * (#4331): the Dart schedule owner removes it when it cancels the schedule
+ * because no alert is active, so a handle left over from an alert the user
+ * deleted does not keep widget or boot scans running — polling would be
  * unconsented.
  *
  * ## Handle-freshness gate (#3688)
@@ -88,8 +90,8 @@ object BackgroundScanEnqueuer {
         if (!handleIsFresh(context)) {
             Log.d(
                 TAG,
-                "$dartTask: callback handle predates this build — skipping " +
-                    "until the next app launch re-persists it (#3688)",
+                "$dartTask: no handle stamp for this build (stale, #3688, " +
+                    "or schedule cancelled, #4331) — skipping",
             )
             return false
         }
@@ -130,7 +132,8 @@ object BackgroundScanEnqueuer {
     /**
      * True when the Dart-side stamp says the persisted callback handle was
      * written by the currently installed build. Absent stamp = stale (the
-     * update that ships the stamp, or any update before the first launch).
+     * update that ships the stamp, or any update before the first launch)
+     * or unconsented (the schedule was cancelled, #4331).
      */
     private fun handleIsFresh(context: Context): Boolean {
         val stamped = context

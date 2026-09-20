@@ -5,16 +5,23 @@
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../../core/background/hive_isolate_lock.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
 import '../data/radius_alert_store.dart';
 import '../../../core/storage/hive_storage.dart';
+import 'alert_schedule_reconciler.dart';
 import 'background_alert_scan_coordinator.dart';
 import '../../../core/background/background_price_fetcher.dart';
 import 'background_price_fetcher_provider.dart';
 import 'background_price_history_writer.dart';
+import 'ios_background_task_ids.dart';
 import 'notification_templates.dart';
 import 'slc_wake_monitor.dart';
+
+// #4162 — the iOS task ids moved to their own file; re-exported so every
+// existing importer keeps working.
+export 'ios_background_task_ids.dart';
 
 /// Background price-refresh scheduling + the WorkManager / iOS BGTask
 /// callback entry point.
@@ -144,28 +151,40 @@ class BackgroundService {
   /// radius-only user got no WorkManager task and radius alerts never
   /// fired. Idempotent: safe to call after every alert mutation and at
   /// startup. Cancels only when BOTH alert kinds are empty.
-  static Future<void> reconcile() async {
+  static Future<void> reconcile() => schedule.reconcile();
+
+  /// The one owner of the schedule (#4162): every arm and cancel — this
+  /// isolate's reconciles and the boot re-arm — goes through it, so it can
+  /// record which alerts-gate reading each apply acted on.
+  static AlertScheduleReconciler schedule = AlertScheduleReconciler(
+    gate: hasActiveAlerts,
+    bootGate: _hasActiveAlertsInIsolate,
+    fetcher: createBackgroundPriceFetcher,
+    slc: createSlcWakeMonitor,
+    persistTemplates: _persistNotificationTemplates,
+  );
+
+  /// [hasActiveAlerts] from a background isolate (#4331): the boot task's
+  /// isolate has no box open, so it takes the Hive lock and opens them the
+  /// way a scan does. Throws when the lock stays busy — an unreadable gate,
+  /// which leaves the schedule as it is.
+  static Future<bool> _hasActiveAlertsInIsolate() async {
+    final lock = await HiveIsolateLock.create();
+    if (!await lock.acquire()) {
+      throw StateError('Hive lock busy: alerts gate unreadable at boot');
+    }
     try {
-      final active = await hasActiveAlerts();
-      if (active) {
-        // #2306 — resolve the localized notification templates HERE, in
-        // the main isolate, where the active in-app locale is known, and
-        // stash them in Hive settings. The OS-spawned background isolate
-        // has no BuildContext and an unreliable Platform.localeName, so it
-        // reads these templates back instead of branching de/en itself.
-        await _persistNotificationTemplates();
-        await init();
-      } else {
-        await cancelAll();
+      await HiveStorage.initInIsolate();
+      return await hasActiveAlerts();
+    } finally {
+      try {
+        await HiveStorage.closeIsolateBoxes();
+      } catch (e, st) {
+        log.error(e, st, layer: ErrorLayer.background, context: const {
+          'where': 'BackgroundService: boot gate failed to close boxes',
+        });
       }
-      // #3169 — significant-location-change wake (iOS only; no-op
-      // elsewhere via the facade seam). Armed only while alerts are
-      // active, and the native side additionally requires an existing
-      // Always location grant — it never prompts.
-      await createSlcWakeMonitor().setEnabled(active);
-    } catch (e, st) {
-      // Never let a scheduling hiccup crash an alert mutation or startup.
-      log.error(e, st, layer: ErrorLayer.background, context: const {'where': 'BackgroundService.reconcile'});
+      lock.release();
     }
   }
 
@@ -253,59 +272,46 @@ class BackgroundService {
 /// the same self-healing window every workmanager app already has.
 @pragma('vm:entry-point')
 void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) async {
-    // #2413 — boot re-arm: re-register the periodic tasks rather than scan.
-    // The BootReceiver enqueues this one-off after a reboot.
-    if (task == BackgroundService.bootReregisterTask) {
-      debugPrint('BackgroundService: re-registering periodic tasks after boot');
-      await BackgroundService.init();
-      return true;
-    }
-
-    final trigger = _triggerForTask(task);
-    if (trigger == null) {
-      debugPrint('BackgroundService: ignoring unknown task "$task"');
-      return true;
-    }
-    debugPrint('BackgroundService: running task "$task" (${trigger.tag})');
-    await BackgroundAlertScanCoordinator().scan(trigger: trigger);
-
-    // #3169 — a BGProcessingTask submission is ONE-SHOT (unlike the
-    // BGAppRefresh lane, which the workmanager plugin re-submits inside its
-    // native handler). Re-arm it here, after the scan, so the processing
-    // lane keeps firing across days without the app being opened.
-    if (task == IosBackgroundTaskIds.processing) {
-      await scheduleIosProcessingTask(Workmanager());
-    }
-    return true;
-  });
+  Workmanager().executeTask((task, inputData) => runBackgroundTask(task));
 }
 
-/// Submit (or replace) the pending BGProcessingTask request (#3169).
-///
-/// One scheduling surface shared by [IosBackgroundPriceFetcher.init] (arm
-/// on every reconcile) and [callbackDispatcher] (re-arm after each run,
-/// because a processing submission is one-shot). `earliestBeginDate` is the
-/// delay below; iOS then runs the task in an idle window of its choosing —
-/// typically overnight, often while charging. Requires network (the scan is
-/// useless without it) but NOT external power, to maximise run chances.
-///
-/// Never throws — scheduling is best-effort; the host side already logs a
-/// rejected submission. A failure here must not fail the scan that
-/// triggered the re-arm.
-Future<void> scheduleIosProcessingTask(Workmanager workmanager) async {
-  try {
-    await workmanager.registerProcessingTask(
-      IosBackgroundTaskIds.processing,
-      IosBackgroundTaskIds.processing,
-      initialDelay: IosBackgroundTaskIds.processingEarliestDelay,
-      constraints: Constraints(networkType: NetworkType.connected),
-    );
-    debugPrint('BackgroundService: BGProcessingTask armed '
-        '("${IosBackgroundTaskIds.processing}", OS-budgeted, best-effort)');
-  } catch (e, st) {
-    log.error(e, st, layer: ErrorLayer.background, context: const {'where': 'scheduleIosProcessingTask'});
+/// What [callbackDispatcher] does with one task (#4162) — a function of
+/// its own so the boot, scan and re-arm branches are executed by tests
+/// rather than read as source. [schedule], [coordinator] and
+/// [workmanager] default to production.
+@visibleForTesting
+Future<bool> runBackgroundTask(
+  String task, {
+  AlertScheduleReconciler? schedule,
+  BackgroundAlertScanCoordinator Function()? coordinator,
+  Workmanager? workmanager,
+}) async {
+  // #2413 — boot re-arm: re-register the periodic tasks rather than scan.
+  // The BootReceiver enqueues this one-off after a reboot.
+  if (task == BackgroundService.bootReregisterTask) {
+    log.debug('re-registering periodic tasks after boot',
+        tag: 'BackgroundService');
+    await (schedule ?? BackgroundService.schedule).bootRearm();
+    return true;
   }
+
+  final trigger = _triggerForTask(task);
+  if (trigger == null) {
+    log.debug('ignoring unknown task "$task"', tag: 'BackgroundService');
+    return true;
+  }
+  log.debug('running task "$task" (${trigger.tag})', tag: 'BackgroundService');
+  await (coordinator ?? BackgroundAlertScanCoordinator.new)()
+      .scan(trigger: trigger);
+
+  // #3169 — a BGProcessingTask submission is ONE-SHOT (unlike the
+  // BGAppRefresh lane, which the workmanager plugin re-submits inside its
+  // native handler). Re-arm it here, after the scan, so the processing
+  // lane keeps firing across days without the app being opened.
+  if (task == IosBackgroundTaskIds.processing) {
+    await scheduleIosProcessingTask(workmanager ?? Workmanager());
+  }
+  return true;
 }
 
 /// Resolve the [BackgroundScanTrigger] for a WorkManager / iOS task name.
@@ -342,42 +348,3 @@ BackgroundScanTrigger? _triggerForTask(String task) {
 @visibleForTesting
 BackgroundScanTrigger? debugTriggerForTask(String task) =>
     _triggerForTask(task);
-
-/// iOS BGTaskScheduler identifiers. Must match the values registered in
-/// `ios/Runner/AppDelegate.swift` and listed under
-/// `BGTaskSchedulerPermittedIdentifiers` in `ios/Runner/Info.plist` — all
-/// three break together (#2414).
-class IosBackgroundTaskIds {
-  IosBackgroundTaskIds._();
-
-  /// BGAppRefreshTask identifier for the periodic price scan.
-  // i18n-ignore: bundle-id-derived task identifier, not user-facing.
-  static const String appRefresh = 'de.tankstellen.tankstellen.background';
-
-  /// BGProcessingTask identifier (#3169) — the second BGTask lane. Must be
-  /// listed in `BGTaskSchedulerPermittedIdentifiers` and registered via
-  /// `WorkmanagerPlugin.registerBGProcessingTask` in AppDelegate.swift.
-  // i18n-ignore: bundle-id-derived task identifier, not user-facing.
-  static const String processing = 'de.tankstellen.tankstellen.processing';
-
-  /// One-off task identifier the native SlcWakeBridge enqueues on a
-  /// significant-location-change wake (#3169). NOT a BGTask — it rides a
-  /// plain `beginBackgroundTask` window, so it needs no Info.plist entry;
-  /// it only has to match `SlcWakeBridge.taskIdentifier` in
-  /// AppDelegate.swift.
-  // i18n-ignore: bundle-id-derived task identifier, not user-facing.
-  static const String slcWake = 'de.tankstellen.tankstellen.slcWake';
-
-  /// One-off task identifier for the opportunistic foreground-wake scan
-  /// (#3169). Like [slcWake], a `beginBackgroundTask` one-off — no
-  /// Info.plist entry needed.
-  // i18n-ignore: bundle-id-derived task identifier, not user-facing.
-  static const String opportunistic =
-      'de.tankstellen.tankstellen.opportunistic';
-
-  /// Earliest-begin delay for a BGProcessingTask submission. Long enough
-  /// that the lane complements (rather than duplicates) the BGAppRefresh
-  /// lane and the foreground opportunistic scans; iOS adds its own idle
-  /// scheduling on top, typically landing the run overnight.
-  static const Duration processingEarliestDelay = Duration(hours: 4);
-}
