@@ -22,8 +22,7 @@ part of 'geolocator_wrapper.dart';
 /// `FusedLocationClient` still leaves compile-time `com.google.android.gms.*`
 /// REFERENCES in the fdroid dex that `fdroid scanner` rejects. Plan (see
 /// `.local-docs/fdroid-gms-free-refactor-notes.md`): vendor + patch
-/// `geolocator_android` for the libre build (drop `FusedLocationClient` + the
-/// `GoogleApiAvailability` probe), swapped in via a libre-only
+/// `geolocator_android` for the libre build, swapped in via a libre-only
 /// `pubspec_overrides.yaml` — keeping this Dart API + all 11 call sites
 /// unchanged. Refactor TODO: extract `_SharedPositionSource` to its own file
 /// and split out a thin permissions seam.
@@ -43,8 +42,7 @@ final geolocatorWrapperProvider = GeolocatorWrapperProvider._();
 /// `FusedLocationClient` still leaves compile-time `com.google.android.gms.*`
 /// REFERENCES in the fdroid dex that `fdroid scanner` rejects. Plan (see
 /// `.local-docs/fdroid-gms-free-refactor-notes.md`): vendor + patch
-/// `geolocator_android` for the libre build (drop `FusedLocationClient` + the
-/// `GoogleApiAvailability` probe), swapped in via a libre-only
+/// `geolocator_android` for the libre build, swapped in via a libre-only
 /// `pubspec_overrides.yaml` — keeping this Dart API + all 11 call sites
 /// unchanged. Refactor TODO: extract `_SharedPositionSource` to its own file
 /// and split out a thin permissions seam.
@@ -69,8 +67,7 @@ final class GeolocatorWrapperProvider
   /// `FusedLocationClient` still leaves compile-time `com.google.android.gms.*`
   /// REFERENCES in the fdroid dex that `fdroid scanner` rejects. Plan (see
   /// `.local-docs/fdroid-gms-free-refactor-notes.md`): vendor + patch
-  /// `geolocator_android` for the libre build (drop `FusedLocationClient` + the
-  /// `GoogleApiAvailability` probe), swapped in via a libre-only
+  /// `geolocator_android` for the libre build, swapped in via a libre-only
   /// `pubspec_overrides.yaml` — keeping this Dart API + all 11 call sites
   /// unchanged. Refactor TODO: extract `_SharedPositionSource` to its own file
   /// and split out a thin permissions seam.
