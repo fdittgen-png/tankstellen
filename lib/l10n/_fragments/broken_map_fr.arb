@@ -1,6 +1,6 @@
 {
   "brokenMapChipDisclaimer": "Lectures MAP suspectes",
-  "brokenMapSnackbarUnreliable": "Le capteur MAP est défaillant — la consommation peut être sous-estimée de 50 à 80 %. Essayez un autre adaptateur.",
+  "brokenMapSnackbarUnreliable": "Le capteur MAP donne des valeurs incorrectes — la consommation affichée peut être 50 à 80 % trop basse. Essayez un autre adaptateur.",
   "brokenMapBannerHardDisable": "Capteur MAP non fiable. Affichage de la moyenne par plein au lieu de la consommation en direct.",
   "brokenMapOverlayPosterior": "Capteur MAP : {posterior} % ± {margin} %",
   "brokenMapOverlayPosteriorVerified": "Capteur MAP : {posterior} % ± {margin} % (vérifié)",

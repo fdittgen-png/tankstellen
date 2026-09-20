@@ -3710,7 +3710,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get brokenMapBannerHardDisable =>
-      'Capteur MAP non fiable. Affichage de la moyenne par plein au lieu du débit en direct.';
+      'Capteur MAP non fiable. Affichage de la moyenne par plein au lieu de la consommation en direct.';
 
   @override
   String brokenMapOverlayPosterior(String posterior, String margin) {
@@ -3854,12 +3854,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String catalogResetConfirmBody(String vehicle) {
-    return 'Cela remplace la capacité du réservoir, la puissance et la cylindrée de ce véhicule par les valeurs de la base pour $vehicle. Les autres champs et votre historique de pleins ne sont pas modifiés.';
+    return 'Cela remplace la capacité du réservoir, la puissance moteur et la cylindrée de ce véhicule par les valeurs de la base pour $vehicle. Les autres champs et votre historique de pleins ne sont pas modifiés.';
   }
 
   @override
   String get catalogResetNoMatchSnackbar =>
-      'Aucune entrée correspondante dans la base de véhicules.';
+      'Aucune entrée correspondante dans la base de véhicules pour ce véhicule.';
 
   @override
   String get catalogResetDoneSnackbar =>
@@ -3930,7 +3930,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get confirmDeleteTitle => 'Supprimer ?';
 
   @override
-  String get confirmDeleteBody => 'Voulez-vous vraiment supprimer ceci ?';
+  String get confirmDeleteBody =>
+      'Voulez-vous vraiment supprimer cet élément ?';
 
   @override
   String get consoFeatureGroupTitle => 'Conso';
@@ -8181,11 +8182,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get obd2StartEngineToReconnect =>
-      'Démarrez le moteur pour reconnecter';
+      'Démarrez le moteur pour vous reconnecter';
 
   @override
   String get obd2ResetConnectionEngineOff =>
-      'Moteur éteint — démarrez-le pour reconnecter';
+      'Moteur éteint — démarrez-le pour vous reconnecter';
 
   @override
   String obd2ParkedPromptTitle(int minutes) {
