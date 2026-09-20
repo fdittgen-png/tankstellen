@@ -16,6 +16,7 @@ import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
 import '../../../helpers/empty_imu_source.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #3438 (Epic #3417) — end-to-end through the [TripRecording] notifier:
@@ -47,8 +48,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
     unawaited(geo.dispose());
   });
 

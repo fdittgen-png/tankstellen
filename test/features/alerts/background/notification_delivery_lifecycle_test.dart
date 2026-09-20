@@ -36,6 +36,7 @@ import 'package:tankstellen/features/alerts/data/radius_alert_store.dart';
 import 'package:tankstellen/features/alerts/domain/entities/radius_alert.dart';
 
 import '../../../fakes/fake_storage_repository.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 import 'support/delivery_trace.dart';
 import 'support/scan_disk_image.dart';
@@ -157,8 +158,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   group('a revoked permission or a disabled channel (N2, #4335)', () {

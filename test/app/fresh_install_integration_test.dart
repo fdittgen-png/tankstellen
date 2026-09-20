@@ -25,6 +25,8 @@ import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/features/search/providers/search_provider.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../helpers/hive_temp_dir.dart';
+
 /// Integration test for issue #565 — fresh-install end-to-end.
 ///
 /// Boots the app against a completely empty Hive (no consent flag, no
@@ -64,10 +66,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   /// Heavy external providers that must be stubbed even though storage

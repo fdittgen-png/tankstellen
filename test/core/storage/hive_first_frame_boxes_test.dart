@@ -9,6 +9,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_first_frame_boxes.dart';
 import 'package:tankstellen/core/storage/hive_open_timing.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4116 — this file exists because the app stopped starting and 16,626
 /// tests passed.
 ///
@@ -34,8 +36,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test('openAll actually runs, and every first-frame box is open after it',

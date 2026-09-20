@@ -16,6 +16,8 @@ import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_s
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Regression: EditVehicleScreen must render its chrome via
 /// [PageScaffold] (#923 phase 3k). The `bottomNavigationBar` is still
 /// wired through (pinned Save) so the save-bar button remains findable.
@@ -69,8 +71,7 @@ void main() {
     });
 
     tearDown(() async {
-      await Hive.close();
-      if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tempDir);
     });
 
     testWidgets(

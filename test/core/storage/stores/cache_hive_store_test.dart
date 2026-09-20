@@ -9,6 +9,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/stores/cache_hive_store.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   late CacheHiveStore store;
   late Directory tempDir;
@@ -21,10 +23,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('CacheHiveStore — cache', () {

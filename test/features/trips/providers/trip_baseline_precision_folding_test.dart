@@ -15,6 +15,7 @@ import 'package:tankstellen/features/trips/providers/trip_baseline_recorder.dart
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #2515 PR2 — precision-folding integration coverage that drives the
@@ -41,8 +42,7 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2Baselines).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   /// Drive [readings] through the recorder for a fresh [vehicleId] in

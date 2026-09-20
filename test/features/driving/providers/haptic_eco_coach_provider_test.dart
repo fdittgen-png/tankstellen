@@ -16,6 +16,8 @@ import 'package:tankstellen/features/feature_management/application/feature_flag
 import 'package:tankstellen/features/feature_management/data/feature_flags_repository.dart';
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Provider-layer coverage for the [hapticEcoCoachEnabledProvider]
 /// (#1122). As of #1373 phase 3a this provider is a thin shim that
 /// delegates to [featureFlagsProvider]; tests assert that contract:
@@ -50,8 +52,7 @@ void main() {
 
   tearDown(() async {
     await flagsBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   ProviderContainer makeContainer() {

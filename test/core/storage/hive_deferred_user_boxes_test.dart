@@ -15,6 +15,8 @@ import 'package:tankstellen/core/storage/hive_open_timing.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4318 — `priceHistory` left the first-frame batch. These tests RUN the
 /// deferred open against real Hive files: single-flight under a race, the
 /// armed key, per-box timing, and a genuinely corrupt file.
@@ -83,8 +85,7 @@ void main() {
   tearDown(() async {
     HiveDeferredUserBoxes.resetForTest();
     errorLogger.resetForTest();
-    await Hive.close();
-    dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   test('manages priceHistory', () {

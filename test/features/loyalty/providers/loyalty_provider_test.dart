@@ -11,6 +11,8 @@ import 'package:tankstellen/features/loyalty/data/loyalty_card_repository.dart';
 import 'package:tankstellen/features/loyalty/domain/entities/loyalty_card.dart';
 import 'package:tankstellen/features/loyalty/providers/loyalty_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Unit tests for `lib/features/loyalty/providers/loyalty_provider.dart`
 /// (Refs #561 phase: loyalty_provider).
 ///
@@ -57,13 +59,8 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close().timeout(
-      const Duration(seconds: 3),
-      onTimeout: () => <void>[],
-    );
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir,
+        closeTimeout: const Duration(seconds: 3));
   });
 
   // ---------------------------------------------------------------------------

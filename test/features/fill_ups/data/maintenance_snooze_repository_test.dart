@@ -9,6 +9,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/fill_ups/data/maintenance_snooze_repository.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/maintenance_suggestion.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Direct unit tests for [MaintenanceSnoozeRepository] (Refs #561).
 ///
 /// Covers the snooze contract used by the predictive-maintenance card
@@ -30,8 +32,7 @@ void main() {
         await Hive.box<dynamic>(HiveBoxes.settings).clear();
         await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('keyPrefix constant equals "maintenance.snooze."', () {
@@ -285,8 +286,7 @@ void main() {
         await Hive.box<dynamic>(HiveBoxes.settings).clear();
         await Hive.box<dynamic>(HiveBoxes.settings).close();
       }
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('snooze silently no-ops when the settings box is closed; '

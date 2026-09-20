@@ -16,6 +16,8 @@ import 'package:tankstellen/features/feature_management/domain/app_profile.dart'
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// Provider-layer coverage for the AppProfile system (#1517).
 ///
 /// Each test owns its own Hive boxes so the migration logic
@@ -44,8 +46,7 @@ void main() {
   tearDown(() async {
     await flagsBox.deleteFromDisk();
     await profileBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   ProviderContainer makeContainer() {

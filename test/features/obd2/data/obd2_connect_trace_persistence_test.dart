@@ -11,6 +11,8 @@ import 'package:tankstellen/features/obd2/data/obd2_connect_trace.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_log.dart';
 import 'package:tankstellen/features/obd2/data/obd2_connect_trace_persistence.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #3184 — the connect-trace ring must survive an app kill. The canonical
 /// field flow is "it won't connect" → force-quit → relaunch → export the
 /// error log; the pre-#3184 in-memory-only ring shipped EMPTY through that
@@ -44,8 +46,7 @@ void main() {
   tearDown(() async {
     Obd2ConnectTraceLog.clear();
     TraceStorage.extraExportSections.clear();
-    await Hive.close();
-    await tempDir.delete(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('Obd2ConnectTracePersistence.init (#3184)', () {

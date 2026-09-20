@@ -9,6 +9,8 @@ import 'package:tankstellen/features/feature_management/data/feature_flags_repos
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Unit tests for [FeatureFlagsRepository] (epic #1612, child #1629).
 ///
 /// Pins the persistence contract: a fresh (empty) box yields the
@@ -32,8 +34,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('isEmpty', () {

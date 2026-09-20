@@ -19,6 +19,8 @@ import 'package:tankstellen/features/trips/domain/trip_sample.dart';
 import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 import 'package:tankstellen/features/trips/domain/trip_verdict.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 final _start = DateTime(2026, 8, 30, 8);
 
 List<TripSample> _samples(int n) => [
@@ -110,8 +112,7 @@ void main() {
     });
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      dir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(dir);
     });
 
     test('save writes meta + chunks; summaries never touch a chunk; '

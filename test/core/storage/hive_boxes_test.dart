@@ -9,6 +9,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_map_coercion.dart';
 import 'package:tankstellen/core/storage/hive_isolate_boxes.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 void main() {
   group('HiveBoxes', () {
     group('box name constants', () {
@@ -481,8 +483,7 @@ void main() {
     });
 
     tearDown(() async {
-      await Hive.close();
-      if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmp);
     });
 
     test('migrates a plaintext box into an encrypted box, preserving '
@@ -530,8 +531,7 @@ void main() {
     });
 
     tearDown(() async {
-      await Hive.close();
-      if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmp);
     });
 
     test('currentSchemaVersion is a positive integer', () {

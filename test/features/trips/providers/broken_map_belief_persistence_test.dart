@@ -4,7 +4,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -17,6 +16,7 @@ import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Hive-backed persistence tests for the [BrokenMapBeliefByVehicle]
@@ -45,18 +45,10 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2TripHistory).deleteFromDisk();
-    await Hive.close();
     // Windows occasionally holds the box file open briefly after
-    // [Hive.close]. Suppress the deleteSync error so the suite stays
-    // green — the temp dir lives under [Directory.systemTemp] and the
-    // OS will reclaim it on next reboot. Mirrors the
-    // [feedback_hive_widget_test_teardown] guidance that bounded
-    // cleanup beats a PathAccessException race.
-    try {
-      tmpDir.deleteSync(recursive: true);
-    } on FileSystemException catch (e, st) {
-      debugPrint('persistence_test tearDown: $e\n$st');
-    }
+    // [Hive.close]; the helper absorbs that so the suite stays green and
+    // the OS reclaims the temp dir.
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   Future<void> seedTrip({

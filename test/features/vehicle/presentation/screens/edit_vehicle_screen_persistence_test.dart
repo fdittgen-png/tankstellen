@@ -15,6 +15,8 @@ import 'package:tankstellen/features/vehicle/presentation/screens/edit_vehicle_s
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Architectural-correctness test for #1226: the edit-vehicle Save
 /// pathway must preserve every non-form field on the loaded
 /// [VehicleProfile] (calibrationMode, autoRecord and friends,
@@ -41,10 +43,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   testWidgets(

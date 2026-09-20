@@ -12,6 +12,8 @@ import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/storage/isolate_error_spool.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #4318 — the isolate error spool left the first-frame batch. The reason
 /// it was there (#1105: pre-bind errors must land somewhere) still holds,
 /// so this RUNS the pre-bind path with the spool box closed, exactly as a
@@ -43,8 +45,7 @@ void main() {
 
   tearDown(() async {
     errorLogger.resetForTest();
-    await Hive.close();
-    dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   test('a pre-bind error with the spool box closed is still persisted, and '

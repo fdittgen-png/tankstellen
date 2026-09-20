@@ -10,6 +10,8 @@ import 'package:tankstellen/core/constants/field_names.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #2864 — the BG price-history writer recorded only e5/e10/diesel, so a
 /// non-DE station's extended fuel set (FR E85 / LPG, IT CNG, AR diesel-premium)
 /// was dropped from history. The extraction is now mapping-driven over every
@@ -34,8 +36,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   test('records a non-DE fuel set (E85 / LPG / E98)', () async {

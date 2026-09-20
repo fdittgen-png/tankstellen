@@ -15,6 +15,7 @@ import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/fill_ups/providers/consumption_providers.dart';
 import 'package:tankstellen/features/fill_ups/providers/pending_reconciliation_provider.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// Detect-vs-publish seam coverage (Epic #2439 / #2442).
@@ -48,8 +49,7 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2TripHistory).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   ProviderContainer makeContainer() {

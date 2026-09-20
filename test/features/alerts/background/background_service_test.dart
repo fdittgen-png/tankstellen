@@ -16,6 +16,7 @@ import 'package:tankstellen/core/utils/json_extensions.dart';
 import 'package:tankstellen/features/alerts/background/slc_wake_monitor.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import 'support/delivery_trace.dart';
 import 'support/scan_session_driver.dart';
 
@@ -464,9 +465,9 @@ void main() {
       lock = HiveIsolateLock.fromFile(File('${dir.path}/hive_bg.lock'));
       events = [];
     });
-    tearDown(() {
+    tearDown(() async {
       lock.release();
-      dir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(dir);
     });
 
     BackgroundAlertScanCoordinator coordinator({

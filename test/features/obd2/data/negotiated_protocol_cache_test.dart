@@ -9,6 +9,7 @@ import 'package:tankstellen/features/obd2/data/protocol/elm327_protocol.dart';
 import 'package:tankstellen/features/obd2/data/negotiated_protocol_cache.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #2261 concern 3 — ATDPN protocol cache + ATSP{n} on warm connect.
@@ -70,7 +71,7 @@ void main() {
     tearDown(() async {
       await box.close();
       await Hive.deleteBoxFromDisk('proto_test');
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test(

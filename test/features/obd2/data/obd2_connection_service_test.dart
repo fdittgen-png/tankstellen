@@ -25,6 +25,7 @@ import 'package:tankstellen/features/obd2/data/transport/obd2_permissions.dart';
 import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/negotiated_protocol_cache.dart';
 import 'package:tankstellen/features/obd2/data/supported_pids_cache.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 void main() {
@@ -895,8 +896,7 @@ void main() {
 
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     // The resolved candidate's MAC is 'aa:bb' + a Peugeot 107 active
@@ -1015,8 +1015,7 @@ void main() {
       Obd2ConnectTraceLog.clear();
       Obd2CommDiagnostics.instance.reset();
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     Future<Obd2ConnectOutcome?> connectWith0100Reply(String reply) async {

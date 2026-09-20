@@ -13,6 +13,8 @@ import 'package:tankstellen/features/trips/api.dart'
 import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_sample_wal.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #3758 — append-only sample WAL: the fix for the ~40 min recording
 /// crash (whole-list re-serialization + compute() spawn every 5 s).
 void main() {
@@ -34,7 +36,7 @@ void main() {
 
   tearDown(() async {
     await wal.clear();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
     errorLogger.testRecorderOverride = null;
     errorLogger.resetForTest();
   });

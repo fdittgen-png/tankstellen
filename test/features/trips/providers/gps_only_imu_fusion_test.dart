@@ -25,6 +25,7 @@ import 'package:tankstellen/features/driving/providers/live_harsh_event_bus_prov
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 import 'package:tankstellen/features/trips/domain/entities/trip_termination.dart';
 import 'package:tankstellen/features/trips/domain/recording_session_journal.dart';
@@ -54,8 +55,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('GPS+IMU fusion in GpsOnlyRecordingPipeline (#2760)', () {

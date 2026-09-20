@@ -14,6 +14,8 @@ import 'package:tankstellen/features/trips/domain/trip_sample.dart';
 import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 import 'package:tankstellen/features/trips/providers/gps_only_trip_wal.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late Directory dir;
@@ -35,8 +37,7 @@ void main() {
   tearDown(() async {
     await sampleWal.clear();
     await box.deleteFromDisk();
-    await Hive.close();
-    dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   TripSample fix(int i) => TripSample(

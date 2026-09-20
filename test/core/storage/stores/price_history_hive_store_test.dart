@@ -8,6 +8,8 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/core/storage/stores/price_history_hive_store.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   late PriceHistoryHiveStore store;
   late Directory tempDir;
@@ -20,10 +22,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   final recordA = {

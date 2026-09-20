@@ -26,6 +26,8 @@ import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic
 import 'package:tankstellen/features/trips/domain/entities/recording_session_event.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   group('DroppedSessionManager verified recovery (#4196)', () {
     late Directory tmpDir;
@@ -47,8 +49,7 @@ void main() {
     tearDown(() async {
       await pausedBox.deleteFromDisk();
       await historyBox.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     ({DroppedSessionManager mgr, _FakeHost host, List<_GateScanner> sources})

@@ -8,6 +8,8 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_legacy_migration.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4110 — the pre-encryption plaintext migration is one-time by
 /// definition, and ran on every cold start.
 ///
@@ -30,8 +32,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test('a fresh install still needs the probes', () {

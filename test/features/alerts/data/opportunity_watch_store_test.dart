@@ -10,6 +10,8 @@ import 'package:tankstellen/features/alerts/data/opportunity_watch_store.dart';
 import 'package:tankstellen/features/alerts/data/usual_station_store.dart';
 import 'package:tankstellen/features/alerts/domain/opportunity.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #4154 — the two settings behind "what may interrupt me".
 ///
 /// Against a real Hive box, for #4116's reason: the closed-box branch is
@@ -25,8 +27,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('OpportunityWatchStore', () {

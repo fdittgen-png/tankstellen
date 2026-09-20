@@ -10,6 +10,8 @@ import 'package:tankstellen/features/trips/data/welford.dart';
 import 'package:tankstellen/features/trips/domain/cold_start_baselines.dart';
 import 'package:tankstellen/features/trips/domain/situation_classifier.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -26,8 +28,7 @@ void main() {
 
   tearDown(() async {
     await box.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('BaselineStore (#769)', () {

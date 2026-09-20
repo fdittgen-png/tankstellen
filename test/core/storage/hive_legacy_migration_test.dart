@@ -9,6 +9,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_legacy_migration.dart';
 import 'package:tankstellen/core/storage/impl/hive_directory_resolver.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4372 — the #1686 plaintext→encrypted migration opened each box WITH
 /// the key first and expected a plaintext file to throw. Hive does not
 /// throw there: its crash recovery reads the plaintext frames as corrupt
@@ -47,9 +49,8 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
     HiveDirectoryResolver.hivePathForTest = null;
-    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   test('a plaintext box keeps every record and ends up encrypted', () async {

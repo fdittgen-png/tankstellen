@@ -9,6 +9,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/vehicle/data/repositories/service_reminder_repository.dart';
 import 'package:tankstellen/features/vehicle/domain/entities/service_reminder.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   late Directory tempDir;
   late Box<String> box;
@@ -23,10 +25,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   const oilChange = ServiceReminder(

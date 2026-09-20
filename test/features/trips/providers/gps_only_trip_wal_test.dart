@@ -10,6 +10,8 @@ import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 import 'package:tankstellen/features/trips/providers/gps_only_trip_wal.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #3248 — GPS-only recordings now write a WAL so an OS kill mid-trip recovers
 /// rather than losing the whole trip. These drive the writer against a real
 /// in-memory ActiveTripRepository (the same box launch-recovery reads).
@@ -31,8 +33,7 @@ void main() {
 
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmp.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmp);
     });
 
     final start = DateTime.utc(2026, 6, 26, 9);

@@ -10,6 +10,7 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/trips/providers/trip_baseline_sync.dart';
 import 'package:tankstellen/features/sync/providers/baseline_sync_enabled_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #3670 — [syncBaselineAfterFlush] is the fire-and-forget half of the
@@ -28,8 +29,7 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2Baselines).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
     debugBaselineMergeOverride = null;
   });
 

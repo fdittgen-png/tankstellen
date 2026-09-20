@@ -11,6 +11,8 @@ import 'package:tankstellen/features/feature_management/data/feature_flags_repos
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/sync/providers/baseline_sync_enabled_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Provider-layer coverage for the [baselineSyncEnabledProvider]
 /// (#780). As of #1373 phase 3e this provider is a thin shim that
 /// delegates to [featureFlagsProvider]; tests assert that contract:
@@ -52,8 +54,7 @@ void main() {
 
   tearDown(() async {
     await flagsBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   ProviderContainer makeContainer({List<Object> extraOverrides = const []}) {

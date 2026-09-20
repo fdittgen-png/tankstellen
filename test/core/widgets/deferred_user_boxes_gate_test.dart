@@ -11,6 +11,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_deferred_user_boxes.dart';
 import 'package:tankstellen/core/widgets/deferred_user_boxes_gate.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4318 — the privacy dashboard reads the deferred price-history box
 /// synchronously; its route waits for the box without flashing a loader
 /// on the normal path.
@@ -25,8 +27,7 @@ void main() {
 
   tearDown(() async {
     HiveDeferredUserBoxes.resetForTest();
-    await Hive.close();
-    dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
 
   const child = Text('dashboard', textDirection: TextDirection.ltr);

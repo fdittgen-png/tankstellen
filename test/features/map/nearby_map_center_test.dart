@@ -16,6 +16,7 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/domain/station.dart';
 
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/pump_app.dart';
 
 /// #692 — Searching a distant city from the user's location must pan the
@@ -32,8 +33,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   // Two Paris-area stations (around 48.8, 2.3) while user is at

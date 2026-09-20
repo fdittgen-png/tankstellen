@@ -8,6 +8,8 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/stores/favorites_hive_store.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4190 — every [FavoritesHiveStore] entry point survives a closed box.
 ///
 /// The fault-injection shape #2349 established, for a real failure: a
@@ -30,8 +32,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('with the box CLOSED', () {

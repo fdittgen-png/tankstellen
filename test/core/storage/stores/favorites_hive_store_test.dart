@@ -10,6 +10,8 @@ import 'package:tankstellen/core/storage/stores/favorites_hive_store.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/opening_hours.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   late FavoritesHiveStore store;
   late Directory tempDir;
@@ -22,10 +24,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('Fuel favorites', () {

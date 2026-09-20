@@ -28,6 +28,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/services/station_service_chain_codec.dart';
 import 'package:tankstellen/core/domain/station.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 void main() {
   // ---------------------------------------------------------------------------
   // 1. SCHEMA GUARD — cached-Station key signature pinned to the schema version.
@@ -242,8 +244,7 @@ void main() {
     });
 
     tearDown(() async {
-      await Hive.close();
-      if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmp);
     });
 
     test('an OLD-format cached search blob stamped at the old version is '

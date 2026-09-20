@@ -17,6 +17,8 @@ import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/trips/domain/entities/recording_session_event.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Focused unit tests for the #2188 [DroppedSessionManager] — the
 /// connection-drop RECOVERY state machine extracted from
 /// `TripRecordingController`. Drives the manager against a fake
@@ -49,8 +51,7 @@ void main() {
     tearDown(() async {
       await pausedBox.deleteFromDisk();
       await historyBox.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     DateTime now() => DateTime(2026, 5, 28, 12);

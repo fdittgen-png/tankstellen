@@ -12,6 +12,8 @@ import 'package:tankstellen/core/telemetry/trace_recorder.dart';
 import 'package:tankstellen/features/obd2/data/supported_pids_cache.dart';
 import 'package:tankstellen/features/obd2/data/session/supported_pids_resolver.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #2424 (follow-up to #2379) — [SupportedPidsResolver] is best-effort:
 /// every catch site (prime, VIN-for-cache-key read, supported-PID scan)
 /// already degrades gracefully on a flaky/slow ELM327. A transient there
@@ -106,8 +108,7 @@ void main() {
 
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      if (tmpDir.existsSync()) tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test(

@@ -3,7 +3,6 @@
 
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
@@ -11,6 +10,7 @@ import 'package:tankstellen/features/fill_ups/data/maintenance_snooze_repository
 import 'package:tankstellen/features/fill_ups/domain/entities/maintenance_suggestion.dart';
 import 'package:tankstellen/features/fill_ups/presentation/widgets/maintenance_suggestion_card.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
 import '../../../../helpers/pump_app.dart';
 
 /// Widget-level coverage for [MaintenanceSuggestionCard] (#1124).
@@ -45,23 +45,11 @@ void main() {
   });
 
   tearDownAll(() async {
-    // Best-effort cleanup. On Windows the Hive lock file can keep a
-    // handle on the box file for a few hundred ms after Hive.close —
-    // a hard `deleteSync` would throw and a hard `Hive.close()` await
-    // can deadlock the test runner there. The OS will reclaim this
-    // temp dir on the next pass; no real damage if cleanup is skipped.
-    try {
-      await Hive.close().timeout(const Duration(seconds: 2));
-    } on Object catch (e) {
-      debugPrint('tearDownAll: Hive.close skipped ($e)');
-    }
-    try {
-      if (tempDir.existsSync()) {
-        tempDir.deleteSync(recursive: true);
-      }
-    } on FileSystemException catch (e) {
-      debugPrint('tearDownAll: temp dir cleanup skipped ($e)');
-    }
+    // On Windows the Hive lock file can keep a handle on the box file
+    // for a few hundred ms after `Hive.close()`; the helper's bounded
+    // close leaves the temp dir to the OS rather than racing it.
+    await closeHiveAndDeleteTemp(tempDir,
+        closeTimeout: const Duration(seconds: 2));
   });
 
   group('MaintenanceSuggestionCard — rendering', () {

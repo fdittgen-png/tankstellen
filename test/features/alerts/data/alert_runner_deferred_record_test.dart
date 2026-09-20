@@ -24,6 +24,8 @@ import 'package:tankstellen/features/alerts/domain/radius_alert_evaluator.dart';
 import 'package:tankstellen/features/alerts/domain/station_price_sample.dart';
 import 'package:tankstellen/features/alerts/domain/velocity_alert_detector.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 class _Notifier implements NotificationService {
   final List<String> titles = [];
   @override
@@ -62,8 +64,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   StationPriceSample sample(String id, double price) => StationPriceSample(

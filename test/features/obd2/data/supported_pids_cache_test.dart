@@ -10,6 +10,8 @@ import 'package:tankstellen/features/obd2/data/session/obd2_service.dart';
 import 'package:tankstellen/features/obd2/data/transport/obd2_transport.dart';
 import 'package:tankstellen/features/obd2/data/supported_pids_cache.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 // Shared AT-init boilerplate for the FakeObd2Transport — mirrors
 // obd2_service_test.dart so the #811 tests can stay self-contained.
 const _initResponses = {
@@ -179,8 +181,7 @@ void main() {
 
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('empty cache returns null', () {
@@ -262,8 +263,7 @@ void main() {
 
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('cache miss on first connect → scan runs, result is persisted',
@@ -552,8 +552,7 @@ void main() {
 
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     // The production-shaped key the live Obd2ConnectionService hands the

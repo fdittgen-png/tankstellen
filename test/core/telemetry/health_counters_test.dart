@@ -9,6 +9,8 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/telemetry/health_counters.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 void main() {
   late Directory tempDir;
 
@@ -20,10 +22,7 @@ void main() {
 
   tearDown(() async {
     healthCounters.resetForTest();
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   HealthCounters counters({DateTime? at}) =>

@@ -10,6 +10,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/hive_first_frame_boxes.dart';
 import 'package:tankstellen/core/storage/hive_open_timing.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #4140 — the regression gate on the cold-start path.
 ///
 /// [kColdStartBudget] says a cold start reaches a usable map in 2,500 ms
@@ -46,8 +48,7 @@ void main() {
     });
 
     tearDown(() async {
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('is exactly the boxes the budget was measured against',

@@ -13,6 +13,8 @@ import 'package:tankstellen/features/vehicle/presentation/widgets/service_remind
 import 'package:tankstellen/features/vehicle/providers/service_reminder_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Render tests for [ServiceReminderSection] (#584). Focuses on the
 /// empty-state UI because the preset chips are the only UI the user
 /// interacts with on a fresh vehicle. Tap behaviour (preset → stored
@@ -34,10 +36,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   Future<void> pump(

@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_trip_box_encryption.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 void main() {
   late Directory tmp;
   late HiveAesCipher cipher;
@@ -18,8 +20,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tmp.existsSync()) tmp.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmp);
   });
 
   group('HiveTripBoxEncryption (#3611)', () {

@@ -9,6 +9,7 @@ import 'package:hive/hive.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/vehicles_step.dart';
 
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/pump_app.dart';
 
 /// #692 — The onboarding wizard needs an optional Vehicles step so the
@@ -24,8 +25,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   testWidgets(

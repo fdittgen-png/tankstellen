@@ -13,6 +13,8 @@ import 'package:tankstellen/features/feature_management/domain/feature_manifest.
 import 'package:tankstellen/features/profile/data/models/user_profile.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Coverage for [migrateLegacyToggles] (#1373 phase 3a).
 ///
 /// Five scenarios pin the contract:
@@ -45,8 +47,7 @@ void main() {
   tearDown(() async {
     await settings.deleteFromDisk();
     await flagsBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   group('migrateLegacyToggles — hapticEcoCoach', () {

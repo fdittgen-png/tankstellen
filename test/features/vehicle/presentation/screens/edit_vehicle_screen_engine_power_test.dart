@@ -16,6 +16,8 @@ import 'package:tankstellen/features/vehicle/presentation/widgets/engine_power_f
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// Widget-level coverage for the engine-power field on the edit-vehicle
 /// form (Epic #3015): it renders with the pre-filled kW value, shows the
 /// derived PS equivalent as helper text, and an edit persists into the
@@ -31,10 +33,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   Future<VehicleProfileRepository> pumpScreen(

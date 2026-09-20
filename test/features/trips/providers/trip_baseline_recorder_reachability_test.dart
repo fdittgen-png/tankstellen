@@ -17,6 +17,7 @@ import 'package:tankstellen/features/trips/providers/trip_baseline_sync.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// End-to-end reachability guard for the baseline recorder (#2513,
@@ -46,8 +47,7 @@ void main() {
 
   tearDown(() async {
     await Hive.box<String>(HiveBoxes.obd2Baselines).deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   /// Build the synthetic trip: a stop-and-go segment (speed oscillating

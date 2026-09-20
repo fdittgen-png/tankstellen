@@ -15,6 +15,7 @@ import 'package:tankstellen/features/fill_ups/domain/services/reconciler.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 
+import '../helpers/hive_temp_dir.dart';
 import '../helpers/silence_error_logger.dart';
 
 /// End-to-end integration coverage for the fill-up + receipt-scan +
@@ -50,8 +51,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   test(

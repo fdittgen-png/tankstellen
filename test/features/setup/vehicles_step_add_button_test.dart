@@ -11,6 +11,7 @@ import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/setup/presentation/widgets/vehicles_step.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/pump_app.dart';
 
 /// #695 — The wizard's \"Add vehicle\" button must navigate to the
@@ -52,8 +53,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   testWidgets(

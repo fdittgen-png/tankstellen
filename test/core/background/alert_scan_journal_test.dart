@@ -9,6 +9,8 @@ import 'package:tankstellen/core/background/alert_scan_journal.dart';
 import 'package:tankstellen/core/background/scan_run_phase.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// #3147 — rolling journal of background alert-scan runs, persisted in
 /// the alerts box alongside the dedup rows so "why didn't I get an
 /// alert?" is answerable from the error-log export.
@@ -28,10 +30,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   final t0 = DateTime.utc(2026, 6, 10, 8);

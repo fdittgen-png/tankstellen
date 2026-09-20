@@ -13,6 +13,8 @@ import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #2565 — the GPS-DEGRADE half: an OBD2 drop on a healthy-GPS drive must
 /// keep RECORDING (GPS-only) instead of pausing, and only escalate to
 /// "paused" when GPS ALSO dies. Drives the real
@@ -43,8 +45,7 @@ void main() {
     tearDown(() async {
       await pausedBox.deleteFromDisk();
       await historyBox.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     Map<String, String> initResponses() => {

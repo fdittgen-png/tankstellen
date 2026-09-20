@@ -14,6 +14,8 @@ import 'package:tankstellen/features/driving/providers/haptic_eco_coach_provider
 import 'package:tankstellen/features/glide_coach/providers/glide_coach_enabled_provider.dart';
 import 'package:tankstellen/features/sync/providers/baseline_sync_enabled_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Coverage for the shared [FeatureToggleNotifier] mixin +
 /// [watchEffectiveFeature] helper (#3175) — the single implementation
 /// behind every per-feature toggle shim (glide-coach, baseline-sync,
@@ -50,8 +52,7 @@ void main() {
 
   tearDown(() async {
     await flagsBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   ProviderContainer makeContainer() {

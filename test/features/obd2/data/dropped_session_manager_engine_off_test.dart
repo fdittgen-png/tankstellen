@@ -22,6 +22,8 @@ import 'package:tankstellen/features/trips/domain/entities/gps_sample_diagnostic
 import 'package:tankstellen/features/trips/domain/entities/recording_session_event.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   late Directory tmpDir;
   late Box<String> pausedBox;
@@ -42,8 +44,7 @@ void main() {
   tearDown(() async {
     await pausedBox.deleteFromDisk();
     await historyBox.deleteFromDisk();
-    await Hive.close();
-    tmpDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tmpDir);
   });
 
   DroppedSessionManager build(_Host host) =>

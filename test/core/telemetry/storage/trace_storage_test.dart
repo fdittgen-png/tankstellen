@@ -10,6 +10,8 @@ import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/pii_scrubber.dart';
 import 'package:tankstellen/core/telemetry/storage/trace_storage.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// Create a plain JSON map that Hive can serialize (no freezed objects).
 /// This mirrors what TraceStorage.store does: trace.toJson(), but we ensure
 /// nested objects are fully converted to plain maps via jsonEncode/jsonDecode.
@@ -55,10 +57,7 @@ void main() {
 
   tearDown(() async {
     TraceStorage.extraExportSections.clear();
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('TraceStorage', () {

@@ -7,6 +7,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/telemetry/storage/startup_failure_store.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #3149 — when the storage phase bricks, Hive (and with it the trace
 /// store + isolate spool) is dead, so the cause must persist through a
 /// plain file the next successful launch can replay. These tests pin the
@@ -20,9 +22,9 @@ void main() {
     StartupFailureStore.directoryProvider = () async => tempDir;
   });
 
-  tearDown(() {
+  tearDown(() async {
     StartupFailureStore.resetForTest();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   test('persist → drain round-trips error type, message and stack', () async {

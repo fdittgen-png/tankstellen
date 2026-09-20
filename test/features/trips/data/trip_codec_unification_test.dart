@@ -14,6 +14,7 @@ import 'package:tankstellen/features/trips/domain/trip_recorder.dart';
 import 'package:tankstellen/features/obd2/data/active_trip_repository.dart';
 import 'package:tankstellen/features/obd2/data/paused_trip_repository.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 /// #3739 — ONE canonical TripSummary/TripSample codec for every
@@ -175,8 +176,7 @@ void main() {
     });
 
     tearDown(() async {
-      await Hive.close();
-      if (tmpDir.existsSync()) tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('history path — TripHistoryRepository save/loadById', () async {

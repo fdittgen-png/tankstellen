@@ -14,6 +14,7 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/core/storage/local_data_eraser.dart';
 
 import '../../fakes/fake_storage_repository.dart';
+import '../../helpers/hive_temp_dir.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -44,8 +45,7 @@ void main() {
       Hive.init(dir.path);
     });
     tearDown(() async {
-      await Hive.close();
-      dir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(dir);
     });
 
     test('clears every open box and deletes closed ones from disk',
@@ -73,8 +73,7 @@ void main() {
     final dir = Directory.systemTemp.createTempSync('eraser_fault_');
     Hive.init(dir.path);
     addTearDown(() async {
-      await Hive.close();
-      dir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(dir);
     });
     final result = await LocalDataEraser.eraseAll(
       storage: FakeStorageRepository(),

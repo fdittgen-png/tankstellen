@@ -11,6 +11,8 @@ import 'package:tankstellen/features/vehicle/data/repositories/service_reminder_
 import 'package:tankstellen/features/vehicle/domain/entities/service_reminder.dart';
 import 'package:tankstellen/features/vehicle/providers/service_reminder_providers.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 void main() {
   late Directory tempDir;
   late Box<String> box;
@@ -31,10 +33,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   group('ServiceReminderList provider (#584)', () {

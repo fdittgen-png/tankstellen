@@ -13,6 +13,7 @@ import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_recording_controller.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 
 void main() {
@@ -546,8 +547,7 @@ void main() {
     tearDown(() async {
       await pausedBox.deleteFromDisk();
       await historyBox.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     /// Common AT-init responses so `connect()` on the Obd2Service
@@ -842,8 +842,7 @@ void main() {
     tearDown(() async {
       await pausedBox.deleteFromDisk();
       await historyBox.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     Map<String, String> initResponses() => {

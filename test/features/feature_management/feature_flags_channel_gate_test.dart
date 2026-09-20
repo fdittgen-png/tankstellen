@@ -12,6 +12,8 @@ import 'package:tankstellen/features/feature_management/domain/build_channel.dar
 import 'package:tankstellen/features/feature_management/domain/feature.dart';
 import 'package:tankstellen/features/feature_management/domain/feature_manifest.dart';
 
+import '../../helpers/hive_temp_dir.dart';
+
 /// Build-channel enforcement in `FeatureFlags` (#1674, epic #1670).
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -133,8 +135,7 @@ void main() {
 
     tearDown(() async {
       await box.deleteFromDisk();
-      await Hive.close();
-      tmpDir.deleteSync(recursive: true);
+      await closeHiveAndDeleteTemp(tmpDir);
     });
 
     test('a persisted beta-only feature is dropped in a production build',

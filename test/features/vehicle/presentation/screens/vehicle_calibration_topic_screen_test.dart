@@ -11,6 +11,8 @@ import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/vehicle/presentation/screens/topics/vehicle_calibration_topic_screen.dart';
 import 'package:tankstellen/l10n/app_localizations.dart';
 
+import '../../../../helpers/hive_temp_dir.dart';
+
 /// The Calibration topic screen (#3900) — the reset actions carried over
 /// from the dissolved `VehicleExtrasSection` (glyphs per #1219 / #3651
 /// so users can tell at a glance which side of the calibration pipeline
@@ -27,8 +29,7 @@ void main() {
   });
 
   tearDown(() async {
-    await Hive.close();
-    if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(tempDir);
   });
 
   Future<void> pump(

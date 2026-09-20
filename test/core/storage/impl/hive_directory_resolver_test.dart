@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/storage/impl/hive_directory_resolver.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
+
 /// #3747 (item 3) — the iOS Hive dir migration: Documents → Application
 /// Support, one-time MOVE, never-throws with rollback on failure.
 void main() {
@@ -19,8 +21,8 @@ void main() {
     target = Directory('${root.path}/ApplicationSupport');
   });
 
-  tearDown(() {
-    if (root.existsSync()) root.deleteSync(recursive: true);
+  tearDown(() async {
+    await closeHiveAndDeleteTemp(root);
   });
 
   File seed(Directory dir, String name, [String content = 'data']) =>

@@ -25,6 +25,7 @@ import 'package:tankstellen/features/favorites/providers/favorites_provider.dart
 import 'package:tankstellen/features/itinerary/providers/itinerary_provider.dart';
 import 'package:tankstellen/features/trips/providers/vehicle_baseline_summary_provider.dart';
 
+import '../../../helpers/hive_temp_dir.dart';
 import '../../../helpers/silence_error_logger.dart';
 import '../support/fake_tanksync_backend.dart';
 import '../support/sync_session_driver.dart';
@@ -45,8 +46,7 @@ void main() {
     await Hive.openBox<String>(HiveBoxes.obd2Baselines);
   });
   tearDownAll(() async {
-    await Hive.close();
-    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    await closeHiveAndDeleteTemp(dir);
   });
   tearDown(() => s.dispose());
 
