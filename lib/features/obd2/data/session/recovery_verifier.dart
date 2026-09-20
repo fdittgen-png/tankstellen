@@ -35,6 +35,13 @@ class RecoveryVerifier {
   /// search and the 15 s staleness fence.
   static const Duration defaultWindow = Duration(seconds: 45);
 
+  /// #4386 — consecutive unverified adoptions after which automatic
+  /// recovery has said everything it can: the window has stopped growing
+  /// (`nextWindow` caps at 4×) and four adapters-in-a-row answered `ATRV`
+  /// with nothing behind it. Past this the honest thing is to say so, not
+  /// to keep a silent ladder running for the rest of the drive.
+  static const int unverifiedCap = 4;
+
   final Duration baseWindow;
   Timer? _timer;
   bool _awaiting = false;
@@ -45,6 +52,10 @@ class RecoveryVerifier {
 
   /// Consecutive adoptions that delivered no engine data.
   int get unverifiedStreak => _unverifiedStreak;
+
+  /// #4386 — automatic recovery is exhausted: [unverifiedCap] adoptions
+  /// in a row proved the adapter and never the car. Cleared by [verify].
+  bool get exhausted => _unverifiedStreak >= unverifiedCap;
 
   /// The window the NEXT adoption gets.
   Duration get nextWindow =>

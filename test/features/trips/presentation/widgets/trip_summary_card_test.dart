@@ -242,7 +242,10 @@ void main() {
           isEv: false,
         ),
       );
-      expect(find.text('6.4 L/100 km'), findsOneWidget);
+      // #4330 — the seeded figure carries no provenance tag, so the
+      // canonical contract classes it `estimated` and the card marks it;
+      // only an attestably measured figure renders bare.
+      expect(find.text('≈ 6.4 L/100 km'), findsOneWidget);
       expect(find.textContaining('kWh'), findsNothing);
     });
 
@@ -257,7 +260,7 @@ void main() {
           isEv: true,
         ),
       );
-      expect(find.text('18.4 kWh/100 km'), findsOneWidget);
+      expect(find.text('≈ 18.4 kWh/100 km'), findsOneWidget); // #4330
       // The fuel-mode unit must NOT leak into the EV row.
       expect(find.textContaining('L/100 km'), findsNothing);
     });

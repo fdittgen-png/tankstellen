@@ -29,6 +29,8 @@ class _Scanner implements Obd2ReattachSource {
   Future<void> stop() async {}
   @override
   set onPassiveWait(VoidCallback? callback) {}
+  @override
+  set onOwnerState(Obd2RecoveryOwnerStateCallback? callback) {} // #4385
 
   @override
   set adoptionGate(Obd2AdoptionGate? gate) {}
@@ -181,6 +183,74 @@ void main() {
         reason: 'an alternator at 14 V is a running engine whatever the '
             'bus says — the silent verdict is the livelock, not a parked car');
     expect(ctl.currentState, TripRecordingControllerState.recording);
+    await ctl.stop();
+  });
+
+  /// #4384 (Epic #4195) — the mid-trip silent-bus verdict. A bus that
+  /// stops answering with the alternator gone reads `asleep` whatever the
+  /// car is doing; on a MOVING car that is a broken adapter, and calling
+  /// it engine-off shows "Engine off — waiting" to a driver at 95 km/h
+  /// and (through `_dropTail`) parks the one reconnect owner.
+  ///
+  /// [moving] stamps the motion rung the recording publishes (#4383).
+  Future<TripRecordingController> silentBusMidTrip({
+    required bool moving,
+  }) async {
+    final responses = parkedResponses()..['0100'] = '41 00 BE 3E B8 11>';
+    final transport = FakeObd2Transport(responses);
+    final svc = Obd2Service(transport);
+    await svc.connect();
+    await svc.discoverSupportedPids();
+    final nowValue = DateTime(2026, 9, 18, 8);
+    final ctl = TripRecordingController(
+      service: svc,
+      pollInterval: const Duration(minutes: 1), // no background ticks
+      vehicleId: 'car-mute-elm',
+      pausedRepo: pausedRepo,
+      historyRepo: historyRepo,
+      pauseGraceWindow: const Duration(hours: 1),
+      silentReconnectWindow: Duration.zero,
+      pinnedAdapterMac: 'AA:BB:CC:DD:EE:FF',
+      reconnectScannerFactory: (mac, onReconnect) => _Scanner(),
+      now: () => nowValue,
+    );
+    ctl.updateGpsFix(
+        latitude: 48.85, longitude: 2.35, speedKmh: 95, fixAt: nowValue);
+    await ctl.start();
+
+    // What the ~10 s `ATRV` watch reads once the ELM goes mute: battery
+    // voltage, no alternator. Then the recording's own movement evidence
+    // (#4383) — the only live signal left — and the drop detector's 50
+    // consecutive null parses, which fire `_onSilentFailure`.
+    final power = Obd2VehiclePower.instance;
+    power.noteVoltage(12.4);
+    if (moving) power.noteMotion();
+    for (var i = 0; i < 50; i++) {
+      ctl.debugObserveHighPriorityParse(null);
+    }
+    expect(power.asleep, isTrue,
+        reason: 'precondition: 12.4 V + a silent bus = asleep, and motion '
+            'does not change the fused state (#3599)');
+    expect(power.lastVoltageV, isNotNull,
+        reason: 'precondition: the #3859 verdict needs voltage evidence');
+    return ctl;
+  }
+
+  test('#4384 — a mute bus at road speed classifies as silentFailure, '
+      'never engineOff', () async {
+    final ctl = await silentBusMidTrip(moving: true);
+    expect(ctl.dropReason, TripDropReason.silentFailure,
+        reason: '#4195 invariant 7 inverted: the car IS running, so the '
+            'silent bus is the adapter failing, not the engine stopping');
+    expect(ctl.currentState, TripRecordingControllerState.degradedGpsOnly,
+        reason: 'GPS recording continues either way (invariant 1)');
+    await ctl.stop();
+  });
+
+  test('#4384 — a genuinely parked car still parks as engineOff', () async {
+    final ctl = await silentBusMidTrip(moving: false);
+    expect(ctl.dropReason, TripDropReason.engineOff,
+        reason: 'no motion term → the #3859 verdict is untouched');
     await ctl.stop();
   });
 }

@@ -21,6 +21,7 @@ import '../domain/services/obd2_gps_estimate_fallback.dart';
 import 'obd2_breadcrumb_provider.dart';
 import 'obd2_controller_phase_mapper.dart';
 import 'obd2_reconnect_provider.dart';
+import 'obd2_recording_movement_wake.dart';
 import 'obd2_supervised_teardown.dart';
 import '../data/obd2_comm_diagnostics.dart';
 
@@ -44,7 +45,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     required this._readOemPidsFlag,
     required this._readDiagnosticCaptureFlag,
     this._startWatchdog = kObd2TripStartWatchdog, this._baselinesBudget = kObd2TripStartBaselinesBudget,
-  });
+    Obd2RecordingMovementWake? movementWake, // #4383 — injectable for tests
+  }) : _movementWakeOverride = movementWake;
 
   final Ref _ref;
   final Obd2RecordingPipelineHost _host;
@@ -58,6 +60,11 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   final bool Function() _readDiagnosticCaptureFlag;
   final Duration _startWatchdog; // #3382 trip-start abort budgets
   final Duration _baselinesBudget;
+  final Obd2RecordingMovementWake? _movementWakeOverride;
+  // #4383 — the recording's GPS speed nudges the ONE owner's wake() and
+  // stamps the power model's motion rung (same throttle as GPS-only).
+  late final Obd2RecordingMovementWake _movementWake =
+      _movementWakeOverride ?? Obd2RecordingMovementWake.forRef(_ref);
 
   Obd2Service? _service;
   // #3500 — per-trip IMU fusion (shared with the GPS-only pipeline); the
@@ -138,9 +145,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
           _service = svc;
           _controller?.replaceService(svc);
         },
-        // #2565/#3014 — read the live transport kind + adapter name at
-        // handle-drop time, so the reconnect dispatches over the SAME
-        // transport and the trace headline names the adapter.
+        // #2565/#3014 — live transport kind + adapter name at handle-drop
+        // time: same transport for the reconnect, adapter in the headline.
         readLinkKind: () => _service?.linkKind,
         readAdapterName: () => _service?.adapterName,
       ),
@@ -203,6 +209,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     _liveSub = ctl.live.listen((reading) {
       // #3500 — feed real vehicle speed to the fusion's min-speed gate.
       _imuFusion?.feedSpeedKmh(reading.speedKmh);
+      _movementWake.onSpeed(reading.speedKmh); // #4383 — GPS while degraded
       // #2261 — deferred `0902` capability probe, one-shot fire-and-forget.
       if (!_capabilityReconcileKicked) {
         _capabilityReconcileKicked = true;
@@ -210,10 +217,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       }
       final classified = _baselines.recordAndClassify(reading);
       _haptics.fireForBandTransition(_host.state.band, classified.band);
-      // #2506 — surface the GPS coaching hint the controller computed on a
-      // no-fuel-PID tick. `MinimalDriveSummary` swaps to the GPS coaching
-      // triplet when `reading.fuelRateLPerHour == null` and reads
-      // `state.gpsCoachingHint`. Null (measured fuel / no hint) clears it.
+      // #2506 — the GPS coaching hint of a no-fuel-PID tick; MinimalDrive-
+      // Summary reads `state.gpsCoachingHint`. Null (measured / none) clears.
       final gpsHint = ctl.latestGpsCoachingHint;
       _host.state = _host.state.copyWith(
         phase: phaseForController(ctl),
@@ -354,15 +359,12 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         sessionJournal: sessionJournal,
       );
     }
-    // #1303 / #4311 / #4328 — the WAL row exists exactly while the trip is
-    // not in history: it goes once the write landed, never after a failed
-    // one, and a self-finalised trip's own save already retired it.
+    // #1303 / #4311 / #4328 — the WAL row goes once the write landed, never
+    // after a failed one; a self-finalised trip's own save already retired it.
     if (!finalised && outcome.isSettled) await _host.clearActiveSnapshot();
-    // #2548 — third beat, shown ONLY when cloud sync is on (the upload
-    // saveToHistory kicked off is fire-and-forget, so it is worded
-    // "Syncing in background…" and never blocks the resolve; sync-off
-    // resolves straight to the outcome). The gate read must never derail
-    // the save flow.
+    // #2548 — third beat, ONLY when cloud sync is on (the fire-and-forget
+    // upload is worded "Syncing in background…" and never blocks the
+    // resolve). The gate read must never derail the save flow.
     try {
       if (!finalised && _ref.read(tripsSyncEnabledProvider)) {
         _host.setSaveStage(TripSaveStage.syncingToCloud);
@@ -376,8 +378,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     await _baselines.flushAndSync();
     // #1312 — clear the captured adapter identity once persisted.
     _adapterMac = _adapterName = _adapterFirmware = null;
-    // #3527 — keep-link: a supervisor-owned service stays connected at
-    // trip end (see obd2_supervised_teardown.dart for the rationale).
+    // #3527 keep-link (rationale in obd2_supervised_teardown.dart).
     await teardownServiceRespectingSupervisor(_ref, svc);
     _service = null;
     _host.state = _host.state.copyWith(
@@ -385,6 +386,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         clearSaveStage: true, // #4311 S2 — a save stage never outlives the save
         clearDropReason: true,
         reconnectPassiveWaiting: false,
+        linkOwnerParked: false, // #4385
         parkedPromptDue: false);
     return StoppedTripResult(
       summary: summary,

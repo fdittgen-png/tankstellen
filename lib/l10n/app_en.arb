@@ -7654,6 +7654,10 @@
   "@obd2WaitingForEngineBanner": {
     "description": "Calm floating pill on the trip-recording screen (#3858/#3859, Epic #3855) while the car's engine is off — either the recording started before the engine, or the driver switched it off with the recording still running. GPS keeps recording; engine data attaches by itself when the engine starts. Not an error."
   },
+  "obd2AdapterNotRespondingBanner": "Adapter not responding — still recording with GPS",
+  "@obd2AdapterNotRespondingBanner": {
+    "description": "Floating pill on the trip-recording screen (#4386, Epic #4195) once automatic OBD2 recovery is exhausted: the adapter keeps answering, but four reconnections in a row delivered no engine data, so the app stops implying a reconnect is imminent. The trip is NOT lost — GPS recording continues — and the pill's Reset action stays as the one thing left to try."
+  },
   "obd2StartEngineToReconnect": "Start the engine to reconnect",
   "@obd2StartEngineToReconnect": {
     "description": "Replaces the 'Reset connection' button on the OBD2 pause banner while the vehicle power model says the car is asleep (#3860): a reset would only dial a sleeping adapter. States what is actually needed."

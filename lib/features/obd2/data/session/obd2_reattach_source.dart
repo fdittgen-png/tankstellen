@@ -33,6 +33,12 @@ abstract class Obd2ReattachSource {
   /// so the UI can swap the busy "reconnecting" banner copy.
   set onPassiveWait(VoidCallback? callback);
 
+  /// #4385 — invoked on every CHANGE of what the one recovery owner is
+  /// doing, so the trip can journal the episode (#4195 invariant 8) and
+  /// the banner can stop claiming "reconnecting" while the owner is
+  /// parked. A pure notification: the trip still never dials.
+  set onOwnerState(Obd2RecoveryOwnerStateCallback? callback);
+
   /// #3915 — the trip's adoption gate: which instances it refuses, and
   /// the notification of each adoption. Null = adopt anything live.
   set adoptionGate(Obd2AdoptionGate? gate);
@@ -46,6 +52,27 @@ abstract class Obd2ReattachSource {
   /// Current backoff in milliseconds (telemetry).
   int get currentBackoffMs;
 }
+
+/// #4385 (Epic #4195) — what the ONE reconnect owner is doing while the
+/// trip records degraded. Not a second state machine: a projection of
+/// [Obd2LinkSupervisor]'s own state for the journal and the banner.
+enum Obd2RecoveryOwnerState {
+  /// Dialing, or holding a link the trip has not adopted yet.
+  working,
+
+  /// Parked in `engineOff` — zero dials until a wake trigger (#3859).
+  parked,
+
+  /// In the #3603 storm cadence: dials are minutes apart.
+  standingDown,
+}
+
+/// Signature of [Obd2ReattachSource.onOwnerState]: the new owner state
+/// plus a short free-text detail for the journal.
+typedef Obd2RecoveryOwnerStateCallback = void Function(
+  Obd2RecoveryOwnerState state,
+  String detail,
+);
 
 /// #3915 (Epic #3914) — the trip layer's say over WHICH instance a
 /// reattach may hand it. The [DroppedSessionManager] owns the policy
@@ -100,6 +127,8 @@ class SupervisorReattachSource implements Obd2ReattachSource {
   StreamSubscription<Obd2LinkState>? _sub;
   Timer? _revalidate;
   VoidCallback? _onPassiveWait;
+  Obd2RecoveryOwnerStateCallback? _onOwnerState;
+  Obd2RecoveryOwnerState? _lastOwnerState;
   Obd2AdoptionGate? _gate;
   bool _passiveNotified = false;
   bool _fired = false;
@@ -114,6 +143,7 @@ class SupervisorReattachSource implements Obd2ReattachSource {
     if (_sub != null || _fired) return;
     _stopped = false;
     _sub = _supervisor.states.listen((next) {
+      _publishOwnerState(); // #4385 — before the ready short-circuit
       if (next == Obd2LinkState.ready) {
         _poke();
         return;
@@ -143,6 +173,10 @@ class SupervisorReattachSource implements Obd2ReattachSource {
   /// `engineOff` waits for a wake trigger.
   void _poke() {
     if (_fired || _probing) return;
+    // #4385 — the revalidate tick is also the level read of what the
+    // owner is doing: a supervisor already parked when the trip started
+    // watching emits no transition at all (the #3777 shape).
+    _publishOwnerState();
     if (_supervisor.state.value != Obd2LinkState.ready) return;
     final svc = _supervisor.service;
     if (svc == null || !svc.isConnected) {
@@ -210,8 +244,32 @@ class SupervisorReattachSource implements Obd2ReattachSource {
     _sub = null;
   }
 
+  /// #4385 — one edge per CHANGE of the owner's disposition.
+  void _publishOwnerState() {
+    if (_fired || _stopped) return;
+    final next = switch (_supervisor.state.value) {
+      Obd2LinkState.engineOff => Obd2RecoveryOwnerState.parked,
+      Obd2LinkState.reconnecting when _supervisor.inStandDown =>
+        Obd2RecoveryOwnerState.standingDown,
+      _ => Obd2RecoveryOwnerState.working,
+    };
+    if (next == _lastOwnerState) return;
+    _lastOwnerState = next;
+    _onOwnerState?.call(next, switch (next) {
+      Obd2RecoveryOwnerState.parked => 'link owner parked — engine off',
+      Obd2RecoveryOwnerState.standingDown =>
+        'attempt ${_supervisor.attemptNumber}, '
+            'next dial in ~${_supervisor.currentBackoffMs ~/ 1000}s',
+      Obd2RecoveryOwnerState.working => 'link owner dialing',
+    });
+  }
+
   @override
   set onPassiveWait(VoidCallback? callback) => _onPassiveWait = callback;
+
+  @override
+  set onOwnerState(Obd2RecoveryOwnerStateCallback? callback) =>
+      _onOwnerState = callback;
 
   @override
   set adoptionGate(Obd2AdoptionGate? gate) => _gate = gate;

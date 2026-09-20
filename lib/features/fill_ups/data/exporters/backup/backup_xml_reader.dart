@@ -4,6 +4,7 @@
 import 'package:xml/xml.dart';
 
 import 'backup_xml_element_helpers.dart';
+import 'backup_xml_trip_provenance.dart';
 
 import '../../../../ev/domain/entities/charging_log.dart';
 import '../../../../../core/domain/fuel_type.dart';
@@ -276,6 +277,8 @@ class BackupXmlReader {
       }
     }
 
+    // #4330 — the figure's provenance; all-null for a pre-#4330 backup.
+    final provenance = readTripProvenance(summaryEl);
     final summary = TripSummary(
       distanceKm: reqDouble(summaryEl, 'DistanceKm'),
       maxRpm: reqDouble(summaryEl, 'MaxRpm'),
@@ -292,6 +295,10 @@ class BackupXmlReader {
       secondsBelowOptimalGear: readDouble(summaryEl, 'SecondsBelowOptimalGear'),
       kind: TripKind.fromWireName(readText(summaryEl, 'Kind')),
       harshEvents: harshEvents,
+      pumpGainApplied: provenance.pumpGainApplied,
+      pumpGainFuelKey: provenance.pumpGainFuelKey,
+      dominantFuelSource: provenance.dominantFuelSource,
+      consumptionVersion: provenance.consumptionVersion,
     );
 
     final samples = <TripSample>[];

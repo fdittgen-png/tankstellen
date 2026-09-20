@@ -199,7 +199,13 @@ extension Obd2LinkSupervisorActions on Obd2LinkSupervisor {
     // movement / resume) wakes the loop exactly as an engine-off
     // classification always did. This costs nothing on the reliability
     // floor: with no evidence the model is `unknown`, not `asleep`.
-    if (_vehiclePower.asleep) {
+    // #4384 — a silent bus alone reads `asleep` on a MOVING car too (a
+    // mute ELM ages the voltage stamp out at road speed), and parking
+    // then is the #4195 class-3 failure: the one owner stops dialing on
+    // a car that is demonstrably running. Fresh motion (#4383 publishes
+    // it) vetoes the park; it never asserts the engine, only that this
+    // is not a car sleeping in a car park.
+    if (_vehiclePower.asleep && !_vehiclePower.motionFresh) {
       BreadcrumbCollector.add(
         'OBD2 link drop',
         detail: '$reason — car asleep (${_vehiclePower.detail}), '

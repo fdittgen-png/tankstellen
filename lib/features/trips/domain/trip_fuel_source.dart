@@ -27,6 +27,17 @@ const Set<String> kMeasuredFuelSourceTags = {'pid9D', 'pidA2', 'pid5E'};
 /// `FuelRateSourceTag` names that mean "estimated from air mass".
 const Set<String> kEstimatedFuelSourceTags = {'maf66', 'maf', 'speedDensity'};
 
+/// #4330 — the provenance an OBD2 trip's figure carries when the
+/// adapter+ECU supported NO fuel PID and `Obd2GpsEstimateFallback`
+/// back-filled it from GPS road-load physics (#2431).
+///
+/// It is not a `FuelRateSourceTag`: no per-sample stamp can carry it,
+/// because the samples that produced it have no engine fuel signal at
+/// all — that is the whole point. It is written onto the summary by the
+/// fallback itself, so the figure's class survives into a summary-only
+/// history row exactly like the engine branches do.
+const String kGpsPhysicsFuelSourceTag = 'gpsPhysics';
+
 /// The branch that produced the MOST fuel-carrying samples, by the
 /// per-sample provenance stamp ([TripSample.fuelSource]); null when no
 /// sample carries one (legacy / GPS-only trips). Stamped onto
@@ -68,6 +79,11 @@ TripFuelSourceKind tripFuelSourceKind(TripSummary summary) {
   if (summary.kind == TripKind.gpsOnly) return TripFuelSourceKind.gps;
   final dominant = summary.dominantFuelSource;
   if (dominant != null) {
+    // #4330 — an OBD2 trip whose adapter supported no fuel PID: the
+    // figure IS the GPS-physics estimate, so the class is `gps`, not the
+    // `none` it fell through to before (which labelled a figure the
+    // trip plainly shows as "no per-distance fuel figure exists").
+    if (dominant == kGpsPhysicsFuelSourceTag) return TripFuelSourceKind.gps;
     if (kMeasuredFuelSourceTags.contains(dominant)) {
       return TripFuelSourceKind.measured;
     }

@@ -24,6 +24,12 @@ enum RecordingSessionEventKind {
   /// The supervisor parked the link as engine-off.
   linkEngineOff,
 
+  /// #4385 — the one reconnect owner entered its stand-down (storm)
+  /// cadence while the trip was degraded: dials are minutes apart, not
+  /// seconds. Detail = the attempt + the wait, so the timeline says why
+  /// nothing happened for the next quarter hour.
+  linkStandDown,
+
   /// A quiet-window vehicle-protocol establishment/recovery began (#3783).
   protocolEstablish,
 
@@ -53,6 +59,11 @@ enum RecordingSessionEventKind {
   /// #4196 — the adopted link delivered no engine data in its window and
   /// was handed back to the owner. Detail = the consecutive count.
   recoveryUnverified,
+
+  /// #4386 — automatic recovery is exhausted: the unverified streak hit
+  /// its cap, so the app stops implying a reconnect is imminent and
+  /// offers the one manual action instead. Detail = the streak.
+  recoveryExhausted,
 
   /// #3915 — the same `Obd2Service` instance was rebound and dropped
   /// again twice within a minute: the trip refuses it for the rest of

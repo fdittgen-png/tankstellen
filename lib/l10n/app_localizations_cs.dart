@@ -7284,6 +7284,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Čeká se na motor — záznam pomocí GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Nastartujte motor pro opětovné připojení';
 

@@ -7271,6 +7271,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Venter på motoren — optager med GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect => 'Start motoren for at genforbinde';
 
   @override

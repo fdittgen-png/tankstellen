@@ -140,6 +140,36 @@ void main() {
           reason: 'the honest outcome snackbar surfaces');
     });
 
+    testWidgets(
+        '#4386 — once automatic recovery is exhausted the pill says so, '
+        'and its Reset — the one action left — is tappable', (tester) async {
+      final fake = _FakeTripRecording(
+        const TripRecordingState(
+          phase: TripRecordingPhase.degradedGpsOnly,
+          recoveryExhausted: true,
+        ),
+      );
+      await pumpApp(
+        tester,
+        const _Host(),
+        overrides: [tripRecordingProvider.overrideWith(() => fake)],
+      );
+      await tester.pump(_pastDebounce);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Adapter not responding — still recording with GPS'),
+          findsOneWidget);
+      expect(find.text('Recording with GPS — OBD2 reconnecting'), findsNothing,
+          reason: 'four adoptions proved the adapter and none proved the '
+              'car — claiming a reconnect is in progress is a lie');
+
+      // #3676/#3678 — the one actionable hint stays, and works.
+      await tester.tap(find.byKey(const Key('gpsDegradedBannerReset')));
+      await tester.pumpAndSettle();
+      expect(fake.stopCalls, 0, reason: 'GPS recording is never interrupted');
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+
     testWidgets('the pause banner does NOT render in degradedGpsOnly — '
         'the two banners are mutually exclusive', (tester) async {
       final fake = _FakeTripRecording(

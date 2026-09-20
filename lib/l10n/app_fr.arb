@@ -6909,5 +6909,9 @@
   "refuelPlanEvidenceIncomplete": "Certaines stations ont été écartées — masquées par vous, ou absentes de la source de ce pays — c'est donc la meilleure parmi les autres.",
   "refuelPlanReferencePricesSkipped": "{count, plural, =1{1 prix de référence pour ce secteur n'est pas un endroit où s'arrêter} other{{count} prix de référence pour ce secteur ne sont pas des endroits où s'arrêter}}",
   "carbonCo2ScopeWellToWheel": "Du puits à la roue",
-  "carbonCo2FactorSource": "Facteurs : {source}"
+  "carbonCo2FactorSource": "Facteurs : {source}",
+  "obd2AdapterNotRespondingBanner": "L'adaptateur ne répond pas — enregistrement GPS en cours",
+  "@obd2AdapterNotRespondingBanner": {
+    "description": "MT — needs native review"
+  }
 }

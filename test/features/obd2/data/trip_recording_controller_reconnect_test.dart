@@ -1236,6 +1236,9 @@ class _ObservableScanner implements Obd2ReattachSource {
   VoidCallback? onPassiveWait;
 
   @override
+  Obd2RecoveryOwnerStateCallback? onOwnerState; // #4385
+
+  @override
   Obd2AdoptionGate? adoptionGate;
 
   @override
@@ -1275,6 +1278,8 @@ class _DelayedReattachSource implements Obd2ReattachSource {
 
   @override
   set onPassiveWait(VoidCallback? callback) {}
+  @override
+  set onOwnerState(Obd2RecoveryOwnerStateCallback? callback) {} // #4385
 
   @override
   set adoptionGate(Obd2AdoptionGate? gate) {}

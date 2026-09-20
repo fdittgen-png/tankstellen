@@ -110,6 +110,19 @@ mixin _TripRecordingSummary on _TripRecordingTelemetryIngest {
           _liveSampleSnapshot.lastPumpGainResolution?.gain ?? _vehicle?.pumpGain,
       pumpGainFuelKey:
           _liveSampleSnapshot.lastPumpGainResolution?.requestedFuelKey,
+      // #4330 (#4233 follow-up) — stamp the model the figure came out of,
+      // for every finalise path this method serves: OBD2 measured and
+      // estimated trips, the grace-window expiry, a recovered snapshot and
+      // a paused recovery all used to persist `cmv: null`. No figure, no
+      // stamp — a version on nothing would be provenance for nothing.
+      consumptionVersion: avg == null && base.fuelLitersConsumed == null
+          ? null
+          : tripConsumptionVersion(
+              pumpGainApplied:
+                  _liveSampleSnapshot.lastPumpGainResolution?.gain ??
+                      _vehicle?.pumpGain,
+              resolution: _liveSampleSnapshot.lastPumpGainResolution,
+            ),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/utils/unit_formatter.dart';
+import '../../../../core/utils/data_value_labels.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../data/trip_history_repository.dart';
@@ -67,7 +68,8 @@ class TrajetRow extends StatelessWidget {
     final avgUnit = isEv ? 'kWh/100 km' : 'L/100 km';
     final figures = CalibratedTripFigures.of(s, vehicle);
     // #4233 — the L/100 km through the canonical adapter (ADR 0024 §7).
-    final avg = tripConsumptionEstimate(s, vehicle).litresPer100Km.valueOrNull;
+    final consumption = tripConsumptionEstimate(s, vehicle).litresPer100Km;
+    final avg = consumption.valueOrNull;
     // Compact density on landscape / tablet widths — drops the
     // per-row vertical margin from 3 → 1 dp and the inner padding
     // from (12, 8) → (10, 4) so a 600+ dp viewport shows ~50 % more
@@ -166,14 +168,17 @@ class TrajetRow extends StatelessWidget {
                         // #3918 — the consumption figure is re-expressed
                         // at the vehicle's CURRENT pump gain (display
                         // only); #3919 — the fuel-source chip follows it.
-                        // #3576 — a persisted GPS-physics estimate alone is
-                        // `~`-prefixed; #4233 keeps that rule exactly.
+                        // #4330 — the estimate marker comes from the
+                        // canonical contract's own provenance, not from
+                        // "is the stored avg null": a GPS batch figure and
+                        // a MAF figure are estimates too, and were showing
+                        // bare. `qualify` marks every one of them, once.
                         if (avg != null)
                           _Chip(
                             icon: Icons.eco,
                             text: l.trajetsRowAvgConsumption(
-                              '${s.avgLPer100Km == null ? '~' : ''}'
-                              '${UnitFormatter.formatDecimal(avg)}',
+                              consumption.qualify(
+                                  l, (v) => UnitFormatter.formatDecimal(v)),
                               avgUnit,
                             ),
                           ),

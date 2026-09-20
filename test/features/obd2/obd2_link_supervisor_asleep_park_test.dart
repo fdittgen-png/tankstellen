@@ -165,4 +165,65 @@ void main() {
       unawaited(sup.dispose());
     });
   });
+
+  test(
+      '#4384 — the SAME asleep verdict on a moving car dials: a mute bus '
+      'at road speed is a broken link, never a parked car', () {
+    fakeAsync((async) {
+      dialer.enqueue(_liveService());
+      final sup = build();
+      unawaited(sup.connect());
+      async.flushMicrotasks();
+      final callsAfterConnect = dialer.calls;
+
+      // The class-3 shape: the ELM stops answering, the voltage stamp
+      // ages past its window and the bus probe is silent, so the fused
+      // model reads `asleep` — while the recording's GPS says 95 km/h
+      // (#4383 stamps the motion rung for exactly this).
+      power.noteVoltage(12.4);
+      power.noteBusSilent();
+      power.noteMotion();
+      expect(power.asleep, isTrue,
+          reason: 'the fused STATE is unchanged by motion (#3599)');
+      expect(power.motionFresh, isTrue);
+
+      drops.add(const Obd2LinkDropEvent(
+          transportKind: 'classic', mac: 'AA', reason: 'socket closed'));
+      async.flushMicrotasks();
+
+      expect(sup.state.value, isNot(Obd2LinkState.engineOff),
+          reason: '#4195 invariant 7 — the car is demonstrably running; '
+              'parking the ONE owner here is the class-3 failure');
+      expect(dialer.calls, callsAfterConnect + 1,
+          reason: 'the ordinary drop ladder runs');
+      expect(sup.state.value, Obd2LinkState.ready);
+      unawaited(sup.dispose());
+    });
+  });
+
+  test('#4384 — motion that has aged out parks exactly as before', () {
+    fakeAsync((async) {
+      dialer.enqueue(_liveService());
+      final sup = build();
+      unawaited(sup.connect());
+      async.flushMicrotasks();
+      final callsAfterConnect = dialer.calls;
+
+      power.noteMotion(); // the drive that has since ended
+      nowValue = nowValue.add(power.motionWindow);
+      power.noteVoltage(12.4);
+      power.noteBusSilent();
+      expect(power.motionFresh, isFalse);
+
+      drops.add(const Obd2LinkDropEvent(
+          transportKind: 'classic', mac: 'AA', reason: 'socket closed'));
+      async.flushMicrotasks();
+      async.elapse(const Duration(minutes: 2));
+
+      expect(sup.state.value, Obd2LinkState.engineOff);
+      expect(dialer.calls, callsAfterConnect,
+          reason: 'the #3859 zero-dial park is untouched by #4384');
+      unawaited(sup.dispose());
+    });
+  });
 }

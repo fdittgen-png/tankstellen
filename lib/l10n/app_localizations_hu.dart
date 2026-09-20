@@ -7309,6 +7309,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Várakozás a motorra — rögzítés GPS-szel';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Indítsd be a motort az újracsatlakozáshoz';
 

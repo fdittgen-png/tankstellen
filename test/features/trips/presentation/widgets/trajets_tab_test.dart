@@ -727,7 +727,9 @@ void main() {
         activeVehicle: combustionVehicle,
       );
 
-      expect(find.text('6,4 L/100 km'), findsOneWidget);
+      // #4330 — no provenance tag on the seeded figure, so the contract
+      // classes it `estimated` and the row marks it.
+      expect(find.text('≈ 6,4 L/100 km'), findsOneWidget);
       expect(find.textContaining('kWh'), findsNothing);
     });
 
@@ -749,7 +751,7 @@ void main() {
         activeVehicle: evVehicle,
       );
 
-      expect(find.text('18,5 kWh/100 km'), findsOneWidget);
+      expect(find.text('≈ 18,5 kWh/100 km'), findsOneWidget); // #4330
       expect(find.textContaining('L/100 km'), findsNothing);
     });
   });

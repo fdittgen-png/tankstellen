@@ -7327,6 +7327,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Изчакване на двигателя — запис с GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Запалете двигателя за повторно свързване';
 

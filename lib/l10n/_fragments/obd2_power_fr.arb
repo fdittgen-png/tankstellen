@@ -1,0 +1,6 @@
+{
+  "obd2AdapterNotRespondingBanner": "L'adaptateur ne répond pas — enregistrement GPS en cours",
+  "obd2WaitingForEngineBanner": "En attente du moteur — enregistrement par GPS",
+  "obd2StartEngineToReconnect": "Démarrez le moteur pour vous reconnecter",
+  "obd2ResetConnectionEngineOff": "Moteur éteint — démarrez-le pour vous reconnecter"
+}
