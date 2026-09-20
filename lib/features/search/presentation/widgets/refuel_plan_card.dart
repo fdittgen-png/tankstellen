@@ -23,6 +23,8 @@
 /// withhold it (economics spec §4.1).
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -31,7 +33,9 @@ import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/section_card.dart';
+import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../providers/refuel_plan_applier.dart';
 import '../../providers/refuel_plan_candidates.dart';
 import '../../providers/refuel_plan_provider.dart';
 import 'refuel_plan_block.dart';
@@ -70,11 +74,40 @@ class RefuelPlanCard extends ConsumerWidget {
             tradeOff: cheapest == null || identical(distinct[i], cheapest)
                 ? null
                 : plans.tradeOff(distinct[i], cheapest),
+            onApply: () => unawaited(_apply(context, ref, distinct[i], state)),
           ),
         ],
         _Caveats(state: state),
       ],
     );
+  }
+
+  /// Hand [plan] to navigation through the injected launcher, gated
+  /// exactly as every station action is (#4348), and say what happened.
+  static Future<void> _apply(
+    BuildContext context,
+    WidgetRef ref,
+    RefuelPlan plan,
+    RefuelPlanState state,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final applier = ref.read(refuelPlanApplierProvider);
+    final result = await applier.apply(plan, state.candidates);
+    if (!context.mounted) return;
+    switch (result.refusal) {
+      case null:
+        SnackBarHelper.showSuccess(context,
+            l10n.refuelPlanApplyOpened(result.launch!.planStops.length));
+      case RefuelPlanApplyRefusal.referenceLocation:
+        SnackBarHelper.showError(
+            context, l10n.refuelPlanApplyRefusedReference);
+      case RefuelPlanApplyRefusal.providerUnavailable:
+        SnackBarHelper.showError(
+            context, l10n.refuelPlanApplyRefusedUnavailable);
+      case RefuelPlanApplyRefusal.noRoute:
+      case RefuelPlanApplyRefusal.launchFailed:
+        SnackBarHelper.showError(context, l10n.refuelPlanApplyFailed);
+    }
   }
 
   static String _title(AppLocalizations l10n, RefuelObjective objective) =>

@@ -39,7 +39,12 @@ class RefuelPlanBlock extends StatelessWidget {
     required this.plan,
     required this.stationNames,
     this.tradeOff,
+    this.onApply,
   });
+
+  /// Hand this plan's stops to navigation (#4363). Null for a plan with
+  /// nothing to add — a no-stop journey has no stops to apply.
+  final VoidCallback? onApply;
 
   /// Every objective this itinerary is the answer to, already localized.
   /// More than one means the objectives agreed.
@@ -116,6 +121,17 @@ class RefuelPlanBlock extends StatelessWidget {
                 name: stationNames[plan.stops[i].candidate.stationId] ??
                     plan.stops[i].candidate.stationId,
               ),
+          ],
+          if (onApply != null && plan.stops.isNotEmpty) ...[
+            const SizedBox(height: Spacing.xs),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.tonalIcon(
+                onPressed: onApply,
+                icon: const Icon(Icons.alt_route),
+                label: Text(l10n.refuelPlanApply),
+              ),
+            ),
           ],
           if (tradeOff case final trade? when trade.isMaterial) ...[
             const SizedBox(height: Spacing.xs),

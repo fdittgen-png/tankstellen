@@ -162,7 +162,7 @@ final class RefuelDecisionProvider
   }
 }
 
-String _$refuelDecisionHash() => r'5f59de96ff8133936bc6cc57ecbfa6d6e109390d';
+String _$refuelDecisionHash() => r'ccb4ef682cfba8983e2e5a547a38b17b3f366a8d';
 
 /// The three answers for the current result set (#4090, epic #4087).
 ///

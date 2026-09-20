@@ -22,6 +22,7 @@ import '../../../payment/domain/qr_payment_decoder.dart';
 import '../../../payment/presentation/scan_payment_dispatcher.dart';
 import '../../../payment/presentation/widgets/unknown_qr_dialog.dart';
 import '../../../../core/domain/station.dart';
+import '../../../../core/widgets/refuel_compare_button.dart';
 import '../../../sync/presentation/widgets/qr_scanner_screen.dart';
 import '../../providers/station_detail_provider.dart';
 import 'station_brand_helpers.dart';
@@ -83,6 +84,9 @@ class StationDetailAppBarActions extends ConsumerWidget {
             onPressed: () => ReportRoute(stationId).push<void>(context),
             tooltip: l10n.reportPrice,
           ),
+        // #4363 — the detail screen is one of three doors into the SAME
+        // comparison the list and the map write.
+        if (station case final s?) RefuelCompareButton(station: s),
         IconButton(
           icon: AnimatedFavoriteStar(isFavorite: isFav),
           onPressed: () {
@@ -197,3 +201,4 @@ class StationDetailAppBarActions extends ConsumerWidget {
     }
   }
 }
+

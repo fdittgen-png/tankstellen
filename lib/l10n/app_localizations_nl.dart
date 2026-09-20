@@ -542,11 +542,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String refuelPlanStopLine(String litres, String cost) {
-    return 'Buy $litres — $cost';
-  }
-
-  @override
   String refuelPlanGap(String from, String to) {
     return 'No station in range between $from and $to';
   }
@@ -8005,6 +8000,190 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get refuelUnitPerSession => '/sessie';
+
+  @override
+  String get refuelCompareAdd => 'Compare';
+
+  @override
+  String get refuelCompareRemove => 'Remove from comparison';
+
+  @override
+  String get refuelCompareTitle => 'Your comparison';
+
+  @override
+  String refuelCompareCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stations',
+      one: '1 station',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get refuelCompareClear => 'Clear';
+
+  @override
+  String refuelCompareFull(int max) {
+    return 'You can compare up to $max stations';
+  }
+
+  @override
+  String refuelCompareContextLine(
+    String fuel,
+    String quantity,
+    String consumption,
+  ) {
+    return '$fuel · buying $quantity · $consumption';
+  }
+
+  @override
+  String refuelCompareConsumptionEstimated(String consumption) {
+    return '$consumption (estimated)';
+  }
+
+  @override
+  String get refuelCompareConsumptionMissing =>
+      'no consumption yet — add a few fill-ups to see costs';
+
+  @override
+  String get refuelCompareQuantityEdit => 'Change the quantity';
+
+  @override
+  String get refuelCompareOriginMissing =>
+      'Distances are straight-line until a search sets where you are.';
+
+  @override
+  String refuelCompareRowCost(String litres, String cash, String distance) {
+    return 'Buy $litres · $cash · $distance there and back';
+  }
+
+  @override
+  String refuelCompareRowStopCost(String litres, String cash, String distance) {
+    return 'Buy $litres · $cash · $distance off your route';
+  }
+
+  @override
+  String get refuelCompareBaseline => 'Cheapest for this quantity';
+
+  @override
+  String refuelCompareCostsMore(String amount, String station) {
+    return '$amount more than $station';
+  }
+
+  @override
+  String get refuelCompareDistanceApproximate =>
+      'straight-line distance, estimated';
+
+  @override
+  String get refuelCompareDistancePending => 'road distance on its way';
+
+  @override
+  String refuelCompareNoPrice(String fuel) {
+    return 'No price for $fuel here';
+  }
+
+  @override
+  String get refuelCompareOutOfRange => 'Out of reach on what is in the tank';
+
+  @override
+  String get refuelCompareExceedsCapacity =>
+      'That quantity would not fit in the tank';
+
+  @override
+  String get refuelCompareNotCosted =>
+      'Cannot be costed with the current inputs';
+
+  @override
+  String get refuelCompareCurrencyWithheld =>
+      'Prices are in different currencies and no exchange rate is available, so no cheapest is named.';
+
+  @override
+  String get refuelPlanApply => 'Add stops to route';
+
+  @override
+  String refuelPlanApplyOpened(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops added to your route',
+      one: '1 stop added to your route',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get refuelPlanApplyRefusedReference =>
+      'A reference price is not a place to stop at, so this plan cannot be sent to navigation.';
+
+  @override
+  String get refuelPlanApplyRefusedUnavailable =>
+      'This country\'s price source is unavailable, so its stops cannot be sent to navigation.';
+
+  @override
+  String get refuelPlanApplyFailed => 'Could not open navigation';
+
+  @override
+  String get refuelPlanNeedsExchangeRate =>
+      'These prices are in another currency and no exchange rate is available, so no comparable total can be shown.';
+
+  @override
+  String get refuelPlanLeastDrivingTitle => 'Least extra driving';
+
+  @override
+  String refuelPlanStopNamed(int position, String station) {
+    return '$position. $station';
+  }
+
+  @override
+  String refuelPlanStopDetail(String litres, String cost, String arrival) {
+    return 'Buy $litres for $cost · arrive with $arrival';
+  }
+
+  @override
+  String refuelPlanStopNativePrice(String price) {
+    return '$price at the pump';
+  }
+
+  @override
+  String refuelPlanJourneyTotals(String distance, String duration) {
+    return '$distance · $duration';
+  }
+
+  @override
+  String refuelPlanTradeOff(String cost, String minutes, String distance) {
+    return 'Against the cheapest: $cost · $minutes · $distance';
+  }
+
+  @override
+  String refuelPlanNoStopSummary(String litres) {
+    return 'Your tank covers this journey — about $litres used, nothing to buy.';
+  }
+
+  @override
+  String get refuelPlanDetourTimeApproximate =>
+      'Detour times are estimated from the route\'s average speed.';
+
+  @override
+  String get refuelPlanSearchBounded =>
+      'The best of the itineraries compared — this route has more stations than the planner combines.';
+
+  @override
+  String get refuelPlanEvidenceIncomplete =>
+      'Some stations were left out — hidden by you, or not listed by this country\'s source — so this is the best among the rest.';
+
+  @override
+  String refuelPlanReferencePricesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count reference prices for this area are not places you can stop at',
+      one: '1 reference price for this area is not a place you can stop at',
+    );
+    return '$_temp0';
+  }
 
   @override
   String stationCardPriceUnit(String currency) {
