@@ -24,5 +24,15 @@ abstract class RouteWaypoint with _$RouteWaypoint {
     required double lat,
     required double lng,
     required String label,
+
+    /// #4432 — this waypoint is where the VEHICLE is, read from GPS at
+    /// search time, not a place the user named.
+    ///
+    /// The distinction is not cosmetic. An origin that is the driver has
+    /// a direction: everything behind it has been passed and is not a
+    /// candidate (`dropStationsBehindOrigin`). A named city has no
+    /// behind — it has a near side and a far side — so the flag defaults
+    /// to false and every existing caller keeps the old corridor.
+    @Default(false) bool isVehiclePosition,
   }) = _RouteWaypoint;
 }

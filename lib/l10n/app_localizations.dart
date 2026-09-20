@@ -14923,6 +14923,30 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 reference price for this area is not a place you can stop at} other{{count} reference prices for this area are not places you can stop at}}'**
   String refuelPlanReferencePricesSkipped(int count);
 
+  /// The route start field when the current-position origin could NOT be re-read at search time and the previously captured fix is used instead (#4432). The bare 'Current location' label asserted a freshness the coordinate did not have — at motorway speed a four-minute-old fix is five kilometres behind. {age} is the position-age vocabulary the results bar already uses ('< 1 min', '4 min', '2 h', '3 d').
+  ///
+  /// In en, this message translates to:
+  /// **'Current position ({age} ago)'**
+  String routeOriginStaleCurrentLocation(String age);
+
+  /// The distance segment of a station row in a route search (#4432). It is the straight-line offset from the route line to the station — NOT how far the station is from the driver (a stop 60 km ahead can be 4.4 km off the route) and NOT a road detour (leaving and rejoining is driven, not flown). The row used to show a bare '4.4 km' in the same typography a proximity row uses for 'from me'. {distance} is already unit-formatted.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} from the route'**
+  String routeStopOffRoute(String distance);
+
+  /// Short qualifier shown with the off-route figure (#4432): the number is measured on the map, not driven, so it is an estimate of position rather than a routed distance.
+  ///
+  /// In en, this message translates to:
+  /// **'geometric estimate'**
+  String get routeStopOffRouteQualifier;
+
+  /// Long-press / screen-reader sentence on the route row's distance segment, naming the quantity outright and saying which two quantities it is NOT (#4432).
+  ///
+  /// In en, this message translates to:
+  /// **'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.'**
+  String get routeStopOffRouteTooltip;
+
   /// Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').
   ///
   /// In en, this message translates to:

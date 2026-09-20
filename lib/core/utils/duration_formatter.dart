@@ -52,3 +52,22 @@ String formatDriveTimeCompact(AppLocalizations l, Duration d) {
   return l.durationHoursMinutesCompact(
       total ~/ 60, (total % 60).toString().padLeft(2, '0'));
 }
+
+/// The one POSITION-AGE format (#4432) — "how old is this fix".
+///
+/// Coarser than [formatElapsedDuration] on purpose: the question a
+/// driver asks of a coordinate is "is it still me?", and seconds do not
+/// change the answer. `< 1 min` · `4 min` · `2 h` · `3 d`, the exact
+/// vocabulary the results summary bar's position pill has shown since
+/// #4063 — extracted here so the route origin's own staleness label
+/// cannot drift into a second dialect of the same fact.
+///
+/// Takes a [Duration] rather than a timestamp so the caller supplies the
+/// clock (`appClockProvider`), not this function.
+String formatPositionAge(AppLocalizations l, Duration age) {
+  final d = age.isNegative ? Duration.zero : age;
+  if (d.inMinutes < 1) return l.positionAgeUnderMinute;
+  if (d.inMinutes < 60) return l.durationMinutesShort(d.inMinutes);
+  if (d.inHours < 24) return l.positionAgeHours(d.inHours);
+  return l.positionAgeDays(d.inDays);
+}

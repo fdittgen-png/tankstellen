@@ -28,6 +28,7 @@ import '../../../../core/domain/search_mode.dart';
 import '../../providers/radar_pin_provider.dart';
 import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
+import '../../providers/refresh_active_search.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/selected_station_provider.dart';
 import '../widgets/radar_pin_help_sheet.dart';
@@ -153,7 +154,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     // post-await ref.read throws a StateError if the screen unmounted
     // while the dialog was up.
     final positionNotifier = ref.read(userPositionProvider.notifier);
-    final searchNotifier = ref.read(searchStateProvider.notifier);
 
     var consented = LocationConsentDialog.hasConsent(settings);
     if (!consented) {
@@ -177,7 +177,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         }
       }
     }
-    unawaited(searchNotifier.repeatLastSearch());
+    // #4432 — dispatch by what is on screen: a route refresh re-runs
+    // the route (re-resolving a current-position origin), a nearby one
+    // replays the proximity search as before.
+    if (!mounted) return;
+    unawaited(refreshActiveSearch(ref));
   }
 
   // ---------------------------------------------------------------------------

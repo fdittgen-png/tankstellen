@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/location/user_position_provider.dart';
+import '../../../../core/utils/duration_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'results/summary_chip.dart';
 
@@ -23,14 +24,11 @@ class UserPositionBar extends ConsumerWidget {
   const UserPositionBar({super.key, this.onUpdatePosition});
 
   /// #4063 — the age label is user-facing text; its unit abbreviations
-  /// come from ARB like every other string.
-  String _formatAge(AppLocalizations l, DateTime updatedAt) {
-    final diff = DateTime.now().difference(updatedAt);
-    if (diff.inMinutes < 1) return l.positionAgeUnderMinute;
-    if (diff.inMinutes < 60) return l.durationMinutesShort(diff.inMinutes);
-    if (diff.inHours < 24) return l.positionAgeHours(diff.inHours);
-    return l.positionAgeDays(diff.inDays);
-  }
+  /// come from ARB like every other string. #4432 — the banding moved to
+  /// [formatPositionAge] so the route origin's staleness label speaks the
+  /// same dialect; the wall-clock read stays here.
+  String _formatAge(AppLocalizations l, DateTime updatedAt) =>
+      formatPositionAge(l, DateTime.now().difference(updatedAt));
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

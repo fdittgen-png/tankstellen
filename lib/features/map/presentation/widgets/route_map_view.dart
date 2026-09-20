@@ -162,6 +162,11 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           child: StationMapLayers(
             mapController: widget.mapController,
             stations: displayStations,
+            // #4432 — `center` is `_routeBounds.center`, the bounding box
+            // of the along-route STATIONS (#2782/#2755). It is a camera
+            // target, not a position: `originMarker` is deliberately left
+            // null so no "you are here" dot is drawn there. The route's
+            // start and destination are marked from the polyline instead.
             center: center,
             zoom: zoom,
             searchRadiusKm: 5,

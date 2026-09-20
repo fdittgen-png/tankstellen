@@ -9009,6 +9009,23 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String routeOriginStaleCurrentLocation(String age) {
+    return 'Current position ($age ago)';
+  }
+
+  @override
+  String routeStopOffRoute(String distance) {
+    return '$distance from the route';
+  }
+
+  @override
+  String get routeStopOffRouteQualifier => 'geometric estimate';
+
+  @override
+  String get routeStopOffRouteTooltip =>
+      'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/L';
   }

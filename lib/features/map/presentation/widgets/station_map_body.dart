@@ -28,6 +28,7 @@ class StationMapBody extends StatelessWidget {
     super.key,
     required this.mapController,
     required this.center,
+    this.originMarker,
     required this.zoom,
     required this.fitBounds,
     required this.onMapReady,
@@ -49,7 +50,20 @@ class StationMapBody extends StatelessWidget {
   });
 
   final MapController mapController;
+
+  /// Where the CAMERA starts, and the centre of the search-radius
+  /// circle. Not a claim about anyone's position (#4432).
   final LatLng center;
+
+  /// The point this surface may honestly mark as the search's origin —
+  /// "where this search was run from" — or null when it has none.
+  ///
+  /// #4432: a proximity search has one (the GPS fix, or the ZIP/city
+  /// centre the user chose); the route map does not, because its
+  /// [center] is the bounding-box centre of the found stations and
+  /// drawing a "you are here" dot there was the honesty bug. The route
+  /// map marks its start and destination from the polyline instead.
+  final LatLng? originMarker;
   final double zoom;
   final LatLngBounds fitBounds;
   final VoidCallback onMapReady;
@@ -157,29 +171,66 @@ class StationMapBody extends StatelessWidget {
               ),
             ],
           ),
-        // Center marker
-        MarkerLayer(
-          markers: [
-            Marker(
-              point: center,
-              width: 20,
-              height: 20,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 4,
-                    ),
-                  ],
+        // #4432 — the ORIGIN marker, and only when this surface has an
+        // origin. It used to be drawn unconditionally at [center], which
+        // is the camera target: on the route map that is the bounding-box
+        // centre of the found stations (#2755), so the primary-colour
+        // circle a driver reads as "you are here" was pointing at the
+        // middle of the results. A camera centre is not a position claim.
+        if (originMarker != null)
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: originMarker!,
+                width: 20,
+                height: 20,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        // #4432 — the route's own endpoints, which are NOT the camera
+        // centre and NOT a device position. Drawn from the polyline the
+        // router returned, so start and destination are where the route
+        // actually begins and ends.
+        if (routePolyline != null && routePolyline!.length > 1)
+          MarkerLayer(
+            markers: [
+              Marker(
+                key: const ValueKey('route-start-marker'),
+                point: routePolyline!.first,
+                width: 22,
+                height: 22,
+                child: Icon(
+                  Icons.trip_origin,
+                  size: 22,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              Marker(
+                key: const ValueKey('route-destination-marker'),
+                point: routePolyline!.last,
+                width: 26,
+                height: 26,
+                child: Icon(
+                  Icons.place,
+                  size: 26,
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            ],
+          ),
         // Station markers (#1774 — `markers` is memoised by the parent). Modes:
         //  - #3000 `clusterAlways` + `excludeSelectedFromClustering` (route
         //    map): SELECTED stations stay un-clustered as full pills on top,

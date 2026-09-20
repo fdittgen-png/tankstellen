@@ -1,0 +1,6 @@
+{
+  "routeOriginStaleCurrentLocation": "Position actuelle (il y a {age})",
+  "routeStopOffRoute": "{distance} de l'itinéraire",
+  "routeStopOffRouteQualifier": "estimation géométrique",
+  "routeStopOffRouteTooltip": "Distance à vol d'oiseau entre cet itinéraire et la station. Ce n'est ni la distance depuis votre position, ni le trajet supplémentaire qu'un arrêt coûterait."
+}
