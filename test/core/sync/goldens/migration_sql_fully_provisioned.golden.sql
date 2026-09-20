@@ -1,4 +1,4 @@
--- TankSync Schema Setup (schema version 15)
+-- TankSync Schema Setup (schema version 16)
 -- Run this in your Supabase SQL Editor
 -- Dashboard → SQL Editor → New Query → Paste → Run
 
@@ -1262,6 +1262,185 @@ REVOKE ALL ON FUNCTION public.fleet_log_export(UUID, TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.fleet_log_export(UUID, TEXT) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.fleet_log_export(UUID, TEXT) FROM anon;
 
+-- ── Fleet invites (#4399, v16, ADR 0025 D7) ────────────────────────
+-- Server-only: RLS enabled and deliberately POLICY-LESS, with the
+-- default anon/authenticated table grants revoked, so only the
+-- SECURITY DEFINER functions below touch it. The plaintext code is
+-- never stored — the key is its SHA-256.
+CREATE TABLE IF NOT EXISTS public.fleet_invites (
+  code_hash TEXT PRIMARY KEY,
+  org_id UUID NOT NULL REFERENCES public.fleet_organizations(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'employee' CHECK (role IN ('employee', 'manager', 'admin')),
+  max_uses INTEGER NOT NULL DEFAULT 1 CHECK (max_uses BETWEEN 1 AND 200),
+  uses INTEGER NOT NULL DEFAULT 0 CHECK (uses >= 0),
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_by UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CHECK (uses <= max_uses)
+);
+CREATE INDEX IF NOT EXISTS fleet_invites_org_idx
+  ON public.fleet_invites(org_id);
+CREATE INDEX IF NOT EXISTS fleet_invites_created_by_idx
+  ON public.fleet_invites(created_by);
+ALTER TABLE public.fleet_invites ENABLE ROW LEVEL SECURITY;
+-- Hygiene, not redundancy: Supabase grants table privileges to anon and
+-- authenticated by default, and a privilege still applies where a
+-- policy is missing.
+REVOKE ALL ON TABLE public.fleet_invites FROM anon, authenticated;
+
+-- One definition, called by both the issuer and the redeemer. Pure: it
+-- hashes whatever the caller passes and touches no table, so EXECUTE
+-- for authenticated discloses nothing.
+CREATE OR REPLACE FUNCTION public.fleet_invite_hash(p_code TEXT)
+RETURNS TEXT
+LANGUAGE sql
+IMMUTABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT encode(
+    sha256(
+      convert_to(
+        upper(regexp_replace(coalesce(p_code, ''), '[^0-9A-Za-z]', '', 'g')),
+        'UTF8')),
+    'hex');
+$$;
+REVOKE ALL ON FUNCTION public.fleet_invite_hash(TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_invite_hash(TEXT) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_invite_hash(TEXT) FROM anon;
+
+-- ── Fleet invite RPCs (#4399, v16) ─────────────────────────────────
+
+-- Issuing: manager / admin only, and an invite may never grant more
+-- than its issuer holds. There is no UI in this slice; a manager runs
+--   SELECT public.fleet_create_invite('<org uuid>'::uuid, 'employee', 14, 1);
+-- and hands the returned string — the one moment the plaintext exists
+-- — to the employee.
+CREATE OR REPLACE FUNCTION public.fleet_create_invite(
+  p_org UUID,
+  p_role TEXT DEFAULT 'employee',
+  p_expires_in_days INTEGER DEFAULT 14,
+  p_max_uses INTEGER DEFAULT 1
+)
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_caller_role TEXT;
+  v_role TEXT := coalesce(nullif(trim(p_role), ''), 'employee');
+  v_days INTEGER := coalesce(p_expires_in_days, 14);
+  v_max_uses INTEGER := coalesce(p_max_uses, 1);
+  v_raw TEXT;
+  v_code TEXT;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'not_authenticated' USING ERRCODE = '42501';
+  END IF;
+  -- coalesce: NULL NOT IN (…) is NULL, which IF would treat as allowed.
+  v_caller_role := coalesce(public.fleet_role(p_org), '');
+  IF v_caller_role NOT IN ('manager', 'admin') THEN
+    RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501';
+  END IF;
+  IF v_role NOT IN ('employee', 'manager', 'admin') THEN
+    RAISE EXCEPTION 'unknown_role' USING ERRCODE = '22023';
+  END IF;
+  IF v_role = 'admin' AND v_caller_role <> 'admin' THEN
+    RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501';
+  END IF;
+  IF v_days < 1 OR v_days > 90 THEN
+    RAISE EXCEPTION 'invite_lifetime_out_of_range' USING ERRCODE = '22023';
+  END IF;
+  IF v_max_uses < 1 OR v_max_uses > 200 THEN
+    RAISE EXCEPTION 'invite_uses_out_of_range' USING ERRCODE = '22023';
+  END IF;
+  -- 80 bits from gen_random_uuid()'s CSPRNG, grouped in an alphabet
+  -- with no ambiguous glyph. Only the hash is stored.
+  v_raw := upper(replace(gen_random_uuid()::text, '-', ''));
+  v_code := substr(v_raw, 1, 5) || '-' || substr(v_raw, 6, 5) || '-' ||
+            substr(v_raw, 11, 5) || '-' || substr(v_raw, 16, 5);
+  INSERT INTO public.fleet_invites
+    (code_hash, org_id, role, max_uses, expires_at, created_by)
+    VALUES (public.fleet_invite_hash(v_code), p_org, v_role, v_max_uses,
+            now() + (v_days * INTERVAL '1 day'), auth.uid());
+  INSERT INTO public.fleet_audit_events (org_id, actor, action, target)
+    VALUES (p_org, auth.uid(), 'invite_created', v_role);
+  RETURN v_code;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_create_invite(UUID, TEXT, INTEGER, INTEGER) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_create_invite(UUID, TEXT, INTEGER, INTEGER) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_create_invite(UUID, TEXT, INTEGER, INTEGER) FROM anon;
+
+-- Redeeming. The parameter is `p_invite_code` because that is the key
+-- FleetJoinService puts on the wire; PostgREST resolves an RPC by its
+-- argument NAMES, so a `p_code` signature would 404 as PGRST202 and the
+-- employee would be told their administrator has not enabled fleets.
+-- Returns the {org_id, role} object the client already decodes.
+CREATE OR REPLACE FUNCTION public.fleet_join(p_invite_code TEXT)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_uid UUID := auth.uid();
+  v_enabled TEXT;
+  v_hash TEXT;
+  v_org UUID;
+  v_role TEXT;
+BEGIN
+  -- Everything that does NOT depend on the code, first: each of these
+  -- answers a question about the CALLER, so none can probe a code.
+  IF v_uid IS NULL THEN
+    RAISE EXCEPTION 'not_authenticated' USING ERRCODE = '42501';
+  END IF;
+  IF coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) THEN
+    RAISE EXCEPTION 'identity_required' USING ERRCODE = '42501';
+  END IF;
+  SELECT value INTO v_enabled FROM public.tanksync_meta WHERE key = 'fleet_enabled';
+  IF v_enabled IS DISTINCT FROM 'true' THEN
+    RAISE EXCEPTION 'fleet_disabled' USING ERRCODE = '42501';
+  END IF;
+  IF EXISTS (SELECT 1 FROM public.fleet_members WHERE user_id = v_uid) THEN
+    RAISE EXCEPTION 'already_member' USING ERRCODE = '23505';
+  END IF;
+
+  -- One probe, one failure token: unknown, expired, spent and
+  -- cascaded-away codes are indistinguishable.
+  v_hash := public.fleet_invite_hash(p_invite_code);
+  SELECT i.org_id, i.role INTO v_org, v_role
+    FROM public.fleet_invites i
+   WHERE i.code_hash = v_hash
+     AND i.expires_at > now()
+     AND i.uses < i.max_uses
+   FOR UPDATE;
+  IF v_org IS NULL THEN
+    RAISE EXCEPTION 'invalid_code' USING ERRCODE = 'P0002';
+  END IF;
+
+  -- The row is locked, so two devices redeeming a single-use code
+  -- serialise: the loser re-evaluates `uses < max_uses`, fails it, and
+  -- gets the same invalid_code as a stranger.
+  UPDATE public.fleet_invites
+     SET uses = uses + 1
+   WHERE code_hash = v_hash;
+
+  INSERT INTO public.fleet_members (org_id, user_id, role)
+    VALUES (v_org, v_uid, v_role);
+  -- ADR 0025 D5.4. A hash PREFIX: enough to correlate two joins on one
+  -- code, never enough to replay it.
+  INSERT INTO public.fleet_audit_events (org_id, actor, action, target)
+    VALUES (v_org, v_uid, 'member_joined', left(v_hash, 12));
+
+  RETURN jsonb_build_object('org_id', v_org::text, 'role', v_role);
+END;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_join(TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_join(TEXT) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_join(TEXT) FROM anon;
+
 CREATE TABLE IF NOT EXISTS public.tanksync_meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
@@ -1272,7 +1451,7 @@ DROP POLICY IF EXISTS tanksync_meta_read ON public.tanksync_meta;
 CREATE POLICY tanksync_meta_read ON public.tanksync_meta
   FOR SELECT USING (true);
 INSERT INTO public.tanksync_meta (key, value, updated_at)
-  VALUES ('schema_version', '15', now())
+  VALUES ('schema_version', '16', now())
   ON CONFLICT (key)
   DO UPDATE SET value = EXCLUDED.value, updated_at = now();
 

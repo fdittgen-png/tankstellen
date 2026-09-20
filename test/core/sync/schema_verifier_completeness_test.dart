@@ -76,10 +76,16 @@ void main() {
   // (the `fleet_*` SECURITY DEFINER RPCs do, and no client write policy
   // exists), so it is not a synced table; `UserDataSync` reads the
   // caller's own rows through its table MAP for the GDPR export.
+  // #4399 — `fleet_invites` is server-only in the strongest sense: RLS
+  // is enabled with NO policy at all and the default anon/authenticated
+  // table grants are revoked, so `fleet_create_invite` / `fleet_join`
+  // are its only reader and its only writer. Nothing `.from()`s it and
+  // nothing may, or an invite code becomes readable.
   const serverOnlyTables = <String>{
     'database_owner',
     'tanksync_meta',
     'fleet_audit_events',
+    'fleet_invites',
   };
 
   group('SchemaVerifier completeness (#2929)', () {
@@ -139,7 +145,7 @@ void main() {
     // green. HARD RULE #5 covers RPCs as well as tables, so the fleet
     // functions are named here one by one.
     test('wizard SQL creates every fleet RPC the client calls (#4212, '
-        '#4215, #4216)', () {
+        '#4215, #4216, #4399)', () {
       final sql = SchemaVerifier.getMigrationSql(const {});
       for (final fn in const [
         'fleet_create_organization',
@@ -150,6 +156,13 @@ void main() {
         'fleet_log_document_access',
         'fleet_period_metrics',
         'fleet_log_export',
+        // #4399 — the join half. `fleet_join` is the one the client
+        // calls; `fleet_create_invite` / `fleet_invite_hash` are what
+        // make a redeemable code exist at all, so a self-host missing
+        // them has a join path with nothing to join.
+        'fleet_join',
+        'fleet_create_invite',
+        'fleet_invite_hash',
       ]) {
         expect(sql, contains('FUNCTION public.$fn'),
             reason: 'wizard SQL is missing the "$fn" RPC — a self-hoster '
