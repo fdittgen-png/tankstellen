@@ -3,6 +3,12 @@
 
 /// #4162 — suspend: the app is backgrounded (and resumed) while a pass or
 /// an init is parked on the network.
+///
+/// #4420 — nothing in this suite may turn on real elapsed milliseconds.
+/// Every future a pass can win or lose against is parked on a [Completer]
+/// only the test completes, and the per-pass timeout budget is staged by
+/// the test ([_PerPassBudgetEntry]): a pass that must be abandoned is
+/// given none, a pass that must survive is given [_unlosableBudget].
 library;
 
 import 'dart:async';
@@ -20,6 +26,35 @@ import 'package:tankstellen/core/sync/tanksync_session_phase.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 import '../support/sync_session_driver.dart';
+
+/// #4420 — the budget handed to a pass that must NOT be abandoned. The
+/// work it covers is microtasks only, so no amount of CI load can burn
+/// through an hour of it; a timeout here is a real defect, never noise.
+const Duration _unlosableBudget = Duration(hours: 1);
+
+/// #4420 — a pull entry whose timeout budget the test stages per pass.
+///
+/// [SyncPullCoordinator] reads `timeout` once per pass, so flipping
+/// [budget] between two `pullAll` calls is what turns "the abandoned pass
+/// answers after the current one" into a sequence the test dictates,
+/// instead of a race between two real 20 ms timers that a loaded runner
+/// can make BOTH passes lose.
+class _PerPassBudgetEntry extends SyncPullEntry {
+  _PerPassBudgetEntry({required super.tables, required super.pull})
+      : super(timeout: Duration.zero);
+
+  /// The budget the next pass over this entry runs on.
+  Duration budget = Duration.zero;
+
+  @override
+  Duration get timeout => budget;
+}
+
+/// How many selects against the favorites table have reached the fake
+/// wire — the observable that says an abandoned pull really is parked
+/// there rather than still queued behind a microtask.
+int _favoritesOnTheWire(SyncSession s) =>
+    s.backend.requests.where((u) => u.path.endsWith('/favorites')).length;
 
 void main() {
   silenceErrorLoggerSpool();
@@ -56,52 +91,81 @@ void main() {
       'gate while the abandoned pull is still on the wire — its late answer '
       'is refused at the transport and never persisted; the next pass '
       'persists once (S6, #4377)', () async {
-    // Every request parks on the fake network until released — the
-    // abandoned select and the next pass's select both wait here.
-    final network = Completer<void>();
+    // #4420 — the abandoned select parks HERE, on a completer only this
+    // test completes, and is released strictly after the current pass has
+    // persisted. The ordering below is therefore a sequence the test
+    // dictates, not a race two real 20 ms timers could both lose.
+    final abandonedWire = Completer<void>();
     final persisted = <int>[];
     final refused = <Object>[];
     var inFlight = 0;
     var maxInFlight = 0;
-    s = await SyncSession.start(entries: [
-      SyncPullEntry(
-        tables: const ['favorites'],
-        timeout: const Duration(milliseconds: 20),
-        pull: () async {
-          inFlight++;
-          if (inFlight > maxInFlight) maxInFlight = inFlight;
-          final transport = SupabaseSyncTransport.currentOrNull()!;
-          try {
-            final rows = await transport.select('favorites', 'id');
-            // The persist step every real pull ends with.
-            persisted.add(rows.length);
-            return rows.length;
-          } catch (e) {
-            refused.add(e);
-            rethrow;
-          } finally {
-            inFlight--;
-          }
-        },
-      ),
-    ]);
+    final entry = _PerPassBudgetEntry(
+      tables: const ['favorites'],
+      pull: () async {
+        inFlight++;
+        if (inFlight > maxInFlight) maxInFlight = inFlight;
+        final transport = SupabaseSyncTransport.currentOrNull()!;
+        try {
+          final rows = await transport.select('favorites', 'id');
+          // The persist step every real pull ends with.
+          persisted.add(rows.length);
+          return rows.length;
+        } catch (e, st) {
+          refused.add(e);
+          Error.throwWithStackTrace(e, st);
+        } finally {
+          inFlight--;
+        }
+      },
+    );
+    s = await SyncSession.start(entries: [entry]);
     await s.connectConsented();
-    s.backend.hang = network;
+    // The connect already selected favorites once; count from here.
+    final wireBefore = _favoritesOnTheWire(s);
+    s.backend.hang = abandonedWire;
 
+    // Pass 1 is given NO budget: its select goes on the wire and the pass
+    // abandons it at once. The pull can only answer when this test
+    // completes [abandonedWire], which happens strictly later — so "the
+    // pass times out" is the only reachable outcome, not the likely one.
+    entry.budget = Duration.zero;
     await SyncPullCoordinator.instance.pullAll(now: () => t0);
     expect(SyncPullCoordinator.instance.lastOutcome,
         SyncPassOutcome.completedWithTimeouts);
     expect(SyncPullCoordinator.instance.isRunning, isFalse);
     expect(inFlight, 1, reason: 'the timeout does not cancel the pull');
+    await SyncSession.settle();
+    expect(_favoritesOnTheWire(s) - wireBefore, 1,
+        reason: 'the abandoned select really did reach the fake wire and is '
+            'parked there — the whole sequence below rests on it, so pin '
+            'it rather than assume it');
 
     // The resume / "sync now" pass starts while the abandoned select is
-    // still parked; then the network answers both.
-    final second = SyncPullCoordinator.instance.pullAll(now: () => t0);
-    await SyncSession.settle();
-    expect(maxInFlight, 2);
+    // still parked. The wire is open again, so its own select answers at
+    // once, and its budget is one CI load cannot burn through: this pass
+    // CANNOT be abandoned the way pass 1 was.
+    entry.budget = _unlosableBudget;
     s.backend.hang = null;
-    network.complete();
-    await second;
+    await SyncPullCoordinator.instance.pullAll(now: () => t0);
+    await SyncSession.settle();
+
+    expect(SyncPullCoordinator.instance.lastOutcome, SyncPassOutcome.completed,
+        reason: 'the current pass must NOT time out. If it did, both passes '
+            'were abandoned, nothing persisted, and the ordering this test '
+            'exists to catch was never exercised — that is the vacuous '
+            'failure of #4420, not an ordering violation');
+    expect(maxInFlight, 2,
+        reason: 'the current pass ran while the abandoned pull was still on '
+            'the wire — that overlap is the whole scenario');
+    expect(persisted, [0], reason: 'the current pass persists the table');
+    expect(refused, isEmpty,
+        reason: 'nothing is refused yet — the abandoned pull has not '
+            'answered');
+
+    // Only NOW does the abandoned pull answer, strictly after the current
+    // pass persisted. That order is the property (#4377).
+    abandonedWire.complete();
     await SyncSession.settle();
 
     expect(persisted, [0],
@@ -138,8 +202,12 @@ void main() {
     await s.storage.putSetting('sync_user_id', null);
 
     final abandoned = TankSyncInit.run(s.storage);
+    // #4420 — the init is parked on [park] and can only answer once this
+    // test releases it, so an already-spent budget abandons it by
+    // construction; the old real 20 ms one only did so by luck.
+    await SyncSession.settle();
     try {
-      await abandoned.timeout(const Duration(milliseconds: 20));
+      await abandoned.timeout(Duration.zero);
     } on TimeoutException {
       // The launch paints on without sync.
     }

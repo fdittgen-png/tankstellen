@@ -98,7 +98,11 @@ void main() {
     s = await SyncSession.start(entries: [
       SyncPullEntry(
         tables: const ['trips'],
-        timeout: const Duration(milliseconds: 10),
+        // #4420 — the pull is a completer nothing ever completes, so the
+        // budget being already spent makes the timeout the only reachable
+        // outcome. A real 10 ms one waited on the wall clock to reach the
+        // same certainty, three times over.
+        timeout: Duration.zero,
         pull: () => Completer<int>().future,
       ),
     ]);
