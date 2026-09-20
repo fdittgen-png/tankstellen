@@ -9265,6 +9265,264 @@ abstract class AppLocalizations {
   /// **'Company vehicles, assignments and manager reporting.'**
   String get featureGroupDescription_fleet;
 
+  /// #4215 — title of the employee's fleet expense list.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel expenses'**
+  String get fleetExpensesTitle;
+
+  /// #4215 — empty state of the fleet expense list.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses yet'**
+  String get fleetExpensesEmptyTitle;
+
+  /// #4215 — empty-state body of the fleet expense list.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan a fuel receipt and it appears here as a candidate you can check before submitting it.'**
+  String get fleetExpensesEmptyBody;
+
+  /// #4215 — expense status: read and self-consistent, waiting for the employee.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get fleetExpenseStatusDraft;
+
+  /// #4215 — expense status: something does not add up.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs review'**
+  String get fleetExpenseStatusNeedsReview;
+
+  /// #4215 — expense status: handed to the company.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get fleetExpenseStatusSubmitted;
+
+  /// #4215 — expense status: the company accepted it.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get fleetExpenseStatusApproved;
+
+  /// #4215 — expense status: the company refused it.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get fleetExpenseStatusRejected;
+
+  /// #4215 — expense status: handed to the accounting system.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported'**
+  String get fleetExpenseStatusExported;
+
+  /// #4215 — expense status: closed, kept for retention only.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived'**
+  String get fleetExpenseStatusArchived;
+
+  /// #4215 — shown where a station name would be when the document carried none.
+  ///
+  /// In en, this message translates to:
+  /// **'Station not read'**
+  String get fleetExpenseUnknownStation;
+
+  /// #4215 — title of the expense review screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Check this receipt'**
+  String get fleetExpenseReviewTitle;
+
+  /// #4215 — the review screen opened with an id it cannot find.
+  ///
+  /// In en, this message translates to:
+  /// **'This expense is not on this device.'**
+  String get fleetExpenseNotFound;
+
+  /// #4215 — the reconciler's arithmetic check passed.
+  ///
+  /// In en, this message translates to:
+  /// **'Litres × price per litre matches the printed total.'**
+  String get fleetExpenseArithmeticOk;
+
+  /// #4215 — the reconciler's arithmetic check failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Litres × price per litre does not match the printed total. Check the numbers before you submit.'**
+  String get fleetExpenseArithmeticMismatch;
+
+  /// #4215 — the reconciler had no complete set of numbers to check.
+  ///
+  /// In en, this message translates to:
+  /// **'A number is missing, so the total cannot be checked.'**
+  String get fleetExpenseArithmeticIncomplete;
+
+  /// #4215 — section of fields the machine could not read.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs your confirmation'**
+  String get fleetExpenseNeedsConfirmationTitle;
+
+  /// #4215 — section of fields the machine did read.
+  ///
+  /// In en, this message translates to:
+  /// **'Read from the document'**
+  String get fleetExpenseReadTitle;
+
+  /// #4215 — receipt field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Station'**
+  String get fleetExpenseFieldStation;
+
+  /// #4215 — receipt field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get fleetExpenseFieldDate;
+
+  /// #4215 — receipt field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel grade'**
+  String get fleetExpenseFieldFuel;
+
+  /// #4215 — receipt field label for the dispensed volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get fleetExpenseFieldLitres;
+
+  /// #4215 — receipt field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Price per litre'**
+  String get fleetExpenseFieldPricePerLitre;
+
+  /// #4215 — receipt field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get fleetExpenseFieldTotal;
+
+  /// #4215 — receipt field label for the VAT amount as printed.
+  ///
+  /// In en, this message translates to:
+  /// **'VAT'**
+  String get fleetExpenseFieldVat;
+
+  /// #4215 — receipt field label for the VAT percentage as printed.
+  ///
+  /// In en, this message translates to:
+  /// **'VAT rate'**
+  String get fleetExpenseFieldVatRate;
+
+  /// #4215 — receipt field label for the masked card or fuel-card reference.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment reference'**
+  String get fleetExpenseFieldPaymentReference;
+
+  /// #4215 — receipt field label.
+  ///
+  /// In en, this message translates to:
+  /// **'Odometer'**
+  String get fleetExpenseFieldOdometer;
+
+  /// #4215 — the value of a field the machine did not read.
+  ///
+  /// In en, this message translates to:
+  /// **'Not read'**
+  String get fleetExpenseValueMissing;
+
+  /// #4215 — section describing where the expense came from.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get fleetExpenseDocumentTitle;
+
+  /// #4215 — import source label.
+  ///
+  /// In en, this message translates to:
+  /// **'Photographed receipt'**
+  String get fleetExpenseSourceOcrPhoto;
+
+  /// #4215 — import source label.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF receipt'**
+  String get fleetExpenseSourceOcrPdf;
+
+  /// #4215 — import source label for e-mail or SMS receipt text.
+  ///
+  /// In en, this message translates to:
+  /// **'Digital receipt'**
+  String get fleetExpenseSourceEReceipt;
+
+  /// #4215 — import source label for a structured e-invoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Electronic invoice'**
+  String get fleetExpenseSourceStructuredInvoice;
+
+  /// #4215 — ADR 0025: a scan is never an authoritative record.
+  ///
+  /// In en, this message translates to:
+  /// **'A photograph is not an authoritative document, however well it was read.'**
+  String get fleetExpenseNotAuthoritative;
+
+  /// #4215 — shown only for a received electronic invoice the deployment marked authoritative.
+  ///
+  /// In en, this message translates to:
+  /// **'The company treats this document as an authoritative record.'**
+  String get fleetExpenseAuthoritative;
+
+  /// #4215 — the reconciler matched an existing fill-up instead of creating a second one.
+  ///
+  /// In en, this message translates to:
+  /// **'Attached to a fill-up you already logged.'**
+  String get fleetExpenseAttachedToFillUp;
+
+  /// #4215 — how many machine-read fields the employee changed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No corrections} =1{1 field corrected} other{{count} fields corrected}}'**
+  String fleetExpenseCorrections(int count);
+
+  /// #4215 — ADR 0025 reimbursement / accounting state boundary, stated on the screen that submits.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting hands this to your company as a claim. It is not an accounting record, and it does not decide whether you are reimbursed.'**
+  String get fleetExpenseNotAnAccountingRecord;
+
+  /// #4215 — the one-tap action when the arithmetic reconciles.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm and submit'**
+  String get fleetExpenseConfirmAndSubmit;
+
+  /// #4215 — disabled-with-reason label on the submit action.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm the highlighted fields first'**
+  String get fleetExpenseFixFirst;
+
+  /// #4215 — the submit action on an expense that has left the employee's hands.
+  ///
+  /// In en, this message translates to:
+  /// **'Already submitted'**
+  String get fleetExpenseAlreadySubmitted;
+
+  /// #4215 — the workflow refused the submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not submit this expense.'**
+  String get fleetExpenseSubmitFailed;
+
   /// Label of the compact current-vehicle context chip shown on fleet-enabled surfaces (#4213).
   ///
   /// In en, this message translates to:

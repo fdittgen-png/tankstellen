@@ -7015,5 +7015,182 @@
   "fleetVehicleSemanticsChange": "Changer de véhicule actuel",
   "@fleetVehicleSemanticsChange": {
     "description": "MT — needs native review"
+  },
+  "fleetExpensesTitle": "Frais de carburant",
+  "@fleetExpensesTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpensesEmptyTitle": "Aucun frais pour l'instant",
+  "@fleetExpensesEmptyTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpensesEmptyBody": "Scannez un ticket de carburant : il apparaîtra ici comme proposition, à vérifier avant de l'envoyer.",
+  "@fleetExpensesEmptyBody": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusDraft": "Brouillon",
+  "@fleetExpenseStatusDraft": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusNeedsReview": "À vérifier",
+  "@fleetExpenseStatusNeedsReview": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusSubmitted": "Envoyé",
+  "@fleetExpenseStatusSubmitted": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusApproved": "Approuvé",
+  "@fleetExpenseStatusApproved": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusRejected": "Refusé",
+  "@fleetExpenseStatusRejected": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusExported": "Exporté",
+  "@fleetExpenseStatusExported": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusArchived": "Archivé",
+  "@fleetExpenseStatusArchived": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseUnknownStation": "Station non lue",
+  "@fleetExpenseUnknownStation": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseReviewTitle": "Vérifier ce ticket",
+  "@fleetExpenseReviewTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseNotFound": "Ce frais ne se trouve pas sur cet appareil.",
+  "@fleetExpenseNotFound": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseArithmeticOk": "Litres × prix au litre correspond au total imprimé.",
+  "@fleetExpenseArithmeticOk": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseArithmeticMismatch": "Litres × prix au litre ne correspond pas au total imprimé. Vérifiez les chiffres avant d'envoyer.",
+  "@fleetExpenseArithmeticMismatch": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseArithmeticIncomplete": "Un chiffre manque : le total ne peut pas être vérifié.",
+  "@fleetExpenseArithmeticIncomplete": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseNeedsConfirmationTitle": "À confirmer par vos soins",
+  "@fleetExpenseNeedsConfirmationTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseReadTitle": "Lu sur le document",
+  "@fleetExpenseReadTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldStation": "Station",
+  "@fleetExpenseFieldStation": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldDate": "Date",
+  "@fleetExpenseFieldDate": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldFuel": "Type de carburant",
+  "@fleetExpenseFieldFuel": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldLitres": "Volume",
+  "@fleetExpenseFieldLitres": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldPricePerLitre": "Prix au litre",
+  "@fleetExpenseFieldPricePerLitre": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldTotal": "Total",
+  "@fleetExpenseFieldTotal": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldVat": "TVA",
+  "@fleetExpenseFieldVat": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldVatRate": "Taux de TVA",
+  "@fleetExpenseFieldVatRate": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldPaymentReference": "Référence de paiement",
+  "@fleetExpenseFieldPaymentReference": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldOdometer": "Kilométrage",
+  "@fleetExpenseFieldOdometer": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseValueMissing": "Non lu",
+  "@fleetExpenseValueMissing": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseDocumentTitle": "Document",
+  "@fleetExpenseDocumentTitle": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSourceOcrPhoto": "Ticket photographié",
+  "@fleetExpenseSourceOcrPhoto": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSourceOcrPdf": "Ticket PDF",
+  "@fleetExpenseSourceOcrPdf": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSourceEReceipt": "Ticket numérique",
+  "@fleetExpenseSourceEReceipt": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSourceStructuredInvoice": "Facture électronique",
+  "@fleetExpenseSourceStructuredInvoice": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseNotAuthoritative": "Une photo n'est pas un document probant, aussi bien lue soit-elle.",
+  "@fleetExpenseNotAuthoritative": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseAuthoritative": "L'entreprise traite ce document comme un justificatif probant.",
+  "@fleetExpenseAuthoritative": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseAttachedToFillUp": "Rattaché à un plein que vous avez déjà enregistré.",
+  "@fleetExpenseAttachedToFillUp": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseCorrections": "{count, plural, =0{Aucune correction} =1{1 champ corrigé} other{{count} champs corrigés}}",
+  "@fleetExpenseCorrections": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fleetExpenseNotAnAccountingRecord": "En envoyant, vous transmettez une demande à votre entreprise. Ce n'est pas une pièce comptable et cela ne décide pas du remboursement.",
+  "@fleetExpenseNotAnAccountingRecord": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseConfirmAndSubmit": "Confirmer et envoyer",
+  "@fleetExpenseConfirmAndSubmit": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFixFirst": "Confirmez d'abord les champs signalés",
+  "@fleetExpenseFixFirst": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseAlreadySubmitted": "Déjà envoyé",
+  "@fleetExpenseAlreadySubmitted": {
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSubmitFailed": "Impossible d'envoyer ce frais.",
+  "@fleetExpenseSubmitFailed": {
+    "description": "MT — needs native review"
   }
 }

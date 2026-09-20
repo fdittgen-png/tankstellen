@@ -145,12 +145,20 @@ void main() {
 
     test('the fleet source itself cannot hold bytes — no Uint8List, no '
         'base64, no typed_data anywhere in the slice', () {
+      // #4215 (F7): `fleet_document_store.dart` is the ONE exemption,
+      // and a narrow one. Something has to hand the private bucket the
+      // receipt, so bytes cross that seam — as a PARAMETER. The next
+      // test pins the part that matters: they never become a field, so
+      // no fleet object can be holding an image when it reaches a log,
+      // a trace, a sync row or an export.
+      const uploadSeam = 'lib/features/fleet/data/fleet_document_store.dart';
       final offenders = <String>[];
       for (final entity in Directory('lib/features/fleet')
           .listSync(recursive: true)
           .whereType<File>()) {
         final path = entity.path.replaceAll(r'\', '/');
         if (!path.endsWith('.dart')) continue;
+        if (path.endsWith(uploadSeam)) continue;
         // Comments are prose ABOUT the rule (document_meta.dart spells
         // it out); the ban is on code.
         final code = entity
@@ -164,6 +172,30 @@ void main() {
       expect(offenders, isEmpty,
           reason: 'a receipt image must not be representable in the fleet '
               'domain — that is what makes "never in a log" structural');
+    });
+
+    test('and in the one file that may name bytes, they are a parameter '
+        'and never a field (#4215 F7)', () {
+      final code =
+          File('lib/features/fleet/data/fleet_document_store.dart')
+              .readAsLinesSync()
+              .where((l) => !l.trimLeft().startsWith('//'))
+              .join('\n');
+      // A stored image is the thing the rule forbids: `final
+      // Uint8List …` (or a `late`/`var` field) would make a receipt
+      // reachable from an object that outlives the upload call.
+      final storedBytes =
+          RegExp(r'(final|late|var)\s+Uint8List[?\s]', multiLine: true);
+      expect(storedBytes.hasMatch(code), isFalse,
+          reason: 'bytes cross the seam; they do not live in it');
+      expect(storedBytes.hasMatch('  final Uint8List cached;'), isTrue,
+          reason: 'fidelity: the pattern must catch a real stored field');
+      expect(code, contains('required Uint8List bytes'),
+          reason: 'the parameter is the only shape allowed, and it must '
+              'still be there — otherwise this test guards nothing');
+      expect(code, isNot(contains('base64')),
+          reason: 'a base64 receipt is a receipt in a string, which is '
+              'exactly how one reaches a log');
     });
 
     test('the OCR trace serialiser elides the capture on the size-bounded '

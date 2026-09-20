@@ -1,4 +1,4 @@
--- TankSync Schema Setup (schema version 13)
+-- TankSync Schema Setup (schema version 14)
 -- Run this in your Supabase SQL Editor
 -- Dashboard → SQL Editor → New Query → Paste → Run
 
@@ -112,6 +112,8 @@ ALTER TABLE public.fleet_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fleet_vehicles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.vehicle_assignments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.fleet_policies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fleet_expenses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.fleet_documents ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_own ON public.users;
 CREATE POLICY users_own ON public.users FOR ALL USING (id = auth.uid());
@@ -291,6 +293,58 @@ DROP POLICY IF EXISTS fleet_policies_member_select ON public.fleet_policies;
 CREATE POLICY fleet_policies_member_select ON public.fleet_policies
   FOR SELECT TO authenticated
   USING (public.is_fleet_member(org_id));
+
+-- #4215 (v14): user-owned. `(SELECT auth.uid())` so the lookup is
+-- evaluated once per statement rather than once per row.
+REVOKE ALL ON TABLE public.fleet_expenses FROM anon;
+DROP POLICY IF EXISTS fleet_expenses_own ON public.fleet_expenses;
+CREATE POLICY fleet_expenses_own ON public.fleet_expenses
+  FOR ALL TO authenticated
+  USING (user_id = (SELECT auth.uid()))
+  WITH CHECK (user_id = (SELECT auth.uid()));
+
+-- The manager sees submitted work, never a draft. fleet_role() is NULL
+-- for a non-member and NULL IN (…) is NULL, so a stranger is refused.
+DROP POLICY IF EXISTS fleet_expenses_manager_select ON public.fleet_expenses;
+CREATE POLICY fleet_expenses_manager_select ON public.fleet_expenses
+  FOR SELECT TO authenticated
+  USING (
+    status <> 'draft'
+    AND public.fleet_role(org_id) IN ('manager', 'admin')
+  );
+
+-- The WITH CHECK is not a restatement of the USING: it pins the
+-- object_key to `<org>/<caller>/<id>`. Without it a client could insert
+-- an own row naming ANOTHER user's object path, and the Storage policy
+-- that joins this table would hand over their receipt (#4049's
+-- ownership gap, one table over).
+REVOKE ALL ON TABLE public.fleet_documents FROM anon;
+DROP POLICY IF EXISTS fleet_documents_own ON public.fleet_documents;
+CREATE POLICY fleet_documents_own ON public.fleet_documents
+  FOR ALL TO authenticated
+  USING (user_id = (SELECT auth.uid()))
+  WITH CHECK (
+    user_id = (SELECT auth.uid())
+    AND object_key = org_id::text || '/' || (SELECT auth.uid())::text
+                     || '/' || id::text
+  );
+
+-- "Only inside the expense workflow, audited" (ADR 0025 D9 matrix):
+-- a manager reaches a receipt only while a non-draft expense of their
+-- org cites it. Both halves are stated here rather than inherited from
+-- another table's RLS.
+DROP POLICY IF EXISTS fleet_documents_manager_select ON public.fleet_documents;
+CREATE POLICY fleet_documents_manager_select ON public.fleet_documents
+  FOR SELECT TO authenticated
+  USING (
+    public.fleet_role(org_id) IN ('manager', 'admin')
+    AND EXISTS (
+      SELECT 1 FROM public.fleet_expenses e
+       WHERE e.org_id = fleet_documents.org_id
+         AND e.status <> 'draft'
+         AND e.data ->> 'documentId' = fleet_documents.id::text
+    )
+  );
 
 -- ── Owner protection (#3747, v8) ────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.database_owner (
@@ -557,6 +611,11 @@ REVOKE EXECUTE ON FUNCTION public.delete_user() FROM anon;
 -- public.users, sync_settings, wait_time_pings and trip_shares included.
 -- v13 (#4212) — the two user-linked fleet tables join the list; the
 -- org's own rows (organisations, vehicles, policies) are not the user's.
+-- v14 (#4215) — fleet_expenses + fleet_documents join it, and the
+-- stored receipt BYTES go with them: deleting the metadata row without
+-- its object would leave the receipt in the bucket, which is exactly
+-- the failure Art. 17 is about. The sweep runs BEFORE the loop, while
+-- the rows that name the object keys still exist.
 CREATE OR REPLACE FUNCTION public.erase_my_data()
 RETURNS TABLE(table_name TEXT, rows_deleted BIGINT)
 LANGUAGE plpgsql
@@ -575,7 +634,51 @@ BEGIN
   PERFORM set_config('request.jwt.claims',
                      json_build_object('role', 'service_role')::text, true);
 
+  -- #4215 — the receipt objects, keyed through the rows deleted below.
+  -- BEST-EFFORT, and structurally unable to abort the erasure.
+  --
+  -- Supabase ships protect_objects_delete on storage.objects: a BEFORE
+  -- DELETE FOR EACH STATEMENT trigger that raises 42501 for a direct
+  -- SQL delete. Statement-level means it fires even when the statement
+  -- matches ZERO rows, so the first shape of this sweep took down
+  -- erase_my_data() for EVERY caller, fleet member or not — an Art. 17
+  -- regression on a shipped path (#3865). The live matrix caught it.
+  --
+  -- Two guards, and the second is the one that matters: the
+  -- transaction-local allow_delete_query switch is what the trigger
+  -- looks for, and the EXCEPTION block means no future storage-side
+  -- guard can ever again take the row erasure down with it. A skipped
+  -- sweep is a WARNING, never a failed erase.
+  --
+  -- The client removes the bytes through the Storage API BEFORE calling
+  -- this function (FleetDocumentStore.eraseOwnObjects), because that is
+  -- the only path that deletes the S3 object as well as its row. This
+  -- statement is the fallback for a caller that did not, and on its own
+  -- it can leave the stored bytes orphaned in the bucket.
+  IF to_regclass('storage.objects') IS NOT NULL THEN
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM pg_trigger
+         WHERE tgrelid = 'storage.objects'::regclass
+           AND NOT tgisinternal
+           AND tgname = 'protect_objects_delete'
+      ) THEN
+        PERFORM set_config('storage.allow_delete_query', 'true', true);
+      END IF;
+      DELETE FROM storage.objects o
+        USING public.fleet_documents d
+        WHERE o.bucket_id = 'fleet-documents'
+          AND o.name = d.object_key
+          AND d.user_id = uid;
+    EXCEPTION WHEN OTHERS THEN
+      RAISE WARNING 'erase_my_data: fleet-documents object sweep skipped (%)',
+        SQLERRM;
+    END;
+  END IF;
+
   FOREACH spec SLICE 1 IN ARRAY ARRAY[
+    ARRAY['fleet_expenses',   'user_id'],
+    ARRAY['fleet_documents',  'user_id'],
     ARRAY['vehicle_assignments', 'user_id'],
     ARRAY['fleet_members',    'user_id'],
     ARRAY['trip_shares',      'owner_id'],
@@ -802,6 +905,192 @@ REVOKE ALL ON FUNCTION public.fleet_end_assignment(UUID, TIMESTAMPTZ) FROM PUBLI
 GRANT EXECUTE ON FUNCTION public.fleet_end_assignment(UUID, TIMESTAMPTZ) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.fleet_end_assignment(UUID, TIMESTAMPTZ) FROM anon;
 
+-- ── Fleet audit log (#4215, v14, ADR 0025 D5.4) ────────────────────
+-- Server-only: written by the fleet_* RPCs, read by the subject (own
+-- rows) and by an org admin. No client write policy exists, so the
+-- trail cannot be rewritten by the party it is about.
+CREATE TABLE IF NOT EXISTS public.fleet_audit_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id UUID NOT NULL REFERENCES public.fleet_organizations(id) ON DELETE CASCADE,
+  actor UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  action TEXT NOT NULL,
+  target TEXT,
+  at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS fleet_audit_events_org_at_idx
+  ON public.fleet_audit_events(org_id, at DESC);
+CREATE INDEX IF NOT EXISTS fleet_audit_events_actor_idx
+  ON public.fleet_audit_events(actor);
+ALTER TABLE public.fleet_audit_events ENABLE ROW LEVEL SECURITY;
+-- Hygiene, not redundancy: Supabase grants table privileges to anon
+-- by default, and a privilege still applies where a policy is missing.
+REVOKE ALL ON TABLE public.fleet_audit_events FROM anon;
+DROP POLICY IF EXISTS fleet_audit_events_select ON public.fleet_audit_events;
+CREATE POLICY fleet_audit_events_select ON public.fleet_audit_events
+  FOR SELECT TO authenticated
+  USING (
+    actor = (SELECT auth.uid())
+    OR public.fleet_role(org_id) = 'admin'
+  );
+
+-- ── Fleet expense RPCs (#4215, v14) ────────────────────────────────
+
+-- Manager review: submitted -> approved | rejected, audited. Raised
+-- messages are stable snake_case tokens the client maps to its own
+-- translated wording; they are never shown verbatim.
+CREATE OR REPLACE FUNCTION public.fleet_review_expense(
+  p_id TEXT,
+  p_user UUID,
+  p_decision TEXT
+)
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  org UUID;
+  current_status TEXT;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RAISE EXCEPTION 'not_authenticated' USING ERRCODE = '42501';
+  END IF;
+  IF p_decision IS NULL OR p_decision NOT IN ('approved', 'rejected') THEN
+    RAISE EXCEPTION 'unknown_decision' USING ERRCODE = '22023';
+  END IF;
+  SELECT org_id, status INTO org, current_status
+    FROM public.fleet_expenses
+   WHERE user_id = p_user AND id = p_id;
+  -- Same error for "no such expense" and "not yours to see", so this is
+  -- not an existence oracle for other people's expense ids.
+  IF org IS NULL THEN
+    RAISE EXCEPTION 'expense_not_found' USING ERRCODE = 'P0002';
+  END IF;
+  IF coalesce(public.fleet_role(org), '') NOT IN ('manager', 'admin') THEN
+    RAISE EXCEPTION 'forbidden' USING ERRCODE = '42501';
+  END IF;
+  -- The device allows submitted -> approved | rejected and nothing
+  -- else; the server agrees, so a draft cannot be approved even by a
+  -- manager who guessed its id.
+  IF current_status IS DISTINCT FROM 'submitted' THEN
+    RAISE EXCEPTION 'not_submitted' USING ERRCODE = '22023';
+  END IF;
+  UPDATE public.fleet_expenses
+     SET status = p_decision, updated_at = now()
+   WHERE user_id = p_user AND id = p_id;
+  INSERT INTO public.fleet_audit_events (org_id, actor, action, target)
+    VALUES (org, auth.uid(), 'expense_' || p_decision, p_id);
+  RETURN p_decision;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_review_expense(TEXT, UUID, TEXT) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_review_expense(TEXT, UUID, TEXT) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_review_expense(TEXT, UUID, TEXT) FROM anon;
+
+-- One audit row per signed URL the client asks Storage for (D5.4). Its
+-- access test MIRRORS the object policy rather than merely checking
+-- membership, so a row in the log means a URL was really issued: the
+-- looser first version recorded an access for a manager asking after a
+-- DRAFT receipt, which the bytes policy then refused, leaving an
+-- auditor unable to tell a real access from a refused one.
+-- It returns a boolean and never the URL: issuing the URL is the
+-- Storage API's job, governed by the object policies, so a caller
+-- cannot use this to obtain access it does not already have.
+CREATE OR REPLACE FUNCTION public.fleet_log_document_access(p_document UUID)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  org UUID;
+  doc_owner UUID;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  SELECT org_id, user_id INTO org, doc_owner
+    FROM public.fleet_documents
+   WHERE id = p_document AND deleted_at IS NULL;
+  IF org IS NULL THEN
+    RETURN FALSE;
+  END IF;
+  -- Mirror the READ rule exactly. "Any member of the org" was not
+  -- enough: a manager asking for a DRAFT receipt they may never read
+  -- got a 'document_signed_url' row and a TRUE while the object policy
+  -- correctly refused the bytes, so the log claimed an access that
+  -- never happened and an auditor could not tell the two apart. The
+  -- owner always passes; anybody else needs the role on the
+  -- document's org AND a non-draft expense of that org citing it.
+  IF doc_owner IS DISTINCT FROM auth.uid() THEN
+    IF coalesce(public.fleet_role(org), '') NOT IN ('manager', 'admin') THEN
+      RETURN FALSE;
+    END IF;
+    IF NOT EXISTS (
+      SELECT 1 FROM public.fleet_expenses e
+       WHERE e.org_id = org
+         AND e.status <> 'draft'
+         AND e.data ->> 'documentId' = p_document::text
+    ) THEN
+      RETURN FALSE;
+    END IF;
+  END IF;
+  INSERT INTO public.fleet_audit_events (org_id, actor, action, target)
+    VALUES (org, auth.uid(), 'document_signed_url', p_document::text);
+  RETURN TRUE;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.fleet_log_document_access(UUID) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.fleet_log_document_access(UUID) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.fleet_log_document_access(UUID) FROM anon;
+
+-- ── Private receipt bucket (#4215, v14) ────────────────────────────
+DO $fleet_storage$
+BEGIN
+  IF to_regclass('storage.objects') IS NULL THEN
+    RAISE NOTICE 'storage schema absent - fleet-documents bucket skipped';
+    RETURN;
+  END IF;
+
+  INSERT INTO storage.buckets (id, name, public)
+       VALUES ('fleet-documents', 'fleet-documents', false)
+  ON CONFLICT (id) DO UPDATE SET public = false;
+
+  EXECUTE $p$DROP POLICY IF EXISTS fleet_documents_object_own ON storage.objects$p$;
+  EXECUTE $p$
+    CREATE POLICY fleet_documents_object_own ON storage.objects
+      FOR ALL TO authenticated
+      USING (bucket_id = 'fleet-documents' AND owner = (SELECT auth.uid()))
+      WITH CHECK (
+        bucket_id = 'fleet-documents'
+        AND owner = (SELECT auth.uid())
+        AND split_part(name, '/', 2) = (SELECT auth.uid())::text
+      )
+  $p$;
+
+  EXECUTE $p$DROP POLICY IF EXISTS fleet_documents_object_manager_read ON storage.objects$p$;
+  EXECUTE $p$
+    CREATE POLICY fleet_documents_object_manager_read ON storage.objects
+      FOR SELECT TO authenticated
+      USING (
+        bucket_id = 'fleet-documents'
+        AND EXISTS (
+          SELECT 1
+            FROM public.fleet_documents d
+            JOIN public.fleet_expenses e
+              ON e.org_id = d.org_id
+             AND e.data ->> 'documentId' = d.id::text
+           WHERE d.object_key = storage.objects.name
+             AND d.user_id = storage.objects.owner
+             AND d.deleted_at IS NULL
+             AND e.status <> 'draft'
+             AND public.fleet_role(d.org_id) IN ('manager', 'admin')
+        )
+      )
+  $p$;
+END
+$fleet_storage$;
+
 CREATE TABLE IF NOT EXISTS public.tanksync_meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
@@ -812,7 +1101,7 @@ DROP POLICY IF EXISTS tanksync_meta_read ON public.tanksync_meta;
 CREATE POLICY tanksync_meta_read ON public.tanksync_meta
   FOR SELECT USING (true);
 INSERT INTO public.tanksync_meta (key, value, updated_at)
-  VALUES ('schema_version', '13', now())
+  VALUES ('schema_version', '14', now())
   ON CONFLICT (key)
   DO UPDATE SET value = EXCLUDED.value, updated_at = now();
 

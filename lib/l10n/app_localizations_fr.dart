@@ -5447,6 +5447,153 @@ class AppLocalizationsFr extends AppLocalizations {
       'Véhicules de société, affectations et rapports pour les gestionnaires.';
 
   @override
+  String get fleetExpensesTitle => 'Frais de carburant';
+
+  @override
+  String get fleetExpensesEmptyTitle => 'Aucun frais pour l\'instant';
+
+  @override
+  String get fleetExpensesEmptyBody =>
+      'Scannez un ticket de carburant : il apparaîtra ici comme proposition, à vérifier avant de l\'envoyer.';
+
+  @override
+  String get fleetExpenseStatusDraft => 'Brouillon';
+
+  @override
+  String get fleetExpenseStatusNeedsReview => 'À vérifier';
+
+  @override
+  String get fleetExpenseStatusSubmitted => 'Envoyé';
+
+  @override
+  String get fleetExpenseStatusApproved => 'Approuvé';
+
+  @override
+  String get fleetExpenseStatusRejected => 'Refusé';
+
+  @override
+  String get fleetExpenseStatusExported => 'Exporté';
+
+  @override
+  String get fleetExpenseStatusArchived => 'Archivé';
+
+  @override
+  String get fleetExpenseUnknownStation => 'Station non lue';
+
+  @override
+  String get fleetExpenseReviewTitle => 'Vérifier ce ticket';
+
+  @override
+  String get fleetExpenseNotFound =>
+      'Ce frais ne se trouve pas sur cet appareil.';
+
+  @override
+  String get fleetExpenseArithmeticOk =>
+      'Litres × prix au litre correspond au total imprimé.';
+
+  @override
+  String get fleetExpenseArithmeticMismatch =>
+      'Litres × prix au litre ne correspond pas au total imprimé. Vérifiez les chiffres avant d\'envoyer.';
+
+  @override
+  String get fleetExpenseArithmeticIncomplete =>
+      'Un chiffre manque : le total ne peut pas être vérifié.';
+
+  @override
+  String get fleetExpenseNeedsConfirmationTitle => 'À confirmer par vos soins';
+
+  @override
+  String get fleetExpenseReadTitle => 'Lu sur le document';
+
+  @override
+  String get fleetExpenseFieldStation => 'Station';
+
+  @override
+  String get fleetExpenseFieldDate => 'Date';
+
+  @override
+  String get fleetExpenseFieldFuel => 'Type de carburant';
+
+  @override
+  String get fleetExpenseFieldLitres => 'Volume';
+
+  @override
+  String get fleetExpenseFieldPricePerLitre => 'Prix au litre';
+
+  @override
+  String get fleetExpenseFieldTotal => 'Total';
+
+  @override
+  String get fleetExpenseFieldVat => 'TVA';
+
+  @override
+  String get fleetExpenseFieldVatRate => 'Taux de TVA';
+
+  @override
+  String get fleetExpenseFieldPaymentReference => 'Référence de paiement';
+
+  @override
+  String get fleetExpenseFieldOdometer => 'Kilométrage';
+
+  @override
+  String get fleetExpenseValueMissing => 'Non lu';
+
+  @override
+  String get fleetExpenseDocumentTitle => 'Document';
+
+  @override
+  String get fleetExpenseSourceOcrPhoto => 'Ticket photographié';
+
+  @override
+  String get fleetExpenseSourceOcrPdf => 'Ticket PDF';
+
+  @override
+  String get fleetExpenseSourceEReceipt => 'Ticket numérique';
+
+  @override
+  String get fleetExpenseSourceStructuredInvoice => 'Facture électronique';
+
+  @override
+  String get fleetExpenseNotAuthoritative =>
+      'Une photo n\'est pas un document probant, aussi bien lue soit-elle.';
+
+  @override
+  String get fleetExpenseAuthoritative =>
+      'L\'entreprise traite ce document comme un justificatif probant.';
+
+  @override
+  String get fleetExpenseAttachedToFillUp =>
+      'Rattaché à un plein que vous avez déjà enregistré.';
+
+  @override
+  String fleetExpenseCorrections(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count champs corrigés',
+      one: '1 champ corrigé',
+      zero: 'Aucune correction',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fleetExpenseNotAnAccountingRecord =>
+      'En envoyant, vous transmettez une demande à votre entreprise. Ce n\'est pas une pièce comptable et cela ne décide pas du remboursement.';
+
+  @override
+  String get fleetExpenseConfirmAndSubmit => 'Confirmer et envoyer';
+
+  @override
+  String get fleetExpenseFixFirst => 'Confirmez d\'abord les champs signalés';
+
+  @override
+  String get fleetExpenseAlreadySubmitted => 'Déjà envoyé';
+
+  @override
+  String get fleetExpenseSubmitFailed => 'Impossible d\'envoyer ce frais.';
+
+  @override
   String get fleetVehicleCurrentLabel => 'Véhicule actuel';
 
   @override

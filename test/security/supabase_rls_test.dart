@@ -151,6 +151,24 @@ void main() {
     'fleet_policies': {
       'fleet_policies_member_select': 'SELECT',
     },
+    // #4215 (v14, ADR 0025) — the two USER-owned fleet tables. Unlike
+    // the five above they carry the schema's ordinary own-row `FOR
+    // ALL`, because an expense is the employee's; the second policy on
+    // each is the manager's read, and it is SELECT so a manager can
+    // never write somebody else's claim (review is an RPC).
+    'fleet_expenses': {
+      'fleet_expenses_own': 'ALL',
+      'fleet_expenses_manager_select': 'SELECT',
+    },
+    'fleet_documents': {
+      'fleet_documents_own': 'ALL',
+      'fleet_documents_manager_select': 'SELECT',
+    },
+    // The audit trail: readable by the subject and an org admin,
+    // writable by nobody — one policy, and it is a SELECT.
+    'fleet_audit_events': {
+      'fleet_audit_events_select': 'SELECT',
+    },
   };
 
   group('Supabase RLS matrix (#1110)', () {

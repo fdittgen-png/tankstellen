@@ -5372,6 +5372,152 @@ class AppLocalizationsEn extends AppLocalizations {
       'Company vehicles, assignments and manager reporting.';
 
   @override
+  String get fleetExpensesTitle => 'Fuel expenses';
+
+  @override
+  String get fleetExpensesEmptyTitle => 'No expenses yet';
+
+  @override
+  String get fleetExpensesEmptyBody =>
+      'Scan a fuel receipt and it appears here as a candidate you can check before submitting it.';
+
+  @override
+  String get fleetExpenseStatusDraft => 'Draft';
+
+  @override
+  String get fleetExpenseStatusNeedsReview => 'Needs review';
+
+  @override
+  String get fleetExpenseStatusSubmitted => 'Submitted';
+
+  @override
+  String get fleetExpenseStatusApproved => 'Approved';
+
+  @override
+  String get fleetExpenseStatusRejected => 'Rejected';
+
+  @override
+  String get fleetExpenseStatusExported => 'Exported';
+
+  @override
+  String get fleetExpenseStatusArchived => 'Archived';
+
+  @override
+  String get fleetExpenseUnknownStation => 'Station not read';
+
+  @override
+  String get fleetExpenseReviewTitle => 'Check this receipt';
+
+  @override
+  String get fleetExpenseNotFound => 'This expense is not on this device.';
+
+  @override
+  String get fleetExpenseArithmeticOk =>
+      'Litres × price per litre matches the printed total.';
+
+  @override
+  String get fleetExpenseArithmeticMismatch =>
+      'Litres × price per litre does not match the printed total. Check the numbers before you submit.';
+
+  @override
+  String get fleetExpenseArithmeticIncomplete =>
+      'A number is missing, so the total cannot be checked.';
+
+  @override
+  String get fleetExpenseNeedsConfirmationTitle => 'Needs your confirmation';
+
+  @override
+  String get fleetExpenseReadTitle => 'Read from the document';
+
+  @override
+  String get fleetExpenseFieldStation => 'Station';
+
+  @override
+  String get fleetExpenseFieldDate => 'Date';
+
+  @override
+  String get fleetExpenseFieldFuel => 'Fuel grade';
+
+  @override
+  String get fleetExpenseFieldLitres => 'Volume';
+
+  @override
+  String get fleetExpenseFieldPricePerLitre => 'Price per litre';
+
+  @override
+  String get fleetExpenseFieldTotal => 'Total';
+
+  @override
+  String get fleetExpenseFieldVat => 'VAT';
+
+  @override
+  String get fleetExpenseFieldVatRate => 'VAT rate';
+
+  @override
+  String get fleetExpenseFieldPaymentReference => 'Payment reference';
+
+  @override
+  String get fleetExpenseFieldOdometer => 'Odometer';
+
+  @override
+  String get fleetExpenseValueMissing => 'Not read';
+
+  @override
+  String get fleetExpenseDocumentTitle => 'Document';
+
+  @override
+  String get fleetExpenseSourceOcrPhoto => 'Photographed receipt';
+
+  @override
+  String get fleetExpenseSourceOcrPdf => 'PDF receipt';
+
+  @override
+  String get fleetExpenseSourceEReceipt => 'Digital receipt';
+
+  @override
+  String get fleetExpenseSourceStructuredInvoice => 'Electronic invoice';
+
+  @override
+  String get fleetExpenseNotAuthoritative =>
+      'A photograph is not an authoritative document, however well it was read.';
+
+  @override
+  String get fleetExpenseAuthoritative =>
+      'The company treats this document as an authoritative record.';
+
+  @override
+  String get fleetExpenseAttachedToFillUp =>
+      'Attached to a fill-up you already logged.';
+
+  @override
+  String fleetExpenseCorrections(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fields corrected',
+      one: '1 field corrected',
+      zero: 'No corrections',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fleetExpenseNotAnAccountingRecord =>
+      'Submitting hands this to your company as a claim. It is not an accounting record, and it does not decide whether you are reimbursed.';
+
+  @override
+  String get fleetExpenseConfirmAndSubmit => 'Confirm and submit';
+
+  @override
+  String get fleetExpenseFixFirst => 'Confirm the highlighted fields first';
+
+  @override
+  String get fleetExpenseAlreadySubmitted => 'Already submitted';
+
+  @override
+  String get fleetExpenseSubmitFailed => 'Could not submit this expense.';
+
+  @override
   String get fleetVehicleCurrentLabel => 'Current vehicle';
 
   @override
@@ -16012,6 +16158,157 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get featureGroupDescription_fleet =>
       '⟦Çóɱƥáñý ṽéĥîçłéš, áššîǧñɱéñŧš áñđ ɱáñáǧéř řéƥóřŧîñǧ. ····················⟧';
+
+  @override
+  String get fleetExpensesTitle => '⟦Ƒúéł éẋƥéñšéš ·····⟧';
+
+  @override
+  String get fleetExpensesEmptyTitle => '⟦Ñó éẋƥéñšéš ýéŧ ······⟧';
+
+  @override
+  String get fleetExpensesEmptyBody =>
+      '⟦Šçáñ á ƒúéł řéçéîƥŧ áñđ îŧ áƥƥéářš ĥéřé áš á çáñđîđáŧé ýóú çáñ çĥéçķ ƀéƒóřé šúƀɱîŧŧîñǧ îŧ. ·································⟧';
+
+  @override
+  String get fleetExpenseStatusDraft => '⟦Đřáƒŧ ··⟧';
+
+  @override
+  String get fleetExpenseStatusNeedsReview => '⟦Ñééđš řéṽîéŵ ·····⟧';
+
+  @override
+  String get fleetExpenseStatusSubmitted => '⟦Šúƀɱîŧŧéđ ····⟧';
+
+  @override
+  String get fleetExpenseStatusApproved => '⟦Áƥƥřóṽéđ ····⟧';
+
+  @override
+  String get fleetExpenseStatusRejected => '⟦Řéĵéçŧéđ ····⟧';
+
+  @override
+  String get fleetExpenseStatusExported => '⟦Éẋƥóřŧéđ ····⟧';
+
+  @override
+  String get fleetExpenseStatusArchived => '⟦Ářçĥîṽéđ ····⟧';
+
+  @override
+  String get fleetExpenseUnknownStation => '⟦Šŧáŧîóñ ñóŧ řéáđ ······⟧';
+
+  @override
+  String get fleetExpenseReviewTitle => '⟦Çĥéçķ ŧĥîš řéçéîƥŧ ·······⟧';
+
+  @override
+  String get fleetExpenseNotFound =>
+      '⟦Ŧĥîš éẋƥéñšé îš ñóŧ óñ ŧĥîš đéṽîçé. ·············⟧';
+
+  @override
+  String get fleetExpenseArithmeticOk =>
+      '⟦Łîŧřéš × ƥřîçé ƥéř łîŧřé ɱáŧçĥéš ŧĥé ƥřîñŧéđ ŧóŧáł. ··················⟧';
+
+  @override
+  String get fleetExpenseArithmeticMismatch =>
+      '⟦Łîŧřéš × ƥřîçé ƥéř łîŧřé đóéš ñóŧ ɱáŧçĥ ŧĥé ƥřîñŧéđ ŧóŧáł. Çĥéçķ ŧĥé ñúɱƀéřš ƀéƒóřé ýóú šúƀɱîŧ. ··································⟧';
+
+  @override
+  String get fleetExpenseArithmeticIncomplete =>
+      '⟦Á ñúɱƀéř îš ɱîššîñǧ, šó ŧĥé ŧóŧáł çáññóŧ ƀé çĥéçķéđ. ··················⟧';
+
+  @override
+  String get fleetExpenseNeedsConfirmationTitle =>
+      '⟦Ñééđš ýóúř çóñƒîřɱáŧîóñ ·········⟧';
+
+  @override
+  String get fleetExpenseReadTitle => '⟦Řéáđ ƒřóɱ ŧĥé đóçúɱéñŧ ·········⟧';
+
+  @override
+  String get fleetExpenseFieldStation => '⟦Šŧáŧîóñ ···⟧';
+
+  @override
+  String get fleetExpenseFieldDate => '⟦Đáŧé ··⟧';
+
+  @override
+  String get fleetExpenseFieldFuel => '⟦Ƒúéł ǧřáđé ····⟧';
+
+  @override
+  String get fleetExpenseFieldLitres => '⟦Ṽółúɱé ···⟧';
+
+  @override
+  String get fleetExpenseFieldPricePerLitre => '⟦Ƥřîçé ƥéř łîŧřé ······⟧';
+
+  @override
+  String get fleetExpenseFieldTotal => '⟦Ŧóŧáł ··⟧';
+
+  @override
+  String get fleetExpenseFieldVat => '⟦ṼÁŦ ·⟧';
+
+  @override
+  String get fleetExpenseFieldVatRate => '⟦ṼÁŦ řáŧé ···⟧';
+
+  @override
+  String get fleetExpenseFieldPaymentReference => '⟦Ƥáýɱéñŧ řéƒéřéñçé ·······⟧';
+
+  @override
+  String get fleetExpenseFieldOdometer => '⟦Óđóɱéŧéř ····⟧';
+
+  @override
+  String get fleetExpenseValueMissing => '⟦Ñóŧ řéáđ ···⟧';
+
+  @override
+  String get fleetExpenseDocumentTitle => '⟦Đóçúɱéñŧ ····⟧';
+
+  @override
+  String get fleetExpenseSourceOcrPhoto => '⟦Ƥĥóŧóǧřáƥĥéđ řéçéîƥŧ ·········⟧';
+
+  @override
+  String get fleetExpenseSourceOcrPdf => '⟦ƤĐƑ řéçéîƥŧ ·····⟧';
+
+  @override
+  String get fleetExpenseSourceEReceipt => '⟦Đîǧîŧáł řéçéîƥŧ ······⟧';
+
+  @override
+  String get fleetExpenseSourceStructuredInvoice =>
+      '⟦Éłéçŧřóñîç îñṽóîçé ········⟧';
+
+  @override
+  String get fleetExpenseNotAuthoritative =>
+      '⟦Á ƥĥóŧóǧřáƥĥ îš ñóŧ áñ áúŧĥóřîŧáŧîṽé đóçúɱéñŧ, ĥóŵéṽéř ŵéłł îŧ ŵáš řéáđ. ···························⟧';
+
+  @override
+  String get fleetExpenseAuthoritative =>
+      '⟦Ŧĥé çóɱƥáñý ŧřéáŧš ŧĥîš đóçúɱéñŧ áš áñ áúŧĥóřîŧáŧîṽé řéçóřđ. ·······················⟧';
+
+  @override
+  String get fleetExpenseAttachedToFillUp =>
+      '⟦Áŧŧáçĥéđ ŧó á ƒîłł-úƥ ýóú áłřéáđý łóǧǧéđ. ···············⟧';
+
+  @override
+  String fleetExpenseCorrections(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fields corrected',
+      one: '1 field corrected',
+      zero: 'No corrections',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get fleetExpenseNotAnAccountingRecord =>
+      '⟦Šúƀɱîŧŧîñǧ ĥáñđš ŧĥîš ŧó ýóúř çóɱƥáñý áš á çłáîɱ. Îŧ îš ñóŧ áñ áççóúñŧîñǧ řéçóřđ, áñđ îŧ đóéš ñóŧ đéçîđé ŵĥéŧĥéř ýóú ářé řéîɱƀúřšéđ. ················································⟧';
+
+  @override
+  String get fleetExpenseConfirmAndSubmit => '⟦Çóñƒîřɱ áñđ šúƀɱîŧ ·······⟧';
+
+  @override
+  String get fleetExpenseFixFirst =>
+      '⟦Çóñƒîřɱ ŧĥé ĥîǧĥłîǧĥŧéđ ƒîéłđš ƒîřšŧ ··············⟧';
+
+  @override
+  String get fleetExpenseAlreadySubmitted => '⟦Áłřéáđý šúƀɱîŧŧéđ ·······⟧';
+
+  @override
+  String get fleetExpenseSubmitFailed =>
+      '⟦Çóúłđ ñóŧ šúƀɱîŧ ŧĥîš éẋƥéñšé. ···········⟧';
 
   @override
   String get fleetVehicleCurrentLabel => '⟦Çúřřéñŧ ṽéĥîçłé ······⟧';

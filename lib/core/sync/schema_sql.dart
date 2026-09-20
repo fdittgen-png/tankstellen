@@ -18,6 +18,7 @@
 library;
 
 import 'schema_sql_fleet.dart';
+import 'schema_sql_fleet_expenses.dart';
 import 'schema_sql_owner.dart';
 import 'schema_sql_policies.dart';
 import 'schema_table_specs.dart';
@@ -59,7 +60,15 @@ import 'schema_table_specs.dart';
 /// `fleet_policies` (SELECT-only policies through the `is_fleet_member`
 /// / `fleet_role` oracles), the four `fleet_*` write RPCs, and the two
 /// user-linked fleet tables joining `erase_my_data()`.
-const int kSupabaseSchemaVersion = 13;
+/// v14 (#4215, ADR 0025): the expense workflow — `fleet_expenses` and
+/// `fleet_documents` (USER-owned: own-row `FOR ALL` plus a manager
+/// SELECT restricted to `status <> 'draft'`, so a draft never leaves
+/// the employee's scope), the server-only `fleet_audit_events` log,
+/// the `fleet_review_expense` / `fleet_log_document_access` RPCs, the
+/// private `fleet-documents` Storage bucket with its two object
+/// policies, and an `erase_my_data()` that deletes the stored receipt
+/// BYTES as well as the rows that name them.
+const int kSupabaseSchemaVersion = 14;
 
 /// The metadata table that records the applied schema version. Readable by
 /// anyone (it carries no user data — only the schema version the verifier
@@ -142,6 +151,11 @@ String buildMigrationSql(Map<String, bool> schema) {
     ..writeln(ownerProtectionSql)
     ..writeln(rpcSql)
     ..writeln(fleetRpcSql)
+    // #4215 (v14) — the audit table BEFORE the RPCs that INSERT into
+    // it; the bucket last, since its policies read fleet_documents.
+    ..writeln(fleetAuditTableSql)
+    ..writeln(fleetExpenseRpcSql)
+    ..writeln(fleetDocumentStorageSql)
     ..writeln(_metaSql);
 
   return buffer.toString();

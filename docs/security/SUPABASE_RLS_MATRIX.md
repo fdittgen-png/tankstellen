@@ -82,6 +82,10 @@ Legend:
 | `fleet_vehicles`   | member       | (rpc)           | (rpc)      | none               | `fleet_vehicles_member_select` — every member sees the org's vehicle directory; nothing in it names a person. No location column (D5). |
 | `vehicle_assignments` | own rows + org-wide for `manager`/`admin` | (rpc) | (rpc: `effective_to` only) | none | `fleet_assignments_select`. Effective-dated; `fleet_end_assignment` stamps `effective_to`, never deletes. Erased by `erase_my_data()` (`user_id`). |
 | `fleet_policies`   | member       | (rpc)           | (rpc)      | none               | `fleet_policies_member_select`. JSONB thresholds / retention (D9), seeded by `fleet_create_organization`. |
+| `fleet_expenses`   | own (`user_id = auth.uid()`) + org `manager`/`admin` for `status <> 'draft'` | own | own | own | #4215 (schema v14, ADR 0025). The first USER-owned fleet tables: `fleet_expenses_own` `FOR ALL` plus the SELECT-only `fleet_expenses_manager_select`, whose `status <> 'draft'` predicate is what keeps an employee's working copy out of the manager's scope. A manager has NO update policy — approval is the `fleet_review_expense` RPC. Erased by `erase_my_data()` (`user_id`). |
+| `fleet_documents`  | own + org `manager`/`admin` only through a non-draft expense that cites the document | own, `object_key` pinned to `<org>/<auth.uid()>/<id>` | own | own | `fleet_documents_own` `FOR ALL` plus `fleet_documents_manager_select`, which EXISTS-joins `fleet_expenses` for the draft rule. The own policy's `WITH CHECK` pins `object_key`: without it a client could insert an own row naming another user's object path, and the Storage policy would hand over their receipt (#4049's ownership gap, one table over). Metadata only — the bytes are private Storage objects. Erased by `erase_my_data()` (`user_id`), which also deletes the objects. |
+| `fleet_audit_events` | own rows as `actor` + org `admin` | (rpc) | (none) | (none) | `fleet_audit_events_select`. Append-only from the client's point of view: written solely by `fleet_review_expense` / `fleet_log_document_access`, with no INSERT/UPDATE/DELETE policy, so the audited party cannot rewrite the trail. Exported to the subject, NOT erased (D9 legal-obligation basis). |
+| `storage.objects` (bucket `fleet-documents`) | owner; or an org `manager`/`admin` where the metadata row belongs to the object's real uploader AND a non-draft expense cites it | owner, key second segment = `auth.uid()` | owner | owner | `fleet_documents_object_own` `FOR ALL` plus the SELECT-only `fleet_documents_object_manager_read`. The manager policy never parses the object key (untrusted text) and does **not** simply delegate to `fleet_documents`' RLS — it binds `d.user_id = storage.objects.owner`, calls `fleet_role(d.org_id)` and joins the owning expense for `status <> 'draft'`, so a forged metadata row matches nothing. Bucket created and re-asserted `public = false`; reads are 5-minute signed URLs, audited before issue and never persisted. |
 
 ## RPCs (SECURITY DEFINER functions)
 
@@ -105,6 +109,8 @@ explicitly, and is `REVOKE`d from `PUBLIC` and `anon` before being
 | `fleet_upsert_vehicle(p_org, p_id, p_fleet_code, p_display_name, p_plate_masked, p_data)` | `authenticated`, `manager`/`admin` of `p_org` | Inserts or updates one vehicle; `org_id` is in the UPDATE's WHERE so a foreign id updates nothing. | #4212 (v13). |
 | `fleet_assign_vehicle(p_org, p_fleet_vehicle_id, p_user, p_effective_from)` | `authenticated`, `manager`/`admin` of `p_org` | Opens an assignment; target must be an active member and the vehicle must belong to the org; idempotent on an already-open one. | #4212 (v13). |
 | `fleet_end_assignment(p_assignment_id, p_effective_to)` | `authenticated`, `manager`/`admin` of the row's org | Stamps `effective_to`; never deletes. Returns FALSE for "not found" and "not your org" alike. | #4212 (v13). |
+| `fleet_review_expense(p_id, p_user, p_decision)` | `authenticated`, `manager`/`admin` of the expense's org | `submitted → approved \| rejected`, and nothing else: a draft cannot be approved even by a manager who guessed its id. Writes one `fleet_audit_events` row per decision. | #4215 (v14). The manager has no UPDATE policy on the table, so this is the only door. |
+| `fleet_log_document_access(p_document)` | `authenticated`; the document's owner, or a `manager`/`admin` of its org with a non-draft expense citing it | Records one `document_signed_url` audit row. Its access test MIRRORS the object policy, so a row in the log means a URL was really issued — checking membership alone logged a refused read as an access. Returns a boolean, never a URL; the client refuses to issue a signed URL when this returns false. | #4215 (v14, ADR 0025 D5.4). |
 
 The migration source-of-truth lives in `supabase/migrations/`:
 
@@ -167,6 +173,20 @@ The migration source-of-truth lives in `supabase/migrations/`:
   with SELECT-only policies through `is_fleet_member()` / `fleet_role()`;
   the four `fleet_*` RPCs; `erase_my_data()` redefined to cover the two
   user-linked fleet tables (#4212, schema v13, ADR 0025).
+- `20260918000002_fleet_expenses.sql` — `fleet_expenses` and
+  `fleet_documents` (user-owned: own-row `FOR ALL` + a manager SELECT
+  restricted to `status <> 'draft'`), the server-only
+  `fleet_audit_events` log, `fleet_review_expense()` and
+  `fleet_log_document_access()`, the private `fleet-documents` Storage
+  bucket with two `storage.objects` policies, and `erase_my_data()`
+  redefined again to sweep the stored receipt objects alongside the
+  rows — behind `storage.allow_delete_query` and an `EXCEPTION`
+  block, because Supabase's statement-level `protect_objects_delete`
+  trigger raises 42501 even for a zero-row delete and would abort the
+  whole erasure. The client removes the BYTES through the Storage API
+  first (`FleetDocumentStore.eraseOwnObjects`); the SQL sweep is the
+  fallback and can leave S3 objects orphaned on its own (#4215,
+  schema v14, ADR 0025).
 
 If a migration not listed above is found in `supabase/migrations/`,
 this matrix is stale. See "How to update" below.

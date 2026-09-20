@@ -216,6 +216,11 @@ REVOKE EXECUTE ON FUNCTION public.delete_user() FROM anon;
 -- public.users, sync_settings, wait_time_pings and trip_shares included.
 -- v13 (#4212) — the two user-linked fleet tables join the list; the
 -- org's own rows (organisations, vehicles, policies) are not the user's.
+-- v14 (#4215) — fleet_expenses + fleet_documents join it, and the
+-- stored receipt BYTES go with them: deleting the metadata row without
+-- its object would leave the receipt in the bucket, which is exactly
+-- the failure Art. 17 is about. The sweep runs BEFORE the loop, while
+-- the rows that name the object keys still exist.
 CREATE OR REPLACE FUNCTION public.erase_my_data()
 RETURNS TABLE(table_name TEXT, rows_deleted BIGINT)
 LANGUAGE plpgsql
@@ -234,7 +239,51 @@ BEGIN
   PERFORM set_config('request.jwt.claims',
                      json_build_object('role', 'service_role')::text, true);
 
+  -- #4215 — the receipt objects, keyed through the rows deleted below.
+  -- BEST-EFFORT, and structurally unable to abort the erasure.
+  --
+  -- Supabase ships protect_objects_delete on storage.objects: a BEFORE
+  -- DELETE FOR EACH STATEMENT trigger that raises 42501 for a direct
+  -- SQL delete. Statement-level means it fires even when the statement
+  -- matches ZERO rows, so the first shape of this sweep took down
+  -- erase_my_data() for EVERY caller, fleet member or not — an Art. 17
+  -- regression on a shipped path (#3865). The live matrix caught it.
+  --
+  -- Two guards, and the second is the one that matters: the
+  -- transaction-local allow_delete_query switch is what the trigger
+  -- looks for, and the EXCEPTION block means no future storage-side
+  -- guard can ever again take the row erasure down with it. A skipped
+  -- sweep is a WARNING, never a failed erase.
+  --
+  -- The client removes the bytes through the Storage API BEFORE calling
+  -- this function (FleetDocumentStore.eraseOwnObjects), because that is
+  -- the only path that deletes the S3 object as well as its row. This
+  -- statement is the fallback for a caller that did not, and on its own
+  -- it can leave the stored bytes orphaned in the bucket.
+  IF to_regclass('storage.objects') IS NOT NULL THEN
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM pg_trigger
+         WHERE tgrelid = 'storage.objects'::regclass
+           AND NOT tgisinternal
+           AND tgname = 'protect_objects_delete'
+      ) THEN
+        PERFORM set_config('storage.allow_delete_query', 'true', true);
+      END IF;
+      DELETE FROM storage.objects o
+        USING public.fleet_documents d
+        WHERE o.bucket_id = 'fleet-documents'
+          AND o.name = d.object_key
+          AND d.user_id = uid;
+    EXCEPTION WHEN OTHERS THEN
+      RAISE WARNING 'erase_my_data: fleet-documents object sweep skipped (%)',
+        SQLERRM;
+    END;
+  END IF;
+
   FOREACH spec SLICE 1 IN ARRAY ARRAY[
+    ARRAY['fleet_expenses',   'user_id'],
+    ARRAY['fleet_documents',  'user_id'],
     ARRAY['vehicle_assignments', 'user_id'],
     ARRAY['fleet_members',    'user_id'],
     ARRAY['trip_shares',      'owner_id'],

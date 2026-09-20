@@ -57,6 +57,14 @@ void main() {
     'fleet_vehicles',
     'vehicle_assignments',
     'fleet_policies',
+    // #4215 (v14) — the two USER-owned fleet tables. `fleet_expenses`
+    // rides the generic EntitySync transport, so its `.from()` is the
+    // engine's parameterised one and the literal scan below cannot see
+    // it; `fleet_documents` is written through FleetDocumentStore's
+    // seam for the same reason. Both must be listed here, exactly like
+    // the #4062 map-routed rule.
+    'fleet_expenses',
+    'fleet_documents',
   };
 
   // Tables read only by server-side SQL (functions / triggers / RPCs), never
@@ -64,7 +72,15 @@ void main() {
   // the verifier's probe list but are still created by the wizard SQL.
   // `tanksync_meta` is the schema-version row the verifier reads via a
   // dedicated probe (not a sync `.from()` of user data).
-  const serverOnlyTables = <String>{'database_owner', 'tanksync_meta'};
+  // #4215 — `fleet_audit_events` joins them: the client never writes it
+  // (the `fleet_*` SECURITY DEFINER RPCs do, and no client write policy
+  // exists), so it is not a synced table; `UserDataSync` reads the
+  // caller's own rows through its table MAP for the GDPR export.
+  const serverOnlyTables = <String>{
+    'database_owner',
+    'tanksync_meta',
+    'fleet_audit_events',
+  };
 
   group('SchemaVerifier completeness (#2929)', () {
     test('every synced table is in the verifier required/optional lists', () {

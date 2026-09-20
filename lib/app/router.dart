@@ -16,6 +16,7 @@ import '../features/receipts_ocr/api.dart';
 import '../features/widget/presentation/widget_uri_parser.dart';
 import '../features/widget/providers/pending_widget_uri_provider.dart';
 import 'routes/consumption_routes.dart';
+import 'routes/fleet_routes.dart';
 import 'routes/onboarding_routes.dart';
 import 'routes/profile_routes.dart';
 import 'routes/search_routes.dart';
@@ -212,6 +213,7 @@ GoRouter router(Ref ref) {
       ...searchRoutes,
       ...profileRoutes,
       ...consumptionRoutes,
+      ...fleetRoutes,
       ...stationRoutes(ref),
       ...syncRoutes,
     ],

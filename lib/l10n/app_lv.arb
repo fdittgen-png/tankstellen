@@ -9263,5 +9263,225 @@
   "@fleetVehicleSemanticsChange": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fleetExpensesTitle": "Fuel expenses",
+  "@fleetExpensesTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpensesEmptyTitle": "No expenses yet",
+  "@fleetExpensesEmptyTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpensesEmptyBody": "Scan a fuel receipt and it appears here as a candidate you can check before submitting it.",
+  "@fleetExpensesEmptyBody": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusDraft": "Draft",
+  "@fleetExpenseStatusDraft": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusNeedsReview": "Needs review",
+  "@fleetExpenseStatusNeedsReview": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusSubmitted": "Submitted",
+  "@fleetExpenseStatusSubmitted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusApproved": "Approved",
+  "@fleetExpenseStatusApproved": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusRejected": "Rejected",
+  "@fleetExpenseStatusRejected": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusExported": "Exported",
+  "@fleetExpenseStatusExported": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseStatusArchived": "Archived",
+  "@fleetExpenseStatusArchived": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseUnknownStation": "Station not read",
+  "@fleetExpenseUnknownStation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseReviewTitle": "Check this receipt",
+  "@fleetExpenseReviewTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseNotFound": "This expense is not on this device.",
+  "@fleetExpenseNotFound": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseArithmeticOk": "Litres × price per litre matches the printed total.",
+  "@fleetExpenseArithmeticOk": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseArithmeticMismatch": "Litres × price per litre does not match the printed total. Check the numbers before you submit.",
+  "@fleetExpenseArithmeticMismatch": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseArithmeticIncomplete": "A number is missing, so the total cannot be checked.",
+  "@fleetExpenseArithmeticIncomplete": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseNeedsConfirmationTitle": "Needs your confirmation",
+  "@fleetExpenseNeedsConfirmationTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseReadTitle": "Read from the document",
+  "@fleetExpenseReadTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldStation": "Station",
+  "@fleetExpenseFieldStation": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldDate": "Date",
+  "@fleetExpenseFieldDate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldFuel": "Fuel grade",
+  "@fleetExpenseFieldFuel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldLitres": "Volume",
+  "@fleetExpenseFieldLitres": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldPricePerLitre": "Price per litre",
+  "@fleetExpenseFieldPricePerLitre": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldTotal": "Total",
+  "@fleetExpenseFieldTotal": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldVat": "VAT",
+  "@fleetExpenseFieldVat": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldVatRate": "VAT rate",
+  "@fleetExpenseFieldVatRate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldPaymentReference": "Payment reference",
+  "@fleetExpenseFieldPaymentReference": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFieldOdometer": "Odometer",
+  "@fleetExpenseFieldOdometer": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseValueMissing": "Not read",
+  "@fleetExpenseValueMissing": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseDocumentTitle": "Document",
+  "@fleetExpenseDocumentTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSourceOcrPhoto": "Photographed receipt",
+  "@fleetExpenseSourceOcrPhoto": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSourceOcrPdf": "PDF receipt",
+  "@fleetExpenseSourceOcrPdf": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSourceEReceipt": "Digital receipt",
+  "@fleetExpenseSourceEReceipt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSourceStructuredInvoice": "Electronic invoice",
+  "@fleetExpenseSourceStructuredInvoice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseNotAuthoritative": "A photograph is not an authoritative document, however well it was read.",
+  "@fleetExpenseNotAuthoritative": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseAuthoritative": "The company treats this document as an authoritative record.",
+  "@fleetExpenseAuthoritative": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseAttachedToFillUp": "Attached to a fill-up you already logged.",
+  "@fleetExpenseAttachedToFillUp": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseCorrections": "{count, plural, =0{No corrections} =1{1 field corrected} other{{count} fields corrected}}",
+  "@fleetExpenseCorrections": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fleetExpenseNotAnAccountingRecord": "Submitting hands this to your company as a claim. It is not an accounting record, and it does not decide whether you are reimbursed.",
+  "@fleetExpenseNotAnAccountingRecord": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseConfirmAndSubmit": "Confirm and submit",
+  "@fleetExpenseConfirmAndSubmit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseFixFirst": "Confirm the highlighted fields first",
+  "@fleetExpenseFixFirst": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseAlreadySubmitted": "Already submitted",
+  "@fleetExpenseAlreadySubmitted": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fleetExpenseSubmitFailed": "Could not submit this expense.",
+  "@fleetExpenseSubmitFailed": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
