@@ -66,6 +66,12 @@ void main() {
             windowDistanceKm: 0,
             residualCoverage: 0,
             conditionShares: const <DrivingCondition, double>{},
+            // #4364 — this fixture evaluates no condition context at all
+            // (empty shares, zero residual coverage), so the honest
+            // coverage is 0, and both cost metrics are `insufficient`,
+            // so there is no denomination to name.
+            conditionCoverage: 0,
+            costCurrency: null,
           ),
         },
         typicalExpectedLPer100Km:
