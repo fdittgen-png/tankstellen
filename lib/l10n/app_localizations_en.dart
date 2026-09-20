@@ -8794,6 +8794,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refuelCompareRemove => 'Remove from comparison';
 
   @override
+  String get refuelComparePickStations => 'Compare stations';
+
+  @override
+  String get refuelComparePickingActive => 'Compare stations, picking is on';
+
+  @override
+  String get refuelComparePickPrompt =>
+      'Tap the compare button on any station to add it to this comparison.';
+
+  @override
   String get refuelCompareTitle => 'Your comparison';
 
   @override
@@ -20816,6 +20826,17 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get refuelCompareRemove => '⟦Řéɱóṽé ƒřóɱ çóɱƥářîšóñ ·········⟧';
+
+  @override
+  String get refuelComparePickStations => '⟦Çóɱƥářé šŧáŧîóñš ·······⟧';
+
+  @override
+  String get refuelComparePickingActive =>
+      '⟦Çóɱƥářé šŧáŧîóñš, ƥîçķîñǧ îš óñ ············⟧';
+
+  @override
+  String get refuelComparePickPrompt =>
+      '⟦Ŧáƥ ŧĥé çóɱƥářé ƀúŧŧóñ óñ áñý šŧáŧîóñ ŧó áđđ îŧ ŧó ŧĥîš çóɱƥářîšóñ. ························⟧';
 
   @override
   String get refuelCompareTitle => '⟦Ýóúř çóɱƥářîšóñ ······⟧';

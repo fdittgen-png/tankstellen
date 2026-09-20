@@ -8883,6 +8883,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get refuelCompareRemove => 'Aus dem Vergleich entfernen';
 
   @override
+  String get refuelComparePickStations => 'Stationen vergleichen';
+
+  @override
+  String get refuelComparePickingActive =>
+      'Stationen vergleichen, Auswahl aktiv';
+
+  @override
+  String get refuelComparePickPrompt =>
+      'Tippe bei einer Station auf die Vergleichen-Schaltfläche, um sie in diesen Vergleich aufzunehmen.';
+
+  @override
   String get refuelCompareTitle => 'Dein Vergleich';
 
   @override

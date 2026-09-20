@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../../core/domain/refuel_comparison_selection.dart';
 import '../../../../../core/domain/search_result_item.dart';
 import '../../../../../core/domain/station.dart';
 import '../../../../../core/navigation/app_routes.dart';
@@ -27,6 +28,11 @@ enum ResultsAction {
 
   /// Open the fuel-cost calculator, pre-filled with the cheapest price.
   fuelCalculator,
+
+  /// #4396 — turn the list's comparison picking mode on or off, so every
+  /// row shows the compare toggle and the FIRST station can be added
+  /// without knowing about the long press.
+  compareStations,
 
   /// #3943 — sort the results by station name, A to Z.
   sortByName,
@@ -53,6 +59,15 @@ enum ResultsAction {
 /// same behaviour, and the active one is ticked. The three modes whose
 /// glyph is self-evident (distance, price, rating) stay as chips on the
 /// row itself.
+///
+/// #4396 — the station comparison joins for the same reason the three
+/// icons did: it existed, and nothing said so. Its only way in from the
+/// list was a long press on a row, which is an accelerator and not an
+/// affordance. The entry here turns picking mode on
+/// ([refuelComparisonPickingProvider]) and every row then shows the
+/// compare toggle it already shows once a comparison exists — one
+/// labelled entry point, no per-row cost while the mode is off, and the
+/// long press kept exactly as it was.
 class ResultsActionMenu extends ConsumerWidget {
   const ResultsActionMenu({
     super.key,
@@ -81,6 +96,8 @@ class ResultsActionMenu extends ConsumerWidget {
         ];
         final (minP, _) = priceRange(stations, fuel, requirePositive: true);
         CalculatorRoute(initialPrice: minP > 0 ? minP : null).go(context);
+      case ResultsAction.compareStations:
+        ref.read(refuelComparisonPickingProvider.notifier).toggle();
       case ResultsAction.sortByName:
         _sort(ref, SortMode.name);
       case ResultsAction.sortOpen24h:
@@ -103,6 +120,9 @@ class ResultsActionMenu extends ConsumerWidget {
       enabledFeaturesProvider.select((f) => f.contains(Feature.fuelCalculator)),
     );
     final sortMode = ref.watch(selectedSortModeProvider);
+    // #4396 — the entry is ticked while picking is on, the same way the
+    // active sort mode is, so the menu also answers "am I picking?".
+    final picking = ref.watch(refuelComparisonPickingProvider);
 
     return PopupMenuButton<ResultsAction>(
       key: const Key('results_action_menu'),
@@ -136,6 +156,17 @@ class ResultsActionMenu extends ConsumerWidget {
             icon: Icons.calculate,
             label: l10n.fuelCostCalculator,
           ),
+        // #4396 — the list's visible door into the comparison. Same glyph
+        // as the per-row toggle and the detail/map buttons, so the mode
+        // and the control it reveals read as one thing.
+        _entry(
+          key: const Key('results_compare_stations'),
+          value: ResultsAction.compareStations,
+          icon: Icons.playlist_add,
+          label: l10n.refuelComparePickStations,
+          selected: picking,
+          selectedSemantics: l10n.refuelComparePickingActive,
+        ),
         const PopupMenuDivider(),
         // #3943 — the three sort modes no glyph can say. Ticked when
         // active, so the menu also answers "how is this list sorted?".

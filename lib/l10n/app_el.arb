@@ -11260,5 +11260,20 @@
   "@vehTripUnavailableShort": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "refuelComparePickStations": "Compare stations",
+  "@refuelComparePickStations": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelComparePickingActive": "Compare stations, picking is on",
+  "@refuelComparePickingActive": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "refuelComparePickPrompt": "Tap the compare button on any station to add it to this comparison.",
+  "@refuelComparePickPrompt": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

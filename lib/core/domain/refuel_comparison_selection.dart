@@ -61,3 +61,33 @@ class RefuelComparisonSelection extends Notifier<List<Station>> {
 final refuelComparisonSelectionProvider =
     NotifierProvider<RefuelComparisonSelection, List<Station>>(
         RefuelComparisonSelection.new);
+
+/// Whether the results list is in picking mode (#4396).
+///
+/// The comparison's own controls are cheap to show once a comparison
+/// exists — every row already grows the toggle. The *first* pick was the
+/// hole: with an empty comparison the list offered nothing but a long
+/// press, which no glyph, label or tooltip advertised, so the feature was
+/// invisible to anyone who had not read the issue.
+///
+/// This flag is the visible door. It is turned on from the results
+/// overflow menu — the same place #3926 moved three unlabelled icon
+/// buttons into labelled entries — and while it is on, every row carries
+/// the explicit toggle exactly as it does once a station is picked. It is
+/// only an affordance switch: it holds no station, and turning it off
+/// leaves the comparison exactly as the driver built it.
+///
+/// It lives beside the selection rather than in the search feature for
+/// the same reason the selection does: the row is drawn by
+/// `station_card_price_column.dart` and the switch is thrown in
+/// `results_action_menu.dart`, and neither may import the other's layer.
+class RefuelComparisonPicking extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void toggle() => state = !state;
+}
+
+final refuelComparisonPickingProvider =
+    NotifierProvider<RefuelComparisonPicking, bool>(
+        RefuelComparisonPicking.new);

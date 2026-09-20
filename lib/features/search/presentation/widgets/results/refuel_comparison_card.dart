@@ -47,9 +47,28 @@ class RefuelComparisonCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final comparison = ref.watch(refuelComparisonProvider);
-    if (comparison.isEmpty) return const SizedBox.shrink();
     final muted = AppText.label(context)
         .copyWith(color: theme.colorScheme.onSurfaceVariant);
+    if (comparison.isEmpty) {
+      // #4396 — picking mode with nothing picked yet. The toggles are
+      // already on every row; this says what they are for, once, in the
+      // slot the comparison itself will take. Outside picking mode the
+      // slot stays the zero-height item `ResultsLeadingItems` documents.
+      if (!ref.watch(refuelComparisonPickingProvider)) {
+        return const SizedBox.shrink();
+      }
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(
+            Spacing.lg, Spacing.sm, Spacing.lg, Spacing.sm),
+        child: SectionCard(
+          child: Text(
+            key: const Key('refuel_compare_pick_prompt'),
+            l10n.refuelComparePickPrompt,
+            style: muted,
+          ),
+        ),
+      );
+    }
 
     final caveats = <String>[
       if (!comparison.originKnown) l10n.refuelCompareOriginMissing,

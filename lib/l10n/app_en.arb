@@ -9539,6 +9539,18 @@
   "@refuelCompareRemove": {
     "description": "Tooltip/label of the same toggle when the station is already in the comparison (#4363)."
   },
+  "refuelComparePickStations": "Compare stations",
+  "@refuelComparePickStations": {
+    "description": "Results overflow-menu entry that turns the list's comparison picking mode on or off, so every station row shows its compare toggle and the first station can be added without knowing the long press (#4396)."
+  },
+  "refuelComparePickingActive": "Compare stations, picking is on",
+  "@refuelComparePickingActive": {
+    "description": "Accessibility label of that same menu entry while picking mode is already on, mirroring the ticked sort entries (#4396)."
+  },
+  "refuelComparePickPrompt": "Tap the compare button on any station to add it to this comparison.",
+  "@refuelComparePickPrompt": {
+    "description": "One-line prompt shown where the comparison card will appear, while picking mode is on and nothing has been picked yet (#4396)."
+  },
   "refuelCompareTitle": "Your comparison",
   "@refuelCompareTitle": {
     "description": "Title of the card comparing the stations the driver picked (#4363)."
