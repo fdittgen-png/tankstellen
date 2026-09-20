@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/gps_calibration_matrix.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
+import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/driving/providers/driving_coach_voice_listener_provider.dart';
 import 'package:tankstellen/features/fill_ups/domain/entities/fill_up.dart';
 import 'package:tankstellen/features/fill_ups/domain/services/fuel_behaviour_evidence_log.dart';
@@ -320,6 +321,40 @@ const _undrivenSurfaces = <String, String>{
           ':142), with a null vehicle so the trace records what was stored',
 };
 
+/// The profile property B drives every consumer against — the one with no
+/// legacy-estimator state at all. Named once so the per-pair tests and the
+/// whole-matrix ratchet below cannot drift apart.
+VehicleProfile get _referenceVehicle => _vehicles['noMatrix']!;
+
+/// Whether [consumer]'s figure for [trip] IS the canonical one, to the
+/// tolerance the audit treats as "the same number". Two absent figures
+/// agree; one absent figure never does.
+bool _agreesWithCanonical(_Consumer consumer, TripSummary trip) {
+  final actual = consumer.read(trip, _referenceVehicle);
+  final expected = _canonical(trip, _referenceVehicle);
+  if (actual == null || expected == null) return actual == expected;
+  return (actual - expected).abs() < 1e-9;
+}
+
+/// Every `<consumer>::<trip>` pair that does NOT agree with the canonical
+/// figure, recomputed over the WHOLE matrix on each call.
+///
+/// #4421 — this used to be an accumulator that the per-pair tests added to
+/// and a `tearDownAll` compared. `package:test` gives `--total-shards` a
+/// contiguous SLICE of each suite's test cases (test_core
+/// `Runner._shardSuite`) yet runs `tearDownAll` in every shard that
+/// receives any of the group, so the accumulator only ever held the
+/// slice's divergences and the exact comparison failed on a partition
+/// boundary — with a different pin named per shard index, and with
+/// nothing about the code under test having changed. Recomputing the set
+/// inside one test case makes the ratchet independent of how CI splits
+/// the suite.
+Set<String> _divergingPairs() => {
+      for (final c in _consumers)
+        for (final trip in _trips.entries)
+          if (!_agreesWithCanonical(c, trip.value)) '${c.name}::${trip.key}',
+    };
+
 /// The consumer areas #4234's Scope paragraph enumerates.
 const _namedAreas = <String>{
   'trip-recording',
@@ -332,6 +367,22 @@ const _namedAreas = <String>{
 };
 
 void main() {
+  // #4421 — the one piece of process-wide state a consumer on these paths
+  // could plausibly reach for is the active country, because #4364 made
+  // the evidence log currency-aware. The audit therefore STAMPS it rather
+  // than inheriting whatever ran before: a deliberately hostile,
+  // zero-decimal, non-EUR country, restored afterwards. Every figure the
+  // audit checks must be blind to it — if one is not, this file goes red
+  // on its own instead of on a shard boundary. Nothing else in the driven
+  // paths reads a static: the fixtures are built here, the consumers are
+  // pure calls, and no clock, Hive box or provider container is touched.
+  late String ambientCountry;
+  setUpAll(() {
+    ambientCountry = PriceFormatter.activeCountry;
+    PriceFormatter.setCountry('KR');
+  });
+  tearDownAll(() => PriceFormatter.setCountry(ambientCountry));
+
   group('#4234 · every named consumer area is audited', () {
     test('the registry plus the undriven list covers every named area', () {
       final covered = {
@@ -382,20 +433,14 @@ void main() {
 
   group('#4234 property B · every consumer receives the canonical figure',
       () {
-    final seenDivergences = <String>{};
-
     for (final c in _consumers) {
       for (final trip in _trips.entries) {
         final key = '${c.name}::${trip.key}';
         test('$key matches tripConsumptionEstimate', () {
-          final vehicle = _vehicles['noMatrix'];
+          final vehicle = _referenceVehicle;
           final actual = c.read(trip.value, vehicle);
           final expected = _canonical(trip.value, vehicle);
-          final agrees = actual == null && expected == null ||
-              (actual != null &&
-                  expected != null &&
-                  (actual - expected).abs() < 1e-9);
-          if (!agrees) seenDivergences.add(key);
+          final agrees = _agreesWithCanonical(c, trip.value);
           if (_knownDivergences.containsKey(key)) {
             expect(agrees, isFalse,
                 reason: '$key is pinned as a known divergence '
@@ -411,10 +456,14 @@ void main() {
       }
     }
 
-    tearDownAll(() {
-      // Belt and braces for the ratchet: the pinned set must be exactly
-      // what diverged, never a superset kept around for comfort.
-      expect(seenDivergences, _knownDivergences.keys.toSet());
+    // The ratchet's both-ways half, as ONE self-contained case (#4421):
+    // the pinned set must be exactly the set that diverges — never a
+    // superset kept around for comfort, and never a pin naming a pair the
+    // matrix no longer has. It recomputes the whole matrix itself, so its
+    // verdict does not depend on which of its sibling cases ran in the
+    // same shard.
+    test('the pinned divergences are exactly the pairs that diverge', () {
+      expect(_divergingPairs(), _knownDivergences.keys.toSet());
     });
   });
 
