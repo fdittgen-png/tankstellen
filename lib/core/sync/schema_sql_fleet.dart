@@ -66,6 +66,19 @@ AS \$\$
 REVOKE ALL ON FUNCTION public.fleet_role(UUID) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.fleet_role(UUID) TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.fleet_role(UUID) FROM anon;
+
+-- Advisor hygiene (#4212): Supabase's ALTER DEFAULT PRIVILEGES grants the
+-- full table ACL to anon and authenticated on every new public table.
+-- RLS already refuses anon every row (verified by the live matrix), so
+-- this REVOKE is behaviourally a no-op; it keeps the fleet tables off the
+-- pg_graphql_anon_table_exposed lint instead of adding five rows to it.
+REVOKE ALL ON TABLE
+  public.fleet_organizations,
+  public.fleet_members,
+  public.fleet_vehicles,
+  public.vehicle_assignments,
+  public.fleet_policies
+  FROM anon;
 ''';
 
 /// The only write path onto the fleet tables (ADR 0025 D7). Every

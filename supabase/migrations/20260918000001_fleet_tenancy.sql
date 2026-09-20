@@ -52,12 +52,21 @@
 --   [x] Five new tables, SELECT-only policies through the oracles.
 --   [x] No change to any existing table's policies.
 --
--- RLS confirmed: [ ]
---   Live matrix (two orgs invisible to each other; ended assignment keeps
---   history; employee cannot call a manager RPC; anon cannot call an
---   oracle) to be run with the live-RPC skill and pasted into the F2 PR
---   — see `test/core/sync/fleet/fleet_rls_contract_test.dart` for the
---   static half CI enforces.
+-- RLS confirmed: [x]
+--   Live matrix run 2026-09-19 against project klelxnkzrxlpzuddhpfg
+--   inside one aborting transaction (zero persistence verified
+--   afterwards: 0 fleet tables, schema_version still 8). All 10
+--   behavioural cases passed: two orgs invisible to each other; an
+--   employee sees only their own assignment and member row while a
+--   manager sees the org roster; every INSERT is refused by RLS and
+--   every UPDATE/DELETE matches 0 rows; an employee calling a manager
+--   RPC raises `forbidden`; a cross-org id raises `vehicle_not_found`;
+--   ending an assignment keeps the row with `effective_to` set and is
+--   idempotent; anon cannot execute any oracle or RPC; `erase_my_data`
+--   removes the caller's membership and assignments, leaves org rows and
+--   nulls `created_by`. No RLS recursion. See
+--   `test/core/sync/fleet/fleet_rls_contract_test.dart` for the static
+--   half CI enforces.
 
 -- ───────────────────────────────────────────────────────────────────
 -- 1. Tables
@@ -470,6 +479,19 @@ REVOKE EXECUTE ON FUNCTION public.erase_my_data() FROM anon;
 -- ───────────────────────────────────────────────────────────────────
 -- 6. Schema version
 -- ───────────────────────────────────────────────────────────────────
+-- Advisor hygiene (#4212): Supabase's ALTER DEFAULT PRIVILEGES grants the
+-- full table ACL to anon and authenticated on every new public table.
+-- RLS already refuses anon every row (verified by the live matrix), so
+-- this REVOKE is behaviourally a no-op; it keeps the fleet tables off the
+-- pg_graphql_anon_table_exposed lint instead of adding five rows to it.
+REVOKE ALL ON TABLE
+  public.fleet_organizations,
+  public.fleet_members,
+  public.fleet_vehicles,
+  public.vehicle_assignments,
+  public.fleet_policies
+  FROM anon;
+
 INSERT INTO public.tanksync_meta (key, value, updated_at)
   VALUES ('schema_version', '13', now())
   ON CONFLICT (key)
