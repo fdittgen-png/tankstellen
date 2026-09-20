@@ -20,6 +20,7 @@ export 'data/ocr/ocr_trace_package.dart';
 export 'data/ocr/ocr_trace_recorder.dart';
 export 'data/ocr/ocr_trace_serializer.dart';
 export 'data/ocr/pump_ocr_config.dart';
+export 'data/parsed_receipt_facts_adapter.dart';
 export 'data/receipt_parser.dart';
 export 'data/receipt_scan_service.dart';
 export 'presentation/widgets/bad_scan_report_sheet.dart';

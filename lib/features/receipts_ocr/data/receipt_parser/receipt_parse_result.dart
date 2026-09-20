@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../../core/domain/fuel_type.dart';
+import 'receipt_fiscal_extractors.dart';
 
 /// Structured fields extracted from a fuel receipt by `ReceiptParser`.
 ///
@@ -51,6 +52,29 @@ class ReceiptParseResult {
   /// (`'totalCost'` / `'liters'` / `'pricePerLiter'`) — #2848.
   final Set<String> derived;
 
+  /// VAT amount as printed, in the major unit of [currency] (#4215).
+  /// Null on every receipt that prints no VAT line — and on every
+  /// pre-#4215 caller, which is why the whole fiscal block is additive
+  /// and nullable: no existing consumption path changes behaviour.
+  final double? vatAmount;
+
+  /// VAT rate in percent as printed (`20.0` for `TVA 20,00 %`) — #4215.
+  final double? vatRate;
+
+  /// ISO 4217 code the amounts are denominated in (`EUR`, `GBP`, …),
+  /// never a symbol (#4215). Null when the paper is silent and no
+  /// locale profile was threaded.
+  final String? currency;
+
+  /// Masked payment / fuel-card reference (`****1234`) or the printed
+  /// document reference. Never a full card number — the masking
+  /// happens in the extractor, not at the render site (#4215).
+  final String? paymentReference;
+
+  /// Odometer reading in kilometres when the forecourt printed one
+  /// (#4215). Fleet pumps routinely ask the driver to key it in.
+  final double? odometerKm;
+
   const ReceiptParseResult({
     this.liters,
     this.totalCost,
@@ -63,8 +87,39 @@ class ReceiptParseResult {
     this.validated = false,
     this.validationReason,
     this.derived = const {},
+    this.vatAmount,
+    this.vatRate,
+    this.currency,
+    this.paymentReference,
+    this.odometerKm,
   });
 
   /// `true` when the parser extracted at least volume or total cost.
   bool get hasData => liters != null || totalCost != null;
+
+  /// This result with [fiscal] attached (#4215).
+  ///
+  /// The fiscal read is a separate, additive pass over the same text,
+  /// applied at the very END of a parse so the brand-layout merge, the
+  /// per-station override merge and the cross-field reconciliation —
+  /// all of which rebuild a result — cannot drop it on the way.
+  ReceiptParseResult withFiscal(ReceiptFiscalFields fiscal) =>
+      ReceiptParseResult(
+        liters: liters,
+        totalCost: totalCost,
+        pricePerLiter: pricePerLiter,
+        date: date,
+        stationName: stationName,
+        fuelType: fuelType,
+        brandLayout: brandLayout,
+        confidence: confidence,
+        validated: validated,
+        validationReason: validationReason,
+        derived: derived,
+        vatAmount: fiscal.vatAmount,
+        vatRate: fiscal.vatRate,
+        currency: fiscal.currency,
+        paymentReference: fiscal.paymentReference,
+        odometerKm: fiscal.odometerKm,
+      );
 }
