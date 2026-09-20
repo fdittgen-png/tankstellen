@@ -9,6 +9,8 @@ import '../../../../core/logging/error_logger.dart';
 import '../../../../core/logging/app_log.dart';
 import '../../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import 'background_adapter_listener.dart';
+import 'ios_restoration_event.dart';
+import 'ios_restoration_fence.dart';
 import 'ios_state_restoration_service.dart';
 
 /// Produces the connected/disconnected stream for one peripheral id.
@@ -62,13 +64,33 @@ typedef IosAdapterConnectionStates = Stream<bool> Function(String deviceId);
 /// * Late subscribers are tolerated per the [BackgroundAdapterListener]
 ///   contract: events emitted before the first subscriber attaches are
 ///   buffered and replayed on first listen.
+/// * #4357 — a restored peripheral binds only to the identity [start]
+///   armed. [IosRestorationIdentityFence] holds an early
+///   `willRestoreState`, collapses a duplicate one, and REFUSES both a
+///   peripheral that is not this trip's adapter and any delivery after
+///   [stop]. A refusal costs the peripheral every action: no pending
+///   connect is re-armed for it and no [AdapterConnected] is emitted.
 class IosBackgroundAdapterListener implements BackgroundAdapterListener {
   IosBackgroundAdapterListener({
     required this._restoration,
     IosAdapterConnectionStates? connectionStates,
     DateTime Function()? now,
   })  : _connectionStates = connectionStates ?? _fbpConnectionStates,
-        _now = now ?? DateTime.now;
+        _now = now ?? DateTime.now {
+    // #4357 — subscribe to restoration BEFORE `start`. A background
+    // relaunch can deliver `willRestoreState` while the coordinator is
+    // still building; the fence holds those events instead of letting
+    // them fall on the floor, and judges them the moment an identity
+    // binds.
+    _restorationSub = _restoration.events.listen(
+      _onRestorationEvent,
+      onError: (Object e, StackTrace st) {
+        log.error(e, st, layer: ErrorLayer.background, context: const {
+          'where': 'IosBackgroundAdapterListener restoration events error',
+        });
+      },
+    );
+  }
 
   /// Production stream source: flutter_blue_plus's per-device
   /// `connectionState`, which replays the CURRENT state on listen —
@@ -95,7 +117,19 @@ class IosBackgroundAdapterListener implements BackgroundAdapterListener {
   final List<BackgroundAdapterEvent> _pending = <BackgroundAdapterEvent>[];
 
   StreamSubscription<bool>? _stateSub;
+  StreamSubscription<IosRestorationEvent>? _restorationSub;
   String? _watchedId;
+
+  /// #4357 — which trip identity a restored peripheral may bind to.
+  final IosRestorationIdentityFence _fence = IosRestorationIdentityFence();
+
+  final List<IosRestorationDecision> _lastDecisions =
+      <IosRestorationDecision>[];
+
+  /// The verdicts of the most recent restoration delivery (diagnostics;
+  /// also what the ordering tests assert). Empty until iOS restores.
+  List<IosRestorationDecision> get lastRestorationDecisions =>
+      List.unmodifiable(_lastDecisions);
 
   /// Last connected/disconnected value seen, used to (a) de-duplicate
   /// the replayed current state FBP emits to every new stream listener
@@ -143,6 +177,9 @@ class IosBackgroundAdapterListener implements BackgroundAdapterListener {
         'deviceId': mac,
       });
     }
+    // #4357 — bind the restoration fence to THIS trip's adapter, and
+    // judge whatever iOS delivered before the owner was ready.
+    _applyRestorationDecisions(_fence.bind(mac));
     _lastConnected = null;
     _stateSub = _connectionStates(mac).listen(
       _onConnectionState,
@@ -179,6 +216,56 @@ class IosBackgroundAdapterListener implements BackgroundAdapterListener {
     // ends, with no trace/UI signal. Re-issue the pend on every real
     // disconnect so the NEXT adapter power-on still relaunches the app.
     if (!connected) unawaited(_repend(id));
+  }
+
+  /// #4357 — iOS handed peripherals back. Judge each against the bound
+  /// trip identity; never adopt one the fence refuses.
+  void _onRestorationEvent(IosRestorationEvent event) {
+    if (event is! IosRestorationWillRestore) return;
+    _applyRestorationDecisions(_fence.offer(event.peripheralUuids));
+  }
+
+  /// Act on the fence's verdicts. The only action an ADMITTED
+  /// peripheral earns is re-arming its own pending connect — the
+  /// connection-state watch, not this path, is what turns a live link
+  /// into an [AdapterConnected]. A refused peripheral earns nothing at
+  /// all: no re-pend, no watch, no event. That is the whole fence.
+  void _applyRestorationDecisions(List<IosRestorationDecision> decisions) {
+    if (decisions.isEmpty) return;
+    _lastDecisions
+      ..clear()
+      ..addAll(decisions);
+    for (final decision in decisions) {
+      final uuid = decision.peripheralUuid;
+      switch (decision.verdict) {
+        case IosRestorationVerdict.admitted:
+          BreadcrumbCollector.add('obd2-restoration: restored-admitted',
+              detail: 'uuid=$uuid');
+          unawaited(_repend(uuid));
+        case IosRestorationVerdict.duplicateIgnored:
+          BreadcrumbCollector.add('obd2-restoration: restored-duplicate',
+              detail: 'uuid=$uuid');
+        case IosRestorationVerdict.deferred:
+          BreadcrumbCollector.add('obd2-restoration: restored-deferred',
+              detail: 'uuid=$uuid');
+        case IosRestorationVerdict.refusedUnknownAdapter:
+        case IosRestorationVerdict.refusedAfterStop:
+          // Not an error the user can act on, but it must never be
+          // invisible: a refused restoration is the difference between
+          // "the app ignored the OS" and "the app refused to attach
+          // another car's adapter to this trip".
+          BreadcrumbCollector.add('obd2-restoration: restored-refused',
+              detail: 'uuid=$uuid reason=${decision.verdict.name}');
+          log.warn(
+              'IosBackgroundAdapterListener: refused a restored peripheral',
+              layer: ErrorLayer.background,
+              context: {
+                'deviceId': uuid,
+                'verdict': decision.verdict.name,
+                'boundAdapterId': _fence.boundAdapterId ?? '<none>',
+              });
+      }
+    }
   }
 
   /// #3242 — re-arm the OS-level pending connect after a disconnect cleared it.
@@ -228,6 +315,9 @@ class IosBackgroundAdapterListener implements BackgroundAdapterListener {
   Future<void> stop() async {
     _watchedId = null;
     _lastConnected = null;
+    // #4357 — after Stop, a queued restoration event is refused rather
+    // than held: nothing may revive the trip the user just ended.
+    _fence.unbind();
     try {
       await _stateSub?.cancel();
     } catch (e, st) {
@@ -244,6 +334,15 @@ class IosBackgroundAdapterListener implements BackgroundAdapterListener {
   /// lifecycle the Android bridge follows. Safe to call more than once.
   Future<void> dispose() async {
     await stop();
+    try {
+      await _restorationSub?.cancel();
+    } catch (e, st) {
+      await errorLogger.log(ErrorLayer.background, e, st, context: const {
+        'where': 'IosBackgroundAdapterListener.dispose restoration',
+      });
+    } finally {
+      _restorationSub = null;
+    }
     if (!_events.isClosed) {
       await _events.close();
     }

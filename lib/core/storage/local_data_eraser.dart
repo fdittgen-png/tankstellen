@@ -63,9 +63,12 @@ class LocalDataEraser {
     }
     await step('apiKeys', storage.deleteAllApiKeys);
     await step('supabaseAnonKey', storage.deleteSupabaseAnonKey);
-    await step('githubToken',
-        () => const FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions)
-            .delete(key: kGithubFeedbackTokenKey));
+    await step(
+        'githubToken',
+        () => const FlutterSecureStorage(
+              aOptions: kSecureStorageAndroidOptions,
+              iOptions: kSecureStorageIosOptions,
+            ).delete(key: kGithubFeedbackTokenKey));
     await step('feedbackConsent', () async {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(FeedbackConsent.storageKey);

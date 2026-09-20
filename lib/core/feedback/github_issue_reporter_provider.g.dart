@@ -129,4 +129,4 @@ final class GithubIssueReporterProvider
 }
 
 String _$githubIssueReporterHash() =>
-    r'870675d74aff5b1100ae521730c3be2a5d3a8683';
+    r'3669bdb0accebca10c4473474c1195075a759c78';
