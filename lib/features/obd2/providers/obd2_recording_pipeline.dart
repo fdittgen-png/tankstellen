@@ -13,8 +13,6 @@ import '../../../core/domain/vehicle_profile.dart';
 import '../data/adapter_pin_resolution.dart';
 import '../domain/obd2_connection_errors.dart';
 import '../data/session/obd2_disconnect_quietly.dart';
-// #3776 — Obd2LinkSupervisorActions.reportServiceDead (extension scope).
-import '../data/session/obd2_link_supervisor.dart';
 import '../data/session/obd2_service.dart';
 import '../domain/obd2_trip_start_budgets.dart';
 import '../data/session/trip_recording_controller.dart';
@@ -149,18 +147,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       // #3776 — the trip layer never closes a supervisor-owned link; a
       // dead one is handed to the owner, which closes + redials.
       isLinkSupervised: (svc) => supervisorOwnsService(_ref, svc),
-      reportSupervisedLinkDead: (svc, reason) {
-        try {
-          return _ref
-              .read(obd2ReconnectProvider.notifier)
-              .supervisor
-              .reportServiceDead(svc, reason: reason);
-        } catch (_) {
-          // No supervisor graph (widget tests / legacy path) — the
-          // caller closes the service itself.
-          return false;
-        }
-      },
+      reportSupervisedLinkDead: (svc, reason) =>
+          reportDeadLinkToSupervisor(_ref, svc, reason),
       breadcrumbCollector: breadcrumbs,
       gpsEstimateFolder: gpsEstimateFolder,
       allSamplesReader: _host.readAllCapturedSamples, // #3878
@@ -191,10 +179,14 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     } on TimeoutException {
       _controller = null;
       _imuFusion = null;
+      // #4344 — a timeout cancels nothing: END the abandoned start, or it
+      // polls, ticks and records when its held read finally answers.
+      unawaited(ctl.stop());
       unawaited(imuFusion.stop());
       unawaited(service.disconnectQuietly());
       throw const Obd2AdapterUnresponsive();
     }
+    if (!identical(_controller, ctl)) return; // #4344 — stopped mid-start
     // #1374/#1981 — GPS trip-path sampling; never blocks trip-start.
     unawaited(_gps.start(ctl));
     // #1615 — opt-in OEM-PID exact-fuel-level poll; no-op when off.
@@ -237,33 +229,12 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     });
     // #797 phase 1 — listen to explicit state changes so the UI surfaces
     // "pausedDueToDrop" even when no TripLiveReading lands.
-    _stateSub = ctl.stateChanges.listen((_) {
-      final newPhase = phaseForController(ctl);
-      // #2767 — surface whether the reconnect scanner has given up active
-      // scanning and is passive-waiting, so the GPS-degraded banner can swap
-      // its copy. Only meaningful while a drop is being recovered; false in
-      // every other phase so a fresh recording / save never inherits a stale
-      // flag.
-      final passiveWaiting = (newPhase == TripRecordingPhase.degradedGpsOnly ||
-              newPhase == TripRecordingPhase.pausedDueToDrop) &&
-          ctl.reconnectPassiveWaiting;
-      // #1330 phase 3 — surface the controller's drop reason. Cleared
-      // when leaving the drop state (#3859: the GPS-degraded phase too).
-      if (newPhase == TripRecordingPhase.pausedDueToDrop ||
-          newPhase == TripRecordingPhase.degradedGpsOnly) {
-        _host.state = _host.state.copyWith(
-          phase: newPhase,
-          dropReason: ctl.dropReason,
-          reconnectPassiveWaiting: passiveWaiting,
-          parkedPromptDue: ctl.parkedPromptDue, // #3862
-        );
-      } else {
-        _host.state = _host.state.copyWith(
-          phase: newPhase,
-          clearDropReason: true,
-          reconnectPassiveWaiting: passiveWaiting,
-          parkedPromptDue: false,
-        );
+    _stateSub = ctl.stateChanges.listen((state) {
+      _host.state = stateAfterControllerChange(_host.state, ctl);
+      // #4329 — the controller ended the trip on its own: tear down as a
+      // Stop would, now, instead of sampling a finished trip until one.
+      if (state == TripRecordingControllerState.stopped) {
+        return _host.tearDownFinalisedTrip();
       }
       // #1303 — phase transitions force an immediate snapshot.
       unawaited(_host.flushActiveSnapshot(force: true));
@@ -275,13 +246,10 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     );
   }
 
+  /// #4312 — true only when the controller actually paused: a drop pause
+  /// refuses, and publishing `paused` over it hid the drop banner.
   @override
-  bool pause() {
-    final ctl = _controller;
-    if (ctl == null) return false;
-    ctl.pause();
-    return true;
-  }
+  bool pause() => _controller?.pause() ?? false;
 
   @override
   bool resume() {
@@ -303,6 +271,29 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       _host.state = const TripRecordingState();
       return const StoppedTripResult.empty();
     }
+    // #4344 — stopped before the start went live: end that start (it then
+    // creates nothing) and release what it took. No trip exists to save.
+    if (_liveSub == null) {
+      final imuFusion = _imuFusion;
+      _controller = null;
+      _imuFusion = null;
+      await ctl.stop();
+      await imuFusion?.stop();
+      await teardownServiceRespectingSupervisor(_ref, svc);
+      _service = null;
+      _host.state = const TripRecordingState();
+      return const StoppedTripResult.empty();
+    }
+    // #4311 F1 — the controller already ended this trip itself (grace
+    // window, parked finalise) and saved it under its own id: a Stop now
+    // tears down, it must not save the same drive a second time.
+    final finalised = ctl.currentState == TripRecordingControllerState.stopped;
+    // #4311 S1/S2 — the trip leaves the live loop HERE: nothing the loop or
+    // the controller emits from now on may republish a phase mid-save.
+    await _liveSub?.cancel();
+    _liveSub = null;
+    await _stateSub?.cancel();
+    _stateSub = null;
     // #3795 — attribute the end BEFORE teardown. First-writer-wins, so
     // a cause already recorded (grace expiry, watchdog abort) survives.
     ctl.noteTermination(TripTermination(automatic
@@ -310,9 +301,9 @@ class Obd2RecordingPipeline implements RecordingPipeline {
         : TripTerminationReason.userStopped));
     final termination = ctl.termination;
     final sessionJournal = ctl.sessionJournal;
-    _host.setSaveStage(TripSaveStage.finalizingSummary); // #2548 beat 1
+    if (!finalised) _host.setSaveStage(TripSaveStage.finalizingSummary);
     try {
-      await ctl.refreshOdometer();
+      if (!finalised) await ctl.refreshOdometer();
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.providers, context: const {
         'where': 'Obd2RecordingPipeline.stop: refreshOdometer failed'
@@ -338,38 +329,42 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     final odometerLatestKm = ctl.odometerLatestKm;
     // #2509 — fix count BEFORE teardown (stationary-discard guard).
     final gpsFixCount = ctl.gpsFixCount;
-    await _liveSub?.cancel();
-    _liveSub = null;
-    await _stateSub?.cancel();
-    _stateSub = null;
     // #1374 phase 1 — tear down the Geolocator subscription. Best-effort.
     await _gps.stop();
     // #1615 — tear down the OEM-PID fuel-level poll. Best-effort.
     await _oemFuel.stop();
     _controller = null;
-    // #2548 beat 2 / #726 — write to history (every trip, incl. discarded).
-    _host.setSaveStage(TripSaveStage.savingToHistory);
-    final outcome = await _host.saveToHistory(
-      summary,
-      samples: filled.samples,
-      gpsSampleDiagnostics: capturedGpsDiagnostics,
-      automatic: automatic,
-      vehicleId: _baselines.vehicleId,
-      adapterMac: _adapterMac,
-      adapterName: _adapterName,
-      adapterFirmware: _adapterFirmware,
-      gpsFixCount: gpsFixCount,
-      // #3794 — how it ended + the lifecycle timeline, onto the trip.
-      termination: termination,
-      sessionJournal: sessionJournal,
-    );
+    var outcome = TripPersistOutcome.saved;
+    if (!finalised) {
+      // #2548 beat 2 / #726 — write to history (every trip, incl. discarded).
+      _host.setSaveStage(TripSaveStage.savingToHistory);
+      outcome = await _host.saveToHistory(
+        summary,
+        tripId: ctl.sessionId, // #4328 — the id its WAL row carries
+        samples: filled.samples,
+        gpsSampleDiagnostics: capturedGpsDiagnostics,
+        automatic: automatic,
+        vehicleId: _baselines.vehicleId,
+        adapterMac: _adapterMac,
+        adapterName: _adapterName,
+        adapterFirmware: _adapterFirmware,
+        gpsFixCount: gpsFixCount,
+        // #3794 — how it ended + the lifecycle timeline, onto the trip.
+        termination: termination,
+        sessionJournal: sessionJournal,
+      );
+    }
+    // #1303 / #4311 / #4328 — the WAL row exists exactly while the trip is
+    // not in history: it goes once the write landed, never after a failed
+    // one, and a self-finalised trip's own save already retired it.
+    if (!finalised && outcome.isSettled) await _host.clearActiveSnapshot();
     // #2548 — third beat, shown ONLY when cloud sync is on (the upload
     // saveToHistory kicked off is fire-and-forget, so it is worded
     // "Syncing in background…" and never blocks the resolve; sync-off
     // resolves straight to the outcome). The gate read must never derail
     // the save flow.
     try {
-      if (_ref.read(tripsSyncEnabledProvider)) {
+      if (!finalised && _ref.read(tripsSyncEnabledProvider)) {
         _host.setSaveStage(TripSaveStage.syncingToCloud);
       }
     } catch (e, st) {
@@ -380,15 +375,17 @@ class Obd2RecordingPipeline implements RecordingPipeline {
     // #769 / #780 — flush learned baselines + sync before release.
     await _baselines.flushAndSync();
     // #1312 — clear the captured adapter identity once persisted.
-    _adapterMac = null;
-    _adapterName = null;
-    _adapterFirmware = null;
+    _adapterMac = _adapterName = _adapterFirmware = null;
     // #3527 — keep-link: a supervisor-owned service stays connected at
     // trip end (see obd2_supervised_teardown.dart for the rationale).
     await teardownServiceRespectingSupervisor(_ref, svc);
     _service = null;
-    await _host.clearActiveSnapshot(); // #1303 — no resurrection
-    _host.state = _host.state.copyWith(phase: TripRecordingPhase.finished);
+    _host.state = _host.state.copyWith(
+        phase: TripRecordingPhase.finished,
+        clearSaveStage: true, // #4311 S2 — a save stage never outlives the save
+        clearDropReason: true,
+        reconnectPassiveWaiting: false,
+        parkedPromptDue: false);
     return StoppedTripResult(
       summary: summary,
       odometerStartKm: odometerStartKm,
@@ -397,6 +394,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       distanceKmAtOdometerLatest: ctl.distanceKmAtOdometerLatest,
       // #2509 — surface "no movement detected" only on a stationary discard.
       discardedNoMovement: outcome.isStationaryDiscard,
+      entryId: outcome == TripPersistOutcome.saved ? ctl.sessionId : null,
+      saveFailed: outcome == TripPersistOutcome.failed, // #4378
     );
   }
 }

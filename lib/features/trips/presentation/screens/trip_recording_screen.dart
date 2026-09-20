@@ -24,6 +24,7 @@ import '../../data/pip_controller.dart';
 import '../../../fill_ups/api.dart';
 import '../../domain/trip_recorder.dart';
 import '../../providers/broken_map_warned_vehicles_provider.dart';
+import '../../providers/pending_trip_save_retry_provider.dart';
 import '../../providers/pip_mode_provider.dart';
 import '../../providers/recording_profile_provider.dart';
 import '../../providers/trip_recording_provider.dart';
@@ -31,6 +32,7 @@ import '../widgets/broken_map_widgets.dart';
 import '../widgets/recording_app_bar_actions.dart';
 import '../widgets/recording/auto_pin_toggle.dart';
 import '../widgets/trip_recording_body.dart';
+import '../widgets/trip_stop_snack_bar.dart';
 import 'trip_recording_pin_controller.dart';
 import '../../../../core/logging/app_log.dart';
 import '../../../../core/logging/error_logger.dart';
@@ -48,9 +50,9 @@ part 'trip_recording_screen_handlers.dart';
 /// list / scroll to the new row, but the save action itself NEVER
 /// creates a fill-up. Null means the user cancelled or discarded.
 class TripSaveResult {
-  /// Id of the persisted [TripHistoryEntry] for this trip. Matches
-  /// the id used by [TripHistoryRepository.save] (ISO start timestamp
-  /// when available, otherwise the save-time fallback).
+  /// Id of the persisted [TripHistoryEntry] for this trip — the id the
+  /// stop saved it under ([StoppedTripResult.entryId], #4328: the trip's
+  /// recording id, the one its recovery rows carry).
   final String entryId;
   final TripSummary summary;
 

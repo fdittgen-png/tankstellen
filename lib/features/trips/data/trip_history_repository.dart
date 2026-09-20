@@ -71,14 +71,18 @@ class TripHistoryRepository {
   /// Errors are logged but swallowed. #2833 — a 0-sample ghost whose
   /// sampled twin already exists is a no-op; a sampled twin deletes any
   /// pre-existing 0-sample ghost (see [guardGhostDoubleSave]).
-  Future<void> save(TripHistoryEntry entry) async {
+  ///
+  /// #4328 — returns whether the trip is in history now: false when the
+  /// write failed. A caller holding the trip's only other copy (the
+  /// recording's WAL row) must keep it on false.
+  Future<bool> save(TripHistoryEntry entry) async {
     try {
       final skip = await guardGhostDoubleSave(
         entry: entry,
         existing: loadSummaries(dedupe: false),
         deleteById: delete,
       );
-      if (skip) return;
+      if (skip) return true; // its sampled twin is already in history
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save ghost-guard'});
     }
@@ -86,7 +90,7 @@ class TripHistoryRepository {
       await _writeRows(entry);
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save'});
-      return;
+      return false;
     }
     await _trim();
     final vehicleId = entry.vehicleId;
@@ -98,6 +102,7 @@ class TripHistoryRepository {
         log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save onSavedHook'});
       }
     }
+    return true;
   }
 
   /// Encode (#3613: off-thread above the threshold) and write the v2

@@ -588,6 +588,7 @@ class _FakeHost implements RecordingPipelineHost {
   @override
   Future<TripPersistOutcome> saveToHistory(
     TripSummary summary, {
+    String? tripId,
     bool automatic = false,
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],

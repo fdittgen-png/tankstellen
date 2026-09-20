@@ -96,14 +96,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
       vin: ctl.vin,
       automatic: _lastTrip.automatic, // #3251 — auto-record provenance
       phase: 'recording',
-      summary: const TripSummary(
-        distanceKm: 0,
-        maxRpm: 0,
-        highRpmSeconds: 0,
-        idleSeconds: 0,
-        harshBrakes: 0,
-        harshAccelerations: 0,
-      ),
+      summary: kEmptyTripSummary,
       samples: const [],
       odometerStartKm: ctl.odometerStartKm,
       odometerLatestKm: ctl.odometerLatestKm,
@@ -146,9 +139,6 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
     );
   }
 
-  /// Map the controller's enum to the string the snapshot
-  /// serialises. Centralised so the recovery service doesn't have
-  /// to translate enum names — both sides agree on the wire format.
   /// Cheap gate called from the live-stream listener. Promotes to
   /// a real flush when either the time threshold or the sample
   /// threshold is crossed.
@@ -180,8 +170,7 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
     // makes the intent at the call site obvious without changing
     // behaviour.
     final ctl = _obd2?.controller;
-    if (!force && ctl == null) return;
-    if (ctl == null) return;
+    if (ctl == null || controllerHasStopped(ctl)) return; // #4311
     final repo = _resolveActiveRepo();
     if (repo == null) return;
     final next = _buildSnapshotFor(ctl);
@@ -233,16 +222,13 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
   /// Drop the persisted snapshot + clear in-memory bookkeeping.
   /// Safe to call when nothing was ever written.
   Future<void> _clearActiveSnapshot() async {
+    final id = _activeSnapshot?.id;
     _activeSnapshot = null;
     _lastSnapshotFlushAt = null;
     _samplesSinceLastFlush = 0;
-    final repo = _resolveActiveRepo();
-    if (repo == null) return;
-    try {
-      await repo.clearSnapshot();
-    } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.providers, context: const {'where': 'TripRecording clear snapshot failed'});
-    }
+    await deletePausedTripRow(id); // #4314 — its paused row goes with it
+    // The repository logs and swallows its own failures.
+    await _resolveActiveRepo()?.clearSnapshot();
   }
 
   /// Surface the recovered snapshot from a previous cold-start
@@ -266,9 +252,9 @@ mixin _TripRecordingSnapshot on _$TripRecording, _TripRecordingCore {
       vehicleId: snapshot.vehicleId,
       startedAt: snapshot.startedAt,
     );
-    state = state.copyWith(
+    _publish(state.copyWith(
       phase: TripRecordingPhase.pausedDueToDrop,
-    );
+    ), 'restoreFromSnapshot');
     return true;
   }
 }

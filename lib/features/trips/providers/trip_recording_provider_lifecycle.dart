@@ -31,10 +31,10 @@ mixin _TripRecordingLifecycle
       vehicleId: vehicleId ?? _tryReadActiveVehicle()?.id,
       startedAt: DateTime.now(),
     );
-    state = const TripRecordingState(
+    _publish(const TripRecordingState(
       phase: TripRecordingPhase.connecting,
       connectStage: TripStartStage.connectingAdapter,
-    );
+    ), 'enterConnecting');
   }
 
   /// #2274 concern 2 — advance the inline connect progress shown on the
@@ -42,7 +42,7 @@ mixin _TripRecordingLifecycle
   /// the trip has gone active (the live metrics have taken over).
   void setConnectStage(TripStartStage stage) {
     if (state.phase != TripRecordingPhase.connecting) return;
-    state = state.copyWith(connectStage: stage);
+    _publish(state.copyWith(connectStage: stage), 'setConnectStage');
   }
 
   /// #2548 — enter / advance the transient (non-active)
@@ -51,7 +51,8 @@ mixin _TripRecordingLifecycle
   /// pipeline's `stop()` calls it before its major teardown beats. The
   /// final state write at the end of `stop()` is unchanged.
   void setSaveStage(TripSaveStage stage) {
-    state = state.copyWith(phase: TripRecordingPhase.saving, saveStage: stage);
+    _publish(state.copyWith(phase: TripRecordingPhase.saving, saveStage: stage),
+        'setSaveStage');
   }
 
   /// #2274 concern 2 — abandon a connecting session (connect failed, or
@@ -60,7 +61,7 @@ mixin _TripRecordingLifecycle
   /// trip has gone active.
   void cancelConnecting() {
     if (state.phase != TripRecordingPhase.connecting) return;
-    state = const TripRecordingState();
+    _publish(const TripRecordingState(), 'cancelConnecting');
   }
 
   void pause() {
@@ -70,14 +71,14 @@ mixin _TripRecordingLifecycle
     // the OBD2 pipeline pauses the controller. Only flip the phase when a
     // live recording was actually paused.
     if (_pipelineSlot.pipeline?.pause() ?? false) {
-      state = state.copyWith(phase: TripRecordingPhase.paused);
+      _publish(state.copyWith(phase: TripRecordingPhase.paused), 'pause');
     }
   }
 
   /// #3862 — "Keep": stay recording, do not ask again this session.
   void dismissParkedPrompt() {
     _pipelineSlot.pipeline?.dismissParkedPrompt();
-    state = state.copyWith(parkedPromptDue: false);
+    _publish(state.copyWith(parkedPromptDue: false), 'dismissParkedPrompt');
   }
 
   void resume() {
@@ -91,7 +92,7 @@ mixin _TripRecordingLifecycle
         return;
       }
       obd2.resume();
-      state = state.copyWith(phase: TripRecordingPhase.recording);
+      _publish(state.copyWith(phase: TripRecordingPhase.recording), 'resume');
       return;
     }
     // #1347 — cold-start recovery left us with a snapshot but no
@@ -142,7 +143,10 @@ mixin _TripRecordingLifecycle
         state.phase == TripRecordingPhase.pausedDueToDrop) {
       return _finalizeRecoveredSnapshot();
     }
-    state = const TripRecordingState();
+    // #4329 — a Stop on a trip the controller finished keeps its summary.
+    if (state.phase != TripRecordingPhase.finished) {
+      _publish(const TripRecordingState(), 'stop without a trip');
+    }
     return const StoppedTripResult.empty();
   }
 
@@ -183,12 +187,14 @@ mixin _TripRecordingLifecycle
   /// subsequent fill-up save path can still resolve the link-window
   /// (#888) after the user lands back on the fill-up screen.
   void reset() {
-    state = const TripRecordingState();
-    // #1303 — also drop any stale snapshot. `reset` runs when the
-    // user discards a stopped trip from the summary screen; without
-    // this call the recovery service would re-surface the discarded
-    // trip on next cold start.
-    unawaited(_clearActiveSnapshot());
+    // #1303 — discarding a trip (a running one, or one handed back after a
+    // process death) drops its WAL row, or the next launch hands it back.
+    // #4328 — a STOPPED trip's rows are its save's: gone once the write
+    // landed, KEPT after a failed one (the screen resets after every stop).
+    final discards = _pipelineSlot.pipeline != null ||
+        state.phase == TripRecordingPhase.pausedDueToDrop;
+    _publish(const TripRecordingState(), 'reset');
+    if (discards) unawaited(_clearActiveSnapshot());
   }
 
   /// Lifecycle hook entry point — called by the wiring layer's

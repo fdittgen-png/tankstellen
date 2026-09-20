@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../trips/api.dart';
 import 'active_trip_repository.dart';
+import 'paused_trip_repository.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
 import '../../../core/telemetry/process_death_context.dart';
@@ -25,7 +26,16 @@ import '../../../core/telemetry/process_death_context.dart';
 ///    but no on-screen recovery prompt.
 ///  - [failed]: the snapshot existed but couldn't be parsed or
 ///    finalised. We swallow and log so the launch path keeps going.
-enum ActiveTripRecoveryOutcome { none, recovered, discarded, failed }
+///  - [alreadySaved] (#4328): the snapshot's trip is already in history
+///    under the same id — the process died between the history write and
+///    the WAL clear. Its rows were retired; nothing is handed back.
+enum ActiveTripRecoveryOutcome {
+  none,
+  recovered,
+  discarded,
+  failed,
+  alreadySaved,
+}
 
 /// Launch-time recovery for in-progress trip snapshots that survived
 /// a process death (#1303).
@@ -66,14 +76,14 @@ enum ActiveTripRecoveryOutcome { none, recovered, discarded, failed }
 class ActiveTripRecoveryService {
   final ActiveTripRepository _activeRepo;
 
-  /// Optional history repo. Reserved for a future iteration where a
-  /// stale snapshot could be finalised into history (current rule:
-  /// just discard) — kept in the constructor so we don't have to
-  /// thread it through later. Today it's unused on the recovery
-  /// path; we keep the surface so callers (AppInitializer) don't
-  /// have to refactor when the rule changes.
-  // ignore: unused_field
+  /// Optional history repo (#4328): a snapshot whose id is already a
+  /// history row is a trip that was saved, not one to hand back.
   final TripHistoryRepository? _historyRepo;
+
+  /// Optional paused-trips repo (#4328): an already-saved trip's paused
+  /// row (a link drop's) is retired with its WAL row, so no later sweep
+  /// saves a sample-less copy over the good history row.
+  final PausedTripRepository? _pausedRepo;
 
   final Future<void> Function()? _onAutomaticRecovered;
   final DateTime Function() _now;
@@ -89,6 +99,7 @@ class ActiveTripRecoveryService {
   ActiveTripRecoveryService({
     required this._activeRepo,
     this._historyRepo,
+    this._pausedRepo,
     this._onAutomaticRecovered,
     DateTime Function()? now,
     this.staleAfter = const Duration(hours: 24),
@@ -116,9 +127,9 @@ class ActiveTripRecoveryService {
       return ActiveTripRecoveryOutcome.none;
     }
 
-    // #3250 — a snapshot whose phase is already terminal was finalised to
-    // history (the grace-window auto-finalise, or the stop-transition flush)
-    // but the WAL was left behind. Recovering it resurrects an already-saved
+    // #3250 — a snapshot whose phase is already terminal was written by an
+    // earlier version's stop-transition flush (#4311 removed it: a row now
+    // exists only while its trip is not in history) and left behind. Recovering it resurrects an already-saved
     // trip as a `pausedDueToDrop` banner, and End/Resume re-puts the SAME Hive
     // id — overwriting the good saved entry with a gutted recovery summary.
     // Drop it: it is NOT a live trip to resume.
@@ -143,6 +154,21 @@ class ActiveTripRecoveryService {
           'lastFlushedAt': snapshot.lastFlushedAt.toIso8601String(),
         });
       return ActiveTripRecoveryOutcome.discarded;
+    }
+
+    if (_isInHistory(snapshot.id)) {
+      try {
+        await _activeRepo.clearSnapshot();
+        await _pausedRepo?.delete(snapshot.id);
+      } catch (e, st) {
+        log.error(e, st, layer: ErrorLayer.storage, context: const {
+          'where': 'ActiveTripRecoveryService clear already-saved failed'
+        });
+        return ActiveTripRecoveryOutcome.failed;
+      }
+      log.info('ActiveTripRecoveryService: trip ${snapshot.id} is already in '
+          'history — its WAL row was retired, not recovered (#4328)');
+      return ActiveTripRecoveryOutcome.alreadySaved;
     }
 
     final now = _now();
@@ -190,5 +216,21 @@ class ActiveTripRecoveryService {
 
     _recoveredSnapshot = snapshot;
     return ActiveTripRecoveryOutcome.recovered;
+  }
+
+  /// #4328 — whether trip [id] already has a history row. One id names a
+  /// trip from its start to its history row, so a WAL row that outlived
+  /// the save is recognised here rather than recovered — and saved — a
+  /// second time. An unreadable history box answers false: recovering a
+  /// trip twice is recoverable by the user, losing it is not.
+  bool _isInHistory(String id) {
+    try {
+      return _historyRepo?.storedIds.contains(id) ?? false;
+    } catch (e, st) {
+      log.error(e, st, layer: ErrorLayer.storage, context: const {
+        'where': 'ActiveTripRecoveryService history lookup failed'
+      });
+      return false;
+    }
   }
 }

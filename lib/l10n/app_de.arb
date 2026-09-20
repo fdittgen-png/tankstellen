@@ -4221,6 +4221,8 @@
   "tripRecordingDiscardedNoMovement": "Aufnahme verworfen — keine Bewegung erkannt",
   "tripRecordingGpsNotificationTitle": "Fahrt wird aufgezeichnet",
   "tripRecordingGpsNotificationText": "GPS-Verfolgung deiner Route für Verbrauchs- & Fahrstatistiken",
+  "tripSaveFailedKept": "Fahrt konnte nicht gespeichert werden — sie bleibt erhalten und wird erneut versucht",
+  "tripSaveRetryAction": "Erneut versuchen",
   "tripShareAction": "Mit anderem Konto teilen",
   "@tripShareAction": {
     "description": "Menu option / tooltip on the trip-detail Share menu (#2240) that opens the cross-account sharing sheet — distinct from the existing 'Share image' / 'Share GPX' options which export to the OS share sheet. This shares the trip with a DIFFERENT TankSync account."

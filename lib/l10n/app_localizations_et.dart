@@ -8956,6 +8956,13 @@ class AppLocalizationsEt extends AppLocalizations {
       'Marsruudi jälgimine kütuse ja sõidustatistika jaoks';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Jaga teise kontoga';
 
   @override

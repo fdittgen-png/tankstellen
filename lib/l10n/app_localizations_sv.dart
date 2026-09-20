@@ -8958,6 +8958,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Spårar din rutt för bränsle- och körstatistik';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Dela med ett annat konto';
 
   @override

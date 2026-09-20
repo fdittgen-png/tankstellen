@@ -9017,6 +9017,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Tracciamento del percorso per statistiche carburante e guida';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Condividi con un altro account';
 
   @override

@@ -119,15 +119,21 @@ abstract class RecordingPipelineHost {
   /// snapshotted at start (#1312) and the baseline-store vehicle id; the
   /// GPS-only path leaves them null and the detail card hides the rows.
   ///
+  /// [tripId] (#4328) is the id the trip's recovery rows (WAL, paused row)
+  /// carry, so the saved entry is the SAME trip to a relaunch that finds
+  /// both. Null falls back to the summary's start time.
+  ///
   /// [gpsFixCount] (#2509) is the number of GPS fixes the trip captured.
   /// The guard uses it to keep a genuinely-stationary trip discarded
   /// (#1923 — no distance AND no signal) while persisting a real
   /// GPS-tracked drive whose OBD2 link was dead (distance ≥ 0.01, or a
   /// `startedAt` recovered from a GPS fix). Returns the [TripPersistOutcome]
   /// so the caller can surface a "no movement detected" notice on a
-  /// genuine discard (and never on a save).
+  /// genuine discard (and never on a save), and [TripPersistOutcome.failed]
+  /// when the write did not land — the caller then keeps the recovery rows.
   Future<TripPersistOutcome> saveToHistory(
     TripSummary summary, {
+    String? tripId,
     bool automatic,
     List<TripSample> samples,
     List<GpsSampleDiagnostic> gpsSampleDiagnostics,
@@ -168,10 +174,19 @@ enum TripPersistOutcome {
   /// usable signal (no start time, no samples, no GPS fixes) — a genuine
   /// false-start / stationary stop (#1923). The stop UI surfaces a
   /// "recording discarded — no movement detected" notice.
-  discardedNoMovement;
+  discardedNoMovement,
+
+  /// #4328 — the history write did not land (a Hive failure, no history
+  /// box). The trip is NOT in history, so its WAL row — the only other
+  /// copy — must stay on disk for the next launch to recover.
+  failed;
 
   /// True only for [discardedNoMovement] — the single case the UI surfaces.
   bool get isStationaryDiscard => this == TripPersistOutcome.discardedNoMovement;
+
+  /// #4328 — the trip's fate is decided (saved, or deliberately discarded),
+  /// so its recovery rows may go. False only for [failed].
+  bool get isSettled => this != TripPersistOutcome.failed;
 }
 
 /// The wider host an [Obd2RecordingPipeline] needs (#2227): the base
@@ -199,6 +214,11 @@ abstract class Obd2RecordingPipelineHost implements RecordingPipelineHost {
 
   /// Drop the persisted snapshot once the trip is finalised in history.
   Future<void> clearActiveSnapshot();
+
+  /// #4329 — the controller ended the trip itself (the grace window, the
+  /// parked finalise) and saved it: run the stop's teardown NOW — the emit
+  /// loop, the subscriptions, GPS, the link — which saves nothing twice.
+  void tearDownFinalisedTrip();
 
   /// #3878 — every captured sample of the running trip (WAL + ring).
   Future<List<TripSample>> readAllCapturedSamples();
@@ -231,6 +251,15 @@ class StoppedTripResult {
   /// the recording surface that reads this).
   final bool discardedNoMovement;
 
+  /// #4328 — the id the trip is saved under in history; null when nothing
+  /// was saved (a discard, a failed write, no trip).
+  final String? entryId;
+
+  /// #4378 — the history write did not land. The trip is kept (its WAL row
+  /// and its own pending-save copy), so the stop says so and offers a retry
+  /// instead of reporting a save that never happened (#3582).
+  final bool saveFailed;
+
   const StoppedTripResult({
     required this.summary,
     required this.odometerStartKm,
@@ -238,6 +267,8 @@ class StoppedTripResult {
     this.odometerLatestAt,
     this.distanceKmAtOdometerLatest,
     this.discardedNoMovement = false,
+    this.entryId,
+    this.saveFailed = false,
   });
 
   const StoppedTripResult.empty()
@@ -253,7 +284,9 @@ class StoppedTripResult {
         odometerLatestKm = null,
         odometerLatestAt = null,
         distanceKmAtOdometerLatest = null,
-        discardedNoMovement = false;
+        discardedNoMovement = false,
+        entryId = null,
+        saveFailed = false;
 
   /// End-of-trip km, derived: latest odometer read if we have one,
   /// otherwise start + integrated distance. Null when neither

@@ -25,7 +25,8 @@ import 'trip_consumption_reliability.dart';
 /// is exactly the #1927 bug. The consumption average is then recomputed
 /// against that trusted distance. IMU counts stay absent: the inertial
 /// ring died with the process, and pretending otherwise would defeat the
-/// #2895 veto semantics.
+/// #2895 veto semantics. The skeleton's `kind` survives too (#4313): only
+/// the writer knew whether the trip had a dongle.
 TripSummary rebuildRecoveredSummary({
   required TripSummary skeleton,
   required List<TripSample> samples,
@@ -55,6 +56,7 @@ TripSummary rebuildRecoveredSummary({
   return replay.copyWith(
     distanceKm: distanceKm,
     distanceSource: skeleton.distanceSource,
+    kind: skeleton.kind,
     avgLPer100Km: avgLPer100Km,
     startedAt: skeleton.startedAt ?? replay.startedAt,
     endedAt: skeleton.endedAt ?? replay.endedAt,

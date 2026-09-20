@@ -1,40 +1,29 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-/// The five flags that say what a recording is doing, owned by
-/// [TripRecordingController] instead of shared across its `part` files
-/// (#4034, epic #4032).
-///
-/// `_started`, `_stopped`, `_paused`, `_pausedDueToDrop` and
-/// `_degradedGpsOnly` used to be bare booleans in the controller's
-/// private scope, written from the lifecycle part AND from the drop-host
-/// adapter the [DroppedSessionManager] drives. Nothing tied them
-/// together, so a transition that forgot one of them left the state
-/// machine describing a situation that could not happen — which is the
-/// shape of the recurring OBD2 defects (the PARK/REUSE state trap #3574,
-/// the ready-with-corpse deadlock #3775).
-///
-/// They live here now, and every compound transition — begin, end,
-/// resume-from-drop — sets its whole group in one method, so a caller
-/// cannot perform half of one.
 /// The states a recording can actually be IN (#4162, epic #4155).
 ///
 /// [TripRunState] carries five booleans, which describes **32
-/// combinations**. A handful are reachable and, until now, nobody had
-/// written down which — and #4162's framing is that every impossible
-/// combination is a bug waiting for the right interruption, which the OS
-/// supplies on its own schedule. That is why these only ever reproduce
-/// in the field.
+/// combinations**. Eight are reachable — see
+/// `trip_run_state_reachability_test`, which walks every real transition
+/// (with its caller's guard) from `idle` — and every one of them maps to
+/// one of these six.
 ///
-/// This enum is the written-down answer. It is DERIVED from the flags
-/// rather than replacing them: #4034 already made the transitions
-/// atomic, and a storage change here would be a behaviour change in the
-/// app's highest-risk subsystem. `trip_run_state_reachability_test`
-/// drives every transition from every reachable state and asserts the
-/// result always lands on one of these.
+/// This enum is DERIVED from the flags rather than replacing them: #4034
+/// already made the transitions atomic, and a storage change here would
+/// be a behaviour change in the app's highest-risk subsystem.
 ///
-/// Order matters — a state read must check [finished] FIRST, because an
-/// auto-finalised drop leaves `stopped` true and `started` false.
+/// The precedence of [tripRunPhaseOf] is the one the recording UI has
+/// always shown (`TripRecordingController.currentState`), and it is not
+/// arbitrary:
+///
+/// * [finished] first — an auto-finalised drop leaves `stopped` true with
+///   `started` false;
+/// * the two pauses BEFORE [degradedGpsOnly] — a user pause taken while
+///   degraded is reachable, and the emit loop does not sample during it,
+///   so calling it "recording" would be the lie. Until #4162 this enum
+///   ranked degraded above the pauses and disagreed with the UI on
+///   exactly that reachable state.
 enum TripRunPhase {
   /// Never begun. The only state with nothing set.
   idle,
@@ -57,6 +46,39 @@ enum TripRunPhase {
   finished,
 }
 
+/// The phase five flags describe — total over all 32 combinations, so a
+/// reader can never be handed a combination it cannot name (#4162).
+TripRunPhase tripRunPhaseOf({
+  required bool started,
+  required bool stopped,
+  required bool paused,
+  required bool pausedDueToDrop,
+  required bool degradedGpsOnly,
+}) {
+  if (stopped) return TripRunPhase.finished;
+  if (!started) return TripRunPhase.idle;
+  if (pausedDueToDrop) return TripRunPhase.pausedByDrop;
+  if (paused) return TripRunPhase.pausedByUser;
+  if (degradedGpsOnly) return TripRunPhase.degradedGpsOnly;
+  return TripRunPhase.running;
+}
+
+/// The five flags that say what a recording is doing, owned by
+/// [TripRecordingController] instead of shared across its `part` files
+/// (#4034, epic #4032).
+///
+/// `_started`, `_stopped`, `_paused`, `_pausedDueToDrop` and
+/// `_degradedGpsOnly` used to be bare booleans in the controller's
+/// private scope, written from the lifecycle part AND from the drop-host
+/// adapter the [DroppedSessionManager] drives. Nothing tied them
+/// together, so a transition that forgot one of them left the state
+/// machine describing a situation that could not happen — which is the
+/// shape of the recurring OBD2 defects (the PARK/REUSE state trap #3574,
+/// the ready-with-corpse deadlock #3775).
+///
+/// They live here now, and every compound transition — begin, end,
+/// resume-from-drop — sets its whole group in one method, so a caller
+/// cannot perform half of one.
 class TripRunState {
   bool _started = false;
   bool _stopped = false;
@@ -74,28 +96,24 @@ class TripRunState {
   /// states, and it becomes [pausedDueToDrop] when GPS also dies.
   bool get degradedGpsOnly => _degradedGpsOnly;
 
-  /// True while samples should be flowing: started and not truly paused,
-  /// or degraded onto GPS.
+  /// True while samples should be flowing: running, or degraded onto GPS
+  /// (#4162 — read off [phase], so a user pause taken while degraded is
+  /// not "recording"; nothing in production reads this getter).
   bool get isRecording =>
-      (_started && !_paused && !_pausedDueToDrop) || _degradedGpsOnly;
+      phase == TripRunPhase.running || phase == TripRunPhase.degradedGpsOnly;
 
   /// True for both the user pause and the drop pause.
   bool get isPaused => _paused || _pausedDueToDrop;
 
-  /// Which of the six reachable states this is (#4162).
-  ///
-  /// The order of the checks IS the precedence, and it is not
-  /// arbitrary: `finished` first because an auto-finalised drop leaves
-  /// `stopped` true with `started` false; `degradedGpsOnly` before the
-  /// pauses because #2565 is an active state that outranks them.
-  TripRunPhase get phase {
-    if (_stopped) return TripRunPhase.finished;
-    if (!_started) return TripRunPhase.idle;
-    if (_degradedGpsOnly) return TripRunPhase.degradedGpsOnly;
-    if (_pausedDueToDrop) return TripRunPhase.pausedByDrop;
-    if (_paused) return TripRunPhase.pausedByUser;
-    return TripRunPhase.running;
-  }
+  /// Which of the six named states this is (#4162) — see [tripRunPhaseOf]
+  /// for the precedence and why.
+  TripRunPhase get phase => tripRunPhaseOf(
+        started: _started,
+        stopped: _stopped,
+        paused: _paused,
+        pausedDueToDrop: _pausedDueToDrop,
+        degradedGpsOnly: _degradedGpsOnly,
+      );
 
   /// The trip has begun. `stopped` is cleared in the same step so a
   /// restart can never be seen as "stopped and started at once".
@@ -121,6 +139,16 @@ class TripRunState {
     _paused = false;
   }
 
+  /// #4344 — awaits [step], one of the start's reads, and answers whether
+  /// the trip is still alive after it. A stop that landed meanwhile ended
+  /// it synchronously, so the start must create nothing more: no poll loop,
+  /// no emit timer. A stopped trip never begins again, which makes the
+  /// answer final for a start that was already under way.
+  Future<bool> alive(Future<Object?> step) async {
+    await step;
+    return !_stopped;
+  }
+
   /// The user paused. No-op unless the trip is running and not already
   /// paused either way — returns whether the pause actually happened.
   bool pauseByUser() {
@@ -142,6 +170,4 @@ class TripRunState {
   // private and every writer is greppable.
   void setPausedDueToDrop(bool value) => _pausedDueToDrop = value;
   void setDegradedGpsOnly(bool value) => _degradedGpsOnly = value;
-  void setStopped(bool value) => _stopped = value;
-  void setStarted(bool value) => _started = value;
 }

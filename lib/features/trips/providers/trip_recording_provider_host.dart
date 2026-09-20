@@ -40,6 +40,7 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
   @override
   Future<TripPersistOutcome> saveToHistory(
     TripSummary summary, {
+    String? tripId,
     bool automatic = false,
     List<TripSample> samples = const [],
     List<GpsSampleDiagnostic> gpsSampleDiagnostics = const [],
@@ -53,6 +54,7 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
   }) =>
       _n._saveToHistory(
         summary,
+        tripId: tripId, // #4328
         automatic: automatic,
         samples: samples,
         gpsSampleDiagnostics: gpsSampleDiagnostics,
@@ -85,6 +87,9 @@ class _RecordingPipelineHostAdapter implements Obd2RecordingPipelineHost {
 
   @override
   Future<void> clearActiveSnapshot() => _n._clearActiveSnapshot();
+
+  @override // #4329 — the finalised pipeline's stop saves nothing twice
+  void tearDownFinalisedTrip() => unawaited(_n.stop());
 
   @override
   Future<List<TripSample>> readAllCapturedSamples() =>

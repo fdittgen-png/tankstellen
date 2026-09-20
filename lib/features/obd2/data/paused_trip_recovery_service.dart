@@ -85,8 +85,15 @@ class PausedTripRecoveryService {
   /// blocks the rest. [PausedTripEntry.automatic] entries trigger
   /// [onAutomaticRecovered] (if wired) so the launcher-icon badge
   /// stays consistent with phase 5's "unseen trip" semantics.
+  ///
+  /// #4314 — [excludeIds] are trips an active-trip WAL row still holds.
+  /// A drop writes a paused row NEXT TO that row, under the same id; the
+  /// active recovery hands the sample-complete trip back to the user, so
+  /// sweeping the sample-less paused copy first would save a gutted twin
+  /// (and a later sweep could overwrite the good row with it).
   Future<int> recoverStale({
     Duration olderThan = const Duration(minutes: 5),
+    Set<String> excludeIds = const {},
   }) async {
     final List<PausedTripEntry> entries;
     try {
@@ -102,6 +109,14 @@ class PausedTripRecoveryService {
     for (final entry in entries) {
       try {
         if (now.difference(entry.pausedAt) <= olderThan) continue;
+        if (excludeIds.contains(entry.id)) continue;
+        // #4328 — the same trip is already in history (a finalise saved it
+        // and the process died before this row was deleted): retire the
+        // row. Saving its sample-less summary would overwrite the good one.
+        if (_historyRepo.storedIds.contains(entry.id)) {
+          await _pausedRepo.delete(entry.id);
+          continue;
+        }
         final historyEntry = TripHistoryEntry(
           id: entry.id,
           vehicleId: entry.vehicleId,

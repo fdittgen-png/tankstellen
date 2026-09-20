@@ -8,7 +8,6 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/feedback/auto_record_badge_provider.dart';
-import '../../../core/feedback/auto_record_badge_service.dart';
 import '../../../core/storage/hive_boxes.dart';
 import '../../../core/time/app_clock.dart';
 import '../data/trips_sync.dart';
@@ -20,14 +19,15 @@ import '../../vehicle/api.dart'
     show VehicleOdometerSnapshot, VehicleOdometerSource,
         vehicleOdometerSnapshotStoreProvider;
 import '../../obd2/api.dart';
+import '../data/pending_trip_saves.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_save_stage.dart';
 import '../domain/entities/trip_start_stage.dart';
-import '../domain/services/recovered_summary_rebuild.dart';
 import '../domain/services/physics_scale_calibrator.dart';
 import '../domain/trip_recorder.dart';
 import 'active_vehicle_read.dart';
+import 'finished_trip_entry.dart';
 import 'gps_only_recording_pipeline.dart';
 import 'recording_battery_exemption.dart';
 import 'recording_companion_association.dart';
@@ -36,6 +36,8 @@ import 'active_snapshot_from_controller.dart';
 import 'last_trip_identity.dart';
 import 'recording_pipeline.dart';
 import 'recording_pipeline_slot.dart';
+import 'recording_paused_row.dart';
+import 'recovered_finalise_deps.dart';
 import 'trip_discard_guard.dart';
 import 'trip_baseline_recorder.dart';
 import 'trip_gps_stream_controller.dart';
@@ -43,6 +45,7 @@ import 'trip_haptic_controller.dart';
 import 'trip_oem_fuel_level_controller.dart';
 import 'trip_history_provider.dart';
 import 'trip_recording_phase.dart';
+import 'trip_recording_phase_gate.dart';
 import 'trip_recording_state.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
@@ -110,7 +113,7 @@ class TripRecording extends _$TripRecording
   /// controller exposes to its [DroppedSessionHost] (#2188).
   TripRecordingState _stateForPipeline() => state;
   void _setStateFromPipeline(TripRecordingState value) {
-    state = value;
+    _publish(value, 'pipeline'); // #4162 — the pipelines' one door
   }
 
   /// Standalone entry point for starting a trajet (#888).
@@ -147,12 +150,14 @@ class TripRecording extends _$TripRecording
     Obd2Service? service,
     bool automatic = false,
   }) async {
-    if (state.isActive || _startInProgress) {
+    // C1 (#4162) — a hands-free start never takes over a manual start
+    // whose adapter is still connecting: the user already asked for it.
+    if (state.isActive || _startInProgress ||
+        (automatic && state.isConnecting)) {
       return StartTripOutcome.alreadyActive;
     }
     final activeVehicle = _tryReadActiveVehicle();
     final resolvedVehicleId = vehicleId ?? activeVehicle?.id;
-    final resolvedMac = adapterMac ?? activeVehicle?.obd2AdapterMac;
     _lastTrip.begin(
       vehicleId: resolvedVehicleId,
       startedAt: DateTime.now(),
@@ -166,10 +171,7 @@ class TripRecording extends _$TripRecording
       await start(service, automatic: automatic);
       return StartTripOutcome.started;
     }
-    if (resolvedMac == null || resolvedMac.isEmpty) {
-      return StartTripOutcome.needsPicker;
-    }
-    // Pinned adapter but no service handed in — the UI picker is
+    // No service handed in, pinned adapter or not — the UI picker is
     // still the right place to fire a connect: it reuses the exact
     // same scan + connect flow (with retry/error surfacing) and
     // short-circuits on the pinned MAC. Keeping the connect logic

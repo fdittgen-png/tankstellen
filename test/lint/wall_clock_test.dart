@@ -123,7 +123,8 @@ void main() {
     'lib/features/fill_ups/providers/consumption_providers_calibration.dart': 1,
     'lib/features/fill_ups/providers/consumption_providers_reconcile.dart': 1,
     'lib/features/fill_ups/providers/consumption_providers_windows.dart': 1,
-    'lib/features/trips/providers/gps_only_recording_pipeline.dart': 4,
+    // #4378 — 4 → 3: the trip's start is ONE instant, read once.
+    'lib/features/trips/providers/gps_only_recording_pipeline.dart': 3,
     'lib/features/trips/providers/gps_only_trip_wal.dart': 2,
     'lib/features/trips/providers/live_activity_provider.dart': 1,
     'lib/features/fill_ups/providers/maintenance_provider.dart': 3,
@@ -134,7 +135,8 @@ void main() {
     // mixins — a move, not a widening (total unchanged).
     'lib/features/trips/providers/trip_recording_provider.dart': 2,
     'lib/features/trips/providers/trip_recording_provider_lifecycle.dart': 1,
-    'lib/features/trips/providers/trip_recording_provider_persist.dart': 2,
+    // #4328 — trip_recording_provider_persist.dart: 2 → 0; the history
+    // row's fallback id and lifecycle window end read the AppClock seam.
     'lib/features/trips/providers/trip_recording_provider_snapshot.dart': 5,
     'lib/features/ev/data/services/fr_irve_price_service.dart': 2,
     'lib/features/ev/data/services/open_charge_map_service.dart': 1,

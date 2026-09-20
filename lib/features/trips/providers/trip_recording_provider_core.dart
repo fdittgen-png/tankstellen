@@ -19,6 +19,14 @@ mixin _TripRecordingCore on _$TripRecording {
   // so the second call is rejected.
   bool _startInProgress = false;
 
+  /// #4162 — every state write goes through [_publish], which asks the
+  /// phase gate whether the change is a documented transition. #4311 — a
+  /// save is enforced: nothing may pull the phase out of `saving` sideways.
+  final TripRecordingPhaseGate _phaseGate =
+      TripRecordingPhaseGate(enforcedFrom: {TripRecordingPhase.saving});
+  void _publish(TripRecordingState next, String cause) =>
+      state = _phaseGate.admit(state, next, cause);
+
   /// #4036 — the selected recording strategy (#2190 / #2227), in a slot
   /// the notifier owns. Was a bare field two of this library's files
   /// wrote; `select` / `release` are the only two transitions now.

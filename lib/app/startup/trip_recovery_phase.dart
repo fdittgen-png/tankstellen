@@ -17,6 +17,7 @@ import '../../features/obd2/data/active_trip_sample_wal.dart';
 import '../../features/obd2/data/paused_trip_recovery_service.dart';
 import '../../features/obd2/data/paused_trip_repository.dart';
 import '../../features/trips/api.dart';
+import '../../features/trips/data/pending_trip_saves.dart';
 import '../../core/navigation/app_routes.dart';
 import '../router.dart';
 
@@ -96,7 +97,38 @@ class TripRecoveryPhase {
     // #1794 — the active-trip + trip-history boxes are deferred; wait
     // for the post-first-frame opens before reading them.
     await HiveBoxes.initDeferred();
-    if (!Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)) return;
+    if (!await restoreActiveTripFromOpenBoxes(container)) return;
+    // Auto-navigate to /trip-recording on the next frame so
+    // the user lands directly on the live recording UI. We
+    // re-enter post-frame because the GoRouter redirect chain
+    // (consent → setup → landing) has to settle before we
+    // can push a new route — a synchronous push from inside
+    // the recovery callback would race against the redirect
+    // logic and lose.
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      try {
+        final goRouter = container.read(routerProvider);
+        goRouter.go(RoutePaths.tripRecording);
+      } catch (e, st) {
+        unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
+          'where': 'activeTripRecovery go(/trip-recording)'
+        }));
+      }
+    });
+  }
+
+  /// #1303 — the active-trip pass once the boxes are open: recover the
+  /// snapshot, hand it to the `TripRecording` provider and bump the badge
+  /// for an auto-record trip. True when the provider took the snapshot.
+  ///
+  /// Split from the Hive open and the navigation (#4162) so a test can
+  /// relaunch against a captured disk image through the production pass
+  /// itself, with [now] pinning the staleness clock.
+  static Future<bool> restoreActiveTripFromOpenBoxes(
+    ProviderContainer container, {
+    DateTime Function()? now,
+  }) async {
+    if (!Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)) return false;
     final activeRepo = ActiveTripRepository(
       sampleWal: ActiveTripSampleWal.instance,
       box: Hive.box<String>(HiveBoxes.obd2ActiveTrip),
@@ -107,9 +139,15 @@ class TripRecoveryPhase {
         box: Hive.box<String>(HiveBoxes.obd2TripHistory),
       );
     }
+    final pausedOpen = Hive.isBoxOpen(HiveBoxes.obd2PausedTrips);
     final service = ActiveTripRecoveryService(
       activeRepo: activeRepo,
       historyRepo: historyRepo,
+      pausedRepo: pausedOpen
+          ? PausedTripRepository(
+              box: Hive.box<String>(HiveBoxes.obd2PausedTrips))
+          : null,
+      now: now,
       onAutomaticRecovered: () async {
         try {
           final badge =
@@ -126,14 +164,15 @@ class TripRecoveryPhase {
       case ActiveTripRecoveryOutcome.none:
       case ActiveTripRecoveryOutcome.failed:
       case ActiveTripRecoveryOutcome.discarded:
-        return;
+      case ActiveTripRecoveryOutcome.alreadySaved: // #4328
+        return false;
       case ActiveTripRecoveryOutcome.recovered:
         final snapshot = service.recoveredSnapshot;
-        if (snapshot == null) return;
+        if (snapshot == null) return false;
         try {
           final notifier = container.read(tripRecordingProvider.notifier);
           final applied = notifier.restoreFromSnapshot(snapshot);
-          if (!applied) return;
+          if (!applied) return false;
           // Bump the unseen-trip badge for auto-record sessions —
           // the user should see "your auto-trip didn't fully save"
           // in the launcher even if they don't tap the recording
@@ -149,27 +188,12 @@ class TripRecoveryPhase {
               }));
             }
           }
-          // Auto-navigate to /trip-recording on the next frame so
-          // the user lands directly on the live recording UI. We
-          // re-enter post-frame because the GoRouter redirect chain
-          // (consent → setup → landing) has to settle before we
-          // can push a new route — a synchronous push from inside
-          // the recovery callback would race against the redirect
-          // logic and lose.
-          SchedulerBinding.instance.addPostFrameCallback((_) {
-            try {
-              final goRouter = container.read(routerProvider);
-              goRouter.go(RoutePaths.tripRecording);
-            } catch (e, st) {
-              unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
-                'where': 'activeTripRecovery go(/trip-recording)'
-              }));
-            }
-          });
+          return true;
         } catch (e, st) {
           unawaited(errorLogger.log(ErrorLayer.background, e, st, context: {
             'where': 'activeTripRecovery restoreFromSnapshot'
           }));
+          return false;
         }
     }
   }
@@ -185,6 +209,24 @@ class TripRecoveryPhase {
     // #1794 — the paused-trip + trip-history boxes are deferred; wait
     // for the post-first-frame opens before reading them.
     await HiveBoxes.initDeferred();
+    await recoverPausedTripsFromOpenBoxes(container);
+  }
+
+  /// #1004 phase 4-WAL — the paused-trip pass once the boxes are open.
+  /// Split from the Hive open (#4162) for the same reason as
+  /// [restoreActiveTripFromOpenBoxes]; [now] pins the sweep's clock.
+  static Future<void> recoverPausedTripsFromOpenBoxes(
+    ProviderContainer container, {
+    DateTime Function()? now,
+  }) async {
+    // #4378 — retry the trips whose history write failed BEFORE the
+    // sweeps: one that lands turns its own WAL row into an already-saved
+    // row, which the active pass then retires instead of handing it back
+    // (#4328). One that fails again stays kept for the next launch.
+    final retried = await retryPendingTripSaves();
+    if (retried > 0) {
+      log.info('AppInitializer: retried $retried pending trip save(s)');
+    }
     if (!Hive.isBoxOpen(HiveBoxes.obd2PausedTrips)) return;
     if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return;
     final pausedRepo = PausedTripRepository(
@@ -196,6 +238,7 @@ class TripRecoveryPhase {
     final service = PausedTripRecoveryService(
       pausedRepo: pausedRepo,
       historyRepo: historyRepo,
+      now: now,
       onAutomaticRecovered: () async {
         try {
           final badge =
@@ -207,7 +250,13 @@ class TripRecoveryPhase {
         }
       },
     );
-    final recovered = await service.recoverStale();
+    // #4314 — the active pass that follows owns the trip its WAL row holds.
+    final activeId = Hive.isBoxOpen(HiveBoxes.obd2ActiveTrip)
+        ? ActiveTripRepository(box: Hive.box<String>(HiveBoxes.obd2ActiveTrip))
+            .loadSnapshot()
+            ?.id
+        : null;
+    final recovered = await service.recoverStale(excludeIds: {?activeId});
     if (recovered > 0) {
       log.info(
           'AppInitializer: recovered $recovered paused trip(s) into history');

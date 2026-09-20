@@ -25,38 +25,33 @@ mixin _TripRecordingLifecycle
 
   /// Current logical state. Mirrors [stateChanges] for callers that
   /// want a pull-style read (widget tests, initial value).
-  TripRecordingControllerState get currentState {
-    // Check stopped first: an auto-finalised drop sets both
-    // `_stopped = true` AND `_started = false`, so the order matters.
-    if (_run.stopped) return TripRecordingControllerState.stopped;
-    if (!_run.started) return TripRecordingControllerState.idle;
-    if (_run.pausedDueToDrop) {
-      return TripRecordingControllerState.pausedDueToDrop;
-    }
-    if (_run.paused) return TripRecordingControllerState.paused;
-    // #2565 — degraded GPS-only: checked after the true-pause states but
-    // is still an ACTIVE, recording state.
-    if (_run.degradedGpsOnly) {
-      return TripRecordingControllerState.degradedGpsOnly;
-    }
-    return TripRecordingControllerState.recording;
-  }
+  /// #4162 — ONE precedence: this is a projection of [TripRunState.phase],
+  /// which documents why the pauses outrank the #2565 degrade.
+  TripRecordingControllerState get currentState => switch (_run.phase) {
+        TripRunPhase.finished => TripRecordingControllerState.stopped,
+        TripRunPhase.idle => TripRecordingControllerState.idle,
+        TripRunPhase.pausedByDrop => TripRecordingControllerState.pausedDueToDrop,
+        TripRunPhase.pausedByUser => TripRecordingControllerState.paused,
+        TripRunPhase.degradedGpsOnly =>
+          TripRecordingControllerState.degradedGpsOnly,
+        TripRunPhase.running => TripRecordingControllerState.recording,
+      };
 
   bool get isRecording => _run.isRecording;
   bool get isPaused => _run.isPaused;
   bool get isPausedDueToDrop => _run.pausedDueToDrop;
   bool get isActive => _run.started;
 
-  /// Pause the polling loop without tearing down the recorder. The
-  /// scheduler is stopped (no wasted Bluetooth chatter while the user
-  /// is looking at another screen) but the emit timer keeps ticking so
-  /// a frozen `TripLiveReading` still flushes if UI subscribed late.
-  /// [resume] restarts the scheduler. Safe to call when not recording
-  /// — no-op.
-  void pause() {
-    if (!_run.pauseByUser()) return;
+  /// Pause the polling loop without tearing down the recorder: the
+  /// scheduler stops (no Bluetooth chatter while the user looks away), the
+  /// emit timer keeps ticking so a frozen reading still flushes, and
+  /// [resume] restarts it. Returns whether it paused (#4312) — false when
+  /// not running, or already paused either way (a drop pause included).
+  bool pause() {
+    if (!_run.pauseByUser()) return false;
     _scheduler?.stop();
     _emitState();
+    return true;
   }
 
   /// Resume a paused recording. Works from both user-pause and
@@ -148,9 +143,9 @@ mixin _TripRecordingLifecycle
   /// Start polling. Reads the odometer and VIN ONCE to pin trip
   /// identity; subsequent ticks are scheduled per-PID by
   /// [PidScheduler]. Safe to call multiple times — no-op when already
-  /// recording.
+  /// recording, or once stopped. #4344 — every await is [TripRunState.alive].
   Future<void> start() async {
-    if (_run.started) return;
+    if (_run.started || _run.stopped) return;
     _run.begin();
     _startedAt = _now();
     // #3797 — anchor the lifecycle timeline at t=0 BEFORE any OBD work,
@@ -165,7 +160,7 @@ mixin _TripRecordingLifecycle
     power.evMode = _vehicle?.type == VehicleType.ev;
     if (_service.busProbe == Obd2BusProbeResult.probedSilent) {
       power.noteBusSilent();
-      await _service.readBatteryVoltageV();
+      if (!await _run.alive(_service.readBatteryVoltageV())) return;
     }
     if (_service.busProbe == Obd2BusProbeResult.probedSilent &&
         !power.engineRunning) {
@@ -196,8 +191,8 @@ mixin _TripRecordingLifecycle
     // timeout strikes, and the poll cadence would livelock the search
     // (#3577) for the rest of the trip. One quiet window here fixes all
     // of them at once. No-op when the bus is already confirmed.
-    await _ensureVehicleProtocol(where: 'trip-start');
-    await _readTripIdentity();
+    if (!await _run.alive(_ensureVehicleProtocol(where: 'trip-start'))) return;
+    if (!await _run.alive(_readTripIdentity())) return;
 
     _scheduler = _schedulerOverride ?? _buildScheduler();
     _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
@@ -271,18 +266,8 @@ mixin _TripRecordingLifecycle
     // #1925 — finalise the opt-in OBD2 debug session so its summary
     // (duration, reconnects, data gaps) is complete for export.
     Obd2DebugSessionRecorder.endSession();
-    _scheduler?.stop();
-    _emitTimer?.cancel();
-    _emitTimer = null;
-    // #1904 / #2188 — tear down the grace timer + the pending silent-
-    // reconnect window so neither can fire after the trip has stopped,
-    // and stop the reconnect scanner.
-    _droppedSession.cancelAllTimers();
+    _haltSampling(); // #4329 — the step a self-finalised trip takes too
     await _droppedSession.stopReconnectScanner();
-    // #2565 — `end()` also clears the degrade flag so a stop while
-    // degraded finalises cleanly (the drop-window GPS samples persist in
-    // the mixed trip).
-    _run.end();
     _dropDetector.reset();
     _emitState();
     if (!_stateController.isClosed) {
@@ -293,6 +278,16 @@ mixin _TripRecordingLifecycle
     }
     _distance.publishGateRejectionTally(); // #3253 — once-per-trip tally
     return _finaliseSummary();
+  }
+
+  /// #4329 — the trip is over, and nothing samples it or fires after it
+  /// (#1904/#2188 windows); `end()` clears the #2565 degrade too.
+  void _haltSampling() {
+    _run.end();
+    _scheduler?.stop();
+    _emitTimer?.cancel();
+    _emitTimer = null;
+    _droppedSession.cancelAllTimers();
   }
 
   @override

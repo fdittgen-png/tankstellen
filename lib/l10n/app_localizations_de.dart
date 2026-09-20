@@ -9020,6 +9020,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'GPS-Verfolgung deiner Route für Verbrauchs- & Fahrstatistiken';
 
   @override
+  String get tripSaveFailedKept =>
+      'Fahrt konnte nicht gespeichert werden — sie bleibt erhalten und wird erneut versucht';
+
+  @override
+  String get tripSaveRetryAction => 'Erneut versuchen';
+
+  @override
   String get tripShareAction => 'Mit anderem Konto teilen';
 
   @override

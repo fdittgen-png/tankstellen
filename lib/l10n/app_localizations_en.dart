@@ -8930,6 +8930,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tracking your route for fuel & driving stats';
 
   @override
+  String get tripSaveFailedKept =>
+      'Couldn\'t save this trip — it\'s kept and will be retried';
+
+  @override
+  String get tripSaveRetryAction => 'Retry';
+
+  @override
   String get tripShareAction => 'Share with another account';
 
   @override
@@ -19357,6 +19364,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get tripRecordingGpsNotificationText =>
       '⟦Ŧřáçķîñǧ ýóúř řóúŧé ƒóř ƒúéł & đřîṽîñǧ šŧáŧš ················⟧';
+
+  @override
+  String get tripSaveFailedKept =>
+      '⟦Çóúłđñ\'ŧ šáṽé ŧĥîš ŧřîƥ — îŧ\'š ķéƥŧ áñđ ŵîłł ƀé řéŧřîéđ ···················⟧';
+
+  @override
+  String get tripSaveRetryAction => '⟦Řéŧřý ··⟧';
 
   @override
   String get tripShareAction => '⟦Šĥářé ŵîŧĥ áñóŧĥéř áççóúñŧ ··········⟧';

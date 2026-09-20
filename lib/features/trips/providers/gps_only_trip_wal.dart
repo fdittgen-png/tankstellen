@@ -35,6 +35,9 @@ class GpsOnlyTripWal {
   static const int _flushEveryNSamples = 10;
 
   String? _id;
+
+  /// #4328 — the running trip's id, which its history row is saved under.
+  String? get id => _id;
   DateTime? _startedAt;
   bool _automatic = false;
   String? _vehicleId;
@@ -145,7 +148,9 @@ class GpsOnlyTripWal {
       vin: null,
       automatic: _automatic,
       phase: 'recording',
-      summary: summary,
+      // #4313 — the row knows its trip is dongle-less, so a recovery saves
+      // it as one (a recorder summary carries the gpsPlusObd2 default).
+      summary: summary.copyWith(kind: TripKind.gpsOnly),
       samples: samples,
       odometerStartKm: null,
       odometerLatestKm: null,
