@@ -52,7 +52,9 @@ void main() {
     // #4333 made HiveIsolateLock's three silent best-effort closes log
     // through log.warn (31 → 28).
     '// ignore: silent_catch': 28,
-    '// ignore: catch_no_st': 14,
+    // 14 -> 13: #4355 gave the Android presence-watcher arm a real
+    // `catch (e, st)` with the stack forwarded to the error log.
+    '// ignore: catch_no_st': 13,
     '// ignore: log_raw_debugprint': 0,
     '// i18n-ignore:': 122,
   };

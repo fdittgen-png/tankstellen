@@ -14,11 +14,13 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.annotation.RequiresApi
 import de.tankstellen.tankstellen.R
 
 /**
@@ -45,11 +47,13 @@ import de.tankstellen.tankstellen.R
  *    [FlutterBluePlusElmChannel] takes over for the actual ELM327
  *    session.
  *
- * Idempotency:
- *  - If the service is started for the same MAC it's already armed for,
- *    it's a no-op.
- *  - If started for a different MAC, the prior GATT is closed and we
- *    re-arm against the new MAC.
+ * #4355 — this class is now only the **platform adapter**. Every lifecycle
+ * decision (promotion gating, null-intent reconstruction, generation fencing,
+ * idempotency) lives in [AutoRecordArming], which is a pure-JVM object and is
+ * therefore covered by executable unit tests rather than by a source scan.
+ *
+ * This service watches for an adapter's *presence*. It is explicitly **not**
+ * evidence that a recording is protected — #4352 owns that acknowledgement.
  */
 class AutoRecordForegroundService : Service() {
     companion object {
@@ -59,6 +63,14 @@ class AutoRecordForegroundService : Service() {
         const val NOTIF_KEY_TITLE = "title"
         const val NOTIF_KEY_TEXT = "text"
 
+        /** #4355 — sibling SharedPreferences file holding the DESIRED arming.
+         *  An OS sticky restart always delivers a null intent, so the extras
+         *  are gone; this is what the watcher reconstructs from instead. */
+        const val ARM_PREFS = "autorecord_arm"
+        const val ARM_KEY_MAC = "mac"
+        const val ARM_KEY_GENERATION = "generation"
+        const val ARM_KEY_ARMED = "armed"
+
         private const val TAG = "AutoRecordFgService"
         const val EXTRA_MAC = "mac"
 
@@ -67,8 +79,30 @@ class AutoRecordForegroundService : Service() {
         private const val NOTIFICATION_ID = 4221
     }
 
-    private var gatt: BluetoothGatt? = null
-    private var armedMac: String? = null
+    /**
+     * The lifecycle brain. Constructed lazily so `applicationContext` is
+     * available (it is, from `onCreate` onwards — `onStartCommand` always
+     * follows `onCreate`).
+     */
+    private val arming: AutoRecordArming by lazy {
+        AutoRecordArming(
+            promoter = ForegroundPromoter { startForegroundSafe() },
+            armer = GattArmer(::openGatt),
+            store = SharedPrefsDesiredArmStateStore(applicationContext),
+            host = object : ArmingHost {
+                override fun postTransition(event: Map<String, Any>) =
+                    BackgroundAdapterChannel.post(event)
+
+                override fun postPromoted(generation: Int) =
+                    BackgroundAdapterChannel.postPromoted(generation)
+
+                override fun postStartFailure(reason: String) =
+                    BackgroundAdapterChannel.postStartFailure(reason)
+
+                override fun stopSelf() = stopSelfSafe()
+            },
+        )
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -78,29 +112,17 @@ class AutoRecordForegroundService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val mac = intent?.getStringExtra(EXTRA_MAC)
-        if (mac.isNullOrBlank()) {
-            Log.w(TAG, "onStartCommand: missing MAC extra; stopping")
-            stopSelfSafe()
-            return START_NOT_STICKY
+        // #4355 — a null intent is the NORMAL sticky-restart delivery, not an
+        // error: the OS does not redeliver extras. Handing the seam a null MAC
+        // routes it to the persisted desired state.
+        return when (arming.onStartCommand(intent?.getStringExtra(EXTRA_MAC))) {
+            StartDisposition.STICKY -> START_STICKY
+            StartDisposition.NOT_STICKY -> START_NOT_STICKY
         }
-
-        startForegroundSafe()
-
-        if (mac.equals(armedMac, ignoreCase = true) && gatt != null) {
-            // Idempotent: same MAC already armed. Nothing to do.
-            return START_STICKY
-        }
-
-        // Different MAC (or first arm). Close any prior GATT.
-        closeGatt()
-        armedMac = mac
-        armGatt(mac)
-        return START_STICKY
     }
 
     override fun onDestroy() {
-        closeGatt()
+        arming.onDestroy()
         BackgroundAdapterChannel.markStopped()
         super.onDestroy()
     }
@@ -121,7 +143,7 @@ class AutoRecordForegroundService : Service() {
         }
     }
 
-    private fun startForegroundSafe() {
+    private fun buildNotification(): Notification {
         // #3505 — localized copy persisted by BackgroundAdapterChannel at arm
         // time (HARD RULE #1: no hard-coded user-facing text); the English
         // literals below are only the never-armed / fresh-install fallback.
@@ -129,7 +151,7 @@ class AutoRecordForegroundService : Service() {
         val title = prefs.getString(NOTIF_KEY_TITLE, null) ?: "Trip auto-record"
         val text = prefs.getString(NOTIF_KEY_TEXT, null)
             ?: "Watching for your OBD2 adapter"
-        val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Notification.Builder(this, CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(text)
@@ -146,8 +168,21 @@ class AutoRecordForegroundService : Service() {
                 .setPriority(Notification.PRIORITY_LOW)
                 .build()
         }
+    }
 
-        try {
+    /**
+     * #4355 defect 1 — promotion now REPORTS. It used to return `Unit` and
+     * swallow both catches, so the caller walked straight on into `armGatt`
+     * and opened a BLE connection from a service the OS had refused to
+     * promote: a ghost service Android kills silently mid-trip.
+     *
+     * The typed [PromotionOutcome] strictly subsumes the boolean the issue
+     * asks for — a bare `false` cannot carry the accurate reason that has to
+     * reach the Dart boundary.
+     */
+    private fun startForegroundSafe(): PromotionOutcome {
+        val notification = buildNotification()
+        return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 // Android 10+ accepts the foregroundServiceType variant
                 // — required on Android 14+ so the OS knows we are the
@@ -161,36 +196,47 @@ class AutoRecordForegroundService : Service() {
             } else {
                 startForeground(NOTIFICATION_ID, notification)
             }
+            PromotionOutcome.Promoted
         } catch (e: SecurityException) {
             Log.w(TAG, "startForeground: SecurityException", e)
-            stopSelfSafe()
+            PromotionOutcome.Refused(PromotionFailureReason.PERMISSION_DENIED)
         } catch (e: IllegalStateException) {
-            Log.w(TAG, "startForeground: IllegalStateException (Android 12+ background?)", e)
-            stopSelfSafe()
+            val reason = classifyPromotionFailure(Build.VERSION.SDK_INT, e)
+            Log.w(TAG, "startForeground: refused (${reason.wireName})", e)
+            PromotionOutcome.Refused(reason)
         }
     }
 
+    /**
+     * Opens the stock GATT client for [mac], or returns null when the platform
+     * refuses (no adapter, `BLUETOOTH_CONNECT` not granted, unusable MAC).
+     * Stopping the service on a refusal is [AutoRecordArming]'s call, not ours.
+     */
     @SuppressLint("MissingPermission")
-    private fun armGatt(mac: String) {
+    private fun openGatt(
+        mac: String,
+        generation: Int,
+        onTransition: (type: String, atMillis: Long) -> Unit,
+    ): GattHandle? {
         val manager = getSystemService(BLUETOOTH_SERVICE) as? BluetoothManager
         val adapter: BluetoothAdapter? = manager?.adapter
         if (adapter == null) {
-            Log.w(TAG, "armGatt: no BluetoothAdapter; stopping")
-            stopSelfSafe()
-            return
+            Log.w(TAG, "openGatt: no BluetoothAdapter")
+            return null
         }
         if (!hasBluetoothConnectPermission()) {
-            Log.w(TAG, "armGatt: BLUETOOTH_CONNECT not granted; stopping")
-            stopSelfSafe()
-            return
+            Log.w(TAG, "openGatt: BLUETOOTH_CONNECT not granted")
+            return null
         }
 
         val device = try {
-            adapter.getRemoteDevice(mac)
+            // getRemoteDevice insists on upper-case hex; the seam's pattern
+            // accepts either, so canonicalise here and keep the caller's
+            // spelling for the events the Dart coordinator filters on.
+            adapter.getRemoteDevice(mac.uppercase())
         } catch (e: IllegalArgumentException) {
-            Log.w(TAG, "armGatt: invalid MAC '$mac'", e)
-            stopSelfSafe()
-            return
+            Log.w(TAG, "openGatt: invalid MAC", e)
+            return null
         }
 
         val callback = object : BluetoothGattCallback() {
@@ -199,25 +245,24 @@ class AutoRecordForegroundService : Service() {
                     BluetoothProfile.STATE_CONNECTED -> "connect"
                     BluetoothProfile.STATE_DISCONNECTED -> "disconnect"
                     else -> null
-                }
-                if (type != null) {
-                    BackgroundAdapterChannel.post(
-                        mapOf<String, Any>(
-                            "type" to type,
-                            "mac" to mac,
-                            "atMillis" to System.currentTimeMillis(),
-                        ),
-                    )
-                }
+                } ?: return
+                // #4355 — the callback reports the generation it was opened
+                // for; the seam drops it once that generation is retired.
+                onTransition(type, System.currentTimeMillis())
             }
         }
 
-        gatt = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val gatt = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             device.connectGatt(this, /* autoConnect = */ true, callback, BluetoothDevice.TRANSPORT_LE)
         } else {
             @Suppress("DEPRECATION")
             device.connectGatt(this, true, callback)
         }
+        if (gatt == null) {
+            Log.w(TAG, "openGatt: connectGatt returned null (generation $generation)")
+            return null
+        }
+        return GattHandle { closeGatt(gatt) }
     }
 
     private fun hasBluetoothConnectPermission(): Boolean {
@@ -227,8 +272,7 @@ class AutoRecordForegroundService : Service() {
     }
 
     @SuppressLint("MissingPermission")
-    private fun closeGatt() {
-        val g = gatt ?: return
+    private fun closeGatt(g: BluetoothGatt) {
         try {
             g.disconnect()
         } catch (e: SecurityException) {
@@ -239,8 +283,6 @@ class AutoRecordForegroundService : Service() {
         } catch (e: SecurityException) {
             Log.w(TAG, "closeGatt: SecurityException on close", e)
         }
-        gatt = null
-        armedMac = null
     }
 
     private fun stopSelfSafe() {
@@ -256,5 +298,75 @@ class AutoRecordForegroundService : Service() {
         }
         stopSelf()
         BackgroundAdapterChannel.markStopped()
+    }
+}
+
+/**
+ * #4355 — names the promotion refusal accurately.
+ *
+ * `ForegroundServiceStartNotAllowedException` — the Android 12+ background
+ * -start refusal, which is what actually happens in the field — is an
+ * `IllegalStateException` subclass, so the old code caught it only
+ * incidentally and reported a generic label. It is matched **by name** here;
+ * the match lives in its own API-gated function so the `instanceof` never has
+ * to verify against a class that does not exist on an older runtime.
+ *
+ * Package-internal (not private) so it is directly executable from a unit
+ * test without constructing a real `Service`.
+ */
+internal fun classifyPromotionFailure(
+    sdkInt: Int,
+    e: IllegalStateException,
+): PromotionFailureReason {
+    if (sdkInt < Build.VERSION_CODES.S) return PromotionFailureReason.ILLEGAL_STATE
+    return classifyPromotionFailureApi31(e)
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+private fun classifyPromotionFailureApi31(e: IllegalStateException): PromotionFailureReason =
+    if (e is android.app.ForegroundServiceStartNotAllowedException) {
+        PromotionFailureReason.NOT_ALLOWED_IN_BACKGROUND
+    } else {
+        PromotionFailureReason.ILLEGAL_STATE
+    }
+
+/**
+ * #4355 — [DesiredArmStateStore] backed by the `autorecord_arm`
+ * SharedPreferences file, a sibling of [AutoRecordForegroundService.NOTIF_PREFS].
+ *
+ * It holds the paired adapter MAC the app already stores, the monotonic arm
+ * generation, and the armed flag — no credentials, and nothing that is not
+ * already persisted elsewhere for auto-record.
+ */
+class SharedPrefsDesiredArmStateStore(context: Context) : DesiredArmStateStore {
+    private val prefs = context.applicationContext.getSharedPreferences(
+        AutoRecordForegroundService.ARM_PREFS,
+        Context.MODE_PRIVATE,
+    )
+
+    override fun read(): DesiredArmState? {
+        val mac = prefs.getString(AutoRecordForegroundService.ARM_KEY_MAC, null)
+            ?: return null
+        return DesiredArmState(
+            mac = mac,
+            generation = prefs.getInt(AutoRecordForegroundService.ARM_KEY_GENERATION, 0),
+            armed = prefs.getBoolean(AutoRecordForegroundService.ARM_KEY_ARMED, false),
+        )
+    }
+
+    override fun arm(mac: String, generation: Int) {
+        prefs.edit()
+            .putString(AutoRecordForegroundService.ARM_KEY_MAC, mac)
+            .putInt(AutoRecordForegroundService.ARM_KEY_GENERATION, generation)
+            .putBoolean(AutoRecordForegroundService.ARM_KEY_ARMED, true)
+            .apply()
+    }
+
+    override fun disarm() {
+        // The generation is deliberately kept so it stays monotonic across an
+        // explicit stop; only the desire is cleared.
+        prefs.edit()
+            .putBoolean(AutoRecordForegroundService.ARM_KEY_ARMED, false)
+            .apply()
     }
 }

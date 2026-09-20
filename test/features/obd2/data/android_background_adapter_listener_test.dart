@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/data/transport/android_background_adapter_listener.dart';
@@ -258,6 +260,158 @@ void main() {
         calls.map((c) => c.method),
         containsAllInOrder(<String>['start', 'stop']),
       );
+    });
+
+    group('#4355 promotion acknowledgement contract', () {
+      // The native `start` reply is parked until the service posts its
+      // promotion ack, so a `true` here now MEANS the OS promoted the
+      // service. Everything else is a typed degrade — never `promoted`.
+
+      void emptyEventStream() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockStreamHandler(
+          eventChannel,
+          MockStreamHandler.inline(onListen: (_, _) {}),
+        );
+      }
+
+      test('an acknowledged arm reports promoted', () async {
+        messenger.setMockMethodCallHandler(methodChannel, (call) async => true);
+        emptyEventStream();
+
+        final outcome = await listener.arm(mac: 'AA:BB:CC:DD:EE:01');
+
+        expect(outcome, ForegroundPromotionOutcome.promoted);
+        expect(listener.lastPromotion, ForegroundPromotionOutcome.promoted);
+      });
+
+      test('a native promotionRefused carries the accurate reason through',
+          () async {
+        final reasons = <String, ForegroundPromotionOutcome>{
+          'notAllowedInBackground':
+              ForegroundPromotionOutcome.notAllowedInBackground,
+          'permissionDenied': ForegroundPromotionOutcome.permissionDenied,
+          'gattUnavailable': ForegroundPromotionOutcome.gattUnavailable,
+          'illegalState': ForegroundPromotionOutcome.refused,
+        };
+        emptyEventStream();
+        for (final entry in reasons.entries) {
+          messenger.setMockMethodCallHandler(methodChannel, (call) async {
+            throw PlatformException(
+                code: 'promotionRefused', message: entry.key);
+          });
+          expect(await listener.arm(mac: 'AA:BB:CC:DD:EE:01'), entry.value,
+              reason: entry.key);
+        }
+      });
+
+      test('a native promotionTimeout is a typed failure, never promoted',
+          () async {
+        messenger.setMockMethodCallHandler(methodChannel, (call) async {
+          throw PlatformException(
+              code: 'promotionTimeout',
+              message: 'foreground promotion was not acknowledged');
+        });
+        emptyEventStream();
+
+        expect(await listener.arm(mac: 'AA:BB:CC:DD:EE:01'),
+            ForegroundPromotionOutcome.timedOut);
+      });
+
+      test('#3246 an unregistered <service> is still reported as unavailable',
+          () async {
+        messenger.setMockMethodCallHandler(methodChannel, (call) async {
+          throw PlatformException(
+              code: 'unavailable', message: 'foreground service not registered');
+        });
+        emptyEventStream();
+
+        expect(await listener.arm(mac: 'AA:BB:CC:DD:EE:01'),
+            ForegroundPromotionOutcome.unavailable);
+      });
+
+      test('a platform that never answers resolves to timedOut, not promoted',
+          () async {
+        final bounded = AndroidBackgroundAdapterListener.withChannels(
+          methodChannel: methodChannel,
+          eventChannel: eventChannel,
+          promotionAckTimeout: const Duration(milliseconds: 40),
+        );
+        addTearDown(bounded.dispose);
+        messenger.setMockMethodCallHandler(methodChannel, (call) async {
+          // A wedged platform thread: the reply never comes.
+          return Completer<bool>().future;
+        });
+        emptyEventStream();
+
+        expect(await bounded.arm(mac: 'AA:BB:CC:DD:EE:01'),
+            ForegroundPromotionOutcome.timedOut);
+      });
+
+      test('a non-true reply is never upgraded to promoted', () async {
+        messenger.setMockMethodCallHandler(methodChannel, (call) async => null);
+        emptyEventStream();
+
+        expect(await listener.arm(mac: 'AA:BB:CC:DD:EE:01'),
+            ForegroundPromotionOutcome.refused);
+      });
+
+      test('start() never throws on any refusal path', () async {
+        messenger.setMockMethodCallHandler(methodChannel, (call) async {
+          throw PlatformException(code: 'permission', message: 'denied');
+        });
+        emptyEventStream();
+
+        await expectLater(listener.start(mac: 'AA:BB:CC:DD:EE:01'), completes);
+        expect(
+            listener.lastPromotion, ForegroundPromotionOutcome.permissionDenied);
+      });
+
+      test(
+          'fgsPromoted / fgsStartFailed reach the STATIC promotion stream and '
+          'never the sealed adapter-event stream', () async {
+        messenger.setMockMethodCallHandler(methodChannel, (call) async => true);
+        late MockStreamHandlerEventSink sink;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockStreamHandler(
+          eventChannel,
+          MockStreamHandler.inline(onListen: (_, events) => sink = events),
+        );
+
+        final adapterEvents = <BackgroundAdapterEvent>[];
+        final promotions = <ForegroundPromotionEvent>[];
+        final sub = listener.events.listen(adapterEvents.add);
+        final promoSub = AndroidBackgroundAdapterListener.promotionEvents
+            .listen(promotions.add);
+
+        await listener.arm(mac: 'AA:BB:CC:DD:EE:01');
+
+        // Note: these payloads carry NO mac — a promotion is a process-wide
+        // platform fact, so the parser must route them before the mac check.
+        sink.success(<String, Object?>{
+          'type': 'fgsPromoted',
+          'generation': 7,
+          'atMillis': 1700000000000,
+        });
+        sink.success(<String, Object?>{
+          'type': 'fgsStartFailed',
+          'reason': 'notAllowedInBackground',
+          'atMillis': 1700000001000,
+        });
+        await Future<void>.delayed(Duration.zero);
+
+        expect(adapterEvents, isEmpty);
+        expect(promotions, hasLength(2));
+        expect(promotions[0].outcome, ForegroundPromotionOutcome.promoted);
+        expect(promotions[0].generation, 7);
+        expect(promotions[0].at.millisecondsSinceEpoch, 1700000000000);
+        expect(promotions[1].outcome,
+            ForegroundPromotionOutcome.notAllowedInBackground);
+        expect(promotions[1].generation, isNull);
+
+        await sub.cancel();
+        await promoSub.cancel();
+      });
     });
 
     test('atMillis can be a num that rounds down to int', () async {

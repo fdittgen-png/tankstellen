@@ -7,9 +7,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'background_adapter_listener.dart';
+import 'foreground_promotion.dart';
 import '../../../../../core/utils/event_channel_cancel.dart';
 import '../../../../core/logging/app_log.dart';
 import '../../../../core/logging/error_logger.dart';
+
+// #4355 — the promotion contract is part of this listener's public surface
+// (it is what `arm` returns), so callers need one import, not two.
+export 'foreground_promotion.dart';
 
 /// Production [BackgroundAdapterListener] backed by the native Android
 /// foreground service shipped in #1004 phase 2b-1.
@@ -54,12 +59,20 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
   /// re-arming with a different MAC does NOT churn the EventChannel.
   StreamSubscription<dynamic>? _platformSubscription;
 
+  /// #4355 — outer bound on waiting for the native promotion acknowledgement.
+  /// Deliberately longer than the native side's own bound
+  /// (`BackgroundAdapterChannel.PROMOTION_ACK_TIMEOUT_MS`, 5 s) so the native
+  /// timeout normally wins and Dart reports the accurate native reason; this
+  /// only fires when the platform thread is wedged.
+  final Duration promotionAckTimeout;
+
   /// Default constructor for production use. Channel names match the
   /// strings in [BackgroundAdapterChannel] on the Kotlin side; keep
   /// them in sync.
   AndroidBackgroundAdapterListener()
       : _methods = const MethodChannel('tankstellen/auto_record/methods'),
-        _events = const EventChannel('tankstellen/auto_record/events');
+        _events = const EventChannel('tankstellen/auto_record/events'),
+        promotionAckTimeout = kForegroundPromotionAckTimeout;
 
   /// Test-only constructor that injects custom channels. Useful when
   /// running multiple isolation-level tests in parallel — each test
@@ -69,6 +82,7 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
   AndroidBackgroundAdapterListener.withChannels({
     required MethodChannel methodChannel,
     required EventChannel eventChannel,
+    this.promotionAckTimeout = kForegroundPromotionAckTimeout,
   })  : _methods = methodChannel,
         _events = eventChannel;
 
@@ -90,6 +104,19 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
   /// Broadcast stream of ACL engine-start hint timestamps (#3699).
   static Stream<DateTime> get engineStartHints => _hintController.stream;
 
+  /// #4355 — promotion acknowledgements / refusals. STATIC for the same
+  /// reason as the hint stream: a foreground-service promotion is a
+  /// process-wide platform fact, not a per-adapter transition, so it
+  /// deliberately bypasses the sealed [BackgroundAdapterEvent] hierarchy and
+  /// the per-coordinator MAC filter (the payloads carry no MAC at all).
+  static final StreamController<ForegroundPromotionEvent>
+      _promotionController =
+      StreamController<ForegroundPromotionEvent>.broadcast();
+
+  /// Broadcast stream of [ForegroundPromotionEvent]s (#4355).
+  static Stream<ForegroundPromotionEvent> get promotionEvents =>
+      _promotionController.stream;
+
   /// #3505 — localized notification title/body handed to the native FGS at
   /// arm time (null keeps the built-in English fallback). Settable fields
   /// (not `start` params) so the [BackgroundAdapterListener] interface and
@@ -97,8 +124,29 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
   String? notificationTitle;
   String? notificationText;
 
+  /// #4355 — the outcome of the most recent [arm]. `null` until the first
+  /// attempt. Diagnostics-only here; #4352 owns the recorder's own protection
+  /// verdict and must never read a *presence* watcher's state as evidence
+  /// that a recording is protected.
+  ForegroundPromotionOutcome? lastPromotion;
+
   @override
   Future<void> start({required String mac}) async {
+    await arm(mac: mac);
+  }
+
+  /// #4355 — arms the native presence watcher and reports what the OS
+  /// actually did.
+  ///
+  /// The native `start` reply is parked until the service posts its promotion
+  /// acknowledgement, so a returned [ForegroundPromotionOutcome.promoted] now
+  /// means the OS promoted the service — not merely that a `ComponentName`
+  /// came back, which only ever proved the service was *created*.
+  ///
+  /// Bounded on both sides: the native side times its parked reply out, and
+  /// [promotionAckTimeout] here is the outer net for a wedged platform
+  /// thread. Every path resolves to a typed outcome; this never throws.
+  Future<ForegroundPromotionOutcome> arm({required String mac}) async {
     // Ensure we're listening to the EventChannel BEFORE the service
     // arms — otherwise an early connect event from a fast adapter
     // could beat us to the EventChannel and be dropped. The native
@@ -124,26 +172,47 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
     // native side now reports those honestly instead of a phantom success;
     // degrade silently here (recording falls back to the GPS-only / foreground
     // path) rather than crashing the auto-record coordinator.
+    ForegroundPromotionOutcome outcome;
     try {
-      final armed = await _methods.invokeMethod<bool>('start', <String, Object?>{
-        'mac': mac,
-        // #3505 — localized FGS notification copy; the native side persists
-        // it so a CDM cold start (app process dead) still shows the user's
-        // language instead of the hard-coded English fallback.
-        if (notificationTitle != null) 'notifTitle': notificationTitle,
-        if (notificationText != null) 'notifText': notificationText,
-      });
-      if (armed != true) {
+      final armed = await _methods
+          .invokeMethod<bool>('start', <String, Object?>{
+            'mac': mac,
+            // #3505 — localized FGS notification copy; the native side
+            // persists it so a CDM cold start (app process dead) still shows
+            // the user's language instead of the hard-coded English fallback.
+            if (notificationTitle != null) 'notifTitle': notificationTitle,
+            if (notificationText != null) 'notifText': notificationText,
+          })
+          .timeout(promotionAckTimeout);
+      if (armed == true) {
+        outcome = ForegroundPromotionOutcome.promoted;
+      } else {
+        // A non-true reply is not an acknowledgement. Never treat it as one.
+        outcome = ForegroundPromotionOutcome.refused;
         debugPrint('AndroidBackgroundAdapterListener: FGS not armed (native '
             'returned $armed)');
       }
-      // Benign degrade — the channel code/message is the only useful signal.
-      // ignore: catch_no_st
-    } on PlatformException catch (e) {
-      log.warn('AndroidBackgroundAdapterListener: FGS arm failed — degrading to '
-          'no-FGS recording',
-          error: e, layer: ErrorLayer.background);
+    } on PlatformException catch (e, st) {
+      outcome = foregroundPromotionOutcomeForCode(e.code, e.message);
+      log.warn(
+          'AndroidBackgroundAdapterListener: FGS arm failed '
+          '(${outcome.name}) — degrading to no-FGS recording',
+          error: e,
+          stack: st,
+          layer: ErrorLayer.background);
+    } on TimeoutException catch (e, st) {
+      // The native bound should always fire first; this is the outer net for
+      // a wedged platform thread, and it must not hang the coordinator.
+      outcome = ForegroundPromotionOutcome.timedOut;
+      log.warn(
+          'AndroidBackgroundAdapterListener: FGS promotion was not '
+          'acknowledged — degrading to no-FGS recording',
+          error: e,
+          stack: st,
+          layer: ErrorLayer.background);
     }
+    lastPromotion = outcome;
+    return outcome;
   }
 
   @override
@@ -153,13 +222,49 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
     _platformSubscription = null;
   }
 
-  /// Whether the native foreground service is currently armed. Useful
+  /// Whether the native foreground service is currently PROMOTED. Useful
   /// for diagnostics and for an idempotent "start if not started" flow
   /// in the production coordinator wiring (phase 2b-2). Best-effort —
   /// the OS may have killed the service since the last call.
+  ///
+  /// #4355 — the native flag behind this is now set by the service's
+  /// promotion acknowledgement, not by `startForegroundService` returning a
+  /// `ComponentName`. It is still only a *presence* watcher's state, never
+  /// evidence that a recording is protected.
   Future<bool> isRunning() async {
     final ok = await _methods.invokeMethod<bool>('isRunning');
     return ok ?? false;
+  }
+
+  /// #4355 — routes a promotion acknowledgement / refusal to the static
+  /// [promotionEvents] stream. A malformed payload is dropped, never
+  /// upgraded into a claim that the service was promoted.
+  void _emitPromotion(String type, Map<Object?, Object?> raw, Object? atMillis) {
+    final at = _parseAtMillis(atMillis, raw);
+    if (at == null) return;
+    final outcome = type == kFgsPromotedEvent
+        ? ForegroundPromotionOutcome.promoted
+        : foregroundPromotionOutcomeForReason(raw['reason'] as String?);
+    final generation = raw['generation'];
+    _promotionController.add(ForegroundPromotionEvent(
+      outcome: outcome,
+      at: at,
+      generation: generation is int ? generation : null,
+    ));
+  }
+
+  /// Shared `atMillis` decoding — some channels round-trip ints as doubles.
+  /// Returns null (and logs) for a payload that carries no usable timestamp.
+  static DateTime? _parseAtMillis(Object? atMillis, Object? raw) {
+    if (atMillis is int) return DateTime.fromMillisecondsSinceEpoch(atMillis);
+    if (atMillis is num) {
+      return DateTime.fromMillisecondsSinceEpoch(atMillis.toInt());
+    }
+    debugPrint(
+      'AndroidBackgroundAdapterListener: dropping event with bad '
+      'atMillis (${atMillis.runtimeType}): $raw',
+    );
+    return null;
   }
 
   void _onPlatformEvent(Object? raw) {
@@ -186,6 +291,12 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
     final type = raw['type'];
     final mac = raw['mac'];
     final atMillis = raw['atMillis'];
+    // #4355 — promotion acknowledgements carry NO mac (they are a
+    // process-wide platform fact), so they are routed before the mac check.
+    if (type == kFgsPromotedEvent || type == kFgsStartFailedEvent) {
+      _emitPromotion(type! as String, raw, atMillis);
+      return null;
+    }
     if (type is! String || mac is! String) {
       debugPrint(
         'AndroidBackgroundAdapterListener: dropping event with bad '
@@ -193,19 +304,8 @@ class AndroidBackgroundAdapterListener implements BackgroundAdapterListener {
       );
       return null;
     }
-    DateTime at;
-    if (atMillis is int) {
-      at = DateTime.fromMillisecondsSinceEpoch(atMillis);
-    } else if (atMillis is num) {
-      // Some platforms (and JSON channels) round-trip ints as doubles.
-      at = DateTime.fromMillisecondsSinceEpoch(atMillis.toInt());
-    } else {
-      debugPrint(
-        'AndroidBackgroundAdapterListener: dropping event with bad '
-        'atMillis (${atMillis.runtimeType}): $raw',
-      );
-      return null;
-    }
+    final at = _parseAtMillis(atMillis, raw);
+    if (at == null) return null;
     switch (type) {
       case 'connect':
         return AdapterConnected(mac: mac, at: at);
