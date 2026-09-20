@@ -8916,6 +8916,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get refuelCompareRemove => 'Retirer de la comparaison';
 
   @override
+  String get refuelComparePickStations => 'Comparer des stations';
+
+  @override
+  String get refuelComparePickingActive =>
+      'Comparer des stations, sélection active';
+
+  @override
+  String get refuelComparePickPrompt =>
+      'Appuyez sur le bouton Comparer d\'une station pour l\'ajouter à cette comparaison.';
+
+  @override
   String get refuelCompareTitle => 'Votre comparaison';
 
   @override

@@ -70,8 +70,16 @@ class StationCardHeadlineRow extends ConsumerWidget {
     // drivers can compare is the wrong trade. A long press on the row
     // opens the comparison (`SwipeableStationCard`); from then on each
     // row carries the explicit toggle and its selected state.
-    final comparing = ref.watch(refuelComparisonSelectionProvider
-        .select((selection) => selection.isNotEmpty));
+    //
+    // #4396 — picking mode is the second way in, and the discoverable
+    // one: the long press advertised itself nowhere, so the first add
+    // was invisible. The driver turns the mode on from the results
+    // overflow menu and every row grows the same toggle it grows once a
+    // station is picked — no new control, no new interaction, and a row
+    // that costs exactly what it did before while the mode is off.
+    final comparing = ref.watch(refuelComparisonPickingProvider) ||
+        ref.watch(refuelComparisonSelectionProvider
+            .select((selection) => selection.isNotEmpty));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

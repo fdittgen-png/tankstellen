@@ -14679,6 +14679,24 @@ abstract class AppLocalizations {
   /// **'Remove from comparison'**
   String get refuelCompareRemove;
 
+  /// Results overflow-menu entry that turns the list's comparison picking mode on or off, so every station row shows its compare toggle and the first station can be added without knowing the long press (#4396).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare stations'**
+  String get refuelComparePickStations;
+
+  /// Accessibility label of that same menu entry while picking mode is already on, mirroring the ticked sort entries (#4396).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare stations, picking is on'**
+  String get refuelComparePickingActive;
+
+  /// One-line prompt shown where the comparison card will appear, while picking mode is on and nothing has been picked yet (#4396).
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the compare button on any station to add it to this comparison.'**
+  String get refuelComparePickPrompt;
+
   /// Title of the card comparing the stations the driver picked (#4363).
   ///
   /// In en, this message translates to:

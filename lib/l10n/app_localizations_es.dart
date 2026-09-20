@@ -8876,6 +8876,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get refuelCompareRemove => 'Remove from comparison';
 
   @override
+  String get refuelComparePickStations => 'Compare stations';
+
+  @override
+  String get refuelComparePickingActive => 'Compare stations, picking is on';
+
+  @override
+  String get refuelComparePickPrompt =>
+      'Tap the compare button on any station to add it to this comparison.';
+
+  @override
   String get refuelCompareTitle => 'Your comparison';
 
   @override

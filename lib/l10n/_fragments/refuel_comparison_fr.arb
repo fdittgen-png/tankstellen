@@ -1,6 +1,9 @@
 {
   "refuelCompareAdd": "Comparer",
   "refuelCompareRemove": "Retirer de la comparaison",
+  "refuelComparePickStations": "Comparer des stations",
+  "refuelComparePickingActive": "Comparer des stations, sélection active",
+  "refuelComparePickPrompt": "Appuyez sur le bouton Comparer d'une station pour l'ajouter à cette comparaison.",
   "refuelCompareTitle": "Votre comparaison",
   "refuelCompareCount": "{count, plural, =1{1 station} other{{count} stations}}",
   "refuelCompareClear": "Vider",

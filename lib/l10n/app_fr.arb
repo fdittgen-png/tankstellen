@@ -8693,5 +8693,17 @@
   "vehTripUnavailableShort": "Non comparable",
   "@vehTripUnavailableShort": {
     "description": "MT — needs native review"
+  },
+  "refuelComparePickStations": "Comparer des stations",
+  "@refuelComparePickStations": {
+    "description": "MT — needs native review"
+  },
+  "refuelComparePickingActive": "Comparer des stations, sélection active",
+  "@refuelComparePickingActive": {
+    "description": "MT — needs native review"
+  },
+  "refuelComparePickPrompt": "Appuyez sur le bouton Comparer d'une station pour l'ajouter à cette comparaison.",
+  "@refuelComparePickPrompt": {
+    "description": "MT — needs native review"
   }
 }
