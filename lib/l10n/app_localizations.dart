@@ -9523,6 +9523,348 @@ abstract class AppLocalizations {
   /// **'Could not submit this expense.'**
   String get fleetExpenseSubmitFailed;
 
+  /// #4216 — title of the aggregate-first manager dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Fleet overview'**
+  String get fleetManagerOverviewTitle;
+
+  /// #4216 — empty state when the device holds no fleet directory.
+  ///
+  /// In en, this message translates to:
+  /// **'No fleet on this device'**
+  String get fleetManagerNoFleetTitle;
+
+  /// #4216 — body of the no-fleet empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'Join an organisation to see its vehicles, costs and expenses here.'**
+  String get fleetManagerNoFleetBody;
+
+  /// #4216 — state when the server could not be asked at all. Deliberately not an empty fleet: a manager must never read 'no fuel bought' when the real answer is 'no answer'.
+  ///
+  /// In en, this message translates to:
+  /// **'Figures not loaded'**
+  String get fleetManagerUnavailableTitle;
+
+  /// #4216 — body of the could-not-ask state.
+  ///
+  /// In en, this message translates to:
+  /// **'The organisation\'s figures could not be read. Check your connection and try again.'**
+  String get fleetManagerUnavailableBody;
+
+  /// #4216 — the server answered and the organisation has no expenses in the window.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing reported in this period'**
+  String get fleetManagerEmptyPeriodTitle;
+
+  /// #4216 — body of the empty-period state; explains what is missing rather than showing zeroes.
+  ///
+  /// In en, this message translates to:
+  /// **'No confirmed expenses fall inside the selected dates.'**
+  String get fleetManagerEmptyPeriodBody;
+
+  /// #4216 — the first section of the dashboard: exceptions before totals.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get fleetManagerAttentionTitle;
+
+  /// #4216 — shown when the exception list is empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing needs attention in this period.'**
+  String get fleetManagerAttentionNone;
+
+  /// #4216 — exception about a VEHICLE, never a ranking of drivers.
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle}: cost per km well above the fleet\'s own median'**
+  String fleetManagerAttentionCostOutlier(String vehicle);
+
+  /// #4216 — data-quality exception: the efficiency figure rests on little evidence.
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle}: less than half its fuel is backed by measured distance'**
+  String fleetManagerAttentionLowCoverage(String vehicle);
+
+  /// #4216 — exception: a distance is never derived from a single reading.
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle}: no odometer readings, so cost per km cannot be stated'**
+  String fleetManagerAttentionNoDistance(String vehicle);
+
+  /// #4219 — a report without a factor says 'not calculated' and never substitutes an undocumented one.
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle}: CO₂e not calculated — a grade in this period has no published factor'**
+  String fleetManagerAttentionCo2(String vehicle);
+
+  /// #4216 — the one-currency rule, stated as an exception the manager can act on.
+  ///
+  /// In en, this message translates to:
+  /// **'This period mixes currencies, so there is no single total'**
+  String get fleetManagerAttentionMixedCurrency;
+
+  /// #4216 / ADR 0025 D5.3 — absence with an explanation, so the fleet does not silently look smaller.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 vehicle is hidden: too few expenses to report} other{{count} vehicles are hidden: too few expenses to report}}'**
+  String fleetManagerAttentionSuppressed(int count);
+
+  /// #4216 — KPI tile label.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel spend'**
+  String get fleetManagerKpiSpend;
+
+  /// #4216 — KPI tile label.
+  ///
+  /// In en, this message translates to:
+  /// **'Cost per km'**
+  String get fleetManagerKpiCostPerKm;
+
+  /// #4216 — KPI tile label (L/100 km).
+  ///
+  /// In en, this message translates to:
+  /// **'Consumption'**
+  String get fleetManagerKpiConsumption;
+
+  /// #4216 — KPI tile label for the environmental estimate.
+  ///
+  /// In en, this message translates to:
+  /// **'CO₂e'**
+  String get fleetManagerKpiCo2;
+
+  /// #4214 — the share of consumption backed by measured data.
+  ///
+  /// In en, this message translates to:
+  /// **'Measured coverage'**
+  String get fleetManagerKpiMeasuredCoverage;
+
+  /// #4216 — KPI tile label.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel volume'**
+  String get fleetManagerKpiLitres;
+
+  /// #4216 — KPI tile label.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get fleetManagerKpiDistance;
+
+  /// #4216 — every KPI exposes the sample count it rests on.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{no expenses} =1{1 expense} other{{count} expenses}}'**
+  String fleetManagerSamples(int count);
+
+  /// #4219 UI wording rule 3 — the only rendering of a missing figure; never 0, never a bare dash.
+  ///
+  /// In en, this message translates to:
+  /// **'Not calculated'**
+  String get fleetManagerNotCalculated;
+
+  /// #4216 — heading for the per-currency breakdown shown instead of a single total.
+  ///
+  /// In en, this message translates to:
+  /// **'Totals by currency'**
+  String get fleetManagerMultiCurrencyTotals;
+
+  /// #4216 — per-vehicle section heading.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicles'**
+  String get fleetManagerVehiclesTitle;
+
+  /// #4216 / ADR 0025 UI rule 4 — a suppressed row names the threshold that hid it.
+  ///
+  /// In en, this message translates to:
+  /// **'Fewer than {threshold} expenses — hidden to protect the people behind the numbers'**
+  String fleetManagerVehicleSuppressed(int threshold);
+
+  /// #4216 — fallback label when this device's directory does not know the vehicle's name.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle {code}'**
+  String fleetManagerVehicleUnnamed(String code);
+
+  /// #4216 — vehicle detail screen title.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle'**
+  String get fleetManagerVehicleTitle;
+
+  /// #4216 — the vehicle detail empty state.
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle reported nothing in the selected period.'**
+  String get fleetManagerVehicleNotInPeriod;
+
+  /// #4216 / ADR 0025 D5.1 — the vehicle page states what it deliberately does not contain.
+  ///
+  /// In en, this message translates to:
+  /// **'Journeys are not shown here. Fleet reporting reads confirmed expenses only — never GPS traces or engine telemetry.'**
+  String get fleetManagerNoJourneys;
+
+  /// #4215/#4216 — the org-wide review queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense queue'**
+  String get fleetManagerQueueTitle;
+
+  /// #4216 — empty review queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to review'**
+  String get fleetManagerQueueEmptyTitle;
+
+  /// #4215 — states the policy boundary rather than leaving the absence unexplained.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted expenses appear here. Drafts stay with the employee.'**
+  String get fleetManagerQueueEmptyBody;
+
+  /// #4215 — manager decision.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get fleetManagerQueueApprove;
+
+  /// #4215 — manager decision.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get fleetManagerQueueReject;
+
+  /// #4215 — the server-first rule: a decision the company did not record must not appear as made.
+  ///
+  /// In en, this message translates to:
+  /// **'The decision was not recorded. Nothing has changed.'**
+  String get fleetManagerQueueDecisionFailed;
+
+  /// #4215 — confirmation after a recorded approval.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get fleetManagerQueueApproved;
+
+  /// #4215 — confirmation after a recorded rejection.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get fleetManagerQueueRejected;
+
+  /// #4219 — the reimbursement/accounting boundary, stated where the decision is made.
+  ///
+  /// In en, this message translates to:
+  /// **'Approval is a company decision, not an accounting record.'**
+  String get fleetManagerQueueNotAnApproval;
+
+  /// #4216 — the CO2 / period report screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get fleetManagerReportsTitle;
+
+  /// #4219 — a CO2 figure names its boundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Scope'**
+  String get fleetManagerCo2ScopeLabel;
+
+  /// #4219 / ADR 0025 D8 — the default fleet boundary, spelled out.
+  ///
+  /// In en, this message translates to:
+  /// **'Well-to-wheel (production, distribution and combustion)'**
+  String get fleetManagerCo2ScopeWtw;
+
+  /// #4219 — label before the factor citation.
+  ///
+  /// In en, this message translates to:
+  /// **'Factor'**
+  String get fleetManagerCo2FactorLabel;
+
+  /// #4219 — the explicit 'not calculated' state of the CO2 report.
+  ///
+  /// In en, this message translates to:
+  /// **'A fuel grade in this period has no published emission factor, so no figure is given. No undocumented factor is substituted.'**
+  String get fleetManagerCo2NotCalculatedBody;
+
+  /// #4216 — never silently mix CO2 methodologies.
+  ///
+  /// In en, this message translates to:
+  /// **'This period used more than one factor version. Two methodologies are never added together.'**
+  String get fleetManagerCo2MixedVersions;
+
+  /// #4216 — the manager export action.
+  ///
+  /// In en, this message translates to:
+  /// **'Export CSV'**
+  String get fleetManagerExport;
+
+  /// #4216 / ADR 0025 D5.2 and D5.4 — what the export does and does not contain.
+  ///
+  /// In en, this message translates to:
+  /// **'Exports are recorded in your organisation\'s audit log. Location and telemetry are never included.'**
+  String get fleetManagerExportAudited;
+
+  /// #4216 — the audit row is part of the export, not a side effect: no trail, no file.
+  ///
+  /// In en, this message translates to:
+  /// **'The export was not recorded, so no file was produced.'**
+  String get fleetManagerExportFailed;
+
+  /// #4216 — the export succeeded and was audited.
+  ///
+  /// In en, this message translates to:
+  /// **'Export ready'**
+  String get fleetManagerExportReady;
+
+  /// #4216 — the reporting window shown under the title.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String fleetManagerPeriod(String from, String to);
+
+  /// #4219 claim class 1 — a figure observed at the pump.
+  ///
+  /// In en, this message translates to:
+  /// **'Measured'**
+  String get fleetManagerClaimMeasured;
+
+  /// #4219 claim class 2 — arithmetic over measured facts.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculated'**
+  String get fleetManagerClaimCalculated;
+
+  /// #4219 claim class 3 — a modelled figure; always qualified.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate'**
+  String get fleetManagerClaimEstimate;
+
+  /// #4219 claim class 5 — CO2 under a named factor and boundary.
+  ///
+  /// In en, this message translates to:
+  /// **'Environmental estimate'**
+  String get fleetManagerClaimEnvironmental;
+
+  /// #4216 — navigation action to the report screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get fleetManagerOpenReports;
+
+  /// #4216 — navigation action to the review queue.
+  ///
+  /// In en, this message translates to:
+  /// **'Expenses'**
+  String get fleetManagerOpenQueue;
+
   /// Label of the compact current-vehicle context chip shown on fleet-enabled surfaces (#4213).
   ///
   /// In en, this message translates to:

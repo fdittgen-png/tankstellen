@@ -9,7 +9,7 @@
 <body>
 
 <h1>개인정보 처리방침</h1>
-<p class="meta">Sparkilo (iOS: de.tankstellen.tankstellen, Android: de.tankstellen.fuelprices) &mdash; Version 3 &mdash; 최종 업데이트: 2026년 8월 29일</p>
+<p class="meta">Sparkilo (iOS: de.tankstellen.tankstellen, Android: de.tankstellen.fuelprices) &mdash; Version 4 &mdash; 최종 업데이트: 2026년 9월 20일</p>
 <p class="langs">지원 언어: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. 개요</h2>
@@ -52,6 +52,7 @@
     <tr><td>귀하가 입력한 주소 텍스트 또는 좌표</td><td>지오코딩</td><td>계약</td><td>Nominatim 또는 휴대전화 내장 지오코더(Apple / Google)</td><td>당사는 저장하지 않음</td></tr>
     <tr><td>귀하가 입력한 API 키(Tankerkönig, OpenChargeMap)</td><td>귀하를 대신하여 해당 서비스 호출</td><td>계약</td><td>해당 키가 속한 제공자에게만 전송</td><td>귀하가 삭제할 때까지 기기에 암호화되어 저장됨(Keystore / Keychain)</td></tr>
     <tr><td>주유소 이름 오류 / 주소 오류 신고, 잘못된 스캔 신고</td><td>데이터 수정</td><td>동의(전송 전 귀하가 확인함; 개인 GitHub 토큰이 필요함)</td><td>GitHub(프로젝트 저장소의 공개 이슈)</td><td>이슈가 삭제될 때까지 공개됨</td></tr>
+    <tr id="fleet-membership-row"><td>차량 관리 조직 소속, 역할, 차량 배정 (플릿 모드에서만)</td><td>회사 차량 관리: 고용주를 위한 비용·연비·CO₂e 집계 보고</td><td>고용주와의 계약. 플릿 데이터의 관리자는 고용주입니다</td><td>소속 조직의 TankSync 데이터베이스. 관리자는 집계만 볼 수 있으며, 조직이 정한 기준 미만의 차량별 행은 숨겨지고 위치·주행 데이터는 포함되지 않습니다.</td><td>조직을 떠나거나 계정을 삭제할 때까지. 권한 있는 접근 기록은 조직이 설정한 기간 동안 보관됩니다</td></tr>
   </tbody>
 </table>
 <p>앱은 귀하에게 법적 효력 또는 이와 유사한 중대한 영향을 미치는 자동화된 결정을 내리지 않습니다. 가격 예측은 공개 가격 데이터를 바탕으로 기기에서 계산됩니다.</p>
@@ -139,6 +140,7 @@
 <h2>10. 본 방침의 변경</h2>
 <p>변경 사항은 새로운 버전 번호와 날짜와 함께 이 URL에 게시됩니다. 앱은 귀하가 동의한 버전을 기록하며, 버전이 변경되면 이 페이지를 다시 표시합니다.</p>
 <ul>
+  <li><strong>v4 — 2026년 9월 20일:</strong> 플릿 모드: 조직 소속, 역할, 차량 배정을 명시했습니다. 관리자 보고는 집계만 제공하며 위치·주행 데이터를 포함하지 않습니다.</li>
   <li><strong>v3 — 2026년 8월 29일:</strong> 개인정보처리자 및 모드별 역할, 법적 근거와 보유 기간이 포함된 처리 표, 완전한 수탁자 목록(타일 프록시, 지오코더, 경로 안내, GitHub, 브랜드 로고), 권리 행사 경로, 완전한 삭제 및 내보내기.</li>
   <li><strong>v2 — 2026년 8월 15일:</strong> 계정 삭제 절 추가; 이메일 및 TankSync 계정 데이터 명시.</li>
   <li><strong>v1 — 2026년 4월 7일:</strong> 최초 버전.</li>

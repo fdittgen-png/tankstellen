@@ -51,7 +51,7 @@ Before any other screen, the app shows a **GDPR consent screen**. It is not a co
 
 Before each *system* permission prompt (camera, Bluetooth, notifications) the app shows its own short explanation first, so you know what you are agreeing to before Android asks.
 
-Full text: **[Privacy policy v3, 29 August 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
+Full text: **[Privacy policy v4, 20 September 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
 
 ---
 

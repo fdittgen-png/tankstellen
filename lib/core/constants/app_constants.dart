@@ -158,8 +158,8 @@ class AppConstants {
   /// #3866 — the policy version the consent record stores. Bump together
   /// with `docs/privacy/data_inventory.json` (`policyVersion`) and the
   /// policy page; a bump re-surfaces the consent screen once.
-  static const int privacyPolicyVersion = 3;
-  static const String privacyPolicyDate = '2026-08-29';
+  static const int privacyPolicyVersion = 4;
+  static const String privacyPolicyDate = '2026-09-20';
 
   // Donation links
   static const String paypalUrl = 'https://www.paypal.me/FlorianDITTGEN';

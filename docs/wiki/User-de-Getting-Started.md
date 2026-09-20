@@ -51,7 +51,7 @@ Vor jedem anderen Bildschirm zeigt die App einen **DSGVO-Einwilligungsdialog**. 
 
 Vor jeder *System*-Abfrage (Kamera, Bluetooth, Benachrichtigungen) erklärt die App zuerst selbst kurz, worum es geht — du weißt also, wozu du zustimmst, bevor Android fragt.
 
-Volltext: **[Datenschutzerklärung v3, 29. August 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/)**.
+Volltext: **[Datenschutzerklärung v4, 20. September 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/)**.
 
 ---
 

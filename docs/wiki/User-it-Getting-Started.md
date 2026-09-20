@@ -51,7 +51,7 @@ Prima di ogni altra schermata l'app mostra una **schermata di consenso GDPR**. N
 
 Prima di ogni richiesta *di sistema* (fotocamera, Bluetooth, notifiche) l'app mostra prima una propria spiegazione, così sai a cosa acconsenti prima che Android lo chieda.
 
-Testo integrale: **[Informativa sulla privacy v3, 29 agosto 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
+Testo integrale: **[Informativa sulla privacy v4, 20 settembre 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
 
 ---
 

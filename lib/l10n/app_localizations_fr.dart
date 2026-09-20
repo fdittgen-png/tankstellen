@@ -5594,6 +5594,224 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fleetExpenseSubmitFailed => 'Impossible d\'envoyer ce frais.';
 
   @override
+  String get fleetManagerOverviewTitle => 'Vue d\'ensemble de la flotte';
+
+  @override
+  String get fleetManagerNoFleetTitle => 'Aucune flotte sur cet appareil';
+
+  @override
+  String get fleetManagerNoFleetBody =>
+      'Rejoignez une organisation pour voir ici ses véhicules, ses coûts et ses frais.';
+
+  @override
+  String get fleetManagerUnavailableTitle => 'Chiffres non chargés';
+
+  @override
+  String get fleetManagerUnavailableBody =>
+      'Les chiffres de l\'organisation n\'ont pas pu être lus. Vérifiez votre connexion et réessayez.';
+
+  @override
+  String get fleetManagerEmptyPeriodTitle =>
+      'Rien de déclaré sur cette période';
+
+  @override
+  String get fleetManagerEmptyPeriodBody =>
+      'Aucun frais confirmé ne tombe dans les dates sélectionnées.';
+
+  @override
+  String get fleetManagerAttentionTitle => 'À examiner';
+
+  @override
+  String get fleetManagerAttentionNone => 'Rien à examiner sur cette période.';
+
+  @override
+  String fleetManagerAttentionCostOutlier(String vehicle) {
+    return '$vehicle : coût au km nettement au-dessus de la médiane de la flotte';
+  }
+
+  @override
+  String fleetManagerAttentionLowCoverage(String vehicle) {
+    return '$vehicle : moins de la moitié du carburant est adossée à une distance mesurée';
+  }
+
+  @override
+  String fleetManagerAttentionNoDistance(String vehicle) {
+    return '$vehicle : aucun relevé de compteur, le coût au km ne peut pas être indiqué';
+  }
+
+  @override
+  String fleetManagerAttentionCo2(String vehicle) {
+    return '$vehicle : CO₂e non calculé — un carburant de cette période n\'a pas de facteur publié';
+  }
+
+  @override
+  String get fleetManagerAttentionMixedCurrency =>
+      'Cette période mêle plusieurs devises : il n\'y a donc pas de total unique';
+
+  @override
+  String fleetManagerAttentionSuppressed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count véhicules sont masqués : trop peu de frais pour être analysés',
+      one: '1 véhicule est masqué : trop peu de frais pour être analysé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fleetManagerKpiSpend => 'Dépense carburant';
+
+  @override
+  String get fleetManagerKpiCostPerKm => 'Coût au km';
+
+  @override
+  String get fleetManagerKpiConsumption => 'Consommation';
+
+  @override
+  String get fleetManagerKpiCo2 => 'CO₂e';
+
+  @override
+  String get fleetManagerKpiMeasuredCoverage => 'Couverture mesurée';
+
+  @override
+  String get fleetManagerKpiLitres => 'Volume de carburant';
+
+  @override
+  String get fleetManagerKpiDistance => 'Distance';
+
+  @override
+  String fleetManagerSamples(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count frais',
+      one: '1 frais',
+      zero: 'aucun frais',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get fleetManagerNotCalculated => 'Non calculé';
+
+  @override
+  String get fleetManagerMultiCurrencyTotals => 'Totaux par devise';
+
+  @override
+  String get fleetManagerVehiclesTitle => 'Véhicules';
+
+  @override
+  String fleetManagerVehicleSuppressed(int threshold) {
+    return 'Moins de $threshold frais — masqué pour protéger les personnes derrière les chiffres';
+  }
+
+  @override
+  String fleetManagerVehicleUnnamed(String code) {
+    return 'Véhicule $code';
+  }
+
+  @override
+  String get fleetManagerVehicleTitle => 'Véhicule';
+
+  @override
+  String get fleetManagerVehicleNotInPeriod =>
+      'Ce véhicule n\'a rien déclaré sur la période sélectionnée.';
+
+  @override
+  String get fleetManagerNoJourneys =>
+      'Les trajets ne sont pas affichés ici. Le reporting de flotte ne lit que les frais confirmés — jamais les traces GPS ni la télémétrie moteur.';
+
+  @override
+  String get fleetManagerQueueTitle => 'File des frais';
+
+  @override
+  String get fleetManagerQueueEmptyTitle => 'Rien à examiner';
+
+  @override
+  String get fleetManagerQueueEmptyBody =>
+      'Les frais envoyés apparaissent ici. Les brouillons restent chez la personne qui les a saisis.';
+
+  @override
+  String get fleetManagerQueueApprove => 'Approuver';
+
+  @override
+  String get fleetManagerQueueReject => 'Refuser';
+
+  @override
+  String get fleetManagerQueueDecisionFailed =>
+      'La décision n\'a pas été enregistrée. Rien n\'a changé.';
+
+  @override
+  String get fleetManagerQueueApproved => 'Approuvé';
+
+  @override
+  String get fleetManagerQueueRejected => 'Refusé';
+
+  @override
+  String get fleetManagerQueueNotAnApproval =>
+      'Une approbation est une décision de l\'entreprise, pas une écriture comptable.';
+
+  @override
+  String get fleetManagerReportsTitle => 'Rapports';
+
+  @override
+  String get fleetManagerCo2ScopeLabel => 'Périmètre';
+
+  @override
+  String get fleetManagerCo2ScopeWtw =>
+      'Du puits à la roue (production, distribution et combustion)';
+
+  @override
+  String get fleetManagerCo2FactorLabel => 'Facteur';
+
+  @override
+  String get fleetManagerCo2NotCalculatedBody =>
+      'Un carburant de cette période n\'a pas de facteur d\'émission publié : aucun chiffre n\'est donc donné. Aucun facteur non documenté n\'est substitué.';
+
+  @override
+  String get fleetManagerCo2MixedVersions =>
+      'Cette période utilise plusieurs versions de facteur. Deux méthodologies ne sont jamais additionnées.';
+
+  @override
+  String get fleetManagerExport => 'Exporter en CSV';
+
+  @override
+  String get fleetManagerExportAudited =>
+      'Les exports sont consignés dans le journal d\'audit de votre organisation. La localisation et la télémétrie n\'y figurent jamais.';
+
+  @override
+  String get fleetManagerExportFailed =>
+      'L\'export n\'a pas été consigné : aucun fichier n\'a donc été produit.';
+
+  @override
+  String get fleetManagerExportReady => 'Export prêt';
+
+  @override
+  String fleetManagerPeriod(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get fleetManagerClaimMeasured => 'Mesuré';
+
+  @override
+  String get fleetManagerClaimCalculated => 'Calculé';
+
+  @override
+  String get fleetManagerClaimEstimate => 'Estimation';
+
+  @override
+  String get fleetManagerClaimEnvironmental => 'Estimation environnementale';
+
+  @override
+  String get fleetManagerOpenReports => 'Rapports';
+
+  @override
+  String get fleetManagerOpenQueue => 'Frais';
+
+  @override
   String get fleetVehicleCurrentLabel => 'Véhicule actuel';
 
   @override

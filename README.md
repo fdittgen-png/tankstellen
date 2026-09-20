@@ -143,7 +143,7 @@ logging need no account. Online features still send requests:
 - **Your controls:** consent settings with dates, a one-ZIP export of your data, local deletion, and
   TankSync account deletion from inside the app.
 
-Read the [privacy policy v3](https://fdittgen-png.github.io/tankstellen/privacy-policy/) and the
+Read the [privacy policy v4](https://fdittgen-png.github.io/tankstellen/privacy-policy/) and the
 [privacy and sync guide](https://github.com/fdittgen-png/tankstellen/wiki/User-en-Privacy-Profiles-Sync)
 for purposes, recipients and controls. [`docs/privacy/data_inventory.json`](docs/privacy/data_inventory.json)
 is the machine-readable inventory; tests keep the policy, the Play Data Safety answers, the iOS privacy

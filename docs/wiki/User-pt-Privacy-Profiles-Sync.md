@@ -230,7 +230,7 @@ Cada direito dos artigos 15.º a 22.º tem um botão. Sem necessidade de pedido 
 
 Se já não conseguir abrir a aplicação, peça o apagamento por e-mail a partir do endereço associado à conta. **Uma conta anónima nunca associada a um e-mail não pode ser identificada por ninguém — nem pelo programador — sem o dispositivo que a criou.** É o preço de não lhe pedirem registo.
 
-Texto integral: **[Política de privacidade v3, 29 de agosto de 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, disponível nos 23 idiomas da aplicação. A aplicação regista a que versão consentiu e volta a mostrá-la sempre que mudar.
+Texto integral: **[Política de privacidade v4, 20 de setembro de 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, disponível nos 23 idiomas da aplicação. A aplicação regista a que versão consentiu e volta a mostrá-la sempre que mudar.
 
 ---
 

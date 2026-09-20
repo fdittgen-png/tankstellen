@@ -230,7 +230,7 @@ Ogni diritto degli articoli 15–22 ha un pulsante. Nessuna richiesta di assiste
 
 Se non riesci più ad aprire l'app, chiedi la cancellazione via e-mail dall'indirizzo collegato all'account. **Un account anonimo mai collegato a un'e-mail non può essere identificato da nessuno — sviluppatore incluso — senza il dispositivo che l'ha creato.** È il prezzo di non chiederti di registrarti.
 
-Testo integrale: **[Informativa sulla privacy v3, 29 agosto 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, disponibile in tutte le 23 lingue dell'app. L'app ricorda a quale versione hai acconsentito e la ripropone a ogni modifica.
+Testo integrale: **[Informativa sulla privacy v4, 20 settembre 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, disponibile in tutte le 23 lingue dell'app. L'app ricorda a quale versione hai acconsentito e la ripropone a ogni modifica.
 
 ---
 

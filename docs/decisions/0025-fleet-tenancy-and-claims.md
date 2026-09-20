@@ -182,6 +182,28 @@ and touch no policy page. F9 bumps to v4 in one coordinated change
 (inventory, `AppConstants.privacyPolicyVersion`, 23 policy pages,
 `DATA_SAFETY.md`, xcprivacy).
 
+**Done in F9 (#4216), 20 September 2026.** `policyVersion: 4`, a
+`fleet_membership` data class (membership, role and vehicle
+assignment; Apple `NSPrivacyCollectedDataTypeOtherDataTypes`, Play
+"Other info"), `AppConstants.privacyPolicyVersion = 4`, all **24**
+policy pages (the English one plus 23 translations — the ADR's "23"
+counted the translations only), `DATA_SAFETY.md`, the xcprivacy
+manifest, `README.md` and the seven-language wiki.
+
+Two notes for whoever reads this next:
+
+* the employer is the **controller** for fleet data and Sparkilo the
+  processor; every policy page now says so in the new table row, and
+  the row also states the three things a manager never receives —
+  per-vehicle figures under the organisation's threshold, a location,
+  a journey;
+* the **channel flip** that D6 pairs with this bump (F3's
+  `Feature.fleetMode` / `Feature.fleetManagerTools` leaving `beta`,
+  and the fleet consent switch F3 deferred) is NOT in this change:
+  F3 is a sibling branch and its files do not exist on the F9 stack.
+  It must land with the integration of F3 + F9, or the policy will
+  describe a processing activity users cannot yet perform.
+
 ### D7 — Org writes are RPC-only
 
 There is **no** client `INSERT`, `UPDATE` or `DELETE` policy on

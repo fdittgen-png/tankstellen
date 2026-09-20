@@ -51,7 +51,7 @@ Antes de cualquier otra pantalla, la app muestra una **pantalla de consentimient
 
 Antes de cada solicitud *del sistema* (cámara, Bluetooth, notificaciones) la app muestra primero su propia explicación, para que sepas a qué consientes antes de que Android lo pregunte.
 
-Texto completo: **[Política de privacidad v3, 29 de agosto de 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
+Texto completo: **[Política de privacidad v4, 20 de septiembre de 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**.
 
 ---
 

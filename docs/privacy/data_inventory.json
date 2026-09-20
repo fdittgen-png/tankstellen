@@ -1,7 +1,7 @@
 {
   "$comment": "Single source of truth for what Sparkilo processes (Epic #3865). test/docs/privacy_surfaces_agree_test.dart asserts that the privacy policy, docs/play-store/DATA_SAFETY.md, ios/Runner/PrivacyInfo.xcprivacy and README.md all state exactly these facts. Edit here first, then the surfaces.",
-  "policyVersion": 3,
-  "policyDate": "2026-08-29",
+  "policyVersion": 4,
+  "policyDate": "2026-09-20",
   "policyUrl": "https://fdittgen-png.github.io/tankstellen/privacy-policy/",
   "controller": {
     "name": "Florian DITTGEN",
@@ -103,6 +103,16 @@
       "xcprivacy": "NSPrivacyCollectedDataTypeOtherDiagnosticData",
       "playDataSafety": "Diagnostics",
       "policyPhrase": "performance traces"
+    },
+    {
+      "id": "fleet_membership",
+      "label": "Fleet membership, role and vehicle assignment",
+      "optional": true,
+      "linkedToUser": true,
+      "purpose": "Fleet administration and aggregate manager reporting",
+      "xcprivacy": "NSPrivacyCollectedDataTypeOtherDataTypes",
+      "playDataSafety": "Other info",
+      "policyPhrase": "Fleet membership"
     }
   ],
   "notCollected": [

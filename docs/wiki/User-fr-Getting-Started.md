@@ -51,7 +51,7 @@ Avant tout autre écran, l'application affiche un **écran de consentement RGPD*
 
 Avant chaque demande *système* (caméra, Bluetooth, notifications), l'application affiche d'abord sa propre explication, pour que vous sachiez à quoi vous consentez avant qu'Android ne le demande.
 
-Texte intégral : **[Politique de confidentialité v3, 29 août 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/fr/)**.
+Texte intégral : **[Politique de confidentialité v4, 20 septembre 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/fr/)**.
 
 ---
 

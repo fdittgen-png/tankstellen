@@ -9,7 +9,7 @@
 <body>
 
 <h1>Pravila privatnosti</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen na iOS-u, de.tankstellen.fuelprices na Androidu) &mdash; Version 3 &mdash; Zadnje ažuriranje: 29. kolovoza 2026.</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen na iOS-u, de.tankstellen.fuelprices na Androidu) &mdash; Version 4 &mdash; Zadnje ažuriranje: 20. rujna 2026.</p>
 <p class="langs">Dostupni jezici: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Pregled</h2>
@@ -52,6 +52,7 @@
     <tr><td>Tekst adrese ili koordinate koje upišete</td><td>Geokodiranje</td><td>Ugovor</td><td>Nominatim ili ugrađeni geokoder Vašeg telefona (Apple / Google)</td><td>Mi ih ne pohranjujemo</td></tr>
     <tr><td>API ključevi koje unesete (Tankerkönig, OpenChargeMap)</td><td>Pozivanje tih usluga u Vaše ime</td><td>Ugovor</td><td>Samo pružatelju kojem ključ pripada</td><td>Šifrirani na uređaju (Keystore / Keychain) dok ih ne izbrišete</td></tr>
     <tr><td>Prijave postaja s pogrešnim nazivom / pogrešnom adresom, prijave lošeg skeniranja</td><td>Ispravljanje podataka</td><td>Privola (potvrđujete prije slanja; potreban je osobni GitHub token)</td><td>GitHub (javni problem u repozitoriju projekta)</td><td>Javno dok se problem ne izbriše</td></tr>
+    <tr id="fleet-membership-row"><td>Članstvo u voznom parku, uloga i dodjela vozila (samo način rada voznog parka)</td><td>Vođenje poslovnog voznog parka: skupno izvješćivanje o troškovima, potrošnji i CO₂e za poslodavca</td><td>Ugovor s poslodavcem, koji je voditelj obrade podataka voznog parka</td><td>Baza TankSync vaše organizacije. Voditelji vide samo skupne podatke; retci pojedinih vozila ispod praga organizacije skrivaju se i ne uključuju podatke o lokaciji ni o vožnjama.</td><td>Do odlaska iz organizacije ili brisanja računa; zapisi o povlaštenom pristupu tijekom razdoblja koje odredi organizacija</td></tr>
   </tbody>
 </table>
 <p>Aplikacija ne donosi automatizirane odluke koje bi imale pravne ili slično značajne učinke na Vas. Predviđanja cijena izračunavaju se na uređaju iz javnih podataka o cijenama.</p>
@@ -139,6 +140,7 @@
 <h2>10. Izmjene ovih pravila</h2>
 <p>Izmjene se objavljuju na ovom URL-u s novim brojem verzije i datumom; aplikacija bilježi verziju na koju ste pristali i ponovno prikazuje ovu stranicu kada se verzija promijeni.</p>
 <ul>
+  <li><strong>v4 — 20. rujna 2026.:</strong> način rada voznog parka: prijavljeni su članstvo u organizaciji, uloga i dodjela vozila; izvješća za voditelje isključivo su skupna i ne sadrže podatke o lokaciji ni o vožnjama.</li>
   <li><strong>v3 — 29. kolovoza 2026.:</strong> voditelj obrade i uloge po načinu rada, tablica obrade s pravnim osnovama i razdobljima čuvanja, potpuni popis izvršitelja obrade (proxy za pločice, geokoder, usmjeravanje, GitHub, logotipi marki), putovi za ostvarivanje prava, potpuno brisanje i izvoz.</li>
   <li><strong>v2 — 15. kolovoza 2026.:</strong> odjeljak o brisanju računa; deklarirani e-pošta i podaci TankSync računa.</li>
   <li><strong>v1 — 7. travnja 2026.:</strong> prva verzija.</li>

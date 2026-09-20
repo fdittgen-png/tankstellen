@@ -9,7 +9,7 @@
 <body>
 
 <h1>Integritetspolicy</h1>
-<p class="meta">Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android) &mdash; Version 3 &mdash; Senast uppdaterad: 29 augusti 2026</p>
+<p class="meta">Sparkilo (de.tankstellen.tankstellen på iOS, de.tankstellen.fuelprices på Android) &mdash; Version 4 &mdash; Senast uppdaterad: 20 september 2026</p>
 <p class="langs">Tillgängliga språk: <a href="../">English</a> <a href="../bg/">Български</a> <a href="../cs/">Čeština</a> <a href="../da/">Dansk</a> <a href="../de/">Deutsch</a> <a href="../el/">Ελληνικά</a> <a href="../es/">Español</a> <a href="../et/">Eesti</a> <a href="../fi/">Suomi</a> <a href="../fr/">Français</a> <a href="../hr/">Hrvatski</a> <a href="../hu/">Magyar</a> <a href="../it/">Italiano</a> <a href="../ko/">한국어</a> <a href="../lt/">Lietuvių</a> <a href="../lv/">Latviešu</a> <a href="../nb/">Norsk</a> <a href="../nl/">Nederlands</a> <a href="../pl/">Polski</a> <a href="../pt/">Português</a> <a href="../ro/">Română</a> <a href="../sk/">Slovenčina</a> <a href="../sl/">Slovenščina</a> <a href="../sv/">Svenska</a></p>
 
 <h2>1. Översikt</h2>
@@ -52,6 +52,7 @@
     <tr><td>Adresstext eller koordinater som du skriver in</td><td>Geokodning</td><td>Avtal</td><td>Nominatim, eller telefonens inbyggda geokodare (Apple / Google)</td><td>Lagras inte av oss</td></tr>
     <tr><td>API-nycklar som du anger (Tankerkönig, OpenChargeMap)</td><td>Anropa dessa tjänster för din räkning</td><td>Avtal</td><td>Endast till den leverantör som nyckeln tillhör</td><td>Krypterade på enheten (Keystore / Keychain) tills du raderar dem</td></tr>
     <tr><td>Rapporter om fel namn / fel adress på stationer, rapporter om dålig skanning</td><td>Rätta uppgifterna</td><td>Samtycke (du bekräftar innan de skickas; en personlig GitHub-token krävs)</td><td>GitHub (ett offentligt ärende i projektets kodförråd)</td><td>Offentligt tills ärendet raderas</td></tr>
+    <tr id="fleet-membership-row"><td>Flottmedlemskap, roll och fordonstilldelning (endast flottläge)</td><td>Driva en företagsflotta: aggregerad rapportering av kostnad, förbrukning och CO₂e till arbetsgivaren</td><td>Avtal med din arbetsgivare, som är personuppgiftsansvarig för flottdata</td><td>Din organisations TankSync-databas. Chefer ser endast aggregat; rader för enskilda fordon under organisationens tröskel döljs, och inga plats- eller resedata ingår.</td><td>Tills du lämnar organisationen eller raderar ditt konto; loggar över privilegierad åtkomst under den period din organisation ställer in</td></tr>
   </tbody>
 </table>
 <p>Appen fattar inga automatiserade beslut om dig med rättsliga eller liknande betydande följder. Prisprognoser beräknas på enheten utifrån offentliga prisdata.</p>
@@ -139,6 +140,7 @@
 <h2>10. Ändringar av denna policy</h2>
 <p>Ändringar publiceras på denna URL med nytt versionsnummer och datum; appen registrerar vilken version du samtyckt till och visar denna sida igen när versionen ändras.</p>
 <ul>
+  <li><strong>v4 — 20 september 2026:</strong> flottläge: medlemskap i organisation, roll och fordonstilldelning deklarerade; chefsrapportering är endast aggregerad och innehåller inga plats- eller resedata.</li>
   <li><strong>v3 — 29 augusti 2026:</strong> personuppgiftsansvarig och roller per läge, behandlingstabell med rättsliga grunder och lagringstider, fullständig lista över personuppgiftsbiträden (kartruteproxy, geokodare, ruttberäkning, GitHub, varumärkeslogotyper), vägar för att utöva rättigheter, fullständig radering och export.</li>
   <li><strong>v2 — 15 augusti 2026:</strong> avsnitt om kontoradering; e-post- och TankSync-kontouppgifter deklarerade.</li>
   <li><strong>v1 — 7 april 2026:</strong> första versionen.</li>

@@ -54,13 +54,10 @@ export 'domain/expense.dart';
 export 'domain/expense_fields.dart';
 export 'domain/expense_reconciler.dart';
 export 'domain/expense_state_machine.dart';
-<<<<<<< HEAD
-export 'domain/fleet_scope.dart';
-export 'domain/fleet_vehicle.dart';
-=======
 export 'domain/fleet_attention.dart';
 export 'domain/fleet_kpis.dart';
->>>>>>> deb440c3e (feat(fleet): a manager dashboard that starts with the exceptions and refuses the numbers it cannot back (#4216, #4214))
+export 'domain/fleet_scope.dart';
+export 'domain/fleet_vehicle.dart';
 export 'domain/money.dart';
 export 'domain/vehicle_attribution.dart';
 export 'domain/vehicle_attribution_resolver.dart';
@@ -69,8 +66,5 @@ export 'presentation/widgets/vehicle_switch_sheet.dart';
 export 'providers/current_fleet_vehicle_provider.dart';
 export 'providers/fleet_consent_provider.dart';
 export 'providers/fleet_expense_providers.dart';
-<<<<<<< HEAD
-export 'providers/fleet_scope_provider.dart';
-=======
 export 'providers/fleet_manager_providers.dart';
->>>>>>> deb440c3e (feat(fleet): a manager dashboard that starts with the exceptions and refuses the numbers it cannot back (#4216, #4214))
+export 'providers/fleet_scope_provider.dart';

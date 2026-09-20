@@ -230,7 +230,7 @@ Cada derecho de los artículos 15–22 tiene un botón. Sin necesidad de solicit
 
 Si ya no puedes abrir la app, pide la supresión por correo desde la dirección vinculada a la cuenta. **Una cuenta anónima nunca vinculada a un correo no puede ser identificada por nadie — ni por el desarrollador — sin el dispositivo que la creó.** Es el precio de no pedirte registro.
 
-Texto completo: **[Política de privacidad v3, 29 de agosto de 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, disponible en los 23 idiomas de la app ([Deutsch](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/), [Français](https://fdittgen-png.github.io/tankstellen/privacy-policy/fr/), …). La app recuerda a qué versión consentiste y la vuelve a mostrar cuando cambia.
+Texto completo: **[Política de privacidad v4, 20 de septiembre de 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, disponible en los 23 idiomas de la app ([Deutsch](https://fdittgen-png.github.io/tankstellen/privacy-policy/de/), [Français](https://fdittgen-png.github.io/tankstellen/privacy-policy/fr/), …). La app recuerda a qué versión consentiste y la vuelve a mostrar cuando cambia.
 
 ---
 

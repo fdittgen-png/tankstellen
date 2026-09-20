@@ -230,7 +230,7 @@ Hver rettighed i artikel 15–22 har en knap. Ingen supporthenvendelse nødvendi
 
 Kan du ikke længere åbne appen, så bed om sletning pr. e-mail fra den adresse, der er knyttet til kontoen. **En anonym konto, der aldrig blev knyttet til en e-mail, kan ikke identificeres af nogen — heller ikke udvikleren — uden den enhed, der oprettede den.** Det er prisen for ikke at bede dig registrere dig.
 
-Fuld tekst: **[Privatlivspolitik v3, 29. august 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, tilgængelig på alle 23 appsprog. Appen noterer, hvilken version du samtykkede til, og viser politikken igen, hver gang den ændres.
+Fuld tekst: **[Privatlivspolitik v4, 20. september 2026](https://fdittgen-png.github.io/tankstellen/privacy-policy/)**, tilgængelig på alle 23 appsprog. Appen noterer, hvilken version du samtykkede til, og viser politikken igen, hver gang den ændres.
 
 ---
 

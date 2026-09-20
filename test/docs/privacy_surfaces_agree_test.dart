@@ -78,9 +78,14 @@ void main() {
     final declared = RegExp(r'NSPrivacyCollectedDataType[A-Za-z]+')
         .allMatches(plist)
         .map((m) => m.group(0)!)
+        // The two PLIST KEYS, matched exactly. A suffix rule on
+        // "DataTypes" also swallowed Apple's real
+        // `NSPrivacyCollectedDataTypeOtherDataTypes` value (#4216's
+        // fleet-membership class), which would have made the manifest
+        // and the inventory disagree while looking correct.
         .where((s) =>
-            !s.endsWith('DataType') &&
-            !s.endsWith('DataTypes') &&
+            s != 'NSPrivacyCollectedDataType' &&
+            s != 'NSPrivacyCollectedDataTypes' &&
             !s.contains('Linked') &&
             !s.contains('Tracking') &&
             !s.contains('Purpose'))
