@@ -8,6 +8,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/domain/vehicle_profile.dart';
 import '../../../core/language/language_provider.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/services/voice_announcement_providers.dart';
@@ -16,6 +17,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../driving_score/api.dart'
     show DrivingCoachingHint, coachingHint;
 import '../../trips/api.dart';
+import '../../vehicle/api.dart' show activeVehicleProfileProvider;
 import 'live_harsh_event_bus_provider.dart';
 import 'voice_coaching_enabled_provider.dart';
 
@@ -35,6 +37,33 @@ const Duration _cueCooldown = Duration(seconds: 20);
 /// override + a real (tiny) settle.
 const Duration _tripSummarySettle = Duration(seconds: 1);
 const Duration _tripSummaryFresh = Duration(minutes: 3);
+
+/// The L/100 km the end-of-trip voice line speaks, read through the
+/// canonical [tripConsumptionEstimate] (#4234, Epic #4222).
+///
+/// It used to be `summary.avgLPer100Km` — the raw stored average. That
+/// made the spoken figure the one surface in the app that ignored the
+/// #3918 re-expression: after a full fill re-anchored the pump gain, the
+/// trip card, the trajets row, the monthly card and the tank report all
+/// moved to today's gain while the voice kept reading the stale number,
+/// and a GPS trip carrying only `estimatedAvgLPer100Km` was silently
+/// skipped. The adapter settles both, and — being the same adapter the
+/// trip card uses — it can never disagree with what the driver then sees.
+///
+/// [vehicle] is the active profile; it is used only when it is the trip's
+/// own vehicle, because a gain belongs to the car that earned it. Pure,
+/// so `legacy_estimator_consumer_audit_test.dart` can drive it.
+double? coachSpokenAvgLPer100Km(
+  TripHistoryEntry entry,
+  VehicleProfile? vehicle,
+) {
+  final own = entry.vehicleId == null || entry.vehicleId == vehicle?.id
+      ? vehicle
+      : null;
+  return tripConsumptionEstimate(entry.summary, own)
+      .litresPer100Km
+      .valueOrNull;
+}
 
 /// The dead-link fix (#2663): wires the driving coach into TTS.
 ///
@@ -147,8 +176,10 @@ class DrivingCoachVoiceListener extends _$DrivingCoachVoiceListener {
       if (_onCooldown(key, now)) return;
       final entry = ref.read(tripHistoryListProvider).firstOrNull;
       final summary = entry?.summary;
-      final avg = summary?.avgLPer100Km;
-      if (summary == null || avg == null) return;
+      if (entry == null || summary == null) return;
+      final avg = coachSpokenAvgLPer100Km(
+          entry, ref.read(activeVehicleProfileProvider));
+      if (avg == null) return;
       // Freshness gate: only a trip that ENDED in the last couple of
       // minutes is "the trip that just finished".
       final ended = summary.endedAt;

@@ -60,3 +60,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0024 | Wiring the fuzzy engine — one per-sample stage, the gain once, the version on the trip (#4233) | Accepted |
 | 0025 | Fleet tenancy and claims — org-scoped tables behind oracles, RPC-only writes, every fleet number declares what it is (#4212, #4219) | Accepted |
 | 0026 | iOS recording lifecycle — what each transition promises, and the keychain accessibility it costs (#4357) | Accepted |
+| 0027 | Legacy consumption estimators — deprecated, not removed; per-field policy gated on #4231 (#4234) | Accepted |
