@@ -5020,6 +5020,183 @@
   "@featureGroupDescription_fleet": {
     "description": "Section subtitle of the fleet capabilities in Settings → Feature management (#4212)."
   },
+  "fleetExpensesTitle": "Fuel expenses",
+  "@fleetExpensesTitle": {
+    "description": "#4215 — title of the employee's fleet expense list."
+  },
+  "fleetExpensesEmptyTitle": "No expenses yet",
+  "@fleetExpensesEmptyTitle": {
+    "description": "#4215 — empty state of the fleet expense list."
+  },
+  "fleetExpensesEmptyBody": "Scan a fuel receipt and it appears here as a candidate you can check before submitting it.",
+  "@fleetExpensesEmptyBody": {
+    "description": "#4215 — empty-state body of the fleet expense list."
+  },
+  "fleetExpenseStatusDraft": "Draft",
+  "@fleetExpenseStatusDraft": {
+    "description": "#4215 — expense status: read and self-consistent, waiting for the employee."
+  },
+  "fleetExpenseStatusNeedsReview": "Needs review",
+  "@fleetExpenseStatusNeedsReview": {
+    "description": "#4215 — expense status: something does not add up."
+  },
+  "fleetExpenseStatusSubmitted": "Submitted",
+  "@fleetExpenseStatusSubmitted": {
+    "description": "#4215 — expense status: handed to the company."
+  },
+  "fleetExpenseStatusApproved": "Approved",
+  "@fleetExpenseStatusApproved": {
+    "description": "#4215 — expense status: the company accepted it."
+  },
+  "fleetExpenseStatusRejected": "Rejected",
+  "@fleetExpenseStatusRejected": {
+    "description": "#4215 — expense status: the company refused it."
+  },
+  "fleetExpenseStatusExported": "Exported",
+  "@fleetExpenseStatusExported": {
+    "description": "#4215 — expense status: handed to the accounting system."
+  },
+  "fleetExpenseStatusArchived": "Archived",
+  "@fleetExpenseStatusArchived": {
+    "description": "#4215 — expense status: closed, kept for retention only."
+  },
+  "fleetExpenseUnknownStation": "Station not read",
+  "@fleetExpenseUnknownStation": {
+    "description": "#4215 — shown where a station name would be when the document carried none."
+  },
+  "fleetExpenseReviewTitle": "Check this receipt",
+  "@fleetExpenseReviewTitle": {
+    "description": "#4215 — title of the expense review screen."
+  },
+  "fleetExpenseNotFound": "This expense is not on this device.",
+  "@fleetExpenseNotFound": {
+    "description": "#4215 — the review screen opened with an id it cannot find."
+  },
+  "fleetExpenseArithmeticOk": "Litres × price per litre matches the printed total.",
+  "@fleetExpenseArithmeticOk": {
+    "description": "#4215 — the reconciler's arithmetic check passed."
+  },
+  "fleetExpenseArithmeticMismatch": "Litres × price per litre does not match the printed total. Check the numbers before you submit.",
+  "@fleetExpenseArithmeticMismatch": {
+    "description": "#4215 — the reconciler's arithmetic check failed."
+  },
+  "fleetExpenseArithmeticIncomplete": "A number is missing, so the total cannot be checked.",
+  "@fleetExpenseArithmeticIncomplete": {
+    "description": "#4215 — the reconciler had no complete set of numbers to check."
+  },
+  "fleetExpenseNeedsConfirmationTitle": "Needs your confirmation",
+  "@fleetExpenseNeedsConfirmationTitle": {
+    "description": "#4215 — section of fields the machine could not read."
+  },
+  "fleetExpenseReadTitle": "Read from the document",
+  "@fleetExpenseReadTitle": {
+    "description": "#4215 — section of fields the machine did read."
+  },
+  "fleetExpenseFieldStation": "Station",
+  "@fleetExpenseFieldStation": {
+    "description": "#4215 — receipt field label."
+  },
+  "fleetExpenseFieldDate": "Date",
+  "@fleetExpenseFieldDate": {
+    "description": "#4215 — receipt field label."
+  },
+  "fleetExpenseFieldFuel": "Fuel grade",
+  "@fleetExpenseFieldFuel": {
+    "description": "#4215 — receipt field label."
+  },
+  "fleetExpenseFieldLitres": "Volume",
+  "@fleetExpenseFieldLitres": {
+    "description": "#4215 — receipt field label for the dispensed volume."
+  },
+  "fleetExpenseFieldPricePerLitre": "Price per litre",
+  "@fleetExpenseFieldPricePerLitre": {
+    "description": "#4215 — receipt field label."
+  },
+  "fleetExpenseFieldTotal": "Total",
+  "@fleetExpenseFieldTotal": {
+    "description": "#4215 — receipt field label."
+  },
+  "fleetExpenseFieldVat": "VAT",
+  "@fleetExpenseFieldVat": {
+    "description": "#4215 — receipt field label for the VAT amount as printed."
+  },
+  "fleetExpenseFieldVatRate": "VAT rate",
+  "@fleetExpenseFieldVatRate": {
+    "description": "#4215 — receipt field label for the VAT percentage as printed."
+  },
+  "fleetExpenseFieldPaymentReference": "Payment reference",
+  "@fleetExpenseFieldPaymentReference": {
+    "description": "#4215 — receipt field label for the masked card or fuel-card reference."
+  },
+  "fleetExpenseFieldOdometer": "Odometer",
+  "@fleetExpenseFieldOdometer": {
+    "description": "#4215 — receipt field label."
+  },
+  "fleetExpenseValueMissing": "Not read",
+  "@fleetExpenseValueMissing": {
+    "description": "#4215 — the value of a field the machine did not read."
+  },
+  "fleetExpenseDocumentTitle": "Document",
+  "@fleetExpenseDocumentTitle": {
+    "description": "#4215 — section describing where the expense came from."
+  },
+  "fleetExpenseSourceOcrPhoto": "Photographed receipt",
+  "@fleetExpenseSourceOcrPhoto": {
+    "description": "#4215 — import source label."
+  },
+  "fleetExpenseSourceOcrPdf": "PDF receipt",
+  "@fleetExpenseSourceOcrPdf": {
+    "description": "#4215 — import source label."
+  },
+  "fleetExpenseSourceEReceipt": "Digital receipt",
+  "@fleetExpenseSourceEReceipt": {
+    "description": "#4215 — import source label for e-mail or SMS receipt text."
+  },
+  "fleetExpenseSourceStructuredInvoice": "Electronic invoice",
+  "@fleetExpenseSourceStructuredInvoice": {
+    "description": "#4215 — import source label for a structured e-invoice."
+  },
+  "fleetExpenseNotAuthoritative": "A photograph is not an authoritative document, however well it was read.",
+  "@fleetExpenseNotAuthoritative": {
+    "description": "#4215 — ADR 0025: a scan is never an authoritative record."
+  },
+  "fleetExpenseAuthoritative": "The company treats this document as an authoritative record.",
+  "@fleetExpenseAuthoritative": {
+    "description": "#4215 — shown only for a received electronic invoice the deployment marked authoritative."
+  },
+  "fleetExpenseAttachedToFillUp": "Attached to a fill-up you already logged.",
+  "@fleetExpenseAttachedToFillUp": {
+    "description": "#4215 — the reconciler matched an existing fill-up instead of creating a second one."
+  },
+  "fleetExpenseCorrections": "{count, plural, =0{No corrections} =1{1 field corrected} other{{count} fields corrected}}",
+  "@fleetExpenseCorrections": {
+    "description": "#4215 — how many machine-read fields the employee changed.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fleetExpenseNotAnAccountingRecord": "Submitting hands this to your company as a claim. It is not an accounting record, and it does not decide whether you are reimbursed.",
+  "@fleetExpenseNotAnAccountingRecord": {
+    "description": "#4215 — ADR 0025 reimbursement / accounting state boundary, stated on the screen that submits."
+  },
+  "fleetExpenseConfirmAndSubmit": "Confirm and submit",
+  "@fleetExpenseConfirmAndSubmit": {
+    "description": "#4215 — the one-tap action when the arithmetic reconciles."
+  },
+  "fleetExpenseFixFirst": "Confirm the highlighted fields first",
+  "@fleetExpenseFixFirst": {
+    "description": "#4215 — disabled-with-reason label on the submit action."
+  },
+  "fleetExpenseAlreadySubmitted": "Already submitted",
+  "@fleetExpenseAlreadySubmitted": {
+    "description": "#4215 — the submit action on an expense that has left the employee's hands."
+  },
+  "fleetExpenseSubmitFailed": "Could not submit this expense.",
+  "@fleetExpenseSubmitFailed": {
+    "description": "#4215 — the workflow refused the submit."
+  },
   "fleetVehicleCurrentLabel": "Current vehicle",
   "@fleetVehicleCurrentLabel": {
     "description": "Label of the compact current-vehicle context chip shown on fleet-enabled surfaces (#4213)."

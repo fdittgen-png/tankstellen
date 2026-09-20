@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/sync/schema_verifier.dart';
 import 'package:tankstellen/core/sync/user_data_sync.dart';
+import 'package:tankstellen/features/fleet/data/fleet_document_store.dart';
 
 void main() {
   test('export set ⊇ delete set', () {
@@ -38,6 +39,18 @@ void main() {
     final missing = schemaTables.difference(deletable);
     expect(missing, isEmpty,
         reason: 'synced user table(s) with no erasure path: $missing');
+  });
+
+  // #4215 — `lib/core/` may not import `lib/features/` (epic #3129 pins
+  // the fleet pair at zero), so UserDataSync spells the receipt bucket
+  // out instead of importing FleetDocumentStore.bucket. That is a
+  // duplicated constant, and this is what stops it becoming a drifted
+  // one: the account-deletion path and the feature-side store must
+  // name the same bucket, or one of them erases nothing.
+  test('the receipt bucket is the same string on both sides of the '
+      'core/feature boundary (#4215)', () {
+    expect(UserDataSync.fleetDocumentsBucket, FleetDocumentStore.bucket);
+    expect(UserDataSync.fleetDocumentsBucket, 'fleet-documents');
   });
 
   test('erase_my_data() RPC and the client fallback cover the same tables',

@@ -94,6 +94,14 @@ abstract final class RoutePaths {
   static const reportPattern = '/report/:id';
   static String report(String id) => '/report/$id';
 
+  // Fleet (#4215, Epic #4211) — its own `/fleet/…` family, declared in
+  // `lib/app/routes/fleet_routes.dart`. Kept off the Settings tree on
+  // purpose: an expense is work the employee does, not a preference
+  // they set, and ADR 0025 D10 reaches fleet ADMINISTRATION from
+  // Settings while the employee loop stays a push family of its own.
+  static const fleetExpenses = '/fleet/expenses';
+  static const fleetExpenseReview = '/fleet/expenses/review';
+
   // TankSync.
   static const syncSetup = '/sync-setup';
   static const linkDevice = '/link-device';
@@ -217,4 +225,20 @@ final class CalculatorRoute extends AppRoute {
   String get location => RoutePaths.calculator;
   @override
   Object? get extra => initialPrice;
+}
+
+/// Fleet expense review (`/fleet/expenses/review`, #4215).
+///
+/// The payload is the expense ID, not the `Expense`: the screen reads
+/// the current record from the store, so a stale object captured at
+/// push time cannot outlive a correction made in between — and a deep
+/// link that arrives with no payload at all lands on a "not found"
+/// state instead of a crash.
+final class FleetExpenseReviewRoute extends AppRoute {
+  const FleetExpenseReviewRoute(this.expenseId);
+  final String expenseId;
+  @override
+  String get location => RoutePaths.fleetExpenseReview;
+  @override
+  Object? get extra => expenseId;
 }
