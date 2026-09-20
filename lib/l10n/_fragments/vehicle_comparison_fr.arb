@@ -1,0 +1,203 @@
+{
+  "vehCompareTitle": "Comparer les véhicules",
+  "vehCompareOpenTooltip": "Comparer les véhicules",
+  "vehCompareSelectHint": "Choisis au moins deux véhicules à comparer.",
+  "vehCompareNotEnoughVehicles": "Ajoute un deuxième profil de véhicule pour comparer les historiques.",
+  "vehCompareHonestyNote": "Ces chiffres viennent de tes propres relevés, aux prix que tu as réellement payés. Ils ne mesurent pas l'efficacité intrinsèque d'un véhicule, ne prédisent pas le coût d'un trajet futur et ne représentent pas une économie face à un prix que l'application n'a jamais vu.",
+  "vehComparePeriodLabel": "Période",
+  "vehComparePeriodAll": "Tout l'historique",
+  "vehComparePeriodYear": "12 derniers mois",
+  "vehComparePeriodQuarter": "90 derniers jours",
+  "vehCompareBoundaryPolicyLabel": "Pleins à cheval sur la période",
+  "vehCompareBoundaryClosing": "Compter le plein entier dans la période où il se termine",
+  "vehCompareBoundaryContained": "Seulement les pleins entièrement compris",
+  "vehCompareBoundaryNote": "Un plein n'est jamais coupé à une date. Ses litres ont été mesurés sur le plein entier : il compte donc en entier, ou pas du tout.",
+  "vehCompareReferenceLabel": "Écarts affichés par rapport à {vehicle}",
+  "@vehCompareReferenceLabel": {
+    "placeholders": {
+      "vehicle": {"type": "String"}
+    }
+  },
+  "vehCompareSetReference": "Utiliser comme référence",
+  "vehCompareEvidenceTitle": "Données disponibles",
+  "vehCompareWindowCount": "{count, plural, =0{Aucun plein complet} =1{1 plein complet} other{{count} pleins complets}}",
+  "@vehCompareWindowCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareMatchedDistance": "Distance rattachée",
+  "vehCompareRecordedDistance": "Distance enregistrée",
+  "vehCompareTripCount": "{count, plural, =0{Aucun trajet enregistré} =1{1 trajet enregistré} other{{count} trajets enregistrés}}",
+  "@vehCompareTripCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareConsumptionTitle": "Consommation observée",
+  "vehCompareCostTitle": "Coût",
+  "vehCompareCostPerKmLabel": "Par km, achats du plein",
+  "vehCompareConsumedFuelLabel": "Par km, carburant brûlé (modélisé)",
+  "vehCompareRecordedSpendLabel": "Payé à la pompe",
+  "vehComparePricePerUnitLabel": "Prix moyen payé",
+  "vehCompareRefuellingTitle": "Ravitaillement",
+  "vehCompareFillCountLabel": "Passages à la pompe",
+  "vehCompareTotalQuantityLabel": "Total pris à la pompe",
+  "vehCompareTypicalQuantityLabel": "Plein typique",
+  "vehCompareFullPartialLabel": "Complets / partiels",
+  "vehCompareFullPartialValue": "{full} complets, {partial} partiels",
+  "@vehCompareFullPartialValue": {
+    "placeholders": {
+      "full": {"type": "int"},
+      "partial": {"type": "int"}
+    }
+  },
+  "vehCompareBetweenFillsLabel": "Entre deux pleins",
+  "vehCompareBetweenFillsDays": "{days, plural, =1{1 jour} other{{days} jours}}",
+  "@vehCompareBetweenFillsDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "vehCompareCorrectionsLabel": "Corrections",
+  "vehCompareStationsTitle": "Stations",
+  "vehCompareStationUnnamed": "{count, plural, =1{1 plein sans station enregistrée} other{{count} pleins sans station enregistrée}}",
+  "@vehCompareStationUnnamed": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareStationVisits": "{station} : {count}",
+  "@vehCompareStationVisits": {
+    "placeholders": {
+      "station": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareRangeLabel": "Autonomie estimée",
+  "vehCompareFuelShare": "{fuel} : {share}",
+  "@vehCompareFuelShare": {
+    "placeholders": {
+      "fuel": {"type": "String"},
+      "share": {"type": "String"}
+    }
+  },
+  "vehCompareBoundaryIncluded": "{count, plural, =1{1 plein a commencé avant cette période et a été compté en entier.} other{{count} pleins ont commencé avant cette période et ont été comptés en entier.}}",
+  "@vehCompareBoundaryIncluded": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareBoundaryExcluded": "{count, plural, =1{1 plein a franchi la limite de la période et a été écarté.} other{{count} pleins ont franchi la limite de la période et ont été écartés.}}",
+  "@vehCompareBoundaryExcluded": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareOpeningCarried": "Le premier plein compté a été fait le {date}, avant cette période — son carburant est reporté, pas recompté.",
+  "@vehCompareOpeningCarried": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "vehCompareMissingVehicle": "Ce véhicule n'est plus enregistré, ses chiffres ne peuvent pas être recalculés. La sélection est conservée pour que tu puisses la rétablir.",
+  "vehCompareRemoveFromSelection": "Retirer de la comparaison",
+  "vehCompareUnassignedFills": "{count, plural, =1{1 plein n'appartient à aucun véhicule et ne compte pour aucune de ces colonnes.} other{{count} pleins n'appartiennent à aucun véhicule et ne comptent pour aucune de ces colonnes.}}",
+  "@vehCompareUnassignedFills": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareAmbiguousFills": "{count, plural, =1{1 plein pourrait appartenir à plusieurs de ces véhicules et ne compte pour aucun.} other{{count} pleins pourraient appartenir à plusieurs de ces véhicules et ne comptent pour aucun.}}",
+  "@vehCompareAmbiguousFills": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareUnassignedTrips": "{count, plural, =1{1 trajet enregistré n'appartient à aucun véhicule.} other{{count} trajets enregistrés n'appartiennent à aucun véhicule.}}",
+  "@vehCompareUnassignedTrips": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareWinnerConsumption": "Consommation observée la plus basse : {vehicle}",
+  "@vehCompareWinnerConsumption": {
+    "placeholders": {
+      "vehicle": {"type": "String"}
+    }
+  },
+  "vehCompareWinnerCost": "Coût observé au km le plus bas : {vehicle}",
+  "@vehCompareWinnerCost": {
+    "placeholders": {
+      "vehicle": {"type": "String"}
+    }
+  },
+  "vehCompareNoWinner": "Aucun véhicule ne peut être désigné ici : {reason}",
+  "@vehCompareNoWinner": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
+  "vehCompareSourcesAction": "Afficher les enregistrements",
+  "vehCompareSourcesTitle": "Enregistrements derrière ce chiffre",
+  "vehCompareSourcesFills": "{count, plural, =0{Aucun plein} =1{1 plein} other{{count} pleins}}",
+  "@vehCompareSourcesFills": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareSourcesWindows": "{count, plural, =0{Aucun plein complet} =1{1 plein complet} other{{count} pleins complets}}",
+  "@vehCompareSourcesWindows": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareSourcesTrips": "{count, plural, =0{Aucun trajet} =1{1 trajet} other{{count} trajets}}",
+  "@vehCompareSourcesTrips": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "vehCompareUnavailableShort": "Non comparable",
+  "vehCompareEstimateBadge": "Estimation",
+  "vehCompareSemanticsColumn": "{vehicle}, véhicule {index} sur {total}",
+  "@vehCompareSemanticsColumn": {
+    "placeholders": {
+      "vehicle": {"type": "String"},
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "vehCompareSemanticsMetric": "{label} : {value}, {vehicle}",
+  "@vehCompareSemanticsMetric": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "value": {"type": "String"},
+      "vehicle": {"type": "String"}
+    }
+  },
+  "vehCompareReasonNoEvidence": "Rien n'est enregistré pour ce chiffre.",
+  "vehCompareReasonTooFewSamples": "Trop peu de pleins complets pour comparer.",
+  "vehCompareReasonNoMatchedDistance": "Aucune distance rattachée comme dénominateur.",
+  "vehCompareReasonMixedCurrencies": "Montants dans plusieurs devises, et aucune conversion n'a été choisie.",
+  "vehCompareReasonUnknownCurrency": "La devise de certains montants n'a jamais été enregistrée.",
+  "vehCompareReasonExchangeRateUnavailable": "Aucun taux de change ne relie ces devises.",
+  "vehCompareReasonExchangeRateStale": "Le taux de change est trop ancien pour trancher.",
+  "vehCompareReasonIncompatibleUnits": "Ces quantités sont mesurées dans des unités différentes.",
+  "vehCompareReasonUnsupportedUnit": "Ce carburant n'est pas vendu au litre : il n'y a donc pas de valeur en L/100 km.",
+  "vehCompareReasonAmbiguousAttribution": "Ces enregistrements ne peuvent pas être attribués à un seul véhicule.",
+  "vehCompareReasonMissingPrices": "Certains pleins des périodes comptées n'ont pas de prix.",
+  "vehCompareReasonNoExpectedConsumption": "Aucune consommation attendue n'est enregistrée : rien ne peut être normalisé.",
+  "vehCompareReasonIncompleteConditionCoverage": "Toutes les conditions de conduite n'ont pas été évaluées.",
+  "vehCompareQualUncontrolledConditions": "Les côtes, le froid et le trafic ne sont pas pris en compte.",
+  "vehCompareQualPartialConditionCoverage": "Seuls les démarrages à froid sont enregistrés ; ni la pente ni les arrêts fréquents.",
+  "vehCompareQualUnequalSampleSizes": "Les véhicules reposent sur des volumes de données très différents.",
+  "vehCompareQualEstimatedBasis": "Modélisé, pas mesuré.",
+  "vehCompareQualStaleBasis": "Mesuré, mais trop ancien pour être présenté comme actuel.",
+  "vehCompareQualMixedProvenance": "Des données mesurées et modélisées coexistent ; elles sont présentées séparément.",
+  "vehCompareQualConvertedCurrency": "Converti à un taux nommé et daté — une valorisation, pas le montant payé.",
+  "vehCompareQualExcludedRecords": "Certains enregistrements ne sont pas inclus dans ce total.",
+  "vehCompareQualOpenWindowExcluded": "Le plein en cours n'est pas compté.",
+  "vehCompareQualUnknownBlendShare": "Une partie du réservoir ne peut être attribuée à un seul carburant.",
+  "vehCompareQualReconstructedValuation": "Une valorisation reconstituée du carburant brûlé, pas de l'argent payé."
+}

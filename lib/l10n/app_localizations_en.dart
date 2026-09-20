@@ -10691,6 +10691,409 @@ class AppLocalizationsEn extends AppLocalizations {
       'This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.';
 
   @override
+  String get vehCompareTitle => 'Compare vehicles';
+
+  @override
+  String get vehCompareOpenTooltip => 'Compare vehicles';
+
+  @override
+  String get vehCompareSelectHint => 'Pick at least two vehicles to compare.';
+
+  @override
+  String get vehCompareNotEnoughVehicles =>
+      'Add a second vehicle profile before comparing histories.';
+
+  @override
+  String get vehCompareHonestyNote =>
+      'These figures come from your own records, at the prices you actually paid. They do not measure how efficient a vehicle is in itself, they do not predict what a future trip will cost, and they are not savings against a price this app never saw.';
+
+  @override
+  String get vehComparePeriodLabel => 'Period';
+
+  @override
+  String get vehComparePeriodAll => 'All history';
+
+  @override
+  String get vehComparePeriodYear => 'Last 12 months';
+
+  @override
+  String get vehComparePeriodQuarter => 'Last 90 days';
+
+  @override
+  String get vehCompareBoundaryPolicyLabel => 'Tanks crossing the period edge';
+
+  @override
+  String get vehCompareBoundaryClosing => 'Count the whole tank it ended in';
+
+  @override
+  String get vehCompareBoundaryContained => 'Only tanks entirely inside';
+
+  @override
+  String get vehCompareBoundaryNote =>
+      'A tank is never split at a date. Its litres were measured over the whole tank, so the whole tank is counted or none of it is.';
+
+  @override
+  String vehCompareReferenceLabel(String vehicle) {
+    return 'Differences shown against $vehicle';
+  }
+
+  @override
+  String get vehCompareSetReference => 'Use as reference';
+
+  @override
+  String get vehCompareEvidenceTitle => 'Evidence';
+
+  @override
+  String vehCompareWindowCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count closed tanks',
+      one: '1 closed tank',
+      zero: 'No closed tank',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get vehCompareMatchedDistance => 'Matched distance';
+
+  @override
+  String get vehCompareRecordedDistance => 'Recorded distance';
+
+  @override
+  String vehCompareTripCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count recorded drives',
+      one: '1 recorded drive',
+      zero: 'No recorded drive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get vehCompareConsumptionTitle => 'Observed consumption';
+
+  @override
+  String get vehCompareCostTitle => 'Cost';
+
+  @override
+  String get vehCompareCostPerKmLabel => 'Per km, tank purchases';
+
+  @override
+  String get vehCompareConsumedFuelLabel => 'Per km, fuel burned (modelled)';
+
+  @override
+  String get vehCompareRecordedSpendLabel => 'Paid at the pump';
+
+  @override
+  String get vehComparePricePerUnitLabel => 'Average price paid';
+
+  @override
+  String get vehCompareRefuellingTitle => 'Refuelling';
+
+  @override
+  String get vehCompareFillCountLabel => 'Pump visits';
+
+  @override
+  String get vehCompareTotalQuantityLabel => 'Total pumped';
+
+  @override
+  String get vehCompareTypicalQuantityLabel => 'Typical fill';
+
+  @override
+  String get vehCompareFullPartialLabel => 'Full / partial';
+
+  @override
+  String vehCompareFullPartialValue(int full, int partial) {
+    return '$full full, $partial partial';
+  }
+
+  @override
+  String get vehCompareBetweenFillsLabel => 'Between refuels';
+
+  @override
+  String vehCompareBetweenFillsDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get vehCompareCorrectionsLabel => 'Corrections';
+
+  @override
+  String get vehCompareStationsTitle => 'Stations';
+
+  @override
+  String vehCompareStationUnnamed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills with no station recorded',
+      one: '1 fill with no station recorded',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vehCompareStationVisits(String station, int count) {
+    return '$station: $count';
+  }
+
+  @override
+  String get vehCompareRangeLabel => 'Estimated range';
+
+  @override
+  String vehCompareFuelShare(String fuel, String share) {
+    return '$fuel: $share';
+  }
+
+  @override
+  String vehCompareBoundaryIncluded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tanks opened before this period and were counted whole.',
+      one: '1 tank opened before this period and was counted whole.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vehCompareBoundaryExcluded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tanks crossed the period edge and were left out.',
+      one: '1 tank crossed the period edge and was left out.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vehCompareOpeningCarried(String date) {
+    return 'The first counted tank was filled on $date, before this period — its fuel is carried forward, not re-counted.';
+  }
+
+  @override
+  String get vehCompareMissingVehicle =>
+      'This vehicle is no longer on record, so its figures cannot be recomputed. The selection is kept so you can restore it.';
+
+  @override
+  String get vehCompareRemoveFromSelection => 'Remove from the comparison';
+
+  @override
+  String vehCompareUnassignedFills(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count fill-ups belong to no vehicle and count for none of these columns.',
+      one:
+          '1 fill-up belongs to no vehicle and counts for none of these columns.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vehCompareAmbiguousFills(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count fill-ups could belong to more than one of these vehicles and count for none.',
+      one:
+          '1 fill-up could belong to more than one of these vehicles and counts for none.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vehCompareUnassignedTrips(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count recorded drives belong to no vehicle.',
+      one: '1 recorded drive belongs to no vehicle.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vehCompareWinnerConsumption(String vehicle) {
+    return 'Lowest observed consumption: $vehicle';
+  }
+
+  @override
+  String vehCompareWinnerCost(String vehicle) {
+    return 'Lowest observed cost per km: $vehicle';
+  }
+
+  @override
+  String vehCompareNoWinner(String reason) {
+    return 'No vehicle can be named here: $reason';
+  }
+
+  @override
+  String get vehCompareSourcesAction => 'Show the records';
+
+  @override
+  String get vehCompareSourcesTitle => 'Records behind this figure';
+
+  @override
+  String vehCompareSourcesFills(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups',
+      one: '1 fill-up',
+      zero: 'No fill-up',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vehCompareSourcesWindows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count closed tanks',
+      one: '1 closed tank',
+      zero: 'No closed tank',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String vehCompareSourcesTrips(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count drives',
+      one: '1 drive',
+      zero: 'No drive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get vehCompareUnavailableShort => 'Not comparable';
+
+  @override
+  String get vehCompareEstimateBadge => 'Estimate';
+
+  @override
+  String vehCompareSemanticsColumn(String vehicle, int index, int total) {
+    return '$vehicle, vehicle $index of $total';
+  }
+
+  @override
+  String vehCompareSemanticsMetric(String label, String value, String vehicle) {
+    return '$label: $value, $vehicle';
+  }
+
+  @override
+  String get vehCompareReasonNoEvidence => 'Nothing on record for this figure.';
+
+  @override
+  String get vehCompareReasonTooFewSamples =>
+      'Too few closed tanks to compare.';
+
+  @override
+  String get vehCompareReasonNoMatchedDistance =>
+      'No matched distance to divide by.';
+
+  @override
+  String get vehCompareReasonMixedCurrencies =>
+      'Amounts in more than one currency, and no conversion was chosen.';
+
+  @override
+  String get vehCompareReasonUnknownCurrency =>
+      'Some amounts have no recorded currency.';
+
+  @override
+  String get vehCompareReasonExchangeRateUnavailable =>
+      'No exchange rate relates these currencies.';
+
+  @override
+  String get vehCompareReasonExchangeRateStale =>
+      'The exchange rate is too old to decide this.';
+
+  @override
+  String get vehCompareReasonIncompatibleUnits =>
+      'These quantities are measured in different units.';
+
+  @override
+  String get vehCompareReasonUnsupportedUnit =>
+      'This fuel is not sold by the litre, so there is no L/100 km figure.';
+
+  @override
+  String get vehCompareReasonAmbiguousAttribution =>
+      'These records cannot be attributed to exactly one vehicle.';
+
+  @override
+  String get vehCompareReasonMissingPrices =>
+      'Some fills in the counted tanks carry no price.';
+
+  @override
+  String get vehCompareReasonNoExpectedConsumption =>
+      'No expected consumption is recorded, so nothing can be adjusted against it.';
+
+  @override
+  String get vehCompareReasonIncompleteConditionCoverage =>
+      'Not every driving condition was evaluated.';
+
+  @override
+  String get vehCompareQualUncontrolledConditions =>
+      'Hills, cold and traffic are not accounted for.';
+
+  @override
+  String get vehCompareQualPartialConditionCoverage =>
+      'Only cold starts are recorded; gradient and stop-and-go are not.';
+
+  @override
+  String get vehCompareQualUnequalSampleSizes =>
+      'The vehicles rest on very different amounts of evidence.';
+
+  @override
+  String get vehCompareQualEstimatedBasis => 'Modelled, not measured.';
+
+  @override
+  String get vehCompareQualStaleBasis =>
+      'Measured, but too old to read as current.';
+
+  @override
+  String get vehCompareQualMixedProvenance =>
+      'Measured and modelled evidence both exist; they are reported apart.';
+
+  @override
+  String get vehCompareQualConvertedCurrency =>
+      'Converted at a named, dated rate — a valuation, not the amount paid.';
+
+  @override
+  String get vehCompareQualExcludedRecords =>
+      'Some records were left out of this total.';
+
+  @override
+  String get vehCompareQualOpenWindowExcluded =>
+      'The tank in progress is not counted.';
+
+  @override
+  String get vehCompareQualUnknownBlendShare =>
+      'Part of the tank cannot be attributed to one grade.';
+
+  @override
+  String get vehCompareQualReconstructedValuation =>
+      'A reconstructed valuation of the fuel burned, not money paid.';
+
+  @override
   String get vehicleMultiFuelCapableLabel =>
       'I may fill up with different fuel types';
 
@@ -21820,6 +22223,418 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get pumpGainResetConfirmBody =>
       '⟦Ŧĥîš đîšçářđš ŧĥé ƒúéł ǧáîñ łéářñéđ ƒřóɱ ýóúř ƒîłł-úƥš. ÓƁĐ2 çóñšúɱƥŧîóñ éšŧîɱáŧéš ƒáłł ƀáçķ ŧó ŧĥé úñçóřřéçŧéđ ƒîǧúřé úñŧîł ŧĥé ñéẋŧ ƒúłł-ŧó-ƒúłł ŧáñķ ŵîñđóŵ řé-łéářñš îŧ. ·······························································⟧';
+
+  @override
+  String get vehCompareTitle => '⟦Çóɱƥářé ṽéĥîçłéš ·······⟧';
+
+  @override
+  String get vehCompareOpenTooltip => '⟦Çóɱƥářé ṽéĥîçłéš ·······⟧';
+
+  @override
+  String get vehCompareSelectHint =>
+      '⟦Ƥîçķ áŧ łéášŧ ŧŵó ṽéĥîçłéš ŧó çóɱƥářé. ··············⟧';
+
+  @override
+  String get vehCompareNotEnoughVehicles =>
+      '⟦Áđđ á šéçóñđ ṽéĥîçłé ƥřóƒîłé ƀéƒóřé çóɱƥářîñǧ ĥîšŧóřîéš. ······················⟧';
+
+  @override
+  String get vehCompareHonestyNote =>
+      '⟦Ŧĥéšé ƒîǧúřéš çóɱé ƒřóɱ ýóúř óŵñ řéçóřđš, áŧ ŧĥé ƥřîçéš ýóú áçŧúáłłý ƥáîđ. Ŧĥéý đó ñóŧ ɱéášúřé ĥóŵ éƒƒîçîéñŧ á ṽéĥîçłé îš îñ îŧšéłƒ, ŧĥéý đó ñóŧ ƥřéđîçŧ ŵĥáŧ á ƒúŧúřé ŧřîƥ ŵîłł çóšŧ, áñđ ŧĥéý ářé ñóŧ šáṽîñǧš áǧáîñšŧ á ƥřîçé ŧĥîš áƥƥ ñéṽéř šáŵ. ·······················································································⟧';
+
+  @override
+  String get vehComparePeriodLabel => '⟦Ƥéřîóđ ···⟧';
+
+  @override
+  String get vehComparePeriodAll => '⟦Áłł ĥîšŧóřý ·····⟧';
+
+  @override
+  String get vehComparePeriodYear => '⟦Łášŧ 12 ɱóñŧĥš ·····⟧';
+
+  @override
+  String get vehComparePeriodQuarter => '⟦Łášŧ 90 đáýš ····⟧';
+
+  @override
+  String get vehCompareBoundaryPolicyLabel =>
+      '⟦Ŧáñķš çřóššîñǧ ŧĥé ƥéřîóđ éđǧé ············⟧';
+
+  @override
+  String get vehCompareBoundaryClosing =>
+      '⟦Çóúñŧ ŧĥé ŵĥółé ŧáñķ îŧ éñđéđ îñ ············⟧';
+
+  @override
+  String get vehCompareBoundaryContained =>
+      '⟦Óñłý ŧáñķš éñŧîřéłý îñšîđé ··········⟧';
+
+  @override
+  String get vehCompareBoundaryNote =>
+      '⟦Á ŧáñķ îš ñéṽéř šƥłîŧ áŧ á đáŧé. Îŧš łîŧřéš ŵéřé ɱéášúřéđ óṽéř ŧĥé ŵĥółé ŧáñķ, šó ŧĥé ŵĥółé ŧáñķ îš çóúñŧéđ óř ñóñé óƒ îŧ îš. ···········································⟧';
+
+  @override
+  String vehCompareReferenceLabel(String vehicle) {
+    return '⟦Đîƒƒéřéñçéš šĥóŵñ áǧáîñšŧ $vehicle ··········⟧';
+  }
+
+  @override
+  String get vehCompareSetReference => '⟦Úšé áš řéƒéřéñçé ······⟧';
+
+  @override
+  String get vehCompareEvidenceTitle => '⟦Éṽîđéñçé ····⟧';
+
+  @override
+  String vehCompareWindowCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count closed tanks',
+      one: '1 closed tank',
+      zero: 'No closed tank',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get vehCompareMatchedDistance => '⟦Ṁáŧçĥéđ đîšŧáñçé ·······⟧';
+
+  @override
+  String get vehCompareRecordedDistance => '⟦Řéçóřđéđ đîšŧáñçé ·······⟧';
+
+  @override
+  String vehCompareTripCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count recorded drives',
+      one: '1 recorded drive',
+      zero: 'No recorded drive',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get vehCompareConsumptionTitle => '⟦Óƀšéřṽéđ çóñšúɱƥŧîóñ ·········⟧';
+
+  @override
+  String get vehCompareCostTitle => '⟦Çóšŧ ··⟧';
+
+  @override
+  String get vehCompareCostPerKmLabel => '⟦Ƥéř ķɱ, ŧáñķ ƥúřçĥášéš ········⟧';
+
+  @override
+  String get vehCompareConsumedFuelLabel =>
+      '⟦Ƥéř ķɱ, ƒúéł ƀúřñéđ (ɱóđéłłéđ) ··········⟧';
+
+  @override
+  String get vehCompareRecordedSpendLabel => '⟦Ƥáîđ áŧ ŧĥé ƥúɱƥ ······⟧';
+
+  @override
+  String get vehComparePricePerUnitLabel => '⟦Áṽéřáǧé ƥřîçé ƥáîđ ·······⟧';
+
+  @override
+  String get vehCompareRefuellingTitle => '⟦Řéƒúéłłîñǧ ·····⟧';
+
+  @override
+  String get vehCompareFillCountLabel => '⟦Ƥúɱƥ ṽîšîŧš ·····⟧';
+
+  @override
+  String get vehCompareTotalQuantityLabel => '⟦Ŧóŧáł ƥúɱƥéđ ·····⟧';
+
+  @override
+  String get vehCompareTypicalQuantityLabel => '⟦Ŧýƥîçáł ƒîłł ·····⟧';
+
+  @override
+  String get vehCompareFullPartialLabel => '⟦Ƒúłł / ƥářŧîáł ·····⟧';
+
+  @override
+  String vehCompareFullPartialValue(int full, int partial) {
+    return '⟦$full ƒúłł, $partial ƥářŧîáł ·····⟧';
+  }
+
+  @override
+  String get vehCompareBetweenFillsLabel => '⟦Ɓéŧŵééñ řéƒúéłš ······⟧';
+
+  @override
+  String vehCompareBetweenFillsDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get vehCompareCorrectionsLabel => '⟦Çóřřéçŧîóñš ·····⟧';
+
+  @override
+  String get vehCompareStationsTitle => '⟦Šŧáŧîóñš ····⟧';
+
+  @override
+  String vehCompareStationUnnamed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fills with no station recorded',
+      one: '1 fill with no station recorded',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String vehCompareStationVisits(String station, int count) {
+    return '⟦$station: $count⟧';
+  }
+
+  @override
+  String get vehCompareRangeLabel => '⟦Éšŧîɱáŧéđ řáñǧé ······⟧';
+
+  @override
+  String vehCompareFuelShare(String fuel, String share) {
+    return '⟦$fuel: $share⟧';
+  }
+
+  @override
+  String vehCompareBoundaryIncluded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tanks opened before this period and were counted whole.',
+      one: '1 tank opened before this period and was counted whole.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String vehCompareBoundaryExcluded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tanks crossed the period edge and were left out.',
+      one: '1 tank crossed the period edge and was left out.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String vehCompareOpeningCarried(String date) {
+    return '⟦Ŧĥé ƒîřšŧ çóúñŧéđ ŧáñķ ŵáš ƒîłłéđ óñ $date, ƀéƒóřé ŧĥîš ƥéřîóđ — îŧš ƒúéł îš çářřîéđ ƒóřŵářđ, ñóŧ řé-çóúñŧéđ. ····································⟧';
+  }
+
+  @override
+  String get vehCompareMissingVehicle =>
+      '⟦Ŧĥîš ṽéĥîçłé îš ñó łóñǧéř óñ řéçóřđ, šó îŧš ƒîǧúřéš çáññóŧ ƀé řéçóɱƥúŧéđ. Ŧĥé šéłéçŧîóñ îš ķéƥŧ šó ýóú çáñ řéšŧóřé îŧ. ··········································⟧';
+
+  @override
+  String get vehCompareRemoveFromSelection =>
+      '⟦Řéɱóṽé ƒřóɱ ŧĥé çóɱƥářîšóñ ··········⟧';
+
+  @override
+  String vehCompareUnassignedFills(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count fill-ups belong to no vehicle and count for none of these columns.',
+      one:
+          '1 fill-up belongs to no vehicle and counts for none of these columns.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String vehCompareAmbiguousFills(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count fill-ups could belong to more than one of these vehicles and count for none.',
+      one:
+          '1 fill-up could belong to more than one of these vehicles and counts for none.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String vehCompareUnassignedTrips(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count recorded drives belong to no vehicle.',
+      one: '1 recorded drive belongs to no vehicle.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String vehCompareWinnerConsumption(String vehicle) {
+    return '⟦Łóŵéšŧ óƀšéřṽéđ çóñšúɱƥŧîóñ: $vehicle ···········⟧';
+  }
+
+  @override
+  String vehCompareWinnerCost(String vehicle) {
+    return '⟦Łóŵéšŧ óƀšéřṽéđ çóšŧ ƥéř ķɱ: $vehicle ··········⟧';
+  }
+
+  @override
+  String vehCompareNoWinner(String reason) {
+    return '⟦Ñó ṽéĥîçłé çáñ ƀé ñáɱéđ ĥéřé: $reason ··········⟧';
+  }
+
+  @override
+  String get vehCompareSourcesAction => '⟦Šĥóŵ ŧĥé řéçóřđš ······⟧';
+
+  @override
+  String get vehCompareSourcesTitle =>
+      '⟦Řéçóřđš ƀéĥîñđ ŧĥîš ƒîǧúřé ··········⟧';
+
+  @override
+  String vehCompareSourcesFills(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups',
+      one: '1 fill-up',
+      zero: 'No fill-up',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String vehCompareSourcesWindows(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count closed tanks',
+      one: '1 closed tank',
+      zero: 'No closed tank',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String vehCompareSourcesTrips(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count drives',
+      one: '1 drive',
+      zero: 'No drive',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get vehCompareUnavailableShort => '⟦Ñóŧ çóɱƥářáƀłé ······⟧';
+
+  @override
+  String get vehCompareEstimateBadge => '⟦Éšŧîɱáŧé ····⟧';
+
+  @override
+  String vehCompareSemanticsColumn(String vehicle, int index, int total) {
+    return '⟦$vehicle, ṽéĥîçłé $index óƒ $total ····⟧';
+  }
+
+  @override
+  String vehCompareSemanticsMetric(String label, String value, String vehicle) {
+    return '⟦$label: $value, $vehicle⟧';
+  }
+
+  @override
+  String get vehCompareReasonNoEvidence =>
+      '⟦Ñóŧĥîñǧ óñ řéçóřđ ƒóř ŧĥîš ƒîǧúřé. ·············⟧';
+
+  @override
+  String get vehCompareReasonTooFewSamples =>
+      '⟦Ŧóó ƒéŵ çłóšéđ ŧáñķš ŧó çóɱƥářé. ············⟧';
+
+  @override
+  String get vehCompareReasonNoMatchedDistance =>
+      '⟦Ñó ɱáŧçĥéđ đîšŧáñçé ŧó đîṽîđé ƀý. ············⟧';
+
+  @override
+  String get vehCompareReasonMixedCurrencies =>
+      '⟦Áɱóúñŧš îñ ɱóřé ŧĥáñ óñé çúřřéñçý, áñđ ñó çóñṽéřšîóñ ŵáš çĥóšéñ. ·······················⟧';
+
+  @override
+  String get vehCompareReasonUnknownCurrency =>
+      '⟦Šóɱé áɱóúñŧš ĥáṽé ñó řéçóřđéđ çúřřéñçý. ···············⟧';
+
+  @override
+  String get vehCompareReasonExchangeRateUnavailable =>
+      '⟦Ñó éẋçĥáñǧé řáŧé řéłáŧéš ŧĥéšé çúřřéñçîéš. ················⟧';
+
+  @override
+  String get vehCompareReasonExchangeRateStale =>
+      '⟦Ŧĥé éẋçĥáñǧé řáŧé îš ŧóó ółđ ŧó đéçîđé ŧĥîš. ················⟧';
+
+  @override
+  String get vehCompareReasonIncompatibleUnits =>
+      '⟦Ŧĥéšé ɋúáñŧîŧîéš ářé ɱéášúřéđ îñ đîƒƒéřéñŧ úñîŧš. ···················⟧';
+
+  @override
+  String get vehCompareReasonUnsupportedUnit =>
+      '⟦Ŧĥîš ƒúéł îš ñóŧ šółđ ƀý ŧĥé łîŧřé, šó ŧĥéřé îš ñó Ł/100 ķɱ ƒîǧúřé. ·····················⟧';
+
+  @override
+  String get vehCompareReasonAmbiguousAttribution =>
+      '⟦Ŧĥéšé řéçóřđš çáññóŧ ƀé áŧŧřîƀúŧéđ ŧó éẋáçŧłý óñé ṽéĥîçłé. ······················⟧';
+
+  @override
+  String get vehCompareReasonMissingPrices =>
+      '⟦Šóɱé ƒîłłš îñ ŧĥé çóúñŧéđ ŧáñķš çářřý ñó ƥřîçé. ·················⟧';
+
+  @override
+  String get vehCompareReasonNoExpectedConsumption =>
+      '⟦Ñó éẋƥéçŧéđ çóñšúɱƥŧîóñ îš řéçóřđéđ, šó ñóŧĥîñǧ çáñ ƀé áđĵúšŧéđ áǧáîñšŧ îŧ. ····························⟧';
+
+  @override
+  String get vehCompareReasonIncompleteConditionCoverage =>
+      '⟦Ñóŧ éṽéřý đřîṽîñǧ çóñđîŧîóñ ŵáš éṽáłúáŧéđ. ················⟧';
+
+  @override
+  String get vehCompareQualUncontrolledConditions =>
+      '⟦Ĥîłłš, çółđ áñđ ŧřáƒƒîç ářé ñóŧ áççóúñŧéđ ƒóř. ·················⟧';
+
+  @override
+  String get vehCompareQualPartialConditionCoverage =>
+      '⟦Óñłý çółđ šŧářŧš ářé řéçóřđéđ; ǧřáđîéñŧ áñđ šŧóƥ-áñđ-ǧó ářé ñóŧ. ·······················⟧';
+
+  @override
+  String get vehCompareQualUnequalSampleSizes =>
+      '⟦Ŧĥé ṽéĥîçłéš řéšŧ óñ ṽéřý đîƒƒéřéñŧ áɱóúñŧš óƒ éṽîđéñçé. ·····················⟧';
+
+  @override
+  String get vehCompareQualEstimatedBasis =>
+      '⟦Ṁóđéłłéđ, ñóŧ ɱéášúřéđ. ·········⟧';
+
+  @override
+  String get vehCompareQualStaleBasis =>
+      '⟦Ṁéášúřéđ, ƀúŧ ŧóó ółđ ŧó řéáđ áš çúřřéñŧ. ··············⟧';
+
+  @override
+  String get vehCompareQualMixedProvenance =>
+      '⟦Ṁéášúřéđ áñđ ɱóđéłłéđ éṽîđéñçé ƀóŧĥ éẋîšŧ; ŧĥéý ářé řéƥóřŧéđ áƥářŧ. ·························⟧';
+
+  @override
+  String get vehCompareQualConvertedCurrency =>
+      '⟦Çóñṽéřŧéđ áŧ á ñáɱéđ, đáŧéđ řáŧé — á ṽáłúáŧîóñ, ñóŧ ŧĥé áɱóúñŧ ƥáîđ. ·······················⟧';
+
+  @override
+  String get vehCompareQualExcludedRecords =>
+      '⟦Šóɱé řéçóřđš ŵéřé łéƒŧ óúŧ óƒ ŧĥîš ŧóŧáł. ···············⟧';
+
+  @override
+  String get vehCompareQualOpenWindowExcluded =>
+      '⟦Ŧĥé ŧáñķ îñ ƥřóǧřéšš îš ñóŧ çóúñŧéđ. ·············⟧';
+
+  @override
+  String get vehCompareQualUnknownBlendShare =>
+      '⟦Ƥářŧ óƒ ŧĥé ŧáñķ çáññóŧ ƀé áŧŧřîƀúŧéđ ŧó óñé ǧřáđé. ··················⟧';
+
+  @override
+  String get vehCompareQualReconstructedValuation =>
+      '⟦Á řéçóñšŧřúçŧéđ ṽáłúáŧîóñ óƒ ŧĥé ƒúéł ƀúřñéđ, ñóŧ ɱóñéý ƥáîđ. ·······················⟧';
 
   @override
   String get vehicleMultiFuelCapableLabel =>

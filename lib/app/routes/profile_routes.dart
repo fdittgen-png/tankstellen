@@ -27,6 +27,7 @@ import '../../features/profile/presentation/screens/settings/units_display_scree
 import '../../features/profile/presentation/screens/settings/vehicles_obd2_screen.dart';
 import '../../features/help/api.dart';
 import '../../features/profile/presentation/screens/theme_settings_screen.dart';
+import '../../features/fill_ups/presentation/screens/vehicle_comparison_screen.dart';
 import '../../features/vehicle/presentation/screens/edit_vehicle_screen.dart';
 import '../../features/vehicle/presentation/screens/vehicle_list_screen.dart';
 
@@ -167,5 +168,12 @@ List<RouteBase> get profileRoutes => [
         path: RoutePaths.help,
         builder: (context, state) =>
             HelpScreen(anchor: state.uri.queryParameters['anchor']),
+      ),
+      // #4365 (epic #4358, work package F) — the personal-vehicle
+      // comparison. Appended last so the index-pinned route order in
+      // `test/app/routes/profile_routes_test.dart` stays stable.
+      GoRoute(
+        path: RoutePaths.compareVehicles,
+        builder: (context, state) => const VehicleComparisonScreen(),
       ),
     ];

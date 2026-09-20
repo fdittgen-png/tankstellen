@@ -5148,6 +5148,265 @@
   "pumpGainResetAction": "Zapfsäulen-Kalibrierung zurücksetzen",
   "pumpGainResetConfirmTitle": "Zapfsäulen-Kalibrierung zurücksetzen?",
   "pumpGainResetConfirmBody": "Der aus Ihren Tankfüllungen gelernte Kraftstofffaktor wird verworfen. OBD2-Verbrauchsschätzungen nutzen wieder den unkorrigierten Wert, bis das nächste Voll-zu-Voll-Tankfenster ihn neu lernt.",
+  "vehCompareTitle": "Fahrzeuge vergleichen",
+  "vehCompareOpenTooltip": "Fahrzeuge vergleichen",
+  "vehCompareSelectHint": "Wähle mindestens zwei Fahrzeuge für den Vergleich.",
+  "vehCompareNotEnoughVehicles": "Lege ein zweites Fahrzeugprofil an, um Verläufe zu vergleichen.",
+  "vehCompareHonestyNote": "Diese Werte stammen aus deinen eigenen Aufzeichnungen, zu den Preisen, die du tatsächlich bezahlt hast. Sie messen nicht, wie effizient ein Fahrzeug an sich ist, sie sagen nicht voraus, was eine künftige Fahrt kostet, und sie sind keine Ersparnis gegenüber einem Preis, den diese App nie gesehen hat.",
+  "vehComparePeriodLabel": "Zeitraum",
+  "vehComparePeriodAll": "Gesamter Verlauf",
+  "vehComparePeriodYear": "Letzte 12 Monate",
+  "vehComparePeriodQuarter": "Letzte 90 Tage",
+  "vehCompareBoundaryPolicyLabel": "Tankfüllungen über die Zeitraumgrenze",
+  "vehCompareBoundaryClosing": "Ganze Tankfüllung im Endzeitraum zählen",
+  "vehCompareBoundaryContained": "Nur vollständig enthaltene Tankfüllungen",
+  "vehCompareBoundaryNote": "Eine Tankfüllung wird nie an einem Datum geteilt. Ihre Liter wurden über die gesamte Füllung gemessen — also zählt sie ganz oder gar nicht.",
+  "vehCompareReferenceLabel": "Unterschiede gegenüber {vehicle}",
+  "@vehCompareReferenceLabel": {
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehCompareSetReference": "Als Referenz verwenden",
+  "vehCompareEvidenceTitle": "Datenlage",
+  "vehCompareWindowCount": "{count, plural, =0{Keine abgeschlossene Tankfüllung} =1{1 abgeschlossene Tankfüllung} other{{count} abgeschlossene Tankfüllungen}}",
+  "@vehCompareWindowCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareMatchedDistance": "Zugeordnete Strecke",
+  "vehCompareRecordedDistance": "Erfasste Strecke",
+  "vehCompareTripCount": "{count, plural, =0{Keine erfasste Fahrt} =1{1 erfasste Fahrt} other{{count} erfasste Fahrten}}",
+  "@vehCompareTripCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareConsumptionTitle": "Beobachteter Verbrauch",
+  "vehCompareCostTitle": "Kosten",
+  "vehCompareCostPerKmLabel": "Pro km, Tankkäufe",
+  "vehCompareConsumedFuelLabel": "Pro km, verbrannter Kraftstoff (modelliert)",
+  "vehCompareRecordedSpendLabel": "An der Zapfsäule bezahlt",
+  "vehComparePricePerUnitLabel": "Durchschnittlich bezahlter Preis",
+  "vehCompareRefuellingTitle": "Tankverhalten",
+  "vehCompareFillCountLabel": "Tankvorgänge",
+  "vehCompareTotalQuantityLabel": "Insgesamt getankt",
+  "vehCompareTypicalQuantityLabel": "Typische Tankmenge",
+  "vehCompareFullPartialLabel": "Voll / teilweise",
+  "vehCompareFullPartialValue": "{full} voll, {partial} teilweise",
+  "@vehCompareFullPartialValue": {
+    "placeholders": {
+      "full": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareBetweenFillsLabel": "Zwischen Tankvorgängen",
+  "vehCompareBetweenFillsDays": "{days, plural, =1{1 Tag} other{{days} Tage}}",
+  "@vehCompareBetweenFillsDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareCorrectionsLabel": "Korrekturen",
+  "vehCompareStationsTitle": "Tankstellen",
+  "vehCompareStationUnnamed": "{count, plural, =1{1 Tankvorgang ohne erfasste Tankstelle} other{{count} Tankvorgänge ohne erfasste Tankstelle}}",
+  "@vehCompareStationUnnamed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareStationVisits": "{station}: {count}",
+  "@vehCompareStationVisits": {
+    "placeholders": {
+      "station": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareRangeLabel": "Geschätzte Reichweite",
+  "vehCompareFuelShare": "{fuel}: {share}",
+  "@vehCompareFuelShare": {
+    "placeholders": {
+      "fuel": {
+        "type": "String"
+      },
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "vehCompareBoundaryIncluded": "{count, plural, =1{1 Tankfüllung begann vor diesem Zeitraum und wurde ganz gezählt.} other{{count} Tankfüllungen begannen vor diesem Zeitraum und wurden ganz gezählt.}}",
+  "@vehCompareBoundaryIncluded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareBoundaryExcluded": "{count, plural, =1{1 Tankfüllung überschritt die Zeitraumgrenze und blieb unberücksichtigt.} other{{count} Tankfüllungen überschritten die Zeitraumgrenze und blieben unberücksichtigt.}}",
+  "@vehCompareBoundaryExcluded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareOpeningCarried": "Die erste gezählte Tankfüllung wurde am {date} getankt, vor diesem Zeitraum — ihr Kraftstoff wird übernommen, nicht erneut gezählt.",
+  "@vehCompareOpeningCarried": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "vehCompareMissingVehicle": "Dieses Fahrzeug ist nicht mehr gespeichert, seine Werte lassen sich nicht neu berechnen. Die Auswahl bleibt erhalten, damit du sie wiederherstellen kannst.",
+  "vehCompareRemoveFromSelection": "Aus dem Vergleich entfernen",
+  "vehCompareUnassignedFills": "{count, plural, =1{1 Tankvorgang gehört zu keinem Fahrzeug und zählt für keine dieser Spalten.} other{{count} Tankvorgänge gehören zu keinem Fahrzeug und zählen für keine dieser Spalten.}}",
+  "@vehCompareUnassignedFills": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareAmbiguousFills": "{count, plural, =1{1 Tankvorgang könnte zu mehreren dieser Fahrzeuge gehören und zählt für keines.} other{{count} Tankvorgänge könnten zu mehreren dieser Fahrzeuge gehören und zählen für keines.}}",
+  "@vehCompareAmbiguousFills": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareUnassignedTrips": "{count, plural, =1{1 erfasste Fahrt gehört zu keinem Fahrzeug.} other{{count} erfasste Fahrten gehören zu keinem Fahrzeug.}}",
+  "@vehCompareUnassignedTrips": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareWinnerConsumption": "Niedrigster beobachteter Verbrauch: {vehicle}",
+  "@vehCompareWinnerConsumption": {
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehCompareWinnerCost": "Niedrigste beobachteten Kosten pro km: {vehicle}",
+  "@vehCompareWinnerCost": {
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehCompareNoWinner": "Hier lässt sich kein Fahrzeug benennen: {reason}",
+  "@vehCompareNoWinner": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "vehCompareSourcesAction": "Datensätze anzeigen",
+  "vehCompareSourcesTitle": "Datensätze hinter diesem Wert",
+  "vehCompareSourcesFills": "{count, plural, =0{Kein Tankvorgang} =1{1 Tankvorgang} other{{count} Tankvorgänge}}",
+  "@vehCompareSourcesFills": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareSourcesWindows": "{count, plural, =0{Keine abgeschlossene Tankfüllung} =1{1 abgeschlossene Tankfüllung} other{{count} abgeschlossene Tankfüllungen}}",
+  "@vehCompareSourcesWindows": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareSourcesTrips": "{count, plural, =0{Keine Fahrt} =1{1 Fahrt} other{{count} Fahrten}}",
+  "@vehCompareSourcesTrips": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareUnavailableShort": "Nicht vergleichbar",
+  "vehCompareEstimateBadge": "Schätzung",
+  "vehCompareSemanticsColumn": "{vehicle}, Fahrzeug {index} von {total}",
+  "@vehCompareSemanticsColumn": {
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      },
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "vehCompareSemanticsMetric": "{label}: {value}, {vehicle}",
+  "@vehCompareSemanticsMetric": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehCompareReasonNoEvidence": "Dazu liegt nichts vor.",
+  "vehCompareReasonTooFewSamples": "Zu wenige abgeschlossene Tankfüllungen für einen Vergleich.",
+  "vehCompareReasonNoMatchedDistance": "Keine zugeordnete Strecke als Nenner.",
+  "vehCompareReasonMixedCurrencies": "Beträge in mehreren Währungen, und es wurde keine Umrechnung gewählt.",
+  "vehCompareReasonUnknownCurrency": "Bei manchen Beträgen ist keine Währung erfasst.",
+  "vehCompareReasonExchangeRateUnavailable": "Kein Wechselkurs verbindet diese Währungen.",
+  "vehCompareReasonExchangeRateStale": "Der Wechselkurs ist zu alt für diese Entscheidung.",
+  "vehCompareReasonIncompatibleUnits": "Diese Mengen sind in unterschiedlichen Einheiten gemessen.",
+  "vehCompareReasonUnsupportedUnit": "Dieser Kraftstoff wird nicht in Litern verkauft, daher gibt es keinen L/100-km-Wert.",
+  "vehCompareReasonAmbiguousAttribution": "Diese Datensätze lassen sich nicht genau einem Fahrzeug zuordnen.",
+  "vehCompareReasonMissingPrices": "Bei manchen Tankvorgängen der gezählten Füllungen fehlt der Preis.",
+  "vehCompareReasonNoExpectedConsumption": "Es ist kein erwarteter Verbrauch erfasst, also lässt sich nichts dagegen normieren.",
+  "vehCompareReasonIncompleteConditionCoverage": "Nicht alle Fahrbedingungen wurden ausgewertet.",
+  "vehCompareQualUncontrolledConditions": "Steigungen, Kälte und Verkehr sind nicht berücksichtigt.",
+  "vehCompareQualPartialConditionCoverage": "Nur Kaltstarts werden erfasst, Steigung und Stop-and-go nicht.",
+  "vehCompareQualUnequalSampleSizes": "Die Fahrzeuge beruhen auf sehr unterschiedlich vielen Daten.",
+  "vehCompareQualEstimatedBasis": "Modelliert, nicht gemessen.",
+  "vehCompareQualStaleBasis": "Gemessen, aber zu alt, um als aktuell zu gelten.",
+  "vehCompareQualMixedProvenance": "Es gibt gemessene und modellierte Daten; sie werden getrennt ausgewiesen.",
+  "vehCompareQualConvertedCurrency": "Zu einem benannten, datierten Kurs umgerechnet — eine Bewertung, nicht der gezahlte Betrag.",
+  "vehCompareQualExcludedRecords": "Einige Datensätze sind in dieser Summe nicht enthalten.",
+  "vehCompareQualOpenWindowExcluded": "Die laufende Tankfüllung wird nicht mitgezählt.",
+  "vehCompareQualUnknownBlendShare": "Ein Teil der Tankfüllung lässt sich keiner Sorte zuordnen.",
+  "vehCompareQualReconstructedValuation": "Eine rekonstruierte Bewertung des verbrannten Kraftstoffs, kein gezahltes Geld.",
   "vehicleMultiFuelCapableLabel": "Ich tanke eventuell verschiedene Kraftstoffarten",
   "vehicleMultiFuelCapableHelper": "Ermittelt, welcher Kraftstoff pro Kilometer am günstigsten ist",
   "vinLabel": "FIN (optional)",

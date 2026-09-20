@@ -17665,6 +17665,510 @@ abstract class AppLocalizations {
   /// **'This discards the fuel gain learned from your fill-ups. OBD2 consumption estimates fall back to the uncorrected figure until the next full-to-full tank window re-learns it.'**
   String get pumpGainResetConfirmBody;
 
+  /// Title of the screen that puts two or more personal vehicles' recorded consumption and refuelling side by side (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare vehicles'**
+  String get vehCompareTitle;
+
+  /// Tooltip of the app-bar action on the vehicle list that opens the side-by-side comparison (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Compare vehicles'**
+  String get vehCompareOpenTooltip;
+
+  /// Hint above the vehicle chips on the comparison screen when fewer than two vehicles are selected (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Pick at least two vehicles to compare.'**
+  String get vehCompareSelectHint;
+
+  /// Empty state on the comparison screen when the user has only one vehicle profile (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Add a second vehicle profile before comparing histories.'**
+  String get vehCompareNotEnoughVehicles;
+
+  /// Standing caveat on the vehicle comparison screen stating what a historical observation is and is not (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'These figures come from your own records, at the prices you actually paid. They do not measure how efficient a vehicle is in itself, they do not predict what a future trip will cost, and they are not savings against a price this app never saw.'**
+  String get vehCompareHonestyNote;
+
+  /// Label of the report-period chooser on the vehicle comparison screen (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get vehComparePeriodLabel;
+
+  /// Report-period option covering every record (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'All history'**
+  String get vehComparePeriodAll;
+
+  /// Report-period option covering the last twelve months (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Last 12 months'**
+  String get vehComparePeriodYear;
+
+  /// Report-period option covering the last ninety days (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Last 90 days'**
+  String get vehComparePeriodQuarter;
+
+  /// Label of the control choosing how a full-to-full tank window that straddles the report period boundary is counted (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Tanks crossing the period edge'**
+  String get vehCompareBoundaryPolicyLabel;
+
+  /// Boundary-policy option: a tank counts in the period containing the fill that closed it (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Count the whole tank it ended in'**
+  String get vehCompareBoundaryClosing;
+
+  /// Boundary-policy option: only tanks whose opening and closing fills both fall inside the period count (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Only tanks entirely inside'**
+  String get vehCompareBoundaryContained;
+
+  /// Explanation under the boundary-policy control saying why no consumption is prorated to a calendar cut (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'A tank is never split at a date. Its litres were measured over the whole tank, so the whole tank is counted or none of it is.'**
+  String get vehCompareBoundaryNote;
+
+  /// Caption naming the reference vehicle every delta on the comparison screen is measured against (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Differences shown against {vehicle}'**
+  String vehCompareReferenceLabel(String vehicle);
+
+  /// Action on a comparison column that makes that vehicle the one differences are measured against (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Use as reference'**
+  String get vehCompareSetReference;
+
+  /// Section header of a comparison column listing how much recorded evidence the figures rest on (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence'**
+  String get vehCompareEvidenceTitle;
+
+  /// Number of full-to-full tank windows a comparison column's averages rest on (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No closed tank} =1{1 closed tank} other{{count} closed tanks}}'**
+  String vehCompareWindowCount(int count);
+
+  /// Row label for the distance the counted tank windows actually covered — the denominator of every per-km figure (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Matched distance'**
+  String get vehCompareMatchedDistance;
+
+  /// Row label for the odometer span of the period's fills, shown as context and never used as a divisor (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded distance'**
+  String get vehCompareRecordedDistance;
+
+  /// Number of strictly attributed, non-virtual drives behind a comparison column (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No recorded drive} =1{1 recorded drive} other{{count} recorded drives}}'**
+  String vehCompareTripCount(int count);
+
+  /// Section header of the consumption block in a comparison column (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Observed consumption'**
+  String get vehCompareConsumptionTitle;
+
+  /// Section header of the money block in a comparison column (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Cost'**
+  String get vehCompareCostTitle;
+
+  /// Row label for the cost per kilometre computed from what the counted tank windows' own fills cost (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Per km, tank purchases'**
+  String get vehCompareCostPerKmLabel;
+
+  /// Row label for the modelled valuation of the fuel burned, distinct from what was purchased (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Per km, fuel burned (modelled)'**
+  String get vehCompareConsumedFuelLabel;
+
+  /// Row label for the actual purchase spend recorded in the report period (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Paid at the pump'**
+  String get vehCompareRecordedSpendLabel;
+
+  /// Row label for the observed price paid per litre, kilogram or kilowatt-hour (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Average price paid'**
+  String get vehComparePricePerUnitLabel;
+
+  /// Section header of the refuelling-pattern block in a comparison column (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Refuelling'**
+  String get vehCompareRefuellingTitle;
+
+  /// Row label for the number of real fill-ups in the period, corrections excluded (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Pump visits'**
+  String get vehCompareFillCountLabel;
+
+  /// Row label for the total quantity of fuel purchased in the period (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Total pumped'**
+  String get vehCompareTotalQuantityLabel;
+
+  /// Row label for the median fill quantity — the median, so one large holiday fill does not redefine the driver (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Typical fill'**
+  String get vehCompareTypicalQuantityLabel;
+
+  /// Row label for the split between full-tank fills and partial top-ups (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Full / partial'**
+  String get vehCompareFullPartialLabel;
+
+  /// Value of the full-versus-partial fill row in a comparison column (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{full} full, {partial} partial'**
+  String vehCompareFullPartialValue(int full, int partial);
+
+  /// Row label for the median distance and time recorded between two pump visits (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Between refuels'**
+  String get vehCompareBetweenFillsLabel;
+
+  /// Median number of days between two pump visits (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day} other{{days} days}}'**
+  String vehCompareBetweenFillsDays(int days);
+
+  /// Row label for bookkeeping correction entries, counted apart from real pump visits (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Corrections'**
+  String get vehCompareCorrectionsLabel;
+
+  /// Section header listing which stations the recorded fills were made at (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Stations'**
+  String get vehCompareStationsTitle;
+
+  /// Count of fills whose station was never recorded, shown so the distribution is not read as complete (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill with no station recorded} other{{count} fills with no station recorded}}'**
+  String vehCompareStationUnnamed(int count);
+
+  /// One station and how many recorded fills were made there (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{station}: {count}'**
+  String vehCompareStationVisits(String station, int count);
+
+  /// Row label for the tank range derived from capacity and observed consumption (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated range'**
+  String get vehCompareRangeLabel;
+
+  /// One fuel grade and its share of the quantity burned in the counted tanks (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{fuel}: {share}'**
+  String vehCompareFuelShare(String fuel, String share);
+
+  /// Note stating how many straddling tank windows the boundary policy counted in full (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 tank opened before this period and was counted whole.} other{{count} tanks opened before this period and were counted whole.}}'**
+  String vehCompareBoundaryIncluded(int count);
+
+  /// Note stating how many straddling tank windows the boundary policy left out (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 tank crossed the period edge and was left out.} other{{count} tanks crossed the period edge and were left out.}}'**
+  String vehCompareBoundaryExcluded(int count);
+
+  /// Note preserving the opening tank context when the report period begins between two fills (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'The first counted tank was filled on {date}, before this period — its fuel is carried forward, not re-counted.'**
+  String vehCompareOpeningCarried(String date);
+
+  /// Message on a comparison column whose vehicle profile has been deleted (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'This vehicle is no longer on record, so its figures cannot be recomputed. The selection is kept so you can restore it.'**
+  String get vehCompareMissingVehicle;
+
+  /// Action that drops a deleted vehicle from the comparison selection (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from the comparison'**
+  String get vehCompareRemoveFromSelection;
+
+  /// Note reporting records that could not be credited to any compared vehicle (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill-up belongs to no vehicle and counts for none of these columns.} other{{count} fill-ups belong to no vehicle and count for none of these columns.}}'**
+  String vehCompareUnassignedFills(int count);
+
+  /// Note reporting records whose vehicle cannot be resolved to exactly one compared subject (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill-up could belong to more than one of these vehicles and counts for none.} other{{count} fill-ups could belong to more than one of these vehicles and count for none.}}'**
+  String vehCompareAmbiguousFills(int count);
+
+  /// Note reporting recorded drives with no vehicle attribution (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 recorded drive belongs to no vehicle.} other{{count} recorded drives belong to no vehicle.}}'**
+  String vehCompareUnassignedTrips(int count);
+
+  /// Headline naming the vehicle with the lowest observed consumption over the period (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest observed consumption: {vehicle}'**
+  String vehCompareWinnerConsumption(String vehicle);
+
+  /// Headline naming the vehicle with the lowest observed fuel cost per kilometre (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest observed cost per km: {vehicle}'**
+  String vehCompareWinnerCost(String vehicle);
+
+  /// Message shown instead of a winner when the comparison is withheld, naming the reason (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicle can be named here: {reason}'**
+  String vehCompareNoWinner(String reason);
+
+  /// Action opening the list of records a displayed figure was computed from (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Show the records'**
+  String get vehCompareSourcesAction;
+
+  /// Title of the sheet listing the fill-ups, tank windows and drives behind one comparison figure (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Records behind this figure'**
+  String get vehCompareSourcesTitle;
+
+  /// How many fill-ups back a displayed comparison figure (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No fill-up} =1{1 fill-up} other{{count} fill-ups}}'**
+  String vehCompareSourcesFills(int count);
+
+  /// How many closed tank windows back a displayed comparison figure (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No closed tank} =1{1 closed tank} other{{count} closed tanks}}'**
+  String vehCompareSourcesWindows(int count);
+
+  /// How many recorded drives back a displayed comparison figure (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No drive} =1{1 drive} other{{count} drives}}'**
+  String vehCompareSourcesTrips(int count);
+
+  /// Short value shown in place of a figure that has no comparable number at all — never a zero (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Not comparable'**
+  String get vehCompareUnavailableShort;
+
+  /// Badge marking a figure that is modelled rather than measured (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate'**
+  String get vehCompareEstimateBadge;
+
+  /// Screen-reader label identifying which vehicle a comparison column belongs to and its position (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{vehicle}, vehicle {index} of {total}'**
+  String vehCompareSemanticsColumn(String vehicle, int index, int total);
+
+  /// Screen-reader label for one figure, repeating its vehicle so a column is never mistaken for another (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value}, {vehicle}'**
+  String vehCompareSemanticsMetric(String label, String value, String vehicle);
+
+  /// Reason a comparison figure is unavailable: no records at all (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing on record for this figure.'**
+  String get vehCompareReasonNoEvidence;
+
+  /// Reason a comparison figure is unavailable: the sample is smaller than the metric's stated minimum (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Too few closed tanks to compare.'**
+  String get vehCompareReasonTooFewSamples;
+
+  /// Reason a comparison figure is unavailable: no closed tank covered any distance (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'No matched distance to divide by.'**
+  String get vehCompareReasonNoMatchedDistance;
+
+  /// Reason a comparison figure is unavailable: the amounts span several denominations (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Amounts in more than one currency, and no conversion was chosen.'**
+  String get vehCompareReasonMixedCurrencies;
+
+  /// Reason a comparison figure is unavailable: a fill-up recorded no currency and none may be assumed (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Some amounts have no recorded currency.'**
+  String get vehCompareReasonUnknownCurrency;
+
+  /// Reason a comparison figure is unavailable: a conversion was asked for and no rate exists (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'No exchange rate relates these currencies.'**
+  String get vehCompareReasonExchangeRateUnavailable;
+
+  /// Reason a comparison figure is unavailable: the only rate on record is out of date (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'The exchange rate is too old to decide this.'**
+  String get vehCompareReasonExchangeRateStale;
+
+  /// Reason a comparison figure is unavailable: litres cannot be compared with kilograms or kilowatt-hours (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'These quantities are measured in different units.'**
+  String get vehCompareReasonIncompatibleUnits;
+
+  /// Reason a comparison figure is unavailable: the vehicle's fuel is priced per kilogram or kilowatt-hour (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'This fuel is not sold by the litre, so there is no L/100 km figure.'**
+  String get vehCompareReasonUnsupportedUnit;
+
+  /// Reason a comparison figure is unavailable: the records could belong to more than one compared vehicle (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'These records cannot be attributed to exactly one vehicle.'**
+  String get vehCompareReasonAmbiguousAttribution;
+
+  /// Reason a comparison figure is unavailable: a partial sum would read as a cheaper vehicle (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Some fills in the counted tanks carry no price.'**
+  String get vehCompareReasonMissingPrices;
+
+  /// Reason a condition-adjusted efficiency figure is unavailable (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'No expected consumption is recorded, so nothing can be adjusted against it.'**
+  String get vehCompareReasonNoExpectedConsumption;
+
+  /// Reason a condition-adjusted comparison figure is unavailable: the confounders were only partly measured (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Not every driving condition was evaluated.'**
+  String get vehCompareReasonIncompleteConditionCoverage;
+
+  /// Caveat that travels with an observed consumption figure because conditions were not controlled (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Hills, cold and traffic are not accounted for.'**
+  String get vehCompareQualUncontrolledConditions;
+
+  /// Caveat stating which confounding conditions the app actually evaluates (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Only cold starts are recorded; gradient and stop-and-go are not.'**
+  String get vehCompareQualPartialConditionCoverage;
+
+  /// Caveat that travels with a comparison whose subjects have markedly different sample sizes (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'The vehicles rest on very different amounts of evidence.'**
+  String get vehCompareQualUnequalSampleSizes;
+
+  /// Caveat marking a figure that was computed from a model rather than observed (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Modelled, not measured.'**
+  String get vehCompareQualEstimatedBasis;
+
+  /// Caveat marking a measured figure whose newest evidence is old (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Measured, but too old to read as current.'**
+  String get vehCompareQualStaleBasis;
+
+  /// Caveat stating that measurements and estimates are never pooled into one observation (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Measured and modelled evidence both exist; they are reported apart.'**
+  String get vehCompareQualMixedProvenance;
+
+  /// Caveat marking a figure produced by an explicit currency conversion (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Converted at a named, dated rate — a valuation, not the amount paid.'**
+  String get vehCompareQualConvertedCurrency;
+
+  /// Caveat stating that the figure does not cover every record (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Some records were left out of this total.'**
+  String get vehCompareQualExcludedRecords;
+
+  /// Caveat stating that fills after the last full tank are excluded from the averages (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'The tank in progress is not counted.'**
+  String get vehCompareQualOpenWindowExcluded;
+
+  /// Caveat stating that a counted tank mixed fuel grades, so the burned share per grade is unknown (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'Part of the tank cannot be attributed to one grade.'**
+  String get vehCompareQualUnknownBlendShare;
+
+  /// Caveat marking the modelled consumed-fuel valuation apart from recorded purchase spend (#4365).
+  ///
+  /// In en, this message translates to:
+  /// **'A reconstructed valuation of the fuel burned, not money paid.'**
+  String get vehCompareQualReconstructedValuation;
+
   /// Switch label on the vehicle edit screen (combustion section) shown only for E10/E85 flex-fuel vehicles. Declares this car may be filled with more than one fuel type, enabling the per-fuel cost-per-km comparison (#2885).
   ///
   /// In en, this message translates to:
