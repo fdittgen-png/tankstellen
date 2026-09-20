@@ -5672,6 +5672,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Trop incertain pour être affiché';
 
   @override
+  String get fuelAndTankInsufficientConditionCoverage =>
+      'Pas encore corrigé des conditions : le dénivelé et la circulation ne sont pas relevés';
+
+  @override
+  String get fuelAndTankInsufficientMixedCurrencies =>
+      'Plusieurs devises — aucun chiffre unique';
+
+  @override
   String get fuelAndTankUncontrolled =>
       'Pas encore corrigé des conditions de conduite : dénivelé, démarrages à froid et circulation pèsent encore sur ces chiffres.';
 

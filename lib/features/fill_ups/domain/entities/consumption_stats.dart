@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../../core/domain/money_tally.dart';
 import '../../../../core/services/co2_calculator.dart';
 import 'fill_up.dart';
 
@@ -37,7 +38,14 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     /// about what actually came out of the pump, and are surfaced
     /// separately via [correctionLitersTotal].
     required double totalLiters,
-    required double totalSpent,
+
+    /// Σ recorded purchase spend over the non-correction fills — but
+    /// **null when the history spans more than one denomination**
+    /// (#4364). €30 + DKK 225 is not 255 of anything, and the active
+    /// country's symbol painted on that sum is the defect `FillUp`'s
+    /// own currency doc warns about. The per-denomination breakdown is
+    /// always in [spend]; an absent total is absent, never zero.
+    double? totalSpent,
     required double totalDistanceKm,
     @Default(0) double totalCo2Kg,
     double? avgConsumptionL100km,
@@ -68,7 +76,41 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     /// Sum of `liters` inside the in-progress window after the most
     /// recent plein-complet (#1362). 0 when [openWindowFillCount] is 0.
     @Default(0) double openWindowLiters,
+
+    /// Recorded purchase spend SEGREGATED by the currency each fill
+    /// recorded (#4364). `FillUp.currency` defines null as *unknown*, so
+    /// those amounts land in their own [kUnknownCurrency] bucket and are
+    /// never relabelled with today's country's currency.
+    @Default(MoneyTally.empty) MoneyTally spend,
+
+    /// The same segregation over the CLOSED plein-to-plein windows only
+    /// — the money [avgCostPerKm] may be derived from (#4364).
+    @Default(MoneyTally.empty) MoneyTally closedWindowSpend,
+
+    /// Non-correction fills with no recorded cost (#4364). A fill with
+    /// no price contributes its distance but no money, which shrinks a
+    /// €/km numerator while keeping the whole denominator — a cheaper
+    /// vehicle manufactured out of missing data. Non-zero therefore
+    /// withholds [avgCostPerKm].
+    @Default(0) int unpricedFillCount,
+
+    /// Of [unpricedFillCount], how many fell inside a closed window.
+    @Default(0) int unpricedClosedWindowFillCount,
+
+    /// Litres that DID carry a price — the matched denominator of
+    /// [avgPricePerLiter] (#4364).
+    @Default(0) double pricedLiters,
+
+    /// Closed plein-to-plein windows the averages rest on (#4364). The
+    /// sample size a comparison must show: four windows and one window
+    /// are not the same evidence.
+    @Default(0) int closedWindowCount,
   }) = _ConsumptionStats;
+
+  /// The one denomination every money figure here is in — an ISO code,
+  /// [kUnknownCurrency] when the fills recorded none, or null when the
+  /// history spans several (#4364). Never the active country's currency.
+  String? get spendCurrency => spend.soleCurrency;
 
   /// Empty stats for when there are no fill-ups.
   static const empty = ConsumptionStats(
@@ -112,10 +154,21 @@ abstract class ConsumptionStats with _$ConsumptionStats {
       0,
       (sum, f) => f.isCorrection ? sum : sum + f.liters,
     );
-    final totalSpent = sorted.fold<double>(
-      0,
-      (sum, f) => f.isCorrection ? sum : sum + f.totalCost,
-    );
+    // #4364 — spend is accumulated per DENOMINATION. A fill with no
+    // recorded cost is counted, not summed as a zero: its litres and
+    // its distance are real, its money is simply not known.
+    var spend = MoneyTally.empty;
+    var unpricedFillCount = 0;
+    var pricedLiters = 0.0;
+    for (final f in sorted) {
+      if (f.isCorrection) continue;
+      if (f.totalCost > 0) {
+        spend = spend.plus(f.totalCost, f.currency);
+        pricedLiters += f.liters;
+      } else {
+        unpricedFillCount += 1;
+      }
+    }
     final totalCo2 = Co2Calculator.cumulativeCo2(
       sorted.where((f) => !f.isCorrection).toList(growable: false),
     );
@@ -134,23 +187,28 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     // opening is the very first fill).
     var closedLitersSum = 0.0;
     var closedDistanceSum = 0.0;
-    var closedCostSum = 0.0;
+    var closedSpend = MoneyTally.empty;
+    var closedUnpricedFills = 0;
     var closedCorrectionLiters = 0.0;
     var windowsClosed = 0;
 
     var openingIndex = 0;
     var pendingLiters = 0.0;
-    var pendingCost = 0.0;
+    final pendingCost = <(double, String?)>[];
+    var pendingUnpriced = 0;
     var pendingCorrectionLiters = 0.0;
     var pendingFillCount = 0; // fills strictly after the opening
 
     for (var i = 1; i < sorted.length; i++) {
       final fill = sorted[i];
       pendingLiters += fill.liters;
-      pendingCost += fill.totalCost;
       pendingFillCount += 1;
       if (fill.isCorrection) {
         pendingCorrectionLiters += fill.liters;
+      } else if (fill.totalCost > 0) {
+        pendingCost.add((fill.totalCost, fill.currency));
+      } else {
+        pendingUnpriced += 1;
       }
       if (fill.isFullTank) {
         // Window closes here.
@@ -159,13 +217,17 @@ abstract class ConsumptionStats with _$ConsumptionStats {
             .toDouble();
         closedLitersSum += pendingLiters;
         closedDistanceSum += dist;
-        closedCostSum += pendingCost;
+        for (final (amount, currency) in pendingCost) {
+          closedSpend = closedSpend.plus(amount, currency);
+        }
+        closedUnpricedFills += pendingUnpriced;
         closedCorrectionLiters += pendingCorrectionLiters;
         windowsClosed += 1;
 
         openingIndex = i;
         pendingLiters = 0;
-        pendingCost = 0;
+        pendingCost.clear();
+        pendingUnpriced = 0;
         pendingCorrectionLiters = 0;
         pendingFillCount = 0;
       }
@@ -183,7 +245,20 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     double? avgCo2Km;
     if (closedDistanceSum > 0) {
       avgL100 = (closedLitersSum / closedDistanceSum) * 100;
-      avgCostKm = closedCostSum / closedDistanceSum;
+      // #4364 — a €/km needs a numerator and a denominator that speak
+      // for the SAME thing. Two denominations cannot be summed at all,
+      // and an unpriced fill inside the window keeps its distance while
+      // contributing no money: dividing anyway invents a cheaper tank.
+      // Both cases withhold the figure rather than understate it.
+      // The whole history must be one denomination, not just the closed
+      // windows: nothing downstream carries a currency beside the number,
+      // so a DKK figure would be painted with the active country's symbol.
+      final closedAmount = closedSpend.soleAmount;
+      if (closedAmount != null &&
+          closedUnpricedFills == 0 &&
+          spend.isSingleDenomination) {
+        avgCostKm = closedAmount / closedDistanceSum;
+      }
     }
     // CO2/km mirrors the per-window walker: we re-derive from the same
     // closed liters by mapping fuel-type emission factors. To keep the
@@ -197,7 +272,12 @@ abstract class ConsumptionStats with _$ConsumptionStats {
       }
     }
 
-    final avgPriceLiter = totalLiters > 0 ? totalSpent / totalLiters : null;
+    // Price per litre matches its own numerator: only the litres that
+    // carried a price, and only when they are all one denomination.
+    final spendAmount = spend.soleAmount;
+    final avgPriceLiter = pricedLiters > 0 && spendAmount != null
+        ? spendAmount / pricedLiters
+        : null;
 
     // #2446 — share denominator is pumped + corrections (NOT the
     // correction-excluded headline [totalLiters]), so the "% of fuel
@@ -212,6 +292,7 @@ abstract class ConsumptionStats with _$ConsumptionStats {
       '[stats] windows=$windowsClosed '
       'closed_liters=${closedLitersSum.toStringAsFixed(2)} '
       'closed_dist=${closedDistanceSum.toStringAsFixed(2)} '
+      'currencies=${closedSpend.currencies.join(",")} '
       'corrections=${closedCorrectionLiters.toStringAsFixed(2)} '
       'open_partials=$openWindowFillCount',
     );
@@ -219,7 +300,7 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     return ConsumptionStats(
       fillUpCount: sorted.length,
       totalLiters: totalLiters,
-      totalSpent: totalSpent,
+      totalSpent: spendAmount,
       totalDistanceKm: totalDistance,
       totalCo2Kg: totalCo2,
       avgConsumptionL100km: avgL100,
@@ -232,6 +313,12 @@ abstract class ConsumptionStats with _$ConsumptionStats {
       correctionShare: correctionShare,
       openWindowFillCount: openWindowFillCount,
       openWindowLiters: openWindowLiters,
+      spend: spend,
+      closedWindowSpend: closedSpend,
+      unpricedFillCount: unpricedFillCount,
+      unpricedClosedWindowFillCount: closedUnpricedFills,
+      pricedLiters: pricedLiters,
+      closedWindowCount: windowsClosed,
     );
   }
 

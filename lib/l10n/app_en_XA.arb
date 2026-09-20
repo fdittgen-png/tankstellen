@@ -1572,6 +1572,8 @@
   "fuelAndTankInsufficientNoCo2eFactor": "⟦Ñó ÇÓ2é ƒáçŧóř óñ řéçóřđ ƒóř ŧĥîš ƒúéł ··············⟧",
   "fuelAndTankInsufficientContextNotPure": "⟦Ñóŧ áṽáîłáƀłé ƒóř á ɱîẋéđ ŧáñķ ···········⟧",
   "fuelAndTankInsufficientTooUncertain": "⟦Ŧóó úñçéřŧáîñ ŧó šĥóŵ ········⟧",
+  "fuelAndTankInsufficientConditionCoverage": "⟦Çáñ'ŧ ƀé áđĵúšŧéđ ƒóř çóñđîŧîóñš ýéŧ — ĥîłłš áñđ ŧřáƒƒîç ářéñ'ŧ řéçóřđéđ ··························⟧",
+  "fuelAndTankInsufficientMixedCurrencies": "⟦Šéṽéřáł çúřřéñçîéš — ñó šîñǧłé ƒîǧúřé ··············⟧",
   "fuelAndTankUncontrolled": "⟦Ñóŧ áđĵúšŧéđ ƒóř đřîṽîñǧ çóñđîŧîóñš ýéŧ — ĥîłłš, çółđ šŧářŧš áñđ ŧřáƒƒîç ářé šŧîłł îñ ŧĥéšé ƒîǧúřéš. ····································⟧",
   "fuelAndTankBasisReferenceWindows": "⟦Ƒřóɱ ƒúłł-ŧáñķ ŧó ƒúłł-ŧáñķ ƒîłł-úƥš ·············⟧",
   "fuelAndTankBasisMeasuredTrips": "⟦Ƒřóɱ éñǧîñé řéáđîñǧš óñ ýóúř ŧřîƥš ·············⟧",

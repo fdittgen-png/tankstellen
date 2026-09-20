@@ -20,6 +20,10 @@ part of 'trip_history_provider.dart';
 /// A null [vehicleId] keeps every trip: the tab must not go silently
 /// empty just because the profile selector has never been used (#889).
 ///
+/// **Not for comparisons** (#4364): an unassigned trip matches EVERY
+/// vehicle here, which is right for a browser and wrong the moment two
+/// vehicles are totalled side by side. Use [tripsAttributedToVehicle].
+///
 /// The sort is defensive. `TripHistoryRepository.loadAll` already
 /// returns newest-first, but the list may be populated by another path
 /// (tests, a future sync source), so the ordering contract lives here
@@ -37,6 +41,10 @@ final tripsForVehicleProvider = TripsForVehicleFamily._();
 ///
 /// A null [vehicleId] keeps every trip: the tab must not go silently
 /// empty just because the profile selector has never been used (#889).
+///
+/// **Not for comparisons** (#4364): an unassigned trip matches EVERY
+/// vehicle here, which is right for a browser and wrong the moment two
+/// vehicles are totalled side by side. Use [tripsAttributedToVehicle].
 ///
 /// The sort is defensive. `TripHistoryRepository.loadAll` already
 /// returns newest-first, but the list may be populated by another path
@@ -60,6 +68,10 @@ final class TripsForVehicleProvider
   ///
   /// A null [vehicleId] keeps every trip: the tab must not go silently
   /// empty just because the profile selector has never been used (#889).
+  ///
+  /// **Not for comparisons** (#4364): an unassigned trip matches EVERY
+  /// vehicle here, which is right for a browser and wrong the moment two
+  /// vehicles are totalled side by side. Use [tripsAttributedToVehicle].
   ///
   /// The sort is defensive. `TripHistoryRepository.loadAll` already
   /// returns newest-first, but the list may be populated by another path
@@ -129,6 +141,10 @@ String _$tripsForVehicleHash() => r'63ea5669a615b09be83769735e1147033f94fbf1';
 /// A null [vehicleId] keeps every trip: the tab must not go silently
 /// empty just because the profile selector has never been used (#889).
 ///
+/// **Not for comparisons** (#4364): an unassigned trip matches EVERY
+/// vehicle here, which is right for a browser and wrong the moment two
+/// vehicles are totalled side by side. Use [tripsAttributedToVehicle].
+///
 /// The sort is defensive. `TripHistoryRepository.loadAll` already
 /// returns newest-first, but the list may be populated by another path
 /// (tests, a future sync source), so the ordering contract lives here
@@ -155,6 +171,10 @@ final class TripsForVehicleFamily extends $Family
   /// A null [vehicleId] keeps every trip: the tab must not go silently
   /// empty just because the profile selector has never been used (#889).
   ///
+  /// **Not for comparisons** (#4364): an unassigned trip matches EVERY
+  /// vehicle here, which is right for a browser and wrong the moment two
+  /// vehicles are totalled side by side. Use [tripsAttributedToVehicle].
+  ///
   /// The sort is defensive. `TripHistoryRepository.loadAll` already
   /// returns newest-first, but the list may be populated by another path
   /// (tests, a future sync source), so the ordering contract lives here
@@ -166,6 +186,179 @@ final class TripsForVehicleFamily extends $Family
   @override
   String toString() => r'tripsForVehicleProvider';
 }
+
+/// Trips STRICTLY attributed to [vehicleId], newest first (#4364).
+///
+/// Never includes an unassigned trip. Consumers that need to tell the
+/// driver why a total looks short read [unattributedTripCountProvider] —
+/// the excluded records are reported, not hidden.
+
+@ProviderFor(tripsAttributedToVehicle)
+final tripsAttributedToVehicleProvider = TripsAttributedToVehicleFamily._();
+
+/// Trips STRICTLY attributed to [vehicleId], newest first (#4364).
+///
+/// Never includes an unassigned trip. Consumers that need to tell the
+/// driver why a total looks short read [unattributedTripCountProvider] —
+/// the excluded records are reported, not hidden.
+
+final class TripsAttributedToVehicleProvider
+    extends
+        $FunctionalProvider<
+          List<TripHistoryEntry>,
+          List<TripHistoryEntry>,
+          List<TripHistoryEntry>
+        >
+    with $Provider<List<TripHistoryEntry>> {
+  /// Trips STRICTLY attributed to [vehicleId], newest first (#4364).
+  ///
+  /// Never includes an unassigned trip. Consumers that need to tell the
+  /// driver why a total looks short read [unattributedTripCountProvider] —
+  /// the excluded records are reported, not hidden.
+  TripsAttributedToVehicleProvider._({
+    required TripsAttributedToVehicleFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'tripsAttributedToVehicleProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$tripsAttributedToVehicleHash();
+
+  @override
+  String toString() {
+    return r'tripsAttributedToVehicleProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<List<TripHistoryEntry>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  List<TripHistoryEntry> create(Ref ref) {
+    final argument = this.argument as String;
+    return tripsAttributedToVehicle(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<TripHistoryEntry> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<TripHistoryEntry>>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TripsAttributedToVehicleProvider &&
+        other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$tripsAttributedToVehicleHash() =>
+    r'342a7862120e052558481797babbf5a09ff45667';
+
+/// Trips STRICTLY attributed to [vehicleId], newest first (#4364).
+///
+/// Never includes an unassigned trip. Consumers that need to tell the
+/// driver why a total looks short read [unattributedTripCountProvider] —
+/// the excluded records are reported, not hidden.
+
+final class TripsAttributedToVehicleFamily extends $Family
+    with $FunctionalFamilyOverride<List<TripHistoryEntry>, String> {
+  TripsAttributedToVehicleFamily._()
+    : super(
+        retry: null,
+        name: r'tripsAttributedToVehicleProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// Trips STRICTLY attributed to [vehicleId], newest first (#4364).
+  ///
+  /// Never includes an unassigned trip. Consumers that need to tell the
+  /// driver why a total looks short read [unattributedTripCountProvider] —
+  /// the excluded records are reported, not hidden.
+
+  TripsAttributedToVehicleProvider call(String vehicleId) =>
+      TripsAttributedToVehicleProvider._(argument: vehicleId, from: this);
+
+  @override
+  String toString() => r'tripsAttributedToVehicleProvider';
+}
+
+/// How many recorded trips carry no vehicle at all (#4364).
+///
+/// Reported once, beside a multi-vehicle comparison, instead of being
+/// silently credited to every vehicle. Assigning such a trip moves it
+/// into exactly one vehicle's totals and leaves the others untouched.
+
+@ProviderFor(unattributedTripCount)
+final unattributedTripCountProvider = UnattributedTripCountProvider._();
+
+/// How many recorded trips carry no vehicle at all (#4364).
+///
+/// Reported once, beside a multi-vehicle comparison, instead of being
+/// silently credited to every vehicle. Assigning such a trip moves it
+/// into exactly one vehicle's totals and leaves the others untouched.
+
+final class UnattributedTripCountProvider
+    extends $FunctionalProvider<int, int, int>
+    with $Provider<int> {
+  /// How many recorded trips carry no vehicle at all (#4364).
+  ///
+  /// Reported once, beside a multi-vehicle comparison, instead of being
+  /// silently credited to every vehicle. Assigning such a trip moves it
+  /// into exactly one vehicle's totals and leaves the others untouched.
+  UnattributedTripCountProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'unattributedTripCountProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$unattributedTripCountHash();
+
+  @$internal
+  @override
+  $ProviderElement<int> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  int create(Ref ref) {
+    return unattributedTripCount(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int>(value),
+    );
+  }
+}
+
+String _$unattributedTripCountHash() =>
+    r'b5f591f39b514457db779a106327d0d046428e46';
 
 /// App-wide access to the [TripHistoryRepository] (#726).
 ///

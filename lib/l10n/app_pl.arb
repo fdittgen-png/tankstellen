@@ -9172,5 +9172,15 @@
   "@featureGroupDescription_fleet": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientConditionCoverage": "Can't be adjusted for conditions yet — hills and traffic aren't recorded",
+  "@fuelAndTankInsufficientConditionCoverage": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientMixedCurrencies": "Several currencies — no single figure",
+  "@fuelAndTankInsufficientMixedCurrencies": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

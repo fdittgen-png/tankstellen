@@ -94,12 +94,17 @@ class _MonthlyFuelChartsState extends State<MonthlyFuelCharts> {
         ? _Metric.litres
         : _metric;
 
-    final rows = metric == _Metric.consumption ? consumptionRows : months;
+    // #4364 — a month the selected metric has no value for is left out,
+    // never plotted as zero.
+    final rows = [
+      for (final m in months)
+        if (_valueOf(metric, m) != null) m,
+    ];
     final summaries = [
       for (final m in rows)
         MonthlySummary(
           month: m.month,
-          totalCost: _valueOf(metric, m),
+          totalCost: _valueOf(metric, m)!,
           totalLiters: m.stats.totalLiters,
           totalCo2Kg: 0,
           fillUpCount: m.stats.fillUpCount,
@@ -177,11 +182,16 @@ class _MonthlyFuelChartsState extends State<MonthlyFuelCharts> {
         '${_unitOf(metric, l)}';
   }
 
-  double _valueOf(_Metric m, MonthlyFuelStats s) => switch (m) {
+  /// The month's value for [m], or null when the month has none (#4364).
+  ///
+  /// Null is plotted as an ABSENT month, not as zero: a month whose
+  /// spend spans two currencies has no single total, and a zero bar
+  /// would read as "spent nothing".
+  double? _valueOf(_Metric m, MonthlyFuelStats s) => switch (m) {
         _Metric.litres => s.stats.totalLiters,
         _Metric.spend => s.stats.totalSpent,
-        _Metric.pricePerLitre => s.stats.avgPricePerLiter ?? 0,
-        _Metric.consumption => s.stats.avgConsumptionL100km ?? 0,
+        _Metric.pricePerLitre => s.stats.avgPricePerLiter,
+        _Metric.consumption => s.stats.avgConsumptionL100km,
       };
 
   Color _colorOf(_Metric m, ThemeData t) => switch (m) {

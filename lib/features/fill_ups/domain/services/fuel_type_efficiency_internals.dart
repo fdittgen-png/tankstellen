@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: MIT
 
 import '../../../../core/domain/fuel/fuel_grade.dart';
+import '../../../../core/domain/fuel/fuel_quantity_unit.dart';
 import '../../../../core/domain/fuel/tank_blend_snapshot.dart';
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/money_tally.dart';
 import '../entities/fill_up.dart';
 import '../entities/fuel_type_efficiency_stats.dart';
 import 'fuel_type_efficiency_aggregator.dart' show kMaxMinorityShareForPure;
@@ -14,14 +16,64 @@ import 'fuel_type_efficiency_aggregator.dart' show kMaxMinorityShareForPure;
 // holders the interval walker accumulates into. Nothing here is part of
 // the feature's public contract — `fill_ups/api.dart` does not export it.
 
-/// Volume-weighted price per litre for each fuel, over every real fill of
-/// that fuel (#3846).
+/// The per-fuel pricing evidence of ONE denomination (#3846, #4364).
+///
+/// [pricePerLitre] is empty — never guessed — whenever the supplied fills
+/// span more than one currency ([mixedCurrencies]): a volume-weighted
+/// mean over EUR and DKK receipts is a number that is true in neither.
+class FuelPriceTable {
+  const FuelPriceTable({
+    required this.pricePerLitre,
+    required this.spend,
+    required this.unpricedFillCount,
+  });
+
+  /// Volume-weighted price per `FuelType.apiValue`, in [currency].
+  final Map<String, double> pricePerLitre;
+
+  /// The priced fills' money, segregated by the currency each recorded.
+  final MoneyTally spend;
+
+  /// Non-correction fills that carried no cost at all.
+  final int unpricedFillCount;
+
+  /// The one denomination the table is expressed in, or null when the
+  /// fills were empty or spanned several.
+  String? get currency => spend.soleCurrency;
+
+  bool get mixedCurrencies => !spend.isSingleDenomination;
+}
+
+/// Volume-weighted price per litre for each fuel, over the supplied real
+/// fills of that fuel (#3846) — one denomination only (#4364).
 ///
 /// Weighted by volume rather than a plain mean so a 40 L fill counts more
 /// than a 5 L top-up. Corrections are excluded (no litres, no money) and so
 /// are fills with no recorded cost — a zero-cost fill would drag the average
-/// toward zero and quietly make a fuel look free.
-Map<String, double> weightedPricePerLitre(List<FillUp> sorted) {
+/// toward zero and quietly make a fuel look free; those are COUNTED instead
+/// ([FuelPriceTable.unpricedFillCount]) so the caller can withhold the money
+/// rather than understate it.
+///
+/// The caller decides which fills to pass. `FuelTypeEfficiencyAggregator`
+/// passes only the fills up to and including the last CLOSING plein, so a
+/// purchase logged after every counted window cannot reprice an earlier
+/// period (#4364).
+FuelPriceTable weightedPricePerLitre(List<FillUp> sorted) {
+  var spend = MoneyTally.empty;
+  var unpriced = 0;
+  for (final f in sorted) {
+    if (f.isCorrection) continue;
+    if (f.totalCost <= 0) {
+      unpriced += 1;
+      continue;
+    }
+    if (f.liters <= 0) continue;
+    spend = spend.plus(f.totalCost, f.currency);
+  }
+  if (!spend.isSingleDenomination) {
+    return FuelPriceTable(
+        pricePerLitre: const {}, spend: spend, unpricedFillCount: unpriced);
+  }
   final litres = <String, double>{};
   final cost = <String, double>{};
   for (final f in sorted) {
@@ -31,10 +83,14 @@ Map<String, double> weightedPricePerLitre(List<FillUp> sorted) {
     litres.update(key, (v) => v + f.liters, ifAbsent: () => f.liters);
     cost.update(key, (v) => v + f.totalCost, ifAbsent: () => f.totalCost);
   }
-  return {
-    for (final key in litres.keys)
-      if (litres[key]! > 0) key: cost[key]! / litres[key]!,
-  };
+  return FuelPriceTable(
+    pricePerLitre: {
+      for (final key in litres.keys)
+        if (litres[key]! > 0) key: cost[key]! / litres[key]!,
+    },
+    spend: spend,
+    unpricedFillCount: unpriced,
+  );
 }
 
 /// An interval's carried-over opening tank content (v3, #3764): litres per
@@ -158,17 +214,44 @@ class BucketAcc {
   int attributedIntervalCount = 0;
   int legacyAttributedIntervalCount = 0;
 
-  // Per-fill facts folded from this bucket's intervals.
-  double totalSpent = 0;
+  // Per-fill facts folded from this bucket's intervals (#4364): what the
+  // pump ACTUALLY charged, segregated by denomination, beside the count
+  // of fills that recorded no price at all.
+  MoneyTally recordedSpend = MoneyTally.empty;
+  int unpricedFillCount = 0;
   int fillCount = 0;
 
+  /// False once an interval was folded in whose pricing table spanned
+  /// more than one currency — no money figure may be derived then.
+  bool pricingDenominable = true;
+
   FuelTypeEfficiencyStats toStats() {
+    final unit = commonFuelQuantityUnit([
+          FuelQuantityUnit.fromPriceUnit(bucket.dominant.unit),
+          if (bucket.secondary case final s?)
+            FuelQuantityUnit.fromPriceUnit(s.unit),
+        ]) ??
+        FuelQuantityUnit.unknown;
     final hasDistance = attributedIntervalCount > 0 && intervalDistance > 0;
+    // #4364 — money is only a number when it is one denomination AND
+    // every contributing fill carried a price. Otherwise it is absent,
+    // not zero: a partial numerator over a whole denominator is how a
+    // fuel is made to look cheap.
+    final denominable = pricingDenominable &&
+        recordedSpend.isSingleDenomination &&
+        unpricedFillCount == 0;
+    final cost = denominable ? intervalCost : null;
     return FuelTypeEfficiencyStats(
       bucket: bucket,
-      avgL100km: hasDistance ? (intervalLitres / intervalDistance) * 100 : null,
-      avgCostPerKm: hasDistance ? intervalCost / intervalDistance : null,
-      totalSpent: totalSpent,
+      avgL100km: hasDistance && unit.isLitreBased
+          ? (intervalLitres / intervalDistance) * 100
+          : null,
+      avgCostPerKm:
+          hasDistance && cost != null ? cost / intervalDistance : null,
+      recordedPurchaseSpend: denominable ? recordedSpend.soleAmount : null,
+      recordedSpend: recordedSpend,
+      unpricedFillCount: unpricedFillCount,
+      quantityUnit: unit,
       fillCount: fillCount,
       attributedIntervalCount: attributedIntervalCount,
       legacyAttributedIntervalCount: legacyAttributedIntervalCount,
@@ -177,7 +260,7 @@ class BucketAcc {
       // distance driven instead of only the two derived averages.
       totalLitres: intervalLitres,
       totalDistanceKm: intervalDistance,
-      intervalCost: intervalCost,
+      intervalCost: cost,
     );
   }
 }

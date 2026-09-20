@@ -45,6 +45,8 @@
   "fuelAndTankInsufficientNoCo2eFactor": "Aucun facteur CO2e enregistré pour ce carburant",
   "fuelAndTankInsufficientContextNotPure": "Indisponible pour un réservoir mélangé",
   "fuelAndTankInsufficientTooUncertain": "Trop incertain pour être affiché",
+  "fuelAndTankInsufficientConditionCoverage": "Pas encore corrigé des conditions : le dénivelé et la circulation ne sont pas relevés",
+  "fuelAndTankInsufficientMixedCurrencies": "Plusieurs devises — aucun chiffre unique",
   "fuelAndTankUncontrolled": "Pas encore corrigé des conditions de conduite : dénivelé, démarrages à froid et circulation pèsent encore sur ces chiffres.",
   "fuelAndTankBasisReferenceWindows": "D'après vos pleins complets successifs",
   "fuelAndTankBasisMeasuredTrips": "D'après les données moteur de vos trajets",

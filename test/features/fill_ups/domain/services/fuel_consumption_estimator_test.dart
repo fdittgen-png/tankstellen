@@ -54,7 +54,7 @@ FuelTypeEfficiencyStats _pure(
   bucket: FuelEfficiencyBucket(dominant: fuel),
   avgL100km: l100,
   avgCostPerKm: 0.1,
-  totalSpent: 100,
+  recordedPurchaseSpend: 100,
   fillCount: intervals,
   attributedIntervalCount: intervals,
   totalLitres: litres,
@@ -248,7 +248,7 @@ void main() {
         ),
         avgL100km: 7.0,
         avgCostPerKm: 0.1,
-        totalSpent: 100,
+        recordedPurchaseSpend: 100,
         fillCount: 4,
         attributedIntervalCount: 4,
       );

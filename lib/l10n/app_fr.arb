@@ -6945,5 +6945,13 @@
   "featureGroupDescription_fleet": "Véhicules de société, affectations et rapports pour les gestionnaires.",
   "@featureGroupDescription_fleet": {
     "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientConditionCoverage": "Pas encore corrigé des conditions : le dénivelé et la circulation ne sont pas relevés",
+  "@fuelAndTankInsufficientConditionCoverage": {
+    "description": "MT — needs native review"
+  },
+  "fuelAndTankInsufficientMixedCurrencies": "Plusieurs devises — aucun chiffre unique",
+  "@fuelAndTankInsufficientMixedCurrencies": {
+    "description": "MT — needs native review"
   }
 }

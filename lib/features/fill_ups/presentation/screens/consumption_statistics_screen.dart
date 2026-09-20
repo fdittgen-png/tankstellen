@@ -214,7 +214,11 @@ class _HeaderTiles extends StatelessWidget {
       _TileData(
         icon: Icons.payments_outlined,
         label: l.statTotalSpent,
-        value: PriceFormatter.formatTotal(stats.totalSpent),
+        // #4364 — no single total exists across two currencies; the
+        // per-currency breakdown lives on `stats.spend`.
+        value: stats.totalSpent != null
+            ? PriceFormatter.formatTotal(stats.totalSpent!)
+            : '—',
         accent: scheme.tertiary,
       ),
       _TileData(

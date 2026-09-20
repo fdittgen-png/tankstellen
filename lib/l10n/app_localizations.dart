@@ -9619,6 +9619,18 @@ abstract class AppLocalizations {
   /// **'Too uncertain to show'**
   String get fuelAndTankInsufficientTooUncertain;
 
+  /// Why a condition-adjusted figure is missing: not every confounding condition was evaluated over enough distance (#4364).
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t be adjusted for conditions yet — hills and traffic aren\'t recorded'**
+  String get fuelAndTankInsufficientConditionCoverage;
+
+  /// Why a money figure is missing: the fill-ups behind it were paid in more than one currency (#4364).
+  ///
+  /// In en, this message translates to:
+  /// **'Several currencies — no single figure'**
+  String get fuelAndTankInsufficientMixedCurrencies;
+
   /// Disclosure when a figure is not condition-controlled (#4278).
   ///
   /// In en, this message translates to:

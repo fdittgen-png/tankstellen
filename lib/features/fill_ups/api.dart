@@ -27,6 +27,9 @@ export 'domain/fuel_energy_content.dart';
 export 'domain/services/fill_up_vehicle_scope.dart';
 export 'domain/services/fuel_consumption_estimator.dart';
 export 'domain/services/monthly_insights_aggregator.dart';
+// #4364 — the shared historical-comparison contract #4365/#4366/#4367
+// and the fleet comparison (#4214) consume.
+export 'domain/services/vehicle_cost_comparison.dart';
 export 'presentation/screens/add_fill_up_screen.dart';
 export 'presentation/screens/consumption_statistics_screen.dart';
 export 'presentation/screens/fuel_and_tank_screen.dart';

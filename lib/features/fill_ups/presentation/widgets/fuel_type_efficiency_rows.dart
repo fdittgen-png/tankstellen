@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: MIT
 
-
 part of 'fuel_type_efficiency_card.dart';
 
 /// One composition bucket's row: dominant-fuel icon + the language-neutral
@@ -286,10 +285,11 @@ class _SupportingFigures extends StatelessWidget {
           label: l.fuelCompareCostPer100km,
           value: PriceFormatter.formatTotal(stats.avgCostPer100km!),
         ),
-      _FigureChip(
-        label: l.fuelEfficiencyColTotalSpent,
-        value: PriceFormatter.formatTotal(stats.totalSpent),
-      ),
+      // #4364 — the pump's charge, never a modelled burned-fuel value.
+      if (stats.recordedPurchaseSpend case final double spent)
+        _FigureChip(
+            label: l.fuelEfficiencyColTotalSpent,
+            value: PriceFormatter.formatTotal(spent)),
       if (stats.totalDistanceKm > 0)
         _FigureChip(
           key: ValueKey('fuel_efficiency_distance_${stats.bucket.key}'),

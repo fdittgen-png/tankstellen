@@ -19,7 +19,13 @@ mixin _$ConsumptionStats implements DiagnosticableTreeMixin {
 /// user sees: correction entries are excluded so it stays honest
 /// about what actually came out of the pump, and are surfaced
 /// separately via [correctionLitersTotal].
- double get totalLiters; double get totalSpent; double get totalDistanceKm; double get totalCo2Kg; double? get avgConsumptionL100km; double? get avgCostPerKm; double? get avgPricePerLiter; double? get avgCo2PerKm; DateTime? get periodStart; DateTime? get periodEnd;/// Sum of `liters` from `isCorrection: true` fill-ups inside CLOSED
+ double get totalLiters;/// Σ recorded purchase spend over the non-correction fills — but
+/// **null when the history spans more than one denomination**
+/// (#4364). €30 + DKK 225 is not 255 of anything, and the active
+/// country's symbol painted on that sum is the defect `FillUp`'s
+/// own currency doc warns about. The per-denomination breakdown is
+/// always in [spend]; an absent total is absent, never zero.
+ double? get totalSpent; double get totalDistanceKm; double get totalCo2Kg; double? get avgConsumptionL100km; double? get avgCostPerKm; double? get avgPricePerLiter; double? get avgCo2PerKm; DateTime? get periodStart; DateTime? get periodEnd;/// Sum of `liters` from `isCorrection: true` fill-ups inside CLOSED
 /// plein-to-plein windows (#1362). Always 0 when no corrections
 /// landed in a closed window.
  double get correctionLitersTotal;/// Fraction of pumped-plus-correction litres that came from
@@ -33,7 +39,24 @@ mixin _$ConsumptionStats implements DiagnosticableTreeMixin {
 /// itself a plein-complet (no open window).
  int get openWindowFillCount;/// Sum of `liters` inside the in-progress window after the most
 /// recent plein-complet (#1362). 0 when [openWindowFillCount] is 0.
- double get openWindowLiters;
+ double get openWindowLiters;/// Recorded purchase spend SEGREGATED by the currency each fill
+/// recorded (#4364). `FillUp.currency` defines null as *unknown*, so
+/// those amounts land in their own [kUnknownCurrency] bucket and are
+/// never relabelled with today's country's currency.
+ MoneyTally get spend;/// The same segregation over the CLOSED plein-to-plein windows only
+/// — the money [avgCostPerKm] may be derived from (#4364).
+ MoneyTally get closedWindowSpend;/// Non-correction fills with no recorded cost (#4364). A fill with
+/// no price contributes its distance but no money, which shrinks a
+/// €/km numerator while keeping the whole denominator — a cheaper
+/// vehicle manufactured out of missing data. Non-zero therefore
+/// withholds [avgCostPerKm].
+ int get unpricedFillCount;/// Of [unpricedFillCount], how many fell inside a closed window.
+ int get unpricedClosedWindowFillCount;/// Litres that DID carry a price — the matched denominator of
+/// [avgPricePerLiter] (#4364).
+ double get pricedLiters;/// Closed plein-to-plein windows the averages rest on (#4364). The
+/// sample size a comparison must show: four windows and one window
+/// are not the same evidence.
+ int get closedWindowCount;
 /// Create a copy of ConsumptionStats
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,21 +68,21 @@ $ConsumptionStatsCopyWith<ConsumptionStats> get copyWith => _$ConsumptionStatsCo
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'ConsumptionStats'))
-    ..add(DiagnosticsProperty('fillUpCount', fillUpCount))..add(DiagnosticsProperty('totalLiters', totalLiters))..add(DiagnosticsProperty('totalSpent', totalSpent))..add(DiagnosticsProperty('totalDistanceKm', totalDistanceKm))..add(DiagnosticsProperty('totalCo2Kg', totalCo2Kg))..add(DiagnosticsProperty('avgConsumptionL100km', avgConsumptionL100km))..add(DiagnosticsProperty('avgCostPerKm', avgCostPerKm))..add(DiagnosticsProperty('avgPricePerLiter', avgPricePerLiter))..add(DiagnosticsProperty('avgCo2PerKm', avgCo2PerKm))..add(DiagnosticsProperty('periodStart', periodStart))..add(DiagnosticsProperty('periodEnd', periodEnd))..add(DiagnosticsProperty('correctionLitersTotal', correctionLitersTotal))..add(DiagnosticsProperty('correctionShare', correctionShare))..add(DiagnosticsProperty('openWindowFillCount', openWindowFillCount))..add(DiagnosticsProperty('openWindowLiters', openWindowLiters));
+    ..add(DiagnosticsProperty('fillUpCount', fillUpCount))..add(DiagnosticsProperty('totalLiters', totalLiters))..add(DiagnosticsProperty('totalSpent', totalSpent))..add(DiagnosticsProperty('totalDistanceKm', totalDistanceKm))..add(DiagnosticsProperty('totalCo2Kg', totalCo2Kg))..add(DiagnosticsProperty('avgConsumptionL100km', avgConsumptionL100km))..add(DiagnosticsProperty('avgCostPerKm', avgCostPerKm))..add(DiagnosticsProperty('avgPricePerLiter', avgPricePerLiter))..add(DiagnosticsProperty('avgCo2PerKm', avgCo2PerKm))..add(DiagnosticsProperty('periodStart', periodStart))..add(DiagnosticsProperty('periodEnd', periodEnd))..add(DiagnosticsProperty('correctionLitersTotal', correctionLitersTotal))..add(DiagnosticsProperty('correctionShare', correctionShare))..add(DiagnosticsProperty('openWindowFillCount', openWindowFillCount))..add(DiagnosticsProperty('openWindowLiters', openWindowLiters))..add(DiagnosticsProperty('spend', spend))..add(DiagnosticsProperty('closedWindowSpend', closedWindowSpend))..add(DiagnosticsProperty('unpricedFillCount', unpricedFillCount))..add(DiagnosticsProperty('unpricedClosedWindowFillCount', unpricedClosedWindowFillCount))..add(DiagnosticsProperty('pricedLiters', pricedLiters))..add(DiagnosticsProperty('closedWindowCount', closedWindowCount));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConsumptionStats&&(identical(other.fillUpCount, fillUpCount) || other.fillUpCount == fillUpCount)&&(identical(other.totalLiters, totalLiters) || other.totalLiters == totalLiters)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.totalDistanceKm, totalDistanceKm) || other.totalDistanceKm == totalDistanceKm)&&(identical(other.totalCo2Kg, totalCo2Kg) || other.totalCo2Kg == totalCo2Kg)&&(identical(other.avgConsumptionL100km, avgConsumptionL100km) || other.avgConsumptionL100km == avgConsumptionL100km)&&(identical(other.avgCostPerKm, avgCostPerKm) || other.avgCostPerKm == avgCostPerKm)&&(identical(other.avgPricePerLiter, avgPricePerLiter) || other.avgPricePerLiter == avgPricePerLiter)&&(identical(other.avgCo2PerKm, avgCo2PerKm) || other.avgCo2PerKm == avgCo2PerKm)&&(identical(other.periodStart, periodStart) || other.periodStart == periodStart)&&(identical(other.periodEnd, periodEnd) || other.periodEnd == periodEnd)&&(identical(other.correctionLitersTotal, correctionLitersTotal) || other.correctionLitersTotal == correctionLitersTotal)&&(identical(other.correctionShare, correctionShare) || other.correctionShare == correctionShare)&&(identical(other.openWindowFillCount, openWindowFillCount) || other.openWindowFillCount == openWindowFillCount)&&(identical(other.openWindowLiters, openWindowLiters) || other.openWindowLiters == openWindowLiters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ConsumptionStats&&(identical(other.fillUpCount, fillUpCount) || other.fillUpCount == fillUpCount)&&(identical(other.totalLiters, totalLiters) || other.totalLiters == totalLiters)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.totalDistanceKm, totalDistanceKm) || other.totalDistanceKm == totalDistanceKm)&&(identical(other.totalCo2Kg, totalCo2Kg) || other.totalCo2Kg == totalCo2Kg)&&(identical(other.avgConsumptionL100km, avgConsumptionL100km) || other.avgConsumptionL100km == avgConsumptionL100km)&&(identical(other.avgCostPerKm, avgCostPerKm) || other.avgCostPerKm == avgCostPerKm)&&(identical(other.avgPricePerLiter, avgPricePerLiter) || other.avgPricePerLiter == avgPricePerLiter)&&(identical(other.avgCo2PerKm, avgCo2PerKm) || other.avgCo2PerKm == avgCo2PerKm)&&(identical(other.periodStart, periodStart) || other.periodStart == periodStart)&&(identical(other.periodEnd, periodEnd) || other.periodEnd == periodEnd)&&(identical(other.correctionLitersTotal, correctionLitersTotal) || other.correctionLitersTotal == correctionLitersTotal)&&(identical(other.correctionShare, correctionShare) || other.correctionShare == correctionShare)&&(identical(other.openWindowFillCount, openWindowFillCount) || other.openWindowFillCount == openWindowFillCount)&&(identical(other.openWindowLiters, openWindowLiters) || other.openWindowLiters == openWindowLiters)&&(identical(other.spend, spend) || other.spend == spend)&&(identical(other.closedWindowSpend, closedWindowSpend) || other.closedWindowSpend == closedWindowSpend)&&(identical(other.unpricedFillCount, unpricedFillCount) || other.unpricedFillCount == unpricedFillCount)&&(identical(other.unpricedClosedWindowFillCount, unpricedClosedWindowFillCount) || other.unpricedClosedWindowFillCount == unpricedClosedWindowFillCount)&&(identical(other.pricedLiters, pricedLiters) || other.pricedLiters == pricedLiters)&&(identical(other.closedWindowCount, closedWindowCount) || other.closedWindowCount == closedWindowCount));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,fillUpCount,totalLiters,totalSpent,totalDistanceKm,totalCo2Kg,avgConsumptionL100km,avgCostPerKm,avgPricePerLiter,avgCo2PerKm,periodStart,periodEnd,correctionLitersTotal,correctionShare,openWindowFillCount,openWindowLiters);
+int get hashCode => Object.hashAll([runtimeType,fillUpCount,totalLiters,totalSpent,totalDistanceKm,totalCo2Kg,avgConsumptionL100km,avgCostPerKm,avgPricePerLiter,avgCo2PerKm,periodStart,periodEnd,correctionLitersTotal,correctionShare,openWindowFillCount,openWindowLiters,spend,closedWindowSpend,unpricedFillCount,unpricedClosedWindowFillCount,pricedLiters,closedWindowCount]);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ConsumptionStats(fillUpCount: $fillUpCount, totalLiters: $totalLiters, totalSpent: $totalSpent, totalDistanceKm: $totalDistanceKm, totalCo2Kg: $totalCo2Kg, avgConsumptionL100km: $avgConsumptionL100km, avgCostPerKm: $avgCostPerKm, avgPricePerLiter: $avgPricePerLiter, avgCo2PerKm: $avgCo2PerKm, periodStart: $periodStart, periodEnd: $periodEnd, correctionLitersTotal: $correctionLitersTotal, correctionShare: $correctionShare, openWindowFillCount: $openWindowFillCount, openWindowLiters: $openWindowLiters)';
+  return 'ConsumptionStats(fillUpCount: $fillUpCount, totalLiters: $totalLiters, totalSpent: $totalSpent, totalDistanceKm: $totalDistanceKm, totalCo2Kg: $totalCo2Kg, avgConsumptionL100km: $avgConsumptionL100km, avgCostPerKm: $avgCostPerKm, avgPricePerLiter: $avgPricePerLiter, avgCo2PerKm: $avgCo2PerKm, periodStart: $periodStart, periodEnd: $periodEnd, correctionLitersTotal: $correctionLitersTotal, correctionShare: $correctionShare, openWindowFillCount: $openWindowFillCount, openWindowLiters: $openWindowLiters, spend: $spend, closedWindowSpend: $closedWindowSpend, unpricedFillCount: $unpricedFillCount, unpricedClosedWindowFillCount: $unpricedClosedWindowFillCount, pricedLiters: $pricedLiters, closedWindowCount: $closedWindowCount)';
 }
 
 
@@ -70,7 +93,7 @@ abstract mixin class $ConsumptionStatsCopyWith<$Res>  {
   factory $ConsumptionStatsCopyWith(ConsumptionStats value, $Res Function(ConsumptionStats) _then) = _$ConsumptionStatsCopyWithImpl;
 @useResult
 $Res call({
- int fillUpCount, double totalLiters, double totalSpent, double totalDistanceKm, double totalCo2Kg, double? avgConsumptionL100km, double? avgCostPerKm, double? avgPricePerLiter, double? avgCo2PerKm, DateTime? periodStart, DateTime? periodEnd, double correctionLitersTotal, double correctionShare, int openWindowFillCount, double openWindowLiters
+ int fillUpCount, double totalLiters, double? totalSpent, double totalDistanceKm, double totalCo2Kg, double? avgConsumptionL100km, double? avgCostPerKm, double? avgPricePerLiter, double? avgCo2PerKm, DateTime? periodStart, DateTime? periodEnd, double correctionLitersTotal, double correctionShare, int openWindowFillCount, double openWindowLiters, MoneyTally spend, MoneyTally closedWindowSpend, int unpricedFillCount, int unpricedClosedWindowFillCount, double pricedLiters, int closedWindowCount
 });
 
 
@@ -87,12 +110,12 @@ class _$ConsumptionStatsCopyWithImpl<$Res>
 
 /// Create a copy of ConsumptionStats
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? fillUpCount = null,Object? totalLiters = null,Object? totalSpent = null,Object? totalDistanceKm = null,Object? totalCo2Kg = null,Object? avgConsumptionL100km = freezed,Object? avgCostPerKm = freezed,Object? avgPricePerLiter = freezed,Object? avgCo2PerKm = freezed,Object? periodStart = freezed,Object? periodEnd = freezed,Object? correctionLitersTotal = null,Object? correctionShare = null,Object? openWindowFillCount = null,Object? openWindowLiters = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? fillUpCount = null,Object? totalLiters = null,Object? totalSpent = freezed,Object? totalDistanceKm = null,Object? totalCo2Kg = null,Object? avgConsumptionL100km = freezed,Object? avgCostPerKm = freezed,Object? avgPricePerLiter = freezed,Object? avgCo2PerKm = freezed,Object? periodStart = freezed,Object? periodEnd = freezed,Object? correctionLitersTotal = null,Object? correctionShare = null,Object? openWindowFillCount = null,Object? openWindowLiters = null,Object? spend = null,Object? closedWindowSpend = null,Object? unpricedFillCount = null,Object? unpricedClosedWindowFillCount = null,Object? pricedLiters = null,Object? closedWindowCount = null,}) {
   return _then(_self.copyWith(
 fillUpCount: null == fillUpCount ? _self.fillUpCount : fillUpCount // ignore: cast_nullable_to_non_nullable
 as int,totalLiters: null == totalLiters ? _self.totalLiters : totalLiters // ignore: cast_nullable_to_non_nullable
-as double,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
-as double,totalDistanceKm: null == totalDistanceKm ? _self.totalDistanceKm : totalDistanceKm // ignore: cast_nullable_to_non_nullable
+as double,totalSpent: freezed == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
+as double?,totalDistanceKm: null == totalDistanceKm ? _self.totalDistanceKm : totalDistanceKm // ignore: cast_nullable_to_non_nullable
 as double,totalCo2Kg: null == totalCo2Kg ? _self.totalCo2Kg : totalCo2Kg // ignore: cast_nullable_to_non_nullable
 as double,avgConsumptionL100km: freezed == avgConsumptionL100km ? _self.avgConsumptionL100km : avgConsumptionL100km // ignore: cast_nullable_to_non_nullable
 as double?,avgCostPerKm: freezed == avgCostPerKm ? _self.avgCostPerKm : avgCostPerKm // ignore: cast_nullable_to_non_nullable
@@ -104,7 +127,13 @@ as DateTime?,correctionLitersTotal: null == correctionLitersTotal ? _self.correc
 as double,correctionShare: null == correctionShare ? _self.correctionShare : correctionShare // ignore: cast_nullable_to_non_nullable
 as double,openWindowFillCount: null == openWindowFillCount ? _self.openWindowFillCount : openWindowFillCount // ignore: cast_nullable_to_non_nullable
 as int,openWindowLiters: null == openWindowLiters ? _self.openWindowLiters : openWindowLiters // ignore: cast_nullable_to_non_nullable
-as double,
+as double,spend: null == spend ? _self.spend : spend // ignore: cast_nullable_to_non_nullable
+as MoneyTally,closedWindowSpend: null == closedWindowSpend ? _self.closedWindowSpend : closedWindowSpend // ignore: cast_nullable_to_non_nullable
+as MoneyTally,unpricedFillCount: null == unpricedFillCount ? _self.unpricedFillCount : unpricedFillCount // ignore: cast_nullable_to_non_nullable
+as int,unpricedClosedWindowFillCount: null == unpricedClosedWindowFillCount ? _self.unpricedClosedWindowFillCount : unpricedClosedWindowFillCount // ignore: cast_nullable_to_non_nullable
+as int,pricedLiters: null == pricedLiters ? _self.pricedLiters : pricedLiters // ignore: cast_nullable_to_non_nullable
+as double,closedWindowCount: null == closedWindowCount ? _self.closedWindowCount : closedWindowCount // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -189,10 +218,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int fillUpCount,  double totalLiters,  double totalSpent,  double totalDistanceKm,  double totalCo2Kg,  double? avgConsumptionL100km,  double? avgCostPerKm,  double? avgPricePerLiter,  double? avgCo2PerKm,  DateTime? periodStart,  DateTime? periodEnd,  double correctionLitersTotal,  double correctionShare,  int openWindowFillCount,  double openWindowLiters)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int fillUpCount,  double totalLiters,  double? totalSpent,  double totalDistanceKm,  double totalCo2Kg,  double? avgConsumptionL100km,  double? avgCostPerKm,  double? avgPricePerLiter,  double? avgCo2PerKm,  DateTime? periodStart,  DateTime? periodEnd,  double correctionLitersTotal,  double correctionShare,  int openWindowFillCount,  double openWindowLiters,  MoneyTally spend,  MoneyTally closedWindowSpend,  int unpricedFillCount,  int unpricedClosedWindowFillCount,  double pricedLiters,  int closedWindowCount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ConsumptionStats() when $default != null:
-return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.totalDistanceKm,_that.totalCo2Kg,_that.avgConsumptionL100km,_that.avgCostPerKm,_that.avgPricePerLiter,_that.avgCo2PerKm,_that.periodStart,_that.periodEnd,_that.correctionLitersTotal,_that.correctionShare,_that.openWindowFillCount,_that.openWindowLiters);case _:
+return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.totalDistanceKm,_that.totalCo2Kg,_that.avgConsumptionL100km,_that.avgCostPerKm,_that.avgPricePerLiter,_that.avgCo2PerKm,_that.periodStart,_that.periodEnd,_that.correctionLitersTotal,_that.correctionShare,_that.openWindowFillCount,_that.openWindowLiters,_that.spend,_that.closedWindowSpend,_that.unpricedFillCount,_that.unpricedClosedWindowFillCount,_that.pricedLiters,_that.closedWindowCount);case _:
   return orElse();
 
 }
@@ -210,10 +239,10 @@ return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.total
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int fillUpCount,  double totalLiters,  double totalSpent,  double totalDistanceKm,  double totalCo2Kg,  double? avgConsumptionL100km,  double? avgCostPerKm,  double? avgPricePerLiter,  double? avgCo2PerKm,  DateTime? periodStart,  DateTime? periodEnd,  double correctionLitersTotal,  double correctionShare,  int openWindowFillCount,  double openWindowLiters)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int fillUpCount,  double totalLiters,  double? totalSpent,  double totalDistanceKm,  double totalCo2Kg,  double? avgConsumptionL100km,  double? avgCostPerKm,  double? avgPricePerLiter,  double? avgCo2PerKm,  DateTime? periodStart,  DateTime? periodEnd,  double correctionLitersTotal,  double correctionShare,  int openWindowFillCount,  double openWindowLiters,  MoneyTally spend,  MoneyTally closedWindowSpend,  int unpricedFillCount,  int unpricedClosedWindowFillCount,  double pricedLiters,  int closedWindowCount)  $default,) {final _that = this;
 switch (_that) {
 case _ConsumptionStats():
-return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.totalDistanceKm,_that.totalCo2Kg,_that.avgConsumptionL100km,_that.avgCostPerKm,_that.avgPricePerLiter,_that.avgCo2PerKm,_that.periodStart,_that.periodEnd,_that.correctionLitersTotal,_that.correctionShare,_that.openWindowFillCount,_that.openWindowLiters);case _:
+return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.totalDistanceKm,_that.totalCo2Kg,_that.avgConsumptionL100km,_that.avgCostPerKm,_that.avgPricePerLiter,_that.avgCo2PerKm,_that.periodStart,_that.periodEnd,_that.correctionLitersTotal,_that.correctionShare,_that.openWindowFillCount,_that.openWindowLiters,_that.spend,_that.closedWindowSpend,_that.unpricedFillCount,_that.unpricedClosedWindowFillCount,_that.pricedLiters,_that.closedWindowCount);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -230,10 +259,10 @@ return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.total
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int fillUpCount,  double totalLiters,  double totalSpent,  double totalDistanceKm,  double totalCo2Kg,  double? avgConsumptionL100km,  double? avgCostPerKm,  double? avgPricePerLiter,  double? avgCo2PerKm,  DateTime? periodStart,  DateTime? periodEnd,  double correctionLitersTotal,  double correctionShare,  int openWindowFillCount,  double openWindowLiters)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int fillUpCount,  double totalLiters,  double? totalSpent,  double totalDistanceKm,  double totalCo2Kg,  double? avgConsumptionL100km,  double? avgCostPerKm,  double? avgPricePerLiter,  double? avgCo2PerKm,  DateTime? periodStart,  DateTime? periodEnd,  double correctionLitersTotal,  double correctionShare,  int openWindowFillCount,  double openWindowLiters,  MoneyTally spend,  MoneyTally closedWindowSpend,  int unpricedFillCount,  int unpricedClosedWindowFillCount,  double pricedLiters,  int closedWindowCount)?  $default,) {final _that = this;
 switch (_that) {
 case _ConsumptionStats() when $default != null:
-return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.totalDistanceKm,_that.totalCo2Kg,_that.avgConsumptionL100km,_that.avgCostPerKm,_that.avgPricePerLiter,_that.avgCo2PerKm,_that.periodStart,_that.periodEnd,_that.correctionLitersTotal,_that.correctionShare,_that.openWindowFillCount,_that.openWindowLiters);case _:
+return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.totalDistanceKm,_that.totalCo2Kg,_that.avgConsumptionL100km,_that.avgCostPerKm,_that.avgPricePerLiter,_that.avgCo2PerKm,_that.periodStart,_that.periodEnd,_that.correctionLitersTotal,_that.correctionShare,_that.openWindowFillCount,_that.openWindowLiters,_that.spend,_that.closedWindowSpend,_that.unpricedFillCount,_that.unpricedClosedWindowFillCount,_that.pricedLiters,_that.closedWindowCount);case _:
   return null;
 
 }
@@ -245,7 +274,7 @@ return $default(_that.fillUpCount,_that.totalLiters,_that.totalSpent,_that.total
 
 
 class _ConsumptionStats extends ConsumptionStats with DiagnosticableTreeMixin {
-  const _ConsumptionStats({required this.fillUpCount, required this.totalLiters, required this.totalSpent, required this.totalDistanceKm, this.totalCo2Kg = 0, this.avgConsumptionL100km, this.avgCostPerKm, this.avgPricePerLiter, this.avgCo2PerKm, this.periodStart, this.periodEnd, this.correctionLitersTotal = 0, this.correctionShare = 0, this.openWindowFillCount = 0, this.openWindowLiters = 0}): super._();
+  const _ConsumptionStats({required this.fillUpCount, required this.totalLiters, this.totalSpent, required this.totalDistanceKm, this.totalCo2Kg = 0, this.avgConsumptionL100km, this.avgCostPerKm, this.avgPricePerLiter, this.avgCo2PerKm, this.periodStart, this.periodEnd, this.correctionLitersTotal = 0, this.correctionShare = 0, this.openWindowFillCount = 0, this.openWindowLiters = 0, this.spend = MoneyTally.empty, this.closedWindowSpend = MoneyTally.empty, this.unpricedFillCount = 0, this.unpricedClosedWindowFillCount = 0, this.pricedLiters = 0, this.closedWindowCount = 0}): super._();
   
 
 @override final  int fillUpCount;
@@ -255,7 +284,13 @@ class _ConsumptionStats extends ConsumptionStats with DiagnosticableTreeMixin {
 /// about what actually came out of the pump, and are surfaced
 /// separately via [correctionLitersTotal].
 @override final  double totalLiters;
-@override final  double totalSpent;
+/// Σ recorded purchase spend over the non-correction fills — but
+/// **null when the history spans more than one denomination**
+/// (#4364). €30 + DKK 225 is not 255 of anything, and the active
+/// country's symbol painted on that sum is the defect `FillUp`'s
+/// own currency doc warns about. The per-denomination breakdown is
+/// always in [spend]; an absent total is absent, never zero.
+@override final  double? totalSpent;
 @override final  double totalDistanceKm;
 @override@JsonKey() final  double totalCo2Kg;
 @override final  double? avgConsumptionL100km;
@@ -282,6 +317,29 @@ class _ConsumptionStats extends ConsumptionStats with DiagnosticableTreeMixin {
 /// Sum of `liters` inside the in-progress window after the most
 /// recent plein-complet (#1362). 0 when [openWindowFillCount] is 0.
 @override@JsonKey() final  double openWindowLiters;
+/// Recorded purchase spend SEGREGATED by the currency each fill
+/// recorded (#4364). `FillUp.currency` defines null as *unknown*, so
+/// those amounts land in their own [kUnknownCurrency] bucket and are
+/// never relabelled with today's country's currency.
+@override@JsonKey() final  MoneyTally spend;
+/// The same segregation over the CLOSED plein-to-plein windows only
+/// — the money [avgCostPerKm] may be derived from (#4364).
+@override@JsonKey() final  MoneyTally closedWindowSpend;
+/// Non-correction fills with no recorded cost (#4364). A fill with
+/// no price contributes its distance but no money, which shrinks a
+/// €/km numerator while keeping the whole denominator — a cheaper
+/// vehicle manufactured out of missing data. Non-zero therefore
+/// withholds [avgCostPerKm].
+@override@JsonKey() final  int unpricedFillCount;
+/// Of [unpricedFillCount], how many fell inside a closed window.
+@override@JsonKey() final  int unpricedClosedWindowFillCount;
+/// Litres that DID carry a price — the matched denominator of
+/// [avgPricePerLiter] (#4364).
+@override@JsonKey() final  double pricedLiters;
+/// Closed plein-to-plein windows the averages rest on (#4364). The
+/// sample size a comparison must show: four windows and one window
+/// are not the same evidence.
+@override@JsonKey() final  int closedWindowCount;
 
 /// Create a copy of ConsumptionStats
 /// with the given fields replaced by the non-null parameter values.
@@ -294,21 +352,21 @@ _$ConsumptionStatsCopyWith<_ConsumptionStats> get copyWith => __$ConsumptionStat
 void debugFillProperties(DiagnosticPropertiesBuilder properties) {
   properties
     ..add(DiagnosticsProperty('type', 'ConsumptionStats'))
-    ..add(DiagnosticsProperty('fillUpCount', fillUpCount))..add(DiagnosticsProperty('totalLiters', totalLiters))..add(DiagnosticsProperty('totalSpent', totalSpent))..add(DiagnosticsProperty('totalDistanceKm', totalDistanceKm))..add(DiagnosticsProperty('totalCo2Kg', totalCo2Kg))..add(DiagnosticsProperty('avgConsumptionL100km', avgConsumptionL100km))..add(DiagnosticsProperty('avgCostPerKm', avgCostPerKm))..add(DiagnosticsProperty('avgPricePerLiter', avgPricePerLiter))..add(DiagnosticsProperty('avgCo2PerKm', avgCo2PerKm))..add(DiagnosticsProperty('periodStart', periodStart))..add(DiagnosticsProperty('periodEnd', periodEnd))..add(DiagnosticsProperty('correctionLitersTotal', correctionLitersTotal))..add(DiagnosticsProperty('correctionShare', correctionShare))..add(DiagnosticsProperty('openWindowFillCount', openWindowFillCount))..add(DiagnosticsProperty('openWindowLiters', openWindowLiters));
+    ..add(DiagnosticsProperty('fillUpCount', fillUpCount))..add(DiagnosticsProperty('totalLiters', totalLiters))..add(DiagnosticsProperty('totalSpent', totalSpent))..add(DiagnosticsProperty('totalDistanceKm', totalDistanceKm))..add(DiagnosticsProperty('totalCo2Kg', totalCo2Kg))..add(DiagnosticsProperty('avgConsumptionL100km', avgConsumptionL100km))..add(DiagnosticsProperty('avgCostPerKm', avgCostPerKm))..add(DiagnosticsProperty('avgPricePerLiter', avgPricePerLiter))..add(DiagnosticsProperty('avgCo2PerKm', avgCo2PerKm))..add(DiagnosticsProperty('periodStart', periodStart))..add(DiagnosticsProperty('periodEnd', periodEnd))..add(DiagnosticsProperty('correctionLitersTotal', correctionLitersTotal))..add(DiagnosticsProperty('correctionShare', correctionShare))..add(DiagnosticsProperty('openWindowFillCount', openWindowFillCount))..add(DiagnosticsProperty('openWindowLiters', openWindowLiters))..add(DiagnosticsProperty('spend', spend))..add(DiagnosticsProperty('closedWindowSpend', closedWindowSpend))..add(DiagnosticsProperty('unpricedFillCount', unpricedFillCount))..add(DiagnosticsProperty('unpricedClosedWindowFillCount', unpricedClosedWindowFillCount))..add(DiagnosticsProperty('pricedLiters', pricedLiters))..add(DiagnosticsProperty('closedWindowCount', closedWindowCount));
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ConsumptionStats&&(identical(other.fillUpCount, fillUpCount) || other.fillUpCount == fillUpCount)&&(identical(other.totalLiters, totalLiters) || other.totalLiters == totalLiters)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.totalDistanceKm, totalDistanceKm) || other.totalDistanceKm == totalDistanceKm)&&(identical(other.totalCo2Kg, totalCo2Kg) || other.totalCo2Kg == totalCo2Kg)&&(identical(other.avgConsumptionL100km, avgConsumptionL100km) || other.avgConsumptionL100km == avgConsumptionL100km)&&(identical(other.avgCostPerKm, avgCostPerKm) || other.avgCostPerKm == avgCostPerKm)&&(identical(other.avgPricePerLiter, avgPricePerLiter) || other.avgPricePerLiter == avgPricePerLiter)&&(identical(other.avgCo2PerKm, avgCo2PerKm) || other.avgCo2PerKm == avgCo2PerKm)&&(identical(other.periodStart, periodStart) || other.periodStart == periodStart)&&(identical(other.periodEnd, periodEnd) || other.periodEnd == periodEnd)&&(identical(other.correctionLitersTotal, correctionLitersTotal) || other.correctionLitersTotal == correctionLitersTotal)&&(identical(other.correctionShare, correctionShare) || other.correctionShare == correctionShare)&&(identical(other.openWindowFillCount, openWindowFillCount) || other.openWindowFillCount == openWindowFillCount)&&(identical(other.openWindowLiters, openWindowLiters) || other.openWindowLiters == openWindowLiters));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ConsumptionStats&&(identical(other.fillUpCount, fillUpCount) || other.fillUpCount == fillUpCount)&&(identical(other.totalLiters, totalLiters) || other.totalLiters == totalLiters)&&(identical(other.totalSpent, totalSpent) || other.totalSpent == totalSpent)&&(identical(other.totalDistanceKm, totalDistanceKm) || other.totalDistanceKm == totalDistanceKm)&&(identical(other.totalCo2Kg, totalCo2Kg) || other.totalCo2Kg == totalCo2Kg)&&(identical(other.avgConsumptionL100km, avgConsumptionL100km) || other.avgConsumptionL100km == avgConsumptionL100km)&&(identical(other.avgCostPerKm, avgCostPerKm) || other.avgCostPerKm == avgCostPerKm)&&(identical(other.avgPricePerLiter, avgPricePerLiter) || other.avgPricePerLiter == avgPricePerLiter)&&(identical(other.avgCo2PerKm, avgCo2PerKm) || other.avgCo2PerKm == avgCo2PerKm)&&(identical(other.periodStart, periodStart) || other.periodStart == periodStart)&&(identical(other.periodEnd, periodEnd) || other.periodEnd == periodEnd)&&(identical(other.correctionLitersTotal, correctionLitersTotal) || other.correctionLitersTotal == correctionLitersTotal)&&(identical(other.correctionShare, correctionShare) || other.correctionShare == correctionShare)&&(identical(other.openWindowFillCount, openWindowFillCount) || other.openWindowFillCount == openWindowFillCount)&&(identical(other.openWindowLiters, openWindowLiters) || other.openWindowLiters == openWindowLiters)&&(identical(other.spend, spend) || other.spend == spend)&&(identical(other.closedWindowSpend, closedWindowSpend) || other.closedWindowSpend == closedWindowSpend)&&(identical(other.unpricedFillCount, unpricedFillCount) || other.unpricedFillCount == unpricedFillCount)&&(identical(other.unpricedClosedWindowFillCount, unpricedClosedWindowFillCount) || other.unpricedClosedWindowFillCount == unpricedClosedWindowFillCount)&&(identical(other.pricedLiters, pricedLiters) || other.pricedLiters == pricedLiters)&&(identical(other.closedWindowCount, closedWindowCount) || other.closedWindowCount == closedWindowCount));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,fillUpCount,totalLiters,totalSpent,totalDistanceKm,totalCo2Kg,avgConsumptionL100km,avgCostPerKm,avgPricePerLiter,avgCo2PerKm,periodStart,periodEnd,correctionLitersTotal,correctionShare,openWindowFillCount,openWindowLiters);
+int get hashCode => Object.hashAll([runtimeType,fillUpCount,totalLiters,totalSpent,totalDistanceKm,totalCo2Kg,avgConsumptionL100km,avgCostPerKm,avgPricePerLiter,avgCo2PerKm,periodStart,periodEnd,correctionLitersTotal,correctionShare,openWindowFillCount,openWindowLiters,spend,closedWindowSpend,unpricedFillCount,unpricedClosedWindowFillCount,pricedLiters,closedWindowCount]);
 
 @override
 String toString({ DiagnosticLevel minLevel = DiagnosticLevel.info }) {
-  return 'ConsumptionStats(fillUpCount: $fillUpCount, totalLiters: $totalLiters, totalSpent: $totalSpent, totalDistanceKm: $totalDistanceKm, totalCo2Kg: $totalCo2Kg, avgConsumptionL100km: $avgConsumptionL100km, avgCostPerKm: $avgCostPerKm, avgPricePerLiter: $avgPricePerLiter, avgCo2PerKm: $avgCo2PerKm, periodStart: $periodStart, periodEnd: $periodEnd, correctionLitersTotal: $correctionLitersTotal, correctionShare: $correctionShare, openWindowFillCount: $openWindowFillCount, openWindowLiters: $openWindowLiters)';
+  return 'ConsumptionStats(fillUpCount: $fillUpCount, totalLiters: $totalLiters, totalSpent: $totalSpent, totalDistanceKm: $totalDistanceKm, totalCo2Kg: $totalCo2Kg, avgConsumptionL100km: $avgConsumptionL100km, avgCostPerKm: $avgCostPerKm, avgPricePerLiter: $avgPricePerLiter, avgCo2PerKm: $avgCo2PerKm, periodStart: $periodStart, periodEnd: $periodEnd, correctionLitersTotal: $correctionLitersTotal, correctionShare: $correctionShare, openWindowFillCount: $openWindowFillCount, openWindowLiters: $openWindowLiters, spend: $spend, closedWindowSpend: $closedWindowSpend, unpricedFillCount: $unpricedFillCount, unpricedClosedWindowFillCount: $unpricedClosedWindowFillCount, pricedLiters: $pricedLiters, closedWindowCount: $closedWindowCount)';
 }
 
 
@@ -319,7 +377,7 @@ abstract mixin class _$ConsumptionStatsCopyWith<$Res> implements $ConsumptionSta
   factory _$ConsumptionStatsCopyWith(_ConsumptionStats value, $Res Function(_ConsumptionStats) _then) = __$ConsumptionStatsCopyWithImpl;
 @override @useResult
 $Res call({
- int fillUpCount, double totalLiters, double totalSpent, double totalDistanceKm, double totalCo2Kg, double? avgConsumptionL100km, double? avgCostPerKm, double? avgPricePerLiter, double? avgCo2PerKm, DateTime? periodStart, DateTime? periodEnd, double correctionLitersTotal, double correctionShare, int openWindowFillCount, double openWindowLiters
+ int fillUpCount, double totalLiters, double? totalSpent, double totalDistanceKm, double totalCo2Kg, double? avgConsumptionL100km, double? avgCostPerKm, double? avgPricePerLiter, double? avgCo2PerKm, DateTime? periodStart, DateTime? periodEnd, double correctionLitersTotal, double correctionShare, int openWindowFillCount, double openWindowLiters, MoneyTally spend, MoneyTally closedWindowSpend, int unpricedFillCount, int unpricedClosedWindowFillCount, double pricedLiters, int closedWindowCount
 });
 
 
@@ -336,12 +394,12 @@ class __$ConsumptionStatsCopyWithImpl<$Res>
 
 /// Create a copy of ConsumptionStats
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? fillUpCount = null,Object? totalLiters = null,Object? totalSpent = null,Object? totalDistanceKm = null,Object? totalCo2Kg = null,Object? avgConsumptionL100km = freezed,Object? avgCostPerKm = freezed,Object? avgPricePerLiter = freezed,Object? avgCo2PerKm = freezed,Object? periodStart = freezed,Object? periodEnd = freezed,Object? correctionLitersTotal = null,Object? correctionShare = null,Object? openWindowFillCount = null,Object? openWindowLiters = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? fillUpCount = null,Object? totalLiters = null,Object? totalSpent = freezed,Object? totalDistanceKm = null,Object? totalCo2Kg = null,Object? avgConsumptionL100km = freezed,Object? avgCostPerKm = freezed,Object? avgPricePerLiter = freezed,Object? avgCo2PerKm = freezed,Object? periodStart = freezed,Object? periodEnd = freezed,Object? correctionLitersTotal = null,Object? correctionShare = null,Object? openWindowFillCount = null,Object? openWindowLiters = null,Object? spend = null,Object? closedWindowSpend = null,Object? unpricedFillCount = null,Object? unpricedClosedWindowFillCount = null,Object? pricedLiters = null,Object? closedWindowCount = null,}) {
   return _then(_ConsumptionStats(
 fillUpCount: null == fillUpCount ? _self.fillUpCount : fillUpCount // ignore: cast_nullable_to_non_nullable
 as int,totalLiters: null == totalLiters ? _self.totalLiters : totalLiters // ignore: cast_nullable_to_non_nullable
-as double,totalSpent: null == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
-as double,totalDistanceKm: null == totalDistanceKm ? _self.totalDistanceKm : totalDistanceKm // ignore: cast_nullable_to_non_nullable
+as double,totalSpent: freezed == totalSpent ? _self.totalSpent : totalSpent // ignore: cast_nullable_to_non_nullable
+as double?,totalDistanceKm: null == totalDistanceKm ? _self.totalDistanceKm : totalDistanceKm // ignore: cast_nullable_to_non_nullable
 as double,totalCo2Kg: null == totalCo2Kg ? _self.totalCo2Kg : totalCo2Kg // ignore: cast_nullable_to_non_nullable
 as double,avgConsumptionL100km: freezed == avgConsumptionL100km ? _self.avgConsumptionL100km : avgConsumptionL100km // ignore: cast_nullable_to_non_nullable
 as double?,avgCostPerKm: freezed == avgCostPerKm ? _self.avgCostPerKm : avgCostPerKm // ignore: cast_nullable_to_non_nullable
@@ -353,7 +411,13 @@ as DateTime?,correctionLitersTotal: null == correctionLitersTotal ? _self.correc
 as double,correctionShare: null == correctionShare ? _self.correctionShare : correctionShare // ignore: cast_nullable_to_non_nullable
 as double,openWindowFillCount: null == openWindowFillCount ? _self.openWindowFillCount : openWindowFillCount // ignore: cast_nullable_to_non_nullable
 as int,openWindowLiters: null == openWindowLiters ? _self.openWindowLiters : openWindowLiters // ignore: cast_nullable_to_non_nullable
-as double,
+as double,spend: null == spend ? _self.spend : spend // ignore: cast_nullable_to_non_nullable
+as MoneyTally,closedWindowSpend: null == closedWindowSpend ? _self.closedWindowSpend : closedWindowSpend // ignore: cast_nullable_to_non_nullable
+as MoneyTally,unpricedFillCount: null == unpricedFillCount ? _self.unpricedFillCount : unpricedFillCount // ignore: cast_nullable_to_non_nullable
+as int,unpricedClosedWindowFillCount: null == unpricedClosedWindowFillCount ? _self.unpricedClosedWindowFillCount : unpricedClosedWindowFillCount // ignore: cast_nullable_to_non_nullable
+as int,pricedLiters: null == pricedLiters ? _self.pricedLiters : pricedLiters // ignore: cast_nullable_to_non_nullable
+as double,closedWindowCount: null == closedWindowCount ? _self.closedWindowCount : closedWindowCount // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
