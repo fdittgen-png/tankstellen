@@ -23,7 +23,9 @@ import 'package:flutter_test/flutter_test.dart';
 /// **What counts as a violation** (the scanner's own definition, which is
 /// what the baseline below is measured with):
 /// - the file is under `test/`, ends in `.dart`, and its source contains
-///   the string `Hive` — a test with no Hive in it cannot lose this race.
+///   the string `Hive` in CODE (comments are stripped first) — a test
+///   with no Hive in it cannot lose this race, and naming Hive in prose
+///   is not using it;
 ///   This file itself is excluded: its mutation-check fixtures are
 ///   offender *string literals*, not teardowns;
 /// - a line matching `tearDown(` or `tearDownAll(` opens a brace on that
@@ -51,8 +53,13 @@ void main() {
   /// synthetic offender rather than writing a file.
   List<String> scanSource(String path, String src) {
     final violations = <String>[];
-    if (!src.contains('Hive')) return violations;
     final lines = src.split('\n');
+    // The Hive gate reads CODE, not prose. A file that only names Hive
+    // in a doc comment (explaining a race it does not run) is not
+    // Hive-backed, and pulling it in here would force a meaningless
+    // `Hive.close()` into a teardown that never opened a box.
+    final code = lines.map((l) => l.replaceAll(lineComment, '')).join('\n');
+    if (!code.contains('Hive')) return violations;
     var i = 0;
     while (i < lines.length) {
       if (!tearDownOpen.hasMatch(lines[i])) {
@@ -191,5 +198,33 @@ void main() {
 }
 ''';
     expect(scanSource('synthetic.dart', noHive), isEmpty);
+
+    // Naming Hive in PROSE is not using it. #4357's WAL fault test
+    // explains the Hive snapshot race in a doc comment while opening no
+    // box at all; forcing `closeHiveAndDeleteTemp` on it would add a
+    // `Hive.close()` to a teardown that never opened one.
+    const hiveOnlyInAComment = '''
+/// The caller must not write the Hive snapshot row on a failed write.
+void main() {
+  tearDown(() {
+    dir.deleteSync(recursive: true);
+  });
+}
+''';
+    expect(scanSource('synthetic.dart', hiveOnlyInAComment), isEmpty);
+
+    // …but the gate must still catch real use, including when a comment
+    // is the first mention. This is the pair that keeps the strip honest.
+    const hiveInCommentAndCode = '''
+/// Mentions Hive in prose first.
+import 'package:hive/hive.dart';
+void main() {
+  tearDown(() async {
+    await Hive.close();
+    dir.deleteSync(recursive: true);
+  });
+}
+''';
+    expect(scanSource('synthetic.dart', hiveInCommentAndCode), hasLength(1));
   });
 }

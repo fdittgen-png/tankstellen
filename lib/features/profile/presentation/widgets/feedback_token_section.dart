@@ -45,7 +45,10 @@ class _FeedbackTokenSectionState extends ConsumerState<FeedbackTokenSection> {
 
   FlutterSecureStorage get _storage =>
       widget.storage ??
-      const FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions);
+      const FlutterSecureStorage(
+        aOptions: kSecureStorageAndroidOptions,
+        iOptions: kSecureStorageIosOptions,
+      );
 
   @override
   void initState() {

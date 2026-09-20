@@ -22,8 +22,10 @@ class SettingsHiveStore implements SettingsStorage, ApiKeyStorage {
   Box<dynamic> get _settings => Hive.box(HiveBoxes.settings);
 
   // API Key — stored in platform secure enclave, NOT in plain Hive.
-  static const _secureStorage =
-      FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions);
+  static const _secureStorage = FlutterSecureStorage(
+    aOptions: kSecureStorageAndroidOptions,
+    iOptions: kSecureStorageIosOptions,
+  );
 
   // #3746 — per-country in-memory cache (synchronous reads on the search
   // hot path), keyed by lowercase ISO country code. Backed by one secure-

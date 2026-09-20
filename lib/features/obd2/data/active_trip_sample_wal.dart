@@ -33,6 +33,15 @@ import '../../trips/api.dart'
 /// Never-throws contract: every method swallows and logs — losing WAL
 /// lines must never take down the recording it exists to protect. The
 /// contract is backed by fault-injection tests (#2349).
+///
+/// #4357 — swallowing is not the same as hiding. An [IOSink] reports a
+/// write failure on its `done` future and NOWHERE else: `writeln` is
+/// fire-and-forget by construction, so a disk that fills up, an iOS
+/// file-protection refusal before first unlock, or a deleted container
+/// used to leave `isWritable` true and `appendedCount` climbing while
+/// nothing reached the file. Every fault now lands in [lastFault] and
+/// on the [faults] stream, and [isDurable] — not [isWritable] — is the
+/// predicate that may be read as "what was appended is on disk".
 class ActiveTripSampleWal {
   ActiveTripSampleWal({this._supportDirOverride});
 
@@ -47,17 +56,72 @@ class ActiveTripSampleWal {
 
   static const String fileName = 'active_trip_samples.ndjson';
 
+  /// #4357 — upper bound on a flush/close. An [IOSink] whose underlying
+  /// open failed never completes its flush, and the stop path awaits
+  /// this; without the bound a failed WAL hangs the save.
+  static const Duration _flushTimeout = Duration(seconds: 5);
+
   IOSink? _sink;
   File? _file;
   int _appended = 0;
+  ActiveTripWalFault? _lastFault;
+
+  final StreamController<ActiveTripWalFault> _faults =
+      StreamController<ActiveTripWalFault>.broadcast();
 
   /// True while the sink is open — the repository strips samples from
   /// the Hive row ONLY then; a failed open degrades to the legacy fat
   /// row so no sample is ever lost to a broken WAL.
+  ///
+  /// A ROUTING answer ("is there a sink to append to"), not a
+  /// durability claim — see [isDurable].
   bool get isWritable => _sink != null;
 
+  /// #4357 — the honest durability predicate: a sink is open AND no
+  /// write has failed since it was opened.
+  ///
+  /// The seam S6's persistence observation consumes. It is deliberately
+  /// separate from [isWritable]: flipping [isWritable] on a mid-trip
+  /// fault would make the stop path fall back to an in-memory list that
+  /// only starts at the fault, discarding the lines that DID reach the
+  /// file. Routing [isDurable] into the snapshot-strip and read-back
+  /// decisions is S6's work; what this slice owes is that the failure
+  /// is observable and that nothing here calls a failed write durable.
+  bool get isDurable => _sink != null && _lastFault == null;
+
+  /// The last write/close/open fault, or null while the WAL is healthy.
+  /// Cleared by a successful [openFresh] / [openAppend].
+  ActiveTripWalFault? get lastFault => _lastFault;
+
+  /// Every fault as it happens. Broadcast, so a late observer sees
+  /// nothing — read [lastFault] for the state it missed.
+  Stream<ActiveTripWalFault> get faults => _faults.stream;
+
   /// Samples appended since [openFresh] (telemetry / tests).
+  ///
+  /// Counts lines a HEALTHY sink accepted. Once a fault is recorded,
+  /// [append] stops writing and this stops climbing — the number no
+  /// longer drifts away from what is on disk.
   int get appendedCount => _appended;
+
+  void _recordFault(ActiveTripWalFaultKind kind, String where, Object error,
+      StackTrace stack) {
+    final fault = ActiveTripWalFault(kind: kind, where: where, error: error);
+    _lastFault = fault;
+    log.error(error, stack,
+        layer: ErrorLayer.storage, context: {'where': where});
+    if (!_faults.isClosed) _faults.add(fault);
+  }
+
+  /// Watch [sink]'s `done` future — the ONLY channel an [IOSink] has for
+  /// a write failure. Never awaited: it completes when the sink closes.
+  void _watchSinkDone(IOSink sink, String where) {
+    unawaited(sink.done.then<void>(
+      (_) {},
+      onError: (Object e, StackTrace st) =>
+          _recordFault(ActiveTripWalFaultKind.write, where, e, st),
+    ));
+  }
 
   Future<File?> _resolveFile() async {
     try {
@@ -79,11 +143,15 @@ class ActiveTripSampleWal {
       final file = await _resolveFile();
       if (file == null) return;
       _file = file;
-      _sink = file.openWrite(mode: FileMode.writeOnly);
+      final sink = file.openWrite(mode: FileMode.writeOnly);
+      _sink = sink;
       _appended = 0;
+      _lastFault = null;
+      _watchSinkDone(sink, 'ActiveTripSampleWal.openFresh sink');
     } catch (e, st) {
       _sink = null;
-      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.openFresh'});
+      _recordFault(ActiveTripWalFaultKind.open, 'ActiveTripSampleWal.openFresh',
+          e, st);
     }
   }
 
@@ -95,10 +163,14 @@ class ActiveTripSampleWal {
       final file = await _resolveFile();
       if (file == null) return;
       _file = file;
-      _sink = file.openWrite(mode: FileMode.writeOnlyAppend);
+      final sink = file.openWrite(mode: FileMode.writeOnlyAppend);
+      _sink = sink;
+      _lastFault = null;
+      _watchSinkDone(sink, 'ActiveTripSampleWal.openAppend sink');
     } catch (e, st) {
       _sink = null;
-      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.openAppend'});
+      _recordFault(ActiveTripWalFaultKind.open,
+          'ActiveTripSampleWal.openAppend', e, st);
     }
   }
 
@@ -109,14 +181,26 @@ class ActiveTripSampleWal {
   /// flush actually THROWS on concurrent writes ("StreamSink is bound
   /// to a stream"). A hard kill loses only the unprocessed tail of the
   /// event queue — at 1 Hz effectively the last line at most.
+  ///
+  /// #4357 — "queued" is therefore not "written". The sink's `done`
+  /// future carries the verdict; [_watchSinkDone] turns it into a
+  /// [ActiveTripWalFault] and [isDurable] goes false. A `writeln` that
+  /// throws outright (the sink already torn down) is recorded here and
+  /// does NOT increment [appendedCount].
   void append(TripSample sample) {
     final sink = _sink;
     if (sink == null) return;
+    // A sink that has already failed accepts `writeln` without a word
+    // and drops it — which is how [appendedCount] used to keep
+    // climbing past a dead WAL. Stop at the first fault: the count then
+    // means what it says, and the caller sees [isDurable] false.
+    if (_lastFault != null) return;
     try {
       sink.writeln(jsonEncode(sampleToJson(sample)));
       _appended++;
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.append'});
+      _recordFault(
+          ActiveTripWalFaultKind.write, 'ActiveTripSampleWal.append', e, st);
     }
   }
 
@@ -126,7 +210,11 @@ class ActiveTripSampleWal {
   /// final sample list crosses the boundary, once.
   Future<List<TripSample>> readAll() async {
     try {
-      await _sink?.flush();
+      // A flush on a sink whose underlying open failed never completes
+      // — bound it, or the read of what IS on disk hangs forever.
+      if (_lastFault == null) {
+        await _sink?.flush().timeout(_flushTimeout);
+      }
     } catch (e, st) {
       // Best-effort pre-read flush: a broken sink must not block
       // reading what is already on disk.
@@ -145,15 +233,22 @@ class ActiveTripSampleWal {
 
   /// Close the sink (flushing) without deleting — used at pause /
   /// process-teardown points.
+  ///
+  /// The flush/close is where a queued write failure finally surfaces
+  /// synchronously; it is recorded as a fault so a trip is never
+  /// reported as fully persisted on a sink that could not drain.
   Future<void> close() async {
     final sink = _sink;
     _sink = null;
     if (sink == null) return;
     try {
-      await sink.flush();
-      await sink.close();
+      // Same bound as [readAll]: a flush behind a failed open never
+      // completes, and a WAL close that hangs stalls the stop path.
+      if (_lastFault == null) await sink.flush().timeout(_flushTimeout);
+      await sink.close().timeout(_flushTimeout);
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.close'});
+      _recordFault(
+          ActiveTripWalFaultKind.close, 'ActiveTripSampleWal.close', e, st);
     }
   }
 
@@ -169,6 +264,51 @@ class ActiveTripSampleWal {
       log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'ActiveTripSampleWal.clear'});
     }
   }
+}
+
+/// Which stage of the WAL failed (#4357).
+enum ActiveTripWalFaultKind {
+  /// The file could not be resolved or the sink could not be opened —
+  /// the WAL never started, and the caller degrades to the fat row.
+  open,
+
+  /// A line did not reach the file: the sink's `done` future completed
+  /// with an error, or `writeln` threw on a torn-down sink.
+  write,
+
+  /// The flush/close at pause or teardown failed — whatever was still
+  /// queued did not land.
+  close,
+}
+
+/// One observed WAL failure (#4357) — the unit S6's persistence
+/// observation consumes.
+///
+/// Carries no timestamp on purpose: this layer has no clock, and the
+/// observer that renders a fault is the one that knows which clock to
+/// stamp it with (`appClockProvider`).
+@immutable
+class ActiveTripWalFault {
+  const ActiveTripWalFault({
+    required this.kind,
+    required this.where,
+    required this.error,
+  });
+
+  /// Which stage failed.
+  final ActiveTripWalFaultKind kind;
+
+  /// The `where` tag already used in the error-log context, e.g.
+  /// `ActiveTripSampleWal.append`.
+  final String where;
+
+  /// The underlying fault — a `FileSystemException` for a full disk or
+  /// an iOS file-protection refusal, a `StateError` for a torn-down
+  /// sink.
+  final Object error;
+
+  @override
+  String toString() => 'ActiveTripWalFault(${kind.name}, $where, $error)';
 }
 
 /// Top-level for `compute`: parse the NDJSON WAL at [path] into samples,

@@ -4,9 +4,12 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../logging/app_log.dart';
+import '../logging/error_logger.dart';
 import 'hive_box_key_probe.dart';
 import 'impl/hive_directory_resolver.dart';
 import 'secure_storage_options.dart';
@@ -25,11 +28,62 @@ class StorageInitException implements Exception {
   /// The underlying fault (e.g. the secure-storage `PlatformException`).
   final Object? cause;
 
-  const StorageInitException(this.message, [this.cause]);
+  /// #4357 — true when the keychain refused the read because *protected
+  /// data* is not available: an iOS device that has not been unlocked
+  /// since boot, or (before this key moved to
+  /// `first_unlock_this_device`) any locked screen.
+  ///
+  /// This is the one storage fault that is known-transient. The key is
+  /// on the device, intact, and the very next read after an unlock
+  /// returns it. It is therefore NOT a [StorageKeyLostException]: the
+  /// distinction is the whole point, because acting on an absent key —
+  /// minting a replacement and opening the boxes with it — truncates
+  /// every encrypted box silently (#4118).
+  final bool protectedDataUnavailable;
+
+  const StorageInitException(
+    this.message, [
+    this.cause,
+    this.protectedDataUnavailable = false,
+  ]);
+
+  /// The retryable "keychain sealed until first unlock" verdict.
+  const StorageInitException.protectedDataUnavailable(this.message,
+      [this.cause])
+      : protectedDataUnavailable = true;
 
   @override
-  String toString() => 'StorageInitException: $message'
-      '${cause == null ? '' : ' (cause: $cause)'}';
+  String toString() {
+    final notes = <String>[
+      if (protectedDataUnavailable) 'protected data unavailable',
+      if (cause != null) 'cause: $cause',
+    ];
+    if (notes.isEmpty) return 'StorageInitException: $message';
+    return 'StorageInitException: $message (${notes.join('; ')})';
+  }
+}
+
+/// The Security-framework status the keychain answers a read with while
+/// protected data is unavailable: `errSecInteractionNotAllowed`.
+///
+/// The darwin plugin surfaces the raw `OSStatus` in the
+/// `PlatformException.details` of an `Unexpected security result code`
+/// error, so the classification below reads the number rather than the
+/// (localized) message.
+const int kErrSecInteractionNotAllowed = -25308;
+
+/// True when [error] is a keychain fault caused by protected data being
+/// unavailable rather than by a missing or damaged key (#4357).
+///
+/// Deliberately narrow: only the Security-framework status above and the
+/// explicit `protected_data_unavailable` code count. Anything else stays
+/// a cause-unknown fault, because guessing "transient" for a fault that
+/// is actually permanent is how a user ends up retrying forever.
+bool isProtectedDataUnavailableFault(Object error) {
+  if (error is! PlatformException) return false;
+  if (error.code == 'protected_data_unavailable') return true;
+  final details = error.details;
+  return details is int && details == kErrSecInteractionNotAllowed;
 }
 
 /// Thrown when the encrypted boxes are on disk but the key that reads
@@ -98,9 +152,35 @@ class HiveCipherLoader {
   /// minted either: that is a retryable [StorageInitException], never a
   /// guess that might authorise the truncating open.
   static Future<HiveAesCipher> _loadCipher() async {
-    const secureStorage =
-        FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions);
-    final existing = await secureStorage.read(key: _hiveEncryptionKeyName);
+    const secureStorage = FlutterSecureStorage(
+      aOptions: kSecureStorageAndroidOptions,
+      iOptions: kSecureStorageIosOptions,
+    );
+    // #4357 — the locked-device fence, BEFORE the read. A keychain that
+    // is sealed until first unlock answers a read with an error, and an
+    // error is not evidence about the key: the verdict below must not
+    // run on it, and no replacement key may be minted from it. Asking
+    // first makes that structural rather than incidental — on the
+    // protected-data path neither `read` nor `write` is ever called, so
+    // the truncating open cannot be reached from here.
+    if (await _protectedDataUnavailable(secureStorage)) {
+      throw const StorageInitException.protectedDataUnavailable(
+          'the keychain is sealed until the device is unlocked once after '
+          'boot — no key was read and none was minted');
+    }
+    final String? existing;
+    try {
+      existing = await secureStorage.read(key: _hiveEncryptionKeyName);
+    } on PlatformException catch (e, st) {
+      if (!isProtectedDataUnavailableFault(e)) rethrow;
+      Error.throwWithStackTrace(
+        StorageInitException.protectedDataUnavailable(
+            'the keychain refused the encryption-key read while protected '
+            'data was unavailable — retry once the device is unlocked',
+            e),
+        st,
+      );
+    }
     final stored =
         existing == null ? null : HiveAesCipher(base64Url.decode(existing));
     final verdict =
@@ -124,6 +204,30 @@ class HiveCipherLoader {
       value: base64UrlEncode(key),
     );
     return HiveAesCipher(key);
+  }
+
+  /// Ask the platform whether protected data is readable at all
+  /// (#4357). `isCupertinoProtectedDataAvailable` is platform-gated in
+  /// the plugin itself: it returns `null` — never touching a channel —
+  /// on Android, web and desktop, so this costs nothing off iOS/macOS.
+  ///
+  /// An `unknown` answer (null, or a channel that is not there at all)
+  /// means "do not block the launch": the read below then decides, and
+  /// its own fault classification catches the locked case anyway. Only
+  /// an explicit `false` fences.
+  static Future<bool> _protectedDataUnavailable(
+      FlutterSecureStorage storage) async {
+    try {
+      return await storage.isCupertinoProtectedDataAvailable() == false;
+    } catch (e, st) {
+      log.warn(
+          'HiveCipherLoader: protected-data availability could not be read; '
+          'letting the keychain read decide',
+          error: e,
+          stack: st,
+          layer: ErrorLayer.storage);
+      return false;
+    }
   }
 
   /// Test seam (#3149): the raw cipher load, injectable so a secure-

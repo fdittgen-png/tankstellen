@@ -52,8 +52,10 @@ http.Client githubFeedbackHttpClient(Ref ref) {
 Future<GithubIssueReporter?> githubIssueReporter(Ref ref) async {
   String? token;
   try {
-    const storage =
-        FlutterSecureStorage(aOptions: kSecureStorageAndroidOptions);
+    const storage = FlutterSecureStorage(
+      aOptions: kSecureStorageAndroidOptions,
+      iOptions: kSecureStorageIosOptions,
+    );
     token = await storage.read(key: kGithubFeedbackTokenKey);
   } catch (e, st) {
     // Secure storage can fail on some Android devices (keystore corruption,
