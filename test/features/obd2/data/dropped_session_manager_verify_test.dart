@@ -161,6 +161,54 @@ void main() {
           const Duration(milliseconds: 20));
     });
 
+    test(
+        '#4386 — the 4x cap emits an honest terminal condition, and a '
+        'verified engine parse clears it', () async {
+      final timers = _FakeTimers();
+      final t = build(
+          verifier: RecoveryVerifier(
+              baseWindow: const Duration(milliseconds: 20),
+              startTimer: timers.start));
+      t.mgr.handleDrop();
+
+      // Three unverified adoptions: the window is still stretching, so
+      // automatic recovery still has something to say.
+      for (var i = 0; i < RecoveryVerifier.unverifiedCap - 1; i++) {
+        adopt(t.sources[i], Obd2Service(FakeObd2Transport()));
+        timers.elapse();
+        expect(t.mgr.recoveryExhausted, isFalse,
+            reason: 'the window is still growing at streak ${i + 1}');
+      }
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryExhausted),
+          isEmpty);
+
+      // The fourth: the window has stopped growing and four adapters in
+      // a row answered ATRV with nothing behind it.
+      adopt(t.sources[RecoveryVerifier.unverifiedCap - 1],
+          Obd2Service(FakeObd2Transport()));
+      timers.elapse();
+
+      expect(t.mgr.recoveryExhausted, isTrue);
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryExhausted),
+          hasLength(1), reason: 'said once, not once per window');
+      expect(t.host.degradedGpsOnly, isTrue,
+          reason: '#4195 invariant 1 — GPS recording is untouched');
+
+      // A fifth unverified window must not repeat the announcement.
+      adopt(t.sources[RecoveryVerifier.unverifiedCap],
+          Obd2Service(FakeObd2Transport()));
+      timers.elapse();
+      expect(eventsOf(t.host, RecordingSessionEventKind.recoveryExhausted),
+          hasLength(1));
+
+      // The adapter finally reaches the car: the terminal state clears.
+      adopt(t.sources[RecoveryVerifier.unverifiedCap + 1],
+          Obd2Service(FakeObd2Transport()));
+      t.mgr.onEngineData();
+      expect(t.mgr.recoveryExhausted, isFalse);
+      expect(t.host.degradedGpsOnly, isFalse);
+    });
+
     test('the SAME instance adopted twice without engine data is refused',
         () async {
       final timers = _FakeTimers();

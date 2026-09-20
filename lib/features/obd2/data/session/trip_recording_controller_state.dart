@@ -234,6 +234,11 @@ mixin _TripRecordingSessionState {
   /// surfaced so the degraded banner says "waiting", not "reconnecting".
   bool get linkOwnerParked => _droppedSession.ownerParked;
 
+  /// #4386 — true once automatic recovery is exhausted (the #4196
+  /// unverified streak hit its cap); surfaced so the banner offers the
+  /// one manual action instead of implying a reconnect is imminent.
+  bool get recoveryExhausted => _droppedSession.recoveryExhausted;
+
   /// Owns the trip's distance-resolution concern — the three-tier
   /// odometer-delta / GPS-track / virtual-odometer selection and the two
   /// rolling sample buffers it integrates over — extracted into a focused

@@ -7313,6 +7313,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get obd2WaitingForEngineBanner => 'Gaida dzinēju — ieraksta ar GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Iedarbiniet dzinēju, lai savienotos atkārtoti';
 

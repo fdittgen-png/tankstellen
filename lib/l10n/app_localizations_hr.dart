@@ -7297,6 +7297,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get obd2WaitingForEngineBanner => 'Čekanje motora — snimanje GPS-om';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Pokrenite motor za ponovno povezivanje';
 

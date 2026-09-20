@@ -164,6 +164,14 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
     final awaitingEngine = ref.watch(
       tripRecordingProvider.select((s) => s.awaitingEngine),
     );
+    // #4386 (Epic #4195) — automatic recovery is exhausted: four
+    // adoptions in a row proved the adapter and none proved the car.
+    // Saying "reconnecting" for the rest of the drive would be a lie;
+    // the pill says what is true and keeps the ONE action left (Reset,
+    // #3676/#3678). GPS recording is untouched either way.
+    final recoveryExhausted = ref.watch(
+      tripRecordingProvider.select((s) => s.recoveryExhausted),
+    );
 
     // #3545 — the widget now floats in an overlay Stack, so there is no
     // layout below to ease: the fade alone softens the appearance. When
@@ -174,7 +182,9 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
       opacity: _visible ? 1.0 : 0.0,
       child: _visible
           ? _pill(context,
-              passiveWaiting: passiveWaiting, awaitingEngine: awaitingEngine)
+              passiveWaiting: passiveWaiting,
+              awaitingEngine: awaitingEngine,
+              recoveryExhausted: recoveryExhausted)
           : const SizedBox.shrink(),
     );
   }
@@ -183,6 +193,7 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
     BuildContext context, {
     required bool passiveWaiting,
     required bool awaitingEngine,
+    required bool recoveryExhausted,
   }) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
@@ -209,9 +220,11 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
               // wait, and the key for an engine that is simply off.
               awaitingEngine
                   ? Icons.key_off_outlined
-                  : passiveWaiting
-                      ? Icons.bluetooth_searching
-                      : Icons.gps_fixed,
+                  : recoveryExhausted
+                      ? Icons.link_off
+                      : passiveWaiting
+                          ? Icons.bluetooth_searching
+                          : Icons.gps_fixed,
               size: 18,
               color: theme.colorScheme.onSecondaryContainer,
             ),
@@ -220,9 +233,11 @@ class _GpsDegradedBannerState extends ConsumerState<GpsDegradedBanner> {
               child: Text(
                 awaitingEngine
                     ? l.obd2WaitingForEngineBanner
-                    : passiveWaiting
-                        ? (l.obd2GpsDegradedPassiveWaitingBanner)
-                        : (l.obd2GpsDegradedBannerTitle),
+                    : recoveryExhausted
+                        ? l.obd2AdapterNotRespondingBanner
+                        : passiveWaiting
+                            ? (l.obd2GpsDegradedPassiveWaitingBanner)
+                            : (l.obd2GpsDegradedBannerTitle),
                 key: const Key('gpsDegradedBannerText'),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSecondaryContainer,

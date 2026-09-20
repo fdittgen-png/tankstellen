@@ -7322,6 +7322,10 @@ class AppLocalizationsRo extends AppLocalizations {
       'Se așteaptă motorul — înregistrare cu GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Pornește motorul pentru a reconecta';
 

@@ -7266,6 +7266,10 @@ class AppLocalizationsSv extends AppLocalizations {
       'Väntar på motorn — registrerar med GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect => 'Starta motorn för att återansluta';
 
   @override

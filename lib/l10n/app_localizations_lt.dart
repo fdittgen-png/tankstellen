@@ -7310,6 +7310,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get obd2WaitingForEngineBanner => 'Laukiama variklio — įrašoma GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Užveskite variklį, kad prisijungtumėte iš naujo';
 

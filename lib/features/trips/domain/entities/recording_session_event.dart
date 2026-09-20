@@ -60,6 +60,11 @@ enum RecordingSessionEventKind {
   /// was handed back to the owner. Detail = the consecutive count.
   recoveryUnverified,
 
+  /// #4386 — automatic recovery is exhausted: the unverified streak hit
+  /// its cap, so the app stops implying a reconnect is imminent and
+  /// offers the one manual action instead. Detail = the streak.
+  recoveryExhausted,
+
   /// #3915 — the same `Obd2Service` instance was rebound and dropped
   /// again twice within a minute: the trip refuses it for the rest of
   /// the session and waits for a different one. Detail = the cycle.

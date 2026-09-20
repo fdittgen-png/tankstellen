@@ -9127,5 +9127,10 @@
         "example": "ADEME Base Carbone v23.6 (2026)"
       }
     }
+  },
+  "obd2AdapterNotRespondingBanner": "Adapter not responding — still recording with GPS",
+  "@obd2AdapterNotRespondingBanner": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

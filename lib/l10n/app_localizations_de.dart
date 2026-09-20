@@ -7312,6 +7312,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Warte auf den Motor — Aufzeichnung per GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter antwortet nicht — Aufzeichnung läuft per GPS weiter';
+
+  @override
   String get obd2StartEngineToReconnect => 'Motor starten, um neu zu verbinden';
 
   @override

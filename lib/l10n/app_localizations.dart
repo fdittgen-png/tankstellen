@@ -12099,6 +12099,12 @@ abstract class AppLocalizations {
   /// **'Waiting for the engine — recording on GPS'**
   String get obd2WaitingForEngineBanner;
 
+  /// Floating pill on the trip-recording screen (#4386, Epic #4195) once automatic OBD2 recovery is exhausted: the adapter keeps answering, but four reconnections in a row delivered no engine data, so the app stops implying a reconnect is imminent. The trip is NOT lost — GPS recording continues — and the pill's Reset action stays as the one thing left to try.
+  ///
+  /// In en, this message translates to:
+  /// **'Adapter not responding — still recording with GPS'**
+  String get obd2AdapterNotRespondingBanner;
+
   /// Replaces the 'Reset connection' button on the OBD2 pause banner while the vehicle power model says the car is asleep (#3860): a reset would only dial a sleeping adapter. States what is actually needed.
   ///
   /// In en, this message translates to:

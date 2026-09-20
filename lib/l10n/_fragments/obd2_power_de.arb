@@ -1,5 +1,6 @@
 {
   "obd2WaitingForEngineBanner": "Warte auf den Motor — Aufzeichnung per GPS",
+  "obd2AdapterNotRespondingBanner": "Adapter antwortet nicht — Aufzeichnung läuft per GPS weiter",
   "obd2StartEngineToReconnect": "Motor starten, um neu zu verbinden",
   "obd2ResetConnectionEngineOff": "Motor ist aus — zum Neuverbinden starten",
   "obd2ParkedPromptTitle": "Motor seit {minutes} Min. aus — Aufzeichnung beenden?",

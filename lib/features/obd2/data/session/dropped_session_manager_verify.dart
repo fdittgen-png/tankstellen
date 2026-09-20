@@ -9,6 +9,12 @@ extension DroppedSessionVerify on DroppedSessionManager {
   bool get awaitingEngineData => _verifier.awaiting;
   Duration get currentRecoveryVerifyWindow => _verifier.nextWindow;
 
+  /// #4386 — automatic recovery has said everything it can: every
+  /// adoption since the drop proved the adapter and none proved the car.
+  /// GPS recording is untouched; the UI swaps to the honest terminal
+  /// copy and the one manual action (#3676/#3678).
+  bool get recoveryExhausted => _recoveryExhausted;
+
   /// The adapter came back while degraded: resume polling on it, keep
   /// recording GPS-only, and wait for the bus to prove itself.
   void _beginRecoveryVerification() {
@@ -30,6 +36,7 @@ extension DroppedSessionVerify on DroppedSessionManager {
     }
     _host.degradedGpsOnly = false;
     _note(RecordingSessionEventKind.leftDegraded, 'engine data verified');
+    _recoveryExhausted = false; // #4386 — a verified parse clears it
     _dropReason = null;
     _host.resetDropDetector();
     _trace(AutoRecordEventKind.silentReconnectSucceeded);
@@ -45,6 +52,20 @@ extension DroppedSessionVerify on DroppedSessionManager {
     _note(RecordingSessionEventKind.recoveryUnverified, detail);
     BreadcrumbCollector.add('OBD2 recording: recovery unverified',
         detail: detail);
+    // #4386 — the cap: the window has stopped stretching and four
+    // adapters in a row proved themselves and not the car. Say so once.
+    // Nothing else changes: the ladder below still runs at its capped
+    // cadence and GPS recording never stops — this only stops the UI
+    // promising a reconnect that is not coming.
+    if (_verifier.exhausted && !_recoveryExhausted) {
+      _recoveryExhausted = true;
+      final terminal = 'automatic recovery exhausted after '
+          '${_verifier.unverifiedStreak} unverified adoptions — '
+          'the adapter answers, the vehicle bus does not';
+      _note(RecordingSessionEventKind.recoveryExhausted, terminal);
+      BreadcrumbCollector.add('OBD2 recording: adapter not responding',
+          detail: terminal);
+    }
     // A silent adoption is a quick re-drop for the #3915 cycle breaker.
     _refuseIfReadoptionCycle(TripDropReason.silentFailure);
     _host.stopScheduler();

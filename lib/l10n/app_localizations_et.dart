@@ -7266,6 +7266,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get obd2WaitingForEngineBanner => 'Ootab mootorit — salvestab GPS-iga';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Käivitage mootor uuesti ühendamiseks';
 

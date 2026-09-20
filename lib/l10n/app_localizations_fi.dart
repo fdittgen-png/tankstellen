@@ -7275,6 +7275,10 @@ class AppLocalizationsFi extends AppLocalizations {
       'Odotetaan moottoria — tallennetaan GPS:llä';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Käynnistä moottori yhdistääksesi uudelleen';
 

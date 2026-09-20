@@ -109,6 +109,11 @@ class DroppedSessionManager {
   /// reconnecting, so the banner must not say it is.
   bool _ownerParked = false;
 
+  /// #4386 — the #4196 unverified streak reached its cap: automatic
+  /// recovery is exhausted and the UI says so. Cleared by a verified
+  /// engine parse.
+  bool _recoveryExhausted = false;
+
   /// Reason the most recent drop fired. Null when no drop has occurred
   /// or after a resume / silent recovery cleared it.
   TripDropReason? _dropReason;

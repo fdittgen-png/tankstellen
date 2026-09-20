@@ -356,7 +356,8 @@ void main() {
     // #4385 — 2479 → 2483: the owner's park is readable off the controller
     // (`linkOwnerParked`) so the degraded banner can stop saying
     // "reconnecting" over a supervisor that is not dialing.
-    'lib/features/obd2/data/session/trip_recording_controller.dart': 2483,
+    // #4386 — 2483 → 2488: and whether automatic recovery is exhausted.
+    'lib/features/obd2/data/session/trip_recording_controller.dart': 2488,
     // #4035 — 1 541 → 1 517: the pure ELM AT grammar (the `ATI` command,
     // the firmware-string parse, the reset-command test) left the library.
     // #4315 — 1 517 → 1 368: the dead pull fuel-rate entry point, the
@@ -426,7 +427,9 @@ void main() {
     // #4385 — 579 → 611: the owner's park / stand-down reaches the session
     // journal (#4195 invariant 8) and the banner, through the reattach
     // source's existing level read — no new subscription, no new authority.
-    'lib/features/obd2/data/session/dropped_session_manager.dart': 611,
+    // #4386 — 611 → 637: the #4196 unverified streak's 4x cap emits an
+    // honest terminal condition instead of looping silently for the drive.
+    'lib/features/obd2/data/session/dropped_session_manager.dart': 637,
     'lib/features/driving_score/data/driving_score_calculator.dart': 556,
     'lib/features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart': 525,
     // #4073 — 523 → 502: the private percentile copy moved to core/utils/stats.dart.

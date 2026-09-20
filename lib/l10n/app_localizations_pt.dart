@@ -7320,6 +7320,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'À espera do motor — a gravar com GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect => 'Ligue o motor para reconectar';
 
   @override

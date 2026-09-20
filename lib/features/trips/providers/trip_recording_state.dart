@@ -46,6 +46,12 @@ class TripRecordingState {
   /// banner must then stop claiming a reconnect is in progress.
   final bool linkOwnerParked;
 
+  /// #4386 (Epic #4195) — automatic OBD2 recovery is exhausted: four
+  /// adoptions in a row proved the adapter and none proved the car. GPS
+  /// recording continues; the banner stops promising a reconnect and
+  /// offers the one manual action (#3676/#3678) instead.
+  final bool recoveryExhausted;
+
   /// GPS-only live coaching hint (#2058) — derived from the rolling
   /// window of the last ~5 s of GPS samples on every recorder emit.
   /// Null when the trajet has OBD2 fuel-rate data (the standard
@@ -81,6 +87,7 @@ class TripRecordingState {
     this.dropReason,
     this.reconnectPassiveWaiting = false,
     this.linkOwnerParked = false,
+    this.recoveryExhausted = false,
     this.gpsCoachingHint,
     this.connectStage,
     this.saveStage,
@@ -108,6 +115,7 @@ class TripRecordingState {
     bool clearDropReason = false,
     bool? reconnectPassiveWaiting,
     bool? linkOwnerParked,
+    bool? recoveryExhausted,
     DrivingCoachingHint? gpsCoachingHint,
     bool clearGpsCoachingHint = false,
     TripStartStage? connectStage,
@@ -130,6 +138,7 @@ class TripRecordingState {
         reconnectPassiveWaiting:
             reconnectPassiveWaiting ?? this.reconnectPassiveWaiting,
         linkOwnerParked: linkOwnerParked ?? this.linkOwnerParked,
+        recoveryExhausted: recoveryExhausted ?? this.recoveryExhausted,
         gpsCoachingHint: clearGpsCoachingHint
             ? null
             : (gpsCoachingHint ?? this.gpsCoachingHint),

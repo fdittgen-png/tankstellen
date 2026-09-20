@@ -7242,6 +7242,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Waiting for the engine — recording on GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect => 'Start the engine to reconnect';
 
   @override
@@ -17833,6 +17837,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get obd2WaitingForEngineBanner =>
       '⟦Ŵáîŧîñǧ ƒóř ŧĥé éñǧîñé — řéçóřđîñǧ óñ ǦƤŠ ···············⟧';
+
+  @override
+  String get obd2AdapterNotRespondingBanner =>
+      '⟦Áđáƥŧéř ñóŧ řéšƥóñđîñǧ — šŧîłł řéçóřđîñǧ ŵîŧĥ ǦƤŠ ··················⟧';
 
   @override
   String get obd2StartEngineToReconnect =>

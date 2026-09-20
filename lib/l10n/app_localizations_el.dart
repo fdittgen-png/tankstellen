@@ -7325,6 +7325,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αναμονή για τον κινητήρα — καταγραφή με GPS';
 
   @override
+  String get obd2AdapterNotRespondingBanner =>
+      'Adapter not responding — still recording with GPS';
+
+  @override
   String get obd2StartEngineToReconnect =>
       'Βάλτε μπροστά τον κινητήρα για επανασύνδεση';
 
