@@ -8471,5 +8471,227 @@
   "fleetSettingsExpired": "Ces informations de flotte sont périmées. Reconnectez-vous pour qu'elles soient actualisées avant de choisir un véhicule.",
   "@fleetSettingsExpired": {
     "description": "MT — needs native review"
+  },
+  "vehTripTitle": "Comparer ce trajet",
+  "@vehTripTitle": {
+    "description": "MT — needs native review"
+  },
+  "vehTripOpenTooltip": "Comparer ce trajet entre plusieurs véhicules",
+  "@vehTripOpenTooltip": {
+    "description": "MT — needs native review"
+  },
+  "vehTripNoRoute": "Planifie d'abord un itinéraire — il n'y a pas encore de trajet à comparer.",
+  "@vehTripNoRoute": {
+    "description": "MT — needs native review"
+  },
+  "vehTripNotEnoughVehicles": "Choisis au moins deux véhicules pour comparer ce trajet.",
+  "@vehTripNotEnoughVehicles": {
+    "description": "MT — needs native review"
+  },
+  "vehTripForecastNote": "Ce sont des estimations pour un trajet que tu n'as pas encore fait, calculées à partir de la consommation constatée, du réservoir et du carburant compatible de chaque véhicule. Une prévision, pas l'historique que tu as enregistré.",
+  "@vehTripForecastNote": {
+    "description": "MT — needs native review"
+  },
+  "vehTripScopeNote": "Carburant et ravitaillement uniquement. L'entretien, la dépréciation et l'assurance n'entrent dans aucun total de cet écran.",
+  "@vehTripScopeNote": {
+    "description": "MT — needs native review"
+  },
+  "vehTripObjectiveLabel": "Comparer selon",
+  "@vehTripObjectiveLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripObjectiveCost": "Coût total le plus bas",
+  "@vehTripObjectiveCost": {
+    "description": "MT — needs native review"
+  },
+  "vehTripObjectiveTime": "Durée prévue la plus courte",
+  "@vehTripObjectiveTime": {
+    "description": "MT — needs native review"
+  },
+  "vehTripObjectiveDistance": "Détour le plus faible",
+  "@vehTripObjectiveDistance": {
+    "description": "MT — needs native review"
+  },
+  "vehTripFuelUsedLabel": "Carburant consommé par ce trajet",
+  "@vehTripFuelUsedLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripCostToDriveLabel": "Coût en carburant du trajet",
+  "@vehTripCostToDriveLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripCostToDriveNote": "Le carburant que le trajet consomme, valorisé au meilleur prix disponible pour le carburant de ce véhicule sur cet itinéraire. Il ne change pas selon ce qui se trouve déjà dans le réservoir.",
+  "@vehTripCostToDriveNote": {
+    "description": "MT — needs native review"
+  },
+  "vehTripCashRequiredLabel": "Dépense à la pompe",
+  "@vehTripCashRequiredLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripCashRequiredNote": "Ce que tu paierais sur ce trajet avec le réservoir tel qu'il est maintenant, frais d'arrêt connus inclus. Un réservoir plein coûte moins cher à remplir, pas moins cher à rouler.",
+  "@vehTripCashRequiredNote": {
+    "description": "MT — needs native review"
+  },
+  "vehTripStopsLabel": "Arrêts carburant",
+  "@vehTripStopsLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripExtraKmLabel": "Kilomètres supplémentaires",
+  "@vehTripExtraKmLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripTimeLabel": "Durée prévue",
+  "@vehTripTimeLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripStartTankLabel": "Réservoir au départ",
+  "@vehTripStartTankLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripEndTankLabel": "Réservoir à l'arrivée",
+  "@vehTripEndTankLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripConsumptionLabel": "Consommation retenue",
+  "@vehTripConsumptionLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripNoStops": "Aucun arrêt carburant nécessaire.",
+  "@vehTripNoStops": {
+    "description": "MT — needs native review"
+  },
+  "vehTripStopLine": "{station} : prendre {litres} pour {cost}",
+  "@vehTripStopLine": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "station": {
+        "type": "String"
+      },
+      "litres": {
+        "type": "String"
+      },
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripSourceMeasured": "d'après tes relevés",
+  "@vehTripSourceMeasured": {
+    "description": "MT — needs native review"
+  },
+  "vehTripSourceManual": "ton hypothèse",
+  "@vehTripSourceManual": {
+    "description": "MT — needs native review"
+  },
+  "vehTripSourceEstimated": "estimé",
+  "@vehTripSourceEstimated": {
+    "description": "MT — needs native review"
+  },
+  "vehTripSourceUnknown": "inconnu",
+  "@vehTripSourceUnknown": {
+    "description": "MT — needs native review"
+  },
+  "vehTripGap": "Ce véhicule ne peut pas franchir le tronçon de {fromKm} à {toKm} avec un seul plein.",
+  "@vehTripGap": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "fromKm": {
+        "type": "String"
+      },
+      "toKm": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripWinnerCost": "{vehicle} roule au coût le plus bas",
+  "@vehTripWinnerCost": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripWinnerCash": "{vehicle} demande le moins à la pompe",
+  "@vehTripWinnerCash": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripWinnerTime": "{vehicle} devrait arriver en premier",
+  "@vehTripWinnerTime": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripWinnerWithheld": "Pas de gagnant unique : tous les véhicules choisis n'étaient pas comparables sur ce point.",
+  "@vehTripWinnerWithheld": {
+    "description": "MT — needs native review"
+  },
+  "vehTripApply": "Utiliser ce plan",
+  "@vehTripApply": {
+    "description": "MT — needs native review"
+  },
+  "vehTripApplied": "Navigation lancée pour {vehicle}.",
+  "@vehTripApplied": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      }
+    }
+  },
+  "vehTripApplyRefused": "Ce plan n'a pas pu être transmis à la navigation.",
+  "@vehTripApplyRefused": {
+    "description": "MT — needs native review"
+  },
+  "vehTripBoundedSearch": "Le meilleur des stations examinées, sans preuve qu'il n'existe rien de mieux.",
+  "@vehTripBoundedSearch": {
+    "description": "MT — needs native review"
+  },
+  "vehTripCurrencyWithheld": "Certaines stations de cet itinéraire affichent une devise dans laquelle ce trajet ne peut pas s'exprimer. Leurs prix restent tels qu'ils sont affichés.",
+  "@vehTripCurrencyWithheld": {
+    "description": "MT — needs native review"
+  },
+  "vehTripIncompleteEvidence": "Certaines stations manquent au plan de ce véhicule : il ne vaut que pour celles examinées.",
+  "@vehTripIncompleteEvidence": {
+    "description": "MT — needs native review"
+  },
+  "vehTripAssumptionLabel": "Consommation pour ce trajet",
+  "@vehTripAssumptionLabel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripAssumptionClear": "Revenir à mes relevés",
+  "@vehTripAssumptionClear": {
+    "description": "MT — needs native review"
+  },
+  "vehTripSemanticsColumn": "{vehicle}, véhicule {index} sur {total}",
+  "@vehTripSemanticsColumn": {
+    "description": "MT — needs native review",
+    "placeholders": {
+      "vehicle": {
+        "type": "String"
+      },
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "vehTripNoPriceForFuel": "Aucune station de cet itinéraire ne vend le carburant de ce véhicule : il n'y a donc pas de coût en carburant à afficher.",
+  "@vehTripNoPriceForFuel": {
+    "description": "MT — needs native review"
+  },
+  "vehTripUnavailableShort": "Non comparable",
+  "@vehTripUnavailableShort": {
+    "description": "MT — needs native review"
   }
 }

@@ -11527,6 +11527,161 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pickerLoading => 'Loading catalog…';
 
   @override
+  String get vehTripTitle => 'Compare this trip';
+
+  @override
+  String get vehTripOpenTooltip => 'Compare this trip across vehicles';
+
+  @override
+  String get vehTripNoRoute =>
+      'Plan a route first — there is no journey to compare yet.';
+
+  @override
+  String get vehTripNotEnoughVehicles =>
+      'Pick at least two vehicles to compare this trip.';
+
+  @override
+  String get vehTripForecastNote =>
+      'These are estimates for a journey you have not driven yet, built from each vehicle\'s own consumption evidence, tank and compatible fuel. They are a forecast, not the history you recorded.';
+
+  @override
+  String get vehTripScopeNote =>
+      'Fuel and refuelling only. Maintenance, depreciation and insurance are in no total on this screen.';
+
+  @override
+  String get vehTripObjectiveLabel => 'Compare on';
+
+  @override
+  String get vehTripObjectiveCost => 'Lowest total cost';
+
+  @override
+  String get vehTripObjectiveTime => 'Shortest expected time';
+
+  @override
+  String get vehTripObjectiveDistance => 'Least extra driving';
+
+  @override
+  String get vehTripFuelUsedLabel => 'Fuel this trip burns';
+
+  @override
+  String get vehTripCostToDriveLabel => 'Fuel cost to drive';
+
+  @override
+  String get vehTripCostToDriveNote =>
+      'The fuel the journey burns, valued at the best price for this vehicle\'s fuel on this route. It does not change with what is already in the tank.';
+
+  @override
+  String get vehTripCashRequiredLabel => 'Cash at the pump';
+
+  @override
+  String get vehTripCashRequiredNote =>
+      'What you would pay on this trip with the tank as it is now, known stop charges included. A full tank is cheaper to refuel, not cheaper to drive.';
+
+  @override
+  String get vehTripStopsLabel => 'Refuelling stops';
+
+  @override
+  String get vehTripExtraKmLabel => 'Extra kilometres';
+
+  @override
+  String get vehTripTimeLabel => 'Expected time';
+
+  @override
+  String get vehTripStartTankLabel => 'Tank at departure';
+
+  @override
+  String get vehTripEndTankLabel => 'Tank at arrival';
+
+  @override
+  String get vehTripConsumptionLabel => 'Consumption assumed';
+
+  @override
+  String get vehTripNoStops => 'No refuelling stop needed.';
+
+  @override
+  String vehTripStopLine(String station, String litres, String cost) {
+    return '$station: buy $litres for $cost';
+  }
+
+  @override
+  String get vehTripSourceMeasured => 'from your records';
+
+  @override
+  String get vehTripSourceManual => 'your own assumption';
+
+  @override
+  String get vehTripSourceEstimated => 'estimated';
+
+  @override
+  String get vehTripSourceUnknown => 'not known';
+
+  @override
+  String vehTripGap(String fromKm, String toKm) {
+    return 'This vehicle cannot cross from $fromKm to $toKm on one tank.';
+  }
+
+  @override
+  String vehTripWinnerCost(String vehicle) {
+    return '$vehicle costs the least to drive';
+  }
+
+  @override
+  String vehTripWinnerCash(String vehicle) {
+    return '$vehicle needs the least cash at the pump';
+  }
+
+  @override
+  String vehTripWinnerTime(String vehicle) {
+    return '$vehicle is expected to arrive first';
+  }
+
+  @override
+  String get vehTripWinnerWithheld =>
+      'No single winner: not every selected vehicle could be compared on this figure.';
+
+  @override
+  String get vehTripApply => 'Use this plan';
+
+  @override
+  String vehTripApplied(String vehicle) {
+    return 'Navigation started for $vehicle.';
+  }
+
+  @override
+  String get vehTripApplyRefused =>
+      'This plan could not be handed to navigation.';
+
+  @override
+  String get vehTripBoundedSearch =>
+      'The best of the stations searched, not proof that nothing better exists.';
+
+  @override
+  String get vehTripCurrencyWithheld =>
+      'Some stations on this route quote a currency this trip cannot be expressed in. Their prices stay as quoted.';
+
+  @override
+  String get vehTripIncompleteEvidence =>
+      'Some stations were left out of this vehicle\'s plan, so it speaks only for the ones searched.';
+
+  @override
+  String get vehTripAssumptionLabel => 'Consumption for this trip';
+
+  @override
+  String get vehTripAssumptionClear => 'Use my records again';
+
+  @override
+  String vehTripSemanticsColumn(String vehicle, int index, int total) {
+    return '$vehicle, vehicle $index of $total';
+  }
+
+  @override
+  String get vehTripNoPriceForFuel =>
+      'No station on this route sells this vehicle\'s fuel, so there is no fuel cost to show.';
+
+  @override
+  String get vehTripUnavailableShort => 'Not comparable';
+
+  @override
   String get vinInfoTooltip => 'What is a VIN?';
 
   @override
@@ -23460,6 +23615,162 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get pickerLoading => '⟦Łóáđîñǧ çáŧáłóǧ… ······⟧';
+
+  @override
+  String get vehTripTitle => '⟦Çóɱƥářé ŧĥîš ŧřîƥ ·······⟧';
+
+  @override
+  String get vehTripOpenTooltip =>
+      '⟦Çóɱƥářé ŧĥîš ŧřîƥ áçřóšš ṽéĥîçłéš ·············⟧';
+
+  @override
+  String get vehTripNoRoute =>
+      '⟦Ƥłáñ á řóúŧé ƒîřšŧ — ŧĥéřé îš ñó ĵóúřñéý ŧó çóɱƥářé ýéŧ. ···················⟧';
+
+  @override
+  String get vehTripNotEnoughVehicles =>
+      '⟦Ƥîçķ áŧ łéášŧ ŧŵó ṽéĥîçłéš ŧó çóɱƥářé ŧĥîš ŧřîƥ. ··················⟧';
+
+  @override
+  String get vehTripForecastNote =>
+      '⟦Ŧĥéšé ářé éšŧîɱáŧéš ƒóř á ĵóúřñéý ýóú ĥáṽé ñóŧ đřîṽéñ ýéŧ, ƀúîłŧ ƒřóɱ éáçĥ ṽéĥîçłé\'š óŵñ çóñšúɱƥŧîóñ éṽîđéñçé, ŧáñķ áñđ çóɱƥáŧîƀłé ƒúéł. Ŧĥéý ářé á ƒóřéçášŧ, ñóŧ ŧĥé ĥîšŧóřý ýóú řéçóřđéđ. ····································································⟧';
+
+  @override
+  String get vehTripScopeNote =>
+      '⟦Ƒúéł áñđ řéƒúéłłîñǧ óñłý. Ṁáîñŧéñáñçé, đéƥřéçîáŧîóñ áñđ îñšúřáñçé ářé îñ ñó ŧóŧáł óñ ŧĥîš šçřééñ. ····································⟧';
+
+  @override
+  String get vehTripObjectiveLabel => '⟦Çóɱƥářé óñ ····⟧';
+
+  @override
+  String get vehTripObjectiveCost => '⟦Łóŵéšŧ ŧóŧáł çóšŧ ·······⟧';
+
+  @override
+  String get vehTripObjectiveTime => '⟦Šĥóřŧéšŧ éẋƥéçŧéđ ŧîɱé ·········⟧';
+
+  @override
+  String get vehTripObjectiveDistance => '⟦Łéášŧ éẋŧřá đřîṽîñǧ ········⟧';
+
+  @override
+  String get vehTripFuelUsedLabel => '⟦Ƒúéł ŧĥîš ŧřîƥ ƀúřñš ········⟧';
+
+  @override
+  String get vehTripCostToDriveLabel => '⟦Ƒúéł çóšŧ ŧó đřîṽé ·······⟧';
+
+  @override
+  String get vehTripCostToDriveNote =>
+      '⟦Ŧĥé ƒúéł ŧĥé ĵóúřñéý ƀúřñš, ṽáłúéđ áŧ ŧĥé ƀéšŧ ƥřîçé ƒóř ŧĥîš ṽéĥîçłé\'š ƒúéł óñ ŧĥîš řóúŧé. Îŧ đóéš ñóŧ çĥáñǧé ŵîŧĥ ŵĥáŧ îš áłřéáđý îñ ŧĥé ŧáñķ. ···················································⟧';
+
+  @override
+  String get vehTripCashRequiredLabel => '⟦Çášĥ áŧ ŧĥé ƥúɱƥ ······⟧';
+
+  @override
+  String get vehTripCashRequiredNote =>
+      '⟦Ŵĥáŧ ýóú ŵóúłđ ƥáý óñ ŧĥîš ŧřîƥ ŵîŧĥ ŧĥé ŧáñķ áš îŧ îš ñóŵ, ķñóŵñ šŧóƥ çĥářǧéš îñçłúđéđ. Á ƒúłł ŧáñķ îš çĥéáƥéř ŧó řéƒúéł, ñóŧ çĥéáƥéř ŧó đřîṽé. ··················································⟧';
+
+  @override
+  String get vehTripStopsLabel => '⟦Řéƒúéłłîñǧ šŧóƥš ·······⟧';
+
+  @override
+  String get vehTripExtraKmLabel => '⟦Éẋŧřá ķîłóɱéŧřéš ·······⟧';
+
+  @override
+  String get vehTripTimeLabel => '⟦Éẋƥéçŧéđ ŧîɱé ·····⟧';
+
+  @override
+  String get vehTripStartTankLabel => '⟦Ŧáñķ áŧ đéƥářŧúřé ·······⟧';
+
+  @override
+  String get vehTripEndTankLabel => '⟦Ŧáñķ áŧ ářřîṽáł ······⟧';
+
+  @override
+  String get vehTripConsumptionLabel => '⟦Çóñšúɱƥŧîóñ áššúɱéđ ········⟧';
+
+  @override
+  String get vehTripNoStops => '⟦Ñó řéƒúéłłîñǧ šŧóƥ ñééđéđ. ··········⟧';
+
+  @override
+  String vehTripStopLine(String station, String litres, String cost) {
+    return '⟦$station: ƀúý $litres ƒóř $cost ···⟧';
+  }
+
+  @override
+  String get vehTripSourceMeasured => '⟦ƒřóɱ ýóúř řéçóřđš ·······⟧';
+
+  @override
+  String get vehTripSourceManual => '⟦ýóúř óŵñ áššúɱƥŧîóñ ········⟧';
+
+  @override
+  String get vehTripSourceEstimated => '⟦éšŧîɱáŧéđ ····⟧';
+
+  @override
+  String get vehTripSourceUnknown => '⟦ñóŧ ķñóŵñ ····⟧';
+
+  @override
+  String vehTripGap(String fromKm, String toKm) {
+    return '⟦Ŧĥîš ṽéĥîçłé çáññóŧ çřóšš ƒřóɱ $fromKm ŧó $toKm óñ óñé ŧáñķ. ·················⟧';
+  }
+
+  @override
+  String vehTripWinnerCost(String vehicle) {
+    return '⟦$vehicle çóšŧš ŧĥé łéášŧ ŧó đřîṽé ·········⟧';
+  }
+
+  @override
+  String vehTripWinnerCash(String vehicle) {
+    return '⟦$vehicle ñééđš ŧĥé łéášŧ çášĥ áŧ ŧĥé ƥúɱƥ ············⟧';
+  }
+
+  @override
+  String vehTripWinnerTime(String vehicle) {
+    return '⟦$vehicle îš éẋƥéçŧéđ ŧó ářřîṽé ƒîřšŧ ··········⟧';
+  }
+
+  @override
+  String get vehTripWinnerWithheld =>
+      '⟦Ñó šîñǧłé ŵîññéř: ñóŧ éṽéřý šéłéçŧéđ ṽéĥîçłé çóúłđ ƀé çóɱƥářéđ óñ ŧĥîš ƒîǧúřé. ·····························⟧';
+
+  @override
+  String get vehTripApply => '⟦Úšé ŧĥîš ƥłáñ ·····⟧';
+
+  @override
+  String vehTripApplied(String vehicle) {
+    return '⟦Ñáṽîǧáŧîóñ šŧářŧéđ ƒóř $vehicle. ·········⟧';
+  }
+
+  @override
+  String get vehTripApplyRefused =>
+      '⟦Ŧĥîš ƥłáñ çóúłđ ñóŧ ƀé ĥáñđéđ ŧó ñáṽîǧáŧîóñ. ················⟧';
+
+  @override
+  String get vehTripBoundedSearch =>
+      '⟦Ŧĥé ƀéšŧ óƒ ŧĥé šŧáŧîóñš šéářçĥéđ, ñóŧ ƥřóóƒ ŧĥáŧ ñóŧĥîñǧ ƀéŧŧéř éẋîšŧš. ···························⟧';
+
+  @override
+  String get vehTripCurrencyWithheld =>
+      '⟦Šóɱé šŧáŧîóñš óñ ŧĥîš řóúŧé ɋúóŧé á çúřřéñçý ŧĥîš ŧřîƥ çáññóŧ ƀé éẋƥřéššéđ îñ. Ŧĥéîř ƥřîçéš šŧáý áš ɋúóŧéđ. ·······································⟧';
+
+  @override
+  String get vehTripIncompleteEvidence =>
+      '⟦Šóɱé šŧáŧîóñš ŵéřé łéƒŧ óúŧ óƒ ŧĥîš ṽéĥîçłé\'š ƥłáñ, šó îŧ šƥéáķš óñłý ƒóř ŧĥé óñéš šéářçĥéđ. ·································⟧';
+
+  @override
+  String get vehTripAssumptionLabel => '⟦Çóñšúɱƥŧîóñ ƒóř ŧĥîš ŧřîƥ ··········⟧';
+
+  @override
+  String get vehTripAssumptionClear => '⟦Úšé ɱý řéçóřđš áǧáîñ ········⟧';
+
+  @override
+  String vehTripSemanticsColumn(String vehicle, int index, int total) {
+    return '⟦$vehicle, ṽéĥîçłé $index óƒ $total ····⟧';
+  }
+
+  @override
+  String get vehTripNoPriceForFuel =>
+      '⟦Ñó šŧáŧîóñ óñ ŧĥîš řóúŧé šéłłš ŧĥîš ṽéĥîçłé\'š ƒúéł, šó ŧĥéřé îš ñó ƒúéł çóšŧ ŧó šĥóŵ. ······························⟧';
+
+  @override
+  String get vehTripUnavailableShort => '⟦Ñóŧ çóɱƥářáƀłé ······⟧';
 
   @override
   String get vinInfoTooltip => '⟦Ŵĥáŧ îš á ṼÎÑ? ·····⟧';

@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/domain/comparison_eligibility.dart';
+import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/time/app_clock.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -32,7 +33,7 @@ import '../../../vehicle/api.dart';
 import '../../domain/services/vehicle_history_comparison.dart';
 import '../../providers/vehicle_comparison_provider.dart';
 import '../widgets/vehicle_comparison_column_card.dart';
-import '../widgets/vehicle_comparison_labels.dart';
+import '../../../../core/utils/comparison_labels.dart';
 import '../widgets/vehicle_comparison_sources_sheet.dart';
 
 /// Side-by-side observed consumption and refuelling for two or more of
@@ -66,6 +67,19 @@ class VehicleComparisonScreen extends ConsumerWidget {
 
     return PageScaffold(
       title: l.vehCompareTitle,
+      // #4367 — the forecast sibling of this screen. It reuses THIS
+      // selection, so the driver crosses from "what did each car cost"
+      // to "what would each cost on the trip I am planning" without
+      // picking the cars again — and without the active vehicle moving.
+      actions: [
+        IconButton(
+          key: const Key('veh_compare_open_trip'),
+          tooltip: l.vehTripOpenTooltip,
+          icon: const Icon(Icons.route_outlined),
+          onPressed: () =>
+              const CompareVehicleTripRoute().push<void>(context),
+        ),
+      ],
       body: ListView(
         children: [
           _Selector(

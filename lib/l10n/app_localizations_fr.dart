@@ -11696,6 +11696,162 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pickerLoading => 'Chargement du catalogue…';
 
   @override
+  String get vehTripTitle => 'Comparer ce trajet';
+
+  @override
+  String get vehTripOpenTooltip =>
+      'Comparer ce trajet entre plusieurs véhicules';
+
+  @override
+  String get vehTripNoRoute =>
+      'Planifie d\'abord un itinéraire — il n\'y a pas encore de trajet à comparer.';
+
+  @override
+  String get vehTripNotEnoughVehicles =>
+      'Choisis au moins deux véhicules pour comparer ce trajet.';
+
+  @override
+  String get vehTripForecastNote =>
+      'Ce sont des estimations pour un trajet que tu n\'as pas encore fait, calculées à partir de la consommation constatée, du réservoir et du carburant compatible de chaque véhicule. Une prévision, pas l\'historique que tu as enregistré.';
+
+  @override
+  String get vehTripScopeNote =>
+      'Carburant et ravitaillement uniquement. L\'entretien, la dépréciation et l\'assurance n\'entrent dans aucun total de cet écran.';
+
+  @override
+  String get vehTripObjectiveLabel => 'Comparer selon';
+
+  @override
+  String get vehTripObjectiveCost => 'Coût total le plus bas';
+
+  @override
+  String get vehTripObjectiveTime => 'Durée prévue la plus courte';
+
+  @override
+  String get vehTripObjectiveDistance => 'Détour le plus faible';
+
+  @override
+  String get vehTripFuelUsedLabel => 'Carburant consommé par ce trajet';
+
+  @override
+  String get vehTripCostToDriveLabel => 'Coût en carburant du trajet';
+
+  @override
+  String get vehTripCostToDriveNote =>
+      'Le carburant que le trajet consomme, valorisé au meilleur prix disponible pour le carburant de ce véhicule sur cet itinéraire. Il ne change pas selon ce qui se trouve déjà dans le réservoir.';
+
+  @override
+  String get vehTripCashRequiredLabel => 'Dépense à la pompe';
+
+  @override
+  String get vehTripCashRequiredNote =>
+      'Ce que tu paierais sur ce trajet avec le réservoir tel qu\'il est maintenant, frais d\'arrêt connus inclus. Un réservoir plein coûte moins cher à remplir, pas moins cher à rouler.';
+
+  @override
+  String get vehTripStopsLabel => 'Arrêts carburant';
+
+  @override
+  String get vehTripExtraKmLabel => 'Kilomètres supplémentaires';
+
+  @override
+  String get vehTripTimeLabel => 'Durée prévue';
+
+  @override
+  String get vehTripStartTankLabel => 'Réservoir au départ';
+
+  @override
+  String get vehTripEndTankLabel => 'Réservoir à l\'arrivée';
+
+  @override
+  String get vehTripConsumptionLabel => 'Consommation retenue';
+
+  @override
+  String get vehTripNoStops => 'Aucun arrêt carburant nécessaire.';
+
+  @override
+  String vehTripStopLine(String station, String litres, String cost) {
+    return '$station : prendre $litres pour $cost';
+  }
+
+  @override
+  String get vehTripSourceMeasured => 'd\'après tes relevés';
+
+  @override
+  String get vehTripSourceManual => 'ton hypothèse';
+
+  @override
+  String get vehTripSourceEstimated => 'estimé';
+
+  @override
+  String get vehTripSourceUnknown => 'inconnu';
+
+  @override
+  String vehTripGap(String fromKm, String toKm) {
+    return 'Ce véhicule ne peut pas franchir le tronçon de $fromKm à $toKm avec un seul plein.';
+  }
+
+  @override
+  String vehTripWinnerCost(String vehicle) {
+    return '$vehicle roule au coût le plus bas';
+  }
+
+  @override
+  String vehTripWinnerCash(String vehicle) {
+    return '$vehicle demande le moins à la pompe';
+  }
+
+  @override
+  String vehTripWinnerTime(String vehicle) {
+    return '$vehicle devrait arriver en premier';
+  }
+
+  @override
+  String get vehTripWinnerWithheld =>
+      'Pas de gagnant unique : tous les véhicules choisis n\'étaient pas comparables sur ce point.';
+
+  @override
+  String get vehTripApply => 'Utiliser ce plan';
+
+  @override
+  String vehTripApplied(String vehicle) {
+    return 'Navigation lancée pour $vehicle.';
+  }
+
+  @override
+  String get vehTripApplyRefused =>
+      'Ce plan n\'a pas pu être transmis à la navigation.';
+
+  @override
+  String get vehTripBoundedSearch =>
+      'Le meilleur des stations examinées, sans preuve qu\'il n\'existe rien de mieux.';
+
+  @override
+  String get vehTripCurrencyWithheld =>
+      'Certaines stations de cet itinéraire affichent une devise dans laquelle ce trajet ne peut pas s\'exprimer. Leurs prix restent tels qu\'ils sont affichés.';
+
+  @override
+  String get vehTripIncompleteEvidence =>
+      'Certaines stations manquent au plan de ce véhicule : il ne vaut que pour celles examinées.';
+
+  @override
+  String get vehTripAssumptionLabel => 'Consommation pour ce trajet';
+
+  @override
+  String get vehTripAssumptionClear => 'Revenir à mes relevés';
+
+  @override
+  String vehTripSemanticsColumn(String vehicle, int index, int total) {
+    return '$vehicle, véhicule $index sur $total';
+  }
+
+  @override
+  String get vehTripNoPriceForFuel =>
+      'Aucune station de cet itinéraire ne vend le carburant de ce véhicule : il n\'y a donc pas de coût en carburant à afficher.';
+
+  @override
+  String get vehTripUnavailableShort => 'Non comparable';
+
+  @override
   String get vinInfoTooltip => 'Qu\'est-ce qu\'un VIN ?';
 
   @override

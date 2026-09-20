@@ -1,0 +1,200 @@
+{
+  "vehTripTitle": "Compare this trip",
+  "@vehTripTitle": {
+    "description": "Title of the screen that forecasts the same proposed journey for two or more of the driver's vehicles (#4367)."
+  },
+  "vehTripOpenTooltip": "Compare this trip across vehicles",
+  "@vehTripOpenTooltip": {
+    "description": "Tooltip of the action that opens the same-trip vehicle comparison from the history comparison screen (#4367)."
+  },
+  "vehTripNoRoute": "Plan a route first — there is no journey to compare yet.",
+  "@vehTripNoRoute": {
+    "description": "Shown when no route is active, so the same-trip comparison has no journey to forecast (#4367)."
+  },
+  "vehTripNotEnoughVehicles": "Pick at least two vehicles to compare this trip.",
+  "@vehTripNotEnoughVehicles": {
+    "description": "Shown when fewer than two vehicles are selected for the same-trip comparison (#4367)."
+  },
+  "vehTripForecastNote": "These are estimates for a journey you have not driven yet, built from each vehicle's own consumption evidence, tank and compatible fuel. They are a forecast, not the history you recorded.",
+  "@vehTripForecastNote": {
+    "description": "Standing caveat on the same-trip comparison stating that it is a forecast rather than recorded history (#4367)."
+  },
+  "vehTripScopeNote": "Fuel and refuelling only. Maintenance, depreciation and insurance are in no total on this screen.",
+  "@vehTripScopeNote": {
+    "description": "Standing note stating the economic boundary: the comparison is not a total cost of ownership (#4367)."
+  },
+  "vehTripObjectiveLabel": "Compare on",
+  "@vehTripObjectiveLabel": {
+    "description": "Label of the control choosing which objective every vehicle's plan is reported on (#4367)."
+  },
+  "vehTripObjectiveCost": "Lowest total cost",
+  "@vehTripObjectiveCost": {
+    "description": "Objective option: each vehicle's cheapest plan (#4367)."
+  },
+  "vehTripObjectiveTime": "Shortest expected time",
+  "@vehTripObjectiveTime": {
+    "description": "Objective option: each vehicle's quickest plan (#4367)."
+  },
+  "vehTripObjectiveDistance": "Least extra driving",
+  "@vehTripObjectiveDistance": {
+    "description": "Objective option: each vehicle's plan with the fewest extra road kilometres (#4367)."
+  },
+  "vehTripFuelUsedLabel": "Fuel this trip burns",
+  "@vehTripFuelUsedLabel": {
+    "description": "Row label for the litres the whole journey consumes, detours included (#4367)."
+  },
+  "vehTripCostToDriveLabel": "Fuel cost to drive",
+  "@vehTripCostToDriveLabel": {
+    "description": "Row label for the standardised cost of the fuel the journey burns (#4367)."
+  },
+  "vehTripCostToDriveNote": "The fuel the journey burns, valued at the best price for this vehicle's fuel on this route. It does not change with what is already in the tank.",
+  "@vehTripCostToDriveNote": {
+    "description": "Explanation of the cost-to-drive figure and why it is independent of the starting tank (#4367)."
+  },
+  "vehTripCashRequiredLabel": "Cash at the pump",
+  "@vehTripCashRequiredLabel": {
+    "description": "Row label for the new pump spend this trip needs with the tank as it is now (#4367)."
+  },
+  "vehTripCashRequiredNote": "What you would pay on this trip with the tank as it is now, known stop charges included. A full tank is cheaper to refuel, not cheaper to drive.",
+  "@vehTripCashRequiredNote": {
+    "description": "Explanation separating cash required from cost to drive (#4367)."
+  },
+  "vehTripStopsLabel": "Refuelling stops",
+  "@vehTripStopsLabel": {
+    "description": "Row label for how many stops the plan makes (#4367)."
+  },
+  "vehTripExtraKmLabel": "Extra kilometres",
+  "@vehTripExtraKmLabel": {
+    "description": "Row label for the extra road distance the stops add (#4367)."
+  },
+  "vehTripTimeLabel": "Expected time",
+  "@vehTripTimeLabel": {
+    "description": "Row label for the expected total journey time, stop overheads included (#4367)."
+  },
+  "vehTripStartTankLabel": "Tank at departure",
+  "@vehTripStartTankLabel": {
+    "description": "Row label for the litres in this vehicle's tank when the journey starts (#4367)."
+  },
+  "vehTripEndTankLabel": "Tank at arrival",
+  "@vehTripEndTankLabel": {
+    "description": "Row label for the litres left in the tank at the destination (#4367)."
+  },
+  "vehTripConsumptionLabel": "Consumption assumed",
+  "@vehTripConsumptionLabel": {
+    "description": "Row label for the consumption figure the forecast used for this vehicle (#4367)."
+  },
+  "vehTripNoStops": "No refuelling stop needed.",
+  "@vehTripNoStops": {
+    "description": "Shown for a plan the current tank already covers (#4367)."
+  },
+  "vehTripStopLine": "{station}: buy {litres} for {cost}",
+  "@vehTripStopLine": {
+    "description": "One ordered stop of a vehicle's plan: the station, the quantity to buy and what it costs (#4367).",
+    "placeholders": {
+      "station": {"type": "String"},
+      "litres": {"type": "String"},
+      "cost": {"type": "String"}
+    }
+  },
+  "vehTripSourceMeasured": "from your records",
+  "@vehTripSourceMeasured": {
+    "description": "Provenance label for a planning input derived from the driver's own records (#4367)."
+  },
+  "vehTripSourceManual": "your own assumption",
+  "@vehTripSourceManual": {
+    "description": "Provenance label for a planning input the driver typed themselves (#4367)."
+  },
+  "vehTripSourceEstimated": "estimated",
+  "@vehTripSourceEstimated": {
+    "description": "Provenance label for a modelled planning input (#4367)."
+  },
+  "vehTripSourceUnknown": "not known",
+  "@vehTripSourceUnknown": {
+    "description": "Provenance label for a planning input nothing on record supplies (#4367)."
+  },
+  "vehTripGap": "This vehicle cannot cross from {fromKm} to {toKm} on one tank.",
+  "@vehTripGap": {
+    "description": "Explanation of the stretch of road a vehicle's range cannot cover (#4367).",
+    "placeholders": {
+      "fromKm": {"type": "String"},
+      "toKm": {"type": "String"}
+    }
+  },
+  "vehTripWinnerCost": "{vehicle} costs the least to drive",
+  "@vehTripWinnerCost": {
+    "description": "Verdict naming the vehicle whose fuel cost for this journey is lowest (#4367).",
+    "placeholders": {
+      "vehicle": {"type": "String"}
+    }
+  },
+  "vehTripWinnerCash": "{vehicle} needs the least cash at the pump",
+  "@vehTripWinnerCash": {
+    "description": "Verdict naming the vehicle needing the least new pump spend on this journey (#4367).",
+    "placeholders": {
+      "vehicle": {"type": "String"}
+    }
+  },
+  "vehTripWinnerTime": "{vehicle} is expected to arrive first",
+  "@vehTripWinnerTime": {
+    "description": "Verdict naming the vehicle with the shortest expected journey time (#4367).",
+    "placeholders": {
+      "vehicle": {"type": "String"}
+    }
+  },
+  "vehTripWinnerWithheld": "No single winner: not every selected vehicle could be compared on this figure.",
+  "@vehTripWinnerWithheld": {
+    "description": "Shown instead of a verdict when fewer than two vehicles have a comparable figure (#4367)."
+  },
+  "vehTripApply": "Use this plan",
+  "@vehTripApply": {
+    "description": "Button that hands one vehicle's chosen plan and its ordered stops to navigation (#4367)."
+  },
+  "vehTripApplied": "Navigation started for {vehicle}.",
+  "@vehTripApplied": {
+    "description": "Confirmation that the chosen vehicle's plan was handed to navigation (#4367).",
+    "placeholders": {
+      "vehicle": {"type": "String"}
+    }
+  },
+  "vehTripApplyRefused": "This plan could not be handed to navigation.",
+  "@vehTripApplyRefused": {
+    "description": "Shown when applying a plan was refused — no route, a reference location, a dead price source or a failed launch (#4367)."
+  },
+  "vehTripBoundedSearch": "The best of the stations searched, not proof that nothing better exists.",
+  "@vehTripBoundedSearch": {
+    "description": "Caveat shown when the planner hit its documented work limit for this vehicle (#4367)."
+  },
+  "vehTripCurrencyWithheld": "Some stations on this route quote a currency this trip cannot be expressed in. Their prices stay as quoted.",
+  "@vehTripCurrencyWithheld": {
+    "description": "Caveat shown when a station's price could not be normalised into the comparison currency (#4367)."
+  },
+  "vehTripIncompleteEvidence": "Some stations were left out of this vehicle's plan, so it speaks only for the ones searched.",
+  "@vehTripIncompleteEvidence": {
+    "description": "Caveat shown when partial country coverage or a hidden station shaped this vehicle's candidate set (#4367)."
+  },
+  "vehTripAssumptionLabel": "Consumption for this trip",
+  "@vehTripAssumptionLabel": {
+    "description": "Label of the field where the driver types their own consumption assumption for one vehicle (#4367)."
+  },
+  "vehTripAssumptionClear": "Use my records again",
+  "@vehTripAssumptionClear": {
+    "description": "Button that drops the driver's typed consumption assumption for one vehicle (#4367)."
+  },
+  "vehTripSemanticsColumn": "{vehicle}, vehicle {index} of {total}",
+  "@vehTripSemanticsColumn": {
+    "description": "Screen-reader label naming one vehicle's column in the same-trip comparison (#4367).",
+    "placeholders": {
+      "vehicle": {"type": "String"},
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "vehTripNoPriceForFuel": "No station on this route sells this vehicle's fuel, so there is no fuel cost to show.",
+  "@vehTripNoPriceForFuel": {
+    "description": "Shown in place of a fuel cost when no candidate station on the route prices the vehicle's grade (#4367)."
+  },
+  "vehTripUnavailableShort": "Not comparable",
+  "@vehTripUnavailableShort": {
+    "description": "Shown in place of a figure that has no comparable value, never a dash that could read as zero (#4367)."
+  }
+}

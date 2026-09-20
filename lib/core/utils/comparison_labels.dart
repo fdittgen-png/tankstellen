@@ -3,6 +3,12 @@
 
 /// The one place a #4364 eligibility vocabulary value becomes words.
 ///
+/// Lives in core beside `data_value_labels.dart` (#4367): the
+/// vocabulary is core's, and both the #4365 history comparison and the
+/// #4367 same-trip comparison render it. A second table in the second
+/// surface would drift, and a caveat that drifts is a caveat that goes
+/// missing.
+///
 /// Both switches are exhaustive on purpose: a new
 /// [ComparisonUnavailableReason] or [ComparisonQualification] must be
 /// given a sentence here or the analyzer says so. A caveat that
@@ -10,8 +16,8 @@
 /// into a confident one.
 library;
 
-import '../../../../core/domain/comparison_eligibility.dart';
-import '../../../../l10n/app_localizations.dart';
+import '../../l10n/app_localizations.dart';
+import '../domain/comparison_eligibility.dart';
 
 /// Why a metric has no comparable number, in the user's language.
 String comparisonReasonLabel(

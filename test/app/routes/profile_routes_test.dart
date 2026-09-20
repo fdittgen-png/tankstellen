@@ -8,7 +8,7 @@ import 'package:tankstellen/core/navigation/app_routes.dart';
 
 void main() {
   group('profileRoutes', () {
-    test('returns exactly 27 routes', () {
+    test('returns exactly 28 routes', () {
       // Guards against accidental insert/delete — the Profile shell
       // branch pushes onto these sub-screens. #2248 added the three
       // Developer-tools routes (/developer-tools[/error-log|/flags]);
@@ -17,13 +17,14 @@ void main() {
       // #3884 added the twelve Settings topic screens + the radar
       // sub-screen (/settings/...); #4007 added /help, appended LAST so
       // that no existing index in the tests below moves; #4365 appended
-      // /compare-vehicles and #4217 appended /settings/fleet after it,
-      // each for the same reason. The count is the SUM of both — each
-      // branch said 26 on its own, and 26 is what neither of them is.
-      expect(profileRoutes.length, 27);
+      // /compare-vehicles, #4217 appended /settings/fleet and #4367
+      // appended /vehicles/compare-trip, each for the same reason. The
+      // count is the SUM of all of them — every branch said 26 or 27 on
+      // its own, and neither number is what the merge produces.
+      expect(profileRoutes.length, 28);
     });
 
-    test('route 26 path is "/settings/fleet" (#4217) — appended last', () {
+    test('route 26 path is "/settings/fleet" (#4217)', () {
       final route = profileRoutes[26] as GoRoute;
       expect(route.path, RoutePaths.settingsFleet);
       expect(route.builder, isNotNull);
@@ -117,6 +118,14 @@ void main() {
     test('route 25 path is "/vehicles/compare" (#4365)', () {
       final route = profileRoutes[25] as GoRoute;
       expect(route.path, RoutePaths.compareVehicles);
+    });
+
+    test('route 27 path is "/vehicles/compare-trip" (#4367)', () {
+      // Index 27, not 26: #4217's /settings/fleet landed at 26 while
+      // this branch was in flight, and both were written "appended
+      // last". The merge order decides, and the pin records it.
+      final route = profileRoutes[27] as GoRoute;
+      expect(route.path, RoutePaths.compareVehicleTrip);
     });
 
     test('every entry is a GoRoute', () {
