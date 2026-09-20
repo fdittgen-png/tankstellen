@@ -82,7 +82,7 @@ void main() {
     // v5 (#3794): additive session + obd2Link blocks, on top of v4's
     // obd2Coverage + verdict (#3499/#3501). Every bump is additive, so
     // this block's contract is unchanged.
-    expect(json['schema'], 5);
+    expect(json['schema'], 6);
     final block = json['gpsCoverage'] as Map<String, dynamic>;
     expect(block['actualFixCount'], 12);
     expect(block['expectedFixCount'], 41);

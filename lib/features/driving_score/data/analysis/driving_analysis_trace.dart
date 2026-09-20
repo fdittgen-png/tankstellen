@@ -54,7 +54,24 @@ class DrivingAnalysisTrace {
   ///
   /// Purely additive: both null on legacy trips, and v4 readers that
   /// ignore unknown keys still parse.
-  static const int schema = 5;
+  ///
+  /// v6 (#4352, Epic #4351) — a new top-level `protection` block: which
+  /// **artifact** this trip was recorded on and what native execution
+  /// protection the session actually held. The user report behind
+  /// #4351 is "recording only works while its form is open", and the
+  /// first cause is the artifact, not the code: `FGS_FORM_APPROVED` is
+  /// a build define that the Play workflow passes only when the
+  /// repository variable is set (it is not), so a Play APK and an
+  /// F-Droid APK built from the SAME commit have different
+  /// background-recording capability. Without this block an export
+  /// cannot tell the two apart, and every screen-off report is
+  /// unattributable. `channel` + `foregroundServiceCompiled` are always
+  /// emitted (they are compile-time facts); `verdict` is
+  /// [RecordingProtectionVerdict.unknown] until a session actually
+  /// acquires a lease (S4 / #4352b) — and unknown is never "protected".
+  ///
+  /// Purely additive; v5 readers that ignore unknown keys still parse.
+  static const int schema = 6;
 
   final DateTime capturedAt;
 
@@ -107,6 +124,8 @@ class DrivingAnalysisTrace {
     this.comment = kDrivingAnalysisCommentPrompt,
     this.termination,
     this.sessionJournal,
+    this.protection,
+    this.protectionBuild = RecordingProtectionBuild.current,
     this.adapterName,
     this.adapterMac,
     this.automatic = false,
@@ -120,6 +139,17 @@ class DrivingAnalysisTrace {
 
   /// #3797 — the session's lifecycle timeline.
   final RecordingSessionJournal? sessionJournal;
+
+  /// #4352 — the protection the session actually held. Null when the
+  /// trip predates the contract or never asked for a lease; the export
+  /// then still records the artifact's compiled capability below, so
+  /// "unknown verdict on a build that could not have promoted anyway"
+  /// is distinguishable from "unknown verdict on a capable build".
+  final RecordingProtectionStatus? protection;
+
+  /// #4352 — which artifact this trip was recorded on. Defaults to the
+  /// running build; overridable so a fixture can assert both channels.
+  final RecordingProtectionBuild protectionBuild;
 
   /// #1312 — adapter identity, already persisted on the trip and until
   /// now dropped at export time.
@@ -252,6 +282,17 @@ class DrivingAnalysisTrace {
                 if (sessionJournal!.droppedEvents > 0)
                   'droppedEvents': sessionJournal!.droppedEvents,
               },
+        // #4352/#4351 (schema v6) — the artifact's protection capability
+        // and the session's actual verdict, beside the journal. Always
+        // emitted: the build half is a compile-time fact, and an absent
+        // block would be indistinguishable from a capable build that
+        // simply never reported. `verdict: unknown` is NOT protected.
+        'protection': <String, Object?>{
+          ...protectionBuild.toJson(),
+          ...?protection?.toJson(),
+          if (protection == null)
+            'verdict': RecordingProtectionVerdict.unknown.name,
+        },
         // #3465 — GPS coverage + attributed track gaps (schema v3). Null
         // when there is no track to judge; the gap list inside is capped
         // at [GpsCoverageReport.kExportGapCap] entries.

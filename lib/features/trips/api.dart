@@ -42,6 +42,12 @@ export 'domain/entities/gps_sample_diagnostic.dart';
 // records them) and by the export/UI surfaces.
 export 'domain/entities/recording_session_event.dart';
 export 'domain/entities/trip_termination.dart';
+// #4352 (Epic #4351) — the protection contract: what native execution
+// protection a session actually holds on THIS artifact. Read by the
+// diagnostics export (driving_score) and, from S4/S5 on, by the owner
+// implementation and the disclosure surface.
+export 'domain/recording_protection.dart';
+export 'domain/recording_protection_owner.dart';
 export 'domain/recording_phase_codec.dart';
 export 'domain/recording_session_journal.dart';
 export 'domain/road_load_track.dart';
