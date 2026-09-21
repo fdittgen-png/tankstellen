@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #2622 — the station-card layout was reworked (favourite star hoisted out
 // of the price row to the top-right, Cheapest badge promoted above the

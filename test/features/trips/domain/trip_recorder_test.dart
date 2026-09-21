@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Florian DITTGEN
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/obd2/domain/trip_distance_source.dart';
 import 'package:tankstellen/features/trips/domain/trip_recorder.dart';

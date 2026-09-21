@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # ADR 0024: Wiring the fuzzy engine — one per-sample stage, the gain once, the version on the trip (#4233)

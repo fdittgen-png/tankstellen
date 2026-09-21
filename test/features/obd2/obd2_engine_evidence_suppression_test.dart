@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3756 — reliability-first stand-down taming. Field report 2026-08-22
 // ("adapter works only for a short time, then nothing"): three young

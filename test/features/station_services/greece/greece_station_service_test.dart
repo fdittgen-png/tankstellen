@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3539 — Greece rewritten from the dead per-prefecture fuelpricesgr
 // API (#3194 NXDOMAIN) to the emvouvakis FuelPricesGreeceAPI mirror:

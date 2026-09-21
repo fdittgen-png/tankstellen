@@ -82,7 +82,7 @@ Free, ad-free fuel & EV-charging prices, 17 countries
 ```
 Compare official, real-time fuel prices and EV-charging across 17 countries.
 Routes you to the cheapest station nearby or along your route. No ads, no
-tracking, no account — GPS and keys stay on-device. Free, open-source (MIT).
+tracking, no account — GPS and keys stay on-device. Free, open-source (AGPL-3.0).
 ```
 
 **Maker's first comment**:
@@ -101,7 +101,7 @@ Sparkilo is different in three ways I care about:
    crowdsourced.
 2. It's privacy-first by design — no ads, no tracking, no account. Your
    location and any API keys never leave your phone.
-3. It's free and open-source (MIT). There's even a libre F-Droid build.
+3. It's free and open-source (AGPL-3.0). There's even a libre F-Droid build.
 
 Beyond price comparison it does along-the-route search, on-device price alerts
 that only fire when you're nearby, a fuel-station radar, a consumption tracker
@@ -148,7 +148,7 @@ trajet — pour SP95, gazole, GPL, E85, etc. Recharge électrique aussi (via Ope
 Charge Map).
 
 Ce à quoi je tiens : pas de pub, pas de traçage, pas de compte. Votre position
-GPS ne quitte jamais le téléphone. C'est gratuit et open-source (MIT).
+GPS ne quitte jamais le téléphone. C'est gratuit et open-source (AGPL-3.0).
 
 Il y a aussi des alertes de prix locales, un suivi de consommation avec OCR du
 ticket, un calculateur de coût et un carnet de trajets. 17 pays au total.
@@ -182,7 +182,7 @@ günstigsten entlang eurer Route — für Benzin, Diesel, LPG, CNG, E85. Auch
 E-Laden ist dabei (über Open Charge Map).
 
 Was mir wichtig ist: keine Werbung, kein Tracking, kein Konto. Euer GPS-Standort
-verlässt das Gerät nie. Kostenlos und Open Source (MIT).
+verlässt das Gerät nie. Kostenlos und Open Source (AGPL-3.0).
 
 Dazu gibt es lokale Preisalarme (lösen nur aus, wenn ihr in der Nähe seid),
 einen Verbrauchstracker mit OCR des Kassenbons, einen Kostenrechner und ein
@@ -217,7 +217,7 @@ per benzina, diesel, GPL, metano, E85. C'è anche la ricarica elettrica (via
 Open Charge Map).
 
 Ciò che mi sta a cuore: niente pubblicità, niente tracciamento, niente account.
-La tua posizione GPS non lascia mai il telefono. Gratuita e open-source (MIT).
+La tua posizione GPS non lascia mai il telefono. Gratuita e open-source (AGPL-3.0).
 
 Ci sono anche avvisi di prezzo locali, un registro dei consumi con OCR dello
 scontrino, un calcolatore di costi e un diario di viaggio. In totale 17 paesi.
@@ -438,7 +438,7 @@ Sparkilo — a cross-platform fuel-price app in Flutter: 23 locales, OBD2, on-de
 **Body**:
 
 ```
-Sharing the dev side of Sparkilo, an open-source (MIT) fuel-price + EV-charging
+Sharing the dev side of Sparkilo, an open-source (AGPL-3.0) fuel-price + EV-charging
 app I just launched on Android and F-Droid (iOS in TestFlight).
 
 Stack and the bits that were interesting to build:

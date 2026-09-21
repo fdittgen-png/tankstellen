@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// User-facing trustworthiness label for a vehicle's consumption
 /// calibration (#2027). Surfaced as a small chip on the vehicle

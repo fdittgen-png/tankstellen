@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3529 (Epic #3527) — the Obd2Reconnect provider as the app-wide owner
 // of THE Obd2LinkSupervisor. The old #3019 semantics this file used to

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # fdroid_publish.sh — build + sign the GMS-free fdroid APK and (re)generate the
 # self-hosted F-Droid repo under ./fdroid (#2576). This is the LOCAL-Mac path

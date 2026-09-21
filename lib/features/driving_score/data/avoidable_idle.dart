@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4221 — a stationary engine-on stretch is avoidable idling only when it
 /// runs this long without moving: longer than a traffic-light cycle or a

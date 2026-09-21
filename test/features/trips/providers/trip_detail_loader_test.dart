@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3882 — the trip-detail loader decodes the full trip off the UI isolate
 // (loading → data), serves list fixtures synchronously when no box is

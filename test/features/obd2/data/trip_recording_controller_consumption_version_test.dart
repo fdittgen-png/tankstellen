@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4330 (#4233 follow-up) — `_finaliseSummary` stamps the consumption
 // model version. Every trip this method finalises — an OBD2 measured or

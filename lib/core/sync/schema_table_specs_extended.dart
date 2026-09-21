@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Optional-table specs of the TankSync schema — the tables opt-in
 /// features (history, ratings, trips, sharing, push, reports) write.

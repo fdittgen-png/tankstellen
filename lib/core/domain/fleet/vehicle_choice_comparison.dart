@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Comparing the vehicles assigned to an employee for ONE planned
 /// journey (#4214, Epic #4211).

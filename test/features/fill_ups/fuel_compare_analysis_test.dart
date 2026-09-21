@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3828 — the fuel comparison showed two rows of numbers and left every
 // decision to the reader. The numbers below are the ones from the field

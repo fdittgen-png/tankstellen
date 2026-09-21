@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4330 — a trip figure's provenance (`pg`, `pgk`, `dfs`, `cmv`) survives
 // a backup/restore round-trip. Before this the backup XML wrote none of

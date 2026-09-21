@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The one place the app answers "which fleet am I in, and how fresh is
 /// that answer" (#4212 / #4218, ADR 0025 D2–D4).

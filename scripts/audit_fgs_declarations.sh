@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # audit_fgs_declarations.sh — assert, per ARTIFACT, the EXACT set of
 # foreground-service permissions and foreground-service declarations an

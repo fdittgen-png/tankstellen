@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3918 — the pump-gain resolution order every fuel-rate reader follows:
 // pumpGainByFuel[fuelKey] → scalar pumpGain → 1.0, and the fuel-key

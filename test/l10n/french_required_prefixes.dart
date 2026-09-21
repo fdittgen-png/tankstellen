@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Key-prefix allow-list of French-reachable surfaces that MUST be fully
 /// translated into `app_fr.arb` — no English fallback permitted.

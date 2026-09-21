@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4212 — the two fleet capabilities enter through the existing
 // registry, not through a parallel one. What is pinned here is the part

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4217 / #4211 carry one explicit exclusion: "no sound, voice control,
 // spoken notifications or audio UX". A string is how such a feature

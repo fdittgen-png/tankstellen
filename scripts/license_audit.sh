@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # License audit script for CI -- ensures all dependencies use MIT-compatible licenses.
 # Allowed: MIT, BSD-2/3, Apache-2.0, MPL-2.0, Unlicense, ISC, Zlib, BlueOak-1.0.0

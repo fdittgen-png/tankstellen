@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- #4060 — see the doc block in lib/core/sync/schema_sql_policies.dart.
 -- Additive: v1 stays so clients already in the field keep working.
 -- v11 (#4060): share_trip_with_email_v2 returns a TEXT outcome. v1 gave

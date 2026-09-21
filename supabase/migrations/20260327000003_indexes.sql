@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Performance indexes for common queries
 CREATE INDEX idx_favorites_user ON public.favorites(user_id);
 CREATE INDEX idx_favorites_station ON public.favorites(station_id);

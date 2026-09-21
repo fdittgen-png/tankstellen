@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3887 — the pump is the truth: a full-to-full tank window re-anchors the
 // estimated fuel on the pump's litres PER KM (coverage cancels), strips

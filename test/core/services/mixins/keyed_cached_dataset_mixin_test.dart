@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3156 — KeyedCachedDatasetMixin: the CachedDatasetMixin state machine with
 // per-key freshness clocks + in-flight fetch slots, for bulk feeds that are a

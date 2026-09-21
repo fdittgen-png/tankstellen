@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- #2397 — Storage cache bucket for the `tiles` OSM caching proxy.
 --
 -- Why: the `tiles` edge function (supabase/functions/tiles) proxies OSM

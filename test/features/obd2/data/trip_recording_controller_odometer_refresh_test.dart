@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3877 — the odometer is re-read every few minutes while the engine runs
 // (one PID, no stalls on a car that never answered), and the controller

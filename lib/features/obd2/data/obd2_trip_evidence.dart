@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// What a recorded trip can prove about its OBD2 session WITHOUT the per-PID
 /// communication instrument (#3824).

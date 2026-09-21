@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4196 (Epic #4195) — a reattach is an ADOPTION, not a recovery. The
 // reattach source proves adoption with `ATRV`, which the ELM chip answers

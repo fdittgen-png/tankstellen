@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # ADR 0027: The legacy consumption estimators are deprecated, not removed — a field-by-field policy (#4234)

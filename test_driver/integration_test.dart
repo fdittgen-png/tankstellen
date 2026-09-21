@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // Flutter-drive driver for the App Store screenshot generator
 // (integration_test/appstore_screenshots_test.dart). Each

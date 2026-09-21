@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4366 — the typed evidence contract. These pin the property the
 // existing calculator outputs lack: a numerator that says WHAT it counts

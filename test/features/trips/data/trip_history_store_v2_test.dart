@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3882 — trip detail v2: the columnar chunk is the exact transpose of the
 // per-sample codec (byte-identical `sampleToJson` maps round-trip), the

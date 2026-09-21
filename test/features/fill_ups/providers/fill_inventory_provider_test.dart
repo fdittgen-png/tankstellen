@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3917 — the persisted last inventory: JSON round-trip through the
 // settings box, and the never-throws contract under a faulty store.

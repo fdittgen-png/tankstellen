@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Interactive AppIntent behind the widgets' refresh button (#3171,
 // iOS 17+ — iOS 16 widgets are render-only, the button is simply not

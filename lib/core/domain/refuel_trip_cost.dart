@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Fuel conservation and comparable money for one refuelling trip
 /// (#4360, Epic #4358, work package B).

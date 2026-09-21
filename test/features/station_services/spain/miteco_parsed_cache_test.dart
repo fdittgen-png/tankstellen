@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3156 — Spain used to cache the RAW province rows and re-parse every one of
 // them on every search, including a regex opening-hours pass per row (a dense

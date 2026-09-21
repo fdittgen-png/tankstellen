@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTD/PropertyList-1.0.dtd">
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 
   Share Extension entitlements (#2736).
 

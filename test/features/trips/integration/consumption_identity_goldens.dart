@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Float64 bit patterns of every figure in
 // `consumption_identity_streams.dart`, captured on the tree BEFORE

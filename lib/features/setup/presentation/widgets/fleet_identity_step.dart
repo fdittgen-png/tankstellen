@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Onboarding step where a fleet driver says *which* fleet (#4217,
 /// Epic #4211, ADR 0025 D2/D3).

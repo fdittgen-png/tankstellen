@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// One fully specified refuelling itinerary, evaluated (#4361, Epic
 /// #4358, work packages C and D).

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # #3661 — release-artifact size visibility (llmwiki page 25, "app size").
 #
 # Size has no failing test unless you build one: it drifts in dependency

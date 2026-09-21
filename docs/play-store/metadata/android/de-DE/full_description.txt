@@ -40,5 +40,5 @@ LÄNDER
 • Griechenland: regionale Durchschnittspreise aus amtlichen Bulletins.
 Kraftstoffsorten, Tankstellendetails und Aktualisierungstakt variieren je Land. Ladesäulen weltweit über Open Charge Map.
 
-23 Sprachen. Open Source (MIT):
+23 Sprachen. Open Source (AGPL-3.0):
 https://github.com/fdittgen-png/tankstellen

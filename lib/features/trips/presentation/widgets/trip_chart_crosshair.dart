@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Part of `trip_detail_charts.dart` (#2977) — the scrub-to-read crosshair:
 // the shared time/value projection geometry, the nearest-point hit-test, and

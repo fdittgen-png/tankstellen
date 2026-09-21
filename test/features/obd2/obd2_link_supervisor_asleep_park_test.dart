@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3859 (Epic #3855) — a drop on a car the vehicle power model knows is
 // ASLEEP parks the supervisor without a dial. The field storms were made

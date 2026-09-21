@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Installs the project pre-push hook into .git/hooks/pre-push.
 #
@@ -37,7 +37,7 @@ HOOK_PATH="$HOOKS_DIR/pre-push"
 cat > "$HOOK_PATH" <<'HOOK'
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # MANAGED HOOK — installed by scripts/install_hooks.sh. Do not edit by hand;
 # edit the installer and re-run it instead.

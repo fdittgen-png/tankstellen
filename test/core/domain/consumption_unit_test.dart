@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3883 — every consumption figure is computed in L/100 km and only
 // RENDERED in the user's unit; the reciprocal units guard zero.

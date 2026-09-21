@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3810 — the repo-scoped MCP server config. These tests exist because
 // two of its properties are load-bearing and silently breakable:

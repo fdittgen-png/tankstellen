@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The shape of a period-scoped, multi-vehicle historical comparison
 /// (#4365, Epic #4358 work package F) — the read model the personal

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // App Store screenshot GENERATOR (not a pass/fail test). Drives the real app
 // to the populated Search-results screen with deterministic French station

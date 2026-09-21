@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3631 — highway mode: hysteresis on sustained speed, and the ahead
 // filter that drops opposite-direction stations (the low-fuel-on-the-

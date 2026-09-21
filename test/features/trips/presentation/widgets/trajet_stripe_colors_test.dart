@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Pins the trajet-stripe colour binding so a future theme rework
 // can't silently collapse the two hues onto the same olive/brown —

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4217 §5 — "no legal wall of text; details are expandable", and
 // ADR 0025 D6 — this page takes no consent. Both are easy to lose

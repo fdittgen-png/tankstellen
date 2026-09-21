@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # play_track_status.sh — READ-ONLY report of what is currently live on each
 # Play Store track (production / beta / alpha / internal). Used to confirm a

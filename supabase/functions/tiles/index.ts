@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Edge Function: tiles
 // OSM raster-tile caching proxy (Epic #2394 Layer 2, #2397).

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Hard-acceleration episode → sample-index helper for the trip-detail map
 /// (#1458 phase 1), extracted from `driving_insights_analyzer.dart` so that

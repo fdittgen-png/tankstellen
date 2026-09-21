@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The fuzzy half of the replay harness (#4232). In-process, never spawned
 // (#3752). The traces here are hand-written arithmetic fixtures for the

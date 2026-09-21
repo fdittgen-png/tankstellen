@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Enable pg_cron extension (requires superuser, available on Supabase Pro+)
 -- On free tier, use an external cron (GitHub Actions, cron-job.org) instead.
 CREATE EXTENSION IF NOT EXISTS pg_cron;

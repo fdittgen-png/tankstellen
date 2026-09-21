@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The error-handling boilerplate this codebase repeats at ~630 call
 /// sites, collapsed into four helpers.

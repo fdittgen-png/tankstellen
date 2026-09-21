@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Persisted-dataset model + JSON codec for the Italian MIMIT (ex-MISE)
 /// service — extracted from `mise_station_service.dart` to keep that file

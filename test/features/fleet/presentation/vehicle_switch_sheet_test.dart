@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4213 — the explicit switch. Recent-first, searchable by code, model
 // or plate fragment, and never a route to a car the driver is not

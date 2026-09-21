@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// "Has at least [interval] passed since [last]?" — true when nothing has
 /// happened yet (#4073). The recording controller carried this predicate

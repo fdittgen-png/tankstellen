@@ -5,8 +5,18 @@
 
 # ADR 0007: MIT license choice
 
-**Status:** Accepted
+**Status:** Superseded by [ADR 0028](0028-agpl-with-a-commercial-exception.md)
 **Date:** 2024-06-01
+**Superseded:** 2026-09-20
+
+> This decision no longer holds. Sparkilo is AGPL-3.0-or-later, and the
+> "GPL-licensed dependencies are prohibited" rule below is reversed —
+> the constraint is now AGPL-compatibility outbound. The document is
+> kept because ADR 0028 reverses it knowingly and the reasoning it
+> reverses has to remain readable; in particular, this ADR named
+> "no protection against proprietary forks" as the accepted trade-off,
+> and that is precisely what changed. Everything released before
+> 2026-09-20 remains MIT and can be forked on those terms for ever.
 
 ## Context
 

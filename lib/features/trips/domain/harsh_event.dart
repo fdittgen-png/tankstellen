@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Classifies a single harsh-driving event captured by
 /// [HarshEventDetector] (#2029). Replaces the old integer counters

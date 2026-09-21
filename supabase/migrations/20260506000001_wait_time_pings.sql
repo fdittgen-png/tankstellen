@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- #1119 — Crowd-sourced station wait-time signal.
 --
 -- Why: TankSync already carries community-config plumbing for opt-in

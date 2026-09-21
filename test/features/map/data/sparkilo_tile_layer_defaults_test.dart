@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Pins the hardened-tile-loading defaults shipped in #2122 so a
 // future TileLayer rewrite can't silently revert them. The fixes

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Promote the newest release from one Play track to another at 100%.
 
 #3713 — the Console's promote flow pre-fills the staged-rollout

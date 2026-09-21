@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #3743 — hide the trips-side trip-length aggregation surface: this file
 // aggregates against the CORE TripLengthBreakdown model below.

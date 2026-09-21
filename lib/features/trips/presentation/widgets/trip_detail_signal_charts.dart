@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The driving-signal trip-detail charts (#2461): throttle/pedal, coolant,
 // altitude, and commanded-λ. #4037 made this a library of its own rather

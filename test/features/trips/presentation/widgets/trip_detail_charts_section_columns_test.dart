@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3882 — chart visibility comes from the stored column set (`cols` of the
 // v2 meta row) when it is known: an O(1) lookup instead of ten scans over

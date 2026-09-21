@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # issue_file_affinity.sh — Cluster GitHub issues by declared file paths so no
 # file (especially shared surfaces) appears in two clusters.

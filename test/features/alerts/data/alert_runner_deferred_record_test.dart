@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4185 — a runner's dedup / cooldown row is written when a notification
 // ACTUALLY went out, not when the runner decided to fire. Written early, it

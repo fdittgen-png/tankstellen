@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Row Level Security -- users can ONLY see/modify their own data
 
 -- Enable RLS on all tables

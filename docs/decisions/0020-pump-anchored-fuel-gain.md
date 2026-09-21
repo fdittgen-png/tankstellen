@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # ADR 0020: The pump is the truth — a learned fuel gain anchors OBD2 consumption on full-tank fills

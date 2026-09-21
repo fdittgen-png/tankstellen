@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4180 — the per-country `search<Country>Stations` helpers that drive each
 // REAL station service over the recorded responses already checked in under

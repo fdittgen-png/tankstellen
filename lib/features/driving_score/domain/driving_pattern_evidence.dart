@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4366 (Epic #4358, work package G) — the TYPED raw evidence a driving
 /// pattern comparison may aggregate.

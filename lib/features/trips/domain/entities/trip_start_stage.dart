@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Stage surfaced while the OBD2 adapter is being reached and the
 /// recorder is warming up. Drives the inline [TripStartProgress] card.

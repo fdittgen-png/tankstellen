@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The single per-table registry of the TankSync (self-hosted Supabase)
 /// schema (2026-08-17 review, extensibility finding 8).

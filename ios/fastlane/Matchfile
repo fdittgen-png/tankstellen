@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # SSH URL: avoids relying on a fine-grained PAT (which kept hitting 403 even
 # with read-only Contents scope). Local devs need their personal GitHub SSH

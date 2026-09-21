@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Wires the TankstellenWidget WidgetKit extension target into
 # ios/Runner.xcodeproj (#3166).

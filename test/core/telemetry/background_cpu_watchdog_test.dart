@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3641 — the background CPU watchdog: /proc stat parsing, the
 // two-hot-windows report flow with per-thread attribution, the report

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4217 — the wizard's step indices used to be arithmetic ("Vehicle is
 // index 2, OBD2 is 3 or 4 depending on the platform"). Two conditional

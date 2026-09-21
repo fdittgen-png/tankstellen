@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3616 — the per-tank insight loop: window building mirrors the #1362
 // walker, behavior aggregation honors the #3599 transport exclusion and

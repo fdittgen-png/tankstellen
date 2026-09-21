@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- TankSync: Optional backend for Tankstellen fuel price app
 -- All tables are user-scoped via RLS. App works 100% without this.
 

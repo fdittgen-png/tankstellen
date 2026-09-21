@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3197 — South Korea pinned by an EVIDENCE-BASED fixture (NOT
 // live-recorded): OPINET requires a per-user API key this project does

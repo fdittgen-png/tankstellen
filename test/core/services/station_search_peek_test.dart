@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3618 — the SWR peek must be a faithful, network-free TWIN of the
 // chain's search read: same key construction, same codec, same #2926

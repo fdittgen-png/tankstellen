@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #4402 — a hand-written `_fragments/<feature>_<locale>.arb` must reach
 // `app_<locale>.arb` through the documented pipeline, for every locale,

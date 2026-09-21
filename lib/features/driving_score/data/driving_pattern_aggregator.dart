@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4366 — bounded, summaries-first aggregation of driving patterns
 /// across the driver's own vehicles.

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:tankstellen/core/sync/sync_transport.dart' show JsonRow;
 import 'package:tankstellen/features/fleet/data/fleet_review_transport.dart';

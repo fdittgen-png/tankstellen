@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Bind trip-share grants to the trip's real owner (#4049).
 --
 -- Reported privately by Andrew Pozdnakov (@andrewpozdnakov7) during

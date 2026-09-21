@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3188 — Italy exact fuel-name matching, driven by RECORDED REAL CSV slices
 // (test/fixtures/it_anagrafica_slice.csv / it_prezzo_slice.csv, captured

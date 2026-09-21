@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Seed data for local development and testing
 -- Run with: supabase db reset (applies migrations + seed)
 

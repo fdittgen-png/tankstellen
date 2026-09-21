@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3875 (Epic #3865) — every host the app CONTACTS must be named in the
 // privacy policy. The audit found logo.clearbit.com, the tile proxy, OSRM

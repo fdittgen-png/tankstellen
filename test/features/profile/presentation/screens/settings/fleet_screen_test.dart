@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4217 / #4218 — Settings → Fleet, plus the gate in front of it. Two
 // things must hold together: a personal user sees no fleet tile at all,

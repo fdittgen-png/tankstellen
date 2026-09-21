@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """#3549 — self-published Greek fuel prices.
 
 Fetches the Greek ministry's official daily-prefecture PDF bulletins

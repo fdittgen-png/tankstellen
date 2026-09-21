@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// What fleet the device is currently scoped to, and how much that
 /// answer can be trusted (#4212 / #4218, ADR 0025 D2–D4).

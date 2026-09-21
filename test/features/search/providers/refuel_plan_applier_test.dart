@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4363 — applying a plan goes through one injected launcher, gated
 /// exactly as every station action is (#4348), and never drops the stops

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4212 / #4218 — the fleet scope contract. The rules under test are
 // ADR 0025 D2 (the e-mail identity), D3 (never the community backend)

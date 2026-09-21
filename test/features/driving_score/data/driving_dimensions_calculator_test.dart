@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4205 — behaviour dimensions with value + confidence + evidence, judged in
 // context: missing signals are unknown (never zero behaviour), a climb or a

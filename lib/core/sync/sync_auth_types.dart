@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Auth/sync seam types shared by [SyncState] and its tests — extracted
 /// from `sync_provider.dart` (#3449) so the provider file stays under the

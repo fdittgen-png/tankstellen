@@ -40,5 +40,5 @@ PAESI
 • Grecia: prezzi medi regionali dai bollettini ufficiali.
 Carburanti, dettagli dei distributori e frequenza di aggiornamento variano da paese a paese. Ricarica elettrica in tutto il mondo tramite Open Charge Map.
 
-23 lingue. Open source (MIT):
+23 lingue. Open source (AGPL-3.0):
 https://github.com/fdittgen-png/tankstellen

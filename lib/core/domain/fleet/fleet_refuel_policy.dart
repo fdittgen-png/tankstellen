@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The fleet company's own constraints on where an employee may refuel
 /// (#4214, Epic #4211), applied as a **pure pre-filter** in front of the

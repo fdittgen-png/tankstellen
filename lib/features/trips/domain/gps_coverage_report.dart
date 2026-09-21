@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../../../core/location/recording_location_settings.dart';
 import 'entities/recording_lifecycle_mark.dart';

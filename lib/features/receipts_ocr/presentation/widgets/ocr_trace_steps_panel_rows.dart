@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Presentational row / tile widgets for the OCR-tester steps panel
 // (#2518). Part of `ocr_trace_steps_panel.dart` so it shares that

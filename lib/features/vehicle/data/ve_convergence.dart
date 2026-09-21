@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The ± half-width of the η_v convergence band shown by the Advanced
 /// calibration section for a profile with [sampleCount] accepted

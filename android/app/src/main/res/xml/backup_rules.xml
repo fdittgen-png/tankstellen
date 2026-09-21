@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 
   #3740 — legacy Auto-Backup rules (Android 11 and below; Android 12+
   reads data_extraction_rules.xml instead). Everything is backed up

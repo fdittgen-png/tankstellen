@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The two pieces of ELM327 AT-command grammar the connect handshake
 // needs — pure string work over the wire protocol, with no service state

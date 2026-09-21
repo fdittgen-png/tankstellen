@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4213 — the current-vehicle contract: explicit selection only, the
 // latest VALID assignment as the default, an expired assignment out of

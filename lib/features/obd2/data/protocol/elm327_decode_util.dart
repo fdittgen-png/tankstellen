@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Low-level ELM327 decode helpers shared by the Mode 01/09 parsers
 /// ([Elm327Parsers]) and the Mode 22 manufacturer parsers

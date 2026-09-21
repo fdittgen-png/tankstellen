@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The link states one OBD2 adapter can be in, as seen by the ONE
 /// reconnect owner (#3529, Epic #3527).

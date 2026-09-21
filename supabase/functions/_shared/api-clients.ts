@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Shared API clients for fetching fuel prices from government/open data sources.
 // Each country has its own fetch function that returns a Map<stationId, StationPrices>.

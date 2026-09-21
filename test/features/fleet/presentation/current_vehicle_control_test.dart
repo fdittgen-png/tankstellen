@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4213 — the current-vehicle chip. Every case is pumped at 360 dp,
 // and the layout cases at 1.6× text in GERMAN: German fleet wording is

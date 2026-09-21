@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The scan's velocity path (#4183, #4185), split out of
 /// `background_scan_runners.dart` to keep that file under the 400-line

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3918 — the monthly average re-expresses each estimated trip at the
 // vehicle's CURRENT pump gain (summary path and sample path alike);

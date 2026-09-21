@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #4347 — the selector's fallbacks must stay safe: a PR is only as tested
 // as the tests the selector picks, and the pre-merge coverage policy judges

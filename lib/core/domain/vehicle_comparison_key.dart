@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// What identifies ONE historical vehicle comparison (#4365, Epic #4358
 /// work package F) — the cache key #4366 and #4367 reuse.

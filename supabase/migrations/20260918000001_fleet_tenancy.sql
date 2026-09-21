@@ -1,5 +1,5 @@
 -- Copyright (c) 2026 Florian DITTGEN
--- SPDX-License-Identifier: MIT
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 --
 -- #4212 (Epic #4211, ADR 0025) — fleet tenancy: organisations, members,
 -- vehicles, effective-dated assignments and per-org policies, behind

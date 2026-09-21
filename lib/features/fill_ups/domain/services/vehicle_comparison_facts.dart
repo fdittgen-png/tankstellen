@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The small facts a #4365 comparison column is made of — what backs a
 /// figure, what the tank held when the period opened, how the vehicle

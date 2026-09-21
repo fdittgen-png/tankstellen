@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3866 (Epic #3865) — the trace uploader honours the Error reporting
 // consent, not only its own endpoint config.

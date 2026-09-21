@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3528 (Epic #3527) — ElmSession protocol core: init clone-tolerance,
 // the classify-before-you-kill error ladder, consecutive-timeout death,

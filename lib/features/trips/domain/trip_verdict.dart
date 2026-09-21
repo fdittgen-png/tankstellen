@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The driver's own post-trip verdict (#3501, epic #3498) — the calibration
 /// signal the drivingAnalysis export used to beg for in a free-text comment

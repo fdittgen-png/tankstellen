@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Shared harness for the #4213 current-vehicle tests: an in-memory
 /// fleet directory cache, a fake settings store and a container whose

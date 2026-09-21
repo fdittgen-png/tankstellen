@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #2703 — corridor over-inclusion (originally `countriesTouchingRouteExtent`).
 // A southern-France route whose whole-route AABB corner clipped GB's box (even

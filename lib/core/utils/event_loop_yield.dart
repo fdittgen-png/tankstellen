@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #3451 — chunked bulk persists: yield to the event loop every
 /// [kBulkWriteYieldEvery] writes so a large sync pull (100+ Hive puts in

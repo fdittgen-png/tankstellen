@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Which currency a fill-up is recorded in, decided from the fill's own
 /// evidence rather than from wherever the profile happens to point

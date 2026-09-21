@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The org directory an employee's device holds (#4212, ADR 0025): the
 /// organisation, its vehicles, the assignments RLS let the caller see,

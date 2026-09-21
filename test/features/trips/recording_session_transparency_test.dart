@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // Epic #3794 — recording-session transparency. Until this landed, a
 // finished trip carried NO record of how it ended: a user tap, a

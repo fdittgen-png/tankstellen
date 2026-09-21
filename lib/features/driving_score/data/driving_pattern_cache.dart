@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4366 — the per-trip totals cache that keeps a driving-pattern
 /// comparison off the sample-decoding path on every rebuild.

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4238 / #4200 — the criteria surface proven by what a user can do, at the
 // widths, text scales and pseudo-locale it ships to. State transitions, not

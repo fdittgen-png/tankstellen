@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #2922 — the station cache served stale/corrupt data (phantom "Super U"
 // brand, truncated far-only result sets, missing prices) until the user

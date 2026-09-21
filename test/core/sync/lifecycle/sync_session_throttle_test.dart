@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4162 — throttle and network loss: the launch init and the passes meet
 /// a network that is down, slow, or comes back.

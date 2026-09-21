@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #2790 — the trip-detail screen recomputes GPS driving features from
 // `widget.samples.map(tripDetailToTripSample)`. The reverse converter used to

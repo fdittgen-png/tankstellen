@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3918 — the tank report's recorded figure re-expressed at the current
 // gain, and the residual that remains after that calibration.

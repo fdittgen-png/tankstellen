@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #3014 (Epic #3013, Phase 2) — property-based ELM327 GATT service/characteristic
 /// discovery, extracted as a PURE, platform-free module so it is unit-tested

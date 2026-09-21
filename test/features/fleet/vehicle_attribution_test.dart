@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4213 — the recognition-priority table. The rules under test are the
 // five #4213 lists in order ("Recognition priority") plus the two hard

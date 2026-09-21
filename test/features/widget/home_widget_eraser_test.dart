@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3867 (Epic #3865) — the home-screen widget container is outside Hive;
 // the eraser's key list must cover every key the widget writers use, or a

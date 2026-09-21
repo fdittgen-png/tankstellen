@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4367 — the same-trip comparison surface. Structural only: no golden
 /// PNG, because a macOS-baselined image fails Linux CI and proves

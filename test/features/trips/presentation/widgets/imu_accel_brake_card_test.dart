@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #2792 — surface the dongle-less IMU hard-accel/brake/sharp-corner counts
 // (persisted on TripSummary, previously read by nothing) on a GPS-only trip.

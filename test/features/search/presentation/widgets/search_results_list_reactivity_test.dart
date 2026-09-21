@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Reactivity regression tests for #2114 — the search-results list must
 // repaint when underlying providers change (favorites toggle, ignored

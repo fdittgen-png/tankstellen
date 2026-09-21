@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- #3078 (Epic #3075) — deletion tombstones.
 --
 -- TankSync merges synced entities as `server ∪ local` then upserts. So when

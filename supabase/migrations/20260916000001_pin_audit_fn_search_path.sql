@@ -1,5 +1,5 @@
 -- Copyright (c) 2026 Florian DITTGEN
--- SPDX-License-Identifier: MIT
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 --
 -- #4251 — pin `search_path` on `audit_rls_policies()` from
 -- `20260426000001_rls_audit_function.sql`.

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../../../core/services/country_service_dependencies.dart';
 import '../../../core/services/station_service.dart';

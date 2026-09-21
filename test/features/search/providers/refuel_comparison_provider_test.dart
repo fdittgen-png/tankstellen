@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4363 — the shared comparison through the PRODUCTION provider: the
 /// same candidate reduction and the same trip ledger every other surface

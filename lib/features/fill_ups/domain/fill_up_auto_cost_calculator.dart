@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Auto-fills the total-cost field on the Add-Fill-up form (#581)
 /// when the screen receives a non-null `preFilledPricePerLiter` from

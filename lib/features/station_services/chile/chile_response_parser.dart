@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Pure parsing helpers for the CNE "Bencina en Línea" envelope (#596,
 /// #563 split). Lives separately from `ChileStationService` so the

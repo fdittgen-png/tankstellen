@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The iOS BGTask identifiers and the processing-lane submission (#2414,
 /// #3169). Moved out of `background_service.dart` (which re-exports this

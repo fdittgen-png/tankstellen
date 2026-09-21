@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Proves `tool/autofill_locales.dart` makes the #1699 completeness gate
 // un-trippable by an en+de-only fragment addition (#2335).

@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Wires the widget-variant Swift sources (#3171 — favorites + predictive
 # widgets, shared list view, AppIntent refresh) into ios/Runner.xcodeproj,

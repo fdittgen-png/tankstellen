@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Who the most recent trip belonged to and when it began — owned by the
 /// recording notifier as a collaborator rather than as three loose fields

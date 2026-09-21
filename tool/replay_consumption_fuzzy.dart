@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The fuzzy engine's half of the consumption replay (#4232, over the #4231
 // harness). Replays one trace's samples through `FuzzyConsumptionEngine`

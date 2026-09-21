@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3904 — a degraded OBD2 trip row says in plain words WHY its figures
 // are estimates: a one-line subtitle under the metrics, in the stripe

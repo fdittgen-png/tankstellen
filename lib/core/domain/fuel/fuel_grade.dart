@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Commercial grades, separate from chemical composition and price aliases.
 /// E98 denotes octane, not 98% ethanol. No grade asserts an exact blend.

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4162 / #4311 — the OBD2 stop, the one lifecycle edge a user drives on
 /// every trip, walked through its phases.

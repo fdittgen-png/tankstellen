@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #595 — verify the staggered fade-in wraps each card in the
 // search results list so the shimmer → results transition feels

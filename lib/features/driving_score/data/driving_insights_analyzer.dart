@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Pure analyzer that turns a stream of [TripSample]s into "cost
 /// lines" for the trip Insights tab (#1041 phase 1).

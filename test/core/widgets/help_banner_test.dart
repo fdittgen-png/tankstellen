@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // The bubble only ever READS the settings box (a shown flag and an int
 // position), so the sanctioned stub-reads-only mock is the right double

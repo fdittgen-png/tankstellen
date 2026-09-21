@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Metric-level eligibility for a comparison (#4364, Epic #4358 work
 /// package I) — the contract #4365 (observed comparison), #4366 (driving

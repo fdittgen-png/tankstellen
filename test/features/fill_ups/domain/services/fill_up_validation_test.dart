@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4206 — a valid full-to-full window validates the whole consumption
 // pipeline: pump truth vs raw and calibrated recordings, coverage, residual,

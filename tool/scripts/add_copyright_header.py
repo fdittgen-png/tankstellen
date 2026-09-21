@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """Add a 2-line MIT SPDX copyright header to every hand-written source
 file in the repo (#2053).
 
@@ -32,7 +32,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 HEADER_LINES = (
     "Copyright (c) 2026 Florian DITTGEN",
-    "SPDX-License-Identifier: MIT",
+    "SPDX-License-Identifier: AGPL-3.0-or-later",
 )
 
 MARKER = HEADER_LINES[0]

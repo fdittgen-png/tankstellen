@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3533 (Epic #3527) — locks the rewrite's core single-owner invariant:
 // the trip layer NEVER dials. A [SupervisorReattachSource] is a pure

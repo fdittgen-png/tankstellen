@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # assert_release_boots.sh — install the R8-shrunk release APK on a running
 # emulator, launch it, and assert the process is still alive afterwards.

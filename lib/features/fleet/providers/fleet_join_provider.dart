@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The join / create action behind the onboarding fleet-identity step
 /// and the Settings → Fleet screen (#4217, ADR 0025 D2/D3/D7).

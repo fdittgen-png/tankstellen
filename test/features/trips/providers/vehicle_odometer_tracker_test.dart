@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3877 — the live odometer reading of a running recording lands in the
 // per-vehicle snapshot store (once per distinct reading).

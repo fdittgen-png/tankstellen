@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3824 — the trip-detail OBD2 card told a driver "No OBD2 session recorded —
 // connect an adapter and record a trip with developer mode enabled" about a

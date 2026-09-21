@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4329 — a trip the controller ends on its own (the #797 grace window,
 /// the #3862 parked finalise) stops sampling at once, exactly as `stop()`

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../../vehicle/domain/entities/reference_vehicle.dart';
 import 'broken_map_belief.dart';

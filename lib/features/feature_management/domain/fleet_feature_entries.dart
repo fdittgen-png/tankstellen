@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The manifest entries of the two fleet capabilities (#4212, Epic
 /// #4211), kept out of `feature_manifest.dart` so registering a slice of

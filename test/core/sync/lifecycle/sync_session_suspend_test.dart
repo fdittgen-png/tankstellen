@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4162 — suspend: the app is backgrounded (and resumed) while a pass or
 /// an init is parked on the network.

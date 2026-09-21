@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #3949 (Epic #3947) — the criteria sheet against the visual grammar:
 // section headers in the title role, one row of Reset + Search in the

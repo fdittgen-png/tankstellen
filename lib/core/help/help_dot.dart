@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4007 — the little `?` beside a control. One tap opens the bundled
 // guide at the heading that control's anchor names.

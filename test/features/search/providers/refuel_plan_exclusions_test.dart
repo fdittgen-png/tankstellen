@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4362 through the PRODUCTION provider path, which is where the defect
 /// lived: the plan was built from a list that had already been filtered

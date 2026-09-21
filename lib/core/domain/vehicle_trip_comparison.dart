@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The read model of a same-trip, multi-vehicle forecast (#4367, Epic
 /// #4358 work package H).

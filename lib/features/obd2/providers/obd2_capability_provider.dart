@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Surfaces the runtime [Obd2AdapterCapability] of the currently
 // connected adapter (#1401 phase 6).

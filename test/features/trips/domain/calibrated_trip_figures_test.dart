@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3918 / #3919 — the retro math (shownLitres = stored × gainNow / pg,
 // estimated fuel only) and the fuel-source classification behind the

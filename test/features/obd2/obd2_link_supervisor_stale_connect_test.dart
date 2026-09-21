@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4343 (Epic #4195) — the latest user action wins over a pending
 // manual dial. A connect the user started and then cancelled with

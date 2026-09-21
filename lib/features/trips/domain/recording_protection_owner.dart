@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4352 / Epic #4351 — the **platform seam** of the protection contract,
 /// and the two guards every caller goes through.

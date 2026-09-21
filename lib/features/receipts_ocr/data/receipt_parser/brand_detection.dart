@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Brand-name heuristics that sit between the raw OCR lines and the
 // per-layout parsers in `brand_layouts.dart`. Kept separate from the

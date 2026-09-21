@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // One-shot helper for issue #2305: inject the new audit-2 semantic keys
 // into every non-en/de/en_XA locale ARB with real localized phrasing.

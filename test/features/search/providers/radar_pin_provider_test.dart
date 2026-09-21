@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #2785 — the radar auto-pin preference defaults ON and persists across
 // controller builds; a stored explicit false (a deliberate opt-out) is

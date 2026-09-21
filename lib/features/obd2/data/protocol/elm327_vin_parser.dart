@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Framing-aware decoder for the Mode 09 PID 02 (`0902`) VIN response (#3278).
 ///

@@ -1,6 +1,6 @@
 No sign-in or account is needed to reach any feature, so no demo credentials are required. The optional TankSync cloud sync uses anonymous auth, and only after the user turns it on.
 
-Free, ad-free, open-source (MIT). Fuel price comparison for 12 countries (national price feeds, plus retailer feeds in Denmark) and EV charging locations from Open Charge Map. The interface is available in 23 languages.
+Free, ad-free, open-source (AGPL-3.0). Fuel price comparison for 12 countries (national price feeds, plus retailer feeds in Denmark) and EV charging locations from Open Charge Map. The interface is available in 23 languages.
 
 Background modes: location is used to keep a trip recording running while the app is backgrounded (the trip's distance and consumption depend on an uninterrupted track), and Bluetooth is used to stay connected to the user's OBD2 adapter for the same recording. Both are user-initiated — a recording only starts when the driver taps Start, and a Live Activity shows on the lock screen for as long as one is running.
 

@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- #3452 — EV favorites + favorite-station payloads (schema v5).
 --
 -- Two gaps closed:

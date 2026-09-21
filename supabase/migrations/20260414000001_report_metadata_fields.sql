@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- #484 — extend price_reports to cover metadata corrections
 -- (wrong station name, wrong address) in addition to price and
 -- open/closed status reports.

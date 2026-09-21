@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3196 (SI) — surface the goriva.si `open_hours` text, driven by a
 // RECORDED REAL search slice (test/fixtures/si_goriva_search_slice.json,

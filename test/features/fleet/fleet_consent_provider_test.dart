@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4212 — fleet sharing consent is gated on the master cloud-sync
 // consent exactly like `consentSyncTrips` (#1479): fleet data leaves the

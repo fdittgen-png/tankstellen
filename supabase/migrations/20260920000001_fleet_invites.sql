@@ -1,5 +1,5 @@
 -- Copyright (c) 2026 Florian DITTGEN
--- SPDX-License-Identifier: MIT
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 --
 -- #4399 (Epic #4211, ADR 0025 D1/D2/D3/D7) — the JOIN half of fleet
 -- onboarding. #4212 shipped the administrator's path

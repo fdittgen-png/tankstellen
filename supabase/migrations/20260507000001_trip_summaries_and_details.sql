@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Trip recordings (OBD2 + GPS) synced across the user's linked devices.
 -- Two-row split (#1479 phase 1):
 --   public.trip_summaries — ~1 KB JSONB, queried for the trip-history list
