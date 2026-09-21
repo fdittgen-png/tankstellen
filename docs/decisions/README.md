@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # Architecture Decision Records
@@ -40,7 +40,7 @@ reused. If a decision is reversed, the original ADR is marked
 | 0004 | Hive for local storage             | Accepted |
 | 0005 | Service chain fallback pattern     | Accepted |
 | 0006 | 23-language i18n strategy          | Accepted |
-| 0007 | MIT license choice                 | Accepted |
+| 0007 | MIT license choice                 | Superseded by 0028 |
 | 0008 | Storage migration evaluation (v5.x) | Accepted |
 | 0009 | Cross-platform default + plugin pattern | Accepted |
 | 0010 | GPS driving-style calibration matrix | Accepted |
@@ -61,3 +61,4 @@ reused. If a decision is reversed, the original ADR is marked
 | 0025 | Fleet tenancy and claims — org-scoped tables behind oracles, RPC-only writes, every fleet number declares what it is (#4212, #4219) | Accepted |
 | 0026 | iOS recording lifecycle — what each transition promises, and the keychain accessibility it costs (#4357) | Accepted |
 | 0027 | Legacy consumption estimators — deprecated, not removed; per-field policy gated on #4231 (#4234) | Accepted |
+| 0028 | AGPL-3.0 with a commercial exception, and the name as a mark (#4442) | Accepted |

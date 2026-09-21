@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # ADR 0017: Trip recording is bounded-memory — live ring, WAL as the source of truth, incremental aggregates, downsampled rendering

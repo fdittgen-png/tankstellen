@@ -40,5 +40,5 @@ PAÍSES
 • Grécia: preços médios regionais dos boletins oficiais.
 Os combustíveis, os detalhes das estações e a frequência de atualização variam consoante o país. Carregamento elétrico em todo o mundo através do Open Charge Map.
 
-23 idiomas. Código aberto (MIT):
+23 idiomas. Código aberto (AGPL-3.0):
 https://github.com/fdittgen-png/tankstellen

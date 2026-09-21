@@ -40,5 +40,5 @@ PAÍSES
 • Grecia: precios medios regionales de los boletines oficiales.
 Los combustibles, los detalles de las gasolineras y la frecuencia de actualización varían según el país. Recarga eléctrica en todo el mundo mediante Open Charge Map.
 
-23 idiomas. Código abierto (MIT):
+23 idiomas. Código abierto (AGPL-3.0):
 https://github.com/fdittgen-png/tankstellen

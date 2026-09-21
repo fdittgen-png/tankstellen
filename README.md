@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 <p align="center">
@@ -20,7 +20,7 @@ Connect a compatible OBD-II adapter when you want engine data alongside your tri
 The core app works without an account; cloud sync is optional.
 
 [![CI](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml/badge.svg)](https://github.com/fdittgen-png/tankstellen/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Built with Flutter](https://img.shields.io/badge/Built_with-Flutter-blue.svg)](https://flutter.dev)
 
 [Get started](https://github.com/fdittgen-png/tankstellen/wiki/User-en-Getting-Started) · [User guide](https://github.com/fdittgen-png/tankstellen/wiki) ·
@@ -224,7 +224,29 @@ user-facing strings.
 
 ## License and acknowledgments
 
-Sparkilo is licensed under the [MIT License](LICENSE). © 2026 Florian DITTGEN.
+Sparkilo is licensed under the
+[GNU Affero General Public License v3.0 or later](LICENSE).
+© 2026 Florian DITTGEN. It was MIT until 2026-09-20 — see
+[ADR 0028](docs/decisions/0028-agpl-with-a-commercial-exception.md) for
+why that changed, and note that everything released before then stays
+MIT and can be forked on those terms for ever.
+
+What this means for you: **almost certainly nothing.** Associations,
+public bodies, schools, individuals — and companies running Sparkilo as
+it ships — owe nothing and never will, whether or not they run a
+commercial fleet on it. The AGPL's §13 obligation is triggered by
+*modifying* Sparkilo *and* serving it over a network, not by using it
+and not by charging for the service you run with it. If you do modify it
+and would rather not publish the changes, there is a
+[commercial licence](COMMERCIAL-LICENCE.md).
+
+Two additional permissions are granted under §7 — for app-store
+distribution and for the Play flavour's proprietary Google libraries —
+in [LICENSE-EXCEPTIONS.md](LICENSE-EXCEPTIONS.md).
+
+"Sparkilo" and its logo are trademarks; a fork is welcome and needs its
+own name ([TRADEMARK.md](TRADEMARK.md)). Contributions: see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 If Sparkilo saves you money, you can support its development through the repository's GitHub Sponsor
 button or [PayPal](https://www.paypal.me/FlorianDITTGEN).

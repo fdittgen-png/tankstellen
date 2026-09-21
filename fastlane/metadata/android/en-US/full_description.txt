@@ -40,5 +40,5 @@ COUNTRIES
 • Greece: regional average prices from official bulletins.
 Fuel grades, station details and update frequency vary by country. EV charging locations worldwide via Open Charge Map.
 
-23 languages. Open source (MIT):
+23 languages. Open source (AGPL-3.0):
 https://github.com/fdittgen-png/tankstellen

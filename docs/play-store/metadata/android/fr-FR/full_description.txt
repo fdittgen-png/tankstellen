@@ -40,5 +40,5 @@ PAYS
 • Grèce : prix moyens régionaux issus des bulletins officiels.
 Carburants, détails des stations et fréquence de mise à jour varient selon le pays. Recharge électrique dans le monde entier via Open Charge Map.
 
-23 langues. Open source (MIT) :
+23 langues. Open source (AGPL-3.0) :
 https://github.com/fdittgen-png/tankstellen

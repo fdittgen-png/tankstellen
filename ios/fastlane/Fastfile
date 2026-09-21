@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Time.parse for the #3814 delivery freshness assert. Without this the parse
 # raises NameError, the rescue swallows it, and the staleness check silently

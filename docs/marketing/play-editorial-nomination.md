@@ -10,7 +10,7 @@ This is a content-writing task; no codebase exploration is needed. The brief is 
 > Rationale: Sparkilo's core loop is location-driven — route to the cheapest station nearby or *along your route*, live "Fuel Station Radar" scanning, an approach live-price overlay, and per-trip GPS routes. That is navigation-first behaviour, and the category is where curators look for polished mapping experiences. (Auto & Vehicles is the natural secondary tag — the consumption tracker, OBD2 trip logbook and CO2 dashboard fit it — but the day-to-day job-to-be-done is "navigate me to the best price," so Maps & Navigation is the stronger primary.)
 
 **Single most compelling reason to feature it:**
-> A genuinely **free, ad-free, no-account, open-source (MIT)** comparison app that uses **official government / open-data fuel prices** — not crowdsourced guesses — across **17 countries**, with **GPS and API keys that never leave the device**. It's the rare utility that's both delightful and principled: privacy-by-design, no monetisation dark patterns, and source you can audit on GitHub.
+> A genuinely **free, ad-free, no-account, open-source (AGPL-3.0)** comparison app that uses **official government / open-data fuel prices** — not crowdsourced guesses — across **17 countries**, with **GPS and API keys that never leave the device**. It's the rare utility that's both delightful and principled: privacy-by-design, no monetisation dark patterns, and source you can audit on GitHub.
 
 **What's new / innovative:**
 - **Official price data, not crowdsourced.** Prices come from national government feeds and official open-data sources, so they're authoritative rather than user-submitted and stale.
@@ -57,7 +57,7 @@ This is a content-writing task; no codebase exploration is needed. The brief is 
 > Sparkilo finds you the cheapest place to fill up — petrol, diesel, LPG, CNG, E85, or an EV charger — using **official government price data** across **17 countries**, not crowdsourced guesses. Search nearby or **along your route**, watch pins shade from cheapest to priciest, and get an on-device alert the moment a good price appears near you. It then closes the loop with a consumption tracker, eco-coaching trip logbook, and a CO2 dashboard.
 
 **Why it deserves a Story / feature:**
-- **Principled by design.** Free, no ads, no tracking, no account — and **open-source (MIT)**. Your location and API keys never leave your iPhone.
+- **Principled by design.** Free, no ads, no tracking, no account — and **open-source (AGPL-3.0)**. Your location and API keys never leave your iPhone.
 - **Authoritative, not crowdsourced.** Real-time official price feeds make it trustworthy in a category full of stale, user-submitted data.
 - **Beautifully focused utility.** A calm, modern interface, a home-screen widget, voice announcements for hands-free driving, an approach live-price overlay, and live Fuel Station Radar — saving money made genuinely pleasant to use.
 - **Global from day one.** 17 countries, worldwide EV charging via Open Charge Map, and **23 languages** — a localisation story that travels.
