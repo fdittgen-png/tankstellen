@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #4346 — the architecture inventory on synthetic fixtures. Every case
 // builds a tiny in-memory lib/ (one runs on a temp dir to cover the disk
@@ -171,7 +171,7 @@ export 'stub.dart'
 
   group('shared-state libraries', () {
     const header = '// Copyright (c) 2026 Florian DITTGEN\n'
-        '// SPDX-License-Identifier: MIT\n\n';
+        '// SPDX-License-Identifier: AGPL-3.0-or-later\n\n';
 
     Map<String, String> controllerLibrary({required bool extracted}) => {
           'lib/features/a/controller.dart': '$header'
@@ -256,7 +256,7 @@ export 'stub.dart'
   test('effectiveLines discounts only the project SPDX header', () {
     expect(
         effectiveLines(linesOf('// Copyright (c) 2026 Florian DITTGEN\n'
-            '// SPDX-License-Identifier: MIT\n\nvoid f() {}\n')),
+            '// SPDX-License-Identifier: AGPL-3.0-or-later\n\nvoid f() {}\n')),
         1);
     expect(effectiveLines(linesOf('void f() {}\nvoid g() {}\n')), 2);
   });

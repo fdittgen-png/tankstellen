@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Abstract event source for the OS-level Bluetooth auto-connect
 /// bridge that drives hands-free trip recording (#1004 phase 2).

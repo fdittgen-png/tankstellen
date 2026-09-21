@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../../features/station_services/argentina/argentina_station_service.dart';
 import '../../features/station_services/australia/australia_station_service.dart';

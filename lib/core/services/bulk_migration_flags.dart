@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Staged-rollout toggles for the whole-country bulk-file source migrations
 /// (#2277, child of Epic #2249).

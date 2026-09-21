@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #2778 (Epic #2776 D2) — DE (Tankerkönig) and PT (DGEG) carry opening hours
 // ONLY on the detail endpoint; their SEARCH payload has none, so a cached

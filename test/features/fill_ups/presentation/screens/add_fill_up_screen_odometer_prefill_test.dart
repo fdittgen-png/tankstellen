@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3877 — the odometer field is prefilled from the car's last OBD2
 // reading so a receipt scan is enough; never below the previous fill-up,

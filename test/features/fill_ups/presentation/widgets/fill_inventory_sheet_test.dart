@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3917 — the "Bilan du plein": every line of the inventory, the
 // calibration outcome or its skip reason, the sheet's dismiss button, and

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4213 (Epic #4211) — `FillUp.fleetAttribution`: the fleet vehicle a
 // fill-up was logged against, stamped at creation and never rewritten

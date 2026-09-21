@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Predictive widget (#3171) — Android parity for the `predictive`
 // content variant (#1121, `widget_variants.dart`). Android lets the user

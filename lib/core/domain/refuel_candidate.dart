@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The station side of the refuel economics (#4089), split from
 /// `refuel_economics.dart` when #4359 gave it a road-travel estimate and

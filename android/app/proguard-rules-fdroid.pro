@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # F-Droid flavor — GMS / ML Kit are compile-only stubs (#2584): the real
 # proprietary classes are NEVER on the fdroid runtime/dex (see the compile-only

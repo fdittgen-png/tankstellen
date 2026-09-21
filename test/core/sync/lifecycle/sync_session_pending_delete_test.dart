@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4345 — a delete made while the session is unavailable (lost,
 /// consent withdrawn, not yet ready) must not come back from the server.

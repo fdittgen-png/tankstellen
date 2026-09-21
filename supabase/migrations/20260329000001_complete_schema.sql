@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- TankSync Complete Schema — v4.1.0
 -- Run this in Supabase SQL Editor if tables are missing.
 -- All CREATE TABLE use IF NOT EXISTS, so it's safe to run multiple times.

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The one shape a consumption figure reaches a consumer in (#4230,
 /// Epic #4222). See `docs/decisions/0022-canonical-consumption-estimate.md`

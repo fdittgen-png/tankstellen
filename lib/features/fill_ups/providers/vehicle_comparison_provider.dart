@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The selection and the read model behind the #4365 personal-vehicle
 /// comparison — and the one place that guarantees choosing a column

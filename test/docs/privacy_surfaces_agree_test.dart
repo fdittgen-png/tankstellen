@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3875 (Epic #3865) — the privacy surfaces cannot drift apart again.
 // `docs/privacy/data_inventory.json` is the source of truth; the policy

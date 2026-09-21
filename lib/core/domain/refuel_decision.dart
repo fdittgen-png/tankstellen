@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The RESULT of a refuel decision: the three rankings, and whether one
 /// of them is confident enough to lead (#4089, #4139).

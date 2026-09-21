@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3196 (PT) — extended DGEG fuel-id coverage + DataAtualizacao mapping,
 // driven by a RECORDED REAL PesquisarPostos slice

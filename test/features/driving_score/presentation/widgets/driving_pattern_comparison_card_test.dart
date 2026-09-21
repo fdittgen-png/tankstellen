@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4366 acceptance 9 — the surface. Structural assertions only (no
 // golden PNG): the figures, their exposure, the stated reason where a

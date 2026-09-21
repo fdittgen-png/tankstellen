@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The fleet oracles and RPCs of the TankSync wizard SQL (#4212, ADR
 /// 0025, schema v13) — the wizard twin of

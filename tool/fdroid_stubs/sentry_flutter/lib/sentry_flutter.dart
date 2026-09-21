@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Libre / F-Droid no-op stub for `sentry_flutter` (#3492, epic #3473).
 ///

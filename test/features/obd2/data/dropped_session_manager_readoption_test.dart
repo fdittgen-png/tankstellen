@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3915 (Epic #3914) — the re-adoption cycle breaker in
 // [DroppedSessionManager]: the SAME `Obd2Service` instance rebound and

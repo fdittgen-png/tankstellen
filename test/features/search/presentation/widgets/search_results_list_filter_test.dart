@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Regression tests for #491 — verify that amenity, open-only, and brand
 // filter providers actually narrow the visible station list in

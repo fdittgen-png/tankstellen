@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3616 — the tank-report card renders the pump headline, the trend vs
 // the previous tank, coverage, the behavior hints WITH the partial-

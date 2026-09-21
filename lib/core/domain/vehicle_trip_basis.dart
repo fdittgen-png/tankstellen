@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// What ONE vehicle brings to a proposed journey, and what the journey
 /// itself is (#4367, Epic #4358 work package H).

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3950 — the consumption-statistics page's month comparison reuses the
 // ONE `MonthlyMetricsTable` of the Trajets month card, so both carry the

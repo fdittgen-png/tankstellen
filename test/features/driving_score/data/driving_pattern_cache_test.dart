@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4366 acceptance 8 — a cached per-trip total must go stale for the
 // right reasons: a trip edit, a deletion, a vehicle reassignment or a

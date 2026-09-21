@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The current fleet vehicle, and the only way it ever changes: the
 /// driver picking one (#4213, Epic #4211, ADR 0025 D4/D7).

@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Wires the Live Activity Swift sources (#3170) into ios/Runner.xcodeproj,
 # following the reproducible pbxproj-wiring pattern established by

@@ -1,5 +1,5 @@
 -- Copyright (c) 2026 Florian DITTGEN
--- SPDX-License-Identifier: MIT
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 --
 -- #4215 (Epic #4211, ADR 0025) — the server half of the expense /
 -- document workflow: two USER-owned tables, one org-owned audit log, a

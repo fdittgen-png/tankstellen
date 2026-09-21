@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../domain/entities/gps_sample_diagnostic.dart';
 import '../domain/entities/trip_save_stage.dart';

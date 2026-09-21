@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #3382 — time budgets that bound the OBD2 trip-START sequence so a slow /
 /// silent adapter (or a Hive stall) can never leave the recording stuck in

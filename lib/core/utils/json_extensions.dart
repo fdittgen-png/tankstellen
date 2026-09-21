@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'number_parsing.dart';
 /// Safe typed accessors for `Map<String, dynamic>` JSON payloads.

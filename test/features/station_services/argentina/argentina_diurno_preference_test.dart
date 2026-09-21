@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3196 (AR) — prefer tipohorario=Diurno rows in the merge. The open-data
 // CSV publishes separate Diurno (daytime) and Nocturno rows per product;

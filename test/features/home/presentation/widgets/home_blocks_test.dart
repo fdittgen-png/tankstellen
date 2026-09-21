@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4137 — "empty states are the design, not an afterthought". A
 // first-run home that shows three empty cards is worse than the search

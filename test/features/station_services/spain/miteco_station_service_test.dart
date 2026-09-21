@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #2780 (Epic #2776 D4) — every parse assertion here drives the REAL
 // [MitecoStationService.searchStations] through a fixed Dio (see

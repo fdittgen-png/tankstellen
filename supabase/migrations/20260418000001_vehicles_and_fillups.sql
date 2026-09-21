@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Vehicles + consumption fill-ups synced across the user's linked devices.
 -- Profiles are intentionally NOT synced — each device keeps its own active
 -- profile and per-device defaults (fuel, radius, landing screen).

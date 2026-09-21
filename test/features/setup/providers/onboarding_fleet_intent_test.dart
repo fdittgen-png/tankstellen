@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4217 — the fourth intent card. `applyProfileChoice` is the one place
 // the preset bundle and the fleet flag are applied together, in that

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Which stops a journey needs, and which of them is the minimum of each
 /// objective (#4146, rewritten for #4362, Epic #4358).

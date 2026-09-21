@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3870 (Epic #3865) — the two disclosed, switchable third-party flows:
 // the map tile proxy (default on) and internet brand logos (default OFF).

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // `gamificationEnabled` is `@Deprecated` post-#1373 phase 3b but the
 // field is still around (kept for the one-shot migration read in

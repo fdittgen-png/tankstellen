@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3528 integration (Epic #3527) — a successful `Obd2Service.connect`
 // attaches an ElmSession over the transport: every service send runs the

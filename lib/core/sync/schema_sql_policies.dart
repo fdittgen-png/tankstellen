@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// RLS policies + SECURITY DEFINER RPCs for the TankSync schema, split out of
 /// `schema_sql.dart` (which holds the CREATE TABLE blocks) to keep each file

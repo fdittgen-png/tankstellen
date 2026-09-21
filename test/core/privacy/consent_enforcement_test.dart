@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3866 (Epic #3865) — consent is enforced where the data moves, and the
 // record of it is demonstrable (Art. 7): the Cloud Sync consent gates the

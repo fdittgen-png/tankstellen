@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3919 — the dominant fuel-source branch is stamped onto the summary at
 // persist time (from the per-sample provenance) and round-trips through

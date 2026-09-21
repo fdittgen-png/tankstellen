@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3634 — real road distances: the OSRM /table parser, and the
 // enrichment notifier's movement/time gate + merge + silent degrade.

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3549 — the SELF-PUBLISHED Greek price source pinned by a REAL run of
 // the publisher pipeline.

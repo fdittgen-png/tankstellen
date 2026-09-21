@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Extracted from `trip_summary.dart` (#4233 — keeps that file under the
 // 400-line guard); re-exported from there so importers are unaffected.

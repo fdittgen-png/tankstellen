@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 
 # file_child_issue.sh — Wrapper around `gh issue create` that automatically
 # inherits the parent Epic's milestone and area/* label, derives type/* from

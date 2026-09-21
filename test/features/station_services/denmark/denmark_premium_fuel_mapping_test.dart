@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3187 — Denmark premium-fuel mapping, driven by RECORDED REAL feed slices
 // (test/fixtures/dk_shell_prices_slice.json / dk_ok_prices_slice.json,

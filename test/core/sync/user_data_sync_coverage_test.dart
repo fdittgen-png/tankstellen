@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3868 / #3869 (Epic #3865) — the server export set is a superset of the
 // server deletion set (the app never deletes rows it would not show), the

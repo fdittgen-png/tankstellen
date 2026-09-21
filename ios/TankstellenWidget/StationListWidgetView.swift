@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Shared SwiftUI body for the station-list widgets (#3171): the Nearest,
 // Favorites and Predictive variants all render this view — only the entry

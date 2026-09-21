@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Cross-account trip sharing (#2240).
 --
 -- Distinct from the cross-DEVICE sync shipped by #1479 (same account,

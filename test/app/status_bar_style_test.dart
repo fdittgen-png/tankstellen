@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3841 — the status bar stayed an opaque black band after visiting the
 // recording screen, for a whole session, through THREE shipped attempts.

@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- #1119 — pg_cron schedule for the wait-time aggregator.
 --
 -- Why: keep the wait_time_aggregates rolling-median rows fresh

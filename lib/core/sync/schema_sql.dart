@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The complete TankSync (self-hosted Supabase) schema, expressed as the
 /// idempotent SQL a self-hoster pastes into their Supabase SQL Editor.

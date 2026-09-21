@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3625 — the reattach source must never hand the trip layer a corpse.
 // Field flap: after an in-trip drop the supervisor still HELD the very

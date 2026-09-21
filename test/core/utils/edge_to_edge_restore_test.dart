@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3827 — leaving the recording screen left the status bar an opaque black
 // band for the rest of the session, on every other screen, until restart.

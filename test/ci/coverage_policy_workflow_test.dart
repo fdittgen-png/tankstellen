@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #4347 — the CI wiring of the pre-merge changed-line coverage policy.
 // The policy's behaviour is executed in coverage_policy_test.dart; these

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3877 — the end-of-trip odometer is the latest READING plus the distance
 // driven since it (the stop often comes with the engine already off, when

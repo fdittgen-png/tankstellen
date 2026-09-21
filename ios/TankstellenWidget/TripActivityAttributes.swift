@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Shared ActivityKit attributes for the trip-recording / approach-radar
 // Live Activity (#3170) — the iOS-native answer to the Android PiP tile.

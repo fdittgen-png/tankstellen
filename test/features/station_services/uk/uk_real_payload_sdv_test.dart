@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3191 — UK SDV premium diesel + Shell feed + real-schema name fallback,
 // driven by a RECORDED REAL ASDA CMA feed slice

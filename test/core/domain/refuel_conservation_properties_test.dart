@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Property tests for the #4360 conservation and comparability laws,
 /// folded into the economics train per #4339 S13 (#4158 style).

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3529 (Epic #3527) — Obd2LinkSupervisor invariants: single flight,
 // one intent flag, NO dead-end states (the loop retries until user stop

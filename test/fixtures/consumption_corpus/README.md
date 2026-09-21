@@ -1,6 +1,6 @@
 <!--
   Copyright (c) 2026 Florian DITTGEN
-  SPDX-License-Identifier: MIT
+  SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
 # Consumption replay corpus (#4231, Epic #4222)

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4352 / Epic #4351 — the **protection contract**: what native execution
 /// protection a recording session actually holds, on *this* artifact.

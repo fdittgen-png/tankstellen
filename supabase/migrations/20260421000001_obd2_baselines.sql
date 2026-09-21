@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Per-vehicle OBD2 consumption baselines (#780).
 --
 -- One JSON payload per (user, vehicle) pair holding the Welford

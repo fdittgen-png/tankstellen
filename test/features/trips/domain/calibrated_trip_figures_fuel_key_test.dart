@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4220 — a trip's estimated fuel is re-expressed at the gain of the fuel
 // it was RECORDED on, never at whatever grade the tank holds today. The

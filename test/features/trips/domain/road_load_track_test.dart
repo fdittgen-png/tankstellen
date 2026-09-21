@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4203 — the road-load feature track: grade with confidence (steep climbs,
 // GPS noise, tunnels, poor accuracy), curvature that is unknown rather than

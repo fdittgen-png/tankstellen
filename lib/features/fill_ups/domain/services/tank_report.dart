@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Per-tank insight loop (#3616): the latest closed plein-to-plein window
 /// as a first-class report — its true pump consumption, the evolution

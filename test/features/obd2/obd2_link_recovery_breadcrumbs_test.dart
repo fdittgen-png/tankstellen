@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3534 (Epic #3527) — the induced-drop recovery chain is visible in the
 // breadcrumb export: detect (`OBD2 link drop`) → failed dial(s)

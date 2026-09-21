@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3904 — the month card's value columns never wrap. The old fixed-flex
 // rows squeezed "10,1 L/100 km" into ~⅔ of the label's width and broke

@@ -1,5 +1,5 @@
 -- Copyright (c) 2026 Florian DITTGEN
--- SPDX-License-Identifier: MIT
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 --
 -- #3726 — Play UGC-policy prerequisite: in-app REPORT for community
 -- user-generated content (shared trips, community price reports, shared

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Pure climb + stop-and-go-restart detection over a trip's [TripSample]
 /// stream, extracted from `driving_insights_analyzer.dart` so the analyzer

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // `intl` re-exports a `TextDirection` symbol; this provider has no painter
 // so there's no dart:ui clash, but we hide it to match the repo-wide guard

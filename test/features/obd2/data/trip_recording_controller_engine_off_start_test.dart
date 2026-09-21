@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3858 (Epic #3855) — a recording started with the engine OFF. The bus
 // probe is silent and the adapter reads 12.4 V: the controller starts

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4369 — the self-hosted F-Droid publish workflow built WITHOUT
 // `FDROID_LIBRE=true` while scripts/fdroid_publish.sh and the fdroiddata

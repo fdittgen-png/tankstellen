@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #3857 (Epic #3855) — the ~10 s `ATRV` voltage watch of
 /// [TripRecordingController], as a collaborator that owns its two fields

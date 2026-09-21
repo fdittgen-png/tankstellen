@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4138 — intents are presets over parameters that already exist, and
 // the sheet must never show a label that no longer matches the state.

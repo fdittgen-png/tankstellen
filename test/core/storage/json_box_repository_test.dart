@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3614 — unit tests for the shared keyed-Hive-JSON repository base
 // extracted from the loyalty / achievements / service-reminder repos.

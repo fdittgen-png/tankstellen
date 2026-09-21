@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4162 — partial restore: the two stores a TankSync session lives in
 /// (the settings box and the platform keychain) come back independently —

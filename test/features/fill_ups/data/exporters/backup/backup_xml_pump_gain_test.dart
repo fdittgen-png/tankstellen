@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3918 — `pumpGainByFuel` / `tankFuelKey` round-trip through the backup
 // XML; both are omitted when empty so the committed golden is unchanged.

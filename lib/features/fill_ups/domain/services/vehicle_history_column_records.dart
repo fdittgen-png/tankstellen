@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The record-shaped half of a #4365 comparison column: which trips
 /// count, how the vehicle was refuelled, where it was refuelled, and

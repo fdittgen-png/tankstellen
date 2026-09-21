@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The single source of truth for classifying one raw ELM327 adapter
 /// reply into a coarse health bucket (#2464, foundation of Epic #2463).

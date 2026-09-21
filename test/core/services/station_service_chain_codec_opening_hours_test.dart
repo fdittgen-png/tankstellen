@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #2777 (Epic #2776 D1) — the search-list cache codec MUST round-trip the
 // structured Station.openingHours. Before the fix the field was

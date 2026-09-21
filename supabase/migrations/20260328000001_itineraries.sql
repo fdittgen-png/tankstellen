@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- Saved itineraries: routes prepared on one device, synced to others
 CREATE TABLE IF NOT EXISTS public.itineraries (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

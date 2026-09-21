@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3821 — store copy is shipped text that no compiler ever sees, so the only
 // thing standing between a typo and a public listing is a test.

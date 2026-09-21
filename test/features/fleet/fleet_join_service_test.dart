@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4217 — the join half of fleet onboarding. What is pinned here is
 // the promise the UI is built on: the service NEVER throws, and every

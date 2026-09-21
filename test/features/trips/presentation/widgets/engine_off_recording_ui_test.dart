@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3859 / #3860 / #3862 (Epic #3855) — the one UX vocabulary for a car
 // whose engine is off: the GPS pill says *waiting for the engine* and

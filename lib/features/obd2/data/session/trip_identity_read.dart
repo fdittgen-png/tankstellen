@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #3858 — the once-per-session guard on the trip's identity reads
 /// (odometer / VIN / ECU fuel type), owned by [TripRecordingController]

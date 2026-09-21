@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The one owner of a historical multi-vehicle comparison (#4364, Epic
 /// #4358 work package I) — what #4365, #4366 and #4367 consume, and what

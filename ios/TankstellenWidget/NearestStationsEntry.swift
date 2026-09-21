@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // TimelineEntry payload shared by every station-list widget in the bundle
 // (#3171): Nearest reads `nearest_json`, Favorites reads `stations_json`,

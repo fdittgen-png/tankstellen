@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3603 — reconnect stand-down. Field storm: 20 consecutive
 // liveReconnect rfcommOpenFail timeouts over 21 minutes, each burning

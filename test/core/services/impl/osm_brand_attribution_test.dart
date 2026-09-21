@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #2922 — the OSM brand enricher could stamp a neighbouring supermarket's fuel
 // POI ("Super U") onto a different station because its nearest-POI attribution

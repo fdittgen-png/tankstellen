@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The manager dashboard's read path (#4216, ADR 0025, schema v15) —
 /// the wizard twin of

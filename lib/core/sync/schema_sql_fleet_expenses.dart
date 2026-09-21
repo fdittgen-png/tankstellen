@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The audit log, review RPCs and private Storage bucket of the fleet
 /// expense workflow (#4215, ADR 0025, schema v14) — the wizard twin of

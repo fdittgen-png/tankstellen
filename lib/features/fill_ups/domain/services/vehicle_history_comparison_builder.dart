@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Builds a #4365 [VehicleHistoryComparison] — a PURE function of the
 /// records, the key and an injected report instant.

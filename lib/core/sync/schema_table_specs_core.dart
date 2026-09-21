@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Required-table specs of the TankSync schema — the tables core sync
 /// needs before it can function at all (a missing one means the wizard

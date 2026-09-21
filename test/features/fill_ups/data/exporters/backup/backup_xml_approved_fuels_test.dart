@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4324 — `approvedFuelGrades` round-trips through the backup XML, is
 // omitted when empty, and a pre-#4324 backup still restores (nothing

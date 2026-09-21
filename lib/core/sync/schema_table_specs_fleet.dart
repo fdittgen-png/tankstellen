@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Fleet table specs of the TankSync schema (#4212 / #4215, ADR 0025,
 /// schema v13 / v14) — the wizard twins of

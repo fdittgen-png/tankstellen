@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/models/trip_calculation.dart';

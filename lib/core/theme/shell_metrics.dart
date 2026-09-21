@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The app's toolbar height, everywhere — `AppBar` through the theme and
 /// every `SliverAppBar` explicitly (#4082). Material's 56 dp spent a

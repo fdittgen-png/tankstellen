@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Argentine "Secretaría de Energía" open-data CSV uses product strings like:
 ///   - "Nafta (premium) de más de 95 Ron"

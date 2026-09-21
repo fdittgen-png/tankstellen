@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4217 / ADR 0025 D2–D4 — the step's three faces and, above all, the
 // rule that a blocked fleet is *explained*: an anonymous identity or

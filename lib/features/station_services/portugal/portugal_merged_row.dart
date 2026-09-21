@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Merge accumulator for the DGEG `PesquisarPostos` rows — extracted from
 /// `portugal_station_service.dart` to keep that file under the 400-line cap

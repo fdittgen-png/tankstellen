@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Joining a fleet — the one write path an employee has into the org
 /// tables (#4217, Epic #4211, ADR 0025 D2/D3/D7).

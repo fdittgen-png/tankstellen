@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3917 — the inventory a fill establishes, built from the learner's
 // outcome and persisted as JSON until the next fill.

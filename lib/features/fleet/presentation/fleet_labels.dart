@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The one place a fleet role, a blocked scope or a refused join turns
 /// into a sentence (#4217 / #4218).

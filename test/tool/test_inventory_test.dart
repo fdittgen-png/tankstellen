@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #4235 — the test-suite inventory classifies every test file with an
 // action from the issue's fixed vocabulary. Runs IN-PROCESS (#3752).

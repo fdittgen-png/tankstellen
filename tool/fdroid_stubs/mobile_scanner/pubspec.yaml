@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 #
 # Libre / F-Droid drop-in replacement for the `mobile_scanner` plugin (#3477,
 # epic #3473). The upstream plugin's Android side pulls ML Kit barcode

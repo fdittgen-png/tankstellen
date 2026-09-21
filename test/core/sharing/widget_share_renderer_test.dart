@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // #1584 — Tagged `flaky` because share_plus's platform channel
 // occasionally returns null or doesn't call back in the headless

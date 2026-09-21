@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The vehicle signals the recording path consumes, named by what they
 /// MEAN rather than by the OBD-II PID that carries them (#4159).

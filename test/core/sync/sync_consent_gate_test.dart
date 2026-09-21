@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3866 (Epic #3865) — the Cloud Sync CONSENT gates the whole sync path.
 // Before: only trips / trip shares read it; favorites, alerts, vehicles,

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3869 (Epic #3865, GDPR Art. 20) — the one-ZIP export accounts for every
 // Hive box (registry-driven), carries every server table, and is readable

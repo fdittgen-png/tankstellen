@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The Alerts screen's section chrome — headers, per-section empty
 /// lines, and the card that groups a section's rows.

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3788 — the F-Droid variant must reach NO developer-hosted service by
 // default. fdroiddata's static review of MR !42093 blocked the app on

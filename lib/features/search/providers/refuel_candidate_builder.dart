@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// One station → one [RefuelCandidate], the same way everywhere (#4090,
 /// #4156, #4348, #4361; shared by #4363).

@@ -1,5 +1,5 @@
 -- Copyright (c) 2026 Florian DITTGEN
--- SPDX-License-Identifier: MIT
+-- SPDX-License-Identifier: AGPL-3.0-or-later
 --
 -- #3747 (item 1) — pin `search_path` on the three owner-protection
 -- functions from `20260401000001_owner_protection.sql`.

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// In-memory ring buffer that captures every fuel-rate sample the
 /// OBD2 stack produces during a recording trip — the raw inputs (PID

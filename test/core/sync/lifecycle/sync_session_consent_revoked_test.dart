@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4162 — consent revoked: the Cloud Sync consent is withdrawn while a
 /// session is live, mid-pass, or before a setup (GDPR Art. 7(3), #3866),

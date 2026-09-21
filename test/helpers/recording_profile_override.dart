@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:tankstellen/features/trips/domain/entities/recording_profile.dart';
 import 'package:tankstellen/features/trips/providers/recording_profile_provider.dart';

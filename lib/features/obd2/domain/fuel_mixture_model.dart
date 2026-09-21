@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Fuel-mixture policy for the consumption-precision Epic #3416: the
 /// fuel-kind resolution + ethanol blend (#3429), the diesel-aware

@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Pure parsing helpers for the Monitorul Prețurilor single-product
 /// envelope (#3193 — same split shape as the KR parser, #563). Lives

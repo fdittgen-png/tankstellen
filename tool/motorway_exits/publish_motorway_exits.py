@@ -1,5 +1,5 @@
 # Copyright (c) 2026 Florian DITTGEN
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """#3633 — extract motorway exits per supported country from OpenStreetMap.
 
 One Overpass query per country pulls every `highway=motorway_junction`

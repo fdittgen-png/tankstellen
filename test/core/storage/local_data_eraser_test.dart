@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3867 (Epic #3865, GDPR Art. 17) — the local erasure is registry-driven:
 // every Hive box constant declared in `hive_boxes.dart` must be a member

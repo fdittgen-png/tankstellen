@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Which fleet vehicle a record belongs to, how that was decided, and
 /// how sure the app is (#4213, Epic #4211) — the *value*. The decision

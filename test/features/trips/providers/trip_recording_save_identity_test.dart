@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4328 — a trip's history write is the only thing that may retire its
 /// recovery rows, and the trip keeps ONE identity from start to history.

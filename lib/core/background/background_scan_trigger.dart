@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Where a background scan came from. Threaded through to the dedup store
 /// for diagnostics, used in debug logging, and persisted verbatim in the

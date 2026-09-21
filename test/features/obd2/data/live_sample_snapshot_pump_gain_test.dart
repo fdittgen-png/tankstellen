@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #4236 — the live fuel-rate integrator applies the pump gain EXACTLY ONCE
 // and ONLY to estimated branches, under the tank's fuel. Each case is a

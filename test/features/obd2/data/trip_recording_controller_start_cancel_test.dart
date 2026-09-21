@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4344 — a stop that lands while [TripRecordingController.start] awaits
 /// I/O invalidates that start: when the held read finally answers, the

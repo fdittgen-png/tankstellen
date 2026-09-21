@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The single source of truth for the Fuel Station Radar "closeness" signal —
 /// the green fill that grows as the driver nears a station (#2995, lineage

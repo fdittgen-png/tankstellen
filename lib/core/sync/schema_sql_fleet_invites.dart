@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// The invite table and the join RPCs of the TankSync wizard SQL
 /// (#4399, ADR 0025 D1/D2/D3/D7, schema v16) — the wizard twin of

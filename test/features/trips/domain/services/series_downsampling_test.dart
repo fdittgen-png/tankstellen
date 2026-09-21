@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 //
 // #3878 — rendering downsampling invariants: LTTB keeps the endpoints and
 // the extremes, never exceeds the budget, and is the identity below it;

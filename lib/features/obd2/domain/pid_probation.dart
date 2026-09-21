@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../../../core/telemetry/collectors/breadcrumb_collector.dart';
 import '../data/protocol/obd2_response_class.dart';

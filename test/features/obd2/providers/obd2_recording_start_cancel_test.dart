@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// #4344 — the production [Obd2RecordingPipeline] start, cancelled while
 /// the controller's start awaits a held read: by the start watchdog, or by

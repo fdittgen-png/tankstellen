@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 /// Actionable cross-border suggestion shown when the user is close to a
 /// neighbor country whose fuel is cheaper than the current search.

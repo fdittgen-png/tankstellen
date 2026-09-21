@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 Florian DITTGEN
+-- SPDX-License-Identifier: AGPL-3.0-or-later
+
 -- #1110 — RLS audit helper for `test/security/supabase_rls_test.dart`.
 --
 -- Why: Supabase RLS is the only thing that prevents one anon-key
