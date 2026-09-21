@@ -25,6 +25,14 @@
 # none, so the local tool cannot converge and it also re-flows the prebuild
 # shell commands. `fdroid_metadata_canonical_test.dart` implements CI's rule
 # directly, which is why no fdroidserver is needed to stay green.
+#
+# #4445 / ADR 0028 — the `License:` field below describes the PINNED COMMIT,
+# not this branch. The project relicensed to AGPL-3.0-or-later on 2026-09-20;
+# every Builds entry here pins 506fcf502 (v6.0.5, 2026-08-10), which is MIT,
+# so MIT is the correct and honest value today. Move the pin to a
+# post-relicense release and `License:` must become AGPL-3.0-or-later in the
+# SAME commit — `fdroid_recipe_licence_matches_pin_test.dart` fails until it
+# does.
 AntiFeatures:
   NonFreeNet:
     en-US: By default the map loads tiles through a developer-hosted proxy (a fixed
