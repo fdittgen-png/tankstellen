@@ -105,23 +105,43 @@ shares its changes or pays".
   changes is that it becomes a standing release gate rather than a
   one-off check.
 
-- **The F-Droid recipe is a RELEASE BLOCKER, not a footnote.**
-  `fdroid/metadata/de.tankstellen.fuelprices.yml` still says
-  `License: MIT`, and this commit deliberately does not change it,
-  because an AGPL artifact that links the three proprietary Google
-  groups is not distributable and
-  [`fdroid_flavor_not_gms_free`](#4445) records that the last audit
-  checked only the *debug* dependency graph and was wrong.
+- **F-Droid: the two recipes say different things, and both are correct.**
+  This ADR first claimed the recipe was a release blocker pending an audit
+  that did not yet exist. That was wrong, and the correction is recorded
+  rather than quietly edited away: the audit **already existed**.
 
-  Sparkilo is **already published** on F-Droid, which is where this
-  differs from DesKilo: DesKilo's submission was still pending, so a
-  frozen recipe misled nobody. Here, the next F-Droid build cut from an
-  AGPL commit would be published under a `License:` field that says MIT.
-  That is a misstatement to users.
+  `scripts/audit_no_gms.sh` resolves `fdroidReleaseRuntimeClasspath` — the
+  release graph, not debug — then audits the release APK's dex for class
+  definitions and, in strict mode on a release-named artifact, for dangling
+  references at F-Droid's own `check-apk` bar. `fdroid.yml` runs all three
+  layers on **every pull request**. The belief that it checked only the
+  debug graph came from a note that #3473/#3480 had since made obsolete.
 
-  **Therefore: no F-Droid release from an AGPL commit until #4445 has
-  proven the libre release artifact is free of those three groups and
-  the recipe's `License:` has been updated.** Both, in that order.
+  This very relicense proved it. The `build-fdroid` job on the PR that
+  merged ADR 0028 reported:
+
+  ```
+  INFO [strict]: 0 dangling GMS/ML Kit/Play-Core/Sentry type reference(s)
+  OK [strict]: zero GMS/ML Kit/Play-Core/Sentry definitions AND references
+  ==> AUDIT PASSED: fdroid flavor ships no GMS/ML Kit/Play-Core/Sentry
+  ```
+
+  So the libre flavour needs no §7 permission and never did. What remains is
+  a bookkeeping rule, enforced by
+  `test/features/fdroid/fdroid_recipe_licence_matches_pin_test.dart`:
+
+  * `fdroid/metadata/…` — the **self-hosted** repo ships a prebuilt APK
+    built from current master, and the next `v*` tag builds from an AGPL
+    master. It says **AGPL-3.0-or-later**.
+  * `metadata/…` — the source of the official **fdroiddata** recipe. Its
+    `Builds:` entries pin `506fcf502` (v6.0.5, 2026-08-10), which is MIT.
+    The field describes *that commit*, so **MIT is the correct value**, and
+    changing it today would misstate the build F-Droid actually produces.
+    It becomes AGPL in the same commit that moves the pin — the test fails
+    until it does.
+
+  The rule generalises: a claim in an F-Droid recipe is a claim about the
+  pinned commit, never about HEAD.
 
 - **Play and TestFlight are unaffected**, given clause 3.
 
