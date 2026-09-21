@@ -83,4 +83,33 @@ const List<String> kFrenchRequiredPrefixes = <String>[
   // decides whether an attacker-controllable scanned link opens); it must
   // never fall back to English on a French device.
   'qrLaunchConfirm',
+
+  // #2857 — the redesigned alerts screen's station-alert section header and
+  // add button shipped as English-equal autofill placeholders in French.
+  // The fix was a two-key special case in the test; #4436 promoted it to a
+  // prefix so the whole family is covered by the same rule as everything
+  // else here.
+  'alertsStation',
 ];
+
+/// Keys under a [kFrenchRequiredPrefixes] surface whose French value is
+/// legitimately IDENTICAL to the English one (#4436).
+///
+/// The French gate asserts value-distinctness, not just presence — a key
+/// that is present but holds the English string is exactly the failure
+/// #2857 shipped. A handful of strings are the same in both languages for
+/// real reasons, and those are enumerated here rather than handled by
+/// weakening the check. Each entry says why; an entry that stops being
+/// identical (or stops existing) is a test failure, so this list cannot
+/// rot into a blanket exemption.
+const Map<String, String> kFrenchEnglishIdentical = <String, String>{
+  'featureLabel_tankSync': 'TankSync is the product name of the sync '
+      'feature — a proper noun, not translated. Its description IS French.',
+  'featureLabel_glideCoach': 'Glide-coach is a coined feature name kept as '
+      'the product term in every locale; featureDescription_glideCoach '
+      'carries the French explanation.',
+  'obd2CapabilityStandardOnly': '"Standard" is the same word in French, '
+      'with the same meaning and spelling.',
+  'loyaltyBadgePrefix': 'A single U+2212 MINUS SIGN glyph on the '
+      'discounted-price badge — language-neutral punctuation.',
+};
