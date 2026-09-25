@@ -766,7 +766,7 @@ jobs:
           cache: true
       - run: flutter pub get
       - name: OSV vulnerability scan
-        uses: google/osv-scanner-action/osv-scanner-action@v2.5.1
+        uses: google/osv-scanner-action/osv-scanner-action@v2.6.0
         with:
           scan-args: |-
             --lockfile=pubspec.lock
