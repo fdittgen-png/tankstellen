@@ -14,6 +14,7 @@ import 'feature_management/conso_feature_card.dart';
 import 'feature_management/feature_group_card.dart';
 import 'feature_management/feature_grouping.dart';
 import 'feature_management/feature_section_header.dart';
+import 'feature_management/record_driving_workflow_card.dart';
 
 /// Settings-screen section that exposes every [Feature] as a toggle
 /// (#1373 phase 2; #1440 grouping; #1447 cascading-disable; #2681
@@ -123,6 +124,7 @@ class FeatureManagementSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const RecordDrivingWorkflowCard(),
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
             child: Text(

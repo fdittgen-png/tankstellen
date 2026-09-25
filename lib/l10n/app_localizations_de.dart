@@ -8684,6 +8684,55 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'vergangen';
 
   @override
+  String get processWorkflowsDriving => 'Fahrten aufzeichnen und verstehen';
+
+  @override
+  String get processWorkflowsRecordDescription =>
+      'Fahrten aufzeichnen und im Fahrtenverlauf ansehen.';
+
+  @override
+  String get processWorkflowsEnabled => 'Ablauf aktiviert';
+
+  @override
+  String get processWorkflowsNotEnabled => 'Ablauf nicht aktiviert';
+
+  @override
+  String get processWorkflowsDetails => 'Warum ist dies aktiviert?';
+
+  @override
+  String get processWorkflowsEnable => 'Ablauf aktivieren';
+
+  @override
+  String get processWorkflowsRequired =>
+      'Erforderliche Funktionen — gemeinsam aktiviert';
+
+  @override
+  String get processWorkflowsNeeds =>
+      'Vor der Aufzeichnung ein Fahrzeug wählen und den Aufzeichnungsmodus mit den erforderlichen Berechtigungen einrichten. Durch das Aktivieren kann die automatische Aufzeichnung wieder starten, falls sie zuvor für ein Fahrzeug aktiviert wurde.';
+
+  @override
+  String get processWorkflowsImpact =>
+      'Funktionen, die aktiv werden (einschließlich gespeicherter Einstellungen)';
+
+  @override
+  String get processWorkflowsUsedBy =>
+      'Von diesen optionalen Funktionen verwendet';
+
+  @override
+  String get processWorkflowsConfirm => 'Aktivierung bestätigen';
+
+  @override
+  String get processWorkflowsActivated => 'Ablauf aktiviert.';
+
+  @override
+  String get processWorkflowsChanged =>
+      'Die Einstellungen wurden während der Prüfung geändert. Bitte die Vorschau erneut öffnen.';
+
+  @override
+  String get processWorkflowsFailed =>
+      'Der Ablauf konnte nicht vollständig aktualisiert werden. Den aktuellen Zustand prüfen und erneut versuchen.';
+
+  @override
   String pumpGainCalibratedTitle(String vehicleName, String percent) {
     return '$vehicleName: Verbrauchsschätzungen an der Zapfsäule neu verankert ($percent %)';
   }

@@ -8597,6 +8597,54 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tripRecordingPipElapsedCaption => 'elapsed';
 
   @override
+  String get processWorkflowsDriving => 'Record and understand driving';
+
+  @override
+  String get processWorkflowsRecordDescription =>
+      'Record journeys and review them in your driving history.';
+
+  @override
+  String get processWorkflowsEnabled => 'Workflow enabled';
+
+  @override
+  String get processWorkflowsNotEnabled => 'Workflow not enabled';
+
+  @override
+  String get processWorkflowsDetails => 'Why is this enabled?';
+
+  @override
+  String get processWorkflowsEnable => 'Enable workflow';
+
+  @override
+  String get processWorkflowsRequired =>
+      'Required capabilities — enabled together';
+
+  @override
+  String get processWorkflowsNeeds =>
+      'Before recording, choose a vehicle and configure its recording mode and required permissions. Enabling this workflow may resume automatic recording if you previously enabled it for a vehicle.';
+
+  @override
+  String get processWorkflowsImpact =>
+      'Capabilities that will become active (including saved preferences)';
+
+  @override
+  String get processWorkflowsUsedBy => 'Used by these optional capabilities';
+
+  @override
+  String get processWorkflowsConfirm => 'Confirm activation';
+
+  @override
+  String get processWorkflowsActivated => 'Workflow enabled.';
+
+  @override
+  String get processWorkflowsChanged =>
+      'Your settings changed during review. Open the preview again.';
+
+  @override
+  String get processWorkflowsFailed =>
+      'Could not finish updating the workflow. Check its current state and try again.';
+
+  @override
   String pumpGainCalibratedTitle(String vehicleName, String percent) {
     return '$vehicleName: consumption estimates re-anchored to the pump ($percent %)';
   }
@@ -20642,6 +20690,56 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get tripRecordingPipElapsedCaption => '⟦éłáƥšéđ ···⟧';
+
+  @override
+  String get processWorkflowsDriving =>
+      '⟦Řéçóřđ áñđ úñđéřšŧáñđ đřîṽîñǧ ············⟧';
+
+  @override
+  String get processWorkflowsRecordDescription =>
+      '⟦Řéçóřđ ĵóúřñéýš áñđ řéṽîéŵ ŧĥéɱ îñ ýóúř đřîṽîñǧ ĥîšŧóřý. ·····················⟧';
+
+  @override
+  String get processWorkflowsEnabled => '⟦Ŵóřķƒłóŵ éñáƀłéđ ·······⟧';
+
+  @override
+  String get processWorkflowsNotEnabled => '⟦Ŵóřķƒłóŵ ñóŧ éñáƀłéđ ········⟧';
+
+  @override
+  String get processWorkflowsDetails => '⟦Ŵĥý îš ŧĥîš éñáƀłéđ? ·······⟧';
+
+  @override
+  String get processWorkflowsEnable => '⟦Éñáƀłé ŵóřķƒłóŵ ······⟧';
+
+  @override
+  String get processWorkflowsRequired =>
+      '⟦Řéɋúîřéđ çáƥáƀîłîŧîéš — éñáƀłéđ ŧóǧéŧĥéř ················⟧';
+
+  @override
+  String get processWorkflowsNeeds =>
+      '⟦Ɓéƒóřé řéçóřđîñǧ, çĥóóšé á ṽéĥîçłé áñđ çóñƒîǧúřé îŧš řéçóřđîñǧ ɱóđé áñđ řéɋúîřéđ ƥéřɱîššîóñš. Éñáƀłîñǧ ŧĥîš ŵóřķƒłóŵ ɱáý řéšúɱé áúŧóɱáŧîç řéçóřđîñǧ îƒ ýóú ƥřéṽîóúšłý éñáƀłéđ îŧ ƒóř á ṽéĥîçłé. ········································································⟧';
+
+  @override
+  String get processWorkflowsImpact =>
+      '⟦Çáƥáƀîłîŧîéš ŧĥáŧ ŵîłł ƀéçóɱé áçŧîṽé (îñçłúđîñǧ šáṽéđ ƥřéƒéřéñçéš) ··························⟧';
+
+  @override
+  String get processWorkflowsUsedBy =>
+      '⟦Úšéđ ƀý ŧĥéšé óƥŧîóñáł çáƥáƀîłîŧîéš ··············⟧';
+
+  @override
+  String get processWorkflowsConfirm => '⟦Çóñƒîřɱ áçŧîṽáŧîóñ ········⟧';
+
+  @override
+  String get processWorkflowsActivated => '⟦Ŵóřķƒłóŵ éñáƀłéđ. ·······⟧';
+
+  @override
+  String get processWorkflowsChanged =>
+      '⟦Ýóúř šéŧŧîñǧš çĥáñǧéđ đúřîñǧ řéṽîéŵ. Óƥéñ ŧĥé ƥřéṽîéŵ áǧáîñ. ·······················⟧';
+
+  @override
+  String get processWorkflowsFailed =>
+      '⟦Çóúłđ ñóŧ ƒîñîšĥ úƥđáŧîñǧ ŧĥé ŵóřķƒłóŵ. Çĥéçķ îŧš çúřřéñŧ šŧáŧé áñđ ŧřý áǧáîñ. ·····························⟧';
 
   @override
   String pumpGainCalibratedTitle(String vehicleName, String percent) {

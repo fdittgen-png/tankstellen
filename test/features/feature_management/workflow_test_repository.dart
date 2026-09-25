@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Florian DITTGEN
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:tankstellen/features/feature_management/data/feature_flags_repository.dart';
 import 'package:tankstellen/features/feature_management/domain/build_channel.dart';
