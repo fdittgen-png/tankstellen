@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/logging/app_log.dart';
@@ -20,6 +22,27 @@ ProfileRepository profileRepository(Ref ref) {
 class ProfileRepository {
   final StorageRepository _storage;
   static const _uuid = Uuid();
+
+  // Overlapping batches share a main-isolate occupancy-check/write queue.
+  // Background isolates do not write profiles; this is not a cross-isolate lock.
+  static Future<void> _writeTail = Future<void>.value();
+
+  Future<T> _write<T>(Future<T> Function() action) async {
+    final previous = _writeTail;
+    final done = Completer<void>();
+    _writeTail = done.future;
+    await previous;
+    try {
+      return await action();
+    } finally {
+      done.complete();
+    }
+  }
+
+  static String? _country(String? code) {
+    final normalized = code?.trim().toUpperCase();
+    return normalized == null || normalized.isEmpty ? null : normalized;
+  }
 
   ProfileRepository(this._storage);
 
@@ -97,12 +120,13 @@ class ProfileRepository {
   /// Backs the one-profile-per-country rule that keeps the border-cross
   /// auto-switch's country→profile match deterministic.
   bool isCountryTaken(String countryCode, {String? excludeProfileId}) {
-    if (countryCode.isEmpty) return false;
+    final normalized = _country(countryCode);
+    if (normalized == null) return false;
     return getAllProfiles().any(
       (p) =>
           p.id != excludeProfileId &&
           p.countryCode != null &&
-          p.countryCode == countryCode,
+          _country(p.countryCode) == normalized,
     );
   }
 
@@ -137,17 +161,18 @@ class ProfileRepository {
   /// order-independent: the same set of profiles always yields the same
   /// winner, whatever order storage returned them in.
   UserProfile _nextActiveAfterDeletion(List<UserProfile> candidates) {
-    final sorted = [...candidates]..sort((a, b) {
-      final ac = a.countryCode ?? '';
-      final bc = b.countryCode ?? '';
-      // A profile bound to a country outranks one with no country.
-      if (ac.isEmpty != bc.isEmpty) return ac.isEmpty ? 1 : -1;
-      final byCountry = ac.compareTo(bc);
-      if (byCountry != 0) return byCountry;
-      final byName = a.name.compareTo(b.name);
-      if (byName != 0) return byName;
-      return a.id.compareTo(b.id);
-    });
+    final sorted = [...candidates]
+      ..sort((a, b) {
+        final ac = a.countryCode ?? '';
+        final bc = b.countryCode ?? '';
+        // A profile bound to a country outranks one with no country.
+        if (ac.isEmpty != bc.isEmpty) return ac.isEmpty ? 1 : -1;
+        final byCountry = ac.compareTo(bc);
+        if (byCountry != 0) return byCountry;
+        final byName = a.name.compareTo(b.name);
+        if (byName != 0) return byName;
+        return a.id.compareTo(b.id);
+      });
     return sorted.first;
   }
 
@@ -167,10 +192,8 @@ class ProfileRepository {
   /// Migrate existing profiles that have no country/language set.
   /// Backfills from the current global settings stored in Hive.
   Future<void> migrateProfileCountryLanguage() async {
-    final countryCode =
-        _storage.getSetting('active_country_code') as String?;
-    final languageCode =
-        _storage.getSetting('active_language_code') as String?;
+    final countryCode = _storage.getSetting('active_country_code') as String?;
+    final languageCode = _storage.getSetting('active_language_code') as String?;
 
     if (countryCode == null && languageCode == null) return;
 
@@ -248,9 +271,7 @@ class ProfileRepository {
   /// from [source] — the UI language is the user's choice, not a property
   /// of the country being added.
   ///
-  /// Pure: builds the model, writes nothing. The caller persists it (see
-  /// [createMissingCountryProfiles]) so a batch stays atomic-ish and
-  /// testable.
+  /// Pure: builds the model without writing it.
   UserProfile cloneProfileForCountry({
     required UserProfile source,
     required String countryCode,
@@ -268,69 +289,47 @@ class ProfileRepository {
   /// #4259 — create the missing country profiles in [proposals], skipping
   /// any country that is already taken.
   ///
-  /// Idempotent by re-reading occupancy immediately before each write, so a
-  /// double tap, a retry, or a concurrent profile creation cannot produce a
-  /// duplicate country. Never depends on storage order.
-  ///
-  /// **The active profile is never touched.** [createProfile] activates
-  /// whatever it creates when no active id is set (#4268), which on a fresh
-  /// install whose first action is a cross-border route search would hand
-  /// the active country to a route-created profile — forbidden without
-  /// exception by Epic #4257 §C. This path therefore does NOT go through
-  /// [createProfile]: it builds the model itself and persists it with
-  /// [updateProfile], a plain keyed write that has no activation side
-  /// effect. The captured/restored id below is a backstop that asserts the
-  /// invariant rather than the thing that provides it.
-  ///
-  /// One country's failure does not abort the batch: each is reported
-  /// separately so the caller can offer "Retry Italy" rather than an
-  /// all-or-nothing error (#4257 §7).
+  /// Each proposal checks occupancy and persists within one main-isolate
+  /// write queue, including overlapping confirmations. Failures remain
+  /// individually retryable. This operation never writes the active pointer:
+  /// an explicit country switch while saving must not be undone.
   Future<CountryProfileBatchResult> createMissingCountryProfiles(
     List<CountryProfileProposal> proposals,
   ) async {
-    final activeIdBefore = _storage.getActiveProfileId();
     final created = <UserProfile>[];
     final skipped = <String>[];
     final failed = <String, Object>{};
 
     for (final proposal in proposals) {
-      final code = proposal.countryCode;
+      final code = _country(proposal.countryCode) ?? proposal.countryCode;
       try {
-        // Re-check occupancy per write, not once up front: an earlier
-        // proposal in this same batch, another isolate, or a retry may
-        // have taken the country since the proposals were computed.
-        if (isCountryTaken(code)) {
-          skipped.add(code);
-          continue;
-        }
-        final profile = cloneProfileForCountry(
-          source: proposal.source,
-          countryCode: code,
-          fuel: proposal.fuel,
-          name: proposal.name,
-        );
-        await updateProfile(profile);
-        created.add(profile);
-      } catch (e, st) {
-        // #1103 — a failure reported to the user as "Retry Italy" is
-        // useless if it cannot be diagnosed, so the stack trace goes to
-        // the error log (through the ADR 0021 facade) while the error
-        // itself goes back to the caller for the retry UI. The context is
-        // deliberately non-const: which country failed is the whole point.
-        log.error(e, st, layer: ErrorLayer.storage, context: {
-          'where': 'ProfileRepository.createMissingCountryProfiles',
-          'country': code,
+        await _write(() async {
+          if (isCountryTaken(code)) {
+            skipped.add(code);
+            return;
+          }
+          final profile = cloneProfileForCountry(
+            source: proposal.source,
+            countryCode: code,
+            fuel: proposal.fuel,
+            name: proposal.name,
+          );
+          await updateProfile(profile);
+          created.add(profile);
         });
+      } catch (e, st) {
+        // Preserve diagnostics while reporting this country as retryable.
+        log.error(
+          e,
+          st,
+          layer: ErrorLayer.storage,
+          context: {
+            'where': 'ProfileRepository.createMissingCountryProfiles',
+            'country': code,
+          },
+        );
         failed[code] = e;
       }
-    }
-
-    // Restore the active pointer if a write moved it (#4268). Only
-    // meaningful when there WAS one — a device with no active profile
-    // keeps none, so nothing is activated behind the user's back.
-    if (activeIdBefore != null &&
-        _storage.getActiveProfileId() != activeIdBefore) {
-      await _storage.setActiveProfileId(activeIdBefore);
     }
 
     return CountryProfileBatchResult(
