@@ -23,6 +23,7 @@ export 'domain/build_channel.dart';
 export 'domain/conso_mode.dart';
 export 'domain/consumption_tab_visibility.dart';
 export 'domain/feature.dart';
+export 'domain/feature_activation_preview.dart';
 export 'domain/feature_category.dart';
 export 'domain/feature_dependency_graph.dart';
 export 'domain/feature_manifest.dart';

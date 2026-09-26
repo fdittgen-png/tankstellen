@@ -14345,6 +14345,90 @@ abstract class AppLocalizations {
   /// **'elapsed'**
   String get tripRecordingPipElapsedCaption;
 
+  /// No description provided for @processWorkflowsDriving.
+  ///
+  /// In en, this message translates to:
+  /// **'Record and understand driving'**
+  String get processWorkflowsDriving;
+
+  /// No description provided for @processWorkflowsRecordDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Record journeys and review them in your driving history.'**
+  String get processWorkflowsRecordDescription;
+
+  /// No description provided for @processWorkflowsEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow enabled'**
+  String get processWorkflowsEnabled;
+
+  /// No description provided for @processWorkflowsNotEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow not enabled'**
+  String get processWorkflowsNotEnabled;
+
+  /// No description provided for @processWorkflowsDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Why is this enabled?'**
+  String get processWorkflowsDetails;
+
+  /// No description provided for @processWorkflowsEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable workflow'**
+  String get processWorkflowsEnable;
+
+  /// No description provided for @processWorkflowsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required capabilities — enabled together'**
+  String get processWorkflowsRequired;
+
+  /// No description provided for @processWorkflowsNeeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Before recording, choose a vehicle and configure its recording mode and required permissions. Enabling this workflow may resume automatic recording if you previously enabled it for a vehicle.'**
+  String get processWorkflowsNeeds;
+
+  /// No description provided for @processWorkflowsImpact.
+  ///
+  /// In en, this message translates to:
+  /// **'Capabilities that will become active (including saved preferences)'**
+  String get processWorkflowsImpact;
+
+  /// No description provided for @processWorkflowsUsedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Used by these optional capabilities'**
+  String get processWorkflowsUsedBy;
+
+  /// No description provided for @processWorkflowsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm activation'**
+  String get processWorkflowsConfirm;
+
+  /// No description provided for @processWorkflowsActivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow enabled.'**
+  String get processWorkflowsActivated;
+
+  /// No description provided for @processWorkflowsChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Your settings changed during review. Open the preview again.'**
+  String get processWorkflowsChanged;
+
+  /// No description provided for @processWorkflowsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not finish updating the workflow. Check its current state and try again.'**
+  String get processWorkflowsFailed;
+
   /// #3887 — snackbar after a full tank closes a tank window: the OBD2 consumption estimates were rescaled to match the pump; {percent} is the signed change of the estimates, e.g. '-27' (they come down) or '+8'.
   ///
   /// In en, this message translates to:

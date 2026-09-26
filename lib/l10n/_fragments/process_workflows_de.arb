@@ -1,0 +1,16 @@
+{
+  "processWorkflowsDriving": "Fahrten aufzeichnen und verstehen",
+  "processWorkflowsRecordDescription": "Fahrten aufzeichnen und im Fahrtenverlauf ansehen.",
+  "processWorkflowsEnabled": "Ablauf aktiviert",
+  "processWorkflowsNotEnabled": "Ablauf nicht aktiviert",
+  "processWorkflowsDetails": "Warum ist dies aktiviert?",
+  "processWorkflowsEnable": "Ablauf aktivieren",
+  "processWorkflowsRequired": "Erforderliche Funktionen — gemeinsam aktiviert",
+  "processWorkflowsNeeds": "Vor der Aufzeichnung ein Fahrzeug wählen und den Aufzeichnungsmodus mit den erforderlichen Berechtigungen einrichten. Durch das Aktivieren kann die automatische Aufzeichnung wieder starten, falls sie zuvor für ein Fahrzeug aktiviert wurde.",
+  "processWorkflowsImpact": "Funktionen, die aktiv werden (einschließlich gespeicherter Einstellungen)",
+  "processWorkflowsUsedBy": "Von diesen optionalen Funktionen verwendet",
+  "processWorkflowsConfirm": "Aktivierung bestätigen",
+  "processWorkflowsActivated": "Ablauf aktiviert.",
+  "processWorkflowsChanged": "Die Einstellungen wurden während der Prüfung geändert. Bitte die Vorschau erneut öffnen.",
+  "processWorkflowsFailed": "Der Ablauf konnte nicht vollständig aktualisiert werden. Den aktuellen Zustand prüfen und erneut versuchen."
+}

@@ -7788,5 +7788,19 @@
     }
   },
   "routeStopOffRouteQualifier": "estimation géométrique",
-  "routeStopOffRouteTooltip": "Distance à vol d'oiseau entre cet itinéraire et la station. Ce n'est ni la distance depuis votre position, ni le trajet supplémentaire qu'un arrêt coûterait."
+  "routeStopOffRouteTooltip": "Distance à vol d'oiseau entre cet itinéraire et la station. Ce n'est ni la distance depuis votre position, ni le trajet supplémentaire qu'un arrêt coûterait.",
+  "processWorkflowsDriving": "Enregistrer et comprendre les trajets",
+  "processWorkflowsRecordDescription": "Enregistrez vos trajets et consultez votre historique de conduite.",
+  "processWorkflowsEnabled": "Parcours activé",
+  "processWorkflowsNotEnabled": "Parcours non activé",
+  "processWorkflowsDetails": "Pourquoi est-ce activé ?",
+  "processWorkflowsEnable": "Activer le parcours",
+  "processWorkflowsRequired": "Fonctionnalités requises — activées ensemble",
+  "processWorkflowsNeeds": "Avant d’enregistrer, choisissez un véhicule et configurez son mode d’enregistrement et les autorisations requises. L’activation peut relancer l’enregistrement automatique si vous l’aviez activé pour un véhicule.",
+  "processWorkflowsImpact": "Fonctionnalités qui seront activées (préférences enregistrées incluses)",
+  "processWorkflowsUsedBy": "Utilisé par ces fonctionnalités facultatives",
+  "processWorkflowsConfirm": "Confirmer l’activation",
+  "processWorkflowsActivated": "Parcours activé.",
+  "processWorkflowsChanged": "Vos paramètres ont changé pendant la vérification. Ouvrez à nouveau l’aperçu.",
+  "processWorkflowsFailed": "La mise à jour du parcours n’a pas pu être terminée. Vérifiez son état actuel et réessayez."
 }
