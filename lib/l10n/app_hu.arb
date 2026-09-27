@@ -11375,5 +11375,140 @@
   "@processWorkflowsFailed": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "settleFillUpTitle": "What your card charged",
+  "@settleFillUpTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settleFillUpIntro": "Paid in {currency}. Add what your card statement charged to count this fill-up in {profileCurrency}.",
+  "@settleFillUpIntro": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      },
+      "profileCurrency": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpCurrencyUnknownIntro": "No currency was recorded for this fill-up. Say which one you paid in — nothing is assumed.",
+  "@settleFillUpCurrencyUnknownIntro": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settleFillUpCurrencyLabel": "Currency paid in",
+  "@settleFillUpCurrencyLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settleFillUpModeAmount": "Amount charged",
+  "@settleFillUpModeAmount": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settleFillUpModeRate": "Exchange rate",
+  "@settleFillUpModeRate": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settleFillUpAmountLabel": "Charged in {currency}",
+  "@settleFillUpAmountLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpAmountHint": "As printed on your card statement",
+  "@settleFillUpAmountHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settleFillUpRateLabel": "{quote} for 1 {base}",
+  "@settleFillUpRateLabel": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "base": {
+        "type": "String"
+      },
+      "quote": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpRateHint": "Your own rate — it stays labelled as entered by hand",
+  "@settleFillUpRateHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "settleFillUpRemove": "Remove settlement",
+  "@settleFillUpRemove": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpRateSourceCardSettlement": "card settlement",
+  "@fillUpRateSourceCardSettlement": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpRateSourceEnteredByHand": "entered by hand",
+  "@fillUpRateSourceEnteredByHand": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "fillUpSettledLine": "{amount} · converted at {rate}, {source}, {date}",
+  "@fillUpSettledLine": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpSettleHint": "Paid in {currency} — tap to add what your card charged",
+  "@fillUpSettleHint": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "spendWithheldMixedCurrencies": "No single total: fill-ups were paid in {currencies}. Add what your card charged to count them together.",
+  "@spendWithheldMixedCurrencies": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "currencies": {
+        "type": "String"
+      }
+    }
+  },
+  "spendWithheldUnknownCurrency": "No single total: {count, plural, =1{1 fill-up has} other{{count} fill-ups have}} no recorded currency.",
+  "@spendWithheldUnknownCurrency": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

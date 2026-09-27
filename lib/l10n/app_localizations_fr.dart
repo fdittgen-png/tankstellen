@@ -5592,6 +5592,85 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec de création — partage manuel';
 
   @override
+  String get settleFillUpTitle => 'Montant débité par votre carte';
+
+  @override
+  String settleFillUpIntro(String currency, String profileCurrency) {
+    return 'Payé en $currency. Saisissez le montant de votre relevé de carte pour compter ce plein en $profileCurrency.';
+  }
+
+  @override
+  String get settleFillUpCurrencyUnknownIntro =>
+      'Aucune devise n\'a été enregistrée pour ce plein. Indiquez celle dans laquelle vous avez payé — rien n\'est supposé.';
+
+  @override
+  String get settleFillUpCurrencyLabel => 'Devise de paiement';
+
+  @override
+  String get settleFillUpModeAmount => 'Montant débité';
+
+  @override
+  String get settleFillUpModeRate => 'Taux de change';
+
+  @override
+  String settleFillUpAmountLabel(String currency) {
+    return 'Débité en $currency';
+  }
+
+  @override
+  String get settleFillUpAmountHint =>
+      'Tel qu\'indiqué sur votre relevé de carte';
+
+  @override
+  String settleFillUpRateLabel(String base, String quote) {
+    return '$quote pour 1 $base';
+  }
+
+  @override
+  String get settleFillUpRateHint =>
+      'Votre propre taux — il reste signalé comme saisi à la main';
+
+  @override
+  String get settleFillUpRemove => 'Retirer le règlement';
+
+  @override
+  String get fillUpRateSourceCardSettlement => 'relevé de carte';
+
+  @override
+  String get fillUpRateSourceEnteredByHand => 'saisi à la main';
+
+  @override
+  String fillUpSettledLine(
+    String amount,
+    String rate,
+    String source,
+    String date,
+  ) {
+    return '$amount · converti à $rate, $source, $date';
+  }
+
+  @override
+  String fillUpSettleHint(String currency) {
+    return 'Payé en $currency — touchez pour ajouter le montant débité';
+  }
+
+  @override
+  String spendWithheldMixedCurrencies(String currencies) {
+    return 'Pas de total unique : les pleins ont été payés en $currencies. Ajoutez les montants débités pour les additionner.';
+  }
+
+  @override
+  String spendWithheldUnknownCurrency(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pleins n\'ont',
+      one: '1 plein n\'a',
+    );
+    return 'Pas de total unique : $_temp0 pas de devise enregistrée.';
+  }
+
+  @override
   String get fillUpWarningDialogTitle => 'Vérifiez ce plein';
 
   @override

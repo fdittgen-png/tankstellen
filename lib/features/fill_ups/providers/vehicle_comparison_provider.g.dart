@@ -168,7 +168,7 @@ final class VehicleHistoryComparisonProvider
 }
 
 String _$vehicleHistoryComparisonHash() =>
-    r'8666133a5d8681002c12baf0697f27a04debcbdd';
+    r'11a07ff95fb6ec27cd535a33e2c4721df1d9e082';
 
 /// The comparison for one explicit [key] — the reusable result #4366
 /// and #4367 read.

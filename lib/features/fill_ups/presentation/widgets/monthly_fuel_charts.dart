@@ -138,14 +138,14 @@ class _MonthlyFuelChartsState extends State<MonthlyFuelCharts> {
                   ? MonthlyBarChart(
                       key: ValueKey('monthly_stack_${metric.name}'),
                       summaries: summaries,
-                      valueOf: (MonthlySummary s) => s.totalCost,
+                      valueOf: (MonthlySummary s) => s.totalCost!,
                       color: _colorOf(metric, theme),
                       unitLabel: _unitOf(metric, l),
                       stacks: _stacksOf(metric, stackedFuels, months),
                     )
                   : MonthlyMetricChart(
                       key: ValueKey('monthly_line_${metric.name}'),
-                      values: [for (final s in summaries) s.totalCost],
+                      values: [for (final s in summaries) s.totalCost!],
                       months: [for (final s in summaries) s.month],
                       color: _colorOf(metric, theme),
                       maxLabel: _maxLabel(summaries, metric, l),
@@ -176,7 +176,7 @@ class _MonthlyFuelChartsState extends State<MonthlyFuelCharts> {
   ) {
     if (summaries.isEmpty) return '';
     final max = summaries
-        .map((s) => s.totalCost)
+        .map((s) => s.totalCost!)
         .reduce((a, b) => a > b ? a : b);
     return '${UnitFormatter.formatDecimal(max, fractionDigits: 0)} '
         '${_unitOf(metric, l)}';

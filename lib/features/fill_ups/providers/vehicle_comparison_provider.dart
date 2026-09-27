@@ -28,6 +28,8 @@ library;
 import 'package:meta/meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/domain/exchange_rate_provider.dart';
+import '../../../core/domain/money_tally.dart';
 import '../../../core/domain/vehicle_profile.dart';
 import '../../../core/time/app_clock.dart';
 import '../../trips/api.dart';
@@ -141,12 +143,26 @@ class VehicleComparisonSelector extends _$VehicleComparisonSelector {
 VehicleHistoryComparison vehicleHistoryComparison(
     Ref ref, VehicleComparisonKey key) {
   final vehicles = ref.watch(vehicleProfileListProvider);
+  final asOf = ref.watch(appClockProvider).now();
+  // #4437 D — the rates the fill-up history itself supplies (card
+  // settlements and hand-typed rates, each sourced and dated). With none
+  // there is no policy at all, so a mixed-currency ranking is withheld
+  // for exactly the reason it always was; with some, a rate still has to
+  // be fresh to decide a winner (`kExchangeRateMaxAge`).
+  final rates = ref.watch(exchangeRatesProvider);
   return buildVehicleHistoryComparison(
     key: key,
     fillUps: ref.watch(fillUpListProvider),
     trips: ref.watch(tripHistoryListProvider),
-    asOf: ref.watch(appClockProvider).now(),
+    asOf: asOf,
     vehicles: {for (final VehicleProfile v in vehicles) v.id: v},
+    valuation: rates.rates.isEmpty
+        ? null
+        : MoneyValuationPolicy(
+            targetCurrency: ref.watch(comparisonCurrencyProvider),
+            rates: rates,
+            asOf: asOf,
+          ),
   );
 }
 

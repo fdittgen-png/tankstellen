@@ -27,6 +27,7 @@ import '../widgets/fuel_type_efficiency_card.dart';
 import '../../../../core/utils/localized_fuel_name.dart';
 import '../widgets/monthly_fuel_charts.dart';
 import '../widgets/monthly_fuel_comparison_card.dart';
+import '../widgets/spend_withheld_notice.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 /// Full consumption-statistics detail page (#2698), opened from the Fuel
@@ -216,9 +217,7 @@ class _HeaderTiles extends StatelessWidget {
         label: l.statTotalSpent,
         // #4364 — no single total exists across two currencies; the
         // per-currency breakdown lives on `stats.spend`.
-        value: stats.totalSpent != null
-            ? PriceFormatter.formatTotal(stats.totalSpent!)
-            : '—',
+        value: formatTotalSpent(stats), // #4437 — its own currency
         accent: scheme.tertiary,
       ),
       _TileData(
@@ -258,6 +257,12 @@ class _HeaderTiles extends StatelessWidget {
         margin: EdgeInsets.zero,
         child: Column(
           children: [
+            // #4406 / #4437 F — the page's money tiles read `—` for a
+            // history with no single total; say why above them.
+            if (stats.totalSpent == null) ...[
+              SpendWithheldNotice(stats: stats),
+              const SizedBox(height: Spacing.md),
+            ],
             for (var i = 0; i < tiles.length; i += 2)
               Padding(
                 padding: EdgeInsets.only(top: i == 0 ? 0 : Spacing.md),

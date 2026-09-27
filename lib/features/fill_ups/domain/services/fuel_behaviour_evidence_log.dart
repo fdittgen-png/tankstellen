@@ -146,7 +146,7 @@ List<FillWindowEvidence> fillWindowEvidenceFor({
       scoped.every((f) => !inside(f, p) || f.totalCost > 0);
   MoneyTally tallyOf(TankPeriod p) => MoneyTally.of([
         for (final f in scoped)
-          if (inside(f, p) && f.totalCost > 0) (f.totalCost, f.currency),
+          if (inside(f, p) && f.totalCost > 0) f.bookedSpend, // #4437
       ]);
   return [
     for (final p in closedTankPeriods(scoped))

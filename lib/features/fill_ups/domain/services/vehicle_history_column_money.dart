@@ -51,7 +51,8 @@ class ColumnMoney {
       for (final f in windowFills[w.closing.id] ?? const <FillUp>[]) {
         if (f.isCorrection) continue;
         if (f.totalCost > 0) {
-          matchedSpend = matchedSpend.plus(f.totalCost, f.currency);
+          final (amount, currency) = f.bookedSpend; // #4437
+          matchedSpend = matchedSpend.plus(amount, currency);
         } else {
           unpricedWindow += 1;
         }
@@ -62,7 +63,8 @@ class ColumnMoney {
     var pricedQuantity = 0.0;
     for (final f in periodFills) {
       if (f.totalCost > 0) {
-        purchase = purchase.plus(f.totalCost, f.currency);
+        final (amount, currency) = f.bookedSpend;
+        purchase = purchase.plus(amount, currency);
         pricedQuantity += f.liters;
       } else {
         unpricedPeriod += 1;
@@ -73,8 +75,9 @@ class ColumnMoney {
     for (final w in matched) {
       final o = w.opening;
       if (o.liters > 0 && o.totalCost > 0) {
+        final (_, currency) = o.bookedSpend;
         consumed =
-            consumed.plus(w.liters * (o.totalCost / o.liters), o.currency);
+            consumed.plus(w.liters * o.bookedPricePerLiter, currency);
       } else {
         unpricedOpenings += 1;
       }

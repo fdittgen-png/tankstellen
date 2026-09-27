@@ -18,6 +18,7 @@ library;
 
 import '../../l10n/app_localizations.dart';
 import '../domain/comparison_eligibility.dart';
+import '../domain/money_tally.dart';
 
 /// Why a metric has no comparable number, in the user's language.
 String comparisonReasonLabel(
@@ -87,4 +88,26 @@ List<String> comparisonQualificationLabels(
         comparisonQualificationLabel(l, q),
   ];
   return out;
+}
+
+/// Why [spend] has no single total, in one line — or null when it has
+/// one (#4406, #4437 F).
+///
+/// A withheld total used to render as a bare `—`. Unknown currencies are
+/// named FIRST: they are the part the driver can fix (by stating the
+/// currency), and a named-plus-unknown history stays withheld even once
+/// every named part is settled. [unknownFillCount] overrides the tally's
+/// own count when the caller folded buckets rather than fills.
+String? spendWithheldLabel(
+  AppLocalizations l,
+  MoneyTally spend, {
+  int? unknownFillCount,
+}) {
+  if (spend.isSingleDenomination) return null;
+  if (spend.hasUnknownCurrency) {
+    return l.spendWithheldUnknownCurrency(
+        unknownFillCount ?? spend.unknownEntryCount);
+  }
+  final codes = spend.currencies.toList()..sort();
+  return l.spendWithheldMixedCurrencies(codes.join(', '));
 }

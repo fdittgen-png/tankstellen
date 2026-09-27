@@ -104,7 +104,12 @@ class TankReportCard extends ConsumerWidget {
             l.tankReportSincePrevious(
               UnitFormatter.formatDecimal(latest.distanceKm, fractionDigits: 0),
               UnitFormatter.formatDecimal(latest.liters),
-              PriceFormatter.formatTotal(latest.pumpedCost),
+              // #4437 — in the window's own currency; a window that
+              // straddles two currencies has no single cost to print.
+              latest.pumpedSpend.isEmpty
+                  ? PriceFormatter.formatTotal(latest.pumpedCost)
+                  : PriceFormatter.formatTallyTotal(latest.pumpedSpend) ??
+                      '—',
             ),
             style: AppText.label(context),
           ),

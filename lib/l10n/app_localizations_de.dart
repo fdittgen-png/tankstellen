@@ -5575,6 +5575,84 @@ class AppLocalizationsDe extends AppLocalizations {
       'Senden fehlgeschlagen — manuell teilen';
 
   @override
+  String get settleFillUpTitle => 'Was Ihre Karte belastet hat';
+
+  @override
+  String settleFillUpIntro(String currency, String profileCurrency) {
+    return 'Bezahlt in $currency. Tragen Sie den Betrag von Ihrer Kartenabrechnung ein, um diese Betankung in $profileCurrency zu zählen.';
+  }
+
+  @override
+  String get settleFillUpCurrencyUnknownIntro =>
+      'Für diese Betankung wurde keine Währung erfasst. Geben Sie an, in welcher Sie bezahlt haben — es wird nichts angenommen.';
+
+  @override
+  String get settleFillUpCurrencyLabel => 'Bezahlt in Währung';
+
+  @override
+  String get settleFillUpModeAmount => 'Belasteter Betrag';
+
+  @override
+  String get settleFillUpModeRate => 'Wechselkurs';
+
+  @override
+  String settleFillUpAmountLabel(String currency) {
+    return 'Belastet in $currency';
+  }
+
+  @override
+  String get settleFillUpAmountHint => 'Wie auf Ihrer Kartenabrechnung';
+
+  @override
+  String settleFillUpRateLabel(String base, String quote) {
+    return '$quote für 1 $base';
+  }
+
+  @override
+  String get settleFillUpRateHint =>
+      'Ihr eigener Kurs — er bleibt als von Hand eingegeben gekennzeichnet';
+
+  @override
+  String get settleFillUpRemove => 'Abrechnung entfernen';
+
+  @override
+  String get fillUpRateSourceCardSettlement => 'Kartenabrechnung';
+
+  @override
+  String get fillUpRateSourceEnteredByHand => 'von Hand eingegeben';
+
+  @override
+  String fillUpSettledLine(
+    String amount,
+    String rate,
+    String source,
+    String date,
+  ) {
+    return '$amount · umgerechnet zu $rate, $source, $date';
+  }
+
+  @override
+  String fillUpSettleHint(String currency) {
+    return 'In $currency bezahlt — tippen, um den belasteten Betrag einzutragen';
+  }
+
+  @override
+  String spendWithheldMixedCurrencies(String currencies) {
+    return 'Keine Gesamtsumme: Betankungen wurden in $currencies bezahlt. Tragen Sie die belasteten Beträge ein, um sie zusammenzuzählen.';
+  }
+
+  @override
+  String spendWithheldUnknownCurrency(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Betankungen haben',
+      one: '1 Betankung hat',
+    );
+    return 'Keine Gesamtsumme: $_temp0 keine erfasste Währung.';
+  }
+
+  @override
   String get fillUpWarningDialogTitle => 'Tankvorgang prüfen';
 
   @override

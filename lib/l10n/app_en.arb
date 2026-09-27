@@ -5262,6 +5262,124 @@
   "@badScanReportFallbackToShare": {
     "description": "Snackbar shown when the GitHub submission fails and we fall back to the system share sheet (#952 phase 2)."
   },
+  "settleFillUpTitle": "What your card charged",
+  "@settleFillUpTitle": {
+    "description": "Title of the sheet that attaches a card-settlement amount to a fill-up paid in a foreign currency (#4437)."
+  },
+  "settleFillUpIntro": "Paid in {currency}. Add what your card statement charged to count this fill-up in {profileCurrency}.",
+  "@settleFillUpIntro": {
+    "description": "Intro line of the settle sheet: the record's own currency and the profile currency the settled amount is in (#4437).",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      },
+      "profileCurrency": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpCurrencyUnknownIntro": "No currency was recorded for this fill-up. Say which one you paid in — nothing is assumed.",
+  "@settleFillUpCurrencyUnknownIntro": {
+    "description": "Intro line of the settle sheet for a legacy fill-up with no recorded currency (#4437 / #4406). The user must pick the currency explicitly."
+  },
+  "settleFillUpCurrencyLabel": "Currency paid in",
+  "@settleFillUpCurrencyLabel": {
+    "description": "Label of the currency picker on the settle sheet (#4437)."
+  },
+  "settleFillUpModeAmount": "Amount charged",
+  "@settleFillUpModeAmount": {
+    "description": "Segment: enter the amount from the card statement (#4437)."
+  },
+  "settleFillUpModeRate": "Exchange rate",
+  "@settleFillUpModeRate": {
+    "description": "Segment: type an exchange rate by hand instead (#4437)."
+  },
+  "settleFillUpAmountLabel": "Charged in {currency}",
+  "@settleFillUpAmountLabel": {
+    "description": "Label of the settled-amount field; the placeholder is the profile currency code (#4437).",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpAmountHint": "As printed on your card statement",
+  "@settleFillUpAmountHint": {
+    "description": "Helper text of the settled-amount field (#4437)."
+  },
+  "settleFillUpRateLabel": "{quote} for 1 {base}",
+  "@settleFillUpRateLabel": {
+    "description": "Label of the hand-entered rate field, e.g. 'EUR for 1 CHF' (#4437).",
+    "placeholders": {
+      "base": {
+        "type": "String"
+      },
+      "quote": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpRateHint": "Your own rate — it stays labelled as entered by hand",
+  "@settleFillUpRateHint": {
+    "description": "Helper text of the hand-entered rate field (#4437)."
+  },
+  "settleFillUpRemove": "Remove settlement",
+  "@settleFillUpRemove": {
+    "description": "Button that removes a previously entered settlement from a fill-up (#4437)."
+  },
+  "fillUpRateSourceCardSettlement": "card settlement",
+  "@fillUpRateSourceCardSettlement": {
+    "description": "Provenance label of a rate derived from the card-statement amount (#4437). Lower case: it sits mid-sentence."
+  },
+  "fillUpRateSourceEnteredByHand": "entered by hand",
+  "@fillUpRateSourceEnteredByHand": {
+    "description": "Provenance label of a rate the user typed in (#4437). Lower case: it sits mid-sentence."
+  },
+  "fillUpSettledLine": "{amount} · converted at {rate}, {source}, {date}",
+  "@fillUpSettledLine": {
+    "description": "Provenance line under a settled foreign fill-up: the entered amount, the implied rate, its source and the transaction date (#4437).",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpSettleHint": "Paid in {currency} — tap to add what your card charged",
+  "@fillUpSettleHint": {
+    "description": "Hint under an unsettled foreign-currency fill-up card (#4437).",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "spendWithheldMixedCurrencies": "No single total: fill-ups were paid in {currencies}. Add what your card charged to count them together.",
+  "@spendWithheldMixedCurrencies": {
+    "description": "Why a spend total shows a dash: the history spans several currencies (#4437 F / #4406).",
+    "placeholders": {
+      "currencies": {
+        "type": "String"
+      }
+    }
+  },
+  "spendWithheldUnknownCurrency": "No single total: {count, plural, =1{1 fill-up has} other{{count} fill-ups have}} no recorded currency.",
+  "@spendWithheldUnknownCurrency": {
+    "description": "Why a spend total shows a dash: some fill-ups carry no currency (#4437 F / #4406).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "fillUpWarningDialogTitle": "Check this fill-up",
   "@fillUpWarningDialogTitle": {
     "description": "Title of the confirmation dialog shown on save when a fill-up has data-quality warnings (wrong fuel for the engine, or an odometer below the previous reading) before persisting (#2836)."

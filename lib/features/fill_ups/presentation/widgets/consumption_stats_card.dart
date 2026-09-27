@@ -18,6 +18,7 @@ import 'confidence_tier_badge.dart';
 import 'consumption_stat_tile.dart';
 import 'pump_gain_chip.dart';
 import 'resolve_gap_banner.dart';
+import 'spend_withheld_notice.dart';
 import '../../../../core/utils/unit_formatter.dart';
 
 part 'consumption_stats_card_parts.dart';
@@ -218,13 +219,17 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   // #2491 — locale-aware 2 dp + currency symbol.
                   // #4364 — withheld across denominations rather than
                   // stamped with today's country's symbol.
-                  value: stats.totalSpent != null
-                      ? PriceFormatter.formatTotal(stats.totalSpent!)
-                      : '—',
+                  // #4437 — in the fills' own currency, not the profile's.
+                  value: formatTotalSpent(stats),
                 ),
               ),
             ],
           ),
+          // #4406 / #4437 F — a withheld total says why, in one line.
+          if (stats.totalSpent == null) ...[
+            const SizedBox(height: Spacing.sm),
+            SpendWithheldNotice(stats: stats),
+          ],
           // #3903 — the fill-up count is a fifth tile in the same grid
           // style (icon + label + value), not a bare text line.
           if (stats.fillUpCount > 0) ...[

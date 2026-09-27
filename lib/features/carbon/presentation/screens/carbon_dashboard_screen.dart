@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/domain/money_tally.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/page_scaffold.dart';
@@ -40,12 +41,20 @@ class CarbonDashboardScreen extends ConsumerWidget {
     final summaries = MonthlyAggregator.byMonth(fillUps);
     final last12 = MonthlyAggregator.lastN(summaries, 12);
     final totalCo2 = MonthlyAggregator.totalCo2(summaries);
+    // #4437 — null when the history spans several currencies; the
+    // per-fill tally names them (and counts the unknown ones).
     final totalCost = MonthlyAggregator.totalCost(summaries);
+    final spend = MonthlyAggregator.spendOf(fillUps);
 
     final hasData = fillUps.isNotEmpty;
 
     final Widget body = hasData
-        ? ChartsTab(summaries: last12, totalCost: totalCost, totalCo2: totalCo2)
+        ? ChartsTab(
+            summaries: last12,
+            totalCost: totalCost,
+            totalCo2: totalCo2,
+            spend: spend,
+          )
         : EmptyState(
             icon: Icons.eco_outlined,
             title: l.carbonEmptyTitle,
@@ -75,6 +84,7 @@ class CarbonDashboardScreen extends ConsumerWidget {
                 onPressed: () => _shareSummary(
                   l: l,
                   totalCost: totalCost,
+                  currencySymbol: _symbolOf(spend),
                   totalCo2: totalCo2,
                 ),
               ),
@@ -92,7 +102,8 @@ class CarbonDashboardScreen extends ConsumerWidget {
   /// 24-locale fill is needed.
   Future<void> _shareSummary({
     required AppLocalizations l,
-    required double totalCost,
+    required double? totalCost,
+    required String currencySymbol,
     required double totalCo2,
   }) async {
     final title = l.carbonDashboardTitle;
@@ -103,7 +114,7 @@ class CarbonDashboardScreen extends ConsumerWidget {
     // i18n-ignore: language-neutral number/unit format mask.
     final body =
         '$title\n\n'
-        '$costLabel: ${UnitFormatter.formatDecimal(totalCost, fractionDigits: 0)} ${PriceFormatter.currency}\n'
+        '$costLabel: ${totalCost == null ? '—' : '${UnitFormatter.formatDecimal(totalCost, fractionDigits: 0)} $currencySymbol'}\n'
         '$co2Label: ${UnitFormatter.formatDecimal(totalCo2, fractionDigits: 0)} kg';
     final sink = debugCarbonShareSinkOverride ?? _defaultCarbonShareSink;
     try {
@@ -114,4 +125,13 @@ class CarbonDashboardScreen extends ConsumerWidget {
       logFailure(e, st, where: 'CarbonDashboardScreen: share failed');
     }
   }
+}
+
+/// The symbol a single-denomination [spend] is shown with — the active
+/// one for an all-unknown (legacy) history, as before #4437.
+String _symbolOf(MoneyTally spend) {
+  final code = spend.soleCurrency;
+  return (code == null || code == kUnknownCurrency)
+      ? PriceFormatter.currency
+      : PriceFormatter.symbolForCurrency(code);
 }

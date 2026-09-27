@@ -3,12 +3,14 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../../core/domain/money.dart';
 import '../../../../core/services/co2_calculator.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../fleet/api.dart';
 
 part 'fill_up.freezed.dart';
 part 'fill_up.g.dart';
+part 'fill_up_settlement.dart';
 
 /// A single fuel fill-up event logged by the user.
 ///
@@ -40,6 +42,36 @@ abstract class FillUp with _$FillUp {
     /// the JSONB `data` column), so no schema change is required —
     /// CLAUDE.md rule 5.
     String? currency,
+
+    /// What the driver's card statement actually charged for this fill,
+    /// in [settledCurrency] (#4437, follow-up of #4428).
+    ///
+    /// A fill paid abroad is recorded in the currency it happened in
+    /// (CHF 51,73); the issuer then performs the conversion and the
+    /// statement shows the amount in the driver's own money (€ 55,12).
+    /// That figure is per-record EVIDENCE — not an approximation of a
+    /// market rate — so it is stored verbatim and shown verbatim: the
+    /// converted amount on screen is always this number, never a
+    /// recomputed `totalCost × rate`. Null until the driver enters it.
+    ///
+    /// Rides in the JSONB `data` column — no Supabase change (CLAUDE.md
+    /// rule 5).
+    double? settledAmount,
+
+    /// ISO code [settledAmount] is in — the driver's profile currency at
+    /// the moment they entered it, stored explicitly so a later profile
+    /// change cannot re-interpret the figure (#4437).
+    String? settledCurrency,
+
+    /// Where the rate implied by [settledAmount] came from:
+    /// [kRateSourceCardSettlement] or [kRateSourceEnteredByHand] (#4437).
+    /// Shown with every figure it converts, so a hand-typed rate is never
+    /// mistaken for a bank's.
+    String? rateSource,
+
+    /// The instant the implied rate belongs to — the TRANSACTION date,
+    /// never the day the statement was typed in (#4437).
+    DateTime? rateCapturedAt,
 
     /// Optional reference to the [VehicleProfile] this fill-up belongs to
     /// (#694). Null means the user logged the fill-up without attributing
@@ -134,6 +166,13 @@ abstract class FillUp with _$FillUp {
 
   factory FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);
 }
+
+/// [FillUp.rateSource] for an amount copied off the card statement.
+/// A stored value, not display text — the UI resolves its own label.
+const String kRateSourceCardSettlement = 'card settlement';
+
+/// [FillUp.rateSource] for a rate the driver typed in themselves.
+const String kRateSourceEnteredByHand = 'entered by hand';
 
 /// Convenience getters for an individual fill-up.
 extension FillUpX on FillUp {

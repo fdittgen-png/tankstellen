@@ -163,7 +163,10 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     for (final f in sorted) {
       if (f.isCorrection) continue;
       if (f.totalCost > 0) {
-        spend = spend.plus(f.totalCost, f.currency);
+        // #4437 — a settled foreign fill is booked as what the card
+        // statement charged; an unsettled one keeps its native amount.
+        final (amount, currency) = f.bookedSpend;
+        spend = spend.plus(amount, currency);
         pricedLiters += f.liters;
       } else {
         unpricedFillCount += 1;
@@ -206,7 +209,7 @@ abstract class ConsumptionStats with _$ConsumptionStats {
       if (fill.isCorrection) {
         pendingCorrectionLiters += fill.liters;
       } else if (fill.totalCost > 0) {
-        pendingCost.add((fill.totalCost, fill.currency));
+        pendingCost.add(fill.bookedSpend);
       } else {
         pendingUnpriced += 1;
       }

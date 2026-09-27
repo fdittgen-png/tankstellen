@@ -5515,6 +5515,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String get badScanReportFallbackToShare => 'Submission failed — manual share';
 
   @override
+  String get settleFillUpTitle => 'What your card charged';
+
+  @override
+  String settleFillUpIntro(String currency, String profileCurrency) {
+    return 'Paid in $currency. Add what your card statement charged to count this fill-up in $profileCurrency.';
+  }
+
+  @override
+  String get settleFillUpCurrencyUnknownIntro =>
+      'No currency was recorded for this fill-up. Say which one you paid in — nothing is assumed.';
+
+  @override
+  String get settleFillUpCurrencyLabel => 'Currency paid in';
+
+  @override
+  String get settleFillUpModeAmount => 'Amount charged';
+
+  @override
+  String get settleFillUpModeRate => 'Exchange rate';
+
+  @override
+  String settleFillUpAmountLabel(String currency) {
+    return 'Charged in $currency';
+  }
+
+  @override
+  String get settleFillUpAmountHint => 'As printed on your card statement';
+
+  @override
+  String settleFillUpRateLabel(String base, String quote) {
+    return '$quote for 1 $base';
+  }
+
+  @override
+  String get settleFillUpRateHint =>
+      'Your own rate — it stays labelled as entered by hand';
+
+  @override
+  String get settleFillUpRemove => 'Remove settlement';
+
+  @override
+  String get fillUpRateSourceCardSettlement => 'card settlement';
+
+  @override
+  String get fillUpRateSourceEnteredByHand => 'entered by hand';
+
+  @override
+  String fillUpSettledLine(
+    String amount,
+    String rate,
+    String source,
+    String date,
+  ) {
+    return '$amount · converted at $rate, $source, $date';
+  }
+
+  @override
+  String fillUpSettleHint(String currency) {
+    return 'Paid in $currency — tap to add what your card charged';
+  }
+
+  @override
+  String spendWithheldMixedCurrencies(String currencies) {
+    return 'No single total: fill-ups were paid in $currencies. Add what your card charged to count them together.';
+  }
+
+  @override
+  String spendWithheldUnknownCurrency(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups have',
+      one: '1 fill-up has',
+    );
+    return 'No single total: $_temp0 no recorded currency.';
+  }
+
+  @override
   String get fillUpWarningDialogTitle => 'Check this fill-up';
 
   @override
@@ -17537,6 +17615,85 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get badScanReportFallbackToShare =>
       '⟦Šúƀɱîššîóñ ƒáîłéđ — ɱáñúáł šĥářé ············⟧';
+
+  @override
+  String get settleFillUpTitle => '⟦Ŵĥáŧ ýóúř çářđ çĥářǧéđ ·········⟧';
+
+  @override
+  String settleFillUpIntro(String currency, String profileCurrency) {
+    return '⟦Ƥáîđ îñ $currency. Áđđ ŵĥáŧ ýóúř çářđ šŧáŧéɱéñŧ çĥářǧéđ ŧó çóúñŧ ŧĥîš ƒîłł-úƥ îñ $profileCurrency. ·························⟧';
+  }
+
+  @override
+  String get settleFillUpCurrencyUnknownIntro =>
+      '⟦Ñó çúřřéñçý ŵáš řéçóřđéđ ƒóř ŧĥîš ƒîłł-úƥ. Šáý ŵĥîçĥ óñé ýóú ƥáîđ îñ — ñóŧĥîñǧ îš áššúɱéđ. ································⟧';
+
+  @override
+  String get settleFillUpCurrencyLabel => '⟦Çúřřéñçý ƥáîđ îñ ······⟧';
+
+  @override
+  String get settleFillUpModeAmount => '⟦Áɱóúñŧ çĥářǧéđ ······⟧';
+
+  @override
+  String get settleFillUpModeRate => '⟦Éẋçĥáñǧé řáŧé ·····⟧';
+
+  @override
+  String settleFillUpAmountLabel(String currency) {
+    return '⟦Çĥářǧéđ îñ $currency ····⟧';
+  }
+
+  @override
+  String get settleFillUpAmountHint =>
+      '⟦Áš ƥřîñŧéđ óñ ýóúř çářđ šŧáŧéɱéñŧ ·············⟧';
+
+  @override
+  String settleFillUpRateLabel(String base, String quote) {
+    return '⟦$quote ƒóř 1 $base ·⟧';
+  }
+
+  @override
+  String get settleFillUpRateHint =>
+      '⟦Ýóúř óŵñ řáŧé — îŧ šŧáýš łáƀéłłéđ áš éñŧéřéđ ƀý ĥáñđ ··················⟧';
+
+  @override
+  String get settleFillUpRemove => '⟦Řéɱóṽé šéŧŧłéɱéñŧ ·······⟧';
+
+  @override
+  String get fillUpRateSourceCardSettlement => '⟦çářđ šéŧŧłéɱéñŧ ······⟧';
+
+  @override
+  String get fillUpRateSourceEnteredByHand => '⟦éñŧéřéđ ƀý ĥáñđ ······⟧';
+
+  @override
+  String fillUpSettledLine(
+    String amount,
+    String rate,
+    String source,
+    String date,
+  ) {
+    return '⟦$amount · çóñṽéřŧéđ áŧ $rate, $source, $date ·····⟧';
+  }
+
+  @override
+  String fillUpSettleHint(String currency) {
+    return '⟦Ƥáîđ îñ $currency — ŧáƥ ŧó áđđ ŵĥáŧ ýóúř çářđ çĥářǧéđ ···············⟧';
+  }
+
+  @override
+  String spendWithheldMixedCurrencies(String currencies) {
+    return '⟦Ñó šîñǧłé ŧóŧáł: ƒîłł-úƥš ŵéřé ƥáîđ îñ $currencies. Áđđ ŵĥáŧ ýóúř çářđ çĥářǧéđ ŧó çóúñŧ ŧĥéɱ ŧóǧéŧĥéř. ································⟧';
+  }
+
+  @override
+  String spendWithheldUnknownCurrency(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups have',
+      one: '1 fill-up has',
+    );
+    return '⟦Ñó šîñǧłé ŧóŧáł: $_temp0 ñó řéçóřđéđ çúřřéñçý. ··············⟧';
+  }
 
   @override
   String get fillUpWarningDialogTitle => '⟦Çĥéçķ ŧĥîš ƒîłł-úƥ ·······⟧';

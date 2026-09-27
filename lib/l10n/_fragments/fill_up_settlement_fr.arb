@@ -1,0 +1,19 @@
+{
+  "settleFillUpTitle": "Montant débité par votre carte",
+  "settleFillUpIntro": "Payé en {currency}. Saisissez le montant de votre relevé de carte pour compter ce plein en {profileCurrency}.",
+  "settleFillUpCurrencyUnknownIntro": "Aucune devise n'a été enregistrée pour ce plein. Indiquez celle dans laquelle vous avez payé — rien n'est supposé.",
+  "settleFillUpCurrencyLabel": "Devise de paiement",
+  "settleFillUpModeAmount": "Montant débité",
+  "settleFillUpModeRate": "Taux de change",
+  "settleFillUpAmountLabel": "Débité en {currency}",
+  "settleFillUpAmountHint": "Tel qu'indiqué sur votre relevé de carte",
+  "settleFillUpRateLabel": "{quote} pour 1 {base}",
+  "settleFillUpRateHint": "Votre propre taux — il reste signalé comme saisi à la main",
+  "settleFillUpRemove": "Retirer le règlement",
+  "fillUpRateSourceCardSettlement": "relevé de carte",
+  "fillUpRateSourceEnteredByHand": "saisi à la main",
+  "fillUpSettledLine": "{amount} · converti à {rate}, {source}, {date}",
+  "fillUpSettleHint": "Payé en {currency} — touchez pour ajouter le montant débité",
+  "spendWithheldMixedCurrencies": "Pas de total unique : les pleins ont été payés en {currencies}. Ajoutez les montants débités pour les additionner.",
+  "spendWithheldUnknownCurrency": "Pas de total unique : {count, plural, =1{1 plein n'a} other{{count} pleins n'ont}} pas de devise enregistrée."
+}
