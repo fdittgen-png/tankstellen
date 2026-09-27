@@ -62,7 +62,6 @@ export 'domain/fleet_attention.dart';
 export 'domain/fleet_kpis.dart';
 export 'domain/fleet_scope.dart';
 export 'domain/fleet_vehicle.dart';
-export 'domain/money.dart';
 export 'domain/vehicle_attribution.dart';
 export 'domain/vehicle_attribution_resolver.dart';
 export 'presentation/fleet_labels.dart';

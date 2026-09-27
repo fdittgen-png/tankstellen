@@ -79,10 +79,10 @@ void main() {
           OpportunityRefusal.savingNotReproducible);
     });
 
-    test('Money cannot be constructed inconsistently', () {
+    test('OpportunityMoney cannot be constructed inconsistently', () {
       // The three figures are one type precisely so a caller cannot
       // supply a net that disagrees with the other two.
-      final m = Money(gross: 4.0, detour: 1.5);
+      final m = OpportunityMoney(gross: 4.0, detour: 1.5);
       expect(m.net, closeTo(2.5, 1e-9));
     });
   });
@@ -221,7 +221,7 @@ void main() {
         priceAge: priceAge,
         confidence: DataConfidence.high,
         now: now,
-        money: Money(gross: 2.4, detour: 0.4),
+        money: OpportunityMoney(gross: 2.4, detour: 0.4),
       );
       expect(o.kind, OpportunityKind.favouriteStation);
       expect(o.reference, OpportunityReference.thresholdYouSet);
@@ -256,7 +256,7 @@ void main() {
         priceAge: priceAge,
         confidence: DataConfidence.high,
         now: now,
-        money: Money(gross: 3.6, detour: 0.3),
+        money: OpportunityMoney(gross: 3.6, detour: 0.3),
       );
       expect(o.stationId, 'fr-9');
       expect(o.currentPrice, 1.61);

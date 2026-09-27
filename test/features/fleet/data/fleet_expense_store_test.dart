@@ -5,11 +5,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/money.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
 import 'package:tankstellen/features/fleet/data/fleet_expense_store.dart';
 import 'package:tankstellen/features/fleet/domain/expense.dart';
 import 'package:tankstellen/features/fleet/domain/expense_fields.dart';
-import 'package:tankstellen/features/fleet/domain/money.dart';
 import 'package:tankstellen/features/profile/data/full_data_export.dart';
 
 /// #4215 (F5) — the local, encrypted, deferred `fleet_expenses` box and
@@ -20,7 +20,7 @@ void main() {
     stationName: 'Aral Köln',
     litres: 44.07,
     pricePerLitre: 1.759,
-    total: Money(amount: 77.52, currency: 'EUR'),
+    total: Money(77.52, 'EUR'),
   );
 
   Expense expense(String id) => Expense(

@@ -17,9 +17,9 @@
 /// channel, not from the parse quality.
 library;
 
+import '../../../core/domain/money.dart';
 import '../domain/expense.dart';
 import '../domain/expense_fields.dart';
-import '../domain/money.dart';
 
 /// A received electronic invoice, reduced to the fuel purchase it
 /// records (#4215).
@@ -103,7 +103,7 @@ class StructuredFuelInvoice {
     if (amount == null || currency is! String || currency.length != 3) {
       return null;
     }
-    return Money(amount: amount, currency: currency.toUpperCase());
+    return Money(amount, currency.toUpperCase());
   }
 
   static DateTime? _utc(Object? raw) =>
@@ -169,7 +169,7 @@ ExtractedReceiptFields extractedFieldsFromReceipt(
   final code = parsed.currency ?? fallbackCurrency;
   Money? amount(double? value) => value == null || code == null
       ? null
-      : Money(amount: value, currency: code.toUpperCase());
+      : Money(value, code.toUpperCase());
   return ExtractedReceiptFields(
     stationName: parsed.stationName,
     occurredAt: parsed.date,

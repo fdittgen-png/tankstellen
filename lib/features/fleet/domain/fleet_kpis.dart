@@ -121,7 +121,7 @@ final class FleetVehicleMetrics {
 ///    can produce;
 ///  * **more than one currency yields no total.** [spend] is null and
 ///    [spendByCurrency] holds the breakdown — the same refusal
-///    `SavingsLedger.total` and `Money.plus` make on the device, for
+///    `SavingsLedger.total` and `Money +` make on the device, for
 ///    the same reason: €40 + £40 is a number true in no currency;
 ///  * **an absence is stated, never zeroed.** A figure no vehicle could
 ///    supply comes back [Unknown] with its reason, and the screen

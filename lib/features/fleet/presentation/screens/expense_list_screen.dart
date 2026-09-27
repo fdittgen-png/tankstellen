@@ -85,7 +85,7 @@ class _ExpenseTile extends StatelessWidget {
                     total == null
                         ? l.fleetExpenseValueMissing
                         : PriceFormatter.formatTotal(total.amount,
-                            currencyOverride: total.currency),
+                            currencyOverride: total.currencyCode),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),

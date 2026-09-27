@@ -3,13 +3,13 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/domain/money.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/expense.dart';
 import '../../domain/expense_reconciler.dart';
-import '../../domain/money.dart';
 
 /// One row of the review list: what the field is, what was read, and
 /// whether the employee still has to answer for it (#4215).
@@ -45,7 +45,7 @@ List<ReviewField> buildReviewFields(
   String? money(Money? value) => value == null
       ? null
       : PriceFormatter.formatTotal(value.amount,
-          currencyOverride: value.currency);
+          currencyOverride: value.currencyCode);
   return [
     (
       label: l.fleetExpenseFieldStation,
