@@ -4231,6 +4231,76 @@ class AppLocalizationsDe extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Schließen';
 
   @override
+  String get currencyBackfillAction => 'Währung festlegen';
+
+  @override
+  String get currencyBackfillTitle => 'Währung älterer Betankungen';
+
+  @override
+  String get currencyBackfillIntro =>
+      'Geben Sie an, in welcher Währung Ihre Betankungen ohne Währung bezahlt wurden. Nur diese Angabe ändert sich — Liter, Strecken und Beträge bleiben wie erfasst — und Sie können es rückgängig machen.';
+
+  @override
+  String currencyBackfillOnOrBefore(String date) {
+    return 'Betankungen bis einschließlich $date';
+  }
+
+  @override
+  String get currencyBackfillCurrencyLabel => 'Sie wurden alle bezahlt in';
+
+  @override
+  String currencyBackfillPreview(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Betankungen werden als $currency gekennzeichnet.',
+      one: '1 Betankung wird als $currency gekennzeichnet.',
+      zero: 'Keine Betankung ohne Währung in diesem Zeitraum.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyBackfillRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Danach haben $count Betankungen weiterhin keine.',
+      one: 'Danach hat 1 Betankung weiterhin keine.',
+      zero: 'Danach hat jede Betankung eine Währung.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyBackfillApply => 'Übernehmen';
+
+  @override
+  String currencyBackfillDone(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Betankungen als $currency gekennzeichnet.',
+      one: '1 Betankung als $currency gekennzeichnet.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyBackfillStatedSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Betankungen tragen eine von Ihnen angegebene Währung.',
+      one: '1 Betankung trägt eine von Ihnen angegebene Währung.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyBackfillUndo => 'Währungsangaben zurücknehmen';
+
+  @override
   String dataSourceLinkSemantic(String source, String license) {
     return 'Datenquelle $source ($license) im Browser öffnen';
   }

@@ -73,6 +73,17 @@ abstract class FillUp with _$FillUp {
     /// never the day the statement was typed in (#4437).
     DateTime? rateCapturedAt,
 
+    /// When the driver stated this record's [currency] in bulk — "my
+    /// fill-ups up to *date* were all in *currency*" (#4406).
+    ///
+    /// Null on every record whose currency came from anywhere else (the
+    /// entry-time stamp, a receipt, the settle sheet). Non-null marks the
+    /// label as an explicit user statement, never an inference, and is
+    /// what makes the statement reversible: undo returns exactly these
+    /// records to unknown. Rides in the JSONB `data` column — no Supabase
+    /// change (CLAUDE.md rule 5).
+    DateTime? currencyStatedAt,
+
     /// Optional reference to the [VehicleProfile] this fill-up belongs to
     /// (#694). Null means the user logged the fill-up without attributing
     /// it to a specific vehicle. Used to group per-vehicle stats and to

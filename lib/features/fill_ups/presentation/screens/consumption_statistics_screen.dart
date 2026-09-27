@@ -140,6 +140,8 @@ class _ConsumptionStatisticsPageState
                   ),
                   children: [
                     _staggered(0, _HeaderTiles(stats: stats)),
+                    // #4406 — a bulk currency statement stays undoable.
+                    const StatedCurrencyUndoRow(),
                     _staggered(
                         1, MonthlyFuelComparisonCard(months: months)),
                     // #2887 — per-fuel €/km comparison for a multi-fuel

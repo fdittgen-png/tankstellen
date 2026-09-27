@@ -7341,6 +7341,72 @@ abstract class AppLocalizations {
   /// **'Dismiss'**
   String get crossBorderDismissTooltip;
 
+  /// Action under a withheld spend total: open the bulk statement of the currency of fill-ups that have none (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Set their currency'**
+  String get currencyBackfillAction;
+
+  /// Title of the bulk currency statement dialog (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Currency of older fill-ups'**
+  String get currencyBackfillTitle;
+
+  /// Explainer of the bulk currency statement: an explicit user statement, label-only, reversible (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Say which currency your fill-ups without one were paid in. Only that label changes — litres, distances and amounts stay as recorded — and you can undo it.'**
+  String get currencyBackfillIntro;
+
+  /// Cut-off row of the bulk currency statement; tapping it picks the date (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-ups on or before {date}'**
+  String currencyBackfillOnOrBefore(String date);
+
+  /// Label of the currency picker of the bulk statement. No currency is preselected (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'They were all paid in'**
+  String get currencyBackfillCurrencyLabel;
+
+  /// Preview of how many records the bulk statement will label (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No fill-up without a currency in this range.} =1{1 fill-up will be labelled {currency}.} other{{count} fill-ups will be labelled {currency}.}}'**
+  String currencyBackfillPreview(int count, String currency);
+
+  /// How many priced fill-ups stay without a currency after the statement — never guessed (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Afterwards every fill-up has a currency.} =1{Afterwards 1 fill-up still has none.} other{Afterwards {count} fill-ups still have none.}}'**
+  String currencyBackfillRemaining(int count);
+
+  /// Confirm button of the bulk currency statement (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get currencyBackfillApply;
+
+  /// Snackbar after the bulk statement, with an Undo action (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill-up labelled {currency}.} other{{count} fill-ups labelled {currency}.}}'**
+  String currencyBackfillDone(int count, String currency);
+
+  /// Line on the statistics page while bulk-stated currencies exist, next to the undo button (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill-up carries a currency you stated.} other{{count} fill-ups carry a currency you stated.}}'**
+  String currencyBackfillStatedSummary(int count);
+
+  /// Button that returns every bulk-labelled fill-up to 'no currency' (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Undo currency labels'**
+  String get currencyBackfillUndo;
+
   /// Accessibility label and tooltip for the tappable country-service header on the search screen, which opens the active country's upstream fuel-price data source in the browser (#2373). Relocates the open-data attribution from the old bottom footer into the link, so the provider name and licence stay available to screen-reader and long-press users (CC BY / Licence Ouverte / OGL / IODL all mandate visible attribution). {source} and {license} are data — proper-noun provider + licence names rendered verbatim from the country's FuelServicePolicy.
   ///
   /// In en, this message translates to:

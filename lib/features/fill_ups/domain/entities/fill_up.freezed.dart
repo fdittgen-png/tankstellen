@@ -50,7 +50,16 @@ mixin _$FillUp {
 /// mistaken for a bank's.
  String? get rateSource;/// The instant the implied rate belongs to — the TRANSACTION date,
 /// never the day the statement was typed in (#4437).
- DateTime? get rateCapturedAt;/// Optional reference to the [VehicleProfile] this fill-up belongs to
+ DateTime? get rateCapturedAt;/// When the driver stated this record's [currency] in bulk — "my
+/// fill-ups up to *date* were all in *currency*" (#4406).
+///
+/// Null on every record whose currency came from anywhere else (the
+/// entry-time stamp, a receipt, the settle sheet). Non-null marks the
+/// label as an explicit user statement, never an inference, and is
+/// what makes the statement reversible: undo returns exactly these
+/// records to unknown. Rides in the JSONB `data` column — no Supabase
+/// change (CLAUDE.md rule 5).
+ DateTime? get currencyStatedAt;/// Optional reference to the [VehicleProfile] this fill-up belongs to
 /// (#694). Null means the user logged the fill-up without attributing
 /// it to a specific vehicle. Used to group per-vehicle stats and to
 /// pre-fill the next log entry.
@@ -135,16 +144,16 @@ $FillUpCopyWith<FillUp> get copyWith => _$FillUpCopyWithImpl<FillUp>(this as Fil
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FillUp&&(identical(other.id, id) || other.id == id)&&(identical(other.date, date) || other.date == date)&&(identical(other.liters, liters) || other.liters == liters)&&(identical(other.totalCost, totalCost) || other.totalCost == totalCost)&&(identical(other.odometerKm, odometerKm) || other.odometerKm == odometerKm)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.stationId, stationId) || other.stationId == stationId)&&(identical(other.stationName, stationName) || other.stationName == stationName)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.settledAmount, settledAmount) || other.settledAmount == settledAmount)&&(identical(other.settledCurrency, settledCurrency) || other.settledCurrency == settledCurrency)&&(identical(other.rateSource, rateSource) || other.rateSource == rateSource)&&(identical(other.rateCapturedAt, rateCapturedAt) || other.rateCapturedAt == rateCapturedAt)&&(identical(other.vehicleId, vehicleId) || other.vehicleId == vehicleId)&&const DeepCollectionEquality().equals(other.linkedTripIds, linkedTripIds)&&(identical(other.isFullTank, isFullTank) || other.isFullTank == isFullTank)&&(identical(other.isCorrection, isCorrection) || other.isCorrection == isCorrection)&&(identical(other.fuelLevelBeforeL, fuelLevelBeforeL) || other.fuelLevelBeforeL == fuelLevelBeforeL)&&(identical(other.fuelLevelAfterL, fuelLevelAfterL) || other.fuelLevelAfterL == fuelLevelAfterL)&&(identical(other.scannedPricePerLiter, scannedPricePerLiter) || other.scannedPricePerLiter == scannedPricePerLiter)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.fleetAttribution, fleetAttribution) || other.fleetAttribution == fleetAttribution));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FillUp&&(identical(other.id, id) || other.id == id)&&(identical(other.date, date) || other.date == date)&&(identical(other.liters, liters) || other.liters == liters)&&(identical(other.totalCost, totalCost) || other.totalCost == totalCost)&&(identical(other.odometerKm, odometerKm) || other.odometerKm == odometerKm)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.stationId, stationId) || other.stationId == stationId)&&(identical(other.stationName, stationName) || other.stationName == stationName)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.settledAmount, settledAmount) || other.settledAmount == settledAmount)&&(identical(other.settledCurrency, settledCurrency) || other.settledCurrency == settledCurrency)&&(identical(other.rateSource, rateSource) || other.rateSource == rateSource)&&(identical(other.rateCapturedAt, rateCapturedAt) || other.rateCapturedAt == rateCapturedAt)&&(identical(other.currencyStatedAt, currencyStatedAt) || other.currencyStatedAt == currencyStatedAt)&&(identical(other.vehicleId, vehicleId) || other.vehicleId == vehicleId)&&const DeepCollectionEquality().equals(other.linkedTripIds, linkedTripIds)&&(identical(other.isFullTank, isFullTank) || other.isFullTank == isFullTank)&&(identical(other.isCorrection, isCorrection) || other.isCorrection == isCorrection)&&(identical(other.fuelLevelBeforeL, fuelLevelBeforeL) || other.fuelLevelBeforeL == fuelLevelBeforeL)&&(identical(other.fuelLevelAfterL, fuelLevelAfterL) || other.fuelLevelAfterL == fuelLevelAfterL)&&(identical(other.scannedPricePerLiter, scannedPricePerLiter) || other.scannedPricePerLiter == scannedPricePerLiter)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.fleetAttribution, fleetAttribution) || other.fleetAttribution == fleetAttribution));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,date,liters,totalCost,odometerKm,fuelType,stationId,stationName,notes,currency,settledAmount,settledCurrency,rateSource,rateCapturedAt,vehicleId,const DeepCollectionEquality().hash(linkedTripIds),isFullTank,isCorrection,fuelLevelBeforeL,fuelLevelAfterL,scannedPricePerLiter,updatedAt,fleetAttribution]);
+int get hashCode => Object.hashAll([runtimeType,id,date,liters,totalCost,odometerKm,fuelType,stationId,stationName,notes,currency,settledAmount,settledCurrency,rateSource,rateCapturedAt,currencyStatedAt,vehicleId,const DeepCollectionEquality().hash(linkedTripIds),isFullTank,isCorrection,fuelLevelBeforeL,fuelLevelAfterL,scannedPricePerLiter,updatedAt,fleetAttribution]);
 
 @override
 String toString() {
-  return 'FillUp(id: $id, date: $date, liters: $liters, totalCost: $totalCost, odometerKm: $odometerKm, fuelType: $fuelType, stationId: $stationId, stationName: $stationName, notes: $notes, currency: $currency, settledAmount: $settledAmount, settledCurrency: $settledCurrency, rateSource: $rateSource, rateCapturedAt: $rateCapturedAt, vehicleId: $vehicleId, linkedTripIds: $linkedTripIds, isFullTank: $isFullTank, isCorrection: $isCorrection, fuelLevelBeforeL: $fuelLevelBeforeL, fuelLevelAfterL: $fuelLevelAfterL, scannedPricePerLiter: $scannedPricePerLiter, updatedAt: $updatedAt, fleetAttribution: $fleetAttribution)';
+  return 'FillUp(id: $id, date: $date, liters: $liters, totalCost: $totalCost, odometerKm: $odometerKm, fuelType: $fuelType, stationId: $stationId, stationName: $stationName, notes: $notes, currency: $currency, settledAmount: $settledAmount, settledCurrency: $settledCurrency, rateSource: $rateSource, rateCapturedAt: $rateCapturedAt, currencyStatedAt: $currencyStatedAt, vehicleId: $vehicleId, linkedTripIds: $linkedTripIds, isFullTank: $isFullTank, isCorrection: $isCorrection, fuelLevelBeforeL: $fuelLevelBeforeL, fuelLevelAfterL: $fuelLevelAfterL, scannedPricePerLiter: $scannedPricePerLiter, updatedAt: $updatedAt, fleetAttribution: $fleetAttribution)';
 }
 
 
@@ -155,7 +164,7 @@ abstract mixin class $FillUpCopyWith<$Res>  {
   factory $FillUpCopyWith(FillUp value, $Res Function(FillUp) _then) = _$FillUpCopyWithImpl;
 @useResult
 $Res call({
- String id, DateTime date, double liters, double totalCost, double odometerKm,@FuelTypeJsonConverter() FuelType fuelType, String? stationId, String? stationName, String? notes, String? currency, double? settledAmount, String? settledCurrency, String? rateSource, DateTime? rateCapturedAt, String? vehicleId, List<String> linkedTripIds, bool isFullTank, bool isCorrection, double? fuelLevelBeforeL, double? fuelLevelAfterL, double? scannedPricePerLiter, DateTime? updatedAt,@VehicleAttributionJsonConverter() VehicleAttribution? fleetAttribution
+ String id, DateTime date, double liters, double totalCost, double odometerKm,@FuelTypeJsonConverter() FuelType fuelType, String? stationId, String? stationName, String? notes, String? currency, double? settledAmount, String? settledCurrency, String? rateSource, DateTime? rateCapturedAt, DateTime? currencyStatedAt, String? vehicleId, List<String> linkedTripIds, bool isFullTank, bool isCorrection, double? fuelLevelBeforeL, double? fuelLevelAfterL, double? scannedPricePerLiter, DateTime? updatedAt,@VehicleAttributionJsonConverter() VehicleAttribution? fleetAttribution
 });
 
 
@@ -172,7 +181,7 @@ class _$FillUpCopyWithImpl<$Res>
 
 /// Create a copy of FillUp
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? date = null,Object? liters = null,Object? totalCost = null,Object? odometerKm = null,Object? fuelType = null,Object? stationId = freezed,Object? stationName = freezed,Object? notes = freezed,Object? currency = freezed,Object? settledAmount = freezed,Object? settledCurrency = freezed,Object? rateSource = freezed,Object? rateCapturedAt = freezed,Object? vehicleId = freezed,Object? linkedTripIds = null,Object? isFullTank = null,Object? isCorrection = null,Object? fuelLevelBeforeL = freezed,Object? fuelLevelAfterL = freezed,Object? scannedPricePerLiter = freezed,Object? updatedAt = freezed,Object? fleetAttribution = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? date = null,Object? liters = null,Object? totalCost = null,Object? odometerKm = null,Object? fuelType = null,Object? stationId = freezed,Object? stationName = freezed,Object? notes = freezed,Object? currency = freezed,Object? settledAmount = freezed,Object? settledCurrency = freezed,Object? rateSource = freezed,Object? rateCapturedAt = freezed,Object? currencyStatedAt = freezed,Object? vehicleId = freezed,Object? linkedTripIds = null,Object? isFullTank = null,Object? isCorrection = null,Object? fuelLevelBeforeL = freezed,Object? fuelLevelAfterL = freezed,Object? scannedPricePerLiter = freezed,Object? updatedAt = freezed,Object? fleetAttribution = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
@@ -188,6 +197,7 @@ as String?,settledAmount: freezed == settledAmount ? _self.settledAmount : settl
 as double?,settledCurrency: freezed == settledCurrency ? _self.settledCurrency : settledCurrency // ignore: cast_nullable_to_non_nullable
 as String?,rateSource: freezed == rateSource ? _self.rateSource : rateSource // ignore: cast_nullable_to_non_nullable
 as String?,rateCapturedAt: freezed == rateCapturedAt ? _self.rateCapturedAt : rateCapturedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,currencyStatedAt: freezed == currencyStatedAt ? _self.currencyStatedAt : currencyStatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,vehicleId: freezed == vehicleId ? _self.vehicleId : vehicleId // ignore: cast_nullable_to_non_nullable
 as String?,linkedTripIds: null == linkedTripIds ? _self.linkedTripIds : linkedTripIds // ignore: cast_nullable_to_non_nullable
 as List<String>,isFullTank: null == isFullTank ? _self.isFullTank : isFullTank // ignore: cast_nullable_to_non_nullable
@@ -282,10 +292,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DateTime date,  double liters,  double totalCost,  double odometerKm, @FuelTypeJsonConverter()  FuelType fuelType,  String? stationId,  String? stationName,  String? notes,  String? currency,  double? settledAmount,  String? settledCurrency,  String? rateSource,  DateTime? rateCapturedAt,  String? vehicleId,  List<String> linkedTripIds,  bool isFullTank,  bool isCorrection,  double? fuelLevelBeforeL,  double? fuelLevelAfterL,  double? scannedPricePerLiter,  DateTime? updatedAt, @VehicleAttributionJsonConverter()  VehicleAttribution? fleetAttribution)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  DateTime date,  double liters,  double totalCost,  double odometerKm, @FuelTypeJsonConverter()  FuelType fuelType,  String? stationId,  String? stationName,  String? notes,  String? currency,  double? settledAmount,  String? settledCurrency,  String? rateSource,  DateTime? rateCapturedAt,  DateTime? currencyStatedAt,  String? vehicleId,  List<String> linkedTripIds,  bool isFullTank,  bool isCorrection,  double? fuelLevelBeforeL,  double? fuelLevelAfterL,  double? scannedPricePerLiter,  DateTime? updatedAt, @VehicleAttributionJsonConverter()  VehicleAttribution? fleetAttribution)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FillUp() when $default != null:
-return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerKm,_that.fuelType,_that.stationId,_that.stationName,_that.notes,_that.currency,_that.settledAmount,_that.settledCurrency,_that.rateSource,_that.rateCapturedAt,_that.vehicleId,_that.linkedTripIds,_that.isFullTank,_that.isCorrection,_that.fuelLevelBeforeL,_that.fuelLevelAfterL,_that.scannedPricePerLiter,_that.updatedAt,_that.fleetAttribution);case _:
+return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerKm,_that.fuelType,_that.stationId,_that.stationName,_that.notes,_that.currency,_that.settledAmount,_that.settledCurrency,_that.rateSource,_that.rateCapturedAt,_that.currencyStatedAt,_that.vehicleId,_that.linkedTripIds,_that.isFullTank,_that.isCorrection,_that.fuelLevelBeforeL,_that.fuelLevelAfterL,_that.scannedPricePerLiter,_that.updatedAt,_that.fleetAttribution);case _:
   return orElse();
 
 }
@@ -303,10 +313,10 @@ return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerK
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DateTime date,  double liters,  double totalCost,  double odometerKm, @FuelTypeJsonConverter()  FuelType fuelType,  String? stationId,  String? stationName,  String? notes,  String? currency,  double? settledAmount,  String? settledCurrency,  String? rateSource,  DateTime? rateCapturedAt,  String? vehicleId,  List<String> linkedTripIds,  bool isFullTank,  bool isCorrection,  double? fuelLevelBeforeL,  double? fuelLevelAfterL,  double? scannedPricePerLiter,  DateTime? updatedAt, @VehicleAttributionJsonConverter()  VehicleAttribution? fleetAttribution)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  DateTime date,  double liters,  double totalCost,  double odometerKm, @FuelTypeJsonConverter()  FuelType fuelType,  String? stationId,  String? stationName,  String? notes,  String? currency,  double? settledAmount,  String? settledCurrency,  String? rateSource,  DateTime? rateCapturedAt,  DateTime? currencyStatedAt,  String? vehicleId,  List<String> linkedTripIds,  bool isFullTank,  bool isCorrection,  double? fuelLevelBeforeL,  double? fuelLevelAfterL,  double? scannedPricePerLiter,  DateTime? updatedAt, @VehicleAttributionJsonConverter()  VehicleAttribution? fleetAttribution)  $default,) {final _that = this;
 switch (_that) {
 case _FillUp():
-return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerKm,_that.fuelType,_that.stationId,_that.stationName,_that.notes,_that.currency,_that.settledAmount,_that.settledCurrency,_that.rateSource,_that.rateCapturedAt,_that.vehicleId,_that.linkedTripIds,_that.isFullTank,_that.isCorrection,_that.fuelLevelBeforeL,_that.fuelLevelAfterL,_that.scannedPricePerLiter,_that.updatedAt,_that.fleetAttribution);case _:
+return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerKm,_that.fuelType,_that.stationId,_that.stationName,_that.notes,_that.currency,_that.settledAmount,_that.settledCurrency,_that.rateSource,_that.rateCapturedAt,_that.currencyStatedAt,_that.vehicleId,_that.linkedTripIds,_that.isFullTank,_that.isCorrection,_that.fuelLevelBeforeL,_that.fuelLevelAfterL,_that.scannedPricePerLiter,_that.updatedAt,_that.fleetAttribution);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -323,10 +333,10 @@ return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerK
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DateTime date,  double liters,  double totalCost,  double odometerKm, @FuelTypeJsonConverter()  FuelType fuelType,  String? stationId,  String? stationName,  String? notes,  String? currency,  double? settledAmount,  String? settledCurrency,  String? rateSource,  DateTime? rateCapturedAt,  String? vehicleId,  List<String> linkedTripIds,  bool isFullTank,  bool isCorrection,  double? fuelLevelBeforeL,  double? fuelLevelAfterL,  double? scannedPricePerLiter,  DateTime? updatedAt, @VehicleAttributionJsonConverter()  VehicleAttribution? fleetAttribution)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  DateTime date,  double liters,  double totalCost,  double odometerKm, @FuelTypeJsonConverter()  FuelType fuelType,  String? stationId,  String? stationName,  String? notes,  String? currency,  double? settledAmount,  String? settledCurrency,  String? rateSource,  DateTime? rateCapturedAt,  DateTime? currencyStatedAt,  String? vehicleId,  List<String> linkedTripIds,  bool isFullTank,  bool isCorrection,  double? fuelLevelBeforeL,  double? fuelLevelAfterL,  double? scannedPricePerLiter,  DateTime? updatedAt, @VehicleAttributionJsonConverter()  VehicleAttribution? fleetAttribution)?  $default,) {final _that = this;
 switch (_that) {
 case _FillUp() when $default != null:
-return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerKm,_that.fuelType,_that.stationId,_that.stationName,_that.notes,_that.currency,_that.settledAmount,_that.settledCurrency,_that.rateSource,_that.rateCapturedAt,_that.vehicleId,_that.linkedTripIds,_that.isFullTank,_that.isCorrection,_that.fuelLevelBeforeL,_that.fuelLevelAfterL,_that.scannedPricePerLiter,_that.updatedAt,_that.fleetAttribution);case _:
+return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerKm,_that.fuelType,_that.stationId,_that.stationName,_that.notes,_that.currency,_that.settledAmount,_that.settledCurrency,_that.rateSource,_that.rateCapturedAt,_that.currencyStatedAt,_that.vehicleId,_that.linkedTripIds,_that.isFullTank,_that.isCorrection,_that.fuelLevelBeforeL,_that.fuelLevelAfterL,_that.scannedPricePerLiter,_that.updatedAt,_that.fleetAttribution);case _:
   return null;
 
 }
@@ -338,7 +348,7 @@ return $default(_that.id,_that.date,_that.liters,_that.totalCost,_that.odometerK
 @JsonSerializable()
 
 class _FillUp implements FillUp {
-  const _FillUp({required this.id, required this.date, required this.liters, required this.totalCost, required this.odometerKm, @FuelTypeJsonConverter() required this.fuelType, this.stationId, this.stationName, this.notes, this.currency, this.settledAmount, this.settledCurrency, this.rateSource, this.rateCapturedAt, this.vehicleId, final  List<String> linkedTripIds = const <String>[], this.isFullTank = true, this.isCorrection = false, this.fuelLevelBeforeL, this.fuelLevelAfterL, this.scannedPricePerLiter, this.updatedAt, @VehicleAttributionJsonConverter() this.fleetAttribution}): _linkedTripIds = linkedTripIds;
+  const _FillUp({required this.id, required this.date, required this.liters, required this.totalCost, required this.odometerKm, @FuelTypeJsonConverter() required this.fuelType, this.stationId, this.stationName, this.notes, this.currency, this.settledAmount, this.settledCurrency, this.rateSource, this.rateCapturedAt, this.currencyStatedAt, this.vehicleId, final  List<String> linkedTripIds = const <String>[], this.isFullTank = true, this.isCorrection = false, this.fuelLevelBeforeL, this.fuelLevelAfterL, this.scannedPricePerLiter, this.updatedAt, @VehicleAttributionJsonConverter() this.fleetAttribution}): _linkedTripIds = linkedTripIds;
   factory _FillUp.fromJson(Map<String, dynamic> json) => _$FillUpFromJson(json);
 
 @override final  String id;
@@ -390,6 +400,16 @@ class _FillUp implements FillUp {
 /// The instant the implied rate belongs to — the TRANSACTION date,
 /// never the day the statement was typed in (#4437).
 @override final  DateTime? rateCapturedAt;
+/// When the driver stated this record's [currency] in bulk — "my
+/// fill-ups up to *date* were all in *currency*" (#4406).
+///
+/// Null on every record whose currency came from anywhere else (the
+/// entry-time stamp, a receipt, the settle sheet). Non-null marks the
+/// label as an explicit user statement, never an inference, and is
+/// what makes the statement reversible: undo returns exactly these
+/// records to unknown. Rides in the JSONB `data` column — no Supabase
+/// change (CLAUDE.md rule 5).
+@override final  DateTime? currencyStatedAt;
 /// Optional reference to the [VehicleProfile] this fill-up belongs to
 /// (#694). Null means the user logged the fill-up without attributing
 /// it to a specific vehicle. Used to group per-vehicle stats and to
@@ -498,16 +518,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FillUp&&(identical(other.id, id) || other.id == id)&&(identical(other.date, date) || other.date == date)&&(identical(other.liters, liters) || other.liters == liters)&&(identical(other.totalCost, totalCost) || other.totalCost == totalCost)&&(identical(other.odometerKm, odometerKm) || other.odometerKm == odometerKm)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.stationId, stationId) || other.stationId == stationId)&&(identical(other.stationName, stationName) || other.stationName == stationName)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.settledAmount, settledAmount) || other.settledAmount == settledAmount)&&(identical(other.settledCurrency, settledCurrency) || other.settledCurrency == settledCurrency)&&(identical(other.rateSource, rateSource) || other.rateSource == rateSource)&&(identical(other.rateCapturedAt, rateCapturedAt) || other.rateCapturedAt == rateCapturedAt)&&(identical(other.vehicleId, vehicleId) || other.vehicleId == vehicleId)&&const DeepCollectionEquality().equals(other._linkedTripIds, _linkedTripIds)&&(identical(other.isFullTank, isFullTank) || other.isFullTank == isFullTank)&&(identical(other.isCorrection, isCorrection) || other.isCorrection == isCorrection)&&(identical(other.fuelLevelBeforeL, fuelLevelBeforeL) || other.fuelLevelBeforeL == fuelLevelBeforeL)&&(identical(other.fuelLevelAfterL, fuelLevelAfterL) || other.fuelLevelAfterL == fuelLevelAfterL)&&(identical(other.scannedPricePerLiter, scannedPricePerLiter) || other.scannedPricePerLiter == scannedPricePerLiter)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.fleetAttribution, fleetAttribution) || other.fleetAttribution == fleetAttribution));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FillUp&&(identical(other.id, id) || other.id == id)&&(identical(other.date, date) || other.date == date)&&(identical(other.liters, liters) || other.liters == liters)&&(identical(other.totalCost, totalCost) || other.totalCost == totalCost)&&(identical(other.odometerKm, odometerKm) || other.odometerKm == odometerKm)&&(identical(other.fuelType, fuelType) || other.fuelType == fuelType)&&(identical(other.stationId, stationId) || other.stationId == stationId)&&(identical(other.stationName, stationName) || other.stationName == stationName)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.settledAmount, settledAmount) || other.settledAmount == settledAmount)&&(identical(other.settledCurrency, settledCurrency) || other.settledCurrency == settledCurrency)&&(identical(other.rateSource, rateSource) || other.rateSource == rateSource)&&(identical(other.rateCapturedAt, rateCapturedAt) || other.rateCapturedAt == rateCapturedAt)&&(identical(other.currencyStatedAt, currencyStatedAt) || other.currencyStatedAt == currencyStatedAt)&&(identical(other.vehicleId, vehicleId) || other.vehicleId == vehicleId)&&const DeepCollectionEquality().equals(other._linkedTripIds, _linkedTripIds)&&(identical(other.isFullTank, isFullTank) || other.isFullTank == isFullTank)&&(identical(other.isCorrection, isCorrection) || other.isCorrection == isCorrection)&&(identical(other.fuelLevelBeforeL, fuelLevelBeforeL) || other.fuelLevelBeforeL == fuelLevelBeforeL)&&(identical(other.fuelLevelAfterL, fuelLevelAfterL) || other.fuelLevelAfterL == fuelLevelAfterL)&&(identical(other.scannedPricePerLiter, scannedPricePerLiter) || other.scannedPricePerLiter == scannedPricePerLiter)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.fleetAttribution, fleetAttribution) || other.fleetAttribution == fleetAttribution));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,date,liters,totalCost,odometerKm,fuelType,stationId,stationName,notes,currency,settledAmount,settledCurrency,rateSource,rateCapturedAt,vehicleId,const DeepCollectionEquality().hash(_linkedTripIds),isFullTank,isCorrection,fuelLevelBeforeL,fuelLevelAfterL,scannedPricePerLiter,updatedAt,fleetAttribution]);
+int get hashCode => Object.hashAll([runtimeType,id,date,liters,totalCost,odometerKm,fuelType,stationId,stationName,notes,currency,settledAmount,settledCurrency,rateSource,rateCapturedAt,currencyStatedAt,vehicleId,const DeepCollectionEquality().hash(_linkedTripIds),isFullTank,isCorrection,fuelLevelBeforeL,fuelLevelAfterL,scannedPricePerLiter,updatedAt,fleetAttribution]);
 
 @override
 String toString() {
-  return 'FillUp(id: $id, date: $date, liters: $liters, totalCost: $totalCost, odometerKm: $odometerKm, fuelType: $fuelType, stationId: $stationId, stationName: $stationName, notes: $notes, currency: $currency, settledAmount: $settledAmount, settledCurrency: $settledCurrency, rateSource: $rateSource, rateCapturedAt: $rateCapturedAt, vehicleId: $vehicleId, linkedTripIds: $linkedTripIds, isFullTank: $isFullTank, isCorrection: $isCorrection, fuelLevelBeforeL: $fuelLevelBeforeL, fuelLevelAfterL: $fuelLevelAfterL, scannedPricePerLiter: $scannedPricePerLiter, updatedAt: $updatedAt, fleetAttribution: $fleetAttribution)';
+  return 'FillUp(id: $id, date: $date, liters: $liters, totalCost: $totalCost, odometerKm: $odometerKm, fuelType: $fuelType, stationId: $stationId, stationName: $stationName, notes: $notes, currency: $currency, settledAmount: $settledAmount, settledCurrency: $settledCurrency, rateSource: $rateSource, rateCapturedAt: $rateCapturedAt, currencyStatedAt: $currencyStatedAt, vehicleId: $vehicleId, linkedTripIds: $linkedTripIds, isFullTank: $isFullTank, isCorrection: $isCorrection, fuelLevelBeforeL: $fuelLevelBeforeL, fuelLevelAfterL: $fuelLevelAfterL, scannedPricePerLiter: $scannedPricePerLiter, updatedAt: $updatedAt, fleetAttribution: $fleetAttribution)';
 }
 
 
@@ -518,7 +538,7 @@ abstract mixin class _$FillUpCopyWith<$Res> implements $FillUpCopyWith<$Res> {
   factory _$FillUpCopyWith(_FillUp value, $Res Function(_FillUp) _then) = __$FillUpCopyWithImpl;
 @override @useResult
 $Res call({
- String id, DateTime date, double liters, double totalCost, double odometerKm,@FuelTypeJsonConverter() FuelType fuelType, String? stationId, String? stationName, String? notes, String? currency, double? settledAmount, String? settledCurrency, String? rateSource, DateTime? rateCapturedAt, String? vehicleId, List<String> linkedTripIds, bool isFullTank, bool isCorrection, double? fuelLevelBeforeL, double? fuelLevelAfterL, double? scannedPricePerLiter, DateTime? updatedAt,@VehicleAttributionJsonConverter() VehicleAttribution? fleetAttribution
+ String id, DateTime date, double liters, double totalCost, double odometerKm,@FuelTypeJsonConverter() FuelType fuelType, String? stationId, String? stationName, String? notes, String? currency, double? settledAmount, String? settledCurrency, String? rateSource, DateTime? rateCapturedAt, DateTime? currencyStatedAt, String? vehicleId, List<String> linkedTripIds, bool isFullTank, bool isCorrection, double? fuelLevelBeforeL, double? fuelLevelAfterL, double? scannedPricePerLiter, DateTime? updatedAt,@VehicleAttributionJsonConverter() VehicleAttribution? fleetAttribution
 });
 
 
@@ -535,7 +555,7 @@ class __$FillUpCopyWithImpl<$Res>
 
 /// Create a copy of FillUp
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? date = null,Object? liters = null,Object? totalCost = null,Object? odometerKm = null,Object? fuelType = null,Object? stationId = freezed,Object? stationName = freezed,Object? notes = freezed,Object? currency = freezed,Object? settledAmount = freezed,Object? settledCurrency = freezed,Object? rateSource = freezed,Object? rateCapturedAt = freezed,Object? vehicleId = freezed,Object? linkedTripIds = null,Object? isFullTank = null,Object? isCorrection = null,Object? fuelLevelBeforeL = freezed,Object? fuelLevelAfterL = freezed,Object? scannedPricePerLiter = freezed,Object? updatedAt = freezed,Object? fleetAttribution = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? date = null,Object? liters = null,Object? totalCost = null,Object? odometerKm = null,Object? fuelType = null,Object? stationId = freezed,Object? stationName = freezed,Object? notes = freezed,Object? currency = freezed,Object? settledAmount = freezed,Object? settledCurrency = freezed,Object? rateSource = freezed,Object? rateCapturedAt = freezed,Object? currencyStatedAt = freezed,Object? vehicleId = freezed,Object? linkedTripIds = null,Object? isFullTank = null,Object? isCorrection = null,Object? fuelLevelBeforeL = freezed,Object? fuelLevelAfterL = freezed,Object? scannedPricePerLiter = freezed,Object? updatedAt = freezed,Object? fleetAttribution = freezed,}) {
   return _then(_FillUp(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,date: null == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
@@ -551,6 +571,7 @@ as String?,settledAmount: freezed == settledAmount ? _self.settledAmount : settl
 as double?,settledCurrency: freezed == settledCurrency ? _self.settledCurrency : settledCurrency // ignore: cast_nullable_to_non_nullable
 as String?,rateSource: freezed == rateSource ? _self.rateSource : rateSource // ignore: cast_nullable_to_non_nullable
 as String?,rateCapturedAt: freezed == rateCapturedAt ? _self.rateCapturedAt : rateCapturedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,currencyStatedAt: freezed == currencyStatedAt ? _self.currencyStatedAt : currencyStatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,vehicleId: freezed == vehicleId ? _self.vehicleId : vehicleId // ignore: cast_nullable_to_non_nullable
 as String?,linkedTripIds: null == linkedTripIds ? _self._linkedTripIds : linkedTripIds // ignore: cast_nullable_to_non_nullable
 as List<String>,isFullTank: null == isFullTank ? _self.isFullTank : isFullTank // ignore: cast_nullable_to_non_nullable

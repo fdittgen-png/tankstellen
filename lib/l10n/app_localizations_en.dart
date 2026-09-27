@@ -4190,6 +4190,76 @@ class AppLocalizationsEn extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Dismiss';
 
   @override
+  String get currencyBackfillAction => 'Set their currency';
+
+  @override
+  String get currencyBackfillTitle => 'Currency of older fill-ups';
+
+  @override
+  String get currencyBackfillIntro =>
+      'Say which currency your fill-ups without one were paid in. Only that label changes — litres, distances and amounts stay as recorded — and you can undo it.';
+
+  @override
+  String currencyBackfillOnOrBefore(String date) {
+    return 'Fill-ups on or before $date';
+  }
+
+  @override
+  String get currencyBackfillCurrencyLabel => 'They were all paid in';
+
+  @override
+  String currencyBackfillPreview(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups will be labelled $currency.',
+      one: '1 fill-up will be labelled $currency.',
+      zero: 'No fill-up without a currency in this range.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyBackfillRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Afterwards $count fill-ups still have none.',
+      one: 'Afterwards 1 fill-up still has none.',
+      zero: 'Afterwards every fill-up has a currency.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyBackfillApply => 'Apply';
+
+  @override
+  String currencyBackfillDone(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups labelled $currency.',
+      one: '1 fill-up labelled $currency.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyBackfillStatedSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups carry a currency you stated.',
+      one: '1 fill-up carries a currency you stated.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyBackfillUndo => 'Undo currency labels';
+
+  @override
   String dataSourceLinkSemantic(String source, String license) {
     return 'Open the $source data source ($license) in your browser';
   }
@@ -16243,6 +16313,77 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get crossBorderDismissTooltip => '⟦Đîšɱîšš ···⟧';
+
+  @override
+  String get currencyBackfillAction => '⟦Šéŧ ŧĥéîř çúřřéñçý ·······⟧';
+
+  @override
+  String get currencyBackfillTitle => '⟦Çúřřéñçý óƒ ółđéř ƒîłł-úƥš ··········⟧';
+
+  @override
+  String get currencyBackfillIntro =>
+      '⟦Šáý ŵĥîçĥ çúřřéñçý ýóúř ƒîłł-úƥš ŵîŧĥóúŧ óñé ŵéřé ƥáîđ îñ. Óñłý ŧĥáŧ łáƀéł çĥáñǧéš — łîŧřéš, đîšŧáñçéš áñđ áɱóúñŧš šŧáý áš řéçóřđéđ — áñđ ýóú çáñ úñđó îŧ. ······················································⟧';
+
+  @override
+  String currencyBackfillOnOrBefore(String date) {
+    return '⟦Ƒîłł-úƥš óñ óř ƀéƒóřé $date ········⟧';
+  }
+
+  @override
+  String get currencyBackfillCurrencyLabel =>
+      '⟦Ŧĥéý ŵéřé áłł ƥáîđ îñ ········⟧';
+
+  @override
+  String currencyBackfillPreview(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups will be labelled $currency.',
+      one: '1 fill-up will be labelled $currency.',
+      zero: 'No fill-up without a currency in this range.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String currencyBackfillRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Afterwards $count fill-ups still have none.',
+      one: 'Afterwards 1 fill-up still has none.',
+      zero: 'Afterwards every fill-up has a currency.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get currencyBackfillApply => '⟦Áƥƥłý ··⟧';
+
+  @override
+  String currencyBackfillDone(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups labelled $currency.',
+      one: '1 fill-up labelled $currency.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String currencyBackfillStatedSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups carry a currency you stated.',
+      one: '1 fill-up carries a currency you stated.',
+    );
+    return '⟦$_temp0⟧';
+  }
+
+  @override
+  String get currencyBackfillUndo => '⟦Úñđó çúřřéñçý łáƀéłš ········⟧';
 
   @override
   String dataSourceLinkSemantic(String source, String license) {

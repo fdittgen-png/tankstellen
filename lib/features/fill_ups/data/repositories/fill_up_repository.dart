@@ -103,6 +103,16 @@ class FillUpRepository {
     return resolved == null ? fillUp : fillUp.copyWith(currency: resolved);
   }
 
+  /// Replace several EXISTING records by id in one write (#4406 bulk
+  /// currency statement). Ids not in the log are ignored — this is an
+  /// edit path, never a creation path, so no currency is decided here.
+  Future<void> saveMany(Iterable<FillUp> fillUps) async {
+    final byId = {for (final f in fillUps) f.id: f};
+    if (byId.isEmpty) return;
+    final all = [for (final f in getAll()) byId[f.id] ?? f];
+    await _writeAll(all);
+  }
+
   /// Delete a fill-up by id.
   Future<void> delete(String id) async {
     final all = [...getAll()]..removeWhere((f) => f.id == id);

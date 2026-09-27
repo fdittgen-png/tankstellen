@@ -4247,6 +4247,76 @@ class AppLocalizationsFr extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Ignorer';
 
   @override
+  String get currencyBackfillAction => 'Indiquer leur devise';
+
+  @override
+  String get currencyBackfillTitle => 'Devise des anciens pleins';
+
+  @override
+  String get currencyBackfillIntro =>
+      'Indiquez dans quelle devise vos pleins sans devise ont été payés. Seule cette indication change — litres, distances et montants restent tels qu\'enregistrés — et vous pouvez l\'annuler.';
+
+  @override
+  String currencyBackfillOnOrBefore(String date) {
+    return 'Pleins jusqu\'au $date inclus';
+  }
+
+  @override
+  String get currencyBackfillCurrencyLabel => 'Ils ont tous été payés en';
+
+  @override
+  String currencyBackfillPreview(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pleins seront marqués $currency.',
+      one: '1 plein sera marqué $currency.',
+      zero: 'Aucun plein sans devise sur cette période.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyBackfillRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Ensuite, $count pleins n\'en ont toujours pas.',
+      one: 'Ensuite, 1 plein n\'en a toujours pas.',
+      zero: 'Ensuite, chaque plein a une devise.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyBackfillApply => 'Appliquer';
+
+  @override
+  String currencyBackfillDone(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pleins marqués $currency.',
+      one: '1 plein marqué $currency.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyBackfillStatedSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pleins portent une devise que vous avez indiquée.',
+      one: '1 plein porte une devise que vous avez indiquée.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyBackfillUndo => 'Annuler les devises indiquées';
+
+  @override
   String dataSourceLinkSemantic(String source, String license) {
     return 'Ouvrir la source de données $source ($license) dans votre navigateur';
   }
