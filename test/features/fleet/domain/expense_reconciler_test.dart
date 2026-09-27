@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/money.dart';
 import 'package:tankstellen/features/fleet/domain/expense.dart';
 import 'package:tankstellen/features/fleet/domain/expense_fields.dart';
 import 'package:tankstellen/features/fleet/domain/expense_reconciler.dart';
-import 'package:tankstellen/features/fleet/domain/money.dart';
 
 /// #4215 (F5) — the reconciler: does the receipt add up, have we seen
 /// it before, and did the employee already log this fill-up?
@@ -31,7 +31,7 @@ void main() {
         occurredAt: dated ? (occurredAt ?? at) : null,
         litres: litres,
         pricePerLitre: pricePerLitre,
-        total: total == null ? null : Money(amount: total, currency: currency),
+        total: total == null ? null : Money(total, currency),
       );
 
   Expense expense(ExtractedReceiptFields f,

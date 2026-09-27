@@ -53,7 +53,7 @@ Opportunity opportunityFromPriceAlert({
   required DataValue<Duration> priceAge,
   required DataConfidence confidence,
   required DateTime now,
-  Money? money,
+  OpportunityMoney? money,
 }) =>
     Opportunity(
       kind: OpportunityKind.favouriteStation,
@@ -87,7 +87,7 @@ Opportunity opportunityFromRadiusMatch({
   required DataValue<Duration> priceAge,
   required DataConfidence confidence,
   required DateTime now,
-  Money? money,
+  OpportunityMoney? money,
 }) =>
     Opportunity(
       kind: OpportunityKind.exceptionalLocalPrice,
@@ -156,14 +156,18 @@ Opportunity opportunityFromVelocityEvent({
 
 /// The money side of an opportunity, or absent.
 ///
+/// Not a currency amount — the app's one of those is `Money` in
+/// `core/domain/money.dart` (#4395). This is the gross / detour / net
+/// breakdown of a saving, all in the opportunity's own price currency.
+///
 /// A single type rather than three nullable parameters, so the three
 /// figures trust rule 4 ties together cannot be passed independently —
 /// and therefore cannot disagree. [net] is computed here, never
 /// supplied: a caller that could pass its own net could pass one that
 /// does not equal `gross - detour`, which is precisely the unverifiable
 /// claim the rule forbids.
-class Money {
-  Money({required this.gross, required this.detour})
+class OpportunityMoney {
+  OpportunityMoney({required this.gross, required this.detour})
       : net = gross - detour;
 
   /// Price difference × the litres this user actually buys.

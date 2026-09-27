@@ -4,11 +4,11 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/money.dart';
 import 'package:tankstellen/features/fleet/data/expense_intake.dart';
 import 'package:tankstellen/features/fleet/domain/expense.dart';
 import 'package:tankstellen/features/fleet/domain/expense_fields.dart';
 import 'package:tankstellen/features/fleet/domain/expense_reconciler.dart';
-import 'package:tankstellen/features/fleet/domain/money.dart';
 import 'package:tankstellen/features/receipts_ocr/api.dart'
     show EReceiptTextParser, parsedReceiptFactsOf;
 
@@ -104,8 +104,8 @@ void main() {
       parsed: parsedReceiptFactsOf(parsed),
       importSource: ExpenseImportSource.eReceiptText,
     );
-    expect(e.extracted.total, const Money(amount: 77.52, currency: 'EUR'));
-    expect(e.extracted.vat, const Money(amount: 12.38, currency: 'EUR'));
+    expect(e.extracted.total, const Money(77.52, 'EUR'));
+    expect(e.extracted.vat, const Money(12.38, 'EUR'));
     expect(e.authoritative, isFalse);
   });
 

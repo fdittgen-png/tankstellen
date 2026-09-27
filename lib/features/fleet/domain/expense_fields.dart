@@ -3,7 +3,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'money.dart';
+import '../../../core/domain/money.dart';
 
 part 'expense_fields.freezed.dart';
 part 'expense_fields.g.dart';
@@ -79,11 +79,11 @@ extension ExtractedReceiptFieldsX on ExtractedReceiptFields {
     final p = pricePerLitre;
     final t = total;
     if (l == null || p == null || t == null) return null;
-    return Money(amount: l * p, currency: t.currency);
+    return Money(l * p, t.currencyCode);
   }
 
   /// The ISO code the amounts are in, when any amount is known.
-  String? get currency => total?.currency ?? vat?.currency;
+  String? get currency => total?.currencyCode ?? vat?.currencyCode;
 }
 
 /// One field an employee changed after the machine read it (#4215).

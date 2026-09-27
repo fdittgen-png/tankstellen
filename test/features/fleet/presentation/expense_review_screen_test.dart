@@ -5,11 +5,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/money.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/features/fleet/data/fleet_expense_store.dart';
 import 'package:tankstellen/features/fleet/domain/expense.dart';
 import 'package:tankstellen/features/fleet/domain/expense_fields.dart';
-import 'package:tankstellen/features/fleet/domain/money.dart';
 import 'package:tankstellen/features/fleet/presentation/screens/expense_list_screen.dart';
 import 'package:tankstellen/features/fleet/presentation/screens/expense_review_screen.dart';
 import 'package:tankstellen/features/fleet/presentation/widgets/expense_review_fields.dart';
@@ -49,8 +49,8 @@ void main() {
     fuelApiValue: 'diesel',
     litres: 50,
     pricePerLitre: 1.7,
-    total: const Money(amount: 85, currency: 'EUR'),
-    vat: const Money(amount: 13.57, currency: 'EUR'),
+    total: const Money(85, 'EUR'),
+    vat: const Money(13.57, 'EUR'),
     vatRate: 19,
   );
 
@@ -61,7 +61,7 @@ void main() {
     fuelApiValue: 'diesel',
     litres: 50,
     pricePerLitre: 1.7,
-    total: const Money(amount: 58, currency: 'EUR'),
+    total: const Money(58, 'EUR'),
   );
 
   // Nothing but a station: every number is missing.

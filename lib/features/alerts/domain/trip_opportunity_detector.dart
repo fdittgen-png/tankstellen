@@ -238,7 +238,7 @@ abstract final class TripOpportunityDetector {
     final fast = fastest == null ? null : plans.comparableCost(fastest);
     final cheap = plans.comparableCost(cheapest);
     final money = (fast != null && cheap != null && fast > cheap)
-        ? Money(gross: fast - cheap, detour: 0)
+        ? OpportunityMoney(gross: fast - cheap, detour: 0)
         : null;
 
     return TripOpportunityResult.found(
@@ -251,7 +251,7 @@ abstract final class TripOpportunityDetector {
   static Opportunity _refuelSoon(
     TripContext trip,
     RefuelPlanSet plans,
-    Money? money,
+    OpportunityMoney? money,
     DataValue<Duration> priceAge,
     DataConfidence confidence,
     DateTime now, {

@@ -117,4 +117,33 @@ void main() {
       expect(order, lessThan(0), reason: 'DKK13/L is the cheaper litre');
     });
   });
+
+  // #4395 — what the fleet copy brought with it when it was folded in.
+  group('minor units and the persisted form', () {
+    test('minorUnit reads the forecourt table, two decimals otherwise', () {
+      expect(const Money(1, 'EUR').minorUnit, 0.01);
+      expect(const Money(1, 'CHF').minorUnit, 0.05);
+      expect(const Money(1, 'CZK').minorUnit, 1.0);
+      expect(const Money(1, 'HUF').minorUnit, 1.0);
+      expect(const Money(1, 'XXX').minorUnit, 0.01,
+          reason: 'an unknown code falls back to the cent convention');
+      expect(kCurrencyMinorUnits['CZK'], 1.0);
+    });
+
+    test('JSON keeps the `currency` key the synced expenses carry', () {
+      const m = Money(85.04, 'EUR');
+      expect(m.toJson(), {'amount': 85.04, 'currency': 'EUR'});
+      expect(Money.fromJson(m.toJson()), m);
+    });
+
+    test('fromJson accepts an integer amount and a lower-case code', () {
+      expect(Money.fromJson(const {'amount': 85, 'currency': 'czk'}),
+          const Money(85, 'CZK'));
+    });
+
+    test('Comparable orders one currency by amount', () {
+      final sorted = [const Money(3, 'EUR'), const Money(1, 'EUR')]..sort();
+      expect(sorted, const [Money(1, 'EUR'), Money(3, 'EUR')]);
+    });
+  });
 }

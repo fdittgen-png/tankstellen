@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/money.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/features/fleet/domain/expense.dart';
 import 'package:tankstellen/features/fleet/domain/expense_fields.dart';
 import 'package:tankstellen/features/fleet/domain/expense_state_machine.dart';
-import 'package:tankstellen/features/fleet/domain/money.dart';
 
 /// #4215 (F5) — the expense state machine and the correction history.
 ///
@@ -23,7 +23,7 @@ void main() {
     stationName: 'Aral Köln',
     litres: 50,
     pricePerLitre: 1.7,
-    total: Money(amount: 85, currency: 'EUR'),
+    total: Money(85, 'EUR'),
   );
 
   Expense expense({ExpenseStatus status = ExpenseStatus.draft}) => Expense(
@@ -172,7 +172,7 @@ void main() {
           confirmed: fields.copyWith(litres: 48.2), byUserId: 'user-1');
       final twice = machine.recordCorrections(once,
           confirmed: once.confirmed.copyWith(
-              total: const Money(amount: 82.0, currency: 'EUR')),
+              total: const Money(82.0, 'EUR')),
           byUserId: 'user-1');
       expect(twice.corrections.map((c) => c.field), ['litres', 'total']);
       expect(twice.extracted.litres, 50);

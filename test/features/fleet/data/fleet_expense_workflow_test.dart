@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/money.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/features/fleet/data/fleet_expense_workflow.dart';
 import 'package:tankstellen/features/fleet/data/fleet_review_transport.dart';
 import 'package:tankstellen/features/fleet/domain/expense.dart';
 import 'package:tankstellen/features/fleet/domain/expense_fields.dart';
 import 'package:tankstellen/features/fleet/domain/expense_state_machine.dart';
-import 'package:tankstellen/features/fleet/domain/money.dart';
 
 import '../../../helpers/silence_error_logger.dart';
 import 'fake_fleet_review_transport.dart';
@@ -33,7 +33,7 @@ void main() {
     stationName: 'Aral Köln',
     litres: 50,
     pricePerLitre: 1.7,
-    total: Money(amount: 85, currency: 'EUR'),
+    total: Money(85, 'EUR'),
   );
 
   Expense expense({

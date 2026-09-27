@@ -6,11 +6,11 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/fleet/claim_class.dart';
+import 'package:tankstellen/core/domain/money.dart';
 import 'package:tankstellen/features/receipts_ocr/data/ocr/ocr_trace_package.dart';
 import 'package:tankstellen/features/fleet/domain/document_meta.dart';
 import 'package:tankstellen/features/fleet/domain/expense.dart';
 import 'package:tankstellen/features/fleet/domain/expense_fields.dart';
-import 'package:tankstellen/features/fleet/domain/money.dart';
 
 /// #4215 (F5) — the persisted contract of an expense and its document,
 /// and the rule that keeps receipt IMAGE BYTES out of everything that
@@ -24,8 +24,8 @@ void main() {
     fuelApiValue: 'diesel',
     litres: 62.4,
     pricePerLitre: 1.749,
-    total: const Money(amount: 109.14, currency: 'EUR'),
-    vat: const Money(amount: 18.19, currency: 'EUR'),
+    total: const Money(109.14, 'EUR'),
+    vat: const Money(18.19, 'EUR'),
     vatRate: 20,
     paymentReference: '****4417',
     odometerKm: 128450,
@@ -99,8 +99,8 @@ void main() {
       final decoded =
           Expense.fromJson(jsonDecode(jsonEncode(expense.toJson()))
               as Map<String, dynamic>);
-      expect(decoded.extracted.total, const Money(amount: 109.14, currency: 'EUR'));
-      expect(decoded.extracted.vat?.currency, 'EUR');
+      expect(decoded.extracted.total, const Money(109.14, 'EUR'));
+      expect(decoded.extracted.vat?.currencyCode, 'EUR');
     });
 
     test('a document meta survives encode → decode unchanged', () {

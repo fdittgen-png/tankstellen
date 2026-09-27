@@ -294,7 +294,7 @@ class ExpenseReconciler {
     final atotal = a.total;
     final btotal = b.total;
     if (atotal == null || btotal == null) return false;
-    if (atotal.currency.toUpperCase() != btotal.currency.toUpperCase()) {
+    if (!atotal.isSameCurrencyAs(btotal)) {
       return false;
     }
     return (atotal.amount - btotal.amount).abs() <=

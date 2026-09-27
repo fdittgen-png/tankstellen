@@ -32,6 +32,12 @@
 ///
 /// Pure Dart: no Flutter, no formatting, no locale. A formatted string is
 /// never compared.
+///
+/// This is the app's ONLY money type (#4395). The fleet expense trail
+/// (#4215) built its own on a parallel branch; its additions — the
+/// minor-unit table [kCurrencyMinorUnits] and the JSON form the expense
+/// models persist — live here now, because `core` never imports a
+/// feature. `test/lint/single_money_type_test.dart` keeps it at one.
 library;
 
 import 'package:meta/meta.dart';
@@ -52,6 +58,16 @@ class Money implements Comparable<Money> {
   /// running total never has to start life as a bare `0`.
   const Money.zero(this.currencyCode) : amount = 0;
 
+  /// Reads `{"amount": …, "currency": "EUR"}` — the form the fleet
+  /// expense models persist and sync (#4215). The key stays `currency`:
+  /// the Supabase fleet metrics read `total ->> 'currency'`, and
+  /// already-stored expenses carry it. The code is upper-cased on the
+  /// way in so a hand-edited row still compares equal.
+  factory Money.fromJson(Map<String, dynamic> json) => Money(
+        (json['amount'] as num).toDouble(),
+        (json['currency'] as String).toUpperCase(),
+      );
+
   final double amount;
 
   /// ISO 4217, upper case (`EUR`, `DKK`, `GBP`). Never a symbol: `$`
@@ -59,6 +75,12 @@ class Money implements Comparable<Money> {
   final String currencyCode;
 
   bool isSameCurrencyAs(Money other) => other.currencyCode == currencyCode;
+
+  /// The smallest amount [currencyCode] can express — what a printed
+  /// total is rounded to, and therefore the floor of any arithmetic
+  /// tolerance (#4215). An unknown code falls back to two decimals.
+  double get minorUnit =>
+      kCurrencyMinorUnits[currencyCode.toUpperCase()] ?? 0.01;
 
   /// Sum, or null across currencies. Null is the point: a caller that
   /// wanted one number has to say which currency it wanted it in.
@@ -88,9 +110,32 @@ class Money implements Comparable<Money> {
   @override
   int get hashCode => Object.hash(amount, currencyCode);
 
+  /// The persisted form [Money.fromJson] reads back.
+  Map<String, dynamic> toJson() => {'amount': amount, 'currency': currencyCode};
+
   @override
   String toString() => 'Money($amount $currencyCode)';
 }
+
+/// The smallest expressible amount per ISO 4217 code, as a fuel
+/// forecourt actually prints it (#4215, folded into core by #4395).
+///
+/// `CZK` and `HUF` quote fuel to the whole koruna / forint, so a
+/// cent-sized tolerance would flag every honest Czech receipt as an
+/// arithmetic mismatch. `CHF` cash-rounds to five centimes. The fleet
+/// expense reconciler's tolerance is built on this table.
+const Map<String, double> kCurrencyMinorUnits = {
+  'EUR': 0.01,
+  'GBP': 0.01,
+  'USD': 0.01,
+  'CHF': 0.05,
+  'DKK': 0.01,
+  'SEK': 0.01,
+  'NOK': 0.01,
+  'PLN': 0.01,
+  'CZK': 1.0,
+  'HUF': 1.0,
+};
 
 /// Sum [amounts], or null when they are not all one currency (or the
 /// list is empty and no [fallbackCurrency] was named).
