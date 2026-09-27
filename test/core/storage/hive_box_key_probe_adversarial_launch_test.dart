@@ -267,6 +267,15 @@ void main() {
       expect(keyWrites, 1);
     });
 
+    test('foreground scans leave datasets closed until a reader needs them', () async {
+      await launch(master: false);
+      expect(Hive.isBoxOpen(HiveBoxes.datasets), isFalse);
+      await HiveBoxes.initInIsolate();
+      expect(Hive.isBoxOpen(HiveBoxes.datasets), isFalse);
+      await HiveDeferredUserBoxes.ensureOpen(HiveBoxes.datasets);
+      expect(Hive.isBoxOpen(HiveBoxes.datasets), isTrue);
+    });
+
     test('7b — background isolate entry (HiveIsolateBoxes.initInIsolate): a '
         'used install opens; a restored image is refused byte-for-byte',
         () async {
