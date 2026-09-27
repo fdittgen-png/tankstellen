@@ -28,11 +28,12 @@ abstract class RouteWaypoint with _$RouteWaypoint {
     /// #4432 — this waypoint is where the VEHICLE is, read from GPS at
     /// search time, not a place the user named.
     ///
-    /// The distinction is not cosmetic. An origin that is the driver has
-    /// a direction: everything behind it has been passed and is not a
-    /// candidate (`dropStationsBehindOrigin`). A named city has no
-    /// behind — it has a near side and a far side — so the flag defaults
-    /// to false and every existing caller keeps the old corridor.
+    /// The distinction is not cosmetic. An origin that is the driver
+    /// moves: a refresh re-resolves it from GPS, so the corridor starts
+    /// where the vehicle is NOW and a forecourt already passed falls out
+    /// of it (`RouteSearchState.refresh`). A named city stays put, so the
+    /// flag defaults to false and every existing caller keeps a fixed
+    /// origin.
     @Default(false) bool isVehiclePosition,
   }) = _RouteWaypoint;
 }

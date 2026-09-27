@@ -11,6 +11,7 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/domain/tank_state_provider.dart';
 import 'package:tankstellen/features/route_search/domain/entities/route_info.dart';
+import 'package:tankstellen/features/route_search/domain/route_search_strategy.dart';
 import 'package:tankstellen/features/route_search/providers/route_search_provider.dart';
 import 'package:tankstellen/features/search/providers/refuel_plan_provider.dart';
 import 'package:tankstellen/features/search/providers/search_filters_provider.dart';
@@ -209,6 +210,41 @@ void main() {
           reason: 'the routed extra, not 2 × the vertex gap');
       expect(plan.detourTimeIsApproximate, isFalse);
       expect(plan.detourMinutes, closeTo(20 + kStopOverheadMinutes, 1e-9));
+    });
+
+    test(
+        '#4432 — road quotes are keyed by the submitted request, not by a '
+        'geometry fingerprint two routes can share', () async {
+      TravelContext? asked;
+      final c = container(
+        route: RouteSearchResult(
+          route: result().route,
+          stations: [FuelStationResult(station('middle', 45.5, 1.60))],
+          request: const RouteSearchRequest(
+            revision: 7,
+            waypoints: [
+              RouteWaypoint(lat: 44, lng: 5, label: 'from'),
+              RouteWaypoint(lat: 48, lng: 5, label: 'to'),
+            ],
+            fuelType: FuelType.e10,
+            searchRadiusKm: 5,
+            strategyType: RouteSearchStrategyType.uniform,
+          ),
+        ),
+        level: 25,
+        fetcher: (context, stops) async {
+          asked = context;
+          return const [];
+        },
+      );
+      addTearDown(c.dispose);
+      final sub = c.listen(refuelPlanProvider, (_, _) {});
+      addTearDown(sub.close);
+      await Future<void>.delayed(Duration.zero);
+
+      // `Object.hash(41, 444)` was the key before: any other route with
+      // 41 vertices and 444 km got this route's quotes.
+      expect(asked!.routeRevision, 7);
     });
 
     test('a tank that covers the route plans no stop at all', () {

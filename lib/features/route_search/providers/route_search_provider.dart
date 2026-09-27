@@ -23,11 +23,11 @@ import '../data/ev_along_route.dart';
 import '../domain/min_saving_filter.dart';
 import '../domain/route_origin.dart';
 import '../domain/route_search_request.dart';
-import '../data/services/routing_service.dart';
 import '../domain/entities/route_info.dart';
 import '../domain/route_search_result.dart';
 import '../domain/route_search_strategy.dart';
 import '../domain/route_search_strategy_factory.dart';
+import 'route_fetcher_provider.dart';
 
 // Re-export so existing imports of route_search_provider.dart keep working.
 export '../domain/min_saving_filter.dart';
@@ -36,6 +36,12 @@ export '../domain/route_search_result.dart';
 export '../domain/route_search_strategy_factory.dart';
 
 part 'route_search_provider.g.dart';
+
+/// #4432 — process-wide source of request revisions. Per-notifier
+/// counters restart at 1 whenever the auto-dispose provider is rebuilt,
+/// so two unrelated routes could carry the same "revision" to the road
+/// quotes keyed on it; one shared sequence cannot repeat.
+int _routeRequestSerial = 0;
 
 /// Orchestrates "cheapest stations along my route" feature.
 ///
@@ -54,7 +60,8 @@ class RouteSearchState extends _$RouteSearchState {
   /// arm — is fenced against it. Without this, a slow first search
   /// could overwrite the results of the search the driver ran after it
   /// (the corridor sweep streams for seconds), and [clear] could not
-  /// retire work already in flight. Incremented, never reused.
+  /// retire work already in flight. Drawn from [_routeRequestSerial],
+  /// never reused, and published as the request's revision.
   int _generation = 0;
 
   /// #4432 — the last submitted search, so [refresh] can re-run THAT
@@ -87,8 +94,8 @@ class RouteSearchState extends _$RouteSearchState {
     double? minSavingPerLiter,
     DateTime? originCapturedAt,
   }) async {
-    final generation = ++_generation;
-    _lastRequest = RouteSearchRequest(
+    final generation = _generation = ++_routeRequestSerial;
+    final request = _lastRequest = RouteSearchRequest(
       revision: generation,
       waypoints: waypoints,
       fuelType: fuelType,
@@ -122,13 +129,12 @@ class RouteSearchState extends _$RouteSearchState {
       final topN = profile?.routeSearchTopNPerSamplePoint ?? 10;
       final criterion =
           profile?.routeSearchCriterion ?? RouteSearchCriterion.cheapest;
-      final routingService = RoutingService();
+      final fetchRoute = ref.read(routeFetcherProvider);
       if (kDebugMode) { // #3610 — release skips the interpolation.
         debugPrint(
             'RouteSearch: fetching route for ${usableWaypoints.length} waypoints, avoidHighways=$avoidHighways, strategy=${strategyType.key}');
       }
-      final routeResult = await routingService.getRoute(usableWaypoints, avoidHighways: avoidHighways);
-      final route = routeResult.data;
+      final route = await fetchRoute(usableWaypoints, avoidHighways);
       if (kDebugMode) {
         debugPrint(
             'RouteSearch: route=${route.distanceKm.round()}km, ${route.geometry.length} polyline pts, ${route.samplePoints.length} sample pts');
@@ -179,6 +185,7 @@ class RouteSearchState extends _$RouteSearchState {
               isPartial: true,
               corridorCountryCodes: corridorMap.keys.toSet(),
               profileFuelByCountry: profileFuels,
+              request: request,
             )));
           },
         );
@@ -240,6 +247,7 @@ class RouteSearchState extends _$RouteSearchState {
         // #2631 — carried to the map/list so each station prices by its
         // own country fuel (cross-border ES → E10 instead of '--').
         profileFuelByCountry: profileFuels,
+        request: request,
       )));
     } catch (e, st) {
       // A cancelled request is the caller superseding us, not a failure.
@@ -254,8 +262,8 @@ class RouteSearchState extends _$RouteSearchState {
 
   /// Test seam (#2595): runs the cross-border station-search portion of
   /// [searchAlongRoute] against a PRE-BUILT [route], skipping the OSRM
-  /// fetch (the `RoutingService` is constructed internally and not
-  /// injectable). Exercises the real corridor-map build, per-country-fuel
+  /// fetch (#4432 made that injectable via `routeFetcherProvider`; this
+  /// seam remains for the corridor-only tests). Exercises the real corridor-map build, per-country-fuel
   /// query function, strategy sweep + merge, and cross-border cheapest —
   /// so a test can assert each leg routes to its own service + fuel and
   /// the merged result interleaves both countries by corridor position.
@@ -322,7 +330,7 @@ class RouteSearchState extends _$RouteSearchState {
     // #4432 — retire whatever is in flight FIRST. A sweep that was
     // already streaming partials could otherwise repopulate the list
     // the user just cleared.
-    _generation++;
+    _generation = ++_routeRequestSerial;
     _lastRequest = null;
     state = const AsyncValue.data(null);
   }

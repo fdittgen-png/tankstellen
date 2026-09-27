@@ -5,6 +5,7 @@ import '../../../core/domain/fuel_type.dart';
 import '../../../core/domain/search_result_item.dart';
 import '../data/cross_border_corridor.dart' show contributingCountryCodesFor;
 import 'entities/route_info.dart';
+import 'route_search_request.dart';
 import 'route_search_strategy.dart';
 
 /// State for route-based search: the route itself + stations found along it.
@@ -65,6 +66,26 @@ class RouteSearchResult {
   /// (#2510 — no within-country fallback).
   final Map<String, FuelType> profileFuelByCountry;
 
+  /// #4432 — the submitted request this result answers: its revision,
+  /// its resolved endpoints (the origin actually routed from, and when
+  /// that fix was measured) and its options. Every partial and the final
+  /// result of one submission carry the same request. Null only for a
+  /// result built outside a submission (a test fixture, the prebuilt
+  /// corridor seam).
+  final RouteSearchRequest? request;
+
+  /// #4432 — the identity every consumer keys route-scoped work by.
+  ///
+  /// Road quotes, the refuel plan and the vehicle comparison used to key
+  /// on `Object.hash(geometry.length, distanceKm)`: two different routes
+  /// with the same vertex count and length collided, and a re-run of the
+  /// same request — a refresh from where the driver is NOW — was not
+  /// told apart from the route it replaced when OSRM happened to answer
+  /// with an equally long polyline. Revisions are unique per process, so
+  /// equal revisions mean the same submission. 0 means "not a submitted
+  /// request" (see [request]).
+  int get routeRevision => request?.revision ?? 0;
+
   const RouteSearchResult({
     required this.route,
     required this.stations,
@@ -74,5 +95,6 @@ class RouteSearchResult {
     this.isPartial = false,
     this.corridorCountryCodes = const {},
     this.profileFuelByCountry = const {},
+    this.request,
   });
 }
