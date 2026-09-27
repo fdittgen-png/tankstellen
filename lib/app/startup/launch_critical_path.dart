@@ -69,8 +69,10 @@ abstract final class LaunchCriticalPath {
     // Its outcome is captured NOW: a failure while storage is still being
     // awaited would otherwise have no listener and escape uncaught.
     final dates = spanned('date_formatting', dateFormatting)
-        .then<(Object, StackTrace)?>((_) => null,
-            onError: (Object e, StackTrace st) => (e, st));
+        .then<(Object, StackTrace)?>(
+          (_) => null,
+          onError: (Object e, StackTrace st) => (e, st),
+        );
 
     if (!await storageOk) {
       // A recovery screen is up. The probe never throws and the formatting
@@ -91,9 +93,9 @@ abstract final class LaunchCriticalPath {
   /// The storage phase as a graph (#4319): the core boxes first, then
   /// everything that only needs them, in parallel.
   ///
-  /// `Future.wait` waits for every task even when one fails and then
-  /// rethrows the first error, so a failure here never leaves a sibling's
-  /// error unhandled, and the storage gate still sees it.
+  /// Fail immediately when a prerequisite fails. Waiting for every sibling
+  /// can hide that failure forever behind a stalled platform call. The wait
+  /// still observes later sibling errors; none escapes unhandled (#4456).
   static Future<void> storagePhase({
     required Future<void> Function() openBoxes,
     required Future<void> Function() loadApiKeys,
@@ -117,14 +119,15 @@ abstract final class LaunchCriticalPath {
       // `errorLogger.bind` routes a trace into it.
       for (final MapEntry(key: name, value: init) in telemetry.entries)
         spanned(name, init),
-    ]);
+    ], eagerError: true);
   }
 
   /// Runs [body] as a span named [name] on the startup timeline.
   static Future<T> spanned<T>(String name, Future<T> Function() body) {
     final timer = StartupTimer.instance;
     final startMs = timer.elapsedMsNow();
-    return Future<T>.sync(body).whenComplete(() => timer.addSpan(name,
-        startMs: startMs, endMs: timer.elapsedMsNow()));
+    return Future<T>.sync(body).whenComplete(
+      () => timer.addSpan(name, startMs: startMs, endMs: timer.elapsedMsNow()),
+    );
   }
 }

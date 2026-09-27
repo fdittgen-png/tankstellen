@@ -89,7 +89,7 @@ class OpenChargeMapService implements EvStationService {
 
       final data = response.data;
       if (data is! List) {
-        return _demo(centerLat, centerLng, radiusKm);
+        return await _demo(centerLat, centerLng, radiusKm);
       }
       return OcmPoiParser.parsePoiList(data, centerLat, centerLng);
     } on DioException catch (e, st) {
