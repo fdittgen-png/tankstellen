@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../perf/startup_timer.dart';
 import 'hive_first_frame_boxes.dart';
+import 'hive_dataset_repair.dart';
 import 'hive_cipher_loader.dart';
 import 'hive_deferred_user_boxes.dart';
 import 'impl/hive_directory_resolver.dart';
@@ -271,6 +272,7 @@ class HiveBoxes {
         _encryptedBoxes, cipher, await Hive.openBox<int>(boxSchema));
     StartupTimer.instance.mark('hive_migrate');
 
+    await HiveDatasetRepair.runOnce(HiveDirectoryResolver.hivePath, cipher);
     await HiveFirstFrameBoxes.openAll(cipher);
     StartupTimer.instance.mark('hive_open');
 
@@ -350,8 +352,7 @@ class HiveBoxes {
         Hive.openBox<String>(name,
             encryptionCipher:
                 _encryptedDeferredBoxes.contains(name) ? cipher : null),
-      // #4110 — dynamic, not String: it holds the JSON envelopes.
-      Hive.openBox<dynamic>(datasets, encryptionCipher: cipher),
+      // Country datasets open on first async read/write, not on every launch.
       ...HiveDeferredUserBoxes.names.map(HiveDeferredUserBoxes.settled),
     ]);
     // #3882 — the deferred trip boxes carry a schema stamp too (the trip

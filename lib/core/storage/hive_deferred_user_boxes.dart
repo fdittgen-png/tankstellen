@@ -11,8 +11,8 @@ import '../logging/error_logger.dart';
 import 'hive_boxes.dart';
 import 'hive_open_timing.dart';
 
-/// Encrypted USER-DATA boxes that no initial route reads, opened after the
-/// first frame or on first use (#4318).
+/// Encrypted deferred boxes, opened after the
+/// first frame or on first use (#4318). Country datasets open only on demand.
 ///
 /// `HiveFirstFrameBoxes` used to open these before the app could launch.
 /// `Hive.openBox` decrypts and deserializes every value on the main
@@ -36,7 +36,8 @@ import 'hive_open_timing.dart';
 ///   (widget tests, `HiveStorage.initForTest`, background isolates that
 ///   open their own boxes) this class opens nothing and every gate passes.
 abstract final class HiveDeferredUserBoxes {
-  /// The boxes managed here.
+  /// User-data boxes that gate synchronous readers such as the privacy screen.
+  /// The optional dataset cache shares this opener but is never a screen gate.
   static const Set<String> names = {HiveBoxes.priceHistory};
 
   static bool _armed = false;
@@ -86,7 +87,8 @@ abstract final class HiveDeferredUserBoxes {
   /// Opens [name] once; concurrent callers share the same future. Throws
   /// [HiveCorruptionException] when the box cannot be opened.
   static Future<void> ensureOpen(String name) {
-    assert(names.contains(name), '$name is not a deferred user-data box');
+    assert(names.contains(name) || name == HiveBoxes.datasets,
+        '$name is not a deferred box');
     if (!_armed || Hive.isBoxOpen(name)) return _opens[name] ?? Future.value();
     return _opens[name] ??= _open(name);
   }

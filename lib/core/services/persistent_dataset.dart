@@ -90,7 +90,10 @@ class PersistentDataset<T> {
   /// cold-start rehydrate of a whole national dataset (~11k `fromJson`s)
   /// happens off the UI isolate. Same result contract as [read].
   Future<({T value, Duration age})?> readAsync() async {
-    final entry = _cache.get(_key);
+    final cache = _cache;
+    final entry = cache is AsyncCacheStrategy
+        ? await cache.getAsync(_key)
+        : cache.get(_key);
     if (entry == null) return null;
     final value = await compute(_deserialize, entry.payload);
     if (value == null) return null;

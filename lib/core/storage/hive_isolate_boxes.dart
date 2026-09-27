@@ -117,7 +117,10 @@ class HiveIsolateBoxes {
     final cipher = await HiveCipherLoader.loadGuarded();
     // #4072 — the opens are independent; run them together, as
     // HiveBoxes.init already does for the foreground set.
-    await Future.wait(_boxes.map((box) => box.open(cipher)));
+    // Foreground scans share the on-demand dataset reader; opening every
+    // country here would undo its startup deferral. Real workers own no boxes.
+    await Future.wait(_boxes.where((box) => box.name != HiveBoxes.datasets ||
+        !HiveIsolateOwnership.isOwned(box.name)).map((box) => box.open(cipher)));
   }
 
   /// Close the Hive boxes opened by [initInIsolate] at the end of a
