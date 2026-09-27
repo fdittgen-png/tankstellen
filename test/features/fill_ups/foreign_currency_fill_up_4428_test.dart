@@ -243,4 +243,80 @@ void main() {
     expect(mixed.spend.amountIn('EUR'), 60);
     expect(mixed.spend.amountIn('CHF'), 51.73);
   });
+
+  // Boxes 3-5 (#4437): the card settlement supplies the rate.
+  group('the card settlement, attached afterwards', () {
+    late FillUpRepository repo;
+    final txDate = DateTime(2026, 9, 20, 14, 5);
+    final gandria = _fill(
+      id: 'gandria',
+      liters: 25.61,
+      cost: 51.73,
+      odo: 120450,
+      date: txDate,
+      currency: 'CHF',
+    ).copyWith(scannedPricePerLiter: 2.020);
+    final home = _fill(
+      id: 'home',
+      liters: 40,
+      cost: 60,
+      odo: 120000,
+      date: DateTime(2026, 9, 1),
+      currency: 'EUR',
+    );
+
+    setUp(() => repo = FillUpRepository(_FakeSettingsStorage()));
+
+    test('the statement amount is stored with its source and the '
+        'TRANSACTION date, and counted exactly as entered', () async {
+      await repo.save(home);
+      await repo.save(gandria);
+      // Days later, the statement arrives: € 55,12.
+      await repo.save(repo
+          .getAll()
+          .singleWhere((f) => f.id == 'gandria')
+          .settledByCard(amount: 55.12, currency: 'EUR'));
+
+      final stored = repo.getAll().singleWhere((f) => f.id == 'gandria');
+      final rate = settledExchangeRateOf(stored)!;
+      expect(rate.source, kRateSourceCardSettlement);
+      expect(rate.capturedAt, txDate);
+      expect(rate.baseCurrency, 'CHF');
+      expect(rate.quoteCurrency, 'EUR');
+      // The native record is untouched: 25,61 L, CHF 2,020/L, CHF 51,73.
+      expect(stored.currency, 'CHF');
+      expect(stored.totalCost, 51.73);
+      expect(stored.pricePerLiter, 2.020);
+      // The EUR figure is the amount entered — not 51,73 × rate re-derived.
+      expect(stored.bookedSpend, (55.12, 'EUR'));
+      final stats = ConsumptionStats.fromFillUps(repo.getAll());
+      expect(stats.totalSpent, closeTo(60 + 55.12, 1e-9));
+    });
+
+    test('a hand-typed rate is distinguishable from a settled one', () {
+      final byHand = gandria.settledByHandRate(rate: 1.07, currency: 'EUR');
+      final byCard = gandria.settledByCard(amount: 55.12, currency: 'EUR');
+      expect(settledExchangeRateOf(byHand)!.source, kRateSourceEnteredByHand);
+      expect(settledExchangeRateOf(byCard)!.source, kRateSourceCardSettlement);
+      expect(byHand.isRateEnteredByHand, isTrue);
+      expect(byCard.isRateEnteredByHand, isFalse);
+    });
+
+    test('no rate is ever inferred: without a settlement, none exists', () {
+      PriceFormatter.setCountry('DE');
+      // Not from the active country, not from the profile, not today.
+      expect(settledExchangeRateOf(gandria), isNull);
+      expect(settledRatesSnapshot([home, gandria]).rates, isEmpty);
+      expect(ConsumptionStats.fromFillUps([home, gandria]).totalSpent,
+          isNull);
+    });
+
+    test('an EUR-only history is unaffected', () {
+      final before = ConsumptionStats.fromFillUps([home]);
+      expect(before.totalSpent, 60);
+      expect(home.bookedSpend, (60, 'EUR'));
+      expect(PriceFormatter.formatTotalIn(60, 'EUR'),
+          PriceFormatter.formatTotal(60));
+    });
+  });
 }
