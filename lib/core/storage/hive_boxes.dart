@@ -353,7 +353,7 @@ class HiveBoxes {
             encryptionCipher:
                 _encryptedDeferredBoxes.contains(name) ? cipher : null),
       // Country datasets open on first async read/write, not on every launch.
-      HiveDeferredUserBoxes.settled(priceHistory),
+      ...HiveDeferredUserBoxes.names.map(HiveDeferredUserBoxes.settled),
     ]);
     // #3882 — the deferred trip boxes carry a schema stamp too (the trip
     // history box changed its row layout to meta + columnar chunks; the

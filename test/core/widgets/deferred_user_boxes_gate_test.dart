@@ -41,6 +41,7 @@ void main() {
         const MaterialApp(home: DeferredUserBoxesGate(child: child)));
     expect(find.text('dashboard'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(Hive.isBoxOpen(HiveBoxes.datasets), isFalse);
   });
 
   testWidgets('box still opening → held until the open settles, then the '

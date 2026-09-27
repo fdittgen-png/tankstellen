@@ -36,8 +36,9 @@ import 'hive_open_timing.dart';
 ///   (widget tests, `HiveStorage.initForTest`, background isolates that
 ///   open their own boxes) this class opens nothing and every gate passes.
 abstract final class HiveDeferredUserBoxes {
-  /// The boxes managed here.
-  static const Set<String> names = {HiveBoxes.priceHistory, HiveBoxes.datasets};
+  /// User-data boxes that gate synchronous readers such as the privacy screen.
+  /// The optional dataset cache shares this opener but is never a screen gate.
+  static const Set<String> names = {HiveBoxes.priceHistory};
 
   static bool _armed = false;
   static HiveAesCipher? _cipher;
@@ -86,7 +87,8 @@ abstract final class HiveDeferredUserBoxes {
   /// Opens [name] once; concurrent callers share the same future. Throws
   /// [HiveCorruptionException] when the box cannot be opened.
   static Future<void> ensureOpen(String name) {
-    assert(names.contains(name), '$name is not a deferred user-data box');
+    assert(names.contains(name) || name == HiveBoxes.datasets,
+        '$name is not a deferred box');
     if (!_armed || Hive.isBoxOpen(name)) return _opens[name] ?? Future.value();
     return _opens[name] ??= _open(name);
   }
