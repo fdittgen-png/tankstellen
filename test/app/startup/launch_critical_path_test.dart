@@ -230,14 +230,14 @@ void main() {
       await phase;
     });
 
-    test('a failing task still lets its siblings finish, and the phase '
-        'rethrows the failure for the storage gate', () async {
-      final trace = Completer<void>();
+    test('a failing task reaches the storage gate before siblings finish '
+        'without leaking their later errors', () async {
       var healthDone = false;
       final uncaught = <Object>[];
       Object? surfaced;
 
       await runZonedGuarded(() async {
+        final trace = Completer<void>();
         final phase = LaunchCriticalPath.storagePhase(
           openBoxes: () async {},
           loadApiKeys: () async => throw StateError('keystore'),
@@ -246,14 +246,14 @@ void main() {
             'trace_storage': () => trace.future,
             'health_counters': () async => healthDone = true,
           },
-        );
-        await pumpEventQueue();
-        trace.complete();
-        try {
-          await phase;
-        } on Object catch (e) {
+        ).catchError((Object e) {
           surfaced = e;
-        }
+        });
+        await pumpEventQueue();
+        expect(surfaced, isA<StateError>());
+        trace.completeError(StateError('late trace failure'));
+        await phase;
+        await pumpEventQueue();
       }, (e, _) => uncaught.add(e));
 
       expect(healthDone, isTrue);

@@ -32,37 +32,48 @@ import '../widgets/storage_recovery_screen.dart';
 /// the thing that is down — and logs it.
 Future<bool> runStoragePhaseGuarded(Future<void> Function() initStorage) async {
   try {
-    await initStorage();
+    // A platform-channel/storage future may never answer. Stop this launch
+    // rather than leaving the splash indefinitely; timeout does NOT authorize
+    // opening the app or replacing a key. Late completion cannot return true.
+    await initStorage().timeout(const Duration(seconds: 30));
     return true;
   } on HiveCorruptionException catch (e, st) {
     // #4116 — damage is the ONLY cause that may advise data loss on the
     // grounds that the files are unrecoverable.
-    await _report(e, st, 'corruptBox');
     _mount(StorageRecoveryCause.corruptBox);
+    await _report(e, st, 'corruptBox');
     return false;
   } on StorageKeyLostException catch (e, st) {
     // #4118 — a restore, not damage: intact boxes whose KeyStore-bound
     // key could not follow them. Clearing storage is right here too, and
     // this is the one branch that can also say TankSync kept a copy of
     // whatever was synced.
-    await _report(e, st, 'keyLost');
     _mount(StorageRecoveryCause.keyLost);
+    await _report(e, st, 'keyLost');
     return false;
   } catch (e, st) {
     // Any OTHER storage-phase fault — secure-storage cipher,
     // TraceStorage, loadApiKey, or a bug of ours. Cause not established,
     // so the screen says so and tells the user NOT to clear storage.
-    await _report(e, st, 'unknown');
     _mount(StorageRecoveryCause.unknown);
+    await _report(e, st, 'unknown');
     return false;
   }
 }
 
 Future<void> _report(Object e, StackTrace st, String cause) async {
-  await StartupFailureStore.persist(e, st);
-  log.error(e, st,
-      layer: ErrorLayer.storage,
-      context: {'where': 'initStorage', 'cause': cause});
+  // Diagnostics depend on the same platform/filesystem that may have stalled.
+  // Recovery is already mounted; neither persistence nor logging gates it.
+  await StartupFailureStore.persist(
+    e,
+    st,
+  ).timeout(const Duration(seconds: 2), onTimeout: () {});
+  log.error(
+    e,
+    st,
+    layer: ErrorLayer.storage,
+    context: {'where': 'initStorage', 'cause': cause},
+  );
 }
 
 void _mount(StorageRecoveryCause cause) =>
