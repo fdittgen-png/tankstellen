@@ -86,7 +86,7 @@ class SyncHelper {
   }) async {
     try {
       final syncState = ref.read(syncStateProvider);
-      if (syncState.enabled) return syncIfEnabled(ref, context, syncFn);
+      if (syncState.enabled) return await syncIfEnabled(ref, context, syncFn);
       if (syncState.userId == null) return;
       await PendingDeletionsJournal.addAll(table, [recordId]);
     } catch (e, st) {

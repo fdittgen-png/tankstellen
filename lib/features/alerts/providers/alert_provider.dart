@@ -134,7 +134,7 @@ class AlertNotifier extends _$AlertNotifier {
         final merge = ref.read(alertsMergeFnProvider);
         final merged = await merge(state);
         if (applyDownloads) {
-          return _applyMergedAlerts(merged);
+          return await _applyMergedAlerts(merged);
         }
       }
     } catch (e, st) {

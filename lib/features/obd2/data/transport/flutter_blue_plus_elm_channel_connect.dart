@@ -180,13 +180,13 @@ Future<void> _connectDeviceImpl(FlutterBluePlusElmChannel c) async {
   // path. disconnect() is idempotent (no-op when nothing is connected).
   try {
     await c._device.disconnect();
-  } catch (e, _) {
+  } catch (e, st) {
     // Best-effort pre-connect teardown of a stale GATT client. The connect
     // below proceeds regardless — a failure here is RECOVERABLE and
     // routine, never an error trace (#2379). Debug-only.
     assert(() {
       debugPrint('FlutterBluePlusElmChannel: pre-connect dead-GATT teardown '
-          'failed (proceeding): $e');
+          'failed (proceeding): $e\n$st');
       return true;
     }(), 'debug-only breadcrumb — the closure always returns true');
   }

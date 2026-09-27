@@ -70,7 +70,7 @@ class Obd2OdometerReader {
 
       // 3. Manufacturer Mode 22 fallback.
       if (odometerPidStrategy != null) {
-        return _readByStrategy(odometerPidStrategy);
+        return await _readByStrategy(odometerPidStrategy);
       }
 
       // Legacy path: identify brand from VIN and iterate catalog.
@@ -80,7 +80,7 @@ class Obd2OdometerReader {
       final vin = Elm327Protocol.parseVin(vinResponse);
       final brand = vehicleBrandFromVin(vin);
       if (brand == VehicleBrand.unknown) return null;
-      return _readFromCatalogByBrand(brand);
+      return await _readFromCatalogByBrand(brand);
     } catch (_) {
       // #2379 — best-effort one-shot: an engine-off car times this out
       // routinely. NOT an error; the null return is the signal, no trace.
