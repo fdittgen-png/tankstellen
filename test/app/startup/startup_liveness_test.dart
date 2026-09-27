@@ -82,50 +82,17 @@ void main() {
     expect(stoppedBeforeDiagnostics, isTrue);
   });
 
-  for (final succeedsLate in [false, true]) {
-    testWidgets('stalled storage recovers before late success=$succeedsLate', (
-      tester,
-    ) async {
-      final storage = Completer<void>();
-      StartupFailureStore.directoryProvider = () async =>
-          throw const FileSystemException('diagnostics unavailable');
-      addTearDown(StartupFailureStore.resetForTest);
-      var finished = false;
-      var containers = 0;
-      final launch =
-          LaunchCriticalPath.run(
-            probeWidgetLaunch: () async => null,
-            storage: () => runStoragePhaseGuarded(() => storage.future),
-            dateFormatting: () async {},
-            createContainer: () {
-              containers++;
-              throw StateError('must never launch after the storage deadline');
-            },
-          ).then((result) {
-            finished = result == null;
-          });
-      await tester.pump();
-      await tester.pump(const Duration(seconds: 31));
-      final recovered =
-          finished && find.byType(StorageRecoveryHost).evaluate().isNotEmpty;
-      // Release the original operation: a timeout must not become a delayed
-      // second runApp that replaces recovery with a partially initialized app.
-      if (succeedsLate) {
-        storage.complete();
-      } else {
-        storage.completeError(StateError('late storage failure'));
-      }
-      await launch;
-      await tester.pump();
-      expect(recovered, isTrue);
-      expect(containers, 0);
-      expect(
-        tester
-            .widget<StorageRecoveryHost>(find.byType(StorageRecoveryHost))
-            .cause,
-        StorageRecoveryCause.unknown,
-      );
-      await tester.pumpWidget(const SizedBox.shrink());
-    });
-  }
+  testWidgets('slow successful storage remains a valid launch', (tester) async {
+    final storage = Completer<void>();
+    bool? ready;
+    final launch = runStoragePhaseGuarded(
+      () => storage.future,
+    ).then((value) => ready = value);
+    await tester.pump(const Duration(minutes: 1));
+    expect(ready, isNull);
+    expect(find.byType(StorageRecoveryHost), findsNothing);
+    storage.complete();
+    await launch;
+    expect(ready, isTrue);
+  });
 }

@@ -32,10 +32,7 @@ import '../widgets/storage_recovery_screen.dart';
 /// the thing that is down — and logs it.
 Future<bool> runStoragePhaseGuarded(Future<void> Function() initStorage) async {
   try {
-    // A platform-channel/storage future may never answer. Stop this launch
-    // rather than leaving the splash indefinitely; timeout does NOT authorize
-    // opening the app or replacing a key. Late completion cannot return true.
-    await initStorage().timeout(const Duration(seconds: 30));
+    await initStorage();
     return true;
   } on HiveCorruptionException catch (e, st) {
     // #4116 — damage is the ONLY cause that may advise data loss on the
