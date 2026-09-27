@@ -317,7 +317,7 @@ TravelContext? _context(RouteSearchResult? route, TravelPoint? origin) {
       origin: TravelPoint(geometry.first.latitude, geometry.first.longitude),
       destination: TravelPoint(geometry.last.latitude, geometry.last.longitude),
       purpose: TravelPurpose.stopOnJourney,
-      routeRevision: Object.hash(geometry.length, route!.route.distanceKm),
+      routeRevision: route!.routeRevision, // #4432 — the request's own.
     );
   }
   if (origin != null) {

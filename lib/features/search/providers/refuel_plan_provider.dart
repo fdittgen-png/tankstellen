@@ -124,8 +124,10 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
     origin: TravelPoint(geometry.first.latitude, geometry.first.longitude),
     destination: TravelPoint(geometry.last.latitude, geometry.last.longitude),
     purpose: TravelPurpose.stopOnJourney,
-    // A recomputed route with the same endpoints is still a new journey.
-    routeRevision: Object.hash(geometry.length, result.route.distanceKm),
+    // A recomputed route with the same endpoints is still a new journey:
+    // keyed by the submitted request, never a geometry fingerprint that
+    // two routes can share (#4432).
+    routeRevision: result.routeRevision,
   );
   final request = TravelQuoteRequest.budgeted(context, set.travelStops);
   final estimates = ref.watch(stationTravelEstimatesProvider(request));

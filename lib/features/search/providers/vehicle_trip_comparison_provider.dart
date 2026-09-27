@@ -134,7 +134,7 @@ final vehicleTripComparisonProvider =
     currencyCode: currency,
     departAt: now,
     objective: ref.watch(vehicleTripObjectiveProvider),
-    routeRevision: Object.hash(geometry.length, result.route.distanceKm),
+    routeRevision: result.routeRevision, // #4432 — the request's own.
   );
 
   // One candidate set per vehicle, from ITS fuel. Hard exclusions are
