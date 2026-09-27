@@ -10,6 +10,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/storage_repository.dart';
 import 'hive_boxes.dart';
+import 'hive_deferred_user_boxes.dart';
 import 'stores/alerts_hive_store.dart';
 import 'stores/cache_hive_store.dart';
 import 'stores/favorites_hive_store.dart';
@@ -48,8 +49,10 @@ class HiveStorage implements StorageRepository {
   /// #4110 — the bulk-dataset store, on its own deferred box. Not part of
   /// [StorageRepository]: nothing generic wants it, and adding a member
   /// to that interface would touch every fake that implements it.
-  final CacheHiveStore datasetStore =
-      CacheHiveStore(boxName: HiveBoxes.datasets);
+  final CacheStorage datasetStore = CacheHiveStore(
+    boxName: HiveBoxes.datasets,
+    beforeAccess: () => HiveDeferredUserBoxes.settled(HiveBoxes.datasets),
+  );
   final PriceHistoryHiveStore _priceHistory = PriceHistoryHiveStore();
   final AlertsHiveStore _alerts = AlertsHiveStore();
 

@@ -114,10 +114,10 @@ class HiveIsolateLock {
   /// Attempt to acquire the lock, retrying every [retryDelay] until
   /// [acquireTimeout]. Returns `true` if acquired, `false` if it timed out.
   /// Re-entrant for the instance that already holds it.
-  Future<bool> acquire() async {
+  Future<bool> acquire({Duration timeout = acquireTimeout}) async {
     if (_handle != null) return true;
 
-    final deadline = _clock().add(acquireTimeout);
+    final deadline = _clock().add(timeout);
     while (true) {
       if (_tryClaim() || (_reapIfStale() && _tryClaim())) {
         log.debug('acquired', tag: 'HiveIsolateLock');
@@ -127,7 +127,7 @@ class HiveIsolateLock {
       await Future<void>.delayed(retryDelay);
     }
 
-    log.debug('acquire timed out after ${acquireTimeout.inSeconds}s',
+    log.debug('acquire timed out after ${timeout.inSeconds}s',
         tag: 'HiveIsolateLock');
     return false;
   }

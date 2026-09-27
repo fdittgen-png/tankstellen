@@ -5,13 +5,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../constants/app_constants.dart';
 import '../data/storage_repository.dart';
+import '../data/async_cache_storage.dart';
 import '../logging/error_logger.dart';
 import '../services/service_result.dart';
-import '../storage/hive_boxes.dart';
 import '../storage/hive_storage.dart';
 import '../storage/storage_providers.dart';
 import 'cache_eviction_policy.dart';
@@ -79,30 +78,15 @@ CacheManager cacheManager(Ref ref) {
   return CacheManager(ref.watch(storageRepositoryProvider));
 }
 
-/// Minimal cache interface used by service chains ([StationServiceChain],
-/// [GeocodingChain], [LocationSearchService]) to read and write cache
-/// entries without depending on the concrete [CacheManager].
-///
-/// This enables unit-testing chains with a trivial in-memory fake instead
-/// of requiring Hive infrastructure.
-/// The [CacheStrategy] the bulk national datasets read through (#4110).
-///
-/// A `HiveStorage` keeps them in their OWN box, opened after the first
-/// frame, because `Hive.openBox` deserializes every value it reads and
-/// these are multi-MB payloads — paying for them inside `hive_init` made
-/// the cold start wait on ~11k `Station.fromJson` calls it had no use for
-/// yet. Any other storage (a test fake, the in-memory one) has no such
-/// box, so it keeps the single-store behaviour and nothing changes for it.
+/// Stable bulk-dataset routing, independent of whether deferred storage has
+/// opened yet. Async reads/writes wait for its box; fakes supply their own store.
 CacheStrategy datasetCacheFor(StorageRepository storage) {
-  // The box is opened AFTER the first frame, which is the whole point —
-  // so a caller that runs before `initDeferred` completes, or any storage
-  // with no Hive behind it, keeps the pre-#4110 single-store behaviour
-  // instead of writing into a box that is not there. Same philosophy as
-  // the #2670 reader guard: a closed box degrades, it never throws.
-  if (storage is HiveStorage && Hive.isBoxOpen(HiveBoxes.datasets)) {
-    return CacheManager(storage.datasetStore);
-  }
-  return CacheManager(storage);
+  return CacheManager(storage is HiveStorage ? storage.datasetStore : storage);
+}
+
+/// Optional asynchronous read path for stores opened on demand.
+abstract interface class AsyncCacheStrategy implements CacheStrategy {
+  Future<CacheEntry?> getAsync(String key);
 }
 
 abstract interface class CacheStrategy {
@@ -137,7 +121,7 @@ abstract interface class CacheStrategy {
 /// The two-tier retrieval strategy:
 /// - [getFresh] -- returns data only if not expired (used as primary)
 /// - [get] -- returns data regardless of age (used as stale fallback)
-class CacheManager implements CacheStrategy {
+class CacheManager implements AsyncCacheStrategy {
   final CacheStorage _storage;
 
   CacheManager(this._storage);
@@ -194,6 +178,23 @@ class CacheManager implements CacheStrategy {
           context: {'where': 'CacheManager.get (closed box)', 'key': key}));
       return null;
     }
+    return _decodeEntry(raw);
+  }
+
+  @override
+  Future<CacheEntry?> getAsync(String key) async {
+    final storage = _storage;
+    if (storage is! AsyncCacheStorage) return get(key);
+    try {
+      return _decodeEntry(await storage.getCachedDataAsync(key));
+    } on FileSystemException catch (e, st) {
+      unawaited(errorLogger.log(ErrorLayer.storage, e, st,
+          context: {'where': 'CacheManager.getAsync (closed box)', 'key': key}));
+      return null;
+    }
+  }
+
+  static CacheEntry? _decodeEntry(Map<String, dynamic>? raw) {
     if (raw == null) return null;
 
     final payload = raw['payload'];

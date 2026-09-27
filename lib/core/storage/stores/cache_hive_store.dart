@@ -5,8 +5,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 
+import '../../data/async_cache_storage.dart';
 import '../../data/storage_repository.dart';
 import '../../logging/error_logger.dart';
 import '../hive_boxes.dart';
@@ -27,7 +28,7 @@ import '../hive_cache_recovery.dart';
 /// matching the other Hive stores (`RadiusAlertStore`, `PriceSnapshotStore`,
 /// `VelocityAlertCooldown`). The root close-site is fixed in
 /// [HiveBoxes.closeIsolateBoxes]; this is the belt-and-braces reader guard.
-class CacheHiveStore implements CacheStorage, ItineraryStorage {
+class CacheHiveStore implements AsyncCacheStorage, ItineraryStorage {
   /// Recovery hook — [HiveCacheRecovery.recover] in production, a fake in
   /// tests (the dead-handle state can't be produced via Hive's public API).
   /// [boxName] selects which Hive box backs this store. Defaults to the
@@ -36,12 +37,14 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
   /// deserialized inside `hive_init` on every cold start.
   CacheHiveStore({
     String boxName = HiveBoxes.cache,
+    this.beforeAccess,
     @visibleForTesting Future<bool> Function()? recover,
   })  : _boxName = boxName,
         _recover =
             recover ?? (() => HiveCacheRecovery.recover(boxName: boxName));
 
   final String _boxName;
+  final Future<void> Function()? beforeAccess;
 
   final Future<bool> Function() _recover;
 
@@ -55,6 +58,7 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
   @visibleForTesting
   Future<void> writeWithRecovery(
       Future<void> Function(Box<dynamic> box) op) async {
+    await beforeAccess?.call();
     final box = _boxOrNull();
     if (box == null) return;
     try {
@@ -106,6 +110,20 @@ class CacheHiveStore implements CacheStorage, ItineraryStorage {
     final data = map['data'];
     if (data is Map) return toStringDynamicMap(data);
     return null;
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getCachedDataAsync(String key) async {
+    await beforeAccess?.call();
+    final raw = _boxOrNull()?.get(key);
+    // Hive's nested maps must be normalized before model decoding. Doing
+    // that here synchronously defeats PersistentDataset's compute boundary.
+    return compute(_cachedPayload, raw);
+  }
+
+  static Map<String, dynamic>? _cachedPayload(dynamic raw) {
+    if (raw is! Map) return null;
+    return toStringDynamicMap(raw['data']);
   }
 
   @override

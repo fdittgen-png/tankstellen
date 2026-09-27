@@ -11,8 +11,8 @@ import '../logging/error_logger.dart';
 import 'hive_boxes.dart';
 import 'hive_open_timing.dart';
 
-/// Encrypted USER-DATA boxes that no initial route reads, opened after the
-/// first frame or on first use (#4318).
+/// Encrypted deferred boxes, opened after the
+/// first frame or on first use (#4318). Country datasets open only on demand.
 ///
 /// `HiveFirstFrameBoxes` used to open these before the app could launch.
 /// `Hive.openBox` decrypts and deserializes every value on the main
@@ -37,7 +37,7 @@ import 'hive_open_timing.dart';
 ///   open their own boxes) this class opens nothing and every gate passes.
 abstract final class HiveDeferredUserBoxes {
   /// The boxes managed here.
-  static const Set<String> names = {HiveBoxes.priceHistory};
+  static const Set<String> names = {HiveBoxes.priceHistory, HiveBoxes.datasets};
 
   static bool _armed = false;
   static HiveAesCipher? _cipher;
