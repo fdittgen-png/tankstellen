@@ -5,7 +5,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../../core/utils/geo_utils.dart';
+import '../../../../core/utils/route_projection.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../profile/data/models/user_profile.dart';
 import '../../../../core/domain/fuel_type.dart';
@@ -14,6 +14,7 @@ import '../../domain/entities/route_info.dart';
 import '../../domain/route_search_strategy.dart';
 import '../cross_border_corridor.dart' show fuelForStation;
 import '../helpers/batch_query_helper.dart';
+import 'route_filter_sort_isolate.dart';
 
 /// Default strategy: samples every ~15 km along the route,
 /// queries stations at each sample point, deduplicates, and filters
@@ -23,10 +24,9 @@ import '../helpers/batch_query_helper.dart';
 /// - **B (#2101)** — per-sample-point top-N reduce inside
 ///   [BatchQueryHelper], so the candidate pool feeding into the
 ///   distance math is bounded to roughly `samplePoints × N`.
-/// - **A (#2102)** — the three O(N×M) distance passes (detour
-///   filter, cheapest-per-segment, itinerary sort) are packed into
-///   a single [compute] call so they run in a background isolate and
-///   only cross the isolate boundary once.
+/// - **A (#2102)** — the O(N×M) corridor eligibility + itinerary sort
+///   run in a single background-isolate hop, shared with the other
+///   strategies via [filterAndSortAlongRoute] since #4432.
 /// - **C (#2103)** — `onPartial` streaming is forwarded from
 ///   [BatchQueryHelper.queryAll] so the provider can emit each
 ///   incoming batch to the UI. The final returned list is still the
@@ -57,25 +57,27 @@ class UniformSearchStrategy implements RouteSearchStrategy {
           'topN=$topNPerSamplePoint, criterion=${criterion.key}');
     }
 
-    const batchHelper = BatchQueryHelper();
-    final results = await batchHelper.queryAll(
-      samplePoints: route.samplePoints,
-      queryStations: queryStations,
-      fuelType: fuelType,
-      searchRadiusKm: searchRadiusKm,
-      topNPerSamplePoint: topNPerSamplePoint,
-      criterion: criterion,
-      onPartial: onPartial,
-    );
-
-    // #2102 lever A — one isolate hop runs detour filter + itinerary
-    // sort together. EV results passed through unchanged here; the
-    // EV path keeps its own straight-line code in the provider.
+    // #2102 lever A — one isolate hop runs the corridor eligibility +
+    // itinerary sort together. EV results are not produced here; the
+    // EV path keeps its own code in the provider.
     final detourLimit = maxDetourKm ?? searchRadiusKm;
-    return _runFilterAndSort(
-      results: results,
+    // #4432 — partials pass the SAME eligibility as the final list, so
+    // a station behind the driver never flashes onto the list or map.
+    const batchHelper = BatchQueryHelper();
+    return queryEligibleAlongRoute(
       polyline: route.geometry,
       detourLimitKm: detourLimit,
+      keepNonFuel: false,
+      onPartial: onPartial,
+      query: (partial) => batchHelper.queryAll(
+        samplePoints: route.samplePoints,
+        queryStations: queryStations,
+        fuelType: fuelType,
+        searchRadiusKm: searchRadiusKm,
+        topNPerSamplePoint: topNPerSamplePoint,
+        criterion: criterion,
+        onPartial: partial,
+      ),
     );
   }
 
@@ -112,7 +114,9 @@ class UniformSearchStrategy implements RouteSearchStrategy {
   }
 }
 
-/// Runs the detour filter + itinerary sort in a background isolate.
+/// Runs the corridor eligibility + itinerary sort in a background
+/// isolate — the shared [filterAndSortAlongRoute] with no non-fuel
+/// exemption (#4432: Uniform's private nearest-vertex copy is gone).
 ///
 /// Exposed for unit tests; production code reaches it via
 /// [UniformSearchStrategy.searchAlongRoute].
@@ -122,53 +126,25 @@ Future<List<SearchResultItem>> runFilterAndSortForTest({
   required List<LatLng> polyline,
   required double detourLimitKm,
 }) =>
-    _runFilterAndSort(
+    filterAndSortAlongRoute(
       results: results,
       polyline: polyline,
       detourLimitKm: detourLimitKm,
+      keepNonFuel: false,
     );
 
-Future<List<SearchResultItem>> _runFilterAndSort({
-  required List<SearchResultItem> results,
-  required List<LatLng> polyline,
-  required double detourLimitKm,
-}) async {
-  if (results.isEmpty || polyline.isEmpty) return results;
-
-  // Pack inputs into isolate-safe primitives — flutter_map's [LatLng]
-  // and our [SearchResultItem] hierarchy are kept on the UI side; the
-  // isolate decides survival + order from coordinates alone, then we
-  // re-hydrate by id.
-  final coords = <_PointLite>[
-    for (final item in results)
-      _PointLite(id: item.id, lat: item.lat, lng: item.lng),
-  ];
-  final polyLats = List<double>.unmodifiable(
-      polyline.map((p) => p.latitude));
-  final polyLngs = List<double>.unmodifiable(
-      polyline.map((p) => p.longitude));
-
-  final survivors = await compute(
-    _filterAndSortIsolate,
-    _FilterSortPayload(
-      points: coords,
-      polyLats: polyLats,
-      polyLngs: polyLngs,
-      detourLimitKm: detourLimitKm,
-    ),
-  );
-
-  final byId = {for (final r in results) r.id: r};
-  return [
-    for (final id in survivors)
-      if (byId[id] != null) byId[id]!,
-  ];
-}
-
-/// Sync version of computeBestStops — same algorithm, just no isolate
-/// hop (called from `computeBestStops`, which is itself invoked from
-/// the provider after the search returned). Cheap enough on the
-/// already-bounded result set to stay on the UI isolate.
+/// Sync best-stop bucketing — no isolate hop (called from
+/// `computeBestStops`, which the provider invokes after the search
+/// returned, on the already-bounded result set).
+///
+/// #4432 — each station is bucketed by the progress at which the route
+/// meets it ([RouteProjection.project] — the shared itinerary pass),
+/// not by the index of its nearest sample point times 15 km: on a loop
+/// the nearest sample can belong to the wrong pass, and a station
+/// between two samples sat in whichever bucket the nearer one did. The
+/// projection runs over the sample polyline (one point per ~15 km)
+/// because bucket boundaries need kilometre, not metre, precision and
+/// this runs on the UI isolate.
 Map<int, String> _computeBestStopsSync({
   required List<_StationLite> stations,
   required List<LatLng> samplePoints,
@@ -176,19 +152,11 @@ Map<int, String> _computeBestStopsSync({
 }) {
   final segmentCheapest = <int, String>{};
   final cheapestPriceForSegment = <int, double>{};
+  final projection = RouteProjection(samplePoints);
 
   for (final station in stations) {
-    int nearestSampleIdx = 0;
-    double minDist = double.infinity;
-    for (int i = 0; i < samplePoints.length; i++) {
-      final p = samplePoints[i];
-      final d = distanceKm(station.lat, station.lng, p.latitude, p.longitude);
-      if (d < minDist) {
-        minDist = d;
-        nearestSampleIdx = i;
-      }
-    }
-    final segmentIdx = (nearestSampleIdx * 15 / segmentKm).floor();
+    final alongKm = projection.project(station.lat, station.lng).alongKm;
+    final segmentIdx = (alongKm / segmentKm).floor();
     final currentBest = cheapestPriceForSegment[segmentIdx];
     if (currentBest == null || station.price < currentBest) {
       segmentCheapest[segmentIdx] = station.id;
@@ -196,31 +164,6 @@ Map<int, String> _computeBestStopsSync({
     }
   }
   return segmentCheapest;
-}
-
-// ---------------------------------------------------------------------------
-// Isolate entry + payload — kept at top level so `compute()` can ship
-// the function pointer across the boundary.
-
-class _FilterSortPayload {
-  final List<_PointLite> points;
-  final List<double> polyLats;
-  final List<double> polyLngs;
-  final double detourLimitKm;
-
-  const _FilterSortPayload({
-    required this.points,
-    required this.polyLats,
-    required this.polyLngs,
-    required this.detourLimitKm,
-  });
-}
-
-class _PointLite {
-  final String id;
-  final double lat;
-  final double lng;
-  const _PointLite({required this.id, required this.lat, required this.lng});
 }
 
 class _StationLite {
@@ -235,76 +178,3 @@ class _StationLite {
     required this.price,
   });
 }
-
-/// Filter survivors by min-distance-to-polyline, then sort by
-/// distance-along-polyline. Returns survivor ids in itinerary order.
-List<String> _filterAndSortIsolate(_FilterSortPayload payload) {
-  final polyLen = payload.polyLats.length;
-  final step = polyLen > 300 ? 3 : 1;
-
-  // First pass — survivors plus precomputed along-polyline distance.
-  final survivors = <(_PointLite, double)>[];
-  for (final p in payload.points) {
-    double minDist = double.infinity;
-    for (int i = 0; i < polyLen; i += step) {
-      final d = distanceKm(
-        p.lat,
-        p.lng,
-        payload.polyLats[i],
-        payload.polyLngs[i],
-      );
-      if (d < minDist) minDist = d;
-      // Cheap early exit — if we're already well inside the limit,
-      // the survival check is satisfied; we still need the precise
-      // along-polyline position for sorting, computed below.
-    }
-    if (minDist <= payload.detourLimitKm) {
-      final along = _distanceAlongPolylineKm(
-        p.lat,
-        p.lng,
-        payload.polyLats,
-        payload.polyLngs,
-      );
-      survivors.add((p, along));
-    }
-  }
-
-  survivors.sort((a, b) => a.$2.compareTo(b.$2));
-  return [for (final entry in survivors) entry.$1.id];
-}
-
-double _distanceAlongPolylineKm(
-  double lat,
-  double lng,
-  List<double> polyLats,
-  List<double> polyLngs,
-) {
-  // #2169 — uses the isolate-safe geo_utils.distanceKm (only dart:math
-  // + latlong2 imports), matching the survivors loop above.
-  double accumulated = 0;
-  double bestAlong = 0;
-  double bestDist = double.infinity;
-  for (int i = 0; i < polyLats.length - 1; i++) {
-    final segStart = distanceKm(lat, lng, polyLats[i], polyLngs[i]);
-    if (segStart < bestDist) {
-      bestDist = segStart;
-      bestAlong = accumulated;
-    }
-    accumulated += distanceKm(
-      polyLats[i],
-      polyLngs[i],
-      polyLats[i + 1],
-      polyLngs[i + 1],
-    );
-  }
-  // Final point.
-  if (polyLats.isNotEmpty) {
-    final last = distanceKm(
-        lat, lng, polyLats.last, polyLngs.last);
-    if (last < bestDist) {
-      bestAlong = accumulated;
-    }
-  }
-  return bestAlong;
-}
-

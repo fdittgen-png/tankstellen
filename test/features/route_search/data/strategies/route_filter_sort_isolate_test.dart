@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/core/domain/ev/charging_station.dart';
@@ -123,6 +125,58 @@ void main() {
       );
 
       expect(survivors.map((s) => s.id), ['start', 'mid', 'end']);
+    });
+  });
+
+  group('EligiblePartials (#4432)', () {
+    test(
+        'a streamed partial passes the same eligibility as the final list, '
+        'and nothing is forwarded after close', () async {
+      final forwarded = <List<String>>[];
+      final first = Completer<void>();
+      final gate = EligiblePartials(
+        downstream: (p) {
+          forwarded.add([for (final s in p) s.id]);
+          if (!first.isCompleted) first.complete();
+        },
+        polyline: polyline,
+        detourLimitKm: 10,
+      );
+
+      gate.add([
+        fuel('behind-start', 48.0, 1.93), // ~5 km behind: never shown
+        fuel('far-off', 48.5, 2.5),
+        fuel('on-route', 48.0, 2.5),
+      ]);
+      await first.future;
+      expect(forwarded, [
+        ['on-route'],
+      ]);
+
+      gate.close();
+      gate.add([fuel('late', 48.0, 2.6)]);
+      await pumpEventQueue();
+      expect(forwarded, hasLength(1));
+    });
+
+    test('queryEligibleAlongRoute closes the gate before the final filter',
+        () async {
+      final forwarded = <List<String>>[];
+      void Function(List<SearchResultItem>)? sink;
+      final result = await queryEligibleAlongRoute(
+        polyline: polyline,
+        detourLimitKm: 10,
+        onPartial: (p) => forwarded.add([for (final s in p) s.id]),
+        query: (partial) async {
+          sink = partial;
+          return [fuel('b', 48.0, 2.9), fuel('a', 48.0, 2.1)];
+        },
+      );
+      expect(result.map((s) => s.id), ['a', 'b']);
+      // A straggling partial after the final list is dropped.
+      sink!([fuel('straggler', 48.0, 2.5)]);
+      await pumpEventQueue();
+      expect(forwarded, isEmpty);
     });
   });
 }

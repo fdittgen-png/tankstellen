@@ -44,17 +44,6 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
           'BalancedSearch: querying ${route.samplePoints.length} points with radius=${searchRadiusKm}km');
     }
 
-    const batchHelper = BatchQueryHelper();
-    final results = await batchHelper.queryAll(
-      samplePoints: route.samplePoints,
-      queryStations: queryStations,
-      fuelType: fuelType,
-      searchRadiusKm: searchRadiusKm,
-      topNPerSamplePoint: topNPerSamplePoint,
-      criterion: criterion,
-      onPartial: onPartial,
-    );
-
     // #2303 — detour filter + itinerary sort moved off the UI isolate. The
     // returned ordering is purely itinerary position (the per-station balanced
     // score only ever drives `computeBestStops`, never this list's order), so
@@ -62,10 +51,22 @@ class BalancedSearchStrategy implements RouteSearchStrategy {
     // fuel stations farther than the detour limit drop, non-fuel results pass
     // through, survivors come back in itinerary order.
     final detourLimit = maxDetourKm ?? searchRadiusKm;
-    return filterAndSortAlongRoute(
-      results: results,
+    // #4432 — streamed partials pass the same eligibility as the
+    // final list (shared helper).
+    const batchHelper = BatchQueryHelper();
+    return queryEligibleAlongRoute(
       polyline: route.geometry,
       detourLimitKm: detourLimit,
+      onPartial: onPartial,
+      query: (partial) => batchHelper.queryAll(
+        samplePoints: route.samplePoints,
+        queryStations: queryStations,
+        fuelType: fuelType,
+        searchRadiusKm: searchRadiusKm,
+        topNPerSamplePoint: topNPerSamplePoint,
+        criterion: criterion,
+        onPartial: partial,
+      ),
     );
   }
 

@@ -11,6 +11,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/station_offer.dart';
 import '../../../../core/utils/best_stops.dart';
+import '../../../../core/utils/route_projection.dart';
 import '../../../../core/widgets/shell_bottom_inset.dart';
 import '../../../../core/utils/navigation_utils.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -336,12 +337,15 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         .where((s) => StationOffer.forStation(
                 stationId: s.id, lat: s.lat, lng: s.lng)
             .canRouteTo)
-        .toList()
-      ..sort((a, b) {
-        final aIdx = _nearestPolylineIndex(a.lat, a.lng, polyline);
-        final bIdx = _nearestPolylineIndex(b.lat, b.lng, polyline);
-        return aIdx.compareTo(bIdx);
-      });
+        .toList();
+    // #4432 — launch waypoints in the order the route meets them, by
+    // the same itinerary pass the list and the corridor filter use.
+    final projection = RouteProjection(polyline);
+    final along = {
+      for (final s in selectedStations)
+        s.id: projection.project(s.lat, s.lng).alongKm,
+    };
+    selectedStations.sort((a, b) => along[a.id]!.compareTo(along[b.id]!));
 
     unawaited(
       NavigationUtils.openRouteInMaps(
@@ -350,22 +354,5 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
         waypoints: selectedStations.map((s) => '${s.lat},${s.lng}').toList(),
       ),
     );
-  }
-
-  int _nearestPolylineIndex(double lat, double lng, List<LatLng> polyline) {
-    int bestIdx = 0;
-    double bestDist = double.infinity;
-    final step = polyline.length > 200 ? 5 : 1;
-    for (int i = 0; i < polyline.length; i += step) {
-      final p = polyline[i];
-      final d =
-          (p.latitude - lat) * (p.latitude - lat) +
-          (p.longitude - lng) * (p.longitude - lng);
-      if (d < bestDist) {
-        bestDist = d;
-        bestIdx = i;
-      }
-    }
-    return bestIdx;
   }
 }

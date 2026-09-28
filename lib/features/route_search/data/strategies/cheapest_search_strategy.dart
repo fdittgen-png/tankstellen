@@ -52,26 +52,27 @@ class CheapestSearchStrategy implements RouteSearchStrategy {
           'CheapestSearch: querying ${sampledPoints.length} points with radius=${effectiveRadius.toStringAsFixed(1)}km');
     }
 
-    const batchHelper = BatchQueryHelper();
-    final results = await batchHelper.queryAll(
-      samplePoints: sampledPoints,
-      queryStations: queryStations,
-      fuelType: fuelType,
-      searchRadiusKm: effectiveRadius,
-      topNPerSamplePoint: topNPerSamplePoint,
-      criterion: criterion,
-      onPartial: onPartial,
-    );
-
     // #2303 — detour filter + itinerary sort moved off the UI isolate. Same
     // generous (1.5×) detour limit and EV-passthrough semantics as before;
     // fuel stations farther than the limit are dropped, non-fuel results are
     // kept, and survivors are returned in itinerary order.
     final detourLimit = (maxDetourKm ?? searchRadiusKm) * 1.5;
-    return filterAndSortAlongRoute(
-      results: results,
+    // #4432 — streamed partials pass the same eligibility as the
+    // final list (shared helper).
+    const batchHelper = BatchQueryHelper();
+    return queryEligibleAlongRoute(
       polyline: route.geometry,
       detourLimitKm: detourLimit,
+      onPartial: onPartial,
+      query: (partial) => batchHelper.queryAll(
+        samplePoints: sampledPoints,
+        queryStations: queryStations,
+        fuelType: fuelType,
+        searchRadiusKm: effectiveRadius,
+        topNPerSamplePoint: topNPerSamplePoint,
+        criterion: criterion,
+        onPartial: partial,
+      ),
     );
   }
 

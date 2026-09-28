@@ -193,26 +193,27 @@ class EcoRouteSearchStrategy implements RouteSearchStrategy {
       'with radius=${searchRadiusKm}km on the eco-selected polyline',
     );
 
-    const batchHelper = BatchQueryHelper();
-    final results = await batchHelper.queryAll(
-      samplePoints: route.samplePoints,
-      queryStations: queryStations,
-      fuelType: fuelType,
-      searchRadiusKm: searchRadiusKm,
-      topNPerSamplePoint: topNPerSamplePoint,
-      criterion: criterion,
-      onPartial: onPartial,
-    );
-
     // #2303 — detour filter + itinerary sort moved off the UI isolate.
     // Behaviour is unchanged: fuel stations farther than the detour limit are
     // dropped, non-fuel results pass through, survivors come back in
     // itinerary order.
     final detourLimit = maxDetourKm ?? searchRadiusKm;
-    return filterAndSortAlongRoute(
-      results: results,
+    // #4432 — streamed partials pass the same eligibility as the
+    // final list (shared helper).
+    const batchHelper = BatchQueryHelper();
+    return queryEligibleAlongRoute(
       polyline: route.geometry,
       detourLimitKm: detourLimit,
+      onPartial: onPartial,
+      query: (partial) => batchHelper.queryAll(
+        samplePoints: route.samplePoints,
+        queryStations: queryStations,
+        fuelType: fuelType,
+        searchRadiusKm: searchRadiusKm,
+        topNPerSamplePoint: topNPerSamplePoint,
+        criterion: criterion,
+        onPartial: partial,
+      ),
     );
   }
 

@@ -496,12 +496,13 @@ void main() {
             'test/fixtures/miteco_barcelona_08.json')
         .readAsStringSync();
 
-    // Pézenas (FR) → Barcelona (ES) — the bug-report corridor. 4 FR sample
-    // points (lat ≥ 42 → segment 0) + Barcelona at sample index 4 → segment 1
-    // ((4 * 15 / 50).floor() == 1), so the Spanish station ranks in its OWN
-    // segment rather than being out-priced by the cheaper FR E85 station in a
-    // shared segment 0. The Barcelona point (41.39, 2.17) resolves to province
-    // 08 and hits the fixture; FR points stay in France.
+    // Pézenas (FR) → Barcelona (ES) — the bug-report corridor. The FR
+    // sample points sit in the first 50 km segments and Barcelona ~250 km
+    // along the route (#4432 — best stops bucket by projected route km, no
+    // longer by sample index × 15), so the Spanish stations rank in their
+    // OWN segment rather than being out-priced by the cheaper FR E85
+    // station. The Barcelona point (41.39, 2.17) resolves to province 08
+    // and hits the fixture; FR points stay in France.
     const frA = LatLng(43.50, 3.50);
     const frB = LatLng(43.30, 3.30);
     const frC = LatLng(43.10, 3.10);
@@ -580,11 +581,14 @@ void main() {
     expect(esStation.station.priceFor(displayedFuel), isNotNull,
         reason: 'the ES station must show a price, not "--" (#2641)');
 
-    // (iii) The cheapest Spanish station must enter Best Stops. RED on master:
-    // computeBestStops drops the null-E10 station.
+    // (iii) The cheapest Spanish station of its segment must enter Best
+    // Stops. RED on master: computeBestStops drops every null-E10 station.
+    // (#4432 — which ES row wins depends on the segment the real route km
+    // put it in, so the pin is "a Spanish station", not the first one.)
     expect(result.cheapestPerSegment, isNotNull);
-    expect(result.cheapestPerSegment!.values,
-        contains(esStation.station.id),
+    expect(
+        result.cheapestPerSegment!.values.where((id) => id.startsWith('es-')),
+        isNotEmpty,
         reason: 'the cheapest Spanish station must appear in Best Stops, '
             'priced by its E5 grade via the sibling fallback (#2641)');
   });

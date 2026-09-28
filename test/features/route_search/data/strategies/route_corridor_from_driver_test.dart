@@ -97,4 +97,50 @@ void main() {
     expect(survivors.map((s) => s.id), ['culoz', 'seyssel']);
     expect(survivors.map((s) => s.id), isNot(contains('la-tour-du-pin')));
   });
+
+  group('#4432 — eligibility by route occurrence, not nearest vertex', () {
+    // West → east along lat 48; 0.1° of longitude is ~7.44 km.
+    const eastbound = <LatLng>[LatLng(48.0, 2.0), LatLng(48.0, 3.0)];
+
+    test(
+        'a station 5 km behind the driver is inside the detour budget yet '
+        'not a candidate — the start clamp does not admit it', () async {
+      final survivors = await runFilterAndSortForTest(
+        results: [
+          stop('5-km-behind', const LatLng(48.0, 1.933)),
+          stop('at-the-origin', const LatLng(48.0, 1.999)),
+          stop('midway-on-sparse-segment', const LatLng(48.0, 2.5)),
+        ],
+        polyline: eastbound,
+        detourLimitKm: 15,
+      );
+
+      expect(survivors.map((s) => s.id),
+          ['at-the-origin', 'midway-on-sparse-segment']);
+    });
+
+    test(
+        'a station met again after a U-turn is ordered where the route '
+        'meets it, not where a vertex happens to be nearest', () async {
+      // Out east along lat 48.0, back west along lat 48.05.
+      const uTurn = <LatLng>[
+        LatLng(48.0, 2.0),
+        LatLng(48.0, 3.0),
+        LatLng(48.05, 3.0),
+        LatLng(48.05, 2.0),
+      ];
+      final survivors = await runFilterAndSortForTest(
+        results: [
+          stop('return-leg-west', const LatLng(48.05, 2.1)),
+          stop('outbound-east', const LatLng(48.0, 2.9)),
+          stop('outbound-west', const LatLng(48.0, 2.1)),
+        ],
+        polyline: uTurn,
+        detourLimitKm: 3,
+      );
+
+      expect(survivors.map((s) => s.id),
+          ['outbound-west', 'outbound-east', 'return-leg-west']);
+    });
+  });
 }

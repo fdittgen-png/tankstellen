@@ -10,8 +10,8 @@ import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/station_offer.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../../core/utils/route_projection.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -299,43 +299,23 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     _sortMemoOrder = [for (final i in items) i.id];
   }
 
-  /// Sort stations by their position along the route polyline.
+  /// Sort stations by the progress at which the route meets them.
   ///
-  /// For each station, finds the nearest polyline point index — this
-  /// represents how far along the route the station is. Stations
-  /// near the start of the route appear first.
+  /// #4432 — the shared [RouteProjection] itinerary pass, the one the
+  /// search isolate filtered and ordered by: a nearest-VERTEX index here
+  /// could order a loop's second pass (or a station midway along a
+  /// sparse segment) differently from the corridor that admitted it.
   void _sortByRoutePosition(
     List<SearchResultItem> items,
     List<LatLng> polyline,
   ) {
     if (polyline.isEmpty) return;
-
-    // Sample every 3rd point for performance on long routes
-    final step = polyline.length > 300 ? 3 : 1;
-
-    double nearestPolylineIndex(double lat, double lng) {
-      double minDist = double.infinity;
-      int bestIdx = 0;
-      for (int i = 0; i < polyline.length; i += step) {
-        final d = distanceKm(
-          lat,
-          lng,
-          polyline[i].latitude,
-          polyline[i].longitude,
-        );
-        if (d < minDist) {
-          minDist = d;
-          bestIdx = i;
-        }
-      }
-      return bestIdx.toDouble();
-    }
-
-    items.sort((a, b) {
-      final posA = nearestPolylineIndex(a.lat, a.lng);
-      final posB = nearestPolylineIndex(b.lat, b.lng);
-      return posA.compareTo(posB);
-    });
+    final projection = RouteProjection(polyline);
+    final along = {
+      for (final item in items)
+        item.id: projection.project(item.lat, item.lng).alongKm,
+    };
+    items.sort((a, b) => along[a.id]!.compareTo(along[b.id]!));
   }
 
   /// Filter to only the cheapest station per route segment (#4125 — the
