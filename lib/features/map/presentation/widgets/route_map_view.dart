@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/station_offer.dart';
 import '../../../../core/time/app_clock.dart';
@@ -26,19 +25,17 @@ import '../../../route_search/api.dart'
     show
         RouteLiveProgress,
         RouteLiveProgressScope,
-        RouteStopMetrics,
         RouteStopMetricsScope,
         RouteUpdateFromPositionBanner,
         aheadOfDriver,
-        routeLiveProgressControllerProvider,
-        routeStopMetricsFor;
+        routeLiveProgressControllerProvider;
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_result_item.dart';
 import '../../../../core/domain/station.dart';
 import '../../../search/providers/search_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
-import 'station_map_geometry.dart';
+import 'route_map_framing.dart';
 import 'route_best_stops_list.dart';
 import 'route_info_bar.dart';
 import 'route_view_mode_bar.dart';
@@ -69,36 +66,25 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
   RouteViewMode _viewMode = RouteViewMode.allStations;
   final Set<String> _selectedStationIds = {};
 
-  /// #2782 — the camera target: the bounds of the along-route fuel STATIONS
-  /// (the search results), computed ONCE from the immutable result. #2755
-  /// originally framed the full route polyline so the camera showed the
-  /// COMPLETE itinerary, but for a cross-border itinerary that polyline spans
-  /// both countries and the camera zooms far out ("shows far too much").
-  /// Framing the results keeps the scope fit to what the user is actually
-  /// looking at. Computed from ALL result stations (not the displayed
-  /// All/Best subset), so it stays constant across the toggle and keeps
-  /// `StationMapLayers`' value-`==` `_lastFitBounds` guard a no-op — the
-  /// camera holds and never re-zooms to the changed subset.
-  late final LatLngBounds _routeBounds = _computeRouteBounds();
+  /// #4432 — the camera frame and route metrics, held per ROUTE (see
+  /// [RouteMapFraming]): recomputed when a new route revision lands,
+  /// held across partial batches and the All/Best toggle.
+  final RouteMapFraming _framing = RouteMapFraming();
 
-  /// Pre-layout camera fallback used by `MapOptions.initialCenter` /
-  /// `initialZoom` before the first layout pass runs `initialCameraFit`
-  /// (which frames `_routeBounds`). Mirrors `trip_path_map_card.dart`.
-  late final LatLng _initialCenter = _routeBounds.center;
+  LatLngBounds get _routeBounds => _framing.boundsFor(widget.routeResult);
 
-  RouteSearchResult? _metricsOf;
-  Map<String, RouteStopMetrics> _metrics = const {};
-
-  /// #4432 — along-route progress and corridor offset of every result
-  /// station, measured on THIS result's route (never the first-seen
-  /// `Station.dist`). Memoised on the result object: one O(n · P)
-  /// projection per published result, not per rebuild.
-  Map<String, RouteStopMetrics> get _routeMetrics {
-    if (!identical(_metricsOf, widget.routeResult)) {
-      _metricsOf = widget.routeResult;
-      _metrics = routeStopMetricsFor(widget.routeResult);
+  /// #4432 — route-local selections belong to the route they were made
+  /// on. When a new route replaces it, a selection survives only if the
+  /// station is still one of the new route's results; the rest are
+  /// dropped rather than launched as waypoints of a route that no longer
+  /// contains them.
+  @override
+  void didUpdateWidget(RouteMapView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (RouteMapFraming.isNewRoute(oldWidget.routeResult, widget.routeResult)) {
+      final ids = {for (final s in widget.routeResult.stations) s.id};
+      _selectedStationIds.retainWhere(ids.contains);
     }
-    return _metrics;
   }
 
   List<Station> get _allFuelStations => widget.routeResult.stations
@@ -112,29 +98,6 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
   List<Station> _aheadFuelStations(RouteLiveProgress progress) =>
       aheadOfDriver(widget.routeResult, progress, _allFuelStations,
           (s) => (lat: s.lat, lng: s.lng));
-
-  /// Build the framing bounds from the along-route fuel STATIONS (the search
-  /// results) so the camera scope fits what was found (#2782). Falls back to
-  /// the full route polyline only when there are no stations (so an empty
-  /// route still frames something), then to a Paris box if there is no
-  /// geometry either. A degenerate single-point set gets a tiny epsilon box so
-  /// `CameraFit.bounds` can't divide-by-zero (as in `trip_path_map_card.dart`).
-  LatLngBounds _computeRouteBounds() {
-    final points = <LatLng>[
-      for (final s in _allFuelStations) LatLng(s.lat, s.lng),
-    ];
-    if (points.isEmpty) {
-      // No results to frame — fall back to the route geometry so the
-      // itinerary is still visible (the build method renders an EmptyState
-      // in this case anyway), then to the canonical fallback box.
-      points.addAll(widget.routeResult.route.geometry);
-    }
-    // #3488 — delegates to the canonical NaN-safe / zero-span-safe helper:
-    // it drops non-finite points, falls back to a finite box when empty,
-    // and epsilon-pads any near-zero span (single point OR several
-    // co-located stations) so `CameraFit.bounds` never divides-by-zero.
-    return StationMapGeometry.boundsOfPoints(points);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +126,10 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     // `_routeBounds` inside `StationMapLayers`. The recenter button and
     // the toggle therefore always refit to the SAME route bounds, so the
     // camera holds across the All/Best toggle (no random re-zoom).
-    final center = _initialCenter;
+    // #4432 — `StationMapLayers` re-fits when this centre changes VALUE,
+    // which is exactly when `_routeBounds` moved to a new route.
+    final routeBounds = _routeBounds;
+    final center = routeBounds.center;
     const zoom = 6.0;
 
     // #2631 — price each station by ITS country's profile fuel (offline,
@@ -178,7 +144,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     return RouteLiveProgressScope(child: RouteStopMetricsScope(
       // #4432 — the chips and the marker sheet below are shared with the
       // nearby map; this scope is how they learn they are on a route.
-      metrics: _routeMetrics,
+      metrics: _framing.metricsFor(result),
       child: Column(
       children: [
         const RouteUpdateFromPositionBanner(),
@@ -225,7 +191,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
                 padding: const EdgeInsets.all(32),
               ),
             ),
-            cameraFitBounds: _routeBounds,
+            cameraFitBounds: routeBounds,
             routePolyline: result.route.geometry,
             showSearchRadius: false,
             selectedStationIds: _selectedStationIds.isNotEmpty
