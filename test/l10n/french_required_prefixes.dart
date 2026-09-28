@@ -90,6 +90,12 @@ const List<String> kFrenchRequiredPrefixes = <String>[
   // prefix so the whole family is covered by the same rule as everything
   // else here.
   'alertsStation',
+
+  // #4432 — the route start's GPS state (locating / denied / off / timed
+  // out / stale / imprecise) and the route map's device-position label:
+  // the field report was a French driver reading "Position actuelle".
+  'routeOriginStatus',
+  'routeMapDeviceFixMarker',
 ];
 
 /// Keys under a [kFrenchRequiredPrefixes] surface whose French value is

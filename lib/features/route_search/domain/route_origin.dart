@@ -6,12 +6,21 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../../core/error/exceptions.dart';
 import '../../../core/error/guarded.dart';
 import '../../../core/location/location_service.dart';
+import '../../../core/location/position_fix_policy.dart';
 import '../../../core/services/location_search_service.dart';
 import '../../../core/time/app_clock.dart';
 import '../../../core/utils/geo_utils.dart';
 import 'entities/route_info.dart';
+
+// #4432 — the freshness policy moved to core so the route map's device
+// marker judges fixes by the same thresholds; re-exported so the
+// origin's callers and tests keep one import.
+export '../../../core/location/position_fix_policy.dart'
+    show acceptAsCurrentFix, kRouteOriginMaxAccuracyMeters,
+        kRouteOriginMaxFixAge;
 
 /// Watchdog over one origin acquisition (#4432).
 ///
@@ -23,29 +32,6 @@ import 'entities/route_info.dart';
 /// tapped search can never hang forever; it degrades to the stored
 /// origin with its age instead.
 const Duration kRouteOriginAcquireWatchdog = Duration(seconds: 32);
-
-/// How old the RETURNED sample may be and still count as "where I am"
-/// (#4432).
-///
-/// `getCurrentPosition` is not a promise of a new measurement — Android's
-/// fused provider documents that a current-location request may be
-/// answered from a recent cached fix — so the method returning is not
-/// evidence of freshness; only `Position.timestamp` is. At 130 km/h a
-/// vehicle covers ~2.2 km a minute, so 90 s is ~3 km of uncertainty in
-/// the route origin: enough to keep a warm fix, far too little to let
-/// the 37-minute snapshot of the field report through.
-const Duration kRouteOriginMaxFixAge = Duration(seconds: 90);
-
-/// Worst estimated horizontal accuracy, in metres, an origin fix may
-/// carry (#4432).
-///
-/// The service asks for `medium` accuracy on purpose (~100 m is ample
-/// for a road-snapped route start). 500 m allows for a cell-assisted
-/// first fix and still rejects the coarse network guesses that would
-/// snap the origin onto the wrong road. A non-positive accuracy means
-/// the platform did not estimate one; that is unknown, not good, but it
-/// is not on its own a reason to reject a fix whose timestamp is fresh.
-const double kRouteOriginMaxAccuracyMeters = 500;
 
 /// Where a resolved "current position" origin came from (#4432).
 enum RouteOriginFreshness {
@@ -64,6 +50,57 @@ enum RouteOriginFreshness {
   none,
 }
 
+/// Why no fresh position could be read (#4432) — one per remedy the
+/// driver has: grant the permission, switch the service on, try again,
+/// or type a start instead. A silent "GPS error" offered none of them.
+enum RouteOriginFailure {
+  permissionDenied,
+  serviceDisabled,
+  timeout,
+
+  /// A sample came back, but measured too long ago to be "where I am".
+  staleFix,
+
+  /// A sample came back, but too imprecise to route from.
+  poorAccuracy,
+
+  /// Anything else — a degenerate coordinate, a platform error.
+  unavailable,
+}
+
+/// Classify a failed acquisition by the exception it threw (#4432).
+RouteOriginFailure classifyOriginError(Object error) {
+  if (error is TimeoutException) return RouteOriginFailure.timeout;
+  if (error is PermissionDeniedException) {
+    return RouteOriginFailure.permissionDenied;
+  }
+  if (error is LocationServiceDisabledException) {
+    return RouteOriginFailure.serviceDisabled;
+  }
+  if (error is LocationException) {
+    return switch (error.reason) {
+      LocationFailureReason.serviceDisabled =>
+        RouteOriginFailure.serviceDisabled,
+      LocationFailureReason.permissionDenied ||
+      LocationFailureReason.permissionDeniedForever =>
+        RouteOriginFailure.permissionDenied,
+      LocationFailureReason.degenerateFix || null =>
+        RouteOriginFailure.unavailable,
+    };
+  }
+  return RouteOriginFailure.unavailable;
+}
+
+/// Classify a sample that came back but was not accepted (#4432).
+RouteOriginFailure _failureOfRejection(FixRejection rejection) =>
+    switch (rejection) {
+      FixRejection.tooOld ||
+      FixRejection.fromTheFuture =>
+        RouteOriginFailure.staleFix,
+      FixRejection.tooCoarse => RouteOriginFailure.poorAccuracy,
+      FixRejection.unusableCoordinate => RouteOriginFailure.unavailable,
+    };
+
 /// The origin a route search will actually use, and what it is worth
 /// (#4432).
 class ResolvedRouteOrigin {
@@ -71,10 +108,12 @@ class ResolvedRouteOrigin {
     required this.coords,
     required this.freshness,
     required this.age,
+    this.failure,
   });
 
-  const ResolvedRouteOrigin.none()
-      : coords = null,
+  const ResolvedRouteOrigin.none({
+    this.failure = RouteOriginFailure.unavailable,
+  })  : coords = null,
         freshness = RouteOriginFreshness.none,
         age = Duration.zero;
 
@@ -84,6 +123,10 @@ class ResolvedRouteOrigin {
   /// How long ago [coords] was MEASURED — from the fix's own timestamp,
   /// not from when some code last called a method.
   final Duration age;
+
+  /// Why no fresh fix was obtained; null exactly when the origin is
+  /// [RouteOriginFreshness.fresh].
+  final RouteOriginFailure? failure;
 
   bool get isStale => freshness == RouteOriginFreshness.stale;
 }
@@ -122,51 +165,36 @@ Future<ResolvedRouteOrigin> resolveCurrentPositionOrigin({
   required DateTime? capturedAt,
   Duration watchdog = kRouteOriginAcquireWatchdog,
 }) async {
+  RouteOriginFailure failure;
   try {
     final position =
         await locationService.getCurrentPosition().timeout(watchdog);
-    if (acceptAsCurrentFix(position, clock.now())) {
+    final rejection = rejectFix(position, clock.now());
+    if (rejection == null) {
       return ResolvedRouteOrigin(
         coords: LatLng(position.latitude, position.longitude),
         freshness: RouteOriginFreshness.fresh,
         age: Duration.zero,
       );
     }
+    failure = _failureOfRejection(rejection);
   } catch (e, st) {
     // #2146 — the exportable log; the search carries on with the stored
     // origin rather than failing.
     logFailure(e, st, where: 'resolveCurrentPositionOrigin');
+    failure = classifyOriginError(e);
   }
 
   if (stored == null || !isUsableCoord(stored.latitude, stored.longitude)) {
-    return const ResolvedRouteOrigin.none();
+    return ResolvedRouteOrigin.none(failure: failure);
   }
   final since = capturedAt;
   return ResolvedRouteOrigin(
     coords: stored,
     freshness: RouteOriginFreshness.stale,
     age: since == null ? Duration.zero : clock.now().difference(since),
+    failure: failure,
   );
-}
-
-/// Whether [position], measured at its own `timestamp`, may stand as
-/// "where the vehicle is" at [now] (#4432).
-///
-/// Exposed so the thresholds can be tested on both sides of each bound
-/// without driving a location service.
-bool acceptAsCurrentFix(Position position, DateTime now) {
-  if (!isUsableCoord(position.latitude, position.longitude)) return false;
-  final accuracy = position.accuracy;
-  if (accuracy.isFinite &&
-      accuracy > 0 &&
-      accuracy > kRouteOriginMaxAccuracyMeters) {
-    return false;
-  }
-  final age = now.difference(position.timestamp);
-  // A timestamp in the future is a broken clock, not a fresh fix; allow
-  // only the small skew a device/GPS clock difference can produce.
-  if (age.isNegative) return age.abs() <= kRouteOriginMaxFixAge;
-  return age <= kRouteOriginMaxFixAge;
 }
 
 /// Capture an origin for the GPS button, stamped with the fix's OWN
@@ -199,17 +227,19 @@ Future<ResolvedRouteOrigin> captureCurrentPositionOrigin({
       return const ResolvedRouteOrigin.none();
     }
     final now = clock.now();
-    final current = acceptAsCurrentFix(position, now);
+    final rejection = rejectFix(position, now);
+    final current = rejection == null;
     final measuredAgo = now.difference(position.timestamp);
     return ResolvedRouteOrigin(
       coords: LatLng(position.latitude, position.longitude),
       freshness:
           current ? RouteOriginFreshness.fresh : RouteOriginFreshness.stale,
       age: current || measuredAgo.isNegative ? Duration.zero : measuredAgo,
+      failure: current ? null : _failureOfRejection(rejection),
     );
   } catch (e, st) {
     logFailure(e, st, where: 'captureCurrentPositionOrigin');
-    return const ResolvedRouteOrigin.none();
+    return ResolvedRouteOrigin.none(failure: classifyOriginError(e));
   }
 }
 

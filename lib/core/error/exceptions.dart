@@ -63,10 +63,23 @@ class CacheException extends AppException {
   String toString() => 'CacheException: $message';
 }
 
+/// Why a device-location read failed (#4432) — typed, so a surface can
+/// say WHICH remedy applies (grant the permission, turn the service on)
+/// without parsing the English diagnostic in [LocationException.message].
+enum LocationFailureReason {
+  serviceDisabled,
+  permissionDenied,
+  permissionDeniedForever,
+  degenerateFix,
+}
+
 class LocationException extends AppException {
   @override
   final String message;
-  const LocationException({required this.message});
+
+  /// Null for failures that are not a device-location read (geocoding).
+  final LocationFailureReason? reason;
+  const LocationException({required this.message, this.reason});
 
   @override
   String toString() => 'LocationException: $message';

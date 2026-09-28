@@ -9324,6 +9324,40 @@ class AppLocalizationsFr extends AppLocalizations {
       'Distance à vol d\'oiseau entre cet itinéraire et la station. Ce n\'est ni la distance depuis votre position, ni le trajet supplémentaire qu\'un arrêt coûterait.';
 
   @override
+  String get routeOriginStatusLocating => 'Recherche de votre position…';
+
+  @override
+  String get routeOriginStatusPermissionDenied =>
+      'L\'accès à la localisation n\'est pas autorisé. Autorisez-le dans les réglages du système, ou saisissez une adresse de départ.';
+
+  @override
+  String get routeOriginStatusServiceDisabled =>
+      'Les services de localisation sont désactivés. Activez-les, ou saisissez une adresse de départ.';
+
+  @override
+  String get routeOriginStatusTimeout =>
+      'Votre position n\'a pas pu être déterminée à temps.';
+
+  @override
+  String routeOriginStatusStaleFix(String age) {
+    return 'La dernière position date de $age ; elle ne correspond peut-être plus à l\'endroit où vous êtes.';
+  }
+
+  @override
+  String get routeOriginStatusPoorAccuracy =>
+      'Votre position est trop imprécise pour démarrer un itinéraire.';
+
+  @override
+  String get routeOriginStatusUnavailable =>
+      'Votre position n\'est pas disponible.';
+
+  @override
+  String get routeOriginStatusEnterAddress => 'Saisir une adresse';
+
+  @override
+  String get routeMapDeviceFixMarker => 'Votre position actuelle';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/L';
   }

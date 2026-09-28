@@ -28,6 +28,7 @@ import '../../../search/providers/search_provider.dart';
 import '../../../profile/providers/profile_provider.dart';
 import 'station_map_geometry.dart';
 import 'route_best_stops_list.dart';
+import 'route_device_fix_layer.dart';
 import 'route_info_bar.dart';
 import 'route_view_mode_bar.dart';
 import 'station_map_layers.dart';
@@ -67,12 +68,36 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
   /// All/Best subset), so it stays constant across the toggle and keeps
   /// `StationMapLayers`' value-`==` `_lastFitBounds` guard a no-op — the
   /// camera holds and never re-zooms to the changed subset.
-  late final LatLngBounds _routeBounds = _computeRouteBounds();
+  ///
+  /// #4432 — keyed by the route REVISION: recomputed when a different
+  /// submission lands (it used to be `late final`, so a new route kept
+  /// the old one's framing), held across the same revision's partial →
+  /// final updates so streaming results never re-zoom the camera.
+  late LatLngBounds _routeBounds = _computeRouteBounds();
 
   /// Pre-layout camera fallback used by `MapOptions.initialCenter` /
   /// `initialZoom` before the first layout pass runs `initialCameraFit`
   /// (which frames `_routeBounds`). Mirrors `trip_path_map_card.dart`.
-  late final LatLng _initialCenter = _routeBounds.center;
+  /// A camera target only — never drawn as a position (#4432).
+  late LatLng _initialCenter = _routeBounds.center;
+
+  /// #4432 — whether [next] is a different route from [previous]. A
+  /// result outside a submission (revision 0) is told apart by its
+  /// route object, which every partial of one sweep shares.
+  static bool _isNewRoute(RouteSearchResult previous, RouteSearchResult next) =>
+      previous.routeRevision != next.routeRevision ||
+      (next.routeRevision == 0 && !identical(previous.route, next.route));
+
+  @override
+  void didUpdateWidget(RouteMapView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_isNewRoute(oldWidget.routeResult, widget.routeResult)) return;
+    _routeBounds = _computeRouteBounds();
+    _initialCenter = _routeBounds.center;
+    // A selection is route-local: keep only stations the new route has.
+    final ids = {for (final s in _allFuelStations) s.id};
+    _selectedStationIds.removeWhere((id) => !ids.contains(id));
+  }
 
   List<Station> get _allFuelStations => widget.routeResult.stations
       .whereType<FuelStationResult>()
@@ -162,11 +187,11 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           child: StationMapLayers(
             mapController: widget.mapController,
             stations: displayStations,
-            // #4432 — `center` is `_routeBounds.center`, the bounding box
-            // of the along-route STATIONS (#2782/#2755). It is a camera
-            // target, not a position: `originMarker` is deliberately left
-            // null so no "you are here" dot is drawn there. The route's
-            // start and destination are marked from the polyline instead.
+            // #4432 — three separate inputs. `center` is a camera target
+            // (the stations' bounding-box centre), never drawn:
+            // `originMarker` stays null. Start and destination are marked
+            // from the routed polyline. The device dot comes only from a
+            // fresh accepted fix, for a current-position route.
             center: center,
             zoom: zoom,
             searchRadiusKm: 5,
@@ -194,6 +219,10 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             // RouteBestStopsList↔marker 1:1 mapping survive at every zoom.
             clusterAlways: true,
             excludeSelectedFromClustering: true,
+            extraLayers: [
+              if (result.request?.originIsVehiclePosition ?? false)
+                const RouteDeviceFixLayer(),
+            ],
           ),
         ),
         if (_viewMode == RouteViewMode.bestStops && displayStations.isNotEmpty)

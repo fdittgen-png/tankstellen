@@ -2,5 +2,14 @@
   "routeOriginStaleCurrentLocation": "Aktuelle Position (vor {age})",
   "routeStopOffRoute": "{distance} von der Route",
   "routeStopOffRouteQualifier": "geometrische Schätzung",
-  "routeStopOffRouteTooltip": "Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde."
+  "routeStopOffRouteTooltip": "Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde.",
+  "routeOriginStatusLocating": "Position wird ermittelt…",
+  "routeOriginStatusPermissionDenied": "Standortzugriff ist nicht erlaubt. Erlauben Sie ihn in den Systemeinstellungen oder geben Sie eine Startadresse ein.",
+  "routeOriginStatusServiceDisabled": "Die Ortungsdienste sind ausgeschaltet. Schalten Sie sie ein oder geben Sie eine Startadresse ein.",
+  "routeOriginStatusTimeout": "Ihre Position konnte nicht rechtzeitig ermittelt werden.",
+  "routeOriginStatusStaleFix": "Die letzte Positionsbestimmung ist {age} alt und entspricht womöglich nicht mehr Ihrem Standort.",
+  "routeOriginStatusPoorAccuracy": "Ihre Position ist zu ungenau, um eine Route zu starten.",
+  "routeOriginStatusUnavailable": "Ihre Position ist nicht verfügbar.",
+  "routeOriginStatusEnterAddress": "Adresse eingeben",
+  "routeMapDeviceFixMarker": "Ihre aktuelle Position"
 }

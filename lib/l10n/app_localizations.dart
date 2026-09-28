@@ -15204,6 +15204,60 @@ abstract class AppLocalizations {
   /// **'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.'**
   String get routeStopOffRouteTooltip;
 
+  /// Shown under the route start field while a GPS fix for the 'current position' start is being acquired (#4432). A cold lock can take up to 30 s; before this the field simply stayed empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding your position…'**
+  String get routeOriginStatusLocating;
+
+  /// Route start field state when the location permission is refused (#4432). Names both remedies.
+  ///
+  /// In en, this message translates to:
+  /// **'Location access is not allowed. Allow it in the system settings, or enter a start address.'**
+  String get routeOriginStatusPermissionDenied;
+
+  /// Route start field state when the device's location services are switched off (#4432).
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are turned off. Turn them on, or enter a start address.'**
+  String get routeOriginStatusServiceDisabled;
+
+  /// Route start field state when GPS acquisition timed out (#4432). Shown with a retry action.
+  ///
+  /// In en, this message translates to:
+  /// **'Your position could not be found in time.'**
+  String get routeOriginStatusTimeout;
+
+  /// Route start field state when the only available fix is too old to be the current position (#4432). {age} uses the position-age vocabulary ('4 min', '2 h').
+  ///
+  /// In en, this message translates to:
+  /// **'The last position fix is {age} old, so it may not be where you are now.'**
+  String routeOriginStatusStaleFix(String age);
+
+  /// Route start field state when the fix's estimated accuracy is too coarse to route from (#4432).
+  ///
+  /// In en, this message translates to:
+  /// **'Your position is too imprecise to start a route from.'**
+  String get routeOriginStatusPoorAccuracy;
+
+  /// Route start field state for any other GPS failure (#4432).
+  ///
+  /// In en, this message translates to:
+  /// **'Your position is unavailable.'**
+  String get routeOriginStatusUnavailable;
+
+  /// Action under a route-start GPS state: clear the start field so the driver types a place instead (#4432).
+  ///
+  /// In en, this message translates to:
+  /// **'Enter address'**
+  String get routeOriginStatusEnterAddress;
+
+  /// Screen-reader label of the route map's device-position dot (#4432). Only drawn from a fresh, accepted GPS fix — never at the camera centre or the route start.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current position'**
+  String get routeMapDeviceFixMarker;
+
   /// Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').
   ///
   /// In en, this message translates to:

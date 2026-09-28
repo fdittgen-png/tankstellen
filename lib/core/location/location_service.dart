@@ -26,6 +26,7 @@ class LocationService {
       // User-facing text is handled by ErrorLocalizer → ARB.
       throw const LocationException(
         message: 'Location services are disabled.',
+        reason: LocationFailureReason.serviceDisabled,
       );
     }
 
@@ -36,6 +37,7 @@ class LocationService {
         // English diagnostic per exceptions.dart contract (#2316).
         throw const LocationException(
           message: 'Location permission denied.',
+          reason: LocationFailureReason.permissionDenied,
         );
       }
     }
@@ -43,6 +45,7 @@ class LocationService {
     if (permission == LocationPermission.deniedForever) {
       throw const LocationException(
         message: 'Location permission permanently denied.',
+        reason: LocationFailureReason.permissionDeniedForever,
       );
     }
 
@@ -72,6 +75,7 @@ class LocationService {
     if (!isUsableCoord(position.latitude, position.longitude)) {
       throw const LocationException(
         message: 'Degenerate GPS fix (unacquired or null-island coordinate).',
+        reason: LocationFailureReason.degenerateFix,
       );
     }
 

@@ -9287,6 +9287,40 @@ class AppLocalizationsDe extends AppLocalizations {
       'Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde.';
 
   @override
+  String get routeOriginStatusLocating => 'Position wird ermittelt…';
+
+  @override
+  String get routeOriginStatusPermissionDenied =>
+      'Standortzugriff ist nicht erlaubt. Erlauben Sie ihn in den Systemeinstellungen oder geben Sie eine Startadresse ein.';
+
+  @override
+  String get routeOriginStatusServiceDisabled =>
+      'Die Ortungsdienste sind ausgeschaltet. Schalten Sie sie ein oder geben Sie eine Startadresse ein.';
+
+  @override
+  String get routeOriginStatusTimeout =>
+      'Ihre Position konnte nicht rechtzeitig ermittelt werden.';
+
+  @override
+  String routeOriginStatusStaleFix(String age) {
+    return 'Die letzte Positionsbestimmung ist $age alt und entspricht womöglich nicht mehr Ihrem Standort.';
+  }
+
+  @override
+  String get routeOriginStatusPoorAccuracy =>
+      'Ihre Position ist zu ungenau, um eine Route zu starten.';
+
+  @override
+  String get routeOriginStatusUnavailable =>
+      'Ihre Position ist nicht verfügbar.';
+
+  @override
+  String get routeOriginStatusEnterAddress => 'Adresse eingeben';
+
+  @override
+  String get routeMapDeviceFixMarker => 'Ihre aktuelle Position';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/l';
   }

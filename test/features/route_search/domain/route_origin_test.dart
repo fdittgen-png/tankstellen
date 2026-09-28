@@ -294,6 +294,77 @@ void main() {
     });
   });
 
+  group('failure is named, so the UI can offer its remedy (#4432)', () {
+    Future<RouteOriginFailure?> captureFailure() async =>
+        (await captureCurrentPositionOrigin(
+          locationService: location,
+          clock: clock,
+        ))
+            .failure;
+
+    test('a fresh fix carries no failure', () async {
+      answers(_fix(belley.latitude, belley.longitude, at: now));
+      expect(await captureFailure(), isNull);
+      expect((await resolve()).failure, isNull);
+    });
+
+    test('permission refused (once or forever) → permissionDenied',
+        () async {
+      for (final reason in [
+        LocationFailureReason.permissionDenied,
+        LocationFailureReason.permissionDeniedForever,
+      ]) {
+        when(() => location.getCurrentPosition()).thenThrow(
+            LocationException(message: 'denied', reason: reason));
+        expect(await captureFailure(), RouteOriginFailure.permissionDenied);
+        expect((await resolve()).failure, RouteOriginFailure.permissionDenied);
+      }
+    });
+
+    test('services off → serviceDisabled', () async {
+      when(() => location.getCurrentPosition()).thenThrow(
+        const LocationException(
+          message: 'Location services are disabled.',
+          reason: LocationFailureReason.serviceDisabled,
+        ),
+      );
+      expect(await captureFailure(), RouteOriginFailure.serviceDisabled);
+      expect((await resolve()).failure, RouteOriginFailure.serviceDisabled);
+    });
+
+    test('the platform limit or the watchdog firing → timeout', () async {
+      when(() => location.getCurrentPosition())
+          .thenThrow(TimeoutException('30 s'));
+      expect(await captureFailure(), RouteOriginFailure.timeout);
+
+      when(() => location.getCurrentPosition())
+          .thenAnswer((_) => Completer<Position>().future);
+      final origin = await resolve(watchdog: const Duration(milliseconds: 5));
+      expect(origin.failure, RouteOriginFailure.timeout);
+    });
+
+    test('a sample one second past the age bound → staleFix', () async {
+      answers(_fix(belley.latitude, belley.longitude,
+          at: now.subtract(kRouteOriginMaxFixAge + const Duration(seconds: 1))));
+      expect(await captureFailure(), RouteOriginFailure.staleFix);
+      expect((await resolve()).failure, RouteOriginFailure.staleFix);
+    });
+
+    test('a sample one metre past the accuracy bound → poorAccuracy',
+        () async {
+      answers(_fix(belley.latitude, belley.longitude,
+          at: now, accuracy: kRouteOriginMaxAccuracyMeters + 1));
+      expect(await captureFailure(), RouteOriginFailure.poorAccuracy);
+      expect((await resolve()).failure, RouteOriginFailure.poorAccuracy);
+    });
+
+    test('an unclassified error → unavailable', () async {
+      when(() => location.getCurrentPosition())
+          .thenThrow(StateError('platform channel gone'));
+      expect(await captureFailure(), RouteOriginFailure.unavailable);
+    });
+  });
+
   group('buildRouteWaypoints (#2872 / #4432)', () {
     test('marks the start as the vehicle position when asked', () {
       final waypoints = buildRouteWaypoints(

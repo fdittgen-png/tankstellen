@@ -11103,5 +11103,55 @@
   "@currencyBackfillUndo": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "routeOriginStatusLocating": "Finding your position…",
+  "@routeOriginStatusLocating": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeOriginStatusPermissionDenied": "Location access is not allowed. Allow it in the system settings, or enter a start address.",
+  "@routeOriginStatusPermissionDenied": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeOriginStatusServiceDisabled": "Location services are turned off. Turn them on, or enter a start address.",
+  "@routeOriginStatusServiceDisabled": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeOriginStatusTimeout": "Your position could not be found in time.",
+  "@routeOriginStatusTimeout": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeOriginStatusStaleFix": "The last position fix is {age} old, so it may not be where you are now.",
+  "@routeOriginStatusStaleFix": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "age": {
+        "type": "String"
+      }
+    }
+  },
+  "routeOriginStatusPoorAccuracy": "Your position is too imprecise to start a route from.",
+  "@routeOriginStatusPoorAccuracy": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeOriginStatusUnavailable": "Your position is unavailable.",
+  "@routeOriginStatusUnavailable": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeOriginStatusEnterAddress": "Enter address",
+  "@routeOriginStatusEnterAddress": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeMapDeviceFixMarker": "Your current position",
+  "@routeMapDeviceFixMarker": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

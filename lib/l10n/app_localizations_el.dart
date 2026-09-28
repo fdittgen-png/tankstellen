@@ -9285,6 +9285,39 @@ class AppLocalizationsEl extends AppLocalizations {
       'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
 
   @override
+  String get routeOriginStatusLocating => 'Finding your position…';
+
+  @override
+  String get routeOriginStatusPermissionDenied =>
+      'Location access is not allowed. Allow it in the system settings, or enter a start address.';
+
+  @override
+  String get routeOriginStatusServiceDisabled =>
+      'Location services are turned off. Turn them on, or enter a start address.';
+
+  @override
+  String get routeOriginStatusTimeout =>
+      'Your position could not be found in time.';
+
+  @override
+  String routeOriginStatusStaleFix(String age) {
+    return 'The last position fix is $age old, so it may not be where you are now.';
+  }
+
+  @override
+  String get routeOriginStatusPoorAccuracy =>
+      'Your position is too imprecise to start a route from.';
+
+  @override
+  String get routeOriginStatusUnavailable => 'Your position is unavailable.';
+
+  @override
+  String get routeOriginStatusEnterAddress => 'Enter address';
+
+  @override
+  String get routeMapDeviceFixMarker => 'Your current position';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/L';
   }
