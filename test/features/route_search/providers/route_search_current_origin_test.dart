@@ -299,4 +299,41 @@ void main() {
     expect(r1.routeRevision, isNot(r2.routeRevision));
     expect(r1.routeRevision, greaterThan(0));
   });
+
+  test(
+      'a current-location DESTINATION (swapped in) is re-read on refresh; '
+      'the named origin stays put', () async {
+    final container = makeContainer();
+    final notifier = container.read(routeSearchStateProvider.notifier);
+    final capturedAt = clock.now();
+
+    await notifier.searchAlongRoute(
+      waypoints: [
+        RouteWaypoint(lat: c.latitude, lng: c.longitude, label: 'Genève'),
+        RouteWaypoint(
+          lat: a.latitude,
+          lng: a.longitude,
+          label: 'Current location',
+          isVehiclePosition: true,
+        ),
+      ],
+      fuelType: FuelType.e85,
+      searchRadiusKm: 15,
+      originCapturedAt: capturedAt,
+    );
+
+    clock.instant = clock.instant.add(const Duration(minutes: 25));
+    when(() => location.getCurrentPosition())
+        .thenAnswer((_) async => _fix(b, clock.now()));
+    await notifier.refresh();
+
+    final sent = routed.last;
+    expect((sent.first.lat, sent.first.lng), (c.latitude, c.longitude));
+    expect(sent.first.isVehiclePosition, isFalse);
+    expect((sent.last.lat, sent.last.lng), (b.latitude, b.longitude));
+    expect(sent.last.isVehiclePosition, isTrue);
+    final result = container.read(routeSearchStateProvider).requireValue!;
+    expect(result.request!.destinationIsVehiclePosition, isTrue);
+    expect(result.request!.originCapturedAt, clock.now());
+  });
 }

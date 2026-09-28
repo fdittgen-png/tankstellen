@@ -145,4 +145,43 @@ void main() {
       expect(s.isSearching, isFalse);
     });
   });
+
+  group('#4432 — endpoint intent', () {
+    test('swapEndpoints moves coordinate, intent and fix time together', () {
+      final c = makeContainer();
+      final n = c.read(routeInputControllerProvider.notifier);
+      final at = DateTime(2026, 3, 11, 14, 30);
+      n.setStartFromCurrentPosition(const LatLng(45.5, 5.4), at);
+      n.setEndCoords(const LatLng(46.2, 6.1));
+
+      n.swapEndpoints();
+      var s = c.read(routeInputControllerProvider);
+      expect(s.end, RouteEndpoint(
+        coords: const LatLng(45.5, 5.4),
+        intent: EndpointIntent.currentLocation,
+        capturedAt: at,
+      ));
+      expect(s.start, const RouteEndpoint.fixed(LatLng(46.2, 6.1)));
+
+      n.swapEndpoints();
+      s = c.read(routeInputControllerProvider);
+      expect(s.startIsCurrentLocation, isTrue);
+      expect(s.startCapturedAt, at);
+      expect(s.endIsCurrentLocation, isFalse);
+    });
+
+    test('naming a place in either slot clears that slot\'s intent', () {
+      final c = makeContainer();
+      final n = c.read(routeInputControllerProvider.notifier);
+      final at = DateTime(2026, 3, 11, 14, 30);
+      n.setFromCurrentPosition(
+          RouteEndpointSlot.end, const LatLng(45.5, 5.4), at);
+      expect(c.read(routeInputControllerProvider).endIsCurrentLocation,
+          isTrue);
+      n.setEndCoords(const LatLng(46.2, 6.1));
+      final s = c.read(routeInputControllerProvider);
+      expect(s.endIsCurrentLocation, isFalse);
+      expect(s.endCapturedAt, isNull);
+    });
+  });
 }

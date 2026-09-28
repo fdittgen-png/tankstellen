@@ -41,7 +41,9 @@ class RouteSearchRequest {
   final double? segmentKm;
   final double? minSavingPerLiter;
 
-  /// When the origin fix was measured, for a vehicle-position origin.
+  /// When the vehicle-position waypoint's fix was measured — the
+  /// origin's, or the destination's when a current-location endpoint was
+  /// swapped into that slot (#4432).
   final DateTime? originCapturedAt;
 
   /// Whether the start is the driver's own position rather than a place
@@ -49,6 +51,32 @@ class RouteSearchRequest {
   /// now" and "refresh means the same origin, newer prices".
   bool get originIsVehiclePosition =>
       waypoints.isNotEmpty && waypoints.first.isVehiclePosition;
+
+  /// #4432 — the destination is the driver's own position (a
+  /// current-location endpoint swapped into the destination slot); a
+  /// refresh re-reads it just as it re-reads such an origin.
+  bool get destinationIsVehiclePosition =>
+      waypoints.length > 1 && waypoints.last.isVehiclePosition;
+
+  /// The same request with the destination moved to [coords], measured
+  /// at [at]; everything else carried unchanged.
+  RouteSearchRequest withDestination(LatLng coords, DateTime? at) =>
+      RouteSearchRequest(
+        revision: revision,
+        waypoints: [
+          ...waypoints.take(waypoints.length - 1),
+          waypoints.last.copyWith(
+            lat: coords.latitude,
+            lng: coords.longitude,
+          ),
+        ],
+        fuelType: fuelType,
+        searchRadiusKm: searchRadiusKm,
+        strategyType: strategyType,
+        segmentKm: segmentKm,
+        minSavingPerLiter: minSavingPerLiter,
+        originCapturedAt: at,
+      );
 
   /// The same request with the origin moved to [coords], measured at
   /// [at]. Every other endpoint, waypoint and option is carried
