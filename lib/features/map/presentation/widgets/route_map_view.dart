@@ -22,6 +22,13 @@ import '../../../itinerary/providers/itinerary_provider.dart';
 import '../../../route_search/data/cross_border_corridor.dart'
     show fuelForStation;
 import '../../../route_search/domain/entities/route_info.dart';
+import '../../../route_search/api.dart'
+    show
+        RouteLiveProgress,
+        RouteLiveProgressScope,
+        RouteUpdateFromPositionBanner,
+        aheadOfDriver,
+        routeLiveProgressControllerProvider;
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_result_item.dart';
@@ -81,6 +88,13 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
       .map((r) => r.station)
       .toList();
 
+  /// #4432 — the stations still ahead of the driver: markers, counts,
+  /// best stops and the maps launch drop a stop already passed, by the
+  /// same retirement rule as the list.
+  List<Station> _aheadFuelStations(RouteLiveProgress progress) =>
+      aheadOfDriver(widget.routeResult, progress, _allFuelStations,
+          (s) => (lat: s.lat, lng: s.lng));
+
   /// Build the framing bounds from the along-route fuel STATIONS (the search
   /// results) so the camera scope fits what was found (#2782). Falls back to
   /// the full route polyline only when there are no stations (so an empty
@@ -108,7 +122,9 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final result = widget.routeResult;
-    final allFuelStations = _allFuelStations;
+    final progress = ref.watch(routeLiveProgressControllerProvider);
+    final allFuelStations = _aheadFuelStations(progress);
+    final now = ref.watch(appClockProvider).now();
 
     if (allFuelStations.isEmpty && result.route.geometry.isEmpty) {
       return EmptyState(
@@ -141,8 +157,9 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     FuelType resolveFuel(Station s) =>
         fuelForStation(s, result.profileFuelByCountry, fuelType);
 
-    return Column(
+    return RouteLiveProgressScope(child: Column(
       children: [
+        const RouteUpdateFromPositionBanner(),
         RouteViewModeBar(
           allStationsSelected: _viewMode == RouteViewMode.allStations,
           bestStopsSelected: _viewMode == RouteViewMode.bestStops,
@@ -168,12 +185,12 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             // of the along-route STATIONS (#2782/#2755). It is a camera
             // target, not a position, so nothing is drawn there. The
             // route's start and destination are marked from the polyline;
-            // the device marker is the request's accepted current-location
-            // fix, and only while that fix is still current — no fix, no
-            // "you are here" claim.
+            // the device marker is the latest accepted foreground fix, else
+            // the request's current-location fix, and only while that fix
+            // is still current — no fix, no "you are here" claim.
             center: center,
-            originMarker: result.request
-                ?.currentDeviceFix(ref.watch(appClockProvider).now()),
+            originMarker: progress.currentFix(now) ??
+                result.request?.currentDeviceFix(now),
             zoom: zoom,
             searchRadiusKm: 5,
             selectedFuel: widget.selectedFuel as FuelType,
@@ -231,7 +248,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           ),
         ),
       ],
-    );
+    ));
   }
 
   Future<void> _showSaveRouteDialog(
@@ -329,7 +346,8 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
   void _openSelectedInMaps(RouteSearchResult result) {
     final start = result.route.geometry.first;
     final end = result.route.geometry.last;
-    final allStations = _allFuelStations;
+    final allStations =
+        _aheadFuelStations(ref.read(routeLiveProgressControllerProvider));
 
     var selectedStations = _selectedStationIds.isNotEmpty
         ? allStations.where((s) => _selectedStationIds.contains(s.id)).toList()

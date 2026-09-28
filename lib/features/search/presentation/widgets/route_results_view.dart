@@ -20,6 +20,12 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../route_search/data/cross_border_corridor.dart'
     show fuelForStation;
+import '../../../route_search/api.dart'
+    show
+        RouteLiveProgressScope,
+        RouteUpdateFromPositionBanner,
+        aheadOfDriver,
+        routeLiveProgressControllerProvider;
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_result_item.dart';
@@ -56,8 +62,11 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     final l10n = AppLocalizations.of(context);
     final fuelType = ref.watch(selectedFuelTypeProvider);
     final routeState = ref.watch(routeSearchStateProvider);
+    // #4432 — foreground progress along a current-location route: the
+    // scope owns the listener's lifetime (paused while hidden).
+    final progress = ref.watch(routeLiveProgressControllerProvider);
 
-    return routeState.when(
+    return RouteLiveProgressScope(child: routeState.when(
       data: (result) {
         if (result == null) {
           return SliverFillRemaining(
@@ -86,9 +95,14 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         }
 
         final ignoredIds = ref.watch(ignoredStationsProvider);
-        final visibleStations = result.stations
-            .where((s) => !ignoredIds.contains(s.id))
-            .toList();
+        // #4432 — a stop the driver has already passed leaves the list,
+        // the counts and the best stops, by the same retirement rule.
+        final visibleStations = aheadOfDriver(
+          result,
+          progress,
+          result.stations.where((s) => !ignoredIds.contains(s.id)).toList(),
+          (s) => (lat: s.lat, lng: s.lng),
+        );
 
         // Sort stations by position along the route (drive order).
         // #4072 — O(n · P) haversine per station; memoised on the result
@@ -126,11 +140,17 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               if (index == 0) {
-                return RouteResultsHeader(
-                  result: result,
-                  shownCount: displayItems.length,
-                  mode: _resultMode,
-                  onModeChanged: (m) => setState(() => _resultMode = m),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const RouteUpdateFromPositionBanner(),
+                    RouteResultsHeader(
+                      result: result,
+                      shownCount: displayItems.length,
+                      mode: _resultMode,
+                      onModeChanged: (m) => setState(() => _resultMode = m),
+                    ),
+                  ],
                 );
               }
               final item = displayItems[index - 1];
@@ -156,7 +176,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           onRetry: () => ref.read(routeSearchStateProvider.notifier).clear(),
         ),
       ),
-    );
+    ));
   }
 
   /// A single station card wrapped in a Dismissible for swipe actions.

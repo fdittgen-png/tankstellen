@@ -9287,6 +9287,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde.';
 
   @override
+  String get routeLeftRouteNotice =>
+      'Sie haben diese Route offenbar verlassen – ihre Stopps liegen womöglich nicht mehr vor Ihnen.';
+
+  @override
+  String get routeUpdateFromPosition => 'Route ab Ihrer Position aktualisieren';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/l';
   }

@@ -11104,5 +11104,15 @@
   "@currencyBackfillUndo": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "routeLeftRouteNotice": "You seem to have left this route — its stops may no longer be ahead of you.",
+  "@routeLeftRouteNotice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeUpdateFromPosition": "Update route from your position",
+  "@routeUpdateFromPosition": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }
