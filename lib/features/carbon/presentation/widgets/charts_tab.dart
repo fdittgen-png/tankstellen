@@ -4,7 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/domain/money_tally.dart';
 import '../../../../core/services/co2_calculator.dart';
+import '../../../../core/utils/comparison_labels.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -24,14 +26,21 @@ import '../../../../core/utils/unit_formatter.dart';
 /// file under the 300-LOC target (Refs #563).
 class ChartsTab extends ConsumerWidget {
   final List<MonthlySummary> summaries;
-  final double totalCost;
+
+  /// Null when the history spans several currencies (#4437 E).
+  final double? totalCost;
   final double totalCo2;
+
+  /// The per-fill spend [totalCost] came from — names the currency and,
+  /// when there is no single total, says why (#4437 / #4406).
+  final MoneyTally spend;
 
   const ChartsTab({
     super.key,
     required this.summaries,
     required this.totalCost,
     required this.totalCo2,
+    this.spend = MoneyTally.empty,
   });
 
   @override
@@ -73,7 +82,7 @@ class ChartsTab extends ConsumerWidget {
         bottom: 16 + MediaQuery.of(context).viewPadding.bottom,
       ),
       children: [
-        _SummaryRow(totalCost: totalCost, totalCo2: totalCo2),
+        _SummaryRow(totalCost: totalCost, totalCo2: totalCo2, spend: spend),
         const SizedBox(height: 8),
         if (!breakdown.isEmpty)
           TripLengthBreakdownCard(
@@ -94,10 +103,15 @@ class ChartsTab extends ConsumerWidget {
             title: l.monthlyCostsTitle,
             child: MonthlyBarChart(
               key: const Key('monthly_cost_chart'),
-              summaries: summaries,
-              valueOf: (s) => s.totalCost,
+              // #4437 — a month with no single cost is left out, never
+              // plotted as zero or as a cross-currency sum.
+              summaries: [
+                for (final s in summaries)
+                  if (s.totalCost != null) s,
+              ],
+              valueOf: (s) => s.totalCost!,
               color: theme.colorScheme.primary,
-              unitLabel: PriceFormatter.currency,
+              unitLabel: _symbolOf(spend),
             ),
           ),
         ),
@@ -163,11 +177,25 @@ List<TripHistoryEntry> _filterTrips(
       .toList(growable: false);
 }
 
-class _SummaryRow extends StatelessWidget {
-  final double totalCost;
-  final double totalCo2;
+/// The symbol [spend]'s single denomination is shown with — the active
+/// one for an all-unknown (legacy) or mixed history.
+String _symbolOf(MoneyTally spend) {
+  final code = spend.soleCurrency;
+  return (code == null || code == kUnknownCurrency)
+      ? PriceFormatter.currency
+      : PriceFormatter.symbolForCurrency(code);
+}
 
-  const _SummaryRow({required this.totalCost, required this.totalCo2});
+class _SummaryRow extends StatelessWidget {
+  final double? totalCost;
+  final double totalCo2;
+  final MoneyTally spend;
+
+  const _SummaryRow({
+    required this.totalCost,
+    required this.totalCo2,
+    required this.spend,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -188,9 +216,23 @@ class _SummaryRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${UnitFormatter.formatDecimal(totalCost, fractionDigits: 0)} ${PriceFormatter.currency}',
+                    totalCost == null
+                        ? '—'
+                        : '${UnitFormatter.formatDecimal(totalCost, fractionDigits: 0)} ${_symbolOf(spend)}',
                     style: theme.textTheme.titleLarge,
                   ),
+                  // #4406 — a withheld total says why, in one line.
+                  if (totalCost == null &&
+                      spendWithheldLabel(l, spend) != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      spendWithheldLabel(l, spend)!,
+                      key: const Key('carbon_spend_withheld'),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

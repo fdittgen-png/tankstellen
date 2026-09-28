@@ -25,6 +25,7 @@
 ///    far recorded estimates still sit from the pump.
 library;
 
+import '../../../../core/domain/money_tally.dart';
 import '../../../../core/domain/pump_gain_resolution.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../entities/fill_up.dart';
@@ -71,6 +72,7 @@ class TankPeriod {
     required this.distanceKm,
     required this.liters,
     required this.pumpedCost,
+    this.pumpedSpend = MoneyTally.empty,
   }) : assert(distanceKm > 0, 'a tank window needs a positive distance'),
        assert(liters >= 0, 'a tank window cannot consume negative litres');
 
@@ -90,7 +92,16 @@ class TankPeriod {
   final double liters;
 
   /// Σ pumped cost over the same fills (corrections carry cost 0).
+  ///
+  /// A bare sum that knows no currency — kept for the arithmetic that
+  /// predates #4437. Anything SHOWN as money reads [pumpedSpend].
   final double pumpedCost;
+
+  /// The same spend segregated by denomination (#4437): a window that
+  /// straddles a foreign fill has no single cost to print, and a settled
+  /// foreign fill counts as what the card statement charged. Empty on a
+  /// period built by hand (tests), where [pumpedCost] is all there is.
+  final MoneyTally pumpedSpend;
 
   /// The tank's true pump consumption.
   double get lPer100Km => liters / distanceKm * 100.0;
@@ -178,9 +189,14 @@ List<TankPeriod> closedTankPeriods(List<FillUp> fillUps) {
   final periods = <TankPeriod>[];
   FillUp opening = sorted.first;
   var liters = 0.0, cost = 0.0;
+  var spend = MoneyTally.empty;
   for (final f in sorted.skip(1)) {
     liters += f.liters;
     if (!f.isCorrection) cost += f.totalCost;
+    if (!f.isCorrection && f.totalCost > 0) {
+      final (amount, currency) = f.bookedSpend;
+      spend = spend.plus(amount, currency);
+    }
     if (f.isFullTank && !f.isCorrection) {
       final distance = f.odometerKm - opening.odometerKm;
       if (distance > 0) {
@@ -190,6 +206,7 @@ List<TankPeriod> closedTankPeriods(List<FillUp> fillUps) {
           distanceKm: distance,
           liters: liters,
           pumpedCost: cost,
+          pumpedSpend: spend,
         );
         if (_plausiblePeriod(distance, period.lPer100Km)) {
           periods.add(period);
@@ -198,6 +215,7 @@ List<TankPeriod> closedTankPeriods(List<FillUp> fillUps) {
       opening = f;
       liters = 0.0;
       cost = 0.0;
+      spend = MoneyTally.empty;
     }
   }
   return periods;

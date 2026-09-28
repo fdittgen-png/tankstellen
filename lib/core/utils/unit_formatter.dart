@@ -98,14 +98,24 @@ class UnitFormatter {
   /// [fuelType] selects a per-fuel suffix override when the country
   /// defines one (#3198 — AR GNC is priced per m³, not per litre); when
   /// omitted the country-wide suffix applies.
+  ///
+  /// [currencyCode] (#4437) renders a price RECORDED in another currency
+  /// than the country's — a CHF fill under an EUR profile reads
+  /// `2,020 CHF/L`, never `2,020 €/L`. The quantity half of the suffix
+  /// (`L`, AR GNC's `m³`) still comes from the country + fuel rule. A
+  /// currency some registered country uses takes that country's own
+  /// convention (GBP → `p/L`); any other gets
+  /// `PriceFormatter.symbolForCurrency` + the quantity. Null, or the
+  /// country's own currency, changes nothing.
   static String formatPricePerUnit(
     double? price, {
     String? countryCode,
     FuelType? fuelType,
+    String? currencyCode,
   }) {
     if (price == null || price <= 0) return '--';
     final cfg = _resolve(countryCode);
-    final suffix = cfg.pricePerUnitSuffixFor(fuelType);
+    final suffix = _suffixFor(cfg, fuelType, currencyCode);
     // Sub-unit suffixes (pence, cents) render the price * 100 with
     // a single decimal — matches the UK forecourt "155.9 p/L" and
     // the AU "185.9 c/L" conventions.
@@ -115,6 +125,34 @@ class UnitFormatter {
     }
     // Primary-unit suffixes keep 3 decimals for fuel price precision.
     return '${_threeDecimals(price)} $suffix';
+  }
+
+  /// The per-unit suffix for [cfg] + [fuelType], re-denominated in
+  /// [currencyCode] when that is not [cfg]'s own currency (#4437).
+  static String _suffixFor(
+    CountryConfig cfg,
+    FuelType? fuelType,
+    String? currencyCode,
+  ) {
+    final own = cfg.pricePerUnitSuffixFor(fuelType);
+    final code = currencyCode?.trim().toUpperCase();
+    if (code == null || code.isEmpty || code == cfg.currency) return own;
+    final quantity = own.contains('/') ? own.split('/').last : own;
+    CountryConfig? home;
+    for (final c in Countries.all) {
+      if (c.currency == code) {
+        home = c;
+        break;
+      }
+    }
+    // Keep a home country's SUB-UNIT convention (GBP forecourts quote
+    // pence); a primary-unit symbol is taken from the unambiguous table
+    // instead, because a foreign `kr` or `$` reads as the home currency.
+    final homeMoney = home?.pricePerUnitSuffixFor(fuelType).split('/').first;
+    final money = (homeMoney == 'p' || homeMoney == 'c')
+        ? homeMoney!
+        : PriceFormatter.symbolForCurrency(code);
+    return '$money/$quantity';
   }
 
   /// Short-form price-per-unit without value — returns just the

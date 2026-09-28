@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/domain/money_tally.dart';
 import '../../../../core/theme/app_text.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
@@ -11,6 +12,7 @@ import '../../../../core/widgets/panel_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/services/fill_up_monthly_stats_aggregator.dart';
 import 'monthly_insights_table.dart';
+import 'spend_withheld_notice.dart';
 
 /// "This month vs last month" panel for the consumption-statistics page
 /// (#2698). Since #3950 it renders the SAME [MonthlyMetricsTable] as the
@@ -40,6 +42,13 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
     final hasComparison = months.length >= 2;
     final current = months.isNotEmpty ? months.last.stats : null;
     final previous = hasComparison ? months[months.length - 2].stats : null;
+    // #4437 — money is compared only within ONE currency: a CHF month
+    // against a EUR month is no trend, so its previous figure (and the
+    // arrow) is withheld on every money row.
+    final code = current?.spendCurrency;
+    final sameMoney = previous != null && previous.spendCurrency == code;
+    String money(double? v) => PriceFormatter.formatTotalIn(
+        v, code == kUnknownCurrency ? null : code);
 
     final metrics = <MonthlyMetric>[
       _metric(
@@ -55,8 +64,8 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
         l,
         label: l.statTotalSpent,
         current: current?.totalSpent,
-        previous: previous?.totalSpent,
-        format: PriceFormatter.formatTotal,
+        previous: sameMoney ? previous.totalSpent : null,
+        format: money,
         sentiment: MonthlyMetricSentiment.neutral,
         showPrevious: hasComparison,
       ),
@@ -64,7 +73,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
         l,
         label: l.consumptionStatsPricePerLiter,
         current: current?.avgPricePerLiter,
-        previous: previous?.avgPricePerLiter,
+        previous: sameMoney ? previous.avgPricePerLiter : null,
         format: PriceFormatter.formatPriceCompact,
         sentiment: MonthlyMetricSentiment.lowerIsBetter,
         showPrevious: hasComparison,
@@ -82,7 +91,7 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
         l,
         label: l.statAvgCostPerKm,
         current: current?.avgCostPerKm,
-        previous: previous?.avgCostPerKm,
+        previous: sameMoney ? previous.avgCostPerKm : null,
         format: PriceFormatter.formatPerKm,
         sentiment: MonthlyMetricSentiment.lowerIsBetter,
         showPrevious: hasComparison,
@@ -118,6 +127,11 @@ class MonthlyFuelComparisonCard extends StatelessWidget {
             ),
           ],
           const SizedBox(height: Spacing.md),
+          // #4406 — this month's spend is withheld: say why in one line.
+          if (current != null && current.totalSpent == null) ...[
+            SpendWithheldNotice(stats: current),
+            const SizedBox(height: Spacing.sm),
+          ],
           MonthlyMetricsTable(
             metrics: metrics,
             showPreviousColumn: hasComparison,

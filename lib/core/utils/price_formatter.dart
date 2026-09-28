@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../country/country_config.dart';
+import '../domain/money.dart';
+import '../domain/money_tally.dart';
 import 'unit_formatter.dart';
 
 class PriceFormatter {
@@ -130,6 +132,84 @@ class PriceFormatter {
     // own symbol to avoid a doubled separator ("1,05  €").
     final number = _totalFormat.format(amount).trim();
     return '$number $cur';
+  }
+
+  /// Symbols that name exactly one currency (#4437). `$` names four in
+  /// this app's own country table and `kr` three in Europe, so those
+  /// currencies render by ISO code once they are not the active one.
+  static const Map<String, String> _unambiguousSymbols = {
+    'EUR': '€',
+    'GBP': '£',
+    'KRW': '₩',
+  };
+
+  /// The display symbol for an ISO 4217 [currencyCode], independent of
+  /// the country table (#4437).
+  ///
+  /// The active currency keeps the profile's own symbol (a DKK profile
+  /// still reads `kr`), so a home record renders exactly as before. Any
+  /// OTHER currency gets its symbol only when that symbol is unambiguous
+  /// (`€`, `£`, `₩`); everything else is shown by its code (`CHF`,
+  /// `DKK`, `SEK`) — a foreign `kr` or `$` beside a home figure would be
+  /// read as the home currency.
+  static String symbolForCurrency(String currencyCode) {
+    final code = currencyCode.trim().toUpperCase();
+    if (code == _currencyCode) return currency;
+    return _unambiguousSymbols[code] ?? code;
+  }
+
+  /// [formatTotal] in the currency the amount was actually recorded in
+  /// (#4437) — symbol from [symbolForCurrency], decimals from the code
+  /// (a HUF record under an EUR profile is still whole forints).
+  ///
+  /// A null or empty [currencyCode] — a record whose currency was never
+  /// captured — keeps the pre-#4437 rendering in the active currency so
+  /// an unstamped legacy history looks exactly as it always did.
+  static String formatTotalIn(double? amount, String? currencyCode) {
+    final code = currencyCode?.trim().toUpperCase();
+    if (code == null || code.isEmpty || code == _currencyCode) {
+      return formatTotal(amount);
+    }
+    if (amount == null) return '--';
+    final number = NumberFormat.currency(
+      locale: _locale,
+      symbol: '',
+      decimalDigits: _zeroDecimalCurrencies.contains(code) ? 0 : 2,
+    ).format(amount).trim();
+    return '$number ${symbolForCurrency(code)}';
+  }
+
+  /// A [MoneyTally]'s single total in its own denomination (#4437), or
+  /// null when the tally is MIXED — there is no one number to print, and
+  /// the caller says why instead of summing across currencies (#4364).
+  ///
+  /// An empty tally prints zero in the active currency; an all-unknown
+  /// one keeps the active symbol exactly as a pre-#4136 history always
+  /// rendered.
+  static String? formatTallyTotal(MoneyTally tally) {
+    final amount = tally.soleAmount;
+    if (amount == null) return null;
+    final code = tally.soleCurrency;
+    return formatTotalIn(amount, code == kUnknownCurrency ? null : code);
+  }
+
+  /// A directed rate as `1 CHF = 1,0655 €` (#4437) — base on the left,
+  /// four decimals in the active locale, symbols from
+  /// [symbolForCurrency]. Language-neutral: the words around it
+  /// ("converted at …, card settlement") come from the ARB.
+  static String formatRate(ExchangeRate rate) {
+    final figure = NumberFormat('0.0000', _locale).format(rate.rate);
+    return '1 ${symbolForCurrency(rate.baseCurrency)} = $figure '
+        '${symbolForCurrency(rate.quoteCurrency)}';
+  }
+
+  /// [formatPrice] (three decimals, per-litre) in [currencyCode]'s
+  /// symbol (#4437). Null/empty keeps the active symbol, like
+  /// [formatTotalIn].
+  static String formatPriceIn(double? price, String? currencyCode) {
+    final code = currencyCode?.trim();
+    if (code == null || code.isEmpty) return formatPrice(price);
+    return formatPrice(price, currencyOverride: symbolForCurrency(code));
   }
 
   /// Format a cost-per-distance value (e.g. €/km) at three decimals,

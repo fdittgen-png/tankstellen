@@ -26,7 +26,7 @@ MonthlySummary _summary({
 );
 
 double _co2(MonthlySummary s) => s.totalCo2Kg;
-double _cost(MonthlySummary s) => s.totalCost;
+double _cost(MonthlySummary s) => s.totalCost!;
 
 /// The chart paints its labels directly onto the canvas (no Text widgets),
 /// so structural assertions stick to the [CustomPaint] widget itself and

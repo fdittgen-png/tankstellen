@@ -232,6 +232,26 @@ void main() {
     });
   });
 
+  group('#4406 — saveMany (the bulk currency statement write)', () {
+    test('replaces existing records by id and never creates one', () async {
+      await storage.putSetting(StorageKeys.consumptionLog, [
+        _make(id: 'a').toJson()..remove('currency'),
+        _make(id: 'b', date: DateTime(2026, 2, 1)).toJson()
+          ..remove('currency'),
+      ]);
+      final a = repo.getAll().singleWhere((f) => f.id == 'a');
+      await repo.saveMany([
+        a.copyWith(currency: 'EUR'),
+        _make(id: 'ghost').copyWith(currency: 'EUR'),
+      ]);
+      final all = repo.getAll();
+      expect(all.map((f) => f.id), unorderedEquals(['a', 'b']));
+      expect(all.singleWhere((f) => f.id == 'a').currency, 'EUR');
+      // Not in the batch: untouched, and NOT stamped with today's.
+      expect(all.singleWhere((f) => f.id == 'b').currency, isNull);
+    });
+  });
+
   test('getAll tolerates malformed raw entries without crashing', () async {
     // Simulate a previous corrupted store
     await storage.putSetting(StorageKeys.consumptionLog, [

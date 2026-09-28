@@ -300,7 +300,7 @@ class FuelTypeEfficiencyAggregator {
       pricedLitres += f.liters;
       intervalFills += 1;
       if (f.totalCost > 0) {
-        recorded.add((f.totalCost, f.currency));
+        recorded.add(f.bookedSpend); // #4437
       } else {
         unpriced += 1;
       }

@@ -1,0 +1,13 @@
+{
+  "currencyBackfillAction": "Währung festlegen",
+  "currencyBackfillTitle": "Währung älterer Betankungen",
+  "currencyBackfillIntro": "Geben Sie an, in welcher Währung Ihre Betankungen ohne Währung bezahlt wurden. Nur diese Angabe ändert sich — Liter, Strecken und Beträge bleiben wie erfasst — und Sie können es rückgängig machen.",
+  "currencyBackfillOnOrBefore": "Betankungen bis einschließlich {date}",
+  "currencyBackfillCurrencyLabel": "Sie wurden alle bezahlt in",
+  "currencyBackfillPreview": "{count, plural, =0{Keine Betankung ohne Währung in diesem Zeitraum.} =1{1 Betankung wird als {currency} gekennzeichnet.} other{{count} Betankungen werden als {currency} gekennzeichnet.}}",
+  "currencyBackfillRemaining": "{count, plural, =0{Danach hat jede Betankung eine Währung.} =1{Danach hat 1 Betankung weiterhin keine.} other{Danach haben {count} Betankungen weiterhin keine.}}",
+  "currencyBackfillApply": "Übernehmen",
+  "currencyBackfillDone": "{count, plural, =1{1 Betankung als {currency} gekennzeichnet.} other{{count} Betankungen als {currency} gekennzeichnet.}}",
+  "currencyBackfillStatedSummary": "{count, plural, =1{1 Betankung trägt eine von Ihnen angegebene Währung.} other{{count} Betankungen tragen eine von Ihnen angegebene Währung.}}",
+  "currencyBackfillUndo": "Währungsangaben zurücknehmen"
+}

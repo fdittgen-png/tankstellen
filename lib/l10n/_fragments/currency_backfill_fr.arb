@@ -1,0 +1,13 @@
+{
+  "currencyBackfillAction": "Indiquer leur devise",
+  "currencyBackfillTitle": "Devise des anciens pleins",
+  "currencyBackfillIntro": "Indiquez dans quelle devise vos pleins sans devise ont été payés. Seule cette indication change — litres, distances et montants restent tels qu'enregistrés — et vous pouvez l'annuler.",
+  "currencyBackfillOnOrBefore": "Pleins jusqu'au {date} inclus",
+  "currencyBackfillCurrencyLabel": "Ils ont tous été payés en",
+  "currencyBackfillPreview": "{count, plural, =0{Aucun plein sans devise sur cette période.} =1{1 plein sera marqué {currency}.} other{{count} pleins seront marqués {currency}.}}",
+  "currencyBackfillRemaining": "{count, plural, =0{Ensuite, chaque plein a une devise.} =1{Ensuite, 1 plein n'en a toujours pas.} other{Ensuite, {count} pleins n'en ont toujours pas.}}",
+  "currencyBackfillApply": "Appliquer",
+  "currencyBackfillDone": "{count, plural, =1{1 plein marqué {currency}.} other{{count} pleins marqués {currency}.}}",
+  "currencyBackfillStatedSummary": "{count, plural, =1{1 plein porte une devise que vous avez indiquée.} other{{count} pleins portent une devise que vous avez indiquée.}}",
+  "currencyBackfillUndo": "Annuler les devises indiquées"
+}

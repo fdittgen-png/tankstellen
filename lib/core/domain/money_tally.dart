@@ -232,9 +232,15 @@ enum MoneyValuationRule {
   /// NOT a claim about what each purchase cost on its own day.
   reportDateRate,
 
-  /// Each amount at the rate of its own transaction date. Not yet
-  /// available: the app adopts no paid FX history service, so a policy
-  /// naming this must be refused rather than approximated.
+  /// Each amount at the rate of its own transaction date. The app adopts
+  /// no paid FX history service, so a policy naming this for arbitrary
+  /// history must be refused rather than approximated.
+  ///
+  /// #4437 — it IS available for one kind of record: a foreign fill-up
+  /// the driver settled from their card statement. The issuer already
+  /// converted it; the record carries the amount charged, and spend
+  /// aggregates book that amount directly (`FillUpSettlementX
+  /// .bookedSpend`) rather than through a snapshot conversion.
   transactionDateRate,
 }
 

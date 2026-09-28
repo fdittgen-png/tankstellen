@@ -7341,6 +7341,72 @@ abstract class AppLocalizations {
   /// **'Dismiss'**
   String get crossBorderDismissTooltip;
 
+  /// Action under a withheld spend total: open the bulk statement of the currency of fill-ups that have none (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Set their currency'**
+  String get currencyBackfillAction;
+
+  /// Title of the bulk currency statement dialog (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Currency of older fill-ups'**
+  String get currencyBackfillTitle;
+
+  /// Explainer of the bulk currency statement: an explicit user statement, label-only, reversible (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Say which currency your fill-ups without one were paid in. Only that label changes — litres, distances and amounts stay as recorded — and you can undo it.'**
+  String get currencyBackfillIntro;
+
+  /// Cut-off row of the bulk currency statement; tapping it picks the date (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Fill-ups on or before {date}'**
+  String currencyBackfillOnOrBefore(String date);
+
+  /// Label of the currency picker of the bulk statement. No currency is preselected (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'They were all paid in'**
+  String get currencyBackfillCurrencyLabel;
+
+  /// Preview of how many records the bulk statement will label (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No fill-up without a currency in this range.} =1{1 fill-up will be labelled {currency}.} other{{count} fill-ups will be labelled {currency}.}}'**
+  String currencyBackfillPreview(int count, String currency);
+
+  /// How many priced fill-ups stay without a currency after the statement — never guessed (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Afterwards every fill-up has a currency.} =1{Afterwards 1 fill-up still has none.} other{Afterwards {count} fill-ups still have none.}}'**
+  String currencyBackfillRemaining(int count);
+
+  /// Confirm button of the bulk currency statement (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get currencyBackfillApply;
+
+  /// Snackbar after the bulk statement, with an Undo action (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill-up labelled {currency}.} other{{count} fill-ups labelled {currency}.}}'**
+  String currencyBackfillDone(int count, String currency);
+
+  /// Line on the statistics page while bulk-stated currencies exist, next to the undo button (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fill-up carries a currency you stated.} other{{count} fill-ups carry a currency you stated.}}'**
+  String currencyBackfillStatedSummary(int count);
+
+  /// Button that returns every bulk-labelled fill-up to 'no currency' (#4406).
+  ///
+  /// In en, this message translates to:
+  /// **'Undo currency labels'**
+  String get currencyBackfillUndo;
+
   /// Accessibility label and tooltip for the tappable country-service header on the search screen, which opens the active country's upstream fuel-price data source in the browser (#2373). Relocates the open-data attribution from the old bottom footer into the link, so the provider name and licence stay available to screen-reader and long-press users (CC BY / Licence Ouverte / OGL / IODL all mandate visible attribution). {source} and {license} are data — proper-noun provider + licence names rendered verbatim from the country's FuelServicePolicy.
   ///
   /// In en, this message translates to:
@@ -9475,6 +9541,113 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Submission failed — manual share'**
   String get badScanReportFallbackToShare;
+
+  /// Title of the sheet that attaches a card-settlement amount to a fill-up paid in a foreign currency (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'What your card charged'**
+  String get settleFillUpTitle;
+
+  /// Intro line of the settle sheet: the record's own currency and the profile currency the settled amount is in (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'Paid in {currency}. Add what your card statement charged to count this fill-up in {profileCurrency}.'**
+  String settleFillUpIntro(String currency, String profileCurrency);
+
+  /// Intro line of the settle sheet for a legacy fill-up with no recorded currency (#4437 / #4406). The user must pick the currency explicitly.
+  ///
+  /// In en, this message translates to:
+  /// **'No currency was recorded for this fill-up. Say which one you paid in — nothing is assumed.'**
+  String get settleFillUpCurrencyUnknownIntro;
+
+  /// Label of the currency picker on the settle sheet (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'Currency paid in'**
+  String get settleFillUpCurrencyLabel;
+
+  /// Segment: enter the amount from the card statement (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'Amount charged'**
+  String get settleFillUpModeAmount;
+
+  /// Segment: type an exchange rate by hand instead (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange rate'**
+  String get settleFillUpModeRate;
+
+  /// Label of the settled-amount field; the placeholder is the profile currency code (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'Charged in {currency}'**
+  String settleFillUpAmountLabel(String currency);
+
+  /// Helper text of the settled-amount field (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'As printed on your card statement'**
+  String get settleFillUpAmountHint;
+
+  /// Label of the hand-entered rate field, e.g. 'EUR for 1 CHF' (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'{quote} for 1 {base}'**
+  String settleFillUpRateLabel(String base, String quote);
+
+  /// Helper text of the hand-entered rate field (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'Your own rate — it stays labelled as entered by hand'**
+  String get settleFillUpRateHint;
+
+  /// Button that removes a previously entered settlement from a fill-up (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'Remove settlement'**
+  String get settleFillUpRemove;
+
+  /// Provenance label of a rate derived from the card-statement amount (#4437). Lower case: it sits mid-sentence.
+  ///
+  /// In en, this message translates to:
+  /// **'card settlement'**
+  String get fillUpRateSourceCardSettlement;
+
+  /// Provenance label of a rate the user typed in (#4437). Lower case: it sits mid-sentence.
+  ///
+  /// In en, this message translates to:
+  /// **'entered by hand'**
+  String get fillUpRateSourceEnteredByHand;
+
+  /// Provenance line under a settled foreign fill-up: the entered amount, the implied rate, its source and the transaction date (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} · converted at {rate}, {source}, {date}'**
+  String fillUpSettledLine(
+    String amount,
+    String rate,
+    String source,
+    String date,
+  );
+
+  /// Hint under an unsettled foreign-currency fill-up card (#4437).
+  ///
+  /// In en, this message translates to:
+  /// **'Paid in {currency} — tap to add what your card charged'**
+  String fillUpSettleHint(String currency);
+
+  /// Why a spend total shows a dash: the history spans several currencies (#4437 F / #4406).
+  ///
+  /// In en, this message translates to:
+  /// **'No single total: fill-ups were paid in {currencies}. Add what your card charged to count them together.'**
+  String spendWithheldMixedCurrencies(String currencies);
+
+  /// Why a spend total shows a dash: some fill-ups carry no currency (#4437 F / #4406).
+  ///
+  /// In en, this message translates to:
+  /// **'No single total: {count, plural, =1{1 fill-up has} other{{count} fill-ups have}} no recorded currency.'**
+  String spendWithheldUnknownCurrency(int count);
 
   /// Title of the confirmation dialog shown on save when a fill-up has data-quality warnings (wrong fuel for the engine, or an odometer below the previous reading) before persisting (#2836).
   ///

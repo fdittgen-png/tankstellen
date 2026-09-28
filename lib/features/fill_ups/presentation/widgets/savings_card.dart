@@ -10,6 +10,7 @@ import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/services/savings_ledger.dart';
 import '../../providers/savings_provider.dart';
 
 /// What this driver saved against their own normal price (#4136).
@@ -60,7 +61,10 @@ class SavingsCard extends ConsumerWidget {
           if (ledger.total case final total?)
             Text(
               l10n.savingsNet(
-                PriceFormatter.formatPrice(total),
+                // #4437 — a money TOTAL in the ledger's own currency (the
+                // per-litre formatter printed `--` for a net loss and the
+                // profile's symbol on a foreign history).
+                PriceFormatter.formatTotalIn(total, _soleCode(ledger)),
                 ledger.entries.length,
               ),
               style: AppText.unit(context).copyWith(
@@ -76,7 +80,11 @@ class SavingsCard extends ConsumerWidget {
           else
             for (final e in ledger.totalsByCurrency.entries)
               Text(
-                '${e.key} ${PriceFormatter.formatPrice(e.value)}',
+                // #4437 — was `'${e.key} ${formatPrice(v)}'`, which
+                // rendered `DKK 12,300 €`: the code, then the profile's
+                // symbol on the same figure. Now the figure in its own
+                // currency (`12,30 DKK`); the unknown bucket keeps `?`.
+                PriceFormatter.formatTotalIn(e.value, e.key),
                 style: AppText.unit(context).copyWith(
                   fontWeight: FontWeight.w700,
                   color: e.value >= 0
@@ -99,4 +107,11 @@ class SavingsCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// The ledger's one ISO code, or null for an all-unknown history (which
+/// keeps the active symbol exactly as before #4437).
+String? _soleCode(SavingsLedger ledger) {
+  final code = ledger.tally.soleCurrency;
+  return code == kUnknownCurrency ? null : code;
 }

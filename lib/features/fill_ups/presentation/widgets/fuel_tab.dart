@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/storage/storage_keys.dart';
@@ -22,6 +23,7 @@ import '../../domain/entities/fill_up.dart';
 import '../../providers/consumption_providers.dart';
 import 'consumption_stats_card.dart';
 import 'savings_card.dart';
+import 'settle_fill_up_sheet.dart';
 import 'edit_correction_fill_up_sheet.dart';
 import 'fill_inventory_card.dart';
 import 'fill_up_card.dart';
@@ -124,9 +126,13 @@ class FuelTab extends ConsumerWidget {
           fillUp: fillUp,
           ecoScore: ref.watch(ecoScoreForFillUpProvider(fillUp.id)),
           rawLPer100Km: ref.watch(litersPer100KmForFillUpProvider(fillUp.id)),
+          // #4437 C — a record in a foreign currency (or in none) opens
+          // the settle sheet; a home-currency record stays inert.
           onTap: fillUp.isCorrection
               ? () => _openCorrectionEditor(context, fillUp)
-              : null,
+              : (needsSettlementSurface(fillUp)
+                  ? () => _openSettleSheet(context, fillUp)
+                  : null),
         ),
       );
     }
@@ -174,6 +180,17 @@ class FuelTab extends ConsumerWidget {
     );
   }
 
+  void _openSettleSheet(BuildContext context, FillUp fillUp) {
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (_) => SettleFillUpSheet(fillUp: fillUp),
+      ),
+    );
+  }
+
   void _openCorrectionEditor(BuildContext context, FillUp fillUp) {
     unawaited(
       showModalBottomSheet<void>(
@@ -184,4 +201,13 @@ class FuelTab extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Whether [fillUp]'s card opens the settle sheet (#4437 C): a real
+/// fill whose recorded currency is not the profile's — foreign, or never
+/// recorded at all.
+bool needsSettlementSurface(FillUp fillUp) {
+  if (fillUp.isCorrection) return false;
+  final code = fillUp.currency?.trim().toUpperCase();
+  return code == null || code.isEmpty || code != PriceFormatter.currencyCode;
 }

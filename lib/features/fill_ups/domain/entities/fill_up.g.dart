@@ -19,6 +19,15 @@ _FillUp _$FillUpFromJson(Map<String, dynamic> json) => _FillUp(
   stationName: json['stationName'] as String?,
   notes: json['notes'] as String?,
   currency: json['currency'] as String?,
+  settledAmount: (json['settledAmount'] as num?)?.toDouble(),
+  settledCurrency: json['settledCurrency'] as String?,
+  rateSource: json['rateSource'] as String?,
+  rateCapturedAt: json['rateCapturedAt'] == null
+      ? null
+      : DateTime.parse(json['rateCapturedAt'] as String),
+  currencyStatedAt: json['currencyStatedAt'] == null
+      ? null
+      : DateTime.parse(json['currencyStatedAt'] as String),
   vehicleId: json['vehicleId'] as String?,
   linkedTripIds:
       (json['linkedTripIds'] as List<dynamic>?)
@@ -49,6 +58,11 @@ Map<String, dynamic> _$FillUpToJson(_FillUp instance) => <String, dynamic>{
   'stationName': instance.stationName,
   'notes': instance.notes,
   'currency': instance.currency,
+  'settledAmount': instance.settledAmount,
+  'settledCurrency': instance.settledCurrency,
+  'rateSource': instance.rateSource,
+  'rateCapturedAt': instance.rateCapturedAt?.toIso8601String(),
+  'currencyStatedAt': instance.currencyStatedAt?.toIso8601String(),
   'vehicleId': instance.vehicleId,
   'linkedTripIds': instance.linkedTripIds,
   'isFullTank': instance.isFullTank,

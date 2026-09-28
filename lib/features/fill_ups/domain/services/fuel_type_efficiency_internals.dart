@@ -68,7 +68,8 @@ FuelPriceTable weightedPricePerLitre(List<FillUp> sorted) {
       continue;
     }
     if (f.liters <= 0) continue;
-    spend = spend.plus(f.totalCost, f.currency);
+    final (amount, currency) = f.bookedSpend; // #4437
+    spend = spend.plus(amount, currency);
   }
   if (!spend.isSingleDenomination) {
     return FuelPriceTable(
@@ -81,7 +82,8 @@ FuelPriceTable weightedPricePerLitre(List<FillUp> sorted) {
     if (f.liters <= 0 || f.totalCost <= 0) continue;
     final key = f.fuelType.apiValue;
     litres.update(key, (v) => v + f.liters, ifAbsent: () => f.liters);
-    cost.update(key, (v) => v + f.totalCost, ifAbsent: () => f.totalCost);
+    final (amount, _) = f.bookedSpend;
+    cost.update(key, (v) => v + amount, ifAbsent: () => amount);
   }
   return FuelPriceTable(
     pricePerLitre: {

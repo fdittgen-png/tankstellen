@@ -23,6 +23,14 @@
 /// rate, or a future provider overrides [exchangeRatesProvider] and every
 /// consumer starts comparing, complete with the rate's source and date in
 /// the explanation.
+///
+/// #4437 — the first such source is the driver's own fill-up history: a
+/// foreign fill with a card settlement (or a hand-typed rate) implies one
+/// directed, sourced rate dated to its transaction, and the composition
+/// root overrides [exchangeRatesProvider] with those
+/// (`exchangeRatesOverrides()` in `features/fill_ups`). The declaration
+/// here still answers empty — a container without that wiring, and a
+/// history without a settlement, behave exactly as before.
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';

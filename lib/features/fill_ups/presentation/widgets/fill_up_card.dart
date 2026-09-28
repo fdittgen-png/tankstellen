@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../../core/domain/money.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/unit_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -76,13 +77,24 @@ class FillUpCard extends StatelessWidget {
     // #2491 — a fill-up cost is a TOTAL: route it through formatTotal
     // (locale-aware 2 dp + currency symbol) instead of a hand-rolled
     // toStringAsFixed(2) that hardcodes the dot separator.
-    final costStr = PriceFormatter.formatTotal(fillUp.totalCost);
+    //
+    // #4437 — in the currency the fill was RECORDED in: a CHF fill under
+    // an EUR profile reads `51,73 CHF`, never `51,73 €`.
+    final costStr =
+        PriceFormatter.formatTotalIn(fillUp.totalCost, fillUp.currency);
     // #3198 — thread the fill-up's fuel so a per-fuel suffix override
     // applies (AR GNC is priced per m³, not per litre).
     final ppl = UnitFormatter.formatPricePerUnit(
       fillUp.pricePerLiter,
       fuelType: fillUp.fuelType,
+      currencyCode: fillUp.currency,
     );
+    final settlement = settledExchangeRateOf(fillUp);
+    final recorded = fillUp.currency?.trim().toUpperCase();
+    final isUnsettledForeign = settlement == null &&
+        recorded != null &&
+        recorded.isNotEmpty &&
+        recorded != PriceFormatter.currencyCode;
     // #1401 phase 7b — only render the verified-by-adapter chip when
     // both fuel-level captures are present. Either missing → no chip.
     final isVerifiedByAdapter = FillUpVariance.hasAdapterCapture(fillUp);
@@ -113,6 +125,16 @@ class FillUpCard extends StatelessWidget {
           children: [
             Text('$dateStr · $distance'),
             Text('$volume · $costStr · $ppl', style: theme.textTheme.bodySmall),
+            if (settlement != null)
+              _SettledLine(fillUp: fillUp, rate: settlement)
+            else if (isUnsettledForeign)
+              Text(
+                l.fillUpSettleHint(recorded),
+                key: const Key('fill_up_settle_hint'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             if (isVerifiedByAdapter) ...[
               const SizedBox(height: 4),
               // #1401 phase 7b — small "Verified by adapter" chip. Uses
@@ -175,6 +197,60 @@ class FillUpCard extends StatelessWidget {
           semanticsLabel: l.fuelType,
         ),
       ),
+    );
+  }
+}
+
+/// #4437 — the converted figure of a settled foreign fill, with its
+/// provenance: the amount EXACTLY as entered (never `totalCost × rate`),
+/// the rate it implies, where that rate came from and the transaction
+/// date. A card settlement and a hand-typed rate carry different icons
+/// and words, so neither can pass for the other.
+class _SettledLine extends StatelessWidget {
+  final FillUp fillUp;
+  final ExchangeRate rate;
+
+  const _SettledLine({required this.fillUp, required this.rate});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l = AppLocalizations.of(context);
+    final settled = fillUp.settledMoney!;
+    final byHand = fillUp.isRateEnteredByHand;
+    final color = byHand
+        ? theme.colorScheme.tertiary
+        : theme.colorScheme.onSurfaceVariant;
+    return Row(
+      key: Key(byHand ? 'fill_up_rate_by_hand' : 'fill_up_rate_card'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2, right: 4),
+          child: Icon(
+            byHand ? Icons.edit_note : Icons.credit_card,
+            size: 14,
+            color: color,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            l.fillUpSettledLine(
+              PriceFormatter.formatTotalIn(
+                  settled.amount, settled.currencyCode),
+              PriceFormatter.formatRate(rate),
+              byHand
+                  ? l.fillUpRateSourceEnteredByHand
+                  : l.fillUpRateSourceCardSettlement,
+              UnitFormatter.formatMediumDate(
+                rate.capturedAt,
+                locale: Localizations.localeOf(context).toString(),
+              ),
+            ),
+            style: theme.textTheme.bodySmall?.copyWith(color: color),
+          ),
+        ),
+      ],
     );
   }
 }

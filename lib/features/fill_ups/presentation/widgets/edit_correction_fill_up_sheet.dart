@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
+import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/time_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/add_fill_up_validators.dart';
@@ -212,6 +213,9 @@ class _EditCorrectionFillUpSheetState
                 controller: _costCtrl,
                 label: l.totalCost,
                 icon: Icons.attach_money,
+                // #4437 — the amount is in the RECORD's currency, named
+                // here so a foreign correction is not edited as euros.
+                helperText: _currencyHint(widget.fillUp.currency),
                 // Cost may legitimately be 0 for a correction (no
                 // receipt, synthesised entry); accept >= 0 here.
                 validator: (v) {
@@ -287,3 +291,10 @@ class _EditCorrectionFillUpSheetState
   }
 
 }
+
+/// The record's currency symbol, or null when none was recorded — no
+/// guess at today's (#4437).
+String? _currencyHint(String? code) =>
+    (code == null || code.trim().isEmpty)
+        ? null
+        : PriceFormatter.symbolForCurrency(code);

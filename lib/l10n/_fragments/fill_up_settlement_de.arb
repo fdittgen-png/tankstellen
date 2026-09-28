@@ -1,0 +1,19 @@
+{
+  "settleFillUpTitle": "Was Ihre Karte belastet hat",
+  "settleFillUpIntro": "Bezahlt in {currency}. Tragen Sie den Betrag von Ihrer Kartenabrechnung ein, um diese Betankung in {profileCurrency} zu zählen.",
+  "settleFillUpCurrencyUnknownIntro": "Für diese Betankung wurde keine Währung erfasst. Geben Sie an, in welcher Sie bezahlt haben — es wird nichts angenommen.",
+  "settleFillUpCurrencyLabel": "Bezahlt in Währung",
+  "settleFillUpModeAmount": "Belasteter Betrag",
+  "settleFillUpModeRate": "Wechselkurs",
+  "settleFillUpAmountLabel": "Belastet in {currency}",
+  "settleFillUpAmountHint": "Wie auf Ihrer Kartenabrechnung",
+  "settleFillUpRateLabel": "{quote} für 1 {base}",
+  "settleFillUpRateHint": "Ihr eigener Kurs — er bleibt als von Hand eingegeben gekennzeichnet",
+  "settleFillUpRemove": "Abrechnung entfernen",
+  "fillUpRateSourceCardSettlement": "Kartenabrechnung",
+  "fillUpRateSourceEnteredByHand": "von Hand eingegeben",
+  "fillUpSettledLine": "{amount} · umgerechnet zu {rate}, {source}, {date}",
+  "fillUpSettleHint": "In {currency} bezahlt — tippen, um den belasteten Betrag einzutragen",
+  "spendWithheldMixedCurrencies": "Keine Gesamtsumme: Betankungen wurden in {currencies} bezahlt. Tragen Sie die belasteten Beträge ein, um sie zusammenzuzählen.",
+  "spendWithheldUnknownCurrency": "Keine Gesamtsumme: {count, plural, =1{1 Betankung hat} other{{count} Betankungen haben}} keine erfasste Währung."
+}

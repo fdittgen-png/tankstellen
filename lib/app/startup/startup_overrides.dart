@@ -4,6 +4,7 @@
 import 'package:flutter_riverpod/misc.dart';
 
 import '../profile_language_binding.dart';
+import '../../features/fill_ups/providers/exchange_rates_override.dart';
 import '../../features/fill_ups/providers/refuel_profile_override.dart';
 import '../../features/fill_ups/providers/tank_state_override.dart';
 import '../../features/fill_ups/providers/vehicle_trip_basis_override.dart';
@@ -28,9 +29,13 @@ import '../../features/fill_ups/providers/vehicle_trip_basis_override.dart';
 ///    same-trip comparison can plan a column per car without the
 ///    planning side importing `fill_ups` and without the active
 ///    vehicle having a privileged column.
+///  * **exchange rates** (#4437) — the rates the fill-up history holds
+///    (card settlements, hand-typed rates), each sourced and dated, so a
+///    core consumer compares with evidence instead of an empty snapshot.
 List<Override> startupOverrides() => [
       ...profileLanguageOverrides(),
       ...refuelProfileOverrides(),
       ...tankStateOverrides(),
       ...vehicleTripBasisOverrides(),
+      ...exchangeRatesOverrides(),
     ];

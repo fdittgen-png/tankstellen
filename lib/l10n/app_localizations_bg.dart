@@ -4235,6 +4235,76 @@ class AppLocalizationsBg extends AppLocalizations {
   String get crossBorderDismissTooltip => 'Затвори';
 
   @override
+  String get currencyBackfillAction => 'Set their currency';
+
+  @override
+  String get currencyBackfillTitle => 'Currency of older fill-ups';
+
+  @override
+  String get currencyBackfillIntro =>
+      'Say which currency your fill-ups without one were paid in. Only that label changes — litres, distances and amounts stay as recorded — and you can undo it.';
+
+  @override
+  String currencyBackfillOnOrBefore(String date) {
+    return 'Fill-ups on or before $date';
+  }
+
+  @override
+  String get currencyBackfillCurrencyLabel => 'They were all paid in';
+
+  @override
+  String currencyBackfillPreview(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups will be labelled $currency.',
+      one: '1 fill-up will be labelled $currency.',
+      zero: 'No fill-up without a currency in this range.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyBackfillRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Afterwards $count fill-ups still have none.',
+      one: 'Afterwards 1 fill-up still has none.',
+      zero: 'Afterwards every fill-up has a currency.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyBackfillApply => 'Apply';
+
+  @override
+  String currencyBackfillDone(int count, String currency) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups labelled $currency.',
+      one: '1 fill-up labelled $currency.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String currencyBackfillStatedSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups carry a currency you stated.',
+      one: '1 fill-up carries a currency you stated.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get currencyBackfillUndo => 'Undo currency labels';
+
+  @override
   String dataSourceLinkSemantic(String source, String license) {
     return 'Отвори източника на данни $source ($license) в браузъра';
   }
@@ -5582,6 +5652,84 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get badScanReportFallbackToShare =>
       'Изпращането не успя — ръчно споделяне';
+
+  @override
+  String get settleFillUpTitle => 'What your card charged';
+
+  @override
+  String settleFillUpIntro(String currency, String profileCurrency) {
+    return 'Paid in $currency. Add what your card statement charged to count this fill-up in $profileCurrency.';
+  }
+
+  @override
+  String get settleFillUpCurrencyUnknownIntro =>
+      'No currency was recorded for this fill-up. Say which one you paid in — nothing is assumed.';
+
+  @override
+  String get settleFillUpCurrencyLabel => 'Currency paid in';
+
+  @override
+  String get settleFillUpModeAmount => 'Amount charged';
+
+  @override
+  String get settleFillUpModeRate => 'Exchange rate';
+
+  @override
+  String settleFillUpAmountLabel(String currency) {
+    return 'Charged in $currency';
+  }
+
+  @override
+  String get settleFillUpAmountHint => 'As printed on your card statement';
+
+  @override
+  String settleFillUpRateLabel(String base, String quote) {
+    return '$quote for 1 $base';
+  }
+
+  @override
+  String get settleFillUpRateHint =>
+      'Your own rate — it stays labelled as entered by hand';
+
+  @override
+  String get settleFillUpRemove => 'Remove settlement';
+
+  @override
+  String get fillUpRateSourceCardSettlement => 'card settlement';
+
+  @override
+  String get fillUpRateSourceEnteredByHand => 'entered by hand';
+
+  @override
+  String fillUpSettledLine(
+    String amount,
+    String rate,
+    String source,
+    String date,
+  ) {
+    return '$amount · converted at $rate, $source, $date';
+  }
+
+  @override
+  String fillUpSettleHint(String currency) {
+    return 'Paid in $currency — tap to add what your card charged';
+  }
+
+  @override
+  String spendWithheldMixedCurrencies(String currencies) {
+    return 'No single total: fill-ups were paid in $currencies. Add what your card charged to count them together.';
+  }
+
+  @override
+  String spendWithheldUnknownCurrency(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fill-ups have',
+      one: '1 fill-up has',
+    );
+    return 'No single total: $_temp0 no recorded currency.';
+  }
 
   @override
   String get fillUpWarningDialogTitle => 'Проверете това зареждане';

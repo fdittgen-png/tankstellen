@@ -7802,5 +7802,138 @@
   "processWorkflowsConfirm": "Confirmer l’activation",
   "processWorkflowsActivated": "Parcours activé.",
   "processWorkflowsChanged": "Vos paramètres ont changé pendant la vérification. Ouvrez à nouveau l’aperçu.",
-  "processWorkflowsFailed": "La mise à jour du parcours n’a pas pu être terminée. Vérifiez son état actuel et réessayez."
+  "processWorkflowsFailed": "La mise à jour du parcours n’a pas pu être terminée. Vérifiez son état actuel et réessayez.",
+  "settleFillUpTitle": "Montant débité par votre carte",
+  "settleFillUpIntro": "Payé en {currency}. Saisissez le montant de votre relevé de carte pour compter ce plein en {profileCurrency}.",
+  "@settleFillUpIntro": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      },
+      "profileCurrency": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpCurrencyUnknownIntro": "Aucune devise n'a été enregistrée pour ce plein. Indiquez celle dans laquelle vous avez payé — rien n'est supposé.",
+  "settleFillUpCurrencyLabel": "Devise de paiement",
+  "settleFillUpModeAmount": "Montant débité",
+  "settleFillUpModeRate": "Taux de change",
+  "settleFillUpAmountLabel": "Débité en {currency}",
+  "@settleFillUpAmountLabel": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpAmountHint": "Tel qu'indiqué sur votre relevé de carte",
+  "settleFillUpRateLabel": "{quote} pour 1 {base}",
+  "@settleFillUpRateLabel": {
+    "placeholders": {
+      "base": {
+        "type": "String"
+      },
+      "quote": {
+        "type": "String"
+      }
+    }
+  },
+  "settleFillUpRateHint": "Votre propre taux — il reste signalé comme saisi à la main",
+  "settleFillUpRemove": "Retirer le règlement",
+  "fillUpRateSourceCardSettlement": "relevé de carte",
+  "fillUpRateSourceEnteredByHand": "saisi à la main",
+  "fillUpSettledLine": "{amount} · converti à {rate}, {source}, {date}",
+  "@fillUpSettledLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "rate": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "fillUpSettleHint": "Payé en {currency} — touchez pour ajouter le montant débité",
+  "@fillUpSettleHint": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "spendWithheldMixedCurrencies": "Pas de total unique : les pleins ont été payés en {currencies}. Ajoutez les montants débités pour les additionner.",
+  "@spendWithheldMixedCurrencies": {
+    "placeholders": {
+      "currencies": {
+        "type": "String"
+      }
+    }
+  },
+  "spendWithheldUnknownCurrency": "Pas de total unique : {count, plural, =1{1 plein n'a} other{{count} pleins n'ont}} pas de devise enregistrée.",
+  "@spendWithheldUnknownCurrency": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "currencyBackfillAction": "Indiquer leur devise",
+  "currencyBackfillTitle": "Devise des anciens pleins",
+  "currencyBackfillIntro": "Indiquez dans quelle devise vos pleins sans devise ont été payés. Seule cette indication change — litres, distances et montants restent tels qu'enregistrés — et vous pouvez l'annuler.",
+  "currencyBackfillOnOrBefore": "Pleins jusqu'au {date} inclus",
+  "@currencyBackfillOnOrBefore": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "currencyBackfillCurrencyLabel": "Ils ont tous été payés en",
+  "currencyBackfillPreview": "{count, plural, =0{Aucun plein sans devise sur cette période.} =1{1 plein sera marqué {currency}.} other{{count} pleins seront marqués {currency}.}}",
+  "@currencyBackfillPreview": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "currencyBackfillRemaining": "{count, plural, =0{Ensuite, chaque plein a une devise.} =1{Ensuite, 1 plein n'en a toujours pas.} other{Ensuite, {count} pleins n'en ont toujours pas.}}",
+  "@currencyBackfillRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "currencyBackfillApply": "Appliquer",
+  "currencyBackfillDone": "{count, plural, =1{1 plein marqué {currency}.} other{{count} pleins marqués {currency}.}}",
+  "@currencyBackfillDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "currencyBackfillStatedSummary": "{count, plural, =1{1 plein porte une devise que vous avez indiquée.} other{{count} pleins portent une devise que vous avez indiquée.}}",
+  "@currencyBackfillStatedSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "currencyBackfillUndo": "Annuler les devises indiquées"
 }
