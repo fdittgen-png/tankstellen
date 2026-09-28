@@ -115,6 +115,12 @@ final refuelPlanProvider = Provider<RefuelPlanState>((ref) {
     currency: currency,
     rates: rates,
     now: now,
+    // #4432 — a stop the driver has already passed is excluded HERE,
+    // from the plan's own candidates, not merely hidden from the list:
+    // otherwise a stale plan could still route them back to it. Read
+    // from the snapshot, which does not keep the GPS listener alive.
+    passedStationIds: passedStationIds(
+        result, ref.watch(routeProgressSnapshotProvider)),
   );
 
   // #4359 — the exit/rejoin cost of each stop, routed as origin → station

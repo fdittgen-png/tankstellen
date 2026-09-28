@@ -214,10 +214,54 @@ class RouteLiveProgressController extends _$RouteLiveProgressController {
       status: status,
       retiredBeforeKm: tracker.retiredBeforeKm,
     );
+    ref.read(routeProgressSnapshotProvider.notifier).publish(state);
   }
 
   void _cancel() {
     unawaited(_sub?.cancel());
     _sub = null;
   }
+}
+
+/// The last progress [RouteLiveProgressController] published, held
+/// WITHOUT owning its listener (#4432).
+///
+/// Consumers that must honour retirement but must not keep the GPS
+/// subscription alive — the refuel planner and the vehicle comparison,
+/// which are not auto-dispose — watch this instead of the controller.
+/// Watching the controller from them would pin the platform stream open
+/// after the route surface is gone.
+///
+/// Holding the last value after the listener stops is sound: retirement
+/// is monotonic (a stop passed is still passed while the surface is
+/// hidden), and every consumer goes through [aheadOfDriver], which
+/// ignores progress stamped with another route's revision.
+@Riverpod(keepAlive: true)
+class RouteProgressSnapshot extends _$RouteProgressSnapshot {
+  @override
+  RouteLiveProgress build() => RouteLiveProgress.inactive;
+
+  void publish(RouteLiveProgress progress) => state = progress;
+}
+
+/// Ids of [result]'s stations that [progress] has retired: already
+/// behind the driver on every pass of the route (#4432).
+///
+/// Empty whenever [aheadOfDriver] would filter nothing — inactive
+/// progress, another route's progress, nothing retired yet.
+Set<String> passedStationIds(
+  RouteSearchResult result,
+  RouteLiveProgress progress,
+) {
+  final all = result.stations;
+  final ahead = aheadOfDriver(
+      result, progress, all, (s) => (lat: s.lat, lng: s.lng));
+  if (identical(ahead, all) || ahead.length == all.length) {
+    return const <String>{};
+  }
+  final kept = {for (final s in ahead) s.id};
+  return {
+    for (final s in all)
+      if (!kept.contains(s.id)) s.id,
+  };
 }

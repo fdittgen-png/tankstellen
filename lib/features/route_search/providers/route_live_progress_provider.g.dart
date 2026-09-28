@@ -111,7 +111,7 @@ final class RouteLiveProgressControllerProvider
 }
 
 String _$routeLiveProgressControllerHash() =>
-    r'4a3c75200a386252780ff90b858f0b2bac453767';
+    r'84e953c880185271cdbe264ed2b114c682ccc785';
 
 /// A non-recording, lifecycle-owned position listener for the route
 /// results on screen (#4432).
@@ -138,6 +138,113 @@ String _$routeLiveProgressControllerHash() =>
 
 abstract class _$RouteLiveProgressController
     extends $Notifier<RouteLiveProgress> {
+  RouteLiveProgress build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<RouteLiveProgress, RouteLiveProgress>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<RouteLiveProgress, RouteLiveProgress>,
+              RouteLiveProgress,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+/// The last progress [RouteLiveProgressController] published, held
+/// WITHOUT owning its listener (#4432).
+///
+/// Consumers that must honour retirement but must not keep the GPS
+/// subscription alive — the refuel planner and the vehicle comparison,
+/// which are not auto-dispose — watch this instead of the controller.
+/// Watching the controller from them would pin the platform stream open
+/// after the route surface is gone.
+///
+/// Holding the last value after the listener stops is sound: retirement
+/// is monotonic (a stop passed is still passed while the surface is
+/// hidden), and every consumer goes through [aheadOfDriver], which
+/// ignores progress stamped with another route's revision.
+
+@ProviderFor(RouteProgressSnapshot)
+final routeProgressSnapshotProvider = RouteProgressSnapshotProvider._();
+
+/// The last progress [RouteLiveProgressController] published, held
+/// WITHOUT owning its listener (#4432).
+///
+/// Consumers that must honour retirement but must not keep the GPS
+/// subscription alive — the refuel planner and the vehicle comparison,
+/// which are not auto-dispose — watch this instead of the controller.
+/// Watching the controller from them would pin the platform stream open
+/// after the route surface is gone.
+///
+/// Holding the last value after the listener stops is sound: retirement
+/// is monotonic (a stop passed is still passed while the surface is
+/// hidden), and every consumer goes through [aheadOfDriver], which
+/// ignores progress stamped with another route's revision.
+final class RouteProgressSnapshotProvider
+    extends $NotifierProvider<RouteProgressSnapshot, RouteLiveProgress> {
+  /// The last progress [RouteLiveProgressController] published, held
+  /// WITHOUT owning its listener (#4432).
+  ///
+  /// Consumers that must honour retirement but must not keep the GPS
+  /// subscription alive — the refuel planner and the vehicle comparison,
+  /// which are not auto-dispose — watch this instead of the controller.
+  /// Watching the controller from them would pin the platform stream open
+  /// after the route surface is gone.
+  ///
+  /// Holding the last value after the listener stops is sound: retirement
+  /// is monotonic (a stop passed is still passed while the surface is
+  /// hidden), and every consumer goes through [aheadOfDriver], which
+  /// ignores progress stamped with another route's revision.
+  RouteProgressSnapshotProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'routeProgressSnapshotProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$routeProgressSnapshotHash();
+
+  @$internal
+  @override
+  RouteProgressSnapshot create() => RouteProgressSnapshot();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(RouteLiveProgress value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<RouteLiveProgress>(value),
+    );
+  }
+}
+
+String _$routeProgressSnapshotHash() =>
+    r'dc1c8033c5a5f83ba71f1831bf802205eb33b6a4';
+
+/// The last progress [RouteLiveProgressController] published, held
+/// WITHOUT owning its listener (#4432).
+///
+/// Consumers that must honour retirement but must not keep the GPS
+/// subscription alive — the refuel planner and the vehicle comparison,
+/// which are not auto-dispose — watch this instead of the controller.
+/// Watching the controller from them would pin the platform stream open
+/// after the route surface is gone.
+///
+/// Holding the last value after the listener stops is sound: retirement
+/// is monotonic (a stop passed is still passed while the surface is
+/// hidden), and every consumer goes through [aheadOfDriver], which
+/// ignores progress stamped with another route's revision.
+
+abstract class _$RouteProgressSnapshot extends $Notifier<RouteLiveProgress> {
   RouteLiveProgress build();
   @$mustCallSuper
   @override

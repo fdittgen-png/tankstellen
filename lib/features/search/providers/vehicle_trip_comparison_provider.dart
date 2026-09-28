@@ -140,6 +140,10 @@ final vehicleTripComparisonProvider =
   // One candidate set per vehicle, from ITS fuel. Hard exclusions are
   // applied here and recorded; soft display filters never reach this
   // far (#4362).
+  // #4432 — stops the driver has passed leave every column's candidates,
+  // exactly as they leave the single-vehicle plan.
+  final passed =
+      passedStationIds(result, ref.watch(routeProgressSnapshotProvider));
   final sets = <String, PlanCandidateSet>{
     for (final basis in bases.bases)
       basis.vehicleId: buildPlanCandidates(
@@ -151,6 +155,7 @@ final vehicleTripComparisonProvider =
         currency: currency,
         rates: rates,
         now: now,
+        passedStationIds: passed,
       ),
   };
 
