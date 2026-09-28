@@ -1,11 +1,13 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/domain/refuel_plan.dart';
 import 'package:tankstellen/core/utils/price_formatter.dart';
 import 'package:tankstellen/features/search/presentation/widgets/refuel_plan_card.dart';
 import 'package:tankstellen/features/search/providers/refuel_plan_provider.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/pump_app.dart';
 
@@ -17,12 +19,26 @@ import '../../../../helpers/pump_app.dart';
 /// a plan built on an invented capacity would look identical to a real
 /// one.
 void main() {
-  Future<void> pumpWith(WidgetTester tester, RefuelPlanState state) =>
-      pumpApp(
-        tester,
-        const RefuelPlanCard(),
-        overrides: [refuelPlanProvider.overrideWithValue(state)],
-      );
+  Future<void> pumpWith(
+    WidgetTester tester,
+    RefuelPlanState state, {
+    Locale locale = const Locale('en'),
+    double textScale = 1,
+    Size size = const Size(400, 1600),
+  }) async {
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await pumpApp(
+      tester,
+      MediaQuery(
+        data: MediaQueryData(textScaler: TextScaler.linear(textScale)),
+        child: const SingleChildScrollView(child: RefuelPlanCard()),
+      ),
+      overrides: [refuelPlanProvider.overrideWithValue(state)],
+      locale: locale,
+    );
+  }
 
   group('when it cannot plan, it says which input is missing', () {
     testWidgets('no consumption', (tester) async {
@@ -121,5 +137,69 @@ void main() {
 
     // Zero is a real and good answer: the tank covers the trip.
     expect(find.textContaining('No stop needed'), findsOneWidget);
+  });
+
+  testWidgets('it renders in French, with no English fallback in the '
+      'titles this card owns', (tester) async {
+    const candidate = PlanCandidate(
+      stationId: 'a', alongRouteKm: 100, pricePerLitre: 1.6,
+    );
+    const stop = PlannedStop(
+      candidate: candidate, litres: 30, cost: 48, arrivalLitres: 10,
+    );
+    const plan = RefuelPlan(
+      stops: [stop], fuelCost: 48, detourKm: 0, routeKm: 500,
+      drivingMinutes: 300, consumptionLPer100km: 10,
+    );
+
+    await pumpWith(
+      tester,
+      const RefuelPlanState.ready(
+          RefuelPlanSet(cheapest: plan, fastest: plan)),
+      locale: const Locale('fr'),
+    );
+
+    final l = await AppLocalizations.delegate.load(const Locale('fr'));
+    expect(find.text(l.refuelPlanCheapestTitle), findsOneWidget);
+    expect(find.text(l.refuelPlanFastestTitle), findsOneWidget);
+    expect(find.text('Cheapest trip'), findsNothing);
+    expect(find.text('Fastest trip'), findsNothing);
+  });
+
+  testWidgets('a narrow screen at double text scale does not overflow',
+      (tester) async {
+    const candidate = PlanCandidate(
+      stationId: 'a', alongRouteKm: 100, pricePerLitre: 1.6, detourKm: 3,
+    );
+    const stop = PlannedStop(
+      candidate: candidate, litres: 30, cost: 48, arrivalLitres: 10,
+    );
+    const plan = RefuelPlan(
+      stops: [stop], fuelCost: 48, detourKm: 6, routeKm: 500,
+      drivingMinutes: 300, consumptionLPer100km: 10,
+    );
+
+    await pumpWith(
+      tester,
+      const RefuelPlanState.ready(
+          RefuelPlanSet(cheapest: plan, fastest: plan)),
+      textScale: 2,
+      size: const Size(320, 2400),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Cheapest trip'), findsOneWidget);
+    expect(find.text('Fastest trip'), findsOneWidget);
+  });
+
+  testWidgets(
+      'the withheld reason is announced as an accessible figure, not just '
+      'shown', (tester) async {
+    await pumpWith(tester,
+        const RefuelPlanState.blocked(RefuelPlanBlocker.noConsumption));
+
+    final l = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.bySemanticsLabel(l.refuelPlanNeedsConsumption),
+        findsOneWidget);
   });
 }
