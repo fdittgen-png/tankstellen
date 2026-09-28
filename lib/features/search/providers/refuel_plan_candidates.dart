@@ -55,6 +55,12 @@ enum PlanCandidateExclusion {
   /// #4361 — priced in a currency the plan cannot express in the
   /// driver's own at a stated, fresh rate.
   currencyNotComparable,
+
+  /// #4432 — the foreground progress listener has retired every pass of
+  /// the route past this station: the driver has already driven by it.
+  /// Applied to the plan DIRECTLY, not inherited from what the list
+  /// shows, so a stale recommendation cannot outlive the stop on screen.
+  alreadyPassed,
 }
 
 /// The allowed stops, what was excluded and why, and how complete the
@@ -118,6 +124,7 @@ PlanCandidateSet buildPlanCandidates({
   required String currency,
   required ExchangeRateSnapshot rates,
   required DateTime now,
+  Set<String> passedStationIds = const {},
 }) {
   final candidates = <PlanCandidate>[];
   final positions = <String, double>{};
@@ -127,6 +134,11 @@ PlanCandidateSet buildPlanCandidates({
   for (final item in stations) {
     if (item is! FuelStationResult) continue;
     final station = item.station;
+    // #4432 — behind the driver: not a stop whatever its price.
+    if (passedStationIds.contains(station.id)) {
+      exclusions[station.id] = PlanCandidateExclusion.alreadyPassed;
+      continue;
+    }
     final offer = StationOffer.forStation(
         stationId: station.id, lat: station.lat, lng: station.lng);
     if (!offer.canRouteTo) {

@@ -787,14 +787,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get routeDetourBudget => 'Maximum detour';
-
-  @override
-  String routeDetourBudgetCaption(int km) {
-    return 'Surface stations up to $km km off your direct route';
-  }
-
-  @override
   String get routeSegment => 'Route segment';
 
   @override
@@ -9195,6 +9187,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
 
   @override
+  String routeStopAlongRoute(String distance) {
+    return 'About $distance along this route';
+  }
+
+  @override
+  String get routeStopAlongRouteTooltip =>
+      'How far along this route the station is met, counted from the route\'s start. Not the distance from you, and not a driven detour.';
+
+  @override
+  String get routeCorridorLimit => 'Max. distance from route';
+
+  @override
+  String routeCorridorLimitCaption(int km) {
+    return 'Show stations up to $km km from the route line, measured straight — not the extra driving a stop adds';
+  }
+
+  @override
   String get routeLeftRouteNotice =>
       'You seem to have left this route — its stops may no longer be ahead of you.';
 
@@ -10609,12 +10618,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get criteriaRouteOptions => 'Route options';
 
   @override
-  String criteriaRouteOptionsSummary(
+  String criteriaRouteOptionsCorridorSummary(
     int segmentKm,
     int detourKm,
     String saving,
   ) {
-    return 'Every $segmentKm km · $detourKm km detour · $saving';
+    return 'Every $segmentKm km · ≤ $detourKm km from route · $saving';
   }
 
   @override
@@ -12826,14 +12835,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String routeMinSavingCaption(String amount) {
     return '⟦Óñłý šŧáŧîóñš ŵîŧĥîñ $amount óƒ ŧĥé řóúŧé\'š çĥéáƥéšŧ ·················⟧';
-  }
-
-  @override
-  String get routeDetourBudget => '⟦Ṁáẋîɱúɱ đéŧóúř ······⟧';
-
-  @override
-  String routeDetourBudgetCaption(int km) {
-    return '⟦Šúřƒáçé šŧáŧîóñš úƥ ŧó $km ķɱ óƒƒ ýóúř đîřéçŧ řóúŧé ··················⟧';
   }
 
   @override
@@ -21456,6 +21457,23 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
       '⟦Šŧřáîǧĥŧ-łîñé đîšŧáñçé ƒřóɱ ŧĥîš řóúŧé ŧó ŧĥé šŧáŧîóñ. Ñóŧ ŧĥé đîšŧáñçé ƒřóɱ ýóú, áñđ ñóŧ ŧĥé éẋŧřá đřîṽîñǧ á šŧóƥ ŵóúłđ çóšŧ. ·············································⟧';
 
   @override
+  String routeStopAlongRoute(String distance) {
+    return '⟦Áƀóúŧ $distance áłóñǧ ŧĥîš řóúŧé ·········⟧';
+  }
+
+  @override
+  String get routeStopAlongRouteTooltip =>
+      '⟦Ĥóŵ ƒář áłóñǧ ŧĥîš řóúŧé ŧĥé šŧáŧîóñ îš ɱéŧ, çóúñŧéđ ƒřóɱ ŧĥé řóúŧé\'š šŧářŧ. Ñóŧ ŧĥé đîšŧáñçé ƒřóɱ ýóú, áñđ ñóŧ á đřîṽéñ đéŧóúř. ·············································⟧';
+
+  @override
+  String get routeCorridorLimit => '⟦Ṁáẋ. đîšŧáñçé ƒřóɱ řóúŧé ·········⟧';
+
+  @override
+  String routeCorridorLimitCaption(int km) {
+    return '⟦Šĥóŵ šŧáŧîóñš úƥ ŧó $km ķɱ ƒřóɱ ŧĥé řóúŧé łîñé, ɱéášúřéđ šŧřáîǧĥŧ — ñóŧ ŧĥé éẋŧřá đřîṽîñǧ á šŧóƥ áđđš ···································⟧';
+  }
+
+  @override
   String get routeLeftRouteNotice =>
       '⟦Ýóú šééɱ ŧó ĥáṽé łéƒŧ ŧĥîš řóúŧé — îŧš šŧóƥš ɱáý ñó łóñǧéř ƀé áĥéáđ óƒ ýóú. ··························⟧';
 
@@ -22912,12 +22930,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String get criteriaRouteOptions => '⟦Řóúŧé óƥŧîóñš ·····⟧';
 
   @override
-  String criteriaRouteOptionsSummary(
+  String criteriaRouteOptionsCorridorSummary(
     int segmentKm,
     int detourKm,
     String saving,
   ) {
-    return '⟦Éṽéřý $segmentKm ķɱ · $detourKm ķɱ đéŧóúř · $saving ·······⟧';
+    return '⟦Éṽéřý $segmentKm ķɱ · ≤ $detourKm ķɱ ƒřóɱ řóúŧé · $saving ········⟧';
   }
 
   @override

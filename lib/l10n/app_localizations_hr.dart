@@ -789,14 +789,6 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get routeDetourBudget => 'Maksimalni obilazak';
-
-  @override
-  String routeDetourBudgetCaption(int km) {
-    return 'Prikaži postaje do $km km od izravne rute';
-  }
-
-  @override
   String get routeSegment => 'Segment rute';
 
   @override
@@ -9255,6 +9247,23 @@ class AppLocalizationsHr extends AppLocalizations {
       'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
 
   @override
+  String routeStopAlongRoute(String distance) {
+    return 'About $distance along this route';
+  }
+
+  @override
+  String get routeStopAlongRouteTooltip =>
+      'How far along this route the station is met, counted from the route\'s start. Not the distance from you, and not a driven detour.';
+
+  @override
+  String get routeCorridorLimit => 'Max. distance from route';
+
+  @override
+  String routeCorridorLimitCaption(int km) {
+    return 'Show stations up to $km km from the route line, measured straight — not the extra driving a stop adds';
+  }
+
+  @override
   String get routeLeftRouteNotice =>
       'You seem to have left this route — its stops may no longer be ahead of you.';
 
@@ -10676,12 +10685,12 @@ class AppLocalizationsHr extends AppLocalizations {
   String get criteriaRouteOptions => 'Route options';
 
   @override
-  String criteriaRouteOptionsSummary(
+  String criteriaRouteOptionsCorridorSummary(
     int segmentKm,
     int detourKm,
     String saving,
   ) {
-    return 'Every $segmentKm km · $detourKm km detour · $saving';
+    return 'Every $segmentKm km · ≤ $detourKm km from route · $saving';
   }
 
   @override

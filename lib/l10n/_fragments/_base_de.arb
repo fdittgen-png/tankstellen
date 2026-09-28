@@ -351,15 +351,6 @@
       }
     }
   },
-  "routeDetourBudget": "Maximaler Umweg",
-  "routeDetourBudgetCaption": "Stationen bis zu {km} km abseits der direkten Route anzeigen",
-  "@routeDetourBudgetCaption": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
   "routeSegment": "Routenabschnitt",
   "showCheapestEveryNKm": "Günstigste Station alle {km} km entlang der Route anzeigen",
   "@showCheapestEveryNKm": {

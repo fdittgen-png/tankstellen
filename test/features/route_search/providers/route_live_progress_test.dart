@@ -8,6 +8,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tankstellen/core/domain/fuel_type.dart';
+import 'package:tankstellen/core/domain/search_result_item.dart';
+import 'package:tankstellen/core/domain/station.dart';
 import 'package:tankstellen/core/location/geolocator_wrapper.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/core/utils/route_progress.dart';
@@ -233,6 +235,60 @@ void main() {
     expect(geo.cancels, 1);
   });
 
+  test(
+      'accepted progress is mirrored to the snapshot, which outlives the '
+      'listener without holding it open', () async {
+    final c = make(route(fromVehicle: true));
+    // A non-owning consumer (the planner) watches only the snapshot.
+    final snap = c.listen(routeProgressSnapshotProvider, (_, _) {});
+    addTearDown(snap.close);
+    final sub = c.listen(routeLiveProgressControllerProvider, (_, _) {});
+
+    final progress = await feed(c, [
+      fix(48.0, 2.1),
+      fix(48.0, 2.2),
+      fix(48.0, 2.32),
+    ]);
+    expect(progress.retiredBeforeKm, greaterThan(0));
+    expect(snap.read().retiredBeforeKm, progress.retiredBeforeKm);
+    expect(snap.read().revision, 7);
+
+    // The surface goes away: the platform stream is released even though
+    // the snapshot is still watched, and the retirement it recorded is
+    // still there for the planner.
+    sub.close();
+    await pumpEventQueue();
+    expect(geo.cancels, 1);
+    expect(snap.read().retiredBeforeKm, progress.retiredBeforeKm);
+  });
+
+  test('passedStationIds names exactly the retired stops of THIS route', () {
+    final result = RouteSearchResult(
+      route: route(fromVehicle: true).route,
+      stations: [
+        FuelStationResult(_station('passed', 48.0, 2.1)),
+        FuelStationResult(_station('crossing', 48.0, 2.3)),
+        FuelStationResult(_station('ahead', 48.1, 2.6)),
+      ],
+      request: route(fromVehicle: true).request,
+    );
+    // Just past the crossing on the first pass (~22.3 km).
+    const progress = RouteLiveProgress(
+      revision: 7,
+      status: RouteProgressStatus.onRoute,
+      retiredBeforeKm: 20,
+    );
+    expect(passedStationIds(result, progress), {'passed'});
+    // Another route's progress retires nothing on this one.
+    const other = RouteLiveProgress(
+      revision: 8,
+      status: RouteProgressStatus.onRoute,
+      retiredBeforeKm: 20,
+    );
+    expect(passedStationIds(result, other), isEmpty);
+    expect(passedStationIds(result, RouteLiveProgress.inactive), isEmpty);
+  });
+
   test('currentFix goes stale with the route-origin freshness bound', () {
     final p = RouteLiveProgress(
       revision: 1,
@@ -244,3 +300,15 @@ void main() {
     expect(p.currentFix(now.add(const Duration(minutes: 5))), isNull);
   });
 }
+
+Station _station(String id, double lat, double lng) => Station(
+      id: id,
+      name: id,
+      brand: 'B',
+      street: 'R',
+      postCode: '1',
+      place: 'P',
+      lat: lat,
+      lng: lng,
+      e10: 1.8,
+    );

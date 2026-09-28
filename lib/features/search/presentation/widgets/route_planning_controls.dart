@@ -65,7 +65,7 @@ class RoutePlanningControls extends ConsumerWidget {
       expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
       title: Text(l10n.criteriaRouteOptions, style: theme.textTheme.titleSmall),
       subtitle: Text(
-        l10n.criteriaRouteOptionsSummary(
+        l10n.criteriaRouteOptionsCorridorSummary(
           segment.round(),
           detour.round(),
           savingLabel,
@@ -91,10 +91,16 @@ class RoutePlanningControls extends ConsumerWidget {
                 ref.read(routeSegmentSearchParamProvider.notifier).set(v),
           ),
         ),
+        // #4432 — this limit is a straight-line CORRIDOR width: the
+        // strategies admit a station whose offset from the route line
+        // (RouteProjection.offRouteKm) is within it. It is not a driven
+        // detour, so it is labelled as the same "distance from the
+        // route" the result rows show. The persisted value
+        // (`routeDetourBudgetKm`) keeps its meaning.
         CriteriaOptionRow(
-          label: l10n.routeDetourBudget,
+          label: l10n.routeCorridorLimit,
           value: '${detour.round()} km',
-          caption: l10n.routeDetourBudgetCaption(detour.round()),
+          caption: l10n.routeCorridorLimitCaption(detour.round()),
           child: CriteriaOptionSlider(
             value: detour,
             min: 2,

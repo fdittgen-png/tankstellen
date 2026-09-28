@@ -10,18 +10,20 @@ part of 'station_off_route_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Station id → how far that station lies OFF the active route, in km
-/// (#4432).
+/// Station id → where that station sits on the ACTIVE route (#4432):
+/// its along-route progress and its geometric offset from the route
+/// line, as one [RouteStopMetrics] stamped with the route revision.
 ///
 /// ## What this is, exactly
 ///
-/// The straight-line distance from the route's own geometry to the
-/// station, computed against THIS route via [RouteProjection] — the
-/// same projection the refuel plan uses (#4146), so "off the route" has
-/// one definition. It is a **geometric estimate**: the map distance to
-/// the line, not a driven distance. It is therefore neither the
-/// distance from the driver nor the extra driving a stop would cost,
-/// and the row that shows it says so.
+/// Both figures are measured against THIS route's own geometry by
+/// `routeStopMetricsFor` — the one `RouteProjection` itinerary pass the
+/// corridor filter, the list order and the refuel plan (#4146) share,
+/// so "off the route" and "how far along" each have one definition.
+/// They are **geometric**: neither is the distance from the driver nor
+/// the extra driving a stop would cost (those are the routed
+/// `StationTravelEstimate` quantities, #4359), and the row that shows
+/// them says so.
 ///
 /// ## The bug it replaces
 ///
@@ -48,21 +50,23 @@ part of 'station_off_route_provider.dart';
 /// Empty unless a route search is the active one, so a route result
 /// left in memory cannot relabel the distances in a nearby search.
 
-@ProviderFor(stationOffRouteKm)
-final stationOffRouteKmProvider = StationOffRouteKmProvider._();
+@ProviderFor(stationRouteMetrics)
+final stationRouteMetricsProvider = StationRouteMetricsProvider._();
 
-/// Station id → how far that station lies OFF the active route, in km
-/// (#4432).
+/// Station id → where that station sits on the ACTIVE route (#4432):
+/// its along-route progress and its geometric offset from the route
+/// line, as one [RouteStopMetrics] stamped with the route revision.
 ///
 /// ## What this is, exactly
 ///
-/// The straight-line distance from the route's own geometry to the
-/// station, computed against THIS route via [RouteProjection] — the
-/// same projection the refuel plan uses (#4146), so "off the route" has
-/// one definition. It is a **geometric estimate**: the map distance to
-/// the line, not a driven distance. It is therefore neither the
-/// distance from the driver nor the extra driving a stop would cost,
-/// and the row that shows it says so.
+/// Both figures are measured against THIS route's own geometry by
+/// `routeStopMetricsFor` — the one `RouteProjection` itinerary pass the
+/// corridor filter, the list order and the refuel plan (#4146) share,
+/// so "off the route" and "how far along" each have one definition.
+/// They are **geometric**: neither is the distance from the driver nor
+/// the extra driving a stop would cost (those are the routed
+/// `StationTravelEstimate` quantities, #4359), and the row that shows
+/// them says so.
 ///
 /// ## The bug it replaces
 ///
@@ -89,26 +93,28 @@ final stationOffRouteKmProvider = StationOffRouteKmProvider._();
 /// Empty unless a route search is the active one, so a route result
 /// left in memory cannot relabel the distances in a nearby search.
 
-final class StationOffRouteKmProvider
+final class StationRouteMetricsProvider
     extends
         $FunctionalProvider<
-          Map<String, double>,
-          Map<String, double>,
-          Map<String, double>
+          Map<String, RouteStopMetrics>,
+          Map<String, RouteStopMetrics>,
+          Map<String, RouteStopMetrics>
         >
-    with $Provider<Map<String, double>> {
-  /// Station id → how far that station lies OFF the active route, in km
-  /// (#4432).
+    with $Provider<Map<String, RouteStopMetrics>> {
+  /// Station id → where that station sits on the ACTIVE route (#4432):
+  /// its along-route progress and its geometric offset from the route
+  /// line, as one [RouteStopMetrics] stamped with the route revision.
   ///
   /// ## What this is, exactly
   ///
-  /// The straight-line distance from the route's own geometry to the
-  /// station, computed against THIS route via [RouteProjection] — the
-  /// same projection the refuel plan uses (#4146), so "off the route" has
-  /// one definition. It is a **geometric estimate**: the map distance to
-  /// the line, not a driven distance. It is therefore neither the
-  /// distance from the driver nor the extra driving a stop would cost,
-  /// and the row that shows it says so.
+  /// Both figures are measured against THIS route's own geometry by
+  /// `routeStopMetricsFor` — the one `RouteProjection` itinerary pass the
+  /// corridor filter, the list order and the refuel plan (#4146) share,
+  /// so "off the route" and "how far along" each have one definition.
+  /// They are **geometric**: neither is the distance from the driver nor
+  /// the extra driving a stop would cost (those are the routed
+  /// `StationTravelEstimate` quantities, #4359), and the row that shows
+  /// them says so.
   ///
   /// ## The bug it replaces
   ///
@@ -134,38 +140,41 @@ final class StationOffRouteKmProvider
   ///
   /// Empty unless a route search is the active one, so a route result
   /// left in memory cannot relabel the distances in a nearby search.
-  StationOffRouteKmProvider._()
+  StationRouteMetricsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'stationOffRouteKmProvider',
+        name: r'stationRouteMetricsProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$stationOffRouteKmHash();
+  String debugGetCreateSourceHash() => _$stationRouteMetricsHash();
 
   @$internal
   @override
-  $ProviderElement<Map<String, double>> $createElement(
+  $ProviderElement<Map<String, RouteStopMetrics>> $createElement(
     $ProviderPointer pointer,
   ) => $ProviderElement(pointer);
 
   @override
-  Map<String, double> create(Ref ref) {
-    return stationOffRouteKm(ref);
+  Map<String, RouteStopMetrics> create(Ref ref) {
+    return stationRouteMetrics(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(Map<String, double> value) {
+  Override overrideWithValue(Map<String, RouteStopMetrics> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<Map<String, double>>(value),
+      providerOverride: $SyncValueProvider<Map<String, RouteStopMetrics>>(
+        value,
+      ),
     );
   }
 }
 
-String _$stationOffRouteKmHash() => r'116fde11531b606702bf04ca80398526cebc0e52';
+String _$stationRouteMetricsHash() =>
+    r'9c063e6d4a5356a3e4352cea55f7c917e9577b40';

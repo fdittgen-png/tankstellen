@@ -300,7 +300,12 @@ class _StationMapLayersState extends State<StationMapLayers> {
     // per-build post-frame fit that used to live in `NearbyMapView` and
     // land inside the cold-start reset window (deleted in #2398).
     final centerChanged = widget.center != oldWidget.center;
-    if (widget.stations.isNotEmpty && centerChanged) {
+    // #4432 — an explicit [cameraFitBounds] (the route map) is framed
+    // even with no stations yet: a NEW route whose first batch is still
+    // empty must not leave the camera on the previous route's area.
+    final hasSomethingToFrame =
+        widget.stations.isNotEmpty || widget.cameraFitBounds != null;
+    if (hasSomethingToFrame && centerChanged) {
       final bounds = _fitBounds;
       // `LatLngBounds` has value `==`, so this skips an identical re-fit.
       // `NearbyMapView.shouldFit` is the same pure predicate, kept there

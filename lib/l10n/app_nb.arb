@@ -205,15 +205,6 @@
       }
     }
   },
-  "routeDetourBudget": "Maksimal omvei",
-  "routeDetourBudgetCaption": "Vis stasjoner opptil {km} km fra den direkte ruten",
-  "@routeDetourBudgetCaption": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
   "routeSegment": "Rutesegment",
   "showCheapestEveryNKm": "Vis billigste stasjon for hver {km} km langs ruten",
   "avoidHighways": "Unngå motorveier",
@@ -5875,22 +5866,6 @@
   "@criteriaRouteOptions": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
-  },
-  "criteriaRouteOptionsSummary": "Every {segmentKm} km · {detourKm} km detour · {saving}",
-  "@criteriaRouteOptionsSummary": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "segmentKm": {
-        "type": "int"
-      },
-      "detourKm": {
-        "type": "int"
-      },
-      "saving": {
-        "type": "String"
-      }
-    }
   },
   "criteriaSwapEndpoints": "Swap start and destination",
   "@criteriaSwapEndpoints": {
@@ -11606,5 +11581,51 @@
   "@routeUpdateFromPosition": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "routeStopAlongRoute": "About {distance} along this route",
+  "@routeStopAlongRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "routeStopAlongRouteTooltip": "How far along this route the station is met, counted from the route's start. Not the distance from you, and not a driven detour.",
+  "@routeStopAlongRouteTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeCorridorLimit": "Max. distance from route",
+  "@routeCorridorLimit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeCorridorLimitCaption": "Show stations up to {km} km from the route line, measured straight — not the extra driving a stop adds",
+  "@routeCorridorLimitCaption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaRouteOptionsCorridorSummary": "Every {segmentKm} km · ≤ {detourKm} km from route · {saving}",
+  "@criteriaRouteOptionsCorridorSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
   }
 }

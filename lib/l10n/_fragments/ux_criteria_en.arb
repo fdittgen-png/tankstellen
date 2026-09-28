@@ -44,9 +44,9 @@
   "@criteriaRouteOptions": {
     "description": "Title of the collapsible section holding the three route-planning options (segment, detour budget, minimum saving) on the search-criteria sheet (#3927)."
   },
-  "criteriaRouteOptionsSummary": "Every {segmentKm} km · {detourKm} km detour · {saving}",
-  "@criteriaRouteOptionsSummary": {
-    "description": "One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the detour budget and the minimum-saving value ('Off' or an amount per litre) (#3927).",
+  "criteriaRouteOptionsCorridorSummary": "Every {segmentKm} km · ≤ {detourKm} km from route · {saving}",
+  "@criteriaRouteOptionsCorridorSummary": {
+    "description": "One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the corridor limit and the minimum-saving value ('Off' or an amount per litre) (#3927). #4432 — the middle figure limits how far (straight-line) a station may sit from the route line; it is NOT a driven detour, so it must not be called one.",
     "placeholders": {
       "segmentKm": {
         "type": "int"

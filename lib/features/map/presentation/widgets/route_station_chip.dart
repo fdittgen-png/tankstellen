@@ -6,12 +6,19 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../core/utils/station_extensions.dart';
-import '../../../../core/utils/unit_formatter.dart';
 import '../../../../core/domain/station.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../route_search/api.dart'
+    show
+        RouteStopMetrics,
+        RouteStopMetricsScope,
+        routeStopAlongDistance,
+        routeStopAlongText;
 
 /// A chip representing a station stop along the route.
 ///
-/// Shows a sequence number badge, station name, price, and distance.
+/// Shows a sequence number badge, station name, price, and — inside a
+/// [RouteStopMetricsScope] — how far along the route the stop is.
 /// Selected chips use a filled primary style; unselected use an outlined style.
 class RouteStationChip extends StatelessWidget {
   final Station station;
@@ -120,20 +127,60 @@ class RouteStationChip extends StatelessWidget {
                             : DarkModeColors.success(context),
                       ),
                     ),
-                    Text(
-                      ' \u00b7 ${UnitFormatter.formatDistance(station.dist)}',
-                      style: TextStyle(
-                        fontSize: 10,
+                    // #4432 \u2014 the along-route progress, NOT the first-seen
+                    // `Station.dist` (distance from whichever sample
+                    // point's query returned the station). The glyph
+                    // names it on a chip too small for words; the
+                    // sentence survives as tooltip + spoken label. No
+                    // route metrics \u2192 no figure, never a stand-in.
+                    if (RouteStopMetricsScope.of(context, station.id)
+                        case final metrics?)
+                      _AlongRouteFigure(
+                        metrics: metrics,
                         color: isSelected
                             ? selectedFg.withValues(alpha: 0.7)
                             : theme.colorScheme.onSurfaceVariant,
                       ),
-                    ),
                   ],
                 ),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// ` · ⋯ 62 km` — a stop chip's along-route progress (#4432).
+class _AlongRouteFigure extends StatelessWidget {
+  const _AlongRouteFigure({required this.metrics, required this.color});
+
+  final RouteStopMetrics metrics;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final style = TextStyle(fontSize: 10, color: color);
+    final spoken = routeStopAlongText(l10n, metrics);
+    return Tooltip(
+      message: '$spoken. ${l10n.routeStopAlongRouteTooltip}',
+      child: Semantics(
+        key: const Key('route_chip_route_progress'),
+        label: spoken,
+        child: ExcludeSemantics(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // A language-neutral punctuation glyph, not a translatable
+              // string.
+              Text(' · ', style: style),
+              Icon(Icons.linear_scale, size: 10, color: color),
+              const SizedBox(width: 2),
+              Text(routeStopAlongDistance(metrics), style: style),
+            ],
+          ),
         ),
       ),
     );

@@ -351,15 +351,6 @@
       }
     }
   },
-  "routeDetourBudget": "Maximaler Umweg",
-  "routeDetourBudgetCaption": "Stationen bis zu {km} km abseits der direkten Route anzeigen",
-  "@routeDetourBudgetCaption": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
   "routeSegment": "Routenabschnitt",
   "showCheapestEveryNKm": "Günstigste Station alle {km} km entlang der Route anzeigen",
   "@showCheapestEveryNKm": {
@@ -4343,6 +4334,10 @@
   "routeStopOffRoute": "{distance} von der Route",
   "routeStopOffRouteQualifier": "geometrische Schätzung",
   "routeStopOffRouteTooltip": "Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde.",
+  "routeStopAlongRoute": "Etwa {distance} entlang dieser Route",
+  "routeStopAlongRouteTooltip": "Wie weit entlang dieser Route die Tankstelle liegt, gezählt ab dem Start der Route. Nicht die Entfernung von Ihnen und kein gefahrener Umweg.",
+  "routeCorridorLimit": "Max. Abstand zur Route",
+  "routeCorridorLimitCaption": "Tankstellen bis {km} km Luftlinie von der Route zeigen – nicht die zusätzliche Fahrstrecke eines Halts",
   "routeLeftRouteNotice": "Sie haben diese Route offenbar verlassen – ihre Stopps liegen womöglich nicht mehr vor Ihnen.",
   "routeUpdateFromPosition": "Route ab Ihrer Position aktualisieren",
   "stationCardPriceUnit": "{currency}/l",
@@ -5181,8 +5176,8 @@
   "criteriaShowLess": "Weniger anzeigen",
   "criteriaBrands": "Marken",
   "criteriaRouteOptions": "Routenoptionen",
-  "criteriaRouteOptionsSummary": "Alle {segmentKm} km · {detourKm} km Umweg · {saving}",
-  "@criteriaRouteOptionsSummary": {
+  "criteriaRouteOptionsCorridorSummary": "Alle {segmentKm} km · ≤ {detourKm} km von der Route · {saving}",
+  "@criteriaRouteOptionsCorridorSummary": {
     "placeholders": {
       "segmentKm": {
         "type": "int"

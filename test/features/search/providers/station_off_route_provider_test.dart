@@ -87,13 +87,34 @@ void main() {
     final c = container(route: result());
     addTearDown(c.dispose);
 
-    final offsets = c.read(stationOffRouteKmProvider);
-    expect(offsets.keys, containsAll(['on-route', 'off-route']));
+    final metrics = c.read(stationRouteMetricsProvider);
+    expect(metrics.keys, containsAll(['on-route', 'off-route']));
     // A stop sitting ON a corridor vertex is not off the route at all.
-    expect(offsets['on-route'], closeTo(0, 0.1));
+    expect(metrics['on-route']!.offRouteKm, closeTo(0, 0.1));
     // The one to the side is — and it is NOT the station's own `dist`.
-    expect(offsets['off-route'], greaterThan(2));
-    expect(offsets['off-route'], isNot(closeTo(1.2, 0.01)));
+    expect(metrics['off-route']!.offRouteKm, greaterThan(2));
+    expect(metrics['off-route']!.offRouteKm, isNot(closeTo(1.2, 0.01)));
+  });
+
+  test('each stop carries its along-route progress, distinct from its '
+      'offset, stamped with the route revision', () {
+    final c = container(route: result());
+    addTearDown(c.dispose);
+
+    final metrics = c.read(stationRouteMetricsProvider);
+    // 'on-route' sits on the second corridor vertex, ~12.4 km from the
+    // start; its progress is that distance, not its (zero) offset and
+    // not its first-seen `dist`.
+    final along = metrics['on-route']!.alongKm;
+    expect(along, greaterThan(10));
+    expect(along, lessThan(16));
+    expect(along, isNot(closeTo(metrics['on-route']!.offRouteKm, 1)));
+    // Both stations project onto the same stretch of road, so they are
+    // met at nearly the same progress even though their offsets differ.
+    expect(metrics['off-route']!.alongKm, closeTo(along, 3));
+    // No request on the fixture → revision 0; a real search stamps its
+    // own revision so a metric can never be read as another route's.
+    expect(metrics['on-route']!.routeRevision, 0);
   });
 
   test(
@@ -108,8 +129,8 @@ void main() {
     addTearDown(b.dispose);
 
     expect(
-      a.read(stationOffRouteKmProvider)['off-route'],
-      closeTo(b.read(stationOffRouteKmProvider)['off-route']!, 1e-9),
+      a.read(stationRouteMetricsProvider)['off-route']!.offRouteKm,
+      closeTo(b.read(stationRouteMetricsProvider)['off-route']!.offRouteKm, 1e-9),
     );
   });
 
@@ -119,13 +140,13 @@ void main() {
     final c = container(route: result(), mode: SearchMode.nearby);
     addTearDown(c.dispose);
 
-    expect(c.read(stationOffRouteKmProvider), isEmpty);
+    expect(c.read(stationRouteMetricsProvider), isEmpty);
   });
 
   test('no route result yields an empty map', () {
     final c = container(route: null);
     addTearDown(c.dispose);
 
-    expect(c.read(stationOffRouteKmProvider), isEmpty);
+    expect(c.read(stationRouteMetricsProvider), isEmpty);
   });
 }

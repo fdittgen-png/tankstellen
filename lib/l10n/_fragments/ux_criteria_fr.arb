@@ -16,8 +16,8 @@
   "criteriaShowLess": "Afficher moins",
   "criteriaBrands": "Marques",
   "criteriaRouteOptions": "Options d'itinéraire",
-  "criteriaRouteOptionsSummary": "Tous les {segmentKm} km · détour {detourKm} km · {saving}",
-  "@criteriaRouteOptionsSummary": {
+  "criteriaRouteOptionsCorridorSummary": "Tous les {segmentKm} km · ≤ {detourKm} km de l'itinéraire · {saving}",
+  "@criteriaRouteOptionsCorridorSummary": {
     "placeholders": {
       "segmentKm": {
         "type": "int"

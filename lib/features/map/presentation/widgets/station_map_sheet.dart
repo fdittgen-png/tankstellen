@@ -21,6 +21,12 @@ import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/price_freshness_words.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/widgets/amenity_summary.dart';
+import '../../../route_search/api.dart'
+    show
+        RouteStopMetrics,
+        RouteStopMetricsScope,
+        routeStopAlongText,
+        routeStopOffRouteText;
 
 /// The station sheet the map opens OVER itself (#4093, epic #4087).
 ///
@@ -42,10 +48,17 @@ class StationMapSheet extends ConsumerWidget {
     super.key,
     required this.station,
     required this.fuelType,
+    this.routeMetrics,
   });
 
   final Station station;
   final FuelType fuelType;
+
+  /// #4432 — where the station sits on the route the map is showing, or
+  /// null on a nearby map. When present it REPLACES `Station.dist`, which
+  /// on a route is the distance from whichever sample point's query
+  /// returned the station, not from the driver.
+  final RouteStopMetrics? routeMetrics;
 
   /// Show the sheet over the current route. Returns when it closes.
   static Future<void> show(
@@ -53,13 +66,20 @@ class StationMapSheet extends ConsumerWidget {
     required Station station,
     required FuelType fuelType,
   }) {
+    // Read at the tap: the modal route is not a descendant of the route
+    // map's scope, so the value is carried over rather than looked up.
+    final routeMetrics = RouteStopMetricsScope.read(context, station.id);
     return showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       // Over the map, not instead of it: the barrier stays translucent so
       // the markers the user was comparing are still visible behind.
       barrierColor: Colors.black.withValues(alpha: 0.25),
-      builder: (_) => StationMapSheet(station: station, fuelType: fuelType),
+      builder: (_) => StationMapSheet(
+        station: station,
+        fuelType: fuelType,
+        routeMetrics: routeMetrics,
+      ),
     );
   }
 
@@ -98,14 +118,28 @@ class StationMapSheet extends ConsumerWidget {
                       Text(
                         [
                           if (station.place.isNotEmpty) station.place,
-                          PriceFormatter.formatDistance(station.dist),
+                          if (routeMetrics case final m?)
+                            routeStopAlongText(l10n, m)
+                          else
+                            PriceFormatter.formatDistance(station.dist),
                         ].join(' · '),
+                        key: const Key('station_map_sheet_place_line'),
                         style: AppText.body(context).copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      if (routeMetrics case final m?)
+                        Text(
+                          routeStopOffRouteText(l10n, m),
+                          key: const Key('station_map_sheet_off_route'),
+                          style: AppText.body(context).copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                     ],
                   ),
                 ),
