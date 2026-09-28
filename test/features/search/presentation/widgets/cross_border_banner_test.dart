@@ -9,10 +9,21 @@ import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/country/country_provider.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/features/search/domain/entities/cross_border_suggestion.dart';
+import 'package:tankstellen/core/utils/unit_formatter.dart';
 import 'package:tankstellen/features/search/presentation/widgets/cross_border_banner.dart';
 import 'package:tankstellen/features/search/providers/cross_border_suggestion_provider.dart';
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/pump_app.dart';
+
+const _franceSuggestion = CrossBorderSuggestion(
+  neighborCountryCode: 'FR',
+  neighborName: 'France',
+  neighborFlag: '\u{1F1EB}\u{1F1F7}',
+  distanceKm: 4.0,
+  priceDeltaPerLiter: 0.12,
+  sampleCount: 6,
+);
 
 void main() {
   group('CrossBorderBanner', () {
@@ -157,6 +168,76 @@ void main() {
       await tester.pump();
 
       expect(spy.selectedCodes, contains('FR'));
+    });
+
+    testWidgets('it renders in French, with no English fallback in the '
+        'copy this surface owns', (tester) async {
+      await pumpApp(
+        tester,
+        const CrossBorderBanner(),
+        locale: const Locale('fr'),
+        overrides: [
+          crossBorderSuggestionProvider
+              .overrideWith((ref) async => _franceSuggestion),
+        ],
+      );
+
+      final l = await AppLocalizations.delegate.load(const Locale('fr'));
+      final headline = l.crossBorderCheaper(
+        _franceSuggestion.neighborName,
+        UnitFormatter.formatDecimal(_franceSuggestion.distanceKm,
+            fractionDigits: 0),
+        UnitFormatter.formatDecimal(_franceSuggestion.priceDeltaPerLiter,
+            fractionDigits: 2),
+      );
+      expect(find.text(headline), findsOneWidget);
+      expect(find.text(l.crossBorderTapToSwitch), findsOneWidget);
+      expect(find.textContaining('Tap to switch country'), findsNothing);
+    });
+
+    testWidgets('a narrow screen at double text scale does not overflow',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await pumpScaledApp(
+        tester,
+        const CrossBorderBanner(),
+        textScaleFactor: 2,
+        overrides: [
+          crossBorderSuggestionProvider
+              .overrideWith((ref) async => _franceSuggestion),
+        ],
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(Card), findsOneWidget);
+    });
+
+    testWidgets('the headline and its tap hint carry one accessible label '
+        'naming the saving, not just showing it', (tester) async {
+      await pumpApp(
+        tester,
+        const CrossBorderBanner(),
+        overrides: [
+          crossBorderSuggestionProvider
+              .overrideWith((ref) async => _franceSuggestion),
+        ],
+      );
+
+      final l = await AppLocalizations.delegate.load(const Locale('en'));
+      final headline = l.crossBorderCheaper(
+        _franceSuggestion.neighborName,
+        UnitFormatter.formatDecimal(_franceSuggestion.distanceKm,
+            fractionDigits: 0),
+        UnitFormatter.formatDecimal(_franceSuggestion.priceDeltaPerLiter,
+            fractionDigits: 2),
+      );
+      expect(
+        find.bySemanticsLabel('$headline. ${l.crossBorderTapToSwitch}'),
+        findsOneWidget,
+      );
     });
   });
 }
