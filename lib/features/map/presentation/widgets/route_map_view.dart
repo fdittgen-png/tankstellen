@@ -26,9 +26,12 @@ import '../../../route_search/api.dart'
     show
         RouteLiveProgress,
         RouteLiveProgressScope,
+        RouteStopMetrics,
+        RouteStopMetricsScope,
         RouteUpdateFromPositionBanner,
         aheadOfDriver,
-        routeLiveProgressControllerProvider;
+        routeLiveProgressControllerProvider,
+        routeStopMetricsFor;
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_result_item.dart';
@@ -82,6 +85,21 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
   /// `initialZoom` before the first layout pass runs `initialCameraFit`
   /// (which frames `_routeBounds`). Mirrors `trip_path_map_card.dart`.
   late final LatLng _initialCenter = _routeBounds.center;
+
+  RouteSearchResult? _metricsOf;
+  Map<String, RouteStopMetrics> _metrics = const {};
+
+  /// #4432 — along-route progress and corridor offset of every result
+  /// station, measured on THIS result's route (never the first-seen
+  /// `Station.dist`). Memoised on the result object: one O(n · P)
+  /// projection per published result, not per rebuild.
+  Map<String, RouteStopMetrics> get _routeMetrics {
+    if (!identical(_metricsOf, widget.routeResult)) {
+      _metricsOf = widget.routeResult;
+      _metrics = routeStopMetricsFor(widget.routeResult);
+    }
+    return _metrics;
+  }
 
   List<Station> get _allFuelStations => widget.routeResult.stations
       .whereType<FuelStationResult>()
@@ -157,7 +175,11 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
     FuelType resolveFuel(Station s) =>
         fuelForStation(s, result.profileFuelByCountry, fuelType);
 
-    return RouteLiveProgressScope(child: Column(
+    return RouteLiveProgressScope(child: RouteStopMetricsScope(
+      // #4432 — the chips and the marker sheet below are shared with the
+      // nearby map; this scope is how they learn they are on a route.
+      metrics: _routeMetrics,
+      child: Column(
       children: [
         const RouteUpdateFromPositionBanner(),
         RouteViewModeBar(
@@ -248,7 +270,7 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
           ),
         ),
       ],
-    ));
+    )));
   }
 
   Future<void> _showSaveRouteDialog(

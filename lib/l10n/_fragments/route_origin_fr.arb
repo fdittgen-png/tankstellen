@@ -3,6 +3,8 @@
   "routeStopOffRoute": "{distance} de l'itinéraire",
   "routeStopOffRouteQualifier": "estimation géométrique",
   "routeStopOffRouteTooltip": "Distance à vol d'oiseau entre cet itinéraire et la station. Ce n'est ni la distance depuis votre position, ni le trajet supplémentaire qu'un arrêt coûterait.",
+  "routeStopAlongRoute": "Vers {distance} le long de cet itinéraire",
+  "routeStopAlongRouteTooltip": "Position de la station le long de cet itinéraire, comptée depuis son départ. Ce n'est ni la distance depuis votre position, ni un détour parcouru.",
   "routeLeftRouteNotice": "Vous semblez avoir quitté cet itinéraire : ses arrêts ne sont peut-être plus devant vous.",
   "routeUpdateFromPosition": "Mettre à jour l'itinéraire depuis votre position"
 }

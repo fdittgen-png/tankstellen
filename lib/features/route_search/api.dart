@@ -19,6 +19,7 @@ export 'domain/entities/route_info.dart';
 export 'domain/route_search_strategy.dart';
 export 'presentation/widgets/route_input.dart';
 export 'presentation/widgets/route_live_progress_scope.dart';
+export 'presentation/widgets/route_stop_metrics_scope.dart';
 export 'providers/route_input_provider.dart';
 export 'providers/route_live_progress_provider.dart';
 export 'providers/route_search_params_provider.dart';

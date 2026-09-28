@@ -9268,6 +9268,15 @@ class AppLocalizationsHu extends AppLocalizations {
       'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
 
   @override
+  String routeStopAlongRoute(String distance) {
+    return 'About $distance along this route';
+  }
+
+  @override
+  String get routeStopAlongRouteTooltip =>
+      'How far along this route the station is met, counted from the route\'s start. Not the distance from you, and not a driven detour.';
+
+  @override
   String get routeLeftRouteNotice =>
       'You seem to have left this route — its stops may no longer be ahead of you.';
 

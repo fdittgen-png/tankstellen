@@ -16,6 +16,7 @@ import '../../../../core/widgets/price_freshness_words.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/time/app_clock.dart';
 import '../../../../core/country/country_config.dart';
+import '../../providers/station_off_route_provider.dart';
 import 'station_card_distance.dart';
 
 /// The card's single **label**-role metadata line (#3949):
@@ -252,16 +253,25 @@ String stationCardAddressLine(Station station, bool includeStreet) {
 /// deliberately NOT a fallback: for the brandless stations whose name IS
 /// their street (Mexican CRE rows, French independents) it would print
 /// the title a second time, which is the #2926 duplicate all over again.
-class StationCardPlaceLine extends StatelessWidget {
+///
+/// #4432 — on the active route the "how far" is not one number but two
+/// named geometric ones: `Pézenas · About 62 km along this route` on
+/// this line and `4.4 km from the route · geometric estimate` under it
+/// ([StationCardRouteMetric]). The bare first-seen `Station.dist` never
+/// appears on a route row.
+class StationCardPlaceLine extends ConsumerWidget {
   const StationCardPlaceLine({super.key, required this.station});
 
   final Station station;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final style = AppText.body(context);
     final place = station.place;
-    return Row(
+    final metrics = ref.watch(
+      stationRouteMetricsProvider.select((m) => m[station.id]),
+    );
+    final line = Row(
       children: [
         if (place.isNotEmpty)
           Flexible(
@@ -273,7 +283,23 @@ class StationCardPlaceLine extends StatelessWidget {
             ),
           ),
         if (place.isNotEmpty) _Separator(style: style),
-        StationCardDistanceSegment(station: station, style: style),
+        if (metrics == null)
+          StationCardDistanceSegment(station: station, style: style)
+        else
+          // Flexible: the along figure shares the row with the place and
+          // ellipsises rather than overflowing at 320 dp / large text.
+          Flexible(
+            child: StationCardRouteMetric(metrics: metrics, style: style),
+          ),
+      ],
+    );
+    if (metrics == null) return line;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        line,
+        StationCardRouteMetric.offRoute(metrics: metrics, style: style),
       ],
     );
   }

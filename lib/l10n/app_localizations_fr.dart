@@ -9324,6 +9324,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Distance à vol d\'oiseau entre cet itinéraire et la station. Ce n\'est ni la distance depuis votre position, ni le trajet supplémentaire qu\'un arrêt coûterait.';
 
   @override
+  String routeStopAlongRoute(String distance) {
+    return 'Vers $distance le long de cet itinéraire';
+  }
+
+  @override
+  String get routeStopAlongRouteTooltip =>
+      'Position de la station le long de cet itinéraire, comptée depuis son départ. Ce n\'est ni la distance depuis votre position, ni un détour parcouru.';
+
+  @override
   String get routeLeftRouteNotice =>
       'Vous semblez avoir quitté cet itinéraire : ses arrêts ne sont peut-être plus devant vous.';
 

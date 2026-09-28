@@ -9195,6 +9195,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
 
   @override
+  String routeStopAlongRoute(String distance) {
+    return 'About $distance along this route';
+  }
+
+  @override
+  String get routeStopAlongRouteTooltip =>
+      'How far along this route the station is met, counted from the route\'s start. Not the distance from you, and not a driven detour.';
+
+  @override
   String get routeLeftRouteNotice =>
       'You seem to have left this route — its stops may no longer be ahead of you.';
 
@@ -21454,6 +21463,15 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get routeStopOffRouteTooltip =>
       '⟦Šŧřáîǧĥŧ-łîñé đîšŧáñçé ƒřóɱ ŧĥîš řóúŧé ŧó ŧĥé šŧáŧîóñ. Ñóŧ ŧĥé đîšŧáñçé ƒřóɱ ýóú, áñđ ñóŧ ŧĥé éẋŧřá đřîṽîñǧ á šŧóƥ ŵóúłđ çóšŧ. ·············································⟧';
+
+  @override
+  String routeStopAlongRoute(String distance) {
+    return '⟦Áƀóúŧ $distance áłóñǧ ŧĥîš řóúŧé ·········⟧';
+  }
+
+  @override
+  String get routeStopAlongRouteTooltip =>
+      '⟦Ĥóŵ ƒář áłóñǧ ŧĥîš řóúŧé ŧĥé šŧáŧîóñ îš ɱéŧ, çóúñŧéđ ƒřóɱ ŧĥé řóúŧé\'š šŧářŧ. Ñóŧ ŧĥé đîšŧáñçé ƒřóɱ ýóú, áñđ ñóŧ á đřîṽéñ đéŧóúř. ·············································⟧';
 
   @override
   String get routeLeftRouteNotice =>

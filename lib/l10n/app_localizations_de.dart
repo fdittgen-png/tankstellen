@@ -9287,6 +9287,15 @@ class AppLocalizationsDe extends AppLocalizations {
       'Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde.';
 
   @override
+  String routeStopAlongRoute(String distance) {
+    return 'Etwa $distance entlang dieser Route';
+  }
+
+  @override
+  String get routeStopAlongRouteTooltip =>
+      'Wie weit entlang dieser Route die Tankstelle liegt, gezählt ab dem Start der Route. Nicht die Entfernung von Ihnen und kein gefahrener Umweg.';
+
+  @override
   String get routeLeftRouteNotice =>
       'Sie haben diese Route offenbar verlassen – ihre Stopps liegen womöglich nicht mehr vor Ihnen.';
 

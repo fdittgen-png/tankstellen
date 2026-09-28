@@ -10,6 +10,8 @@ import 'package:tankstellen/core/domain/station_amenity.dart';
 import 'package:tankstellen/core/time/app_clock.dart';
 import 'package:tankstellen/core/widgets/amenity_summary.dart';
 import 'package:tankstellen/features/map/presentation/widgets/station_map_sheet.dart';
+import 'package:tankstellen/features/route_search/api.dart'
+    show RouteStopMetrics, RouteStopMetricsScope;
 import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../helpers/silence_error_logger.dart';
@@ -118,5 +120,83 @@ void main() {
     final l10n = await pumpSheet(tester, station(updatedAt: 'gestern'));
     expect(find.text(l10n.priceFreshnessUnknown), findsOneWidget);
     expect(find.text(l10n.priceFreshnessFresh), findsNothing);
+  });
+
+  group('opened from a route map (#4432)', () {
+    // Open the sheet the way a marker does — `show` from a context
+    // INSIDE the route surface's scope — so the carry-over across the
+    // modal route (not a descendant of the scope) is what is tested.
+    Future<void> openFromScope(
+      WidgetTester tester, {
+      Map<String, RouteStopMetrics>? metrics,
+      Locale locale = const Locale('en'),
+    }) async {
+      final s = station();
+      Widget opener = Builder(
+        builder: (context) => TextButton(
+          onPressed: () => StationMapSheet.show(
+            context,
+            station: s,
+            fuelType: FuelType.e10,
+          ),
+          child: const Text('open'),
+        ),
+      );
+      if (metrics != null) {
+        opener = RouteStopMetricsScope(metrics: metrics, child: opener);
+      }
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [appClockProvider.overrideWithValue(FixedClock(now))],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: locale,
+            home: Scaffold(body: opener),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+    }
+
+    const onRoute = {
+      'st-1': RouteStopMetrics(routeRevision: 2, alongKm: 48.2, offRouteKm: 1.3),
+    };
+
+    testWidgets('it names the route readings instead of the first-seen '
+        'sample distance', (tester) async {
+      await openFromScope(tester, metrics: onRoute);
+
+      expect(find.byType(StationMapSheet), findsOneWidget);
+      expect(
+        find.text('Pézenas · About 48 km along this route'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('1,3 km from the route · geometric estimate'),
+        findsOneWidget,
+      );
+      // `Station.dist` (2.5 km from a sample point) is not on the sheet.
+      expect(find.textContaining('2,5 km'), findsNothing);
+    });
+
+    testWidgets('in French, too', (tester) async {
+      await openFromScope(tester,
+          metrics: onRoute, locale: const Locale('fr'));
+
+      expect(find.textContaining('le long de cet itinéraire'), findsOneWidget);
+      expect(find.textContaining('estimation géométrique'), findsOneWidget);
+      expect(find.textContaining('along this route'), findsNothing);
+    });
+
+    testWidgets('outside a route scope it keeps the nearby reading',
+        (tester) async {
+      await openFromScope(tester);
+
+      expect(find.textContaining('2,5 km'), findsOneWidget);
+      expect(find.byKey(const Key('station_map_sheet_off_route')),
+          findsNothing);
+    });
   });
 }

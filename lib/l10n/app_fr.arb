@@ -7937,5 +7937,14 @@
   },
   "currencyBackfillUndo": "Annuler les devises indiquées",
   "routeLeftRouteNotice": "Vous semblez avoir quitté cet itinéraire : ses arrêts ne sont peut-être plus devant vous.",
-  "routeUpdateFromPosition": "Mettre à jour l'itinéraire depuis votre position"
+  "routeUpdateFromPosition": "Mettre à jour l'itinéraire depuis votre position",
+  "routeStopAlongRoute": "Vers {distance} le long de cet itinéraire",
+  "@routeStopAlongRoute": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "routeStopAlongRouteTooltip": "Position de la station le long de cet itinéraire, comptée depuis son départ. Ce n'est ni la distance depuis votre position, ni un détour parcouru."
 }

@@ -4,24 +4,25 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/domain/search_mode.dart';
-import '../../../core/utils/route_projection.dart';
 import '../../route_search/api.dart';
 import 'search_mode_provider.dart';
 
 part 'station_off_route_provider.g.dart';
 
-/// Station id → how far that station lies OFF the active route, in km
-/// (#4432).
+/// Station id → where that station sits on the ACTIVE route (#4432):
+/// its along-route progress and its geometric offset from the route
+/// line, as one [RouteStopMetrics] stamped with the route revision.
 ///
 /// ## What this is, exactly
 ///
-/// The straight-line distance from the route's own geometry to the
-/// station, computed against THIS route via [RouteProjection] — the
-/// same projection the refuel plan uses (#4146), so "off the route" has
-/// one definition. It is a **geometric estimate**: the map distance to
-/// the line, not a driven distance. It is therefore neither the
-/// distance from the driver nor the extra driving a stop would cost,
-/// and the row that shows it says so.
+/// Both figures are measured against THIS route's own geometry by
+/// `routeStopMetricsFor` — the one `RouteProjection` itinerary pass the
+/// corridor filter, the list order and the refuel plan (#4146) share,
+/// so "off the route" and "how far along" each have one definition.
+/// They are **geometric**: neither is the distance from the driver nor
+/// the extra driving a stop would cost (those are the routed
+/// `StationTravelEstimate` quantities, #4359), and the row that shows
+/// them says so.
 ///
 /// ## The bug it replaces
 ///
@@ -48,18 +49,13 @@ part 'station_off_route_provider.g.dart';
 /// Empty unless a route search is the active one, so a route result
 /// left in memory cannot relabel the distances in a nearby search.
 @riverpod
-Map<String, double> stationOffRouteKm(Ref ref) {
+Map<String, RouteStopMetrics> stationRouteMetrics(Ref ref) {
   if (ref.watch(activeSearchModeProvider) != SearchMode.route) {
-    return const <String, double>{};
+    return const <String, RouteStopMetrics>{};
   }
   final result = ref.watch(routeSearchStateProvider).value;
   if (result == null || result.stations.isEmpty) {
-    return const <String, double>{};
+    return const <String, RouteStopMetrics>{};
   }
-  final projection = RouteProjection(result.route.geometry);
-  if (projection.isEmpty) return const <String, double>{};
-  return <String, double>{
-    for (final station in result.stations)
-      station.id: projection.project(station.lat, station.lng).offRouteKm,
-  };
+  return routeStopMetricsFor(result);
 }

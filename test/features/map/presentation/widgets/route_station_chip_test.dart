@@ -6,6 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/map/presentation/widgets/route_station_chip.dart';
 import 'package:tankstellen/core/utils/station_extensions.dart';
 import 'package:tankstellen/core/domain/station.dart';
+import 'package:tankstellen/features/route_search/api.dart'
+    show RouteStopMetrics, RouteStopMetricsScope;
+import 'package:tankstellen/l10n/app_localizations.dart';
 
 import '../../../../fixtures/stations.dart';
 
@@ -55,23 +58,78 @@ void main() {
       expect(find.text('--'), findsOneWidget);
     });
 
-    testWidgets('displays distance with one decimal', (tester) async {
-      final station = Station(
-        id: testStation.id,
-        name: testStation.name,
-        brand: testStation.brand,
-        street: testStation.street,
-        houseNumber: testStation.houseNumber,
-        postCode: testStation.postCode,
-        place: testStation.place,
-        lat: testStation.lat,
-        lng: testStation.lng,
-        dist: 9.87,
-        isOpen: testStation.isOpen,
+    // #4432 — the chip used to print `Station.dist`: the distance from
+    // whichever route sample point's query first returned the station,
+    // neither from the driver nor along the route.
+    Station withFirstSeenDist() => Station(
+          id: testStation.id,
+          name: testStation.name,
+          brand: testStation.brand,
+          street: testStation.street,
+          houseNumber: testStation.houseNumber,
+          postCode: testStation.postCode,
+          place: testStation.place,
+          lat: testStation.lat,
+          lng: testStation.lng,
+          dist: 9.87,
+          isOpen: testStation.isOpen,
+        );
+
+    testWidgets('never shows the first-seen sample distance', (tester) async {
+      await tester.pumpWidget(buildChip(station: withFirstSeenDist()));
+      expect(find.textContaining('9,9 km'), findsNothing);
+      // Outside a route scope there is no route figure to show, and no
+      // stand-in either.
+      expect(find.byKey(const Key('route_chip_route_progress')), findsNothing);
+    });
+
+    testWidgets('inside a route scope shows the along-route progress, named',
+        (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: RouteStopMetricsScope(
+            metrics: {
+              testStation.id: const RouteStopMetrics(
+                routeRevision: 3,
+                alongKm: 61.6,
+                offRouteKm: 4.4,
+              ),
+            },
+            child: RouteStationChip(
+              station: withFirstSeenDist(),
+              stopNumber: 1,
+              isSelected: false,
+              price: 1.9,
+              onTap: () {},
+            ),
+          ),
+        ),
+      ));
+
+      final figure = find.byKey(const Key('route_chip_route_progress'));
+      expect(figure, findsOneWidget);
+      // Whole units, with the along-route glyph naming it.
+      expect(find.text('62 km'), findsOneWidget);
+      expect(
+        find.descendant(of: figure, matching: find.byIcon(Icons.linear_scale)),
+        findsOneWidget,
       );
-      await tester.pumpWidget(buildChip(station: station));
-      // Distance now uses the active country's locale (FR → comma).
-      expect(find.textContaining('9,9 km'), findsOneWidget);
+      // The chip is too small for the words; the tooltip and the spoken
+      // label carry them.
+      expect(
+        tester.widget<Semantics>(figure).properties.label,
+        'About 62 km along this route',
+      );
+      expect(
+        tester.widget<Tooltip>(find.ancestor(
+          of: figure,
+          matching: find.byType(Tooltip),
+        )).message,
+        contains('Not the distance from you'),
+      );
+      expect(find.textContaining('9,9 km'), findsNothing);
     });
 
     testWidgets('selected chip uses primary background color', (tester) async {

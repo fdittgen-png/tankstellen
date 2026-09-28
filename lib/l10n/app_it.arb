@@ -11113,5 +11113,20 @@
   "@routeUpdateFromPosition": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "routeStopAlongRoute": "About {distance} along this route",
+  "@routeStopAlongRoute": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "routeStopAlongRouteTooltip": "How far along this route the station is met, counted from the route's start. Not the distance from you, and not a driven detour.",
+  "@routeStopAlongRouteTooltip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

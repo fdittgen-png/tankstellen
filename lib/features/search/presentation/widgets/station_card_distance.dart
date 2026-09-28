@@ -8,31 +8,20 @@ import '../../../../core/domain/station.dart';
 import '../../../../core/theme/spacing.dart';
 import '../../../../core/utils/price_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../route_search/api.dart'
+    show RouteStopMetrics, routeStopAlongText, routeStopOffRouteText;
 import '../../providers/road_distance_provider.dart';
-import '../../providers/station_off_route_provider.dart';
 
-/// The distance segment of a station row — and, since #4432, the one
-/// place that says WHICH distance it is.
+/// The distance segment of a NEARBY station row: road distance when the
+/// radar's OSRM table answered (#3634, [Icons.route]), else the
+/// crow-flies baseline — the only readings that have ever meant "from
+/// me".
 ///
-/// Three readings share the slot and they are not interchangeable:
-///
-///  * **off-route offset** (`4.4 km from the route · geometric
-///    estimate`, [Icons.alt_route]) — in a route search. It is the
-///    straight-line distance from the route line to the station,
-///    measured against THIS route (`stationOffRouteKmProvider`). It is not
-///    how far the station is from the driver, and it is not the extra
-///    driving a stop costs; it is labelled and qualified so it cannot be
-///    read as either.
-///  * **road distance** ([Icons.route]) — #3634, when the OSRM table has
-///    answered for this station on the radar surface.
-///  * **crow-flies distance** — the haversine baseline, and the only
-///    reading that has ever meant "from me".
-///
-/// In a route context the radar side channel is deliberately NOT
-/// consulted: `roadDistancesProvider` is keyed by station id alone, from
-/// an origin that belongs to a different (nearby) search, so a matching
-/// id there proves nothing about this route. Wearing a route label it
-/// would be a second wrong number rather than the first one fixed.
+/// A route row does not come here: it shows [StationCardRouteMetrics]
+/// instead (#4432). In a route context the radar side channel is
+/// deliberately NOT consulted: `roadDistancesProvider` is keyed by
+/// station id alone, from an origin that belongs to a different (nearby)
+/// search, so a matching id there proves nothing about this route.
 class StationCardDistanceSegment extends ConsumerWidget {
   const StationCardDistanceSegment({
     super.key,
@@ -45,21 +34,6 @@ class StationCardDistanceSegment extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final offRouteKm = ref.watch(
-      stationOffRouteKmProvider.select((m) => m[station.id]),
-    );
-    if (offRouteKm != null) {
-      final l10n = AppLocalizations.of(context);
-      return _IconValue(
-        key: const Key('station_card_off_route'),
-        icon: Icons.alt_route,
-        style: style,
-        text: '${l10n.routeStopOffRoute(
-          PriceFormatter.formatDistance(offRouteKm),
-        )} · ${l10n.routeStopOffRouteQualifier}',
-        tooltip: l10n.routeStopOffRouteTooltip,
-      );
-    }
     final roadKm = ref.watch(
       roadDistancesProvider.select((m) => m[station.id]),
     );
@@ -72,7 +46,7 @@ class StationCardDistanceSegment extends ConsumerWidget {
         overflow: TextOverflow.ellipsis,
       );
     }
-    return _IconValue(
+    return StationCardIconValue(
       key: const Key('station_card_road_distance'),
       icon: Icons.route,
       style: style,
@@ -81,10 +55,67 @@ class StationCardDistanceSegment extends ConsumerWidget {
   }
 }
 
+/// One of the two geometric route readings of a station row (#4432,
+/// checkpoint 3's distance-provenance table), each named and each with
+/// its own glyph so they cannot be mistaken for each other or for a
+/// distance from the driver:
+///
+///  * **along-route progress** ([Icons.linear_scale]) — `About 62 km
+///    along this route`: where the route meets the station, counted from
+///    the route start; the quantity the list is ordered by.
+///  * **corridor offset** ([Icons.alt_route], [offRoute]) — `4.4 km from
+///    the route · geometric estimate`: the straight-line distance from
+///    the route line, qualified because it is flown, not driven.
+///
+/// The routed quantities (road distance to the station, the stop's extra
+/// driving and their evidence status) are `StationTravelEstimate`'s
+/// (#4359) and are shown where the planner uses them; nothing here
+/// stands in for them.
+class StationCardRouteMetric extends StatelessWidget {
+  const StationCardRouteMetric({
+    super.key,
+    required this.metrics,
+    required this.style,
+  }) : offRoute = false;
+
+  const StationCardRouteMetric.offRoute({
+    super.key,
+    required this.metrics,
+    required this.style,
+  }) : offRoute = true;
+
+  final RouteStopMetrics metrics;
+  final TextStyle style;
+
+  /// The corridor offset rather than the along-route progress.
+  final bool offRoute;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (offRoute) {
+      return StationCardIconValue(
+        key: const Key('station_card_off_route'),
+        icon: Icons.alt_route,
+        style: style,
+        text: routeStopOffRouteText(l10n, metrics),
+        tooltip: l10n.routeStopOffRouteTooltip,
+      );
+    }
+    return StationCardIconValue(
+      key: const Key('station_card_route_progress'),
+      icon: Icons.linear_scale,
+      style: style,
+      text: routeStopAlongText(l10n, metrics),
+      tooltip: l10n.routeStopAlongRouteTooltip,
+    );
+  }
+}
+
 /// A small leading glyph plus an ellipsising value, the shape the meta
 /// line's other qualified segments already use.
-class _IconValue extends StatelessWidget {
-  const _IconValue({
+class StationCardIconValue extends StatelessWidget {
+  const StationCardIconValue({
     super.key,
     required this.icon,
     required this.style,

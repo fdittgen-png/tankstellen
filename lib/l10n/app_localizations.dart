@@ -15204,6 +15204,18 @@ abstract class AppLocalizations {
   /// **'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.'**
   String get routeStopOffRouteTooltip;
 
+  /// Along-route progress of a station in a route search (#4432, the distance-provenance table): how far from the START of this route the route meets the station, i.e. its ordered position on the route. It is NOT the distance from the driver (the driver may have moved since the search) and NOT a driven detour. {distance} is already unit-formatted in whole km/mi.
+  ///
+  /// In en, this message translates to:
+  /// **'About {distance} along this route'**
+  String routeStopAlongRoute(String distance);
+
+  /// Long-press / screen-reader sentence on the along-route progress figure of a route stop (#4432), naming what it measures and the two quantities it is NOT.
+  ///
+  /// In en, this message translates to:
+  /// **'How far along this route the station is met, counted from the route\'s start. Not the distance from you, and not a driven detour.'**
+  String get routeStopAlongRouteTooltip;
+
   /// Notice on the route results when foreground GPS fixes place the driver OFF the route, or cannot place them on it at all (#4432). Stops and best-stop picks are route-relative, so they may be stale; the app does NOT re-route on its own — the button beside this notice does.
   ///
   /// In en, this message translates to:
