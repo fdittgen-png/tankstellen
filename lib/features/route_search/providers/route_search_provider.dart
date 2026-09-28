@@ -348,24 +348,30 @@ class RouteSearchState extends _$RouteSearchState {
   Future<bool> refresh() async {
     var request = _lastRequest;
     if (request == null) return false;
-    if (request.originIsVehiclePosition) {
-      final first = request.waypoints.first;
+    // #4432 — whichever endpoint is the driver's own position moves:
+    // the origin normally, the destination after a Swap.
+    final vehicleAt = request.originIsVehiclePosition
+        ? request.waypoints.first
+        : request.destinationIsVehiclePosition
+            ? request.waypoints.last
+            : null;
+    if (vehicleAt != null) {
       final origin = await resolveCurrentPositionOrigin(
         locationService: ref.read(locationServiceProvider),
         clock: ref.read(appClockProvider),
-        stored: LatLng(first.lat, first.lng),
+        stored: LatLng(vehicleAt.lat, vehicleAt.lng),
         capturedAt: request.originCapturedAt,
       );
       if (!ref.mounted) return true;
-      // No usable origin at all: keep the one the request already has
+      // No usable position at all: keep the one the request already has
       // and refresh the prices. Refusing to do anything would make the
       // refresh action a silent no-op, which is its own small lie.
       final coords = origin.coords;
       if (coords != null) {
-        request = request.withOrigin(
-          coords,
-          ref.read(appClockProvider).now().subtract(origin.age),
-        );
+        final at = ref.read(appClockProvider).now().subtract(origin.age);
+        request = request.originIsVehiclePosition
+            ? request.withOrigin(coords, at)
+            : request.withDestination(coords, at);
       }
     }
     await searchAlongRoute(

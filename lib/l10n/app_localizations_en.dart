@@ -9195,6 +9195,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
 
   @override
+  String get routeLeftRouteNotice =>
+      'You seem to have left this route — its stops may no longer be ahead of you.';
+
+  @override
+  String get routeUpdateFromPosition => 'Update route from your position';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/L';
   }
@@ -21447,6 +21454,14 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String get routeStopOffRouteTooltip =>
       '⟦Šŧřáîǧĥŧ-łîñé đîšŧáñçé ƒřóɱ ŧĥîš řóúŧé ŧó ŧĥé šŧáŧîóñ. Ñóŧ ŧĥé đîšŧáñçé ƒřóɱ ýóú, áñđ ñóŧ ŧĥé éẋŧřá đřîṽîñǧ á šŧóƥ ŵóúłđ çóšŧ. ·············································⟧';
+
+  @override
+  String get routeLeftRouteNotice =>
+      '⟦Ýóú šééɱ ŧó ĥáṽé łéƒŧ ŧĥîš řóúŧé — îŧš šŧóƥš ɱáý ñó łóñǧéř ƀé áĥéáđ óƒ ýóú. ··························⟧';
+
+  @override
+  String get routeUpdateFromPosition =>
+      '⟦Úƥđáŧé řóúŧé ƒřóɱ ýóúř ƥóšîŧîóñ ············⟧';
 
   @override
   String stationCardPriceUnit(String currency) {

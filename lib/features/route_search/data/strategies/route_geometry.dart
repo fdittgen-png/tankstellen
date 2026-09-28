@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../../core/country/country_bounding_box.dart';
 import '../../../../core/services/country_service_registry.dart';
 import '../../../../core/utils/geo_utils.dart';
+import '../../../../core/utils/route_projection.dart';
 import '../../../../core/domain/search_result_item.dart';
 import '../../domain/entities/route_info.dart';
 
@@ -59,15 +60,21 @@ double minDistanceToPolyline(double lat, double lng, List<LatLng> polyline) {
 
 /// Sorts [items] in place by their position along [geometry]
 /// (itinerary order), nearest-to-start first.
+///
+/// #4432 — the position is the shared [RouteProjection] itinerary pass
+/// (segment-projected, loop-aware), computed once per item rather than
+/// once per comparison.
 void sortByItineraryOrder(
   List<SearchResultItem> items,
   List<LatLng> geometry,
 ) {
-  items.sort((a, b) {
-    final da = distanceAlongPolyline(a.lat, a.lng, geometry);
-    final db = distanceAlongPolyline(b.lat, b.lng, geometry);
-    return da.compareTo(db);
-  });
+  if (geometry.isEmpty) return;
+  final projection = RouteProjection(geometry);
+  final along = {
+    for (final item in items)
+      item.id: projection.project(item.lat, item.lng).alongKm,
+  };
+  items.sort((a, b) => along[a.id]!.compareTo(along[b.id]!));
 }
 
 /// Map a nearest-sample-point index onto a per-segment bucket index.

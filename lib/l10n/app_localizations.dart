@@ -15204,6 +15204,18 @@ abstract class AppLocalizations {
   /// **'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.'**
   String get routeStopOffRouteTooltip;
 
+  /// Notice on the route results when foreground GPS fixes place the driver OFF the route, or cannot place them on it at all (#4432). Stops and best-stop picks are route-relative, so they may be stale; the app does NOT re-route on its own — the button beside this notice does.
+  ///
+  /// In en, this message translates to:
+  /// **'You seem to have left this route — its stops may no longer be ahead of you.'**
+  String get routeLeftRouteNotice;
+
+  /// Button beside routeLeftRouteNotice (#4432): re-runs the same route search from a freshly resolved current position. Nothing else changes (destination, stops and options stay).
+  ///
+  /// In en, this message translates to:
+  /// **'Update route from your position'**
+  String get routeUpdateFromPosition;
+
   /// Unit rendered in the small unit role beside the results card's display-role price (#3949, Epic #3947), e.g. '1,79⁹' followed by '€/L'. {currency} is the station's currency symbol (€, £, $ …) resolved from its origin country; only the per-litre part is translatable (German uses a lowercase 'l').
   ///
   /// In en, this message translates to:

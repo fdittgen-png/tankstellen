@@ -226,6 +226,8 @@ Future<ResolvedRouteOrigin> captureCurrentPositionOrigin({
 /// #4432 — [originIsVehiclePosition] marks the start waypoint as the
 /// driver's own position, which is what lets the corridor run from the
 /// driver onward instead of in both directions.
+/// [destinationIsVehiclePosition] marks the destination the same way,
+/// for a current-location endpoint swapped into the destination slot.
 List<RouteWaypoint>? buildRouteWaypoints({
   required LatLng? start,
   required String startLabel,
@@ -234,6 +236,7 @@ List<RouteWaypoint>? buildRouteWaypoints({
   required List<LatLng?> stops,
   required List<String> stopLabels,
   bool originIsVehiclePosition = false,
+  bool destinationIsVehiclePosition = false,
 }) {
   if (start == null ||
       end == null ||
@@ -256,7 +259,12 @@ List<RouteWaypoint>? buildRouteWaypoints({
             lng: stop.longitude,
             label: i < stopLabels.length ? stopLabels[i] : '',
           ),
-    RouteWaypoint(lat: end.latitude, lng: end.longitude, label: endLabel),
+    RouteWaypoint(
+      lat: end.latitude,
+      lng: end.longitude,
+      label: endLabel,
+      isVehiclePosition: destinationIsVehiclePosition,
+    ),
   ];
 }
 

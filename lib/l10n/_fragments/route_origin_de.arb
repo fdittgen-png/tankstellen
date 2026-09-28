@@ -2,5 +2,7 @@
   "routeOriginStaleCurrentLocation": "Aktuelle Position (vor {age})",
   "routeStopOffRoute": "{distance} von der Route",
   "routeStopOffRouteQualifier": "geometrische Schätzung",
-  "routeStopOffRouteTooltip": "Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde."
+  "routeStopOffRouteTooltip": "Luftlinie von dieser Route zur Tankstelle. Nicht die Entfernung von Ihnen und nicht die zusätzliche Fahrt, die ein Halt kosten würde.",
+  "routeLeftRouteNotice": "Sie haben diese Route offenbar verlassen – ihre Stopps liegen womöglich nicht mehr vor Ihnen.",
+  "routeUpdateFromPosition": "Route ab Ihrer Position aktualisieren"
 }

@@ -59,10 +59,11 @@ class StationMapBody extends StatelessWidget {
   /// "where this search was run from" — or null when it has none.
   ///
   /// #4432: a proximity search has one (the GPS fix, or the ZIP/city
-  /// centre the user chose); the route map does not, because its
-  /// [center] is the bounding-box centre of the found stations and
-  /// drawing a "you are here" dot there was the honesty bug. The route
-  /// map marks its start and destination from the polyline instead.
+  /// centre the user chose). The route map's [center] is the
+  /// bounding-box centre of the found stations — drawing a "you are
+  /// here" dot there was the honesty bug — so it passes the accepted
+  /// device fix of a current-location route instead, or null. Its start
+  /// and destination are marked from the polyline.
   final LatLng? originMarker;
   final double zoom;
   final LatLngBounds fitBounds;
@@ -181,6 +182,7 @@ class StationMapBody extends StatelessWidget {
           MarkerLayer(
             markers: [
               Marker(
+                key: const ValueKey('origin-marker'),
                 point: originMarker!,
                 width: 20,
                 height: 20,

@@ -9243,6 +9243,13 @@ class AppLocalizationsSl extends AppLocalizations {
       'Straight-line distance from this route to the station. Not the distance from you, and not the extra driving a stop would cost.';
 
   @override
+  String get routeLeftRouteNotice =>
+      'You seem to have left this route — its stops may no longer be ahead of you.';
+
+  @override
+  String get routeUpdateFromPosition => 'Update route from your position';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/L';
   }

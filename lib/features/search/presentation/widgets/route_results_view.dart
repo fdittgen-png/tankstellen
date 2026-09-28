@@ -10,8 +10,8 @@ import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/station_offer.dart';
 import '../../../../core/services/widgets/service_status_banner.dart';
 import '../../../../core/theme/dark_mode_colors.dart';
-import '../../../../core/utils/geo_utils.dart';
 import '../../../../core/utils/navigation_utils.dart';
+import '../../../../core/utils/route_projection.dart';
 import '../../../../core/utils/station_extensions.dart';
 import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
@@ -20,6 +20,12 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../favorites/providers/favorites_provider.dart';
 import '../../../route_search/data/cross_border_corridor.dart'
     show fuelForStation;
+import '../../../route_search/api.dart'
+    show
+        RouteLiveProgressScope,
+        RouteUpdateFromPositionBanner,
+        aheadOfDriver,
+        routeLiveProgressControllerProvider;
 import '../../../route_search/providers/route_search_provider.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/domain/search_result_item.dart';
@@ -56,8 +62,11 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     final l10n = AppLocalizations.of(context);
     final fuelType = ref.watch(selectedFuelTypeProvider);
     final routeState = ref.watch(routeSearchStateProvider);
+    // #4432 — foreground progress along a current-location route: the
+    // scope owns the listener's lifetime (paused while hidden).
+    final progress = ref.watch(routeLiveProgressControllerProvider);
 
-    return routeState.when(
+    return RouteLiveProgressScope(child: routeState.when(
       data: (result) {
         if (result == null) {
           return SliverFillRemaining(
@@ -86,9 +95,14 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
         }
 
         final ignoredIds = ref.watch(ignoredStationsProvider);
-        final visibleStations = result.stations
-            .where((s) => !ignoredIds.contains(s.id))
-            .toList();
+        // #4432 — a stop the driver has already passed leaves the list,
+        // the counts and the best stops, by the same retirement rule.
+        final visibleStations = aheadOfDriver(
+          result,
+          progress,
+          result.stations.where((s) => !ignoredIds.contains(s.id)).toList(),
+          (s) => (lat: s.lat, lng: s.lng),
+        );
 
         // Sort stations by position along the route (drive order).
         // #4072 — O(n · P) haversine per station; memoised on the result
@@ -126,11 +140,17 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               if (index == 0) {
-                return RouteResultsHeader(
-                  result: result,
-                  shownCount: displayItems.length,
-                  mode: _resultMode,
-                  onModeChanged: (m) => setState(() => _resultMode = m),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const RouteUpdateFromPositionBanner(),
+                    RouteResultsHeader(
+                      result: result,
+                      shownCount: displayItems.length,
+                      mode: _resultMode,
+                      onModeChanged: (m) => setState(() => _resultMode = m),
+                    ),
+                  ],
                 );
               }
               final item = displayItems[index - 1];
@@ -156,7 +176,7 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
           onRetry: () => ref.read(routeSearchStateProvider.notifier).clear(),
         ),
       ),
-    );
+    ));
   }
 
   /// A single station card wrapped in a Dismissible for swipe actions.
@@ -299,43 +319,23 @@ class _RouteResultsViewState extends ConsumerState<RouteResultsView> {
     _sortMemoOrder = [for (final i in items) i.id];
   }
 
-  /// Sort stations by their position along the route polyline.
+  /// Sort stations by the progress at which the route meets them.
   ///
-  /// For each station, finds the nearest polyline point index — this
-  /// represents how far along the route the station is. Stations
-  /// near the start of the route appear first.
+  /// #4432 — the shared [RouteProjection] itinerary pass, the one the
+  /// search isolate filtered and ordered by: a nearest-VERTEX index here
+  /// could order a loop's second pass (or a station midway along a
+  /// sparse segment) differently from the corridor that admitted it.
   void _sortByRoutePosition(
     List<SearchResultItem> items,
     List<LatLng> polyline,
   ) {
     if (polyline.isEmpty) return;
-
-    // Sample every 3rd point for performance on long routes
-    final step = polyline.length > 300 ? 3 : 1;
-
-    double nearestPolylineIndex(double lat, double lng) {
-      double minDist = double.infinity;
-      int bestIdx = 0;
-      for (int i = 0; i < polyline.length; i += step) {
-        final d = distanceKm(
-          lat,
-          lng,
-          polyline[i].latitude,
-          polyline[i].longitude,
-        );
-        if (d < minDist) {
-          minDist = d;
-          bestIdx = i;
-        }
-      }
-      return bestIdx.toDouble();
-    }
-
-    items.sort((a, b) {
-      final posA = nearestPolylineIndex(a.lat, a.lng);
-      final posB = nearestPolylineIndex(b.lat, b.lng);
-      return posA.compareTo(posB);
-    });
+    final projection = RouteProjection(polyline);
+    final along = {
+      for (final item in items)
+        item.id: projection.project(item.lat, item.lng).alongKm,
+    };
+    items.sort((a, b) => along[a.id]!.compareTo(along[b.id]!));
   }
 
   /// Filter to only the cheapest station per route segment (#4125 — the

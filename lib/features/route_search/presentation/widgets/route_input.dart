@@ -7,12 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../../core/location/location_service.dart';
 import '../../../../core/error/guarded.dart';
 import '../../../../core/services/location_search_provider.dart';
 import '../../../../core/services/location_search_service.dart';
-import '../../../../core/time/app_clock.dart';
-import '../../../../core/utils/duration_formatter.dart';
 import '../../../../core/utils/frame_callbacks.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -20,6 +17,7 @@ import '../../domain/entities/route_info.dart';
 import '../../domain/route_origin.dart';
 import '../../providers/route_input_provider.dart';
 import 'city_autocomplete_field.dart';
+import 'route_input_current_position.dart';
 
 /// Input widget for route-based search: start, optional stops, destination.
 ///
@@ -43,7 +41,8 @@ class RouteInput extends ConsumerStatefulWidget {
 /// Public State so the parent screen can drive [resolveAndSearch] via a
 /// `GlobalKey` (#2131 — the criteria-screen FAB replaces the inline
 /// route submit button, but the text controllers still live here).
-class RouteInputWidgetState extends ConsumerState<RouteInput> {
+class RouteInputWidgetState extends ConsumerState<RouteInput>
+    with RouteInputCurrentPosition {
   final _startController = TextEditingController();
   final _endController = TextEditingController();
   final _stopControllers = <TextEditingController>[];
@@ -64,7 +63,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
       ref.read(routeInputControllerProvider.notifier).reset();
       if (!_autoGpsTriggered) {
         _autoGpsTriggered = true;
-        unawaited(_useGpsForStart());
+        unawaited(useGpsForStart());
       }
     });
   }
@@ -95,49 +94,9 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
     super.dispose();
   }
 
-  /// Seed the start from GPS. The #2872 degenerate-fix guard and the
-  /// #2146 logging live in [captureCurrentPositionOrigin]; what stays
-  /// here is the widget's own concern — whose text this may overwrite.
-  Future<void> _useGpsForStart() async {
-    final before = _startController.text;
-    final origin = await captureCurrentPositionOrigin(
-      locationService: ref.read(locationServiceProvider),
-      clock: ref.read(appClockProvider),
-    );
-    if (!mounted) return;
-    // #4432 — a late fix must never overwrite an endpoint the user has
-    // typed, picked or swapped while it was in flight. The auto-trigger
-    // in initState races the driver's first keystroke by design.
-    if (_startController.text != before) return;
-    if (origin.coords == null) {
-      // #1692 — a localized message, never a raw exception toString().
-      SnackBarHelper.showError(context, AppLocalizations.of(context).gpsError);
-      return;
-    }
-    _adoptOrigin(origin);
-  }
-
-  /// Write [origin] into the start field and the shared state (#4432).
-  ///
-  /// The label may never assert a freshness the coordinate does not
-  /// have: a fix accepted as current reads "Current location"; anything
-  /// else reads as the previous position it is, with its age. The stamp
-  /// stored alongside is the fix's own measurement time, so the age is
-  /// a measurement rather than a record of when some code ran.
-  void _adoptOrigin(ResolvedRouteOrigin origin) {
-    final coords = origin.coords;
-    if (coords == null) return;
-    final l10n = AppLocalizations.of(context);
-    ref.read(routeInputControllerProvider.notifier)
-        .setStartFromCurrentPosition(
-          coords,
-          ref.read(appClockProvider).now().subtract(origin.age),
-        );
-    _startController.text = origin.isStale
-        ? l10n.routeOriginStaleCurrentLocation(
-            formatPositionAge(l10n, origin.age))
-        : l10n.currentLocation;
-  }
+  @override
+  TextEditingController endpointController(RouteEndpointSlot slot) =>
+      slot == RouteEndpointSlot.start ? _startController : _endController;
 
   void _addStop() {
     _stopControllers.add(TextEditingController());
@@ -156,15 +115,15 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
   /// so the fields' own `onTextChanged` (a `TextField.onChanged`, which
   /// a programmatic controller write never fires) cannot null out the
   /// coordinates we just swapped in.
+  ///
+  /// #4432 — the endpoints swap as complete values (coordinate, intent,
+  /// fix time). Swapping them as bare coordinates turned a
+  /// current-location start into a fixed destination at a stale fix.
   void _swapEndpoints() {
-    final state = ref.read(routeInputControllerProvider);
-    final notifier = ref.read(routeInputControllerProvider.notifier);
     final startText = _startController.text;
-    final startCoords = state.startCoords;
     _startController.text = _endController.text;
     _endController.text = startText;
-    notifier.setStartCoords(state.endCoords);
-    notifier.setEndCoords(startCoords);
+    ref.read(routeInputControllerProvider.notifier).swapEndpoints();
   }
 
   void _onStartCitySelected(ResolvedLocation city) {
@@ -186,25 +145,6 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
     ref
         .read(routeInputControllerProvider.notifier)
         .setStopCoord(i, LatLng(city.lat, city.lng));
-  }
-
-  /// #4432 — renew the current-position origin at submission time.
-  ///
-  /// Bounded, so a slow or refused fix degrades to the stored coordinate
-  /// (relabelled with its age) rather than hanging the search behind the
-  /// platform's acquisition. Null = no usable origin at all.
-  Future<LatLng?> _renewCurrentPositionOrigin(
-    RouteInputState routeState,
-  ) async {
-    final origin = await resolveCurrentPositionOrigin(
-      locationService: ref.read(locationServiceProvider),
-      clock: ref.read(appClockProvider),
-      stored: routeState.startCoords,
-      capturedAt: routeState.startCapturedAt,
-    );
-    if (!mounted) return null;
-    _adoptOrigin(origin);
-    return origin.coords;
   }
 
   /// Resolve any unresolved city text into coordinates and invoke
@@ -241,30 +181,20 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
         if (geo != stopCoords[i]) notifier.setStopCoord(i, stopCoords[i] = geo);
       }
 
-      // #4432 — "Position actuelle" must mean the position NOW: the
-      // stored fix is where the driver was when they tapped the button,
-      // which at motorway speed starts the corridor 50 km behind them.
-      var originIsVehicle = false;
-      DateTime? originCapturedAt;
-      if (routeState.startIsCurrentLocation) {
-        final renewed = await _renewCurrentPositionOrigin(routeState);
-        if (!mounted) return;
-        if (renewed != null) {
-          startCoords = renewed;
-          originIsVehicle = true;
-          originCapturedAt =
-              ref.read(routeInputControllerProvider).startCapturedAt;
-        }
-      }
+      // #4432 — re-read whichever endpoint means "where I am".
+      final renewed = await renewCurrentLocationEndpoints(routeState,
+          start: startCoords, end: endCoords);
+      if (renewed == null) return;
 
       final waypoints = buildRouteWaypoints(
-        start: startCoords,
+        start: renewed.start,
         startLabel: _startController.text,
-        end: endCoords,
+        end: renewed.end,
         endLabel: _endController.text,
         stops: stopCoords,
         stopLabels: [for (final c in _stopControllers) c.text],
-        originIsVehiclePosition: originIsVehicle,
+        originIsVehiclePosition: renewed.originIsVehicle,
+        destinationIsVehiclePosition: renewed.destinationIsVehicle,
       );
       // #2872 — a missing or degenerate anchor never reaches OSRM: it
       // would route from the Gulf of Guinea and centre the route map in
@@ -279,7 +209,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
         return;
       }
 
-      widget.onSearch(waypoints, originCapturedAt);
+      widget.onSearch(waypoints, renewed.capturedAt);
     } catch (e, st) {
       // #2146 — route to the exportable log; the snackbar is transient.
       logFailure(e, st, where: 'RouteInput.resolveAndSearch');
@@ -320,7 +250,7 @@ class RouteInputWidgetState extends ConsumerState<RouteInput> {
           prefixIcon: Icons.trip_origin,
           suffixWidget: IconButton(
             icon: const Icon(Icons.my_location, size: 18),
-            onPressed: _useGpsForStart,
+            onPressed: useGpsForStart,
             tooltip: l10n.useGps,
           ),
           onCitySelected: _onStartCitySelected,

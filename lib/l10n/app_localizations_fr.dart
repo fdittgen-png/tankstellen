@@ -9324,6 +9324,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Distance à vol d\'oiseau entre cet itinéraire et la station. Ce n\'est ni la distance depuis votre position, ni le trajet supplémentaire qu\'un arrêt coûterait.';
 
   @override
+  String get routeLeftRouteNotice =>
+      'Vous semblez avoir quitté cet itinéraire : ses arrêts ne sont peut-être plus devant vous.';
+
+  @override
+  String get routeUpdateFromPosition =>
+      'Mettre à jour l\'itinéraire depuis votre position';
+
+  @override
   String stationCardPriceUnit(String currency) {
     return '$currency/L';
   }

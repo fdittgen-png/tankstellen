@@ -7935,5 +7935,7 @@
       }
     }
   },
-  "currencyBackfillUndo": "Annuler les devises indiquées"
+  "currencyBackfillUndo": "Annuler les devises indiquées",
+  "routeLeftRouteNotice": "Vous semblez avoir quitté cet itinéraire : ses arrêts ne sont peut-être plus devant vous.",
+  "routeUpdateFromPosition": "Mettre à jour l'itinéraire depuis votre position"
 }
