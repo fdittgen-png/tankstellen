@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../../core/navigation/app_routes.dart';
 import '../../../../core/services/station_offer.dart';
+import '../../../../core/time/app_clock.dart';
 import '../../../../core/utils/best_stops.dart';
 import '../../../../core/utils/route_projection.dart';
 import '../../../../core/widgets/shell_bottom_inset.dart';
@@ -165,10 +166,14 @@ class _RouteMapViewState extends ConsumerState<RouteMapView> {
             stations: displayStations,
             // #4432 — `center` is `_routeBounds.center`, the bounding box
             // of the along-route STATIONS (#2782/#2755). It is a camera
-            // target, not a position: `originMarker` is deliberately left
-            // null so no "you are here" dot is drawn there. The route's
-            // start and destination are marked from the polyline instead.
+            // target, not a position, so nothing is drawn there. The
+            // route's start and destination are marked from the polyline;
+            // the device marker is the request's accepted current-location
+            // fix, and only while that fix is still current — no fix, no
+            // "you are here" claim.
             center: center,
+            originMarker: result.request
+                ?.currentDeviceFix(ref.watch(appClockProvider).now()),
             zoom: zoom,
             searchRadiusKm: 5,
             selectedFuel: widget.selectedFuel as FuelType,

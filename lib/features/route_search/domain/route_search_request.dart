@@ -5,7 +5,9 @@ import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../core/domain/fuel_type.dart';
+import '../../../core/utils/geo_utils.dart';
 import 'entities/route_info.dart';
+import 'route_origin.dart' show kRouteOriginMaxFixAge;
 import 'route_search_strategy.dart';
 
 /// One submitted route search, frozen (#4432).
@@ -77,6 +79,31 @@ class RouteSearchRequest {
         minSavingPerLiter: minSavingPerLiter,
         originCapturedAt: at,
       );
+
+  /// #4432 — where the DEVICE is, as far as this request knows, or null
+  /// when it knows nothing current.
+  ///
+  /// Only a current-location endpoint (origin, or destination after a
+  /// Swap) measured within [kRouteOriginMaxFixAge] of [now] qualifies —
+  /// the same freshness bound the origin itself had to pass. A named
+  /// place is never a device position, a stale fallback is a previous
+  /// position rather than "you are here", and a missing or degenerate
+  /// (#2872) coordinate is no claim at all. The route map draws this as
+  /// its device marker, distinct from the route's start / destination
+  /// markers and never at the camera centre.
+  LatLng? currentDeviceFix(DateTime now) {
+    final at = originCapturedAt;
+    final endpoint = originIsVehiclePosition
+        ? waypoints.first
+        : destinationIsVehiclePosition
+            ? waypoints.last
+            : null;
+    if (endpoint == null || at == null) return null;
+    if (!isUsableCoord(endpoint.lat, endpoint.lng)) return null;
+    final age = now.difference(at);
+    if (age.abs() > kRouteOriginMaxFixAge) return null;
+    return LatLng(endpoint.lat, endpoint.lng);
+  }
 
   /// The same request with the origin moved to [coords], measured at
   /// [at]. Every other endpoint, waypoint and option is carried
