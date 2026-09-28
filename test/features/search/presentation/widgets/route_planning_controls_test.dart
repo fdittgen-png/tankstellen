@@ -62,10 +62,13 @@ void main() {
       // #3927 — the options are collapsed while every value still equals
       // the profile default; the one-line summary carries all three.
       expect(find.byType(Slider), findsNothing);
+      // #4432 — the middle figure is a straight-line corridor limit, not
+      // a driven detour, and the summary says so.
       expect(
-        find.text('Every 200 km · 8 km detour · 0,05 €/L'),
+        find.text('Every 200 km · ≤ 8 km from route · 0,05 €/L'),
         findsOneWidget,
       );
+      expect(find.textContaining('detour'), findsNothing);
 
       await tester.tap(find.text('Route options'));
       await tester.pumpAndSettle();
@@ -80,6 +83,54 @@ void main() {
         find.byKey(const ValueKey('criteria-min-saving-5')),
       );
       expect(chip.selected, isTrue);
+      // #4432 — the control is named for what it limits (distance from
+      // the route line), in the same words the result rows use, and the
+      // caption rules out the driven-detour reading.
+      expect(find.text('Max. distance from route'), findsOneWidget);
+      expect(find.text('Maximum detour'), findsNothing);
+      expect(
+        find.textContaining('not the extra driving a stop adds'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('#4432 — French names the corridor limit, not a détour', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            activeProfileProvider.overrideWith(
+              () => _FixedProfile(
+                const UserProfile(
+                  id: 'p',
+                  name: 'P',
+                  routeSegmentKm: 200,
+                  routeDetourBudgetKm: 8,
+                ),
+              ),
+            ),
+            routeDetourSearchParamProvider.overrideWith(
+              () => _FixedDetour(12),
+            ),
+          ],
+          child: const MaterialApp(
+            locale: Locale('fr'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: SingleChildScrollView(child: RoutePlanningControls()),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text("Distance max. à l'itinéraire"), findsOneWidget);
+      expect(find.textContaining('≤ 12 km de l\'itinéraire'), findsOneWidget);
+      expect(find.textContaining('vol d\'oiseau'), findsOneWidget);
+      expect(find.textContaining('Détour'), findsNothing);
+      expect(find.textContaining('détour'), findsNothing);
     });
 
     testWidgets('#3927 — a minimum-saving chip writes the same provider '

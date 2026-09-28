@@ -8,11 +8,11 @@ part of 'profile_edit_sheet.dart';
 // profile_edit_sheet_parts.dart after the criterion + top-N controls
 // pushed that file past 400 lines. Behaviour preserved.
 
-/// Route-planning preferences — route-segment spacing, the maximum
-/// detour budget (#1602) and the minimum-saving filter (#1872). The
-/// whole section is gated on `Feature.routePlanning` by the caller, so
-/// it is only built when the "along the route" search mode is
-/// reachable.
+/// Route-planning preferences — segment spacing, the straight-line
+/// corridor limit (#1602; a width, not a driven detour, #4432) and the
+/// minimum-saving filter (#1872). Gated on `Feature.routePlanning` by
+/// the caller, so it is only built when the "along the route" search
+/// mode is reachable.
 class _RouteSegmentSection extends StatelessWidget {
   final ProfileEditState state;
   final ProfileEditController ctrl;
@@ -50,7 +50,7 @@ class _RouteSegmentSection extends StatelessWidget {
         ),
         Row(
           children: [
-            Text('${l10n.routeDetourBudget}:'),
+            Text('${l10n.routeCorridorLimit}:'),
             Expanded(
               child: Slider(
                 value: state.routeDetourBudgetKm,
@@ -65,7 +65,7 @@ class _RouteSegmentSection extends StatelessWidget {
           ],
         ),
         Text(
-          l10n.routeDetourBudgetCaption(state.routeDetourBudgetKm.round()),
+          l10n.routeCorridorLimitCaption(state.routeDetourBudgetKm.round()),
           style: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),

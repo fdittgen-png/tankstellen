@@ -793,14 +793,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get routeDetourBudget => 'Maximális kerülő';
-
-  @override
-  String routeDetourBudgetCaption(int km) {
-    return 'Állomások megjelenítése legfeljebb $km km-re a közvetlen útvonaltól';
-  }
-
-  @override
   String get routeSegment => 'Útvonalszakasz';
 
   @override
@@ -9277,6 +9269,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'How far along this route the station is met, counted from the route\'s start. Not the distance from you, and not a driven detour.';
 
   @override
+  String get routeCorridorLimit => 'Max. distance from route';
+
+  @override
+  String routeCorridorLimitCaption(int km) {
+    return 'Show stations up to $km km from the route line, measured straight — not the extra driving a stop adds';
+  }
+
+  @override
   String get routeLeftRouteNotice =>
       'You seem to have left this route — its stops may no longer be ahead of you.';
 
@@ -10700,12 +10700,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get criteriaRouteOptions => 'Route options';
 
   @override
-  String criteriaRouteOptionsSummary(
+  String criteriaRouteOptionsCorridorSummary(
     int segmentKm,
     int detourKm,
     String saving,
   ) {
-    return 'Every $segmentKm km · $detourKm km detour · $saving';
+    return 'Every $segmentKm km · ≤ $detourKm km from route · $saving';
   }
 
   @override

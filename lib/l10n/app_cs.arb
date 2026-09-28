@@ -205,15 +205,6 @@
       }
     }
   },
-  "routeDetourBudget": "Maximální zajížďka",
-  "routeDetourBudgetCaption": "Zobrazit stanice až {km} km od přímé trasy",
-  "@routeDetourBudgetCaption": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
   "routeSegment": "Úsek trasy",
   "showCheapestEveryNKm": "Zobrazit nejlevnější stanici každých {km} km podél trasy",
   "avoidHighways": "Vyhnout se dálnicím",
@@ -5875,22 +5866,6 @@
   "@criteriaRouteOptions": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
-  },
-  "criteriaRouteOptionsSummary": "Every {segmentKm} km · {detourKm} km detour · {saving}",
-  "@criteriaRouteOptionsSummary": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "segmentKm": {
-        "type": "int"
-      },
-      "detourKm": {
-        "type": "int"
-      },
-      "saving": {
-        "type": "String"
-      }
-    }
   },
   "criteriaSwapEndpoints": "Swap start and destination",
   "@criteriaSwapEndpoints": {
@@ -11621,5 +11596,36 @@
   "@routeStopAlongRouteTooltip": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
+  },
+  "routeCorridorLimit": "Max. distance from route",
+  "@routeCorridorLimit": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "routeCorridorLimitCaption": "Show stations up to {km} km from the route line, measured straight — not the extra driving a stop adds",
+  "@routeCorridorLimitCaption": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
+  "criteriaRouteOptionsCorridorSummary": "Every {segmentKm} km · ≤ {detourKm} km from route · {saving}",
+  "@criteriaRouteOptionsCorridorSummary": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "segmentKm": {
+        "type": "int"
+      },
+      "detourKm": {
+        "type": "int"
+      },
+      "saving": {
+        "type": "String"
+      }
+    }
   }
 }

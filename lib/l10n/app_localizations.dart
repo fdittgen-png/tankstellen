@@ -1521,18 +1521,6 @@ abstract class AppLocalizations {
   /// **'Only stations within {amount} of the route\'s cheapest'**
   String routeMinSavingCaption(String amount);
 
-  /// No description provided for @routeDetourBudget.
-  ///
-  /// In en, this message translates to:
-  /// **'Maximum detour'**
-  String get routeDetourBudget;
-
-  /// No description provided for @routeDetourBudgetCaption.
-  ///
-  /// In en, this message translates to:
-  /// **'Surface stations up to {km} km off your direct route'**
-  String routeDetourBudgetCaption(int km);
-
   /// No description provided for @routeSegment.
   ///
   /// In en, this message translates to:
@@ -15216,6 +15204,18 @@ abstract class AppLocalizations {
   /// **'How far along this route the station is met, counted from the route\'s start. Not the distance from you, and not a driven detour.'**
   String get routeStopAlongRouteTooltip;
 
+  /// Label of the route-search control that limits how far from the route LINE a station may sit to be listed (#4432; formerly labelled 'Maximum detour', #1602). The value is a straight-line corridor width measured on the map, not the extra kilometres a stop adds to the drive — those are routed separately. The persisted setting keeps its meaning; only the label was made honest.
+  ///
+  /// In en, this message translates to:
+  /// **'Max. distance from route'**
+  String get routeCorridorLimit;
+
+  /// Caption under the corridor-limit control (#4432): says what the number measures (straight-line distance from the route line) and what it does not (the driven detour).
+  ///
+  /// In en, this message translates to:
+  /// **'Show stations up to {km} km from the route line, measured straight — not the extra driving a stop adds'**
+  String routeCorridorLimitCaption(int km);
+
   /// Notice on the route results when foreground GPS fixes place the driver OFF the route, or cannot place them on it at all (#4432). Stops and best-stop picks are route-relative, so they may be stale; the app does NOT re-route on its own — the button beside this notice does.
   ///
   /// In en, this message translates to:
@@ -17565,11 +17565,11 @@ abstract class AppLocalizations {
   /// **'Route options'**
   String get criteriaRouteOptions;
 
-  /// One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the detour budget and the minimum-saving value ('Off' or an amount per litre) (#3927).
+  /// One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the corridor limit and the minimum-saving value ('Off' or an amount per litre) (#3927). #4432 — the middle figure limits how far (straight-line) a station may sit from the route line; it is NOT a driven detour, so it must not be called one.
   ///
   /// In en, this message translates to:
-  /// **'Every {segmentKm} km · {detourKm} km detour · {saving}'**
-  String criteriaRouteOptionsSummary(
+  /// **'Every {segmentKm} km · ≤ {detourKm} km from route · {saving}'**
+  String criteriaRouteOptionsCorridorSummary(
     int segmentKm,
     int detourKm,
     String saving,

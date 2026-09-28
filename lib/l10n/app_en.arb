@@ -488,15 +488,6 @@
       }
     }
   },
-  "routeDetourBudget": "Maximum detour",
-  "routeDetourBudgetCaption": "Surface stations up to {km} km off your direct route",
-  "@routeDetourBudgetCaption": {
-    "placeholders": {
-      "km": {
-        "type": "int"
-      }
-    }
-  },
   "routeSegment": "Route segment",
   "showCheapestEveryNKm": "Show cheapest station every {km} km along route",
   "@showCheapestEveryNKm": {
@@ -10064,6 +10055,19 @@
   "@routeStopAlongRouteTooltip": {
     "description": "Long-press / screen-reader sentence on the along-route progress figure of a route stop (#4432), naming what it measures and the two quantities it is NOT."
   },
+  "routeCorridorLimit": "Max. distance from route",
+  "@routeCorridorLimit": {
+    "description": "Label of the route-search control that limits how far from the route LINE a station may sit to be listed (#4432; formerly labelled 'Maximum detour', #1602). The value is a straight-line corridor width measured on the map, not the extra kilometres a stop adds to the drive — those are routed separately. The persisted setting keeps its meaning; only the label was made honest."
+  },
+  "routeCorridorLimitCaption": "Show stations up to {km} km from the route line, measured straight — not the extra driving a stop adds",
+  "@routeCorridorLimitCaption": {
+    "description": "Caption under the corridor-limit control (#4432): says what the number measures (straight-line distance from the route line) and what it does not (the driven detour).",
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
   "routeLeftRouteNotice": "You seem to have left this route — its stops may no longer be ahead of you.",
   "@routeLeftRouteNotice": {
     "description": "Notice on the route results when foreground GPS fixes place the driver OFF the route, or cannot place them on it at all (#4432). Stops and best-stop picks are route-relative, so they may be stale; the app does NOT re-route on its own — the button beside this notice does."
@@ -11993,9 +11997,9 @@
   "@criteriaRouteOptions": {
     "description": "Title of the collapsible section holding the three route-planning options (segment, detour budget, minimum saving) on the search-criteria sheet (#3927)."
   },
-  "criteriaRouteOptionsSummary": "Every {segmentKm} km · {detourKm} km detour · {saving}",
-  "@criteriaRouteOptionsSummary": {
-    "description": "One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the detour budget and the minimum-saving value ('Off' or an amount per litre) (#3927).",
+  "criteriaRouteOptionsCorridorSummary": "Every {segmentKm} km · ≤ {detourKm} km from route · {saving}",
+  "@criteriaRouteOptionsCorridorSummary": {
+    "description": "One-line summary shown under the collapsed 'Route options' section: the route-segment spacing, the corridor limit and the minimum-saving value ('Off' or an amount per litre) (#3927). #4432 — the middle figure limits how far (straight-line) a station may sit from the route line; it is NOT a driven detour, so it must not be called one.",
     "placeholders": {
       "segmentKm": {
         "type": "int"

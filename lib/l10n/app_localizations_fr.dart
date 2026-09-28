@@ -791,14 +791,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get routeDetourBudget => 'Détour maximal';
-
-  @override
-  String routeDetourBudgetCaption(int km) {
-    return 'Afficher les stations jusqu\'à $km km de votre itinéraire direct';
-  }
-
-  @override
   String get routeSegment => 'Segment de trajet';
 
   @override
@@ -9333,6 +9325,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Position de la station le long de cet itinéraire, comptée depuis son départ. Ce n\'est ni la distance depuis votre position, ni un détour parcouru.';
 
   @override
+  String get routeCorridorLimit => 'Distance max. à l\'itinéraire';
+
+  @override
+  String routeCorridorLimitCaption(int km) {
+    return 'Afficher les stations jusqu\'à $km km à vol d\'oiseau de l\'itinéraire — pas le trajet supplémentaire d\'un arrêt';
+  }
+
+  @override
   String get routeLeftRouteNotice =>
       'Vous semblez avoir quitté cet itinéraire : ses arrêts ne sont peut-être plus devant vous.';
 
@@ -10777,12 +10777,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get criteriaRouteOptions => 'Options d\'itinéraire';
 
   @override
-  String criteriaRouteOptionsSummary(
+  String criteriaRouteOptionsCorridorSummary(
     int segmentKm,
     int detourKm,
     String saving,
   ) {
-    return 'Tous les $segmentKm km · détour $detourKm km · $saving';
+    return 'Tous les $segmentKm km · ≤ $detourKm km de l\'itinéraire · $saving';
   }
 
   @override
