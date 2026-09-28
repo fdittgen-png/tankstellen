@@ -99,6 +99,9 @@ class StationMapBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // #4432 — marker semantics; nullable so a bare test host without
+    // localizations still renders the map.
+    final l10n = Localizations.of<AppLocalizations>(context, AppLocalizations);
 
     return FlutterMap(
       mapController: mapController,
@@ -186,17 +189,24 @@ class StationMapBody extends StatelessWidget {
                 point: originMarker!,
                 width: 20,
                 height: 20,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.3),
-                        blurRadius: 4,
-                      ),
-                    ],
+                // On a ROUTE surface the origin marker is only ever the
+                // accepted device fix (the route map's contract), so it
+                // may be announced as the driver's position. A proximity
+                // map's origin can be a typed place, so it claims nothing.
+                child: _MarkerSemantics(
+                  label: routePolyline == null ? null : l10n?.yourPosition,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.3),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -214,10 +224,13 @@ class StationMapBody extends StatelessWidget {
                 point: routePolyline!.first,
                 width: 22,
                 height: 22,
-                child: Icon(
-                  Icons.trip_origin,
-                  size: 22,
-                  color: theme.colorScheme.primary,
+                child: _MarkerSemantics(
+                  label: l10n?.start,
+                  child: Icon(
+                    Icons.trip_origin,
+                    size: 22,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
               Marker(
@@ -225,10 +238,13 @@ class StationMapBody extends StatelessWidget {
                 point: routePolyline!.last,
                 width: 26,
                 height: 26,
-                child: Icon(
-                  Icons.place,
-                  size: 26,
-                  color: theme.colorScheme.error,
+                child: _MarkerSemantics(
+                  label: l10n?.destination,
+                  child: Icon(
+                    Icons.place,
+                    size: 26,
+                    color: theme.colorScheme.error,
+                  ),
                 ),
               ),
             ],
@@ -314,6 +330,27 @@ class _LimitedMarkersPill extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// #4432 — names a route/position marker for a screen reader. A null
+/// [label] adds nothing: a marker that cannot honestly say what it is
+/// stays silent rather than claiming a position.
+class _MarkerSemantics extends StatelessWidget {
+  const _MarkerSemantics({required this.label, required this.child});
+
+  final String? label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = label;
+    if (text == null) return child;
+    return Semantics(
+      label: text,
+      image: true,
+      child: ExcludeSemantics(child: child),
     );
   }
 }

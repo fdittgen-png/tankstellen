@@ -95,23 +95,39 @@ class RouteUpdateFromPositionBanner extends ConsumerWidget {
       color: theme.colorScheme.secondaryContainer,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        child: Row(
+        // The action sits UNDER the notice, end-aligned, rather than
+        // beside it: a Row gave the button its full intrinsic width, so a
+        // long translation (fr, the en_XA expansion) or enlarged text
+        // overflowed the strip on a narrow phone (#4432 locale pass).
+        // Under the notice the label can wrap within the strip.
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Icon(Icons.wrong_location_outlined,
-                color: theme.colorScheme.onSecondaryContainer),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                l10n.routeLeftRouteNotice,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSecondaryContainer,
+            Row(
+              children: [
+                Icon(Icons.wrong_location_outlined,
+                    color: theme.colorScheme.onSecondaryContainer),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l10n.routeLeftRouteNotice,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSecondaryContainer,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                onPressed: () => unawaited(
+                    ref.read(routeSearchStateProvider.notifier).refresh()),
+                child: Text(
+                  l10n.routeUpdateFromPosition,
+                  textAlign: TextAlign.end,
                 ),
               ),
-            ),
-            TextButton(
-              onPressed: () => unawaited(
-                  ref.read(routeSearchStateProvider.notifier).refresh()),
-              child: Text(l10n.routeUpdateFromPosition),
             ),
           ],
         ),
