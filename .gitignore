@@ -145,6 +145,7 @@ docs/guides/*
 !docs/guides/opening-hours.md
 !docs/guides/play-fgs-declaration.md
 !docs/guides/wiki-mirror.md
+!docs/guides/startup-kpi-measurement.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
