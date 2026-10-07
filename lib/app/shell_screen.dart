@@ -130,7 +130,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen>
   }
 
   void _goToPage(int index) {
-    if (_isTransitioning || index == _currentIndex) return;
+    // A tap during the slide restarts it toward the new tab — dropping it
+    // (the old `_isTransitioning` guard) read as an unresponsive app.
+    if (index == _currentIndex) return;
 
     final oldIndex = _currentIndex;
     _isTransitioning = true;
