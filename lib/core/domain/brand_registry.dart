@@ -205,26 +205,39 @@ class BrandRegistry {
 
   /// Map a raw brand string from API data to its canonical name.
   /// Returns null if the brand is not recognized (→ "Others").
+  ///
+  /// Memoised: a station card resolves its brand 3–4 times per build and
+  /// every call used to be two linear scans over ~360 aliases. The answer
+  /// depends only on [rawBrand] and the const [brandAliases].
   static String? canonicalize(String rawBrand) {
-    final trimmed = rawBrand.trim();
-    if (trimmed.isEmpty) return null;
+    final cache = _canonicalCache;
+    if (cache.containsKey(rawBrand)) return cache[rawBrand];
+    // Distinct raw brands are bounded by the datasets (a few thousand);
+    // the cap only guards against an unbounded feed.
+    if (cache.length >= _canonicalCacheCap) cache.clear();
+    return cache[rawBrand] = _canonicalizeUncached(rawBrand);
+  }
 
-    for (final entry in brandAliases.entries) {
-      for (final alias in entry.value) {
-        if (trimmed.toLowerCase() == alias.toLowerCase()) {
-          return entry.key;
-        }
-      }
+  static const _canonicalCacheCap = 8192;
+  static final Map<String, String?> _canonicalCache = {};
+
+  /// Every alias lowercased once, in [brandAliases] order.
+  static final List<(String, String)> _lowerAliases = [
+    for (final entry in brandAliases.entries)
+      for (final alias in entry.value) (alias.toLowerCase(), entry.key),
+  ];
+
+  static String? _canonicalizeUncached(String rawBrand) {
+    final lower = rawBrand.trim().toLowerCase();
+    if (lower.isEmpty) return null;
+
+    for (final (alias, canonical) in _lowerAliases) {
+      if (lower == alias) return canonical;
     }
 
     // Partial match — brand name contains the canonical name
-    final lower = trimmed.toLowerCase();
-    for (final entry in brandAliases.entries) {
-      for (final alias in entry.value) {
-        if (lower.contains(alias.toLowerCase())) {
-          return entry.key;
-        }
-      }
+    for (final (alias, canonical) in _lowerAliases) {
+      if (lower.contains(alias)) return canonical;
     }
 
     return null; // Unknown → "Others"

@@ -197,7 +197,9 @@ class MexicoStationService
       );
     }
 
-    final merged = _mergeFeeds(placesXml: placesXml, pricesXml: pricesXml);
+    // Two national XML feeds (~13k places): parsed and joined on a worker
+    // isolate so a refresh never freezes the visible list.
+    final merged = await compute(_mergeFeedRecord, (placesXml, pricesXml));
     if (merged.isEmpty) {
       throw const ApiException(
         message: 'CRE feeds parsed to zero stations (schema change?)',
@@ -209,6 +211,9 @@ class MexicoStationService
   /// Parses the `/places` and `/prices` XML feeds and joins them by
   /// `place_id`. The merged list drives [searchStations] via the
   /// in-memory cache.
+  static List<_CreStation> _mergeFeedRecord((String, String) xml) =>
+      _mergeFeeds(placesXml: xml.$1, pricesXml: xml.$2);
+
   static List<_CreStation> _mergeFeeds({
     required String placesXml,
     required String pricesXml,
