@@ -23,6 +23,9 @@ import '../../../../helpers/pump_app.dart';
 class _SpySearchState extends SearchState {
   int repeatCount = 0;
 
+  /// The fuel each replay carried — the chip's NEW fuel, not the old one.
+  final List<FuelType?> repeatFuels = [];
+
   @override
   AsyncValue<ServiceResult<List<SearchResultItem>>> build() =>
       AsyncValue.data(ServiceResult(
@@ -32,8 +35,9 @@ class _SpySearchState extends SearchState {
       ));
 
   @override
-  Future<void> repeatLastSearch() async {
+  Future<void> repeatLastSearch({FuelType? fuelType}) async {
     repeatCount++;
+    repeatFuels.add(fuelType);
   }
 }
 
@@ -251,6 +255,9 @@ void main() {
       container.read(selectedFuelTypeProvider.notifier).select(FuelType.e5);
       await tester.pump();
       expect(spy.repeatCount, 2);
+      expect(spy.repeatFuels, [FuelType.diesel, FuelType.e5],
+          reason: 'each replay re-fetches the fuel just picked — replaying '
+              'the original call re-fetched the profile fuel instead');
     });
 
     testWidgets('results area dominates the viewport (≥60% vertical)',

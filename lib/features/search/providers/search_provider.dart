@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/feedback/in_app_review_service.dart';
-import '../../../core/location/location_service.dart';
 import '../../../core/telemetry/collectors/app_state_collector.dart';
 import '../../../core/location/user_position_provider.dart';
 import '../../../core/services/service_providers.dart';
@@ -55,7 +54,9 @@ class SearchState extends _$SearchState {
   /// run at least one search. Used by [repeatLastSearch], which lets
   /// observers (e.g. MapScreen's app-resume handler, #1268) refresh
   /// stale data without knowing which search-by-X variant was invoked.
-  Future<void> Function()? _lastSearchReplay;
+  /// A non-null `fuelType` replaces the replayed search's fuel — the
+  /// fuel chip re-searches for the fuel just picked, not the old one.
+  Future<void> Function(FuelType? fuelOverride)? _lastSearchReplay;
 
   /// Android Auto v1 (#2948) — mirrors each successful fuel search into the
   /// `car_search_json` SharedPreferences key the native car Search screen
@@ -117,11 +118,13 @@ class SearchState extends _$SearchState {
   /// app returns from background after >10 s (#1268). Returns the same
   /// future the underlying search returns, or a completed future when
   /// no replay is available.
-  Future<void> repeatLastSearch() async {
+  ///
+  /// [fuelType] overrides the replayed search's fuel (the fuel chip).
+  Future<void> repeatLastSearch({FuelType? fuelType}) async {
     final replay = _lastSearchReplay;
     if (replay == null) return;
     if (state.isLoading) return;
-    await replay();
+    await replay(fuelType);
   }
 
   /// #2320 — record an anonymised breadcrumb of the most recent search
@@ -166,26 +169,31 @@ class SearchState extends _$SearchState {
   }
 
   /// Search for nearby stations using the device's current GPS position.
-  /// Stores the position in [userPositionProvider], reverse-geocodes to
-  /// extract a postal code (needed by Prix-Carburants etc.), then
-  /// delegates to [StationService.searchStations]. Missing params fall
-  /// back to the active profile's defaults.
+  /// Stores the position in [userPositionProvider] and delegates to
+  /// [StationService.searchStations]. Missing params fall back to the
+  /// active profile's defaults.
+  /// Nothing waits on a step the result does not need (Epic #4498): an
+  /// instant cached preview, fix reuse, and a non-blocking address label.
   Future<void> searchByGps({
     FuelType? fuelType,
     double? radiusKm,
     SortBy? sortBy,
   }) async {
-    _lastSearchReplay = () => searchByGps(
-          fuelType: fuelType,
+    _lastSearchReplay = (fuelOverride) => searchByGps(
+          fuelType: fuelOverride ?? fuelType,
           radiusKm: radiusKm,
           sortBy: sortBy,
         );
     _recordLastSearch('gps',
         fuelType: fuelType, radiusKm: radiusKm, sortBy: sortBy);
     await _runSearch((cancelToken) async {
-      final position =
-          await ref.read(locationServiceProvider).getCurrentPosition();
-      if (!ref.mounted) return;
+      final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
+      publishLastPositionPreview(ref,
+          fuelType: resolved.fuelType, radiusKm: resolved.radiusKm,
+          sortBy: sortBy ?? SortBy.price, publish: (p) => state = p);
+      final position = await currentOrRecentFix(ref);
+      // Superseded while the fix resolved (fuel chip, refresh): drop it.
+      if (!ref.mounted || cancelToken.isCancelled) return;
       // #2872 — defence-in-depth behind getCurrentPosition's own guard:
       // never persist a degenerate fix ((0,0)/(lat,0)) to
       // userPositionProvider — a poisoned user position would later seed a
@@ -201,7 +209,6 @@ class SearchState extends _$SearchState {
             position.latitude, position.longitude,
           );
 
-      final resolved = resolveFuelAndRadius(ref, fuelType, radiusKm);
       // #1866 — EV runs concurrently ONLY for an EV-intent search; a
       // fuel search stays fuel-only (evFuture null → fuel-only feed).
       final evFuture = isEvSearch(resolved.fuelType)
@@ -213,18 +220,10 @@ class SearchState extends _$SearchState {
             )
           : null;
 
-      // Reverse-geocode for a postal code (Prix-Carburants + co).
-      final addr = await tryReverseGeocode(
-        ref.read(geocodingChainProvider),
-        position.latitude, position.longitude,
-        cancelToken: cancelToken,
-      );
-      if (!ref.mounted) return;
-      String? resolvedPostalCode;
-      if (addr != null) {
-        resolvedPostalCode = extractPostalCode(addr);
-        ref.read(searchLocationProvider.notifier).set(addr);
-      }
+      // The address only labels the place; no source needs a postal code
+      // for real coordinates (FR geo query is distance-ordered, #2966).
+      labelSearchLocation(
+          ref, position.latitude, position.longitude, cancelToken);
 
       final params = SearchParams(
         lat: position.latitude,
@@ -232,7 +231,6 @@ class SearchState extends _$SearchState {
         radiusKm: resolved.radiusKm,
         fuelType: resolved.fuelType,
         sortBy: sortBy ?? SortBy.price,
-        postalCode: resolvedPostalCode,
       );
       // #3618 — SWR: the last stations for this cell paint immediately;
       // the network result then replaces them in place.
@@ -243,7 +241,7 @@ class SearchState extends _$SearchState {
         cancelToken: cancelToken,
         publishPreview: (preview) => state = preview,
       );
-      if (!ref.mounted) return;
+      if (!ref.mounted || cancelToken.isCancelled) return;
       publishTravelOrigin(ref, params);
       _publishCarSearch(result.data, resolved.fuelType);
       final finalState = await finalizeUnifiedResult(ref, result, evFuture);
@@ -264,9 +262,9 @@ class SearchState extends _$SearchState {
     double? radiusKm,
     SortBy? sortBy,
   }) async {
-    _lastSearchReplay = () => searchByZipCode(
+    _lastSearchReplay = (fuelOverride) => searchByZipCode(
           zipCode: zipCode,
-          fuelType: fuelType,
+          fuelType: fuelOverride ?? fuelType,
           radiusKm: radiusKm,
           sortBy: sortBy,
         );
@@ -275,8 +273,9 @@ class SearchState extends _$SearchState {
     _recordLastSearch('zip',
         fuelType: fuelType, radiusKm: radiusKm, sortBy: sortBy);
     await _runSearch((cancelToken) async {
-      await autoUpdatePositionIfEnabled(ref);
-      if (!ref.mounted) return;
+      // The fix only re-measures distances at the end: refresh it alongside
+      // (`ignore` = handled until the await below, which still rethrows).
+      final positionRefresh = autoUpdatePositionIfEnabled(ref)..ignore();
       final geocoding = ref.read(geocodingChainProvider);
       final coordsResult = await geocoding.zipCodeToCoordinates(
         zipCode, cancelToken: cancelToken,
@@ -315,6 +314,7 @@ class SearchState extends _$SearchState {
       final result = await ref
           .read(stationServiceProvider)
           .searchStations(params, cancelToken: cancelToken);
+      await positionRefresh;
       if (!ref.mounted) return;
 
       final adjustedStations =
@@ -346,20 +346,19 @@ class SearchState extends _$SearchState {
     FuelType? fuelType,
     double? radiusKm,
   }) async {
-    _lastSearchReplay = () => searchByCoordinates(
+    _lastSearchReplay = (fuelOverride) => searchByCoordinates(
           lat: lat,
           lng: lng,
           postalCode: postalCode,
           locationName: locationName,
-          fuelType: fuelType,
+          fuelType: fuelOverride ?? fuelType,
           radiusKm: radiusKm,
         );
     // #2320 — lat/lng/postalCode/locationName are all location PII and
     // are intentionally excluded from the breadcrumb.
     _recordLastSearch('coordinates', fuelType: fuelType, radiusKm: radiusKm);
     await _runSearch((cancelToken) async {
-      await autoUpdatePositionIfEnabled(ref);
-      if (!ref.mounted) return;
+      final positionRefresh = autoUpdatePositionIfEnabled(ref)..ignore();
       if (locationName != null) {
         ref.read(searchLocationProvider.notifier).set(locationName);
       }
@@ -386,6 +385,7 @@ class SearchState extends _$SearchState {
       final result = await ref
           .read(stationServiceProvider)
           .searchStations(params, cancelToken: cancelToken);
+      await positionRefresh;
       if (!ref.mounted) return;
       final adjustedStations =
           distancesFromTravelOrigin(ref, result.data, params);

@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/search_mode.dart';
 import 'package:tankstellen/core/domain/search_result_item.dart';
 import 'package:tankstellen/core/services/service_result.dart';
@@ -46,7 +47,7 @@ class _SpyNearby extends SearchState {
       ));
 
   @override
-  Future<void> repeatLastSearch() async => replays++;
+  Future<void> repeatLastSearch({FuelType? fuelType}) async => replays++;
 }
 
 class _FixedMode extends ActiveSearchMode {
