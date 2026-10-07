@@ -98,6 +98,7 @@ export 'providers/pip_mode_provider.dart';
 export 'providers/reconnect_scanner_factory.dart';
 export 'providers/recording_pipeline.dart';
 export 'providers/reference_vehicle_match.dart';
+export 'providers/speed_consumption_bins_provider.dart';
 export 'providers/trip_baseline_recorder.dart';
 export 'providers/trip_gps_stream_controller.dart';
 export 'providers/trip_haptic_controller.dart';

@@ -66,15 +66,10 @@ class ChartsTab extends ConsumerWidget {
     // trip-length card so the two histograms describe the same data
     // slice — and so the reference line on the speed card matches the
     // overall avg already computed above.
-    // #3741 — the list is summaries-only; read only the filtered trips
-    // that actually STORE samples (sampleCount stays truthful on the
-    // summary decode). #3882 — and only their speed + fuel-rate COLUMNS:
-    // the histogram never looks at the other 32 fields.
-    final filteredTrips = _filterTrips(trips, activeVehicle?.id);
-    final speedBins = aggregateSpeedConsumption([
-      for (final t in filteredTrips)
-        if (t.sampleCount > 0) ...ref.watch(tripSpeedFuelSamplesProvider(t.id)),
-    ]);
+    // #3741/#3882 — only the trips that STORE samples, only their speed
+    // + fuel-rate columns, decoded and folded on a worker isolate.
+    final speedBins =
+        ref.watch(speedConsumptionBinsProvider(activeVehicle?.id));
 
     return ListView(
       padding: EdgeInsets.only(
@@ -91,12 +86,15 @@ class ChartsTab extends ConsumerWidget {
             l: l,
             theme: theme,
           ),
-        SpeedConsumptionCard(
-          bins: speedBins,
-          overallAvgLPer100Km: overallAvg,
-          l: l,
-          theme: theme,
-        ),
+        // While the worker runs, no card: an empty histogram would claim
+        // "not enough data" about trips it has not read yet.
+        if (speedBins.value case final bins?)
+          SpeedConsumptionCard(
+            bins: bins,
+            overallAvgLPer100Km: overallAvg,
+            l: l,
+            theme: theme,
+          ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: SectionCard(
@@ -159,22 +157,6 @@ double? _overallAvgLPer100Km(
   }
   if (totalDistanceKm <= 0) return null;
   return (totalLitres / totalDistanceKm) * 100.0;
-}
-
-/// Filter [trips] to those that match [vehicleId] (or carry a legacy
-/// null vehicleId — same convention used by the trajets tab and
-/// [aggregateByTripLength]). Returns the filtered list eagerly so the
-/// caller can `.expand` over it twice without re-running the predicate
-/// per pass — a small but noticeable saving on long trip lists where
-/// each entry carries hundreds of samples.
-List<TripHistoryEntry> _filterTrips(
-  Iterable<TripHistoryEntry> trips,
-  String? vehicleId,
-) {
-  if (vehicleId == null) return trips.toList(growable: false);
-  return trips
-      .where((entry) => entry.vehicleId == null || entry.vehicleId == vehicleId)
-      .toList(growable: false);
 }
 
 /// The symbol [spend]'s single denomination is shown with — the active

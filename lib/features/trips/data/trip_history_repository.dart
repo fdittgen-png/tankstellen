@@ -125,15 +125,28 @@ class TripHistoryRepository {
   }
 
   /// The raw rows of trip [id], or null when absent.
-  TripRowsV2? _rowsOf(String id, String meta) {
+  TripRowsV2? _rowsOf(String id, String meta) =>
+      TripRowsV2(meta: meta, chunks: _chunksOf(id), gpsd: _box.get(tripGpsdKey(id)));
+
+  /// The v2 chunk rows of trip [id] in order (none for a legacy row).
+  List<String> _chunksOf(String id) {
     final chunks = <String>[];
     for (var i = 0;; i++) {
       final c = _box.get(tripChunkKey(id, i));
       if (c == null) break;
       chunks.add(c);
     }
-    return TripRowsV2(meta: meta, chunks: chunks, gpsd: _box.get(tripGpsdKey(id)));
+    return chunks;
   }
+
+  /// The raw rows [decodeTripColumnSource] reads, for every present trip
+  /// in [ids] — box reads only, nothing decoded, so a caller folding MANY
+  /// trips can hand the whole batch to one worker isolate.
+  List<TripColumnSource> columnSources(Iterable<String> ids) => [
+        for (final id in ids)
+          if (_box.get(id) case final raw? when raw.isNotEmpty)
+            (row: raw, chunks: _chunksOf(id)),
+      ];
 
   static bool _isV2(Map<String, dynamic> json) => json['v'] == kTripRowVersion;
 
@@ -254,15 +267,7 @@ class TripHistoryRepository {
     final raw = _box.get(id);
     if (raw == null || raw.isEmpty) return TripColumns.empty;
     try {
-      final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      if (_isV2(json)) {
-        return decodeTripColumnsV2(_rowsOf(id, raw)!.chunks, keys);
-      }
-      final samples = (json['samples'] as List?)
-              ?.map((e) => (e as Map).cast<String, dynamic>())
-              .toList(growable: false) ??
-          const <Map<String, dynamic>>[];
-      return decodeTripChunkColumns(encodeTripChunkFromMaps(samples), keys);
+      return decodeTripColumnSource((row: raw, chunks: _chunksOf(id)), keys);
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository.loadColumns $id', 'entity': id});
       return TripColumns.empty;
@@ -272,18 +277,8 @@ class TripHistoryRepository {
   /// #3882 — a light sample list carrying only [keys] (plus timestamps),
   /// for readers such as the speed/consumption aggregator that take
   /// `List<TripSample>` but touch two or three fields.
-  List<TripSample> loadSamplesWith(String id, Set<String> keys) {
-    final cols = loadColumns(id, keys);
-    return [
-      for (var i = 0; i < cols.length; i++)
-        sampleFromJson({
-          't': cols.timestampsMs[i],
-          's': cols.values['s']?[i] ?? 0.0,
-          for (final k in keys)
-            if (k != 's' && cols.values[k]?[i] != null) k: cols.values[k]![i],
-        }),
-    ];
-  }
+  List<TripSample> loadSamplesWith(String id, Set<String> keys) =>
+      samplesFromColumns(loadColumns(id, keys), keys);
 
   Future<void> delete(String id) async {
     await _box.delete(id);
@@ -325,3 +320,30 @@ class TripHistoryRepository {
     }
   }
 }
+
+/// One trip's raw rows: its main row (v2 meta or a legacy v1 blob) and its
+/// v2 chunk rows. Plain strings, so it crosses an isolate boundary.
+typedef TripColumnSource = ({String row, List<String> chunks});
+
+/// The [keys] columns of one trip from its raw rows. A legacy row decodes
+/// fully and is projected. Pure — safe on a worker isolate.
+TripColumns decodeTripColumnSource(TripColumnSource src, Set<String> keys) {
+  final json = (jsonDecode(src.row) as Map).cast<String, dynamic>();
+  if (json['v'] == kTripRowVersion) return decodeTripColumnsV2(src.chunks, keys);
+  final samples = (json['samples'] as List?)
+          ?.map((e) => (e as Map).cast<String, dynamic>())
+          .toList(growable: false) ??
+      const <Map<String, dynamic>>[];
+  return decodeTripChunkColumns(encodeTripChunkFromMaps(samples), keys);
+}
+
+/// Light samples carrying only [keys] (plus timestamps) from [cols].
+List<TripSample> samplesFromColumns(TripColumns cols, Set<String> keys) => [
+      for (var i = 0; i < cols.length; i++)
+        sampleFromJson({
+          't': cols.timestampsMs[i],
+          's': cols.values['s']?[i] ?? 0.0,
+          for (final k in keys)
+            if (k != 's' && cols.values[k]?[i] != null) k: cols.values[k]![i],
+        }),
+    ];

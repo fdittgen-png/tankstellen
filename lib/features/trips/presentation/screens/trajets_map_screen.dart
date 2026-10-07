@@ -50,10 +50,15 @@ class TrajetsMapScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     // #3741 — the history list is summaries-only; this screen renders
-    // the GPS polylines, so it full-decodes exactly the selected trips
-    // via the per-id family (null → the id vanished; skip it).
+    // the GPS polylines, so it full-decodes exactly the selected trips —
+    // each on a worker isolate (#3882 loader), never in this build
+    // (null → the id vanished; skip it).
+    final loads = [
+      for (final id in tripIds) ref.watch(tripDetailLoaderProvider(id)),
+    ];
+    final loading = loads.any((l) => l.isLoading);
     final selected = <TripHistoryEntry>[
-      for (final id in tripIds) ?ref.watch(tripHistoryDetailProvider(id)),
+      for (final load in loads) ?load.value,
     ];
 
     final tracks = <_TripTrack>[];
@@ -91,13 +96,15 @@ class TrajetsMapScreen extends ConsumerWidget {
           key: const Key('trajets_map_share_gpx'),
           icon: const Icon(Icons.ios_share),
           tooltip: l.trajetsMapShareGpx,
-          onPressed: canExport
+          onPressed: canExport && !loading
               ? () => unawaited(_shareGpx(context, l, selected))
               : null,
         ),
       ],
       bodyPadding: EdgeInsets.zero,
-      body: tracks.isEmpty
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : tracks.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
