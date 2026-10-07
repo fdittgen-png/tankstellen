@@ -2,14 +2,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
 import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
 import 'package:tankstellen/features/trips/data/trip_history_store_v2.dart';
 import 'package:tankstellen/features/trips/domain/services/speed_consumption_histogram.dart';
 import 'package:tankstellen/features/trips/domain/trip_sample.dart';
 import 'package:tankstellen/features/trips/domain/trip_summary.dart';
 import 'package:tankstellen/features/trips/providers/speed_consumption_bins_provider.dart';
+import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
+
+import '../../../helpers/hive_temp_dir.dart';
 
 /// The worker-isolate fold of the carbon Charts histogram must produce the
 /// EXACT bins the old per-trip UI-isolate path did, for both row layouts.
@@ -26,10 +32,11 @@ List<TripSample> _samples(int n, double speedOffset) => [
         ),
     ];
 
-TripHistoryEntry _entry(String id, List<TripSample> samples) =>
+TripHistoryEntry _entry(String id, List<TripSample> samples,
+        {String? vehicleId = 'veh'}) =>
     TripHistoryEntry(
       id: id,
-      vehicleId: 'veh',
+      vehicleId: vehicleId,
       summary: TripSummary(
         distanceKm: 10,
         maxRpm: 3000,
@@ -52,6 +59,15 @@ TripColumnSource _v2Source(TripHistoryEntry e) {
         rows[tripChunkKey(e.id, i)]!,
     ],
   );
+}
+
+/// A fixture list (no box) whose entries carry their samples.
+class _FixtureList extends TripHistoryList {
+  _FixtureList(this._entries);
+  final List<TripHistoryEntry> _entries;
+
+  @override
+  List<TripHistoryEntry> build() => _entries;
 }
 
 List<Object?> _fields(SpeedConsumptionBin b) =>
@@ -79,5 +95,88 @@ void main() {
     ]);
 
     expect(bins.map(_fields).toList(), expected.map(_fields).toList());
+  });
+
+  test('without a repository the fixture entries are the data', () async {
+    final a = _entry('a', _samples(400, 2));
+    final container = ProviderContainer(overrides: [
+      tripHistoryRepositoryProvider.overrideWithValue(null),
+      tripHistoryListProvider.overrideWith(() => _FixtureList([a])),
+    ]);
+    addTearDown(container.dispose);
+
+    final bins =
+        await container.read(speedConsumptionBinsProvider('veh').future);
+
+    expect(bins.map(_fields).toList(),
+        aggregateSpeedConsumption(a.samples).map(_fields).toList());
+  });
+
+  group('through a real repository', () {
+    late Directory dir;
+    late Box<String> box;
+    late TripHistoryRepository repo;
+    final mine = _entry('mine', _samples(700, 0));
+    final shared = _entry('shared', _samples(320, 5), vehicleId: null);
+    final other = _entry('other', _samples(500, 11), vehicleId: 'veh2');
+    final empty = _entry('empty', const [], vehicleId: 'veh');
+
+    setUp(() async {
+      dir = Directory.systemTemp.createTempSync('speed_bins_');
+      Hive.init(dir.path);
+      box = await Hive.openBox<String>('trips_bins');
+      repo = TripHistoryRepository(box: box, cap: 10);
+      for (final e in [mine, shared, other, empty]) {
+        await repo.save(e);
+      }
+    });
+    tearDown(() async {
+      await box.deleteFromDisk();
+      await closeHiveAndDeleteTemp(dir);
+    });
+
+    test('columnSources hands over every stored trip, absent ids skipped',
+        () {
+      final sources = repo.columnSources(['mine', 'missing', 'other']);
+      expect(sources, hasLength(2));
+      expect(speedConsumptionBinsFromSources(sources).map(_fields).toList(),
+          aggregateSpeedConsumption([...mine.samples, ...other.samples])
+              .map(_fields)
+              .toList());
+    });
+
+    Future<List<SpeedConsumptionBin>> binsFor(String? vehicleId) {
+      final container = ProviderContainer(overrides: [
+        tripHistoryRepositoryProvider.overrideWithValue(repo),
+      ]);
+      addTearDown(container.dispose);
+      return container.read(speedConsumptionBinsProvider(vehicleId).future);
+    }
+
+    test('a vehicle sees its own trips plus the unassigned ones', () async {
+      final bins = await binsFor('veh');
+      expect(bins.map(_fields).toList(),
+          aggregateSpeedConsumption([...mine.samples, ...shared.samples])
+              .map(_fields)
+              .toList());
+    });
+
+    test('no vehicle sees every trip that stores samples', () async {
+      final bins = await binsFor(null);
+      expect(
+          bins.map(_fields).toList(),
+          aggregateSpeedConsumption(
+                  [...mine.samples, ...shared.samples, ...other.samples])
+              .map(_fields)
+              .toList());
+    });
+
+    test('a vehicle with no sampled trip gets the empty histogram', () async {
+      final bins = await binsFor('nobody-else');
+      expect(bins.map(_fields).toList(),
+          aggregateSpeedConsumption([...shared.samples]).map(_fields).toList());
+      await repo.delete('shared');
+      expect((await binsFor('nobody-else')).fold<int>(0, (n, b) => n + b.sampleCount), 0);
+    });
   });
 }
