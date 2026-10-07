@@ -84,12 +84,18 @@ class FuelStationRadar {
   /// no imminent station needs a fresh price; otherwise one corridor fetch
   /// (first entry into an area) and/or one JIT price fetch per newly-imminent
   /// station.
+  ///
+  /// [jitPrice] `false` skips the JIT step: a caller that merges its own
+  /// priced in-radius fetch (the on-search radar, whose rank lets that row
+  /// win) would otherwise pay one rate-limited request per station, one
+  /// after another, before its first paint.
   Future<List<Station>> fetchStations(
     double lat,
     double lng,
     double radiusKm,
     String fuelTypeApiValue, {
     double? headingDegrees,
+    bool jitPrice = true,
   }) async {
     final corridor = await corridorCache.stationsNear(
       lat,
@@ -111,7 +117,7 @@ class FuelStationRadar {
     final result = <Station>[];
     for (final s in corridor) {
       final d = geo.distanceMeters(lat, lng, s.lat, s.lng);
-      if (d <= radiusMeters && !isBulkSource) {
+      if (jitPrice && d <= radiusMeters && !isBulkSource) {
         // JIT price (deduped): refresh just this imminent station's price.
         result.add(await priceCache.priceFor(s));
       } else {

@@ -307,6 +307,10 @@ class RadarSearch extends _$RadarSearch {
         radiusKm,
         fuel.apiValue,
         headingDegrees: heading,
+        // The corridor rows already carry prices and the in-radius merge
+        // below brings fresh ones (its row wins the rank's dedup), so no
+        // per-station JIT fetch across the whole search radius.
+        jitPrice: false,
       );
 
       // #2806 — the wide corridor is row-capped + un-distance-ordered, so it can

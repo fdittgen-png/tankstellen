@@ -106,11 +106,16 @@ class MitecoStationService
       // template with its distance to the search centre. #3152
       // filter-before-copyWith: only the in-result survivors below pay the
       // `copyWith` + open-now computation.
+      // The provinces download concurrently (a border search used to pay
+      // one full province round-trip after another); merging in the
+      // original province order keeps the dedupe deterministic.
       final candidates = <(Station, double)>[];
       final seenIds = <String>{};
-      for (final provinceId in provinceIds) {
-        final templates =
-            await _stationsForProvince(provinceId, cancelToken: cancelToken);
+      final perProvince = await Future.wait([
+        for (final provinceId in provinceIds)
+          _stationsForProvince(provinceId, cancelToken: cancelToken),
+      ]);
+      for (final templates in perProvince) {
         for (final t in templates) {
           if (!seenIds.add(t.id)) continue;
           candidates

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show compute;
 import 'mise_dataset.dart';
 import '../../../core/domain/search_params.dart';
 import '../../../core/domain/station.dart';
@@ -143,9 +144,11 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
         _dio.get<String>(_stationsUrl, cancelToken: cancelToken),
         _dio.get<String>(_pricesUrl, cancelToken: cancelToken),
       ]);
-      return (
-        _parseStationsCsv(results[0].data ?? ''),
-        _parsePricesCsv(results[1].data ?? ''),
+      // ~20k station rows + ~100k price rows: parsed on a worker isolate
+      // so a dataset refresh never freezes the visible list.
+      return compute(
+        _parseDataset,
+        (results[0].data ?? '', results[1].data ?? ''),
       );
     }
 
@@ -182,7 +185,10 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
   /// codes, not display names — treated as empty so the brand fallback fires.
   static final RegExp _codeLikeName = RegExp(r'^[A-Z]{0,3}\d{3,}( .*)?$');
 
-  Map<String, MiseStationData> _parseStationsCsv(String csv) {
+  static MiseDataset _parseDataset((String, String) csv) =>
+      (_parseStationsCsv(csv.$1), _parsePricesCsv(csv.$2));
+
+  static Map<String, MiseStationData> _parseStationsCsv(String csv) {
     final stations = <String, MiseStationData>{};
     final rows = CsvParser.parseAll(csv, skipLines: 2, separator: '|');
 
@@ -232,7 +238,7 @@ class MiseStationService with StationServiceHelpers, CachedDatasetMixin implemen
     'v-power diesel',
   };
 
-  Map<String, MisePriceData> _parsePricesCsv(String csv) {
+  static Map<String, MisePriceData> _parsePricesCsv(String csv) {
     final prices = <String, MisePriceData>{};
     final rows = CsvParser.parseAll(csv, skipLines: 2, separator: '|');
 

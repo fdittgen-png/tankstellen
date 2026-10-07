@@ -91,6 +91,7 @@ class _FakeRadar extends FuelStationRadar {
     double radiusKm,
     String fuelTypeApiValue, {
     double? headingDegrees,
+    bool jitPrice = true,
   }) async {
     fetchCalls++;
     return stations;

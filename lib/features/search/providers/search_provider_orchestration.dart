@@ -8,6 +8,9 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../core/error/exceptions.dart';
 import '../../../core/location/user_position_provider.dart';
+import '../../../core/location/location_service.dart';
+import '../../../core/time/app_clock.dart';
+import '../../../core/utils/geo_utils.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/cache/cache_manager.dart';
 import '../../../core/services/geocoding_chain.dart';
@@ -24,6 +27,7 @@ import '../../profile/providers/profile_provider.dart';
 import '../../../core/domain/travel_estimate.dart';
 import 'ev_search_provider.dart';
 import 'refuel_travel_origin_provider.dart';
+import 'search_filters_provider.dart';
 import 'search_result_helpers.dart';
 
 /// Orchestration helpers extracted from `search_provider.dart` (#563)
@@ -67,6 +71,80 @@ Future<void> autoUpdatePositionIfEnabled(Ref ref) async {
       'where': 'search_provider: autoUpdatePositionIfEnabled',
     }));
   }
+}
+
+/// A GPS fix at most this old is reused by the next GPS search instead
+/// of asking the OS again — Refresh used to take two fixes back to back.
+const kRecentFixReuseAge = Duration(seconds: 30);
+
+/// The persisted GPS position seeds the instant launch preview only while
+/// it is this recent, so a reopened app never paints another town.
+const kLastPositionPreviewMaxAge = Duration(minutes: 30);
+
+/// The persisted GPS position, when it came from a fix and is usable.
+UserPositionData? _persistedFix(Ref ref, Duration maxAge) {
+  final last = ref.read(userPositionProvider);
+  if (last == null || last.source != 'GPS') return null;
+  if (!isUsableCoord(last.lat, last.lng)) return null;
+  final age = ref.read(appClockProvider).now().difference(last.updatedAt);
+  return age <= maxAge ? last : null;
+}
+
+/// The position a GPS search runs from: the fix taken in the last
+/// [kRecentFixReuseAge], or a fresh one from [LocationService].
+Future<({double latitude, double longitude})> currentOrRecentFix(
+    Ref ref) async {
+  final recent = _persistedFix(ref, kRecentFixReuseAge);
+  if (recent != null) return (latitude: recent.lat, longitude: recent.lng);
+  final p = await ref.read(locationServiceProvider).getCurrentPosition();
+  return (latitude: p.latitude, longitude: p.longitude);
+}
+
+/// Instant paint for a GPS search: the cached stations of the last GPS
+/// search cell (#3618 preview semantics — any age, honest freshness
+/// banner), published BEFORE the fix resolves. The network result then
+/// replaces it in place. No-op without a recent persisted fix or cache.
+/// EV searches skip it: their feed comes from a different service.
+void publishLastPositionPreview(
+  Ref ref, {
+  required FuelType fuelType,
+  required double radiusKm,
+  required SortBy sortBy,
+  required void Function(AsyncValue<ServiceResult<List<SearchResultItem>>>)
+      publish,
+}) {
+  if (isEvSearch(fuelType)) return;
+  final last = _persistedFix(ref, kLastPositionPreviewMaxAge);
+  if (last == null) return;
+  final cached = peekCachedStationSearch(
+    cache: ref.read(cacheManagerProvider),
+    countryCode: ref.read(activeCountryProvider).code,
+    params: SearchParams(
+      lat: last.lat,
+      lng: last.lng,
+      radiusKm: radiusKm,
+      fuelType: fuelType,
+      sortBy: sortBy,
+    ),
+  );
+  if (cached != null) publish(AsyncValue.data(wrapFuelResultAsSearchItems(cached)));
+}
+
+/// Labels the searched location with its reverse-geocoded address,
+/// WITHOUT holding up the search: the label lands whenever the geocoder
+/// answers, unless a newer search cancelled [cancelToken] first.
+void labelSearchLocation(
+  Ref ref,
+  double lat,
+  double lng,
+  CancelToken cancelToken,
+) {
+  final geocoding = ref.read(geocodingChainProvider);
+  unawaited(tryReverseGeocode(geocoding, lat, lng, cancelToken: cancelToken)
+      .then((addr) {
+    if (addr == null || cancelToken.isCancelled || !ref.mounted) return;
+    ref.read(searchLocationProvider.notifier).set(addr);
+  }));
 }
 
 /// Resolves the effective fuel + radius: honour explicit overrides,

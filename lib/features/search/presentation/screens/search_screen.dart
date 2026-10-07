@@ -216,7 +216,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
     // before the re-search lands.
     ref.listen<FuelType>(selectedFuelTypeProvider, (prev, next) {
       if (prev != next) {
-        unawaited(ref.read(searchStateProvider.notifier).repeatLastSearch());
+        // The replay carries the NEW fuel: replaying the original call
+        // re-fetched the fuel it was first issued with.
+        unawaited(ref
+            .read(searchStateProvider.notifier)
+            .repeatLastSearch(fuelType: next));
       }
     });
 

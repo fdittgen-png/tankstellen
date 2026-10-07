@@ -17,6 +17,7 @@ import '../../../../core/widgets/shimmer_placeholder.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/search_mode.dart';
 import '../../../../core/domain/search_result_item.dart';
+import '../../../../core/domain/station.dart';
 import '../../providers/radar_scope_mode_provider.dart';
 import '../../providers/radar_search_provider.dart';
 import '../../providers/search_mode_provider.dart';
@@ -89,11 +90,7 @@ class SearchResultsContent extends ConsumerWidget {
               onRetry: () => ref.read(radarSearchProvider.notifier).runRadar(),
             );
           }
-          final radarResult = ServiceResult<List<SearchResultItem>>(
-            data: [for (final s in stations) FuelStationResult(s)],
-            source: ServiceSource.cache,
-            fetchedAt: DateTime.now(),
-          );
+          final radarResult = _radarResultFor(stations);
           // #3342 — a second visualization of the SAME station set: a green
           // PPI radar scope (rotating sweep + a chip per station by distance
           // and bearing). The toggle only swaps the view, never re-scans, and
@@ -246,6 +243,23 @@ class SearchResultsContent extends ConsumerWidget {
     );
   }
 }
+
+/// The radar list's [ServiceResult], built once per published station
+/// list. Keyed on the list's identity: a rebuild for anything else (a
+/// heading tick, the locating banner, a position update) then hands
+/// [SearchResultsList] the SAME result — it neither replays its fade
+/// cascade nor re-keys the filtered/sorted family provider on a fresh
+/// list.
+final Expando<ServiceResult<List<SearchResultItem>>> _radarResults =
+    Expando('radarResults');
+
+ServiceResult<List<SearchResultItem>> _radarResultFor(
+        List<Station> stations) =>
+    _radarResults[stations] ??= ServiceResult<List<SearchResultItem>>(
+      data: [for (final s in stations) FuelStationResult(s)],
+      source: ServiceSource.cache,
+      fetchedAt: DateTime.now(),
+    );
 
 /// #3058 — the radar's "scan finished, found nothing" state. Visually distinct
 /// from the loading shimmer (still searching) and the error banner (failed), so
