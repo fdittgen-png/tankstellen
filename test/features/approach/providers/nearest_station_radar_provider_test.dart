@@ -102,6 +102,7 @@ class _CapturingRadar extends FuelStationRadar {
     double radiusKm,
     String fuelTypeApiValue, {
     double? headingDegrees,
+    bool jitPrice = true,
   }) async {
     radiusCalls.add(radiusKm);
     return stations;

@@ -122,7 +122,54 @@ void main() {
       expect(find.byIcon(Icons.radar), findsOneWidget);
       expect(find.byType(SearchResultsList), findsNothing);
     });
+
+    testWidgets(
+        'a radar rebuild that keeps the same stations hands the list the SAME '
+        'result (no replayed fade cascade, no re-keyed sort provider)',
+        (tester) async {
+      final test = standardTestOverrides();
+      when(() => test.mockStorage.hasApiKey(any())).thenReturn(false);
+      when(() => test.mockStorage.getIgnoredIds()).thenReturn(<String>[]);
+      when(() => test.mockStorage.getRatings())
+          .thenReturn(const <String, int>{});
+      final radar = _PricedRadarSearch();
+
+      await pumpApp(
+        tester,
+        SearchResultsContent(onGpsRetry: noopRetry),
+        overrides: [
+          ...test.overrides,
+          radarSearchProvider.overrideWith(() => radar),
+        ].cast(),
+      );
+      final before =
+          tester.widget<SearchResultsList>(find.byType(SearchResultsList));
+
+      // A heading tick: the radar state changes, its station list does not.
+      radar.turnTo(90);
+      await tester.pump();
+      final after =
+          tester.widget<SearchResultsList>(find.byType(SearchResultsList));
+
+      expect(identical(before.result, after.result), isTrue);
+    });
   });
+}
+
+/// Radar active with one priced station; [turnTo] changes only the heading.
+class _PricedRadarSearch extends RadarSearch {
+  static final _stations = <Station>[testStation];
+
+  @override
+  RadarSearchState build() => RadarSearchState(
+        active: true,
+        stations: AsyncData<List<Station>>(_stations),
+      );
+
+  void turnTo(double heading) => state = state.copyWith(heading: heading);
+
+  @override
+  Future<void> runRadar() async {}
 }
 
 /// Radar active + zero stations — drives the #3058 empty-state branch.

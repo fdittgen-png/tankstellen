@@ -212,6 +212,7 @@ ProviderContainer _container({
   double radiusKm = 10.0,
   StreamController<Position>? gps,
   _FakeStationService? service,
+  FuelStationRadar? radar,
 }) =>
     ProviderContainer(
       overrides: [
@@ -225,7 +226,8 @@ ProviderContainer _container({
         ),
         selectedFuelTypeProvider.overrideWith(() => _FixedFuelType(fuel)),
         searchRadiusProvider.overrideWith(() => _FixedRadius(radiusKm)),
-        fuelStationRadarProvider.overrideWithValue(_recordedRadar(corridor)),
+        fuelStationRadarProvider
+            .overrideWithValue(radar ?? _recordedRadar(corridor)),
         stationServiceProvider.overrideWithValue(
           service ?? _FakeStationService(inRadius, throws: inRadiusThrows),
         ),
@@ -239,6 +241,45 @@ ProviderContainer _container({
     );
 
 void main() {
+  group('RadarSearch — no per-station price round-trips', () {
+    test('a polled source paints without one JIT request per station',
+        () async {
+      // A polled (non-bulk) corridor: every station sits inside the search
+      // radius, so the JIT step used to issue one rate-limited request per
+      // station, serially, before the radar could paint (~2 s each in DE).
+      var priceCalls = 0;
+      final corridor = [
+        for (var i = 0; i < 12; i++)
+          _station('S$i', 48.0 + i * 0.002, 2.0, e10: 1.70 + i / 100),
+      ];
+      final radar = FuelStationRadar(
+        isBulkSource: false,
+        corridorCache: CorridorLocationCache(
+          isBulk: false,
+          corridorRadiusKm: 60,
+          tileStepDegrees: 0.5,
+          fetchCorridor: (lat, lng, r) async => corridor,
+        ),
+        priceCache: JitPriceCache(fetchPrice: (s) async {
+          priceCalls++;
+          return s;
+        }),
+      );
+      final container = _container(
+        position: (lat: 48.0, lng: 2.0),
+        corridor: corridor,
+        radar: radar,
+      );
+      addTearDown(container.dispose);
+
+      await container.read(radarSearchProvider.notifier).runRadar();
+
+      expect(priceCalls, 0);
+      expect(container.read(radarSearchProvider).stations.value,
+          hasLength(12));
+    });
+  });
+
   group('RadarSearch — on-search radar over the real fetch', () {
     test('runRadar flips active and surfaces a distance-sorted priced list',
         () async {

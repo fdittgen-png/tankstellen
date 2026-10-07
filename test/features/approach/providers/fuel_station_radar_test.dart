@@ -107,6 +107,50 @@ void main() {
     });
   });
 
+  group('FuelStationRadar — jitPrice: false (the on-search radar)', () {
+    test('a whole search radius of corridor stations makes NO price request',
+        () async {
+      var priceCalls = 0;
+      final radar = _radar(
+        isBulk: false,
+        fetchCorridor: (lat, lng, r) async => [
+          for (var i = 0; i < 40; i++)
+            _station('S$i', lat + i * 0.001, lng, e10: 1.7),
+        ],
+        fetchPrice: (s) async {
+          priceCalls++;
+          return s.copyWith(e10: 1.5);
+        },
+      );
+
+      final out =
+          await radar.fetchStations(48.0, 2.0, 10.0, 'e10', jitPrice: false);
+      expect(out, hasLength(40));
+      expect(priceCalls, 0,
+          reason: 'one serial, rate-limited request per station used to '
+              'gate the radar paint; the in-radius merge prices instead');
+      expect(out.every((s) => s.e10 == 1.7), isTrue,
+          reason: 'the corridor rows keep their own prices');
+    });
+
+    test('the default still JIT-prices every imminent station', () async {
+      var priceCalls = 0;
+      final radar = _radar(
+        isBulk: false,
+        fetchCorridor: (lat, lng, r) async => [
+          for (var i = 0; i < 3; i++) _station('S$i', lat + i * 0.001, lng),
+        ],
+        fetchPrice: (s) async {
+          priceCalls++;
+          return s.copyWith(e10: 1.5);
+        },
+      );
+
+      await radar.fetchStations(48.0, 2.0, 10.0, 'e10');
+      expect(priceCalls, 3);
+    });
+  });
+
   group('FuelStationRadar — bulk-local-filter vs polled-corridor-query', () {
     test('bulk source: prices already in the corridor slice, no JIT fetch',
         () async {
