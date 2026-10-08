@@ -1,0 +1,7 @@
+• Faster start and search: your last results appear instantly, GPS search no longer waits for the address lookup
+• Radar mode shows stations much sooner
+• Refuel decision: route plans, cross-border offers, true trip cost
+• Opportunities feed: alerts that explain themselves
+• Fuel & Tank: next-fill advice per vehicle, vehicle comparisons
+• Privacy & Data area: export or delete everything
+• Now licensed AGPL-3.0

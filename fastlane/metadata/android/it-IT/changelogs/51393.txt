@@ -1,0 +1,7 @@
+• Avvio e ricerca più veloci: gli ultimi risultati compaiono subito, la ricerca GPS non aspetta più l'indirizzo
+• Il radar mostra i distributori molto prima
+• Decisione di rifornimento: piano di viaggio, offerte oltreconfine, costo reale del tragitto
+• Opportunità: avvisi che si spiegano da soli
+• Carburante e serbatoio: consiglio per il prossimo pieno, confronto veicoli
+• Privacy e dati: esporta o elimina tutto
+• Ora con licenza AGPL-3.0
