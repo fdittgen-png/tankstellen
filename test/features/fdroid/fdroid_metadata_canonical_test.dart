@@ -140,7 +140,9 @@ void main() {
       // point would be in the MR body too — fdroiddata accepts that, but
       // it has drifted before, so keep the split unambiguous.
       final body = lines.sublist(firstYaml);
-      expect(body.first, 'AntiFeatures:',
+      // fdroiddata orders AntiFeatures first, then Categories; with no
+      // AntiFeature declared (#4510) the body starts at Categories.
+      expect(body.first, anyOf('AntiFeatures:', 'Categories:'),
           reason: 'the body must start where the MR body starts');
       expect(body.where((l) => l.startsWith('#')), isEmpty,
           reason: 'no comments inside the mirrored body — the MR has none, '
