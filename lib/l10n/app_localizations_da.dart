@@ -7663,7 +7663,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Din placering gemmes ikke på nogen server — der er ingen server.';
+      'Din placering gemmes ikke på nogen server.';
 
   @override
   String get locationConsentBulletNoTracking =>

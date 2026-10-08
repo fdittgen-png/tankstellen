@@ -7685,7 +7685,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Vaša se lokacija ne pohranjuje ni na jednom poslužitelju — poslužitelja nema.';
+      'Vaša se lokacija ne pohranjuje ni na jednom poslužitelju.';
 
   @override
   String get locationConsentBulletNoTracking =>

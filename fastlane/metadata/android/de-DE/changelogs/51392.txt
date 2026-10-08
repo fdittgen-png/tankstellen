@@ -1,0 +1,7 @@
+• Schneller Start und schnellere Suche: deine letzten Ergebnisse erscheinen sofort, die GPS-Suche wartet nicht mehr auf die Adresse
+• Radar zeigt Tankstellen deutlich schneller
+• Tankentscheidung: Routenplan, Angebote jenseits der Grenze, echte Fahrtkosten
+• Chancen-Feed: Hinweise, die sich selbst erklären
+• Kraftstoff & Tank: Tipp für die nächste Füllung, Fahrzeugvergleiche
+• Datenschutz & Daten: alles exportieren oder löschen
+• Jetzt unter AGPL-3.0

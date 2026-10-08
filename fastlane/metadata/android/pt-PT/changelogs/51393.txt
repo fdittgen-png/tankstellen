@@ -1,0 +1,7 @@
+• Arranque e pesquisa mais rápidos: os últimos resultados aparecem de imediato, a pesquisa GPS já não espera pela morada
+• O radar mostra os postos muito mais cedo
+• Decisão de abastecimento: plano de rota, ofertas além-fronteira, custo real da viagem
+• Oportunidades: alertas que se explicam
+• Combustível e depósito: conselho para o próximo abastecimento, comparação de veículos
+• Privacidade e dados: exporte ou apague tudo
+• Agora com licença AGPL-3.0

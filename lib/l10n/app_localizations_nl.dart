@@ -7680,7 +7680,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Je locatie wordt op geen enkele server opgeslagen — er is geen server.';
+      'Je locatie wordt op geen enkele server opgeslagen.';
 
   @override
   String get locationConsentBulletNoTracking =>

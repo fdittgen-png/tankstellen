@@ -7635,7 +7635,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Your location is not stored on any server — there is no server.';
+      'Your location is not stored on any server.';
 
   @override
   String get locationConsentBulletNoTracking =>
@@ -19869,7 +19869,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get locationConsentBulletNoServer =>
-      '⟦Ýóúř łóçáŧîóñ îš ñóŧ šŧóřéđ óñ áñý šéřṽéř — ŧĥéřé îš ñó šéřṽéř. ······················⟧';
+      '⟦Ýóúř łóçáŧîóñ îš ñóŧ šŧóřéđ óñ áñý šéřṽéř. ···············⟧';
 
   @override
   String get locationConsentBulletNoTracking =>

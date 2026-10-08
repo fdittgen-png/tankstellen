@@ -7698,7 +7698,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Jūsu atrašanās vieta netiek glabāta nevienā serverī — servera nav.';
+      'Jūsu atrašanās vieta netiek glabāta nevienā serverī.';
 
   @override
   String get locationConsentBulletNoTracking =>

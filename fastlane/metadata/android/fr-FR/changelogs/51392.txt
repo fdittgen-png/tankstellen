@@ -1,0 +1,7 @@
+• Démarrage et recherche plus rapides : vos derniers résultats s'affichent tout de suite, la recherche GPS n'attend plus l'adresse
+• Le radar affiche les stations bien plus vite
+• Décision de plein : plan d'itinéraire, offres transfrontalières, vrai coût du trajet
+• Fil d'opportunités : des alertes qui s'expliquent
+• Carburant et réservoir : conseil pour le prochain plein, comparaison des véhicules
+• Confidentialité et données : tout exporter ou supprimer
+• Désormais sous licence AGPL-3.0

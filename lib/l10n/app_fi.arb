@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Tämä sovellus haluaa käyttää sijaintiasi löytääkseen huoltoasemia läheltäsi.",
   "locationConsentWhatHappens": "Mitä sijaintitiedoillesi tapahtuu:",
   "locationConsentBulletApi": "Koordinaattisi lähetetään polttoaineen hinta-API:lle lähistön asemien löytämiseksi.",
-  "locationConsentBulletNoServer": "Sijaintiasi ei tallenneta millekään palvelimelle — palvelinta ei ole.",
+  "locationConsentBulletNoServer": "Sijaintiasi ei tallenneta millekään palvelimelle.",
   "locationConsentBulletNoTracking": "Sijaintitietoja ei käytetä mainontaan, analytiikkaan tai seurantaan.",
   "locationConsentRevoke": "Voit peruuttaa sijainnin käyttöoikeuden milloin tahansa järjestelmäasetuksista. Vaihtoehtoisesti voit hakea postinumerolla.",
   "locationConsentLegalBasis": "Oikeusperuste: yleisen tietosuoja-asetuksen 6 artiklan 1 kohdan a alakohta (suostumus)",

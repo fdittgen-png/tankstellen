@@ -12,6 +12,52 @@ About-screen build number always maps back to a commit.
 
 ## [Unreleased]
 
+## [6.1.0] - 2026-10-07 (Build 5139)
+
+### Added
+
+- Refuel decision engine: a refuel plan per route, cross-border offers and
+  one comparison the driver builds; a station's real trip cost from road
+  distances (#4089, #4348, #4359-#4363).
+- Opportunities feed: alerts explain themselves, carry a confidence and
+  share one attention budget (#4149-#4154, #4183).
+- Fuel & Tank surface: per-vehicle fuel behaviour, a next-fill decision,
+  fuzzy consumption and tank-blend engines, pump-anchored fuel gain
+  (#3886, #4232, #4275-#4279, #4321).
+- Vehicle comparisons: consumption, refuelling history, driving patterns and
+  the same trip across selected vehicles (#4365-#4367).
+- Fleet: company cars, refuel policy, expenses from receipts and a manager
+  dashboard (#4212-#4219, #4399).
+- Foreign currency kept as paid, with settled rates (#4428, #4462).
+- A home that answers what the app can do right now; tabs named by intent
+  (Find, Cost, Drive); one adaptive bottom bar (#4137, #4143, #4168).
+- Privacy & Data area: consent enforced, complete erasure and export, every
+  processor disclosed (#3865-#3875, #3907-#3912).
+- Offline brand logos for European fuel brands and EV networks (#3930,
+  #3940); in-app guide opened at the exact control (#4007).
+
+### Changed
+
+- Licence: AGPL-3.0-or-later, with a commercial exception (#4442).
+- Faster start and search: the last results paint instantly, a GPS search no
+  longer waits for the address lookup, radar mode no longer prices every
+  station one by one, heavy decoding runs in the background (#4317-#4319,
+  #4498-#4503).
+- One visual grammar across the core screens (#3947).
+- The F-Droid build reaches no developer-hosted endpoint (#3788).
+
+### Fixed
+
+- OBD2 recording: single-owner link, bounded recovery, engine-off handled as
+  a car state, the ~40 min recording crash, lost trips on stop (#3758,
+  #3775, #3855, #4162, #4311-#4314, #4383-#4386).
+- Sync: queued deletions bound to the account that made them, the local copy
+  kept as promised, trip-share grants bound to ownership (#4046-#4049,
+  #4336-#4338, #4377).
+- Storage: key-loss verdict before any key write; secure storage never
+  self-wipes (#4341, #4350, #4372, #4373).
+- The location consent no longer claims there is no server (#4509).
+
 ## [6.0.5] - 2026-08-10 (Build 5138)
 
 ### Added

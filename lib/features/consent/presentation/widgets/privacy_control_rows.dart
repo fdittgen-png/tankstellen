@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/providers/privacy_controls_provider.dart';
+import '../../../../core/utils/brand_logo_mapper.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// #3870 (Epic #3865) / #3909 (Epic #3907) — the two disclosed,
@@ -38,17 +39,19 @@ class PrivacyControlRows extends ConsumerWidget {
             onChanged: (v) =>
                 ref.read(tileProxyEnabledProvider.notifier).set(v),
           ),
-        PrivacyControlRow(
-          switchKey: const Key('privacyRemoteLogosSwitch'),
-          infoKey: const Key('privacyRemoteLogosInfo'),
-          icon: Icons.image_outlined,
-          title: l.remoteLogosToggleTitle,
-          subtitle: l.remoteLogosToggleShort,
-          details: l.remoteLogosToggleSubtitle,
-          value: logosOn,
-          onChanged: (v) =>
-              ref.read(remoteBrandLogosProvider.notifier).set(v),
-        ),
+        // #4516 — no internet-logo source on a libre build either.
+        if (BrandLogoMapper.remoteLogosAvailable)
+          PrivacyControlRow(
+            switchKey: const Key('privacyRemoteLogosSwitch'),
+            infoKey: const Key('privacyRemoteLogosInfo'),
+            icon: Icons.image_outlined,
+            title: l.remoteLogosToggleTitle,
+            subtitle: l.remoteLogosToggleShort,
+            details: l.remoteLogosToggleSubtitle,
+            value: logosOn,
+            onChanged: (v) =>
+                ref.read(remoteBrandLogosProvider.notifier).set(v),
+          ),
       ],
     );
   }

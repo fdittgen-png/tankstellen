@@ -7665,7 +7665,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Sijaintiasi ei tallenneta millekään palvelimelle — palvelinta ei ole.';
+      'Sijaintiasi ei tallenneta millekään palvelimelle.';
 
   @override
   String get locationConsentBulletNoTracking =>

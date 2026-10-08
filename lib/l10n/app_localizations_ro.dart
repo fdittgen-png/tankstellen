@@ -7707,7 +7707,7 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Locația dvs. nu este stocată pe niciun server — nu există server.';
+      'Locația dvs. nu este stocată pe niciun server.';
 
   @override
   String get locationConsentBulletNoTracking =>

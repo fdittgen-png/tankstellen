@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Den här appen vill använda din plats för att hitta bensinstationer i närheten.",
   "locationConsentWhatHappens": "Vad som händer med dina platsdata:",
   "locationConsentBulletApi": "Dina koordinater skickas till bränslepris-API:et för att hitta stationer i närheten.",
-  "locationConsentBulletNoServer": "Din plats lagras inte på någon server — det finns ingen server.",
+  "locationConsentBulletNoServer": "Din plats lagras inte på någon server.",
   "locationConsentBulletNoTracking": "Platsdata används inte för reklam, analys eller spårning.",
   "locationConsentRevoke": "Du kan när som helst återkalla platsåtkomsten i systeminställningarna. Du kan även söka på postnummer.",
   "locationConsentLegalBasis": "Rättslig grund: art. 6.1 a i GDPR (samtycke)",

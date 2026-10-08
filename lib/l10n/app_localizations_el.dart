@@ -7711,7 +7711,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Η τοποθεσία σας δεν αποθηκεύεται σε κανέναν διακομιστή — δεν υπάρχει διακομιστής.';
+      'Η τοποθεσία σας δεν αποθηκεύεται σε κανέναν διακομιστή.';
 
   @override
   String get locationConsentBulletNoTracking =>

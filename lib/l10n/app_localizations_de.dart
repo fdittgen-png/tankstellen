@@ -7711,7 +7711,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Ihr Standort wird nicht auf Servern gespeichert — es gibt keine eigenen Server.';
+      'Ihr Standort wird nicht auf Servern gespeichert.';
 
   @override
   String get locationConsentBulletNoTracking =>

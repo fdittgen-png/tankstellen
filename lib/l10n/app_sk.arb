@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Táto aplikácia chce použiť vašu polohu na vyhľadanie čerpacích staníc vo vašom okolí.",
   "locationConsentWhatHappens": "Čo sa deje s údajmi o vašej polohe:",
   "locationConsentBulletApi": "Vaše súradnice sa odosielajú do API cien palív na vyhľadanie blízkych staníc.",
-  "locationConsentBulletNoServer": "Vaša poloha sa neukladá na žiadnom serveri — žiadny server neexistuje.",
+  "locationConsentBulletNoServer": "Vaša poloha sa neukladá na žiadnom serveri.",
   "locationConsentBulletNoTracking": "Údaje o polohe sa nepoužívajú na reklamu, analytiku ani sledovanie.",
   "locationConsentRevoke": "Prístup k polohe môžete kedykoľvek odvolať v nastaveniach systému. Prípadne môžete vyhľadávať podľa PSČ.",
   "locationConsentLegalBasis": "Právny základ: čl. 6 ods. 1 písm. a) GDPR (súhlas)",

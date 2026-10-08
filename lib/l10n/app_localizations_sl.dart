@@ -7676,7 +7676,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Vaša lokacija ni shranjena na nobenem strežniku — strežnika ni.';
+      'Vaša lokacija ni shranjena na nobenem strežniku.';
 
   @override
   String get locationConsentBulletNoTracking =>

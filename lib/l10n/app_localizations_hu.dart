@@ -7695,7 +7695,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'A tartózkodási helyét semmilyen szerver nem tárolja — nincs szerver.';
+      'A tartózkodási helyét semmilyen szerver nem tárolja.';
 
   @override
   String get locationConsentBulletNoTracking =>

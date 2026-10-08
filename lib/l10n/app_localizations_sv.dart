@@ -7657,7 +7657,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Din plats lagras inte på någon server — det finns ingen server.';
+      'Din plats lagras inte på någon server.';
 
   @override
   String get locationConsentBulletNoTracking =>

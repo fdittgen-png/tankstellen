@@ -7697,7 +7697,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Jūsų vieta nesaugoma jokiame serveryje — serverio nėra.';
+      'Jūsų vieta nesaugoma jokiame serveryje.';
 
   @override
   String get locationConsentBulletNoTracking =>

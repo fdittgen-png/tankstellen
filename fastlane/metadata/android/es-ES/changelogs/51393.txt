@@ -1,0 +1,7 @@
+• Inicio y búsqueda más rápidos: tus últimos resultados aparecen al instante, la búsqueda GPS ya no espera a la dirección
+• El radar muestra las gasolineras mucho antes
+• Decisión de repostaje: plan de ruta, ofertas transfronterizas, coste real del trayecto
+• Oportunidades: avisos que se explican solos
+• Combustible y depósito: consejo para el próximo repostaje, comparación de vehículos
+• Privacidad y datos: exporta o borra todo
+• Ahora con licencia AGPL-3.0

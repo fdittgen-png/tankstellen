@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Ta aplikacja chce użyć Twojej lokalizacji, aby znaleźć stacje paliw w pobliżu.",
   "locationConsentWhatHappens": "Co dzieje się z danymi o Twojej lokalizacji:",
   "locationConsentBulletApi": "Twoje współrzędne są wysyłane do API cen paliw w celu znalezienia pobliskich stacji.",
-  "locationConsentBulletNoServer": "Twoja lokalizacja nie jest przechowywana na żadnym serwerze — nie ma serwera.",
+  "locationConsentBulletNoServer": "Twoja lokalizacja nie jest przechowywana na żadnym serwerze.",
   "locationConsentBulletNoTracking": "Dane o lokalizacji nie są wykorzystywane do reklam, analiz ani śledzenia.",
   "locationConsentRevoke": "Dostęp do lokalizacji możesz cofnąć w dowolnym momencie w ustawieniach systemu. Możesz też wyszukiwać według kodu pocztowego.",
   "locationConsentLegalBasis": "Podstawa prawna: art. 6 ust. 1 lit. a) RODO (zgoda)",

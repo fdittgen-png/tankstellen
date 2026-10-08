@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Ova aplikacija želi koristiti vašu lokaciju za pronalaženje benzinskih postaja u blizini.",
   "locationConsentWhatHappens": "Što se događa s podacima o vašoj lokaciji:",
   "locationConsentBulletApi": "Vaše se koordinate šalju API-ju cijena goriva radi pronalaženja obližnjih postaja.",
-  "locationConsentBulletNoServer": "Vaša se lokacija ne pohranjuje ni na jednom poslužitelju — poslužitelja nema.",
+  "locationConsentBulletNoServer": "Vaša se lokacija ne pohranjuje ni na jednom poslužitelju.",
   "locationConsentBulletNoTracking": "Podaci o lokaciji ne koriste se za oglašavanje, analitiku ni praćenje.",
   "locationConsentRevoke": "Pristup lokaciji možete opozvati u bilo kojem trenutku u postavkama sustava. Alternativno, pretražujte prema poštanskom broju.",
   "locationConsentLegalBasis": "Pravna osnova: čl. 6. st. 1. t. (a) GDPR-a (privola)",

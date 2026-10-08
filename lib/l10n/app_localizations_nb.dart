@@ -7665,7 +7665,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Plasseringen din lagres ikke på noen server — det finnes ingen server.';
+      'Plasseringen din lagres ikke på noen server.';
 
   @override
   String get locationConsentBulletNoTracking =>

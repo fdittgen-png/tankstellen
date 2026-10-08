@@ -7689,7 +7689,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Vaša poloha sa neukladá na žiadnom serveri — žiadny server neexistuje.';
+      'Vaša poloha sa neukladá na žiadnom serveri.';
 
   @override
   String get locationConsentBulletNoTracking =>
