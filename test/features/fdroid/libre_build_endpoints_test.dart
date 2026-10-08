@@ -14,6 +14,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/core/constants/app_constants.dart';
 import 'package:tankstellen/core/constants/libre_build.dart';
+import 'package:tankstellen/core/utils/brand_logo_mapper.dart';
 
 void main() {
   group('#3788 libre-build endpoint policy', () {
@@ -28,6 +29,18 @@ void main() {
         // work, because that is the mechanism the libre build relies on.
         expect(AppConstants.tileProxyUrl, isNotEmpty);
         expect(AppConstants.effectiveTileUrl, AppConstants.tileProxyUrl);
+      }
+    });
+
+    test('#4516 — no remote brand logos (logo.clearbit.com) on a libre build',
+        () {
+      // Clearbit is a proprietary service: the F-Droid build must not even
+      // offer it, opt-in or not. The default build keeps the opt-in switch.
+      expect(BrandLogoMapper.remoteLogosAvailable, !kLibreBuild);
+      if (kLibreBuild) {
+        expect(BrandLogoMapper.logoUrl('Shell'), isNull);
+      } else {
+        expect(BrandLogoMapper.logoUrl('Shell'), contains('logo.clearbit.com'));
       }
     });
 

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import '../constants/libre_build.dart';
+
 /// Maps fuel station and charging network brand names to their logo
 /// image URLs.
 ///
@@ -135,12 +137,18 @@ class BrandLogoMapper {
   /// is unchanged: [logoUrl] still keys off the raw lowercased brand.
   static Iterable<String> get knownBrandKeys => _brandDomains.keys;
 
-  /// Returns a logo URL for the given [brand], or `null` if unknown.
+  /// #4516 — `false` on a [kLibreBuild]: Clearbit is a proprietary
+  /// service, so the F-Droid build neither offers the internet-logo switch
+  /// nor resolves a remote URL. Bundled logos and the monogram remain.
+  static const bool remoteLogosAvailable = !kLibreBuild;
+
+  /// Returns a logo URL for the given [brand], or `null` if unknown (and
+  /// always `null` when [remoteLogosAvailable] is false).
   ///
   /// Uses Clearbit Logo API (free, no key required, returns 128px PNG).
   /// Example: `https://logo.clearbit.com/shell.com?size=128`
   static String? logoUrl(String brand) {
-    if (brand.isEmpty) return null;
+    if (!remoteLogosAvailable || brand.isEmpty) return null;
     final normalized = brand.toLowerCase().trim();
     final domain = _brandDomains[normalized];
     if (domain == null) return null;
