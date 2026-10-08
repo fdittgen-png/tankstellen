@@ -27,26 +27,16 @@
 # directly, which is why no fdroidserver is needed to stay green.
 #
 # #4445 / ADR 0028 — the `License:` field below describes the PINNED COMMIT,
-# not this branch. The project relicensed to AGPL-3.0-or-later on 2026-09-20;
-# every Builds entry here pins 506fcf502 (v6.0.5, 2026-08-10), which is MIT,
-# so MIT is the correct and honest value today. Move the pin to a
-# post-relicense release and `License:` must become AGPL-3.0-or-later in the
-# SAME commit — `fdroid_recipe_licence_matches_pin_test.dart` fails until it
-# does.
-AntiFeatures:
-  NonFreeNet:
-    en-US: By default the map loads tiles through a developer-hosted proxy (a fixed
-      Supabase edge-function URL), and the optional community price reports / TankSync
-      features ship a default configuration (assets/tanksync_config.json) pointing
-      to the same developer-hosted Supabase instance. The server software is FOSS
-      and TankSync is designed for self-hosting (the app provides the SQL to run your
-      own instance), but the shipped defaults use the developer's instance. The FDROID_LIBRE
-      define these build entries pass removes both defaults, but the code reading
-      it landed after the commit pinned here, so it has no effect on this build; this
-      entry is removed when the pin moves to a release containing it.
+# not this branch. Every Builds entry pins v6.1.0 (8df4bce4, 2026-10-07), the
+# first release after the 2026-09-21 relicense, so AGPL-3.0-or-later is the
+# honest value; `fdroid_recipe_licence_matches_pin_test.dart` checks it.
+#
+# #4510 — no `NonFreeNet`: every pinned commit contains the FDROID_LIBRE
+# reader (#3788) and the Clearbit gate (#4516), so this build reaches no
+# developer-hosted or proprietary endpoint; the #3968 guard enforces it.
 Categories:
   - Market & Price
-License: MIT
+License: AGPL-3.0-or-later
 AuthorName: Florian DITTGEN
 AuthorEmail: fdittgen@gmail.com
 SourceCode: https://github.com/fdittgen-png/tankstellen
@@ -59,9 +49,9 @@ RepoType: git
 Repo: https://github.com/fdittgen-png/tankstellen.git
 
 Builds:
-  - versionName: 6.0.5
-    versionCode: 51381
-    commit: 506fcf502d6d0d64f527b2f215f19cc8107361e1
+  - versionName: 6.1.0
+    versionCode: 51391
+    commit: 8df4bce4ffaa35aa521a5e2a45989d7b0b8a0ebc
     output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
     srclibs:
       - flutter@stable
@@ -85,9 +75,9 @@ Builds:
         --target-platform android-arm --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
         --dart-define=FGS_FORM_APPROVED=true --dart-define=FDROID_LIBRE=true
 
-  - versionName: 6.0.5
-    versionCode: 51382
-    commit: 506fcf502d6d0d64f527b2f215f19cc8107361e1
+  - versionName: 6.1.0
+    versionCode: 51392
+    commit: 8df4bce4ffaa35aa521a5e2a45989d7b0b8a0ebc
     output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
     srclibs:
       - flutter@stable
@@ -111,9 +101,9 @@ Builds:
         --target-platform android-arm64 --build-number=$(( $$VERCODE$$ / 10 )) --dart-define=FORCE_LOCATION_MANAGER=true
         --dart-define=FGS_FORM_APPROVED=true --dart-define=FDROID_LIBRE=true
 
-  - versionName: 6.0.5
-    versionCode: 51383
-    commit: 506fcf502d6d0d64f527b2f215f19cc8107361e1
+  - versionName: 6.1.0
+    versionCode: 51393
+    commit: 8df4bce4ffaa35aa521a5e2a45989d7b0b8a0ebc
     output: build/app/outputs/flutter-apk/app-*-fdroid-release.apk
     srclibs:
       - flutter@stable
@@ -144,5 +134,5 @@ VercodeOperation:
   - '%c * 10 + 2'
   - '%c * 10 + 3'
 UpdateCheckData: pubspec.yaml|version:\s.+\+(\d+)|.|version:\s(.+)\+
-CurrentVersion: 6.0.5
-CurrentVersionCode: 51383
+CurrentVersion: 6.1.0
+CurrentVersionCode: 51393

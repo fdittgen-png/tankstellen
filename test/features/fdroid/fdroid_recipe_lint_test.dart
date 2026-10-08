@@ -142,8 +142,8 @@ void main() {
   group('the scan reads the recipe it claims to — fidelity check', () {
     test('build entries parse with their real values', () {
       expect(entries.map((e) => e.versionCode).toList(),
-          [51381, 51382, 51383]);
-      expect(entries.first.versionName, '6.0.5');
+          [51391, 51392, 51393]);
+      expect(entries.first.versionName, '6.1.0');
       expect(entries.every((e) => e.buildCommand.contains('--flavor fdroid')),
           isTrue);
     });
