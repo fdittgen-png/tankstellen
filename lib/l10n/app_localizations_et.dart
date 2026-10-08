@@ -7659,7 +7659,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Teie asukohta ei salvestata ühessegi serverisse — serverit ei ole.';
+      'Teie asukohta ei salvestata ühessegi serverisse.';
 
   @override
   String get locationConsentBulletNoTracking =>

@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Această aplicație dorește să vă folosească locația pentru a găsi benzinării în apropiere.",
   "locationConsentWhatHappens": "Ce se întâmplă cu datele dvs. de locație:",
   "locationConsentBulletApi": "Coordonatele dvs. sunt trimise către API-ul de prețuri ale carburanților pentru a găsi benzinării din apropiere.",
-  "locationConsentBulletNoServer": "Locația dvs. nu este stocată pe niciun server — nu există server.",
+  "locationConsentBulletNoServer": "Locația dvs. nu este stocată pe niciun server.",
   "locationConsentBulletNoTracking": "Datele de locație nu sunt folosite pentru publicitate, analiză sau urmărire.",
   "locationConsentRevoke": "Puteți revoca accesul la locație oricând din setările sistemului. Alternativ, căutați după codul poștal.",
   "locationConsentLegalBasis": "Temei juridic: art. 6 alin. (1) lit. (a) din RGPD (consimțământ)",

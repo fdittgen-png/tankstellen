@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Denne app vil bruge din placering til at finde tankstationer i nærheden.",
   "locationConsentWhatHappens": "Hvad der sker med dine placeringsdata:",
   "locationConsentBulletApi": "Dine koordinater sendes til brændstofpris-API'en for at finde tankstationer i nærheden.",
-  "locationConsentBulletNoServer": "Din placering gemmes ikke på nogen server — der er ingen server.",
+  "locationConsentBulletNoServer": "Din placering gemmes ikke på nogen server.",
   "locationConsentBulletNoTracking": "Placeringsdata bruges ikke til reklame, analyse eller sporing.",
   "locationConsentRevoke": "Du kan til enhver tid tilbagekalde placeringsadgangen i systemindstillingerne. Alternativt kan du søge på postnummer.",
   "locationConsentLegalBasis": "Retsgrundlag: art. 6, stk. 1, litra a) i GDPR (samtykke)",

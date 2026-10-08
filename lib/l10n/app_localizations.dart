@@ -12682,10 +12682,10 @@ abstract class AppLocalizations {
   /// **'Your coordinates are sent to the fuel price API to find nearby stations.'**
   String get locationConsentBulletApi;
 
-  /// Second transparency bullet in the GDPR location-consent dialog: there is no backend that stores the user's location (#2306).
+  /// Second transparency bullet in the GDPR location-consent dialog: the user's location is never stored on a server (#2306). Never claim there is no server — the app queries price, geocoding and tile servers (#4509).
   ///
   /// In en, this message translates to:
-  /// **'Your location is not stored on any server — there is no server.'**
+  /// **'Your location is not stored on any server.'**
   String get locationConsentBulletNoServer;
 
   /// Third transparency bullet in the GDPR location-consent dialog: location is never used for ads, analytics or tracking (#2306).

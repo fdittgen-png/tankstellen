@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Esta aplicação gostaria de usar a sua localização para encontrar postos de combustível perto de si.",
   "locationConsentWhatHappens": "O que acontece com os seus dados de localização:",
   "locationConsentBulletApi": "As suas coordenadas são enviadas para a API de preços de combustível para encontrar postos próximos.",
-  "locationConsentBulletNoServer": "A sua localização não é armazenada em nenhum servidor — não existe servidor.",
+  "locationConsentBulletNoServer": "A sua localização não é armazenada em nenhum servidor.",
   "locationConsentBulletNoTracking": "Os dados de localização não são usados para publicidade, análise ou rastreio.",
   "locationConsentRevoke": "Pode revogar o acesso à localização a qualquer momento nas definições do sistema. Em alternativa, pesquise por código postal.",
   "locationConsentLegalBasis": "Base jurídica: art. 6.º, n.º 1, al. a) do RGPD (consentimento)",

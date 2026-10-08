@@ -7712,7 +7712,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Местоположението ви не се съхранява на нито един сървър — няма сървър.';
+      'Местоположението ви не се съхранява на нито един сървър.';
 
   @override
   String get locationConsentBulletNoTracking =>

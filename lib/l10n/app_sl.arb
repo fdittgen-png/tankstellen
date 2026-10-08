@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Ta aplikacija želi uporabiti vašo lokacijo za iskanje bližnjih bencinskih črpalk.",
   "locationConsentWhatHappens": "Kaj se zgodi z vašimi podatki o lokaciji:",
   "locationConsentBulletApi": "Vaše koordinate so poslane API-ju cen goriv za iskanje bližnjih črpalk.",
-  "locationConsentBulletNoServer": "Vaša lokacija ni shranjena na nobenem strežniku — strežnika ni.",
+  "locationConsentBulletNoServer": "Vaša lokacija ni shranjena na nobenem strežniku.",
   "locationConsentBulletNoTracking": "Podatki o lokaciji se ne uporabljajo za oglaševanje, analitiko ali sledenje.",
   "locationConsentRevoke": "Dostop do lokacije lahko kadar koli prekličete v sistemskih nastavitvah. Lahko pa iščete tudi po poštni številki.",
   "locationConsentLegalBasis": "Pravna podlaga: člen 6(1)(a) GDPR (privolitev)",

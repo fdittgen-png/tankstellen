@@ -7675,7 +7675,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Vaše poloha se neukládá na žádném serveru — žádný server neexistuje.';
+      'Vaše poloha se neukládá na žádném serveru.';
 
   @override
   String get locationConsentBulletNoTracking =>

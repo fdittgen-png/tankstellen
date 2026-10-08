@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "See rakendus soovib kasutada teie asukohta, et leida läheduses asuvaid tanklaid.",
   "locationConsentWhatHappens": "Mis juhtub teie asukohaandmetega:",
   "locationConsentBulletApi": "Teie koordinaadid saadetakse kütusehindade API-le, et leida lähedalasuvad tanklad.",
-  "locationConsentBulletNoServer": "Teie asukohta ei salvestata ühessegi serverisse — serverit ei ole.",
+  "locationConsentBulletNoServer": "Teie asukohta ei salvestata ühessegi serverisse.",
   "locationConsentBulletNoTracking": "Asukohaandmeid ei kasutata reklaami, analüütika ega jälgimise jaoks.",
   "locationConsentRevoke": "Saate asukoha juurdepääsu igal ajal süsteemiseadetes tühistada. Teise võimalusena otsige sihtnumbri järgi.",
   "locationConsentLegalBasis": "Õiguslik alus: isikuandmete kaitse üldmääruse art 6 lg 1 p a (nõusolek)",

@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Esta aplicación quiere usar tu ubicación para encontrar gasolineras cerca de ti.",
   "locationConsentWhatHappens": "Qué pasa con tus datos de ubicación:",
   "locationConsentBulletApi": "Tus coordenadas se envían a la API de precios de combustible para encontrar gasolineras cercanas.",
-  "locationConsentBulletNoServer": "Tu ubicación no se almacena en ningún servidor — no hay servidor.",
+  "locationConsentBulletNoServer": "Tu ubicación no se almacena en ningún servidor.",
   "locationConsentBulletNoTracking": "Los datos de ubicación no se usan para publicidad, análisis ni seguimiento.",
   "locationConsentRevoke": "Puedes revocar el acceso a la ubicación en cualquier momento en los ajustes del sistema. También puedes buscar por código postal.",
   "locationConsentLegalBasis": "Base jurídica: art. 6.1.a) del RGPD (consentimiento)",

@@ -7738,7 +7738,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'Votre position n\'est stockée sur aucun serveur — il n\'y a pas de serveur.';
+      'Votre position n\'est stockée sur aucun serveur.';
 
   @override
   String get locationConsentBulletNoTracking =>

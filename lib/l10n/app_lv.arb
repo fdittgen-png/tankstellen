@@ -1586,7 +1586,7 @@
   "locationConsentSubtitle": "Šī lietotne vēlas izmantot jūsu atrašanās vietu, lai atrastu tuvumā esošās degvielas uzpildes stacijas.",
   "locationConsentWhatHappens": "Kas notiek ar jūsu atrašanās vietas datiem:",
   "locationConsentBulletApi": "Jūsu koordinātes tiek nosūtītas degvielas cenu API, lai atrastu tuvumā esošās stacijas.",
-  "locationConsentBulletNoServer": "Jūsu atrašanās vieta netiek glabāta nevienā serverī — servera nav.",
+  "locationConsentBulletNoServer": "Jūsu atrašanās vieta netiek glabāta nevienā serverī.",
   "locationConsentBulletNoTracking": "Atrašanās vietas dati netiek izmantoti reklāmai, analītikai vai izsekošanai.",
   "locationConsentRevoke": "Atrašanās vietas piekļuvi varat jebkurā laikā atsaukt sistēmas iestatījumos. Varat arī meklēt pēc pasta indeksa.",
   "locationConsentLegalBasis": "Juridiskais pamats: VDAR 6. panta 1. punkta a) apakšpunkts (piekrišana)",

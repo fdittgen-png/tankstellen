@@ -7696,7 +7696,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get locationConsentBulletNoServer =>
-      'La tua posizione non viene memorizzata su alcun server — non c\'è un server.';
+      'La tua posizione non viene memorizzata su alcun server.';
 
   @override
   String get locationConsentBulletNoTracking =>

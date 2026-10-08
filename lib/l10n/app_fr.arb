@@ -1712,7 +1712,7 @@
   "locationConsentSubtitle": "Cette application souhaite utiliser votre position pour trouver les stations-service près de chez vous.",
   "locationConsentWhatHappens": "Ce qui se passe avec vos données de localisation :",
   "locationConsentBulletApi": "Vos coordonnées sont envoyées à l'API de prix des carburants pour trouver les stations proches.",
-  "locationConsentBulletNoServer": "Votre position n'est stockée sur aucun serveur — il n'y a pas de serveur.",
+  "locationConsentBulletNoServer": "Votre position n'est stockée sur aucun serveur.",
   "locationConsentBulletNoTracking": "Les données de localisation ne sont pas utilisées pour la publicité, l'analyse ou le suivi.",
   "locationConsentRevoke": "Vous pouvez révoquer l'accès à la localisation à tout moment dans les paramètres système. Vous pouvez aussi rechercher par code postal.",
   "locationConsentLegalBasis": "Base juridique : art. 6, §1, a) du RGPD (consentement)",

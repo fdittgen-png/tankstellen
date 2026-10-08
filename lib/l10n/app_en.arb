@@ -7908,9 +7908,9 @@
   "@locationConsentBulletApi": {
     "description": "First transparency bullet in the GDPR location-consent dialog: coordinates leave the device only to query the fuel-price API (#2306)."
   },
-  "locationConsentBulletNoServer": "Your location is not stored on any server — there is no server.",
+  "locationConsentBulletNoServer": "Your location is not stored on any server.",
   "@locationConsentBulletNoServer": {
-    "description": "Second transparency bullet in the GDPR location-consent dialog: there is no backend that stores the user's location (#2306)."
+    "description": "Second transparency bullet in the GDPR location-consent dialog: the user's location is never stored on a server (#2306). Never claim there is no server — the app queries price, geocoding and tile servers (#4509)."
   },
   "locationConsentBulletNoTracking": "Location data is not used for advertising, analytics, or tracking.",
   "@locationConsentBulletNoTracking": {
