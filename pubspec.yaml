@@ -77,7 +77,7 @@ dependencies:
   # Utilities
   collection: ^1.19.0
   meta: ^1.17.0
-  xml: ^7.1.0
+  xml: ^7.0.1
   path_provider: ^2.1.6
   uuid: ^4.6.0
   # Hold below 7.1.0: connectivity_plus 7.1.x's iOS PathMonitor source
