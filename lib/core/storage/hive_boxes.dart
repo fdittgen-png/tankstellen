@@ -13,6 +13,7 @@ import 'impl/hive_directory_resolver.dart';
 import 'hive_isolate_boxes.dart';
 import 'hive_isolate_ownership.dart';
 import 'hive_legacy_migration.dart';
+import 'hive_open_timing.dart';
 import 'hive_schema_migration.dart';
 import 'hive_test_boxes.dart';
 import 'hive_trip_box_encryption.dart';
@@ -243,7 +244,7 @@ class HiveBoxes {
   /// awaiting ~30 `openBox` calls one at a time.
   ///
   /// #1794 — only the boxes the landing screen needs open here. The
-  /// nine deep-feature boxes in [_deferredBoxes] move to [initDeferred],
+  /// deep-feature boxes in [_deferredBoxes] move to [initDeferred],
   /// which the app-initializer kicks after the first frame. Every box
   /// `init()` opens is still open before it returns.
   /// #4110 — the marks below are INSIDE this method because one
@@ -348,10 +349,15 @@ class HiveBoxes {
     await Future.wait(_encryptedDeferredBoxes
         .map((name) => HiveTripBoxEncryption.migrate(name, cipher)));
     await Future.wait([
+      // #4546 — timed, so the startup trace's `boxOpens` shows what each
+      // deferred open (e.g. the encrypted trip history) costs.
       for (final name in _deferredBoxes)
-        Hive.openBox<String>(name,
-            encryptionCipher:
-                _encryptedDeferredBoxes.contains(name) ? cipher : null),
+        HiveOpenTiming.timed(
+            name,
+            () => Hive.openBox<String>(name,
+                encryptionCipher:
+                    _encryptedDeferredBoxes.contains(name) ? cipher : null),
+            phase: HiveOpenTiming.deferredPhase),
       // Country datasets open on first async read/write, not on every launch.
       ...HiveDeferredUserBoxes.names.map(HiveDeferredUserBoxes.settled),
     ]);

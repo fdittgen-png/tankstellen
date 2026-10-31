@@ -9,6 +9,7 @@ import '../logging/error_logger.dart';
 import '../sharing/public_file_exporter.dart';
 import '../storage/hive_open_timing.dart';
 import '../telemetry/storage/trace_storage.dart';
+import 'jank_frame_recorder.dart';
 import 'startup_kpi.dart';
 import 'startup_timer.dart';
 import 'perf_budgets.dart';
@@ -45,7 +46,11 @@ class StartupTraceExport {
   /// v5 (#4318): adds `boxOpens` — every timed box open, first-frame and
   /// deferred, with its duration and the number of values it loaded, so a
   /// growing box shows up before it becomes the next #4110.
-  static const int schemaVersion = 5;
+  ///
+  /// v6 (#4546): adds `jankFrames` — the 20 worst frames of the first
+  /// three minutes (total/build/raster ms, ms since launch), and the
+  /// deferred box opens now appear in `boxOpens` too.
+  static const int schemaVersion = 6;
 
   /// The export-section key registered into the error-log export.
   static const String exportSectionKey = 'startupTrace';
@@ -90,6 +95,7 @@ class StartupTraceExport {
     List<StartupSpan> spans = const [],
     (String, int)? slowestBoxOpen,
     List<Map<String, Object?>> boxOpens = const [],
+    List<Map<String, Object?>> jankFrames = const [],
   }) {
     return {
       'schema': schemaVersion,
@@ -108,6 +114,8 @@ class StartupTraceExport {
       // remember what "slow" means.
       'budgets': perfBudgetExportRows(),
       'boxOpens': boxOpens,
+      // #4546 — worst frames first; empty until frames were observed.
+      'jankFrames': jankFrames,
       // #4110 — omitted rather than null-filled when init has not run
       // (a test, or an export before storage came up): an absent field
       // is honest, a `{"name": null}` row invites a reader to conclude
@@ -131,6 +139,7 @@ class StartupTraceExport {
       spans: timer.spans,
       slowestBoxOpen: HiveOpenTiming.slowest,
       boxOpens: HiveOpenTiming.exportRows(),
+      jankFrames: JankFrameRecorder.instance.exportRows(),
     );
     return const JsonEncoder.withIndent('  ').convert(doc);
   }
@@ -165,6 +174,7 @@ class StartupTraceExport {
           'spans': spanMaps(StartupTimer.instance.spans),
           'kpi': StartupKpi.exportRow(),
           'boxOpens': HiveOpenTiming.exportRows(),
+          'jankFrames': JankFrameRecorder.instance.exportRows(),
           if (HiveOpenTiming.slowest case final slowest?)
             'slowestBoxOpen': {
               'box': slowest.$1,

@@ -4,6 +4,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/core/perf/jank_frame_recorder.dart';
 import 'package:tankstellen/core/perf/perf_budgets.dart';
 import 'package:tankstellen/core/perf/startup_kpi.dart';
 import 'package:tankstellen/core/perf/startup_timer.dart';
@@ -142,6 +143,21 @@ void main() {
       expect((spans.single as Map)['name'], 'tanksync_init');
       expect(((spans.single as Map)['attributes'] as Map)['pulled'], 2);
     });
+
+    test('section carries the app-wide jank ring (#4546)', () {
+      addTearDown(JankFrameRecorder.instance.reset);
+      JankFrameRecorder.instance
+          .record(totalMs: 900, buildMs: 850, rasterMs: 30);
+      StartupTraceExport.ensureExtraExportSectionRegistered();
+
+      final section = TraceStorage
+          .extraExportSections[StartupTraceExport.exportSectionKey]!() as Map;
+      final rows = section['jankFrames'] as List;
+      expect((rows.single as Map)['totalMs'], 900);
+      expect(
+          (jsonDecode(StartupTraceExport.currentJson()) as Map)['jankFrames'],
+          hasLength(1));
+    });
   });
 
   group('#4140 — the export names the KPI', () {
@@ -177,11 +193,33 @@ void main() {
     });
 
     test('the schema version moves with the field set', () {
-      expect(StartupTraceExport.schemaVersion, 5,
+      expect(StartupTraceExport.schemaVersion, 6,
           reason: 'a new export field is a schema bump, or a reader cannot '
               'tell an old export without the field from a new one whose '
               'init never ran. v4 added the #4140 `kpi` section, v5 the '
-              '#4318 `boxOpens` rows');
+              '#4318 `boxOpens` rows, v6 the #4546 `jankFrames`');
+    });
+
+    test('#4546 — the worst frames travel as `jankFrames`', () {
+      final rec = JankFrameRecorder(elapsedMs: () => 4200)
+        ..record(totalMs: 1800, buildMs: 1750, rasterMs: 40);
+      final doc = StartupTraceExport.buildDocument(
+        milestones: const [],
+        totalMs: 900,
+        exportedAt: DateTime.utc(2026, 10, 31),
+        appVersion: '6.1.0',
+        jankFrames: rec.exportRows(),
+      );
+      expect(doc['jankFrames'], [
+        {'totalMs': 1800, 'buildMs': 1750, 'rasterMs': 40, 'atMs': 4200},
+      ]);
+      final empty = StartupTraceExport.buildDocument(
+        milestones: const [],
+        totalMs: null,
+        exportedAt: DateTime.utc(2026, 10, 31),
+        appVersion: '6.1.0',
+      );
+      expect(empty['jankFrames'], isEmpty);
     });
 
     test('#4318 — every timed open travels with its duration and entries',
