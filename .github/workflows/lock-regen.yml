@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/lock-regen.md
 
 name: Tools · Regenerate lockfiles
 
@@ -48,6 +49,9 @@ concurrency:
   group: lock-regen-${{ inputs.branch }}
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   regen:
     runs-on: ubuntu-latest
@@ -56,6 +60,15 @@ jobs:
       # Required to push the regenerated lockfiles back onto the branch.
       contents: write
     steps:
+      - name: Require trusted workflow and an explicit feature branch
+        env:
+          WORKFLOW_REF: ${{ github.ref }}
+          TARGET_BRANCH: ${{ inputs.branch }}
+        run: |
+          set -euo pipefail
+          test "$WORKFLOW_REF" = refs/heads/master
+          git check-ref-format --branch "$TARGET_BRANCH"
+          test "$TARGET_BRANCH" != master
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.branch }}
@@ -64,14 +77,16 @@ jobs:
           # dispatch always uses the workflow file on the default branch).
           persist-credentials: true
 
-      - uses: subosito/flutter-action@v2
+      - name: Check out this workflow's shared actions
+        uses: actions/checkout@v7
         with:
-          channel: stable
-          # Same pin as ci.yml — a lockfile resolved by a different SDK
-          # would not be the one CI, or the F-Droid buildserver,
-          # reproduces.
-          flutter-version: "3.44.9"
-          cache: true
+          ref: ${{ github.workflow_sha }}
+          path: .workflow-tools
+          persist-credentials: false
+
+      - uses: ./.workflow-tools/.github/actions/flutter-setup
+        with:
+          resolve: 'false'
 
       - name: Regenerate pubspec.lock
         run: |
@@ -117,6 +132,10 @@ jobs:
               >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          # Refuse a moved branch rather than rewriting another candidate.
+          EXPECTED=$(git rev-parse HEAD)
+          LIVE=$(git ls-remote origin "refs/heads/$BRANCH" | cut -f1)
+          test "$LIVE" = "$EXPECTED"
           git config user.name "github-actions[bot]"
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
@@ -139,15 +158,16 @@ jobs:
             # sits on a head SHA with NO checks. Say so here, where the
             # operator is already looking, rather than leaving a silently
             # unverified PR.
-            echo "**Now re-fire the checks.** This push used"
+            echo "**Restore PR-event checks.** This push used"
             echo "\`GITHUB_TOKEN\`, which by design triggers no workflow"
             echo "run, so the new head SHA carries no results yet:"
             echo ""
             echo '```sh'
-            echo "gh workflow run ci.yml --ref $BRANCH       # the CI matrix"
+            echo "gh workflow run ci.yml --ref $BRANCH       # diagnostic validation"
             echo "gh workflow run fdroid.yml --ref $BRANCH   # build-fdroid"
             echo '```'
             echo ""
-            echo "Or re-fire everything at once with"
+            echo "Dispatch is diagnostic and may not satisfy required PR contexts."
+            echo "For required PR checks, close/reopen the PR through your own account:"
             echo "\`gh pr close <n> && gh pr reopen <n>\`."
           } >> "$GITHUB_STEP_SUMMARY"

@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/epic-backpatch.md
 
 name: Tools · Epic checklist back-patch
 
@@ -18,9 +19,14 @@ permissions:
   issues: write
   contents: read
 
+concurrency:
+  group: epic-backpatch-${{ github.event.issue.number || github.ref }}
+  cancel-in-progress: false
+
 jobs:
   backpatch:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Back-patch parent Epic checklist
         env:

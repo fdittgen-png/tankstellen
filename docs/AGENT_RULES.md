@@ -128,3 +128,23 @@ own the resulting CI red — is `SKIP_PREPUSH=1 git push`.
 For everything beyond these four rules — architecture, the service-chain
 pattern, the TDD pyramid, GitHub flow, the feature-enum cascade and the
 autonomous-agent batching doctrine — see the `tankstellen-conventions` skill.
+
+## CI and working-branch discipline
+
+Every PR needs review by a different session on the exact current head SHA.
+Declare `Implementation-Session: <unique-ID>` in the PR body. Only the reviewing
+session records the required `independent-session-review` status, using
+[`session_review.py`](../scripts/ci/session_review.py) after checking the diff,
+issue acceptance and validation. Never approve your own work, impersonate a
+reviewer, reuse a previous head's review or bypass protection as administrator.
+New commits require fresh review; unrelated master updates do not require a
+rebase. See [independent review](ci/independent-review.md).
+
+Use a separate worktree per task from current `origin/master`; check the branch
+before edits, commits and pushes. Do not switch a shared checkout under another
+session. The installed pre-push hook checks actual pushed branch refs.
+Keep `strict=false` and serialize merges; update a branch only for an actual
+conflict, prerequisite or known semantic interaction, not every unrelated merge.
+Use whole-workflow retries for an unchanged CI candidate so the plan and shard
+reports share one attempt. Read [CI usage](ci/CI_USAGE.md) and the
+[workflow catalog](../.github/workflows/README.md) before dispatching a publisher.

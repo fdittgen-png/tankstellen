@@ -67,6 +67,7 @@
 
 *Workflow*
 - [CI/CD](Dev-CI-CD-Pipeline)
+- [CI workflow catalog](Dev-CI-Workflow-Catalog) — runbook for every action
 - [GitHub Workflow](Dev-GitHub-Workflow)
 - [Creating Issues](Dev-Creating-Issues)
 - [Contributing](Dev-Contributing)
