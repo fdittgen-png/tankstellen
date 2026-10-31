@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Testwaarschuwingspijplijn uitvoeren",
   "developerToolsTestAlertFired": "Testwaarschuwing geactiveerd — pijplijn leverde {count} melding(en).",
   "developerToolsTestAlertTitle": "Testprijswaarschuwing",
-  "developerToolsTestAlertBody": "Synthetische match: er is in de buurt een station onder je doel gevonden.",
+  "developerToolsTestAlertBody": "Synthetische match: {station} zit onder je doelprijs.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostiek",
   "developerToolsFeatureFlagDump": "Inspecteur voor functievlaggen",
   "developerToolsFlagOn": "Aan",

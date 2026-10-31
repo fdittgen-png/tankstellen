@@ -4403,7 +4403,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Syntetisk match: en station under dit mål blev fundet i nærheden.';
+    return 'Syntetisk match: $station ligger under din målpris.';
   }
 
   @override

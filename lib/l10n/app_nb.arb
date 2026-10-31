@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Kjør testvarselflyt",
   "developerToolsTestAlertFired": "Testvarsel utløst — flyten leverte {count} varsel/varsler.",
   "developerToolsTestAlertTitle": "Testprisvarsel",
-  "developerToolsTestAlertBody": "Syntetisk treff: en stasjon under målet ditt ble funnet i nærheten.",
+  "developerToolsTestAlertBody": "Syntetisk treff: {station} ligger under målprisen din.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostikk",
   "developerToolsFeatureFlagDump": "Inspektør for funksjonsflagg",
   "developerToolsFlagOn": "På",

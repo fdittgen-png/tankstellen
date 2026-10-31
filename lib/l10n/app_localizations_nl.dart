@@ -4419,7 +4419,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Synthetische match: er is in de buurt een station onder je doel gevonden.';
+    return 'Synthetische match: $station zit onder je doelprijs.';
   }
 
   @override

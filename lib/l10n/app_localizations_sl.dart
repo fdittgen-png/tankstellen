@@ -4407,7 +4407,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Sintetično ujemanje: v bližini je bila najdena postaja pod vašim ciljem.';
+    return 'Sintetično ujemanje: $station ima ceno pod vašo ciljno ceno.';
   }
 
   @override

@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Esegui pipeline avviso di prova",
   "developerToolsTestAlertFired": "Avviso di prova attivato: la pipeline ha generato {count} notifica/e.",
   "developerToolsTestAlertTitle": "Avviso di prezzo di prova",
-  "developerToolsTestAlertBody": "Corrispondenza sintetica: è stata trovata nelle vicinanze una stazione sotto il tuo obiettivo.",
+  "developerToolsTestAlertBody": "Corrispondenza sintetica: {station} è sotto il tuo prezzo obiettivo.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostica",
   "developerToolsFeatureFlagDump": "Ispettore dei flag delle funzionalità",
   "developerToolsFlagOn": "Attivo",

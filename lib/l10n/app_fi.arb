@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Suorita testihälytysputki",
   "developerToolsTestAlertFired": "Testihälytys laukaistu — putki toimitti {count} ilmoitusta.",
   "developerToolsTestAlertTitle": "Testihintahälytys",
-  "developerToolsTestAlertBody": "Synteettinen osuma: lähistöltä löytyi tavoitettasi halvempi asema.",
+  "developerToolsTestAlertBody": "Synteettinen osuma: {station} alittaa tavoitehintasi.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostiikka",
   "developerToolsFeatureFlagDump": "Ominaisuuslippujen tarkastelu",
   "developerToolsFlagOn": "Päällä",

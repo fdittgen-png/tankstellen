@@ -4419,7 +4419,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Dopasowanie syntetyczne: w pobliżu znaleziono stację poniżej Twojego celu.';
+    return 'Dopasowanie syntetyczne: cena na stacji $station jest niższa od ceny docelowej.';
   }
 
   @override
