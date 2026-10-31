@@ -404,13 +404,15 @@ void main() {
                   'data is driving telemetry and must be encrypted (#3611)');
         }
 
-        final deferredMatch = RegExp(
-          r'static Future<void> _openDeferred\(\) async \{(.*?)\n  \}',
-          dotAll: true,
-        ).firstMatch(source);
-        expect(deferredMatch, isNotNull,
-            reason: '_openDeferred() must exist');
-        final deferredBody = deferredMatch!.group(1)!;
+        // #4504 — the same deferred boundary delegates its actual opens;
+        // encryption assertions follow that collaborator, as first-frame
+        // assertions above already do. Real encrypted-file coverage lives
+        // in trip_history_lazy_test.dart, including all four trip boxes.
+        expect(source, contains('HiveDeferredBoxOpener.open('));
+        expect(source, contains('_encryptedDeferredBoxes,'));
+        final deferredBody = File(
+          'lib/core/storage/hive_deferred_box_opener.dart',
+        ).readAsStringSync();
         expect(deferredBody.contains('encryptionCipher'), isTrue,
             reason: 'the deferred open must pass the cipher for the '
                 'encrypted trip boxes (#3611)');

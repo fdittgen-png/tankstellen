@@ -106,6 +106,50 @@ void main() {
   }
 
   test(
+    'real deferred opener migrates and encrypts all four trip boxes',
+    () async {
+      final names = {
+        HiveBoxes.obd2Baselines,
+        HiveBoxes.obd2TripHistory,
+        HiveBoxes.obd2PausedTrips,
+        HiveBoxes.obd2ActiveTrip,
+      };
+      await Hive.box<int>(HiveBoxes.boxSchema).delete(
+        HiveTripBoxEncryption.encryptedMarkerKey(HiveBoxes.obd2TripHistory),
+      );
+      final payloads = <String, String>{};
+      for (final name in names) {
+        final payload = jsonEncode(_entry('private-$name', count: 1).toJson());
+        payloads[name] = payload;
+        final plain = await Hive.openBox<String>(name);
+        await plain.put('fixture', payload);
+        await plain.close();
+      }
+      await HiveDeferredBoxOpener.open(
+        names,
+        names,
+        tripHistoryBox: HiveBoxes.obd2TripHistory,
+        boxSchema: HiveBoxes.boxSchema,
+        cacheBox: HiveBoxes.cache,
+        schemaVersion: HiveBoxes.currentSchemaVersion,
+      );
+      for (final name in names) {
+        if (name == HiveBoxes.obd2TripHistory) {
+          final lazy = Hive.lazyBox<String>(name);
+          expect(await lazy.get('fixture'), payloads[name]);
+          await lazy.close();
+        } else {
+          final box = Hive.box<String>(name);
+          expect(box.get('fixture'), payloads[name]);
+          await box.close();
+        }
+        final bytes = await File('${dir.path}/$name.hive').readAsBytes();
+        expect(latin1.decode(bytes), isNot(contains('private-$name')));
+      }
+    },
+  );
+
+  test(
     'real deferred open decrypts metadata only; detail reads preserve samples',
     () async {
       final trips = [
