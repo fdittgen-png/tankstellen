@@ -18,8 +18,8 @@ void main() {
       expect(c.tankController.text, '');
       expect(c.vinController.text, '');
 
-      // #710 — preferred fuel pre-filled to e10.
-      expect(c.fuelTypeController.text, 'e10');
+      // #4513 — a manual form must not invent a vehicle fuel.
+      expect(c.fuelTypeController.text, '');
 
       // Charging preferences defaults match domain defaults.
       expect(c.minSocController.text, '20');
@@ -650,6 +650,24 @@ void main() {
       fuelType: 'petrol',
       transmission: 'manual',
     );
+
+    test('#4513 unknown catalog fuel stays unset instead of inventing E10', () {
+      final c = VehicleFormControllers();
+      addTearDown(c.dispose);
+      c.applyReferenceVehicle(golf.copyWith(fuelType: 'unknown'));
+      expect(c.fuelTypeController.text, '');
+    });
+
+    for (final (source, expected) in const [
+      ('petrol', 'e10'), ('diesel', 'diesel'), ('hybrid', 'e10'), ('electric', ''),
+    ]) {
+      test('#4513 declared catalog $source fuel still prefills $expected', () {
+        final c = VehicleFormControllers();
+        addTearDown(c.dispose);
+        c.applyReferenceVehicle(golf.copyWith(fuelType: source));
+        expect(c.fuelTypeController.text, expected);
+      });
+    }
 
     test('load() populates the power controller from the profile', () {
       final c = VehicleFormControllers();

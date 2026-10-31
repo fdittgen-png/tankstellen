@@ -9,6 +9,8 @@ import '../../../../core/widgets/responsive_layout.dart';
 import '../../../../core/widgets/settings_app_bar_action.dart';
 import '../../../../core/country/country_provider.dart';
 import '../../../../core/error/guarded.dart';
+import '../../../../core/error/error_localizer.dart';
+import '../../../../core/error/exceptions.dart';
 import '../../../../core/location/location_consent.dart';
 import '../../../../core/location/user_position_provider.dart';
 import '../../../../core/storage/storage_providers.dart';
@@ -172,7 +174,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
         if (mounted) {
           SnackBarHelper.showError(
             context,
-            AppLocalizations.of(context).searchFailedSnackbar,
+            e is LocationException
+                ? ErrorLocalizer.localize(e, AppLocalizations.of(context))
+                : AppLocalizations.of(context).searchFailedSnackbar,
           );
         }
       }

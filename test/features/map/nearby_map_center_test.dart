@@ -8,6 +8,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:tankstellen/core/country/country_config.dart';
 import 'package:tankstellen/core/location/user_position_provider.dart';
 import 'package:tankstellen/core/storage/hive_storage.dart';
 import 'package:tankstellen/features/map/presentation/widgets/nearby_map_view.dart';
@@ -18,6 +20,7 @@ import 'package:tankstellen/core/domain/station.dart';
 
 import '../../helpers/hive_temp_dir.dart';
 import '../../helpers/pump_app.dart';
+import '../../helpers/mock_providers.dart';
 
 /// #692 — Searching a distant city from the user's location must pan the
 /// map to the RESULT area, not to the user's GPS. A user in
@@ -117,6 +120,42 @@ void main() {
       expect(initialCenter.longitude, closeTo(2.32, 0.5));
     },
   );
+
+  testWidgets('#4512 a Madrid postcode result opens the actual camera on '
+      'its stations, despite a distant persisted position', (tester) async {
+    final controller = MapController();
+    addTearDown(controller.dispose);
+    final stations = [
+      parisStations[0].copyWith(id: 'es-28013-1', lat: 40.41875, lng: -3.70705),
+      parisStations[1].copyWith(id: 'es-28013-2', lat: 40.423, lng: -3.702),
+    ];
+    await pumpApp(tester, SizedBox(
+      width: 800,
+      height: 1000,
+      child: NearbyMapView(
+        searchState: AsyncValue.data(ServiceResult(
+          data: stations.map(FuelStationResult.new).toList(),
+          source: ServiceSource.cache,
+          fetchedAt: DateTime(2026, 10, 31),
+        )),
+        selectedFuel: FuelType.diesel,
+        searchRadiusKm: 10,
+        mapController: controller,
+      ),
+    ), overrides: [
+      activeCountryOverride(Countries.spain),
+      userPositionProvider.overrideWith(() => _FixedCastelnauPosition()),
+    ]);
+    await tester.pumpAndSettle();
+
+    final camera = controller.camera;
+    expect(camera.center.latitude, closeTo(40.421, 0.01));
+    expect(camera.center.longitude, closeTo(-3.705, 0.01));
+    for (final station in stations) {
+      expect(camera.visibleBounds.contains(LatLng(station.lat, station.lng)),
+          isTrue, reason: 'every returned station must be on the first viewport');
+    }
+  });
 }
 
 class _FixedCastelnauPosition extends UserPosition {
