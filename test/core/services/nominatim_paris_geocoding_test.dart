@@ -148,5 +148,20 @@ void main() {
       expect(result.lat, closeTo(48.8412, 0.0001));
       expect(result.lng, closeTo(2.3876, 0.0001));
     });
+
+    test('#4511 Spanish postcode 28013 uses the active country and Madrid '
+        'coordinates without a French city hint', () async {
+      adapter = _CapturingAdapter(lat: 40.4187507, lon: -3.7070555);
+      dio.httpClientAdapter = adapter;
+      final provider = NominatimGeocodingProvider(countryCode: 'ES', dio: dio);
+      final result = await provider.zipCodeToCoordinates('28013');
+
+      expect(adapter.capturedQueryParams?['country'], 'es');
+      expect(adapter.capturedQueryParams?['postalcode'], '28013');
+      expect(adapter.capturedQueryParams?['q'], isNull);
+      expect(adapter.capturedQueryParams?['city'], isNull);
+      expect(result.lat, closeTo(40.4187507, 0.000001));
+      expect(result.lng, closeTo(-3.7070555, 0.000001));
+    });
   });
 }
