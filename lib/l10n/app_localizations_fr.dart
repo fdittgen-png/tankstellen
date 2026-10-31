@@ -8265,6 +8265,254 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get obd2FullDiagnosticTitle => 'Enregistrement de diagnostic complet';
+
+  @override
+  String get obd2FullDiagnosticSubtitle =>
+      'Enregistre à chaque trajet toutes les valeurs OBD2, les codes défaut et les réponses de l’adaptateur, pour analyser une panne du véhicule. Utilise plus de bande passante de l’adaptateur et de stockage : les valeurs en direct peuvent se rafraîchir plus lentement.';
+
+  @override
+  String get obd2DiagnosticRecordingsTitle => 'Enregistrements de diagnostic';
+
+  @override
+  String get obd2DiagnosticRecordingsEmpty =>
+      'Aucun enregistrement pour l’instant. Faites un trajet avec l’option activée.';
+
+  @override
+  String get obd2DiagnosticRecordingDownload => 'Télécharger l’enregistrement';
+
+  @override
+  String get obd2DiagnosticRecordingDelete => 'Supprimer l’enregistrement';
+
+  @override
+  String get obd2DiagnosticRecordingExportFailed =>
+      'Impossible d’enregistrer le fichier';
+
+  @override
+  String get obd2ReportTitle => 'Rapport d’enregistrement';
+
+  @override
+  String obd2ReportSummary(String minutes, String readings, String values) {
+    return '$minutes min enregistrées · $readings mesures · $values valeurs';
+  }
+
+  @override
+  String get obd2ReportDisclaimer =>
+      'Ces verdicts sont des règles empiriques tirées de ce que le véhicule a transmis en OBD2. Ils orientent un garage, ils ne remplacent pas un diagnostic de réparation.';
+
+  @override
+  String get obd2ReportVerdictGood => 'Bon';
+
+  @override
+  String get obd2ReportVerdictCheck => 'À vérifier';
+
+  @override
+  String get obd2ReportVerdictProblem => 'Problème';
+
+  @override
+  String get obd2ReportVerdictNotReported => 'Non transmis';
+
+  @override
+  String get obd2ReportNotReported =>
+      'Le véhicule ou l’adaptateur n’a pas transmis ces valeurs.';
+
+  @override
+  String get obd2ReportElectricalTitle => 'Batterie et charge';
+
+  @override
+  String obd2ReportElectricalGood(String avg, String min) {
+    return 'La charge semble saine : $avg V en moyenne moteur tournant (minimum $min V). Un alternateur sain fournit 13,2 à 14,8 V.';
+  }
+
+  @override
+  String obd2ReportElectricalLow(String avg, String min) {
+    return 'La tension de charge est basse : $avg V en moyenne moteur tournant (minimum $min V). Un alternateur sain fournit 13,2 à 14,8 V : faites tester la batterie et l’alternateur.';
+  }
+
+  @override
+  String obd2ReportElectricalDips(String count, String min) {
+    return 'Moteur tournant, la tension est tombée sous 12 V $count fois (minimum $min V). Les calculateurs de boîte et moteur peuvent mal réagir à ces chutes : vérifiez la batterie, l’alternateur et les tresses de masse.';
+  }
+
+  @override
+  String obd2ReportElectricalRest(String volts) {
+    return 'Moteur arrêté, la batterie était à $volts V (sain : 12,4 V ou plus).';
+  }
+
+  @override
+  String get obd2ReportDriveTitle => 'Boîte de vitesses et transmission';
+
+  @override
+  String get obd2ReportDriveGood =>
+      'Aucun moment où le moteur restait au ralenti alors que vous accélériez à basse vitesse.';
+
+  @override
+  String obd2ReportDriveEpisodes(String count) {
+    return '$count moments où la puissance n’arrivait pas aux roues : le moteur restait proche du ralenti à basse vitesse alors que vous accélériez. La boîte a peut-être patiné ou est passée au point mort.';
+  }
+
+  @override
+  String obd2ReportDriveEpisode(
+    String time,
+    String speed,
+    String rpm,
+    String volts,
+  ) {
+    return '$time · $speed km/h · $rpm tr/min · $volts';
+  }
+
+  @override
+  String get obd2ReportDriveNoGear =>
+      'Ce véhicule ne transmet pas le rapport engagé en OBD2 standard : les moments sont détectés à partir de la vitesse, du régime et de la pédale.';
+
+  @override
+  String get obd2ReportEngineTitle => 'Moteur';
+
+  @override
+  String obd2ReportEngineGood(String max) {
+    return 'Le liquide de refroidissement a atteint $max °C : normal.';
+  }
+
+  @override
+  String obd2ReportEngineHot(String max) {
+    return 'Le liquide de refroidissement a atteint $max °C : le moteur chauffe trop.';
+  }
+
+  @override
+  String obd2ReportEngineCold(String max, String minutes) {
+    return 'Le liquide est resté à $max °C après $minutes min de conduite : le thermostat est peut-être bloqué ouvert.';
+  }
+
+  @override
+  String get obd2ReportMixtureTitle => 'Carburant et mélange';
+
+  @override
+  String obd2ReportMixtureGood(String trim) {
+    return 'Les corrections de carburant sont en moyenne de $trim % : le mélange est équilibré.';
+  }
+
+  @override
+  String obd2ReportMixtureRich(String trim) {
+    return 'Les corrections sont en moyenne de $trim % : le moteur tourne riche et le calculateur retire du carburant. Cela correspond à une odeur d’essence : injecteurs, régulateur de pression ou électrovanne de purge.';
+  }
+
+  @override
+  String obd2ReportMixtureLean(String trim) {
+    return 'Les corrections sont en moyenne de $trim % : le moteur tourne pauvre et le calculateur ajoute du carburant. Prise d’air possible ou alimentation en carburant faible.';
+  }
+
+  @override
+  String get obd2ReportEmissionsTitle => 'Émissions et vapeurs de carburant';
+
+  @override
+  String obd2ReportCatalyst(String max) {
+    return 'La température du catalyseur a culminé à $max °C.';
+  }
+
+  @override
+  String obd2ReportCatalystHot(String max) {
+    return 'Le catalyseur a atteint $max °C : des ratés ou un mélange riche peuvent le surchauffer.';
+  }
+
+  @override
+  String obd2ReportEvap(String min, String max) {
+    return 'La pression du circuit des vapeurs de carburant variait de $min à $max Pa.';
+  }
+
+  @override
+  String get obd2ReportFaultsTitle => 'Codes défaut';
+
+  @override
+  String get obd2ReportFaultsNone =>
+      'Aucun code défaut et le voyant moteur est éteint.';
+
+  @override
+  String get obd2ReportFaultsMil => 'Le voyant moteur est ALLUMÉ.';
+
+  @override
+  String get obd2ReportFaultsStored => 'Mémorisés';
+
+  @override
+  String get obd2ReportFaultsPending => 'En attente';
+
+  @override
+  String get obd2ReportFaultsPermanent => 'Permanents';
+
+  @override
+  String get obd2ReportFaultsFreezeFrame => 'A déclenché l’image figée';
+
+  @override
+  String get dtcGroupFuelAir => 'dosage air et carburant';
+
+  @override
+  String get dtcGroupIgnition => 'allumage / ratés';
+
+  @override
+  String get dtcGroupEmissions => 'contrôle des émissions';
+
+  @override
+  String get dtcGroupIdleElectrical => 'vitesse, ralenti et électrique';
+
+  @override
+  String get dtcGroupComputer => 'calculateur et sorties';
+
+  @override
+  String get dtcGroupTransmission => 'transmission';
+
+  @override
+  String get dtcGroupChassis => 'châssis';
+
+  @override
+  String get dtcGroupBody => 'carrosserie';
+
+  @override
+  String get dtcGroupNetwork => 'réseau / communication';
+
+  @override
+  String get dtcGroupOther => 'autre';
+
+  @override
+  String obd2ReportUnanswered(String commands) {
+    return 'Non transmis par ce véhicule : $commands';
+  }
+
+  @override
+  String get obd2ReportFailed => 'Impossible de lire cet enregistrement';
+
+  @override
+  String obd2RecordingSizeKb(String size) {
+    return '$size Ko';
+  }
+
+  @override
+  String obd2RecordingSizeMb(String size) {
+    return '$size Mo';
+  }
+
+  @override
+  String obd2ReportVolts(String volts) {
+    return '$volts V';
+  }
+
+  @override
+  String get obd2ReportVoltsUnknown => 'pas de tension';
+
+  @override
+  String obd2ReportDriveEpisodeNeutral(
+    String time,
+    String speed,
+    String rpm,
+    String volts,
+  ) {
+    return '$time · $speed km/h · $rpm tr/min · $volts · point mort signalé';
+  }
+
+  @override
+  String obd2ReportFaultRow(String label, String code, String group) {
+    return '$label : $code · $group';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Impossible de joindre \'$adapterName\' — choisissez un autre adaptateur';
   }

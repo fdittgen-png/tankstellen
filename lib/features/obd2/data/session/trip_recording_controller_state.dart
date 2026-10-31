@@ -84,6 +84,7 @@ mixin _TripRecordingSessionState {
   Future<void> _readTripIdentity();
   VehicleProfile? get _vehicle;
   bool get _diagnosticCapture;
+  TripFullDiagnostics? get _fullDiag;
   PidScheduler? get _schedulerOverride;
   Duration get _schedulerTickRate;
   TripGpsEstimateOverlay? get _gpsEstimateFolder;
@@ -138,7 +139,8 @@ mixin _TripRecordingSessionState {
 
   /// #3857 (Epic #3855) — the ~10 s `ATRV` voltage watch. Was
   /// `_lastVoltageReadAt` / `_pendingVoltageStamp`.
-  final TripVoltageWatch _voltageWatch = TripVoltageWatch();
+  late final TripVoltageWatch _voltageWatch = TripVoltageWatch(
+      interval: _fullDiag?.voltageInterval ?? const Duration(seconds: 10));
 
   /// #3858 — trip identity (odometer / VIN / fuel type) is read once the
   /// bus can answer; a recording that starts with the engine off defers

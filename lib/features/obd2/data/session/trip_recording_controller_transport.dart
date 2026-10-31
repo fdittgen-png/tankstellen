@@ -126,13 +126,9 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
   /// mid-search and tear down the recovering link), run the recovery,
   /// then re-anchor the fence so polling gets a full fresh staleness
   /// window from the true start of the cadence.
-  Future<void> _runProtocolWork(String label) async {
-    _protocolWorkInFlight = true;
-    final scheduler = _scheduler;
-    scheduler?.pause();
+  Future<void> _runProtocolWork(String label) => _quietWindow(() async {
     _sessionJournal.add(RecordingSessionEventKind.protocolEstablish,
         detail: label);
-    try {
       final recovered = await _service.recoverVehicleProtocol();
       _sessionJournal.add(RecordingSessionEventKind.protocolVerdict,
           detail: recovered ? 'answered' : 'silent');
@@ -143,11 +139,35 @@ mixin _TripRecordingTransportGuard on _TripRecordingSessionState {
             : 'bus still silent — polling starts anyway '
                 '(episode recovery re-signals while it persists)',
       );
+  });
+
+  /// #4550 — the quiet window shared by protocol work and the
+  /// full-diagnostic snapshot (`ATH1` … `ATH0` must not interleave a poll).
+  Future<void> _quietWindow(Future<void> Function() body) async {
+    _protocolWorkInFlight = true;
+    final scheduler = _scheduler;
+    scheduler?.pause();
+    try {
+      await body();
     } finally {
       _protocolWorkInFlight = false;
       _engineFence.onFreshParse(_now());
       scheduler?.resume();
     }
+  }
+
+  /// #4550 — the start/stop snapshot on a live link; no-op when off.
+  Future<void> _fullDiagSnapshot(String phase) async {
+    final diag = _fullDiag;
+    if (diag == null || !_service.isConnected || _protocolWorkInFlight) return;
+    await _quietWindow(
+        () => diag.snapshot(phase, _service.sendCommand, now: _now));
+  }
+
+  /// The trip tiers plus, when opted in, the #4549 health plan.
+  void _subscribeAllTiers(PidScheduler s) {
+    _liveSampleSnapshot.subscribeAllTiers(s);
+    _fullDiag?.subscribe(s, advertised: _service.isPidKnownSupported);
   }
 
   /// #3783 — every scheduler (re)start after a rebind funnels here: start

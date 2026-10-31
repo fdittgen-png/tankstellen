@@ -35,8 +35,14 @@ enum PidTier {
   /// ~0.5 Hz — STFT, LTFT, IAT, baro. Slow ECU corrections / ambient.
   slowCorrection,
 
-  /// ~0.1 Hz — coolant, fuel-tank level. Thermal / context; demoted first.
+  /// ~0.1 Hz — coolant, fuel-tank level. Thermal / context.
   thermalContext,
+
+  /// #4549 — the opt-in full-diagnostic health stream (voltage, gear, O2,
+  /// EVAP, DTCs, every other advertised PID). The deepest tier, so the
+  /// governor demotes it FIRST: on a slow adapter the health stream thins
+  /// out before any trip-recording PID does.
+  diagnosticSweep,
 }
 
 /// Configuration for a single subscribed PID in the `PidScheduler`.

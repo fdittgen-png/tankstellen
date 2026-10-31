@@ -37,6 +37,7 @@ import '../../domain/vehicle_power_state.dart';
 import '../../domain/virtual_odometer.dart';
 import 'trip_engine_data_fence.dart';
 import 'trip_fuel_accumulator.dart';
+import 'trip_full_diagnostics.dart';
 import 'trip_gear_coaching_metric.dart';
 import 'trip_identity_read.dart';
 import 'trip_odometer_tracker.dart';
@@ -233,6 +234,8 @@ class TripRecordingController
   /// storage growth for the overwhelming majority of trips.
   @override
   final bool _diagnosticCapture;
+  @override
+  final TripFullDiagnostics? _fullDiag; // #4548 opt-in; null = off, zero cost
 
   /// Optional override — tests inject a hand-built scheduler (usually
   /// with a tiny [PidScheduler.tickRate] + a fake transport) to
@@ -298,6 +301,7 @@ class TripRecordingController
     String? pinnedAdapterMac,
     this._automatic = false,
     this._diagnosticCapture = false,
+    this._fullDiag, // #4548 — full diagnostic recording (raw trace + health)
     Obd2ReattachSource? Function(
       String pinnedMac,
       VoidCallback onReconnect,

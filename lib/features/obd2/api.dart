@@ -86,6 +86,10 @@ export 'providers/obd2_capability_provider.dart';
 export 'providers/obd2_connect_trace_revision_provider.dart';
 export 'providers/obd2_connection_state_provider.dart';
 export 'providers/obd2_debug_logging_provider.dart';
+// #4548 — the full-diagnostic switch + recordings list for the driving
+// settings Troubleshooting group.
+export 'presentation/widgets/obd2_full_diagnostic_section.dart'
+    show Obd2FullDiagnosticSection;
 export 'providers/obd2_reconnect_provider.dart';
 export 'providers/obd2_recording_pipeline.dart';
 export 'providers/obd2_self_test_controller.dart';

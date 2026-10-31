@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import '../../domain/vehicle_power_state.dart';
+import '../diagnostics/obd2_diagnostic_trace.dart';
 import '../protocol/elm_session.dart';
 import '../transport/obd2_link_drop_signal.dart';
 import '../transport/obd2_transport.dart';
@@ -74,7 +75,17 @@ class Obd2ServiceSession {
   /// attached and alive, straight to [transport] otherwise (the init
   /// burst inside `connect` runs pre-session; a dead session means the
   /// supervisor is already recycling this service).
+  ///
+  /// #4548 — while a full diagnostic recording runs, every command and
+  /// its reply is teed into [Obd2DiagnosticTrace] here, so nothing the
+  /// session sends escapes the trace.
   Future<String> send(String command, Obd2Transport transport) {
+    final reply = _send(command, transport);
+    final trace = Obd2DiagnosticTrace.current;
+    return trace == null ? reply : trace.observe(command, reply);
+  }
+
+  Future<String> _send(String command, Obd2Transport transport) {
     final session = _session;
     if (session != null &&
         session.state != ElmSessionState.dead &&

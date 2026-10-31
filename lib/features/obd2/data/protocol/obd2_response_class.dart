@@ -164,3 +164,43 @@ bool _isHexByteToken(String token) {
   }
   return true;
 }
+
+/// #4550 (Epic #4547) — true when [reply] is a well-formed POSITIVE reply
+/// to a diagnostic-mode [command] (Mode 02 freeze frame, 03 / 07 / 0A
+/// trouble codes, 06 monitors, 09 vehicle info).
+///
+/// [classifyObd2Response] only knows the `41` / `49` / `62` echoes and
+/// needs three payload tokens, so a zero-code `43 00`, a `47 …` pending
+/// reply or a multi-frame ISO-TP reply (`014` / `0: 49 02 01 …` /
+/// `1: …`) reads as garbage there — and two garbage replies in a row
+/// make the session warm-start the adapter mid-trip. This check accepts
+/// exactly those shapes: every line is either the multi-frame byte count
+/// or (an optional `N:` frame index and) hex bytes, and the expected
+/// echo (`mode + 0x40`) is present.
+bool isDiagnosticModePositiveReply(String command, String reply) {
+  final c = command.replaceAll(' ', '').toUpperCase();
+  if (c.length < 2) return false;
+  final mode = int.tryParse(c.substring(0, 2), radix: 16);
+  const diagnosticModes = {0x02, 0x03, 0x06, 0x07, 0x09, 0x0A};
+  if (mode == null || !diagnosticModes.contains(mode)) return false;
+  final echo = (mode + 0x40).toRadixString(16).toUpperCase().padLeft(2, '0');
+  final lines = reply
+      .toUpperCase()
+      .replaceAll('>', '\n')
+      .split(RegExp(r'[\r\n]+'))
+      .map((l) => l.trim())
+      .where((l) => l.isNotEmpty)
+      .toList(growable: false);
+  if (lines.isEmpty) return false;
+  var sawEcho = false;
+  for (final line in lines) {
+    if (RegExp(r'^[0-9A-F]{3}$').hasMatch(line)) continue; // byte count
+    final body = line.replaceFirst(RegExp(r'^[0-9A-F]:\s*'), '');
+    final tokens = body.split(RegExp(r'\s+')).where((t) => t.isNotEmpty);
+    for (final t in tokens) {
+      if (!_isHexByteToken(t)) return false;
+      if (t == echo) sawEcho = true;
+    }
+  }
+  return sawEcho;
+}

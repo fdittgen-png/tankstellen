@@ -20,6 +20,7 @@ import '../../trips/api.dart';
 import '../domain/services/obd2_gps_estimate_fallback.dart';
 import 'obd2_breadcrumb_provider.dart';
 import 'obd2_controller_phase_mapper.dart';
+import 'obd2_full_diagnostic_header.dart';
 import 'obd2_reconnect_provider.dart';
 import 'obd2_recording_movement_wake.dart';
 import 'obd2_supervised_teardown.dart';
@@ -56,8 +57,7 @@ class Obd2RecordingPipeline implements RecordingPipeline {
   final TripOemFuelLevelController _oemFuel;
   final VehicleProfile? Function() _readActiveVehicle;
   final bool Function() _readOemPidsFlag;
-  // #2459 — per-trip diagnostic-capture flag (Feature.debugMode).
-  final bool Function() _readDiagnosticCaptureFlag;
+  final bool Function() _readDiagnosticCaptureFlag; // #2459 debugMode flag
   final Duration _startWatchdog; // #3382 trip-start abort budgets
   final Duration _baselinesBudget;
   final Obd2RecordingMovementWake? _movementWakeOverride;
@@ -137,8 +137,8 @@ class Obd2RecordingPipeline implements RecordingPipeline {
       vehicleId: activeVehicle?.id,
       pinnedAdapterMac: pinnedMac,
       automatic: automatic,
-      // #2459 — diagnostic capture (Feature.debugMode); default off.
-      diagnosticCapture: _readDiagnosticCaptureFlag(),
+      diagnosticCapture: _readDiagnosticCaptureFlag(), // #2459, default off
+      fullDiag: obd2FullDiagnostics(_ref, activeVehicle, service, automatic),
       reconnectScannerFactory: buildReconnectScannerFactory(
         ref: _ref,
         onConnected: (svc) {
