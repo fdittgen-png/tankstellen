@@ -109,6 +109,7 @@ docs/*
 !docs/AGENT_RULES.md
 docs/guides/*
 !docs/guides/NETWORK_TESTS.md
+!docs/guides/physical-tank-reference.md
 !docs/guides/NEW_COUNTRY.md
 !docs/guides/ARB_FRAGMENTS.md
 !docs/guides/BLOCKER-IOS-PROVISIONING.md

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../../../../core/domain/fuel_type.dart';
+import '../../../../core/domain/fuel/fuel_quantity_unit.dart';
 import '../entities/fill_up.dart';
 
 // Existing report/reference plausibility guards, now shared (#4469).
@@ -151,13 +152,13 @@ PhysicalWindowRejection? _rejection(List<FillUp> physical, bool liquidOnly) {
     return PhysicalWindowRejection.invalidQuantity;
   }
   final family = fuelCompatibilityFamily(physical.first.fuelType);
+  final liquid = FuelQuantityUnit.fromPriceUnit(
+    physical.first.fuelType.unit,
+  ).isLitreBased;
   if (physical.any(
     (f) =>
         f.fuelType == FuelType.all ||
-        (liquidOnly &&
-            (f.fuelType == FuelType.cng ||
-                f.fuelType == FuelType.hydrogen ||
-                f.fuelType == FuelType.electric)) ||
+        (liquidOnly && !liquid) ||
         fuelCompatibilityFamily(f.fuelType) != family,
   )) {
     return PhysicalWindowRejection.unsupportedTankCombination;
@@ -179,10 +180,11 @@ PhysicalWindowRejection? _rejection(List<FillUp> physical, bool liquidOnly) {
   if (!liters.isFinite ||
       !km.isFinite ||
       !rate.isFinite ||
-      km <= _minDistanceKm ||
-      km > _maxDistanceKm ||
-      rate < _minConsumption ||
-      rate > _maxConsumption) {
+      (liquid &&
+          (km <= _minDistanceKm ||
+              km > _maxDistanceKm ||
+              rate < _minConsumption ||
+              rate > _maxConsumption))) {
     return PhysicalWindowRejection.implausibleConsumption;
   }
   return null;

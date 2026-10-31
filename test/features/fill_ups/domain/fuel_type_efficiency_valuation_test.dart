@@ -211,6 +211,19 @@ void main() {
       expect(_bucketOf(stats, FuelType.electric).avgL100km, isNull);
     });
 
+    test('#4469 native kg spend is not subject to litre-consumption bounds', () {
+      final rows = FuelTypeEfficiencyAggregator.byFuelType([
+        _f(id: 'h1', date: DateTime(2026, 1, 1), liters: 3,
+          cost: 30, odo: 1000, fuel: FuelType.hydrogen),
+        _f(id: 'h2', date: DateTime(2026, 2, 1), liters: 1.4,
+          cost: 14, odo: 1200, fuel: FuelType.hydrogen),
+      ]);
+      final hydrogen = _bucketOf(rows, FuelType.hydrogen);
+      expect(hydrogen.quantityUnit, FuelQuantityUnit.kilogram);
+      expect(hydrogen.avgL100km, isNull);
+      expect(hydrogen.recordedPurchaseSpend, 14);
+    });
+
     test('a missing price withholds the money, never shrinks it (box 6)', () {
       final stats = FuelTypeEfficiencyAggregator.byFuelType([
         _f(id: '1', date: DateTime(2026, 1, 1), liters: 40, cost: 60, odo: 1000),
