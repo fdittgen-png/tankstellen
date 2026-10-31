@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../background/alert_scan_journal.dart';
 import '../health_counters.dart';
+import '../diagnostic_field_policy.dart';
 import '../models/error_trace.dart';
 import '../pii_scrubber.dart';
 
@@ -30,15 +32,59 @@ class TraceStorage {
   /// best-effort: a throw is captured into the section instead of
   /// killing the whole export.
   static final Map<String, Object? Function()> extraExportSections = {};
+  static Future<void> _legacySanitization = Future<void>.value();
+
+  /// Completion barrier for diagnostic-only at-rest repair. Init never waits
+  /// for this work; every read and outbound payload is sanitized immediately.
+  static Future<void> get legacySanitization => _legacySanitization;
 
   static Future<void> init() async {
-    await Hive.openBox<dynamic>(_boxName);
+    final box = await Hive.openBox<dynamic>(_boxName);
+    // Queue repair separately from initialization, in eight-row batches.
+    // Snapshot keys so later inserts/deletes cannot invalidate an iterator.
+    // Cancellation/IO failure leaves the remaining rows for the next init;
+    // it never removes a diagnostic or touches another user-data box.
+    _legacySanitization = Future<void>(() async {
+      final keys = box.keys.toList(growable: false);
+      for (var i = 0; i < keys.length; i++) {
+        if (!box.isOpen) throw StateError('Diagnostic repair interrupted');
+        final raw = box.get(keys[i]);
+        if (raw is Map) {
+          await box.put(
+            keys[i],
+            PiiScrubber.scrubMap(
+              raw,
+              scope: DiagnosticFieldPolicy.legacyScope(raw),
+            ),
+          );
+        }
+        if (raw is String) await box.put(keys[i], PiiScrubber.scrubText(raw));
+        if ((i + 1) % 8 == 0) await Future<void>.delayed(Duration.zero);
+      }
+    });
+    unawaited(
+      _legacySanitization.then<void>(
+        (_) {},
+        onError: (Object e, StackTrace st) {
+          debugPrint(
+            'TraceStorage: deferred repair failed (${e.runtimeType}); '
+            'read/export protection remains active.\n${PiiScrubber.scrubText(st.toString())}',
+          );
+        },
+      ),
+    );
   }
 
   Box<dynamic> get _box => Hive.box(_boxName);
 
   Future<void> store(ErrorTrace trace) async {
-    await _box.put(trace.id, trace.toJson());
+    await _box.put(
+      trace.id,
+      PiiScrubber.scrubMap(
+        PiiScrubber.scrubErrorTrace(trace).toJson(),
+        scope: DiagnosticScope.trace,
+      ),
+    );
     await _prune();
   }
 
@@ -115,7 +161,13 @@ class TraceStorage {
     if (!Hive.isBoxOpen(_boxName)) return const [];
     final unparsed = <Map<String, dynamic>>[];
     for (final raw in _box.values) {
-      if (raw is! Map) continue;
+      if (raw is! Map) {
+        unparsed.add({
+          '_diagnosticOmitted': true,
+          'reason': 'unrecognized_diagnostic_row',
+        });
+        continue;
+      }
       final asMap = _jsonMapFrom(raw);
       try {
         ErrorTrace.fromJson(asMap);
@@ -136,17 +188,10 @@ class TraceStorage {
   /// `as Map<String, dynamic>` cast against a Hive-shaped nested map —
   /// see #1388.
   Map<String, dynamic> _jsonMapFrom(Map<dynamic, dynamic> raw) {
-    final result = <String, dynamic>{};
-    raw.forEach((key, value) {
-      result[key.toString()] = _coerceJsonValue(value);
-    });
-    return result;
-  }
-
-  dynamic _coerceJsonValue(dynamic value) {
-    if (value is Map) return _jsonMapFrom(value);
-    if (value is List) return value.map(_coerceJsonValue).toList();
-    return value;
+    return PiiScrubber.scrubMap(
+      raw,
+      scope: DiagnosticFieldPolicy.legacyScope(raw),
+    );
   }
 
   /// Serialises every persisted trace into a single JSON document the
@@ -207,30 +252,33 @@ class TraceStorage {
     // through attaching to an issue; its failure is recorded in-line.
     extraExportSections.forEach((key, supplier) {
       try {
-        doc[key] = supplier();
+        final section = PiiScrubber.scrubMap({'value': supplier()});
+        doc[key] = section['value'];
+        if (section['_diagnosticOmitted'] == true) {
+          doc['_diagnosticOmitted'] = true;
+        }
       } catch (e, st) {
-        debugPrint('TraceStorage: export section "$key" failed: $e\n$st');
-        doc[key] = 'unavailable: $e';
+        debugPrint(
+          'TraceStorage: export section failed (${e.runtimeType})\n'
+          '${PiiScrubber.scrubText(st.toString(), preserveSymbols: true)}',
+        );
+        doc[key] = 'unavailable: ${e.runtimeType}';
+        doc['_diagnosticOmitted'] = true;
       }
     });
-    return const JsonEncoder.withIndent('  ').convert(doc);
+    // Registered sections and supplier failures must pass the SAME final
+    // boundary; a well-behaved top-level trace cannot sanitize its neighbors.
+    return const JsonEncoder.withIndent(
+      '  ',
+    ).convert(PiiScrubber.scrubMap(doc, scope: DiagnosticScope.bundle));
   }
 
   /// Recursively applies [PiiScrubber.scrubText] to every string value
   /// in a raw (schema-drifted) trace map so the #1301 `unparsedRaw`
   /// escape hatch honours the same redaction policy as parsed traces
-  /// (#3145). Keys are left intact — they are schema, not user data.
+  /// (#3145). Valid schema symbols survive; sensitive/unsupported data does not.
   Map<String, dynamic> _scrubRawDeep(Map<String, dynamic> raw) {
-    dynamic scrubValue(dynamic value) {
-      if (value is String) return PiiScrubber.scrubText(value);
-      if (value is Map<String, dynamic>) {
-        return value.map((k, v) => MapEntry(k, scrubValue(v)));
-      }
-      if (value is List) return value.map(scrubValue).toList();
-      return value;
-    }
-
-    return raw.map((k, v) => MapEntry(k, scrubValue(v)));
+    return PiiScrubber.scrubMap(raw);
   }
 
   /// Single walk over `_box.values` that splits every entry into the
@@ -240,11 +288,17 @@ class TraceStorage {
   /// deserialised exactly once. The `traces` list is UNSORTED; callers
   /// that need newest-first sort it themselves.
   ({List<ErrorTrace> traces, List<Map<String, dynamic>> unparsed})
-      _partition() {
+  _partition() {
     final traces = <ErrorTrace>[];
     final unparsed = <Map<String, dynamic>>[];
     for (final raw in _box.values) {
-      if (raw is! Map) continue;
+      if (raw is! Map) {
+        unparsed.add({
+          '_diagnosticOmitted': true,
+          'reason': 'unrecognized_diagnostic_row',
+        });
+        continue;
+      }
       final asMap = _jsonMapFrom(raw);
       try {
         traces.add(ErrorTrace.fromJson(asMap));

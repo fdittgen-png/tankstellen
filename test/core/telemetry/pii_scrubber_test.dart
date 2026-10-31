@@ -222,7 +222,7 @@ void main() {
 
       expect(scrubbed.appState.activeRoute, contains(PiiScrubber.emailMarker));
       expect(scrubbed.appState.lastApiEndpoint,
-          contains(PiiScrubber.tokenMarker));
+          'https://api.example.com/[REDACTED_PATH]');
       expect(scrubbed.appState.lastSearchParams,
           contains(PiiScrubber.coordMarker));
 
