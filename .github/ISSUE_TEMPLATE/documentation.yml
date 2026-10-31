@@ -5,6 +5,10 @@ name: Documentation Issue
 description: Report incorrect, missing, or unclear documentation
 labels: ["type/docs", "needs-triage"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Triage follows the [Ready/Done/closure contract](https://github.com/fdittgen-png/tankstellen/blob/master/docs/guides/issue-exit-contract.md): bounded reader outcome, real documentation entry point, applicable link/example checks and an explicit STOP condition.
   - type: dropdown
     id: doc_type
     attributes:

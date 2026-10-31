@@ -5,6 +5,11 @@ name: Bug Report
 description: Report something that isn't working correctly
 labels: ["type/bug", "needs-triage"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the symptom; unknown version/device details are fine. Evidence is optional and must be redacted. Report security issues privately via SECURITY.md.
+        Implementers add the bounded brief and STOP condition during triage: [Ready/Done/closure contract](https://github.com/fdittgen-png/tankstellen/blob/master/docs/guides/issue-exit-contract.md).
   - type: textarea
     id: description
     attributes:
@@ -49,7 +54,7 @@ body:
     id: app_version
     attributes:
       label: App version
-      placeholder: e.g. 4.1.0
+      placeholder: e.g. 6.1.0, or unknown
     validations:
       required: true
 
@@ -77,4 +82,4 @@ body:
     id: screenshots
     attributes:
       label: Screenshots
-      description: If applicable, add screenshots or screen recordings.
+      description: Optional redacted screenshots or recordings; omit private locations, identifiers and secrets.
