@@ -92,7 +92,7 @@ Every language version carries the same **14 pages**, in the same order, illustr
 - **Code patterns** — [Dart Best Practices](Dev-Dart-Best-Practices) · [State Management (Riverpod)](Dev-State-Management-Riverpod) · [Service Layer & Fallback](Dev-Service-Layer-Fallback) · [Caching Strategy](Dev-Caching-Strategy) · [Storage & Sync](Dev-Storage-Hive-Sync)
 - **Quality** — [Testing & TDD](Dev-Testing-TDD-Pyramid) · [Error Reporting & Tracing](Dev-Error-Reporting-Tracing)
 - **Deep dives** — [OBD2 Implementation](Dev-OBD2-Implementation) · [Fuzzy Logic Price Predictions](Dev-Fuzzy-Logic-Price-Predictions) · [Localization (ARB)](Dev-Localization-ARB)
-- **Workflow** — [CI/CD Pipeline](Dev-CI-CD-Pipeline) · [GitHub Workflow](Dev-GitHub-Workflow) · [Creating Issues](Dev-Creating-Issues) · [Contributing](Dev-Contributing) · [Adding a Country](Dev-Adding-A-Country)
+- **Workflow** — [CI/CD Pipeline](Dev-CI-CD-Pipeline) · [CI workflow catalog](Dev-CI-Workflow-Catalog) · [GitHub Workflow](Dev-GitHub-Workflow) · [Creating Issues](Dev-Creating-Issues) · [Contributing](Dev-Contributing) · [Adding a Country](Dev-Adding-A-Country)
 - **Reference** — [Official Docs & SDKs](Dev-Official-Docs-SDKs) — every external API, SDK, and country data source we use
 
 ---

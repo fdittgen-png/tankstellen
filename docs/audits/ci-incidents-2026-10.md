@@ -38,3 +38,10 @@ regressions fail while the other three deadline/cleanup cases pass. The
 fixed source is restored. All 163 lint cases pass. Clean build-runner and
 the complete ARB/pseudo/localization pipeline produce no generated drift.
 No live upstream recovery was tested or claimed.
+
+After integrating the merged CI refactor, the same 13 offline regressions
+pass again, the analyzer remains clean, and all 303 lint/localization contract
+cases pass. Clean code generation writes 550 outputs with no committed drift;
+the full ARB/pseudo/localization pipeline also leaves no generated drift.
+The hosted measurement follow-up for #4451 is recorded separately in
+[`../ci/VALIDATION.md`](../ci/VALIDATION.md); no coverage baseline is changed.
