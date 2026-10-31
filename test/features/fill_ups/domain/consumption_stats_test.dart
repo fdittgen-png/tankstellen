@@ -375,11 +375,11 @@ void main() {
     );
 
     test(
-      'plein → correction → plein keeps correction liters in the average and '
+      'plein → correction → plein excludes synthetic liters from consumption and '
       'surfaces the correction share to the user',
       () {
-        // Closed window: fills 2..3 → liters = 5 + 40 = 45 over 1000 km
-        // → 4.5 L/100km. The correction liter total is 5 and
+        // Physical window: 40 L over 1000 km → 4 L/100km.
+        // The correction remains separately accounted for:
         // totalLiters = 50 + 5 + 40 = 95, so share = 5/95 ≈ 0.0526.
         final stats = ConsumptionStats.fromFillUps([
           _f(
@@ -406,7 +406,7 @@ void main() {
             odo: 11000,
           ),
         ]);
-        expect(stats.avgConsumptionL100km, 4.5);
+        expect(stats.avgConsumptionL100km, 4.0);
         expect(stats.correctionLitersTotal, 5);
         expect(stats.correctionShare, closeTo(5 / 95, 0.0001));
         // #2446 — Total L is REAL pumped litres only (50 + 40 = 90),
@@ -501,9 +501,7 @@ void main() {
     });
 
     test('two partials, no plein → entire history is the open window', () {
-      // Spec edge: with no plein-complet anywhere the very first fill
-      // opens the window; nothing closes it; the average has no closed
-      // window to draw from.
+      // Without a physical full anchor both partials remain unqualified.
       final stats = ConsumptionStats.fromFillUps([
         _f(
           id: '1',
@@ -523,8 +521,8 @@ void main() {
         ),
       ]);
       expect(stats.avgConsumptionL100km, isNull);
-      expect(stats.openWindowFillCount, 1);
-      expect(stats.openWindowLiters, 25);
+      expect(stats.openWindowFillCount, 2);
+      expect(stats.openWindowLiters, 45);
     });
   });
 

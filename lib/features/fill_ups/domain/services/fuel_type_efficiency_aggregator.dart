@@ -6,6 +6,7 @@ import '../entities/fill_up.dart';
 import '../entities/fuel_type_efficiency_stats.dart';
 import 'fuel_type_efficiency_internals.dart';
 import 'tank_blend_event_log.dart';
+import 'physical_tank_windows.dart';
 
 /// Minimum attributed closed intervals a bucket must have before the
 /// "cheapest per km" verdict may crown a winner (Epic #2881).
@@ -32,15 +33,14 @@ const double kMaxMinorityShareForPure = 0.15;
 ///
 /// ## Attribution (summary; the ADR is authoritative)
 /// Walks CLOSED plein-to-plein intervals (the same interval definition as
-/// `ConsumptionStats.fromFillUps` in `consumption_stats.dart` — replicated
-/// faithfully here because that walker does not expose a per-interval hook).
+/// `ConsumptionStats.fromFillUps`, through [physicalTankWindows] (#4469)).
 /// Each closed interval's litres-by-fuel composition decides its bucket:
 /// dominant ≥ 85 % volume ⇒ PURE (the dominant [FuelType]); otherwise MIX
 /// (the `dominant/secondary` blend, dominant first; a 3-way blend takes the
 /// two largest for the label, all litres still fold into that bucket). The
 /// whole interval's litres / distance / cost fold into that bucket.
-/// Corrections inherit the interval's bucket and never enter the composition
-/// tally (their `totalCost` is 0, so they do not move €/km).
+/// Synthetic corrections enter neither physical quantities nor composition
+/// (#4469); recorded purchase accounting remains separate.
 ///
 /// ## v3 (#3764) — the composition includes the CARRIED-OVER tank content
 /// v2 tallied only the litres of the interval's contributing fills, which
@@ -89,7 +89,9 @@ class FuelTypeEfficiencyAggregator {
 
     // Chronological copy so callers may pass data in any order — mirrors
     // ConsumptionStats.fromFillUps.
-    final sorted = [...fills]..sort((a, b) => a.date.compareTo(b.date));
+    final sorted = [...fills]..sort(comparePhysicalFills);
+    final windows = physicalTankWindows(sorted, liquidOnly: false).closed;
+    if (windows.isEmpty) return const [];
 
     // #3846 — what each fuel actually COST per litre, volume-weighted over
     // the real fills of that fuel. The interval's money must come from the
@@ -97,25 +99,19 @@ class FuelTypeEfficiencyAggregator {
     // the interval, i.e. the next tank — so E5 was priced with E85's money
     // and vice versa, and the "cheapest to drive on" verdict inverted.
     //
-    // #4364 — bounded to the fills up to and including the LAST CLOSING
-    // plein. Priced over the whole list, a purchase logged after every
+    // #4364/#4469 — bounded to the LAST QUALIFIED closing full. Priced over the whole list, a purchase logged after every
     // counted window moved the volume-weighted mean and silently
     // revalued periods that had already closed: the same history plus one
     // expensive top-up produced a different past. A report must be
     // reproducible from the windows it names.
-    final prices = weightedPricePerLitre(_upToLastClose(sorted));
+    final lastClose = sorted.indexWhere((f) => f.id == windows.last.closing.id);
+    final prices = weightedPricePerLitre(sorted.sublist(0, lastClose + 1));
 
     // Per-bucket accumulators, keyed by FuelEfficiencyBucket.key.
     final acc = <String, BucketAcc>{};
     BucketAcc accFor(FuelEfficiencyBucket bucket) =>
         acc.putIfAbsent(bucket.key, () => BucketAcc(bucket));
 
-    // ── Closed-interval walker (mirrors consumption_stats.dart) ──
-    // An interval opens at sorted[openingIndex] (first fill, or the prior
-    // closing plein) and closes at the next full-tank fill. Contributing
-    // fills are those strictly AFTER the opening up to + including the close.
-    var openingIndex = 0;
-    final pending = <FillUp>[]; // contributing fills of the current interval
     // #4322 — the evidence-only blend after every fill, folded once. Only
     // the fill log feeds it: without recorded trips every drive between
     // fills is unmeasured, the widest honest volume interval, so no share
@@ -125,35 +121,23 @@ class FuelTypeEfficiencyAggregator {
         ? tankBlendAfterEachFill(tankCapacityL: tankCapacityL, fillUps: sorted)
         : const <String, TankBlendSnapshot>{};
 
-    for (var i = 1; i < sorted.length; i++) {
-      final fill = sorted[i];
-      pending.add(fill);
-      if (!fill.isFullTank) continue; // interval still open
-
-      // Interval closes here. Distance from the odometer delta, clamped at
-      // 0 so an odometer reset / out-of-order import never goes negative
-      // (same clamp as consumption_stats.dart).
-      final distance = (fill.odometerKm - sorted[openingIndex].odometerKm)
-          .clamp(0, double.infinity)
-          .toDouble();
+    // #4469 — use the same physical boundaries and quantities as the
+    // tank reference. Unit-aware buckets also support kg/kWh quantities.
+    for (final window in windows) {
       _attributeInterval(
-        pending,
-        distance,
+        window.fills,
+        window.distanceKm,
         accFor,
-        openingContent:
-            _openingContentAt(sorted[openingIndex], blendAfter, tankCapacityL),
+        openingContent: _openingContentAt(
+          window.opening,
+          blendAfter,
+          tankCapacityL,
+        ),
         prices: prices,
       );
-
-      openingIndex = i;
-      pending.clear();
     }
-    // Anything left in `pending` is the in-progress (open) window after the
-    // last plein — excluded from attribution, exactly like the walker.
 
-    final result = [
-      for (final a in acc.values) a.toStats(),
-    ];
+    final result = [for (final a in acc.values) a.toStats()];
     // Sort by €/km ascending; nulls (no usable distance) last. Stable
     // secondary sort by bucket key for deterministic ordering on ties.
     result.sort((x, y) {
@@ -169,19 +153,6 @@ class FuelTypeEfficiencyAggregator {
       return x.bucket.key.compareTo(y.bucket.key);
     });
     return result;
-  }
-
-  /// The prefix of [sorted] the counted closed intervals actually cover:
-  /// everything up to and including the LAST full-tank fill (#4364).
-  ///
-  /// Fills after it are the in-progress window, which the walker never
-  /// attributes. Letting their prices into the pricing table is how an
-  /// unrelated later purchase rewrote a closed period's cost.
-  static List<FillUp> _upToLastClose(List<FillUp> sorted) {
-    for (var i = sorted.length - 1; i >= 1; i--) {
-      if (sorted[i].isFullTank) return sorted.sublist(0, i + 1);
-    }
-    return const [];
   }
 
   /// The lowest-`avgCostPerKm` bucket — but ONLY when every entry that has
@@ -232,7 +203,7 @@ class FuelTypeEfficiencyAggregator {
 
   /// Classify the interval into a PURE or MIX [FuelEfficiencyBucket] by its
   /// composition (ADR 0015) and fold the interval's litres / distance / cost
-  /// (incl. corrections, which inherit the bucket) into that bucket.
+  /// (physical fills only, #4469) into that bucket.
   ///
   /// The composition tally is v3 (#3764) when [openingContent] is known:
   /// the carried-over tank content plus the non-correction fills STRICTLY
@@ -260,12 +231,17 @@ class FuelTypeEfficiencyAggregator {
     // the NEXT tank.
     var tally = openingContent == null
         ? null
-        : _tally(contributing.sublist(0, contributing.length - 1),
-            from: openingContent);
+        : _tally(
+            contributing.sublist(0, contributing.length - 1),
+            from: openingContent,
+          );
     var bucket = tally == null
         ? null
-        : classifyComposition(tally.litresByFuel, tally.fuelByApiValue,
-            unknownLitres: openingContent!.unknownLitres);
+        : classifyComposition(
+            tally.litresByFuel,
+            tally.fuelByApiValue,
+            unknownLitres: openingContent!.unknownLitres,
+          );
     // Legacy/v2: every contributing fill, close included.
     final legacy = bucket == null;
     if (legacy) tally = _tally(contributing);
@@ -276,7 +252,7 @@ class FuelTypeEfficiencyAggregator {
     if (litresByFuel.isEmpty) return;
     bucket ??= classifyComposition(litresByFuel, tally.fuelByApiValue)!;
 
-    // Litres + cost include corrections (they inherit the bucket); distance
+    // Physical quantities exclude synthetic corrections (#4469); distance
     // is the whole interval's odometer delta. fillCount counts only the
     // non-correction fills folded into this bucket.
     var intervalLitres = 0.0;
@@ -289,10 +265,9 @@ class FuelTypeEfficiencyAggregator {
     for (final f in contributing) {
       // Litres stay the plein-to-plein REFILL volume — that is what was
       // burned over the interval, and it is what avgL100km must use.
-      // Corrections are included here (they inherit the bucket and DO
-      // represent fuel that went through the engine).
-      intervalLitres += f.liters;
+      // Synthetic bookkeeping is never a physical quantity.
       if (f.isCorrection) continue;
+      intervalLitres += f.liters;
       // ...but they are never PRICED: a correction is a bookkeeping
       // adjustment, not a visit to a pump, and carries no money. Pricing
       // its litres would invent a purchase — a 999 L correction priced at
@@ -313,8 +288,10 @@ class FuelTypeEfficiencyAggregator {
     // different fuel). Only litres a grade is guaranteed to hold are priced
     // (#4322): the burned volume is split over the characterised part of
     // the tank, never charged at a price guessed for its unknown litres.
-    final compositionLitres =
-        litresByFuel.values.fold<double>(0, (a, b) => a + b);
+    final compositionLitres = litresByFuel.values.fold<double>(
+      0,
+      (a, b) => a + b,
+    );
     var intervalCost = 0.0;
     if (compositionLitres > 0) {
       for (final entry in litresByFuel.entries) {
@@ -346,8 +323,11 @@ class FuelTypeEfficiencyAggregator {
     final fuels = {...?from?.fuelByApiValue};
     for (final f in fills) {
       if (f.isCorrection) continue;
-      litres.update(f.fuelType.apiValue, (v) => v + f.liters,
-          ifAbsent: () => f.liters);
+      litres.update(
+        f.fuelType.apiValue,
+        (v) => v + f.liters,
+        ifAbsent: () => f.liters,
+      );
       fuels[f.fuelType.apiValue] = f.fuelType;
     }
     return OpeningContent(litres, fuels);

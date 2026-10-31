@@ -268,7 +268,7 @@ class PumpGainLearner {
         ? burnedKeys.single
         : normalizePumpGainFuelKey(period.opening.fuelType.apiValue) ??
             fuelKey;
-    if (burnedKeys.length > 1) {
+    if (period.hasMixedPhysicalFuel || burnedKeys.length > 1) {
       _skip('mixed fuel ${burnedKeys.join('+')}');
       return skip(PumpGainSkipReason.mixedFuel,
           period: period, recordedKm: recordedKm);

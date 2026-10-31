@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import '../../../../core/utils/num_extensions.dart';
+import 'physical_tank_windows.dart';
 import '../entities/eco_score.dart';
 import '../entities/fill_up.dart';
 
@@ -50,55 +50,27 @@ class EcoScoreCalculator {
     required FillUp current,
     required List<FillUp> history,
   }) {
-    // Sort chronologically so "previous" is well-defined regardless of
-    // insertion order.
-    final sorted = [...history]..sort((a, b) => a.date.compareTo(b.date));
-
-    final idx = sorted.indexWhere((f) => f.id == current.id);
-    if (idx <= 0) return null; // not found or is the very first entry
-
-    // Previous fill-ups of the same fuel type, strictly before current.
-    final sameFuelPrev = <FillUp>[];
-    for (var i = idx - 1; i >= 0 && sameFuelPrev.length < rollingWindow; i--) {
-      if (sorted[i].fuelType == current.fuelType) {
-        sameFuelPrev.insert(0, sorted[i]);
-      }
-    }
-    if (sameFuelPrev.isEmpty) return null;
-
-    // Current fill-up's L/100 km = liters / distance * 100, where
-    // distance = odometer(current) - odometer(last same-fuel fill-up).
-    // Using the last same-fuel fill-up (not the immediate previous of
-    // any fuel) is debatable but matches how the rolling baseline is
-    // built, so the two numbers compare apples to apples.
-    final referencePrev = sameFuelPrev.last;
-    final currentDistance = current.odometerKm - referencePrev.odometerKm;
-    if (currentDistance <= 0) return null; // odometer rollback / typo
-    final currentLp100 = current.liters / currentDistance * 100;
-
-    // Baseline: pair each previous with the one immediately before it
-    // (same fuel type), same formula, then average.
-    final baselineSamples = <double>[];
-    for (var i = 0; i < sameFuelPrev.length; i++) {
-      // The entry before `sameFuelPrev[i]` of the SAME fuel type.
-      final entry = sameFuelPrev[i];
-      final entryIndex = sorted.indexOf(entry);
-      FillUp? predecessor;
-      for (var j = entryIndex - 1; j >= 0; j--) {
-        if (sorted[j].fuelType == current.fuelType) {
-          predecessor = sorted[j];
-          break;
-        }
-      }
-      if (predecessor == null) continue;
-      final d = entry.odometerKm - predecessor.odometerKm;
-      if (d <= 0) continue;
-      baselineSamples.add(entry.liters / d * 100);
-    }
-    if (baselineSamples.isEmpty) return null;
-
-    final baseline = baselineSamples.average;
-    if (baseline <= 0) return null;
+    final windows = physicalTankWindows(history).closed;
+    final index = windows.indexWhere((w) => w.closing.id == current.id);
+    if (index < 0) return null;
+    final window = windows[index];
+    // Compare complete windows belonging to the same vehicle and opening
+    // grade. A partial or synthetic entry never becomes a scored tank.
+    final prior = windows
+        .take(index)
+        .where(
+          (w) =>
+              w.opening.vehicleId == window.opening.vehicleId &&
+              w.opening.fuelType == window.opening.fuelType,
+        )
+        .toList();
+    if (prior.isEmpty) return null;
+    final recent = prior.skip(
+      prior.length > rollingWindow ? prior.length - rollingWindow : 0,
+    );
+    final km = recent.fold(0.0, (sum, w) => sum + w.distanceKm);
+    final baseline = recent.fold(0.0, (sum, w) => sum + w.liters) / km * 100;
+    final currentLp100 = window.lPer100Km;
 
     final deltaPercent = (currentLp100 - baseline) / baseline * 100;
     final direction = _directionFor(deltaPercent);
@@ -117,42 +89,15 @@ class EcoScoreCalculator {
     return EcoScoreDirection.stable;
   }
 
-  /// Returns just the raw L/100 km for [current] (no baseline / no
-  /// comparison-to-rolling-average), or `null` when the math is
-  /// undefined (first-ever fill-up, odometer rollback, no preceding
-  /// same-fuel entry — same fail-conditions as [compute], but only
-  /// the upstream-distance gate, not the baseline-history gate).
-  ///
-  /// Used on partial / auto-corrected entries (#2060) where [compute]
-  /// returns null because there aren't enough preceding same-fuel
-  /// fill-ups to build a rolling baseline, but the per-entry L/100 km
-  /// itself IS meaningful — distance + litres are present, just not
-  /// the comparison data.
-  ///
-  /// Render this as plain text (no trend arrow, no percentage). The
-  /// [EcoScoreBadge] continues to handle the "↓ X L/100 km · -N%"
-  /// shape when [compute] returns non-null.
+  /// The physical reference on the qualified closing fill, without a trend.
+  /// A full-to-full window needs no earlier comparison window; partial and
+  /// synthetic records never have independent measured consumption (#4469).
   static double? computeLitersPer100Km({
     required FillUp current,
     required List<FillUp> history,
   }) {
-    final sorted = [...history]..sort((a, b) => a.date.compareTo(b.date));
-    final idx = sorted.indexWhere((f) => f.id == current.id);
-    if (idx <= 0) return null; // not found or is the very first entry
-
-    // Find the most recent preceding entry of the SAME fuel type — the
-    // odometer base for distance. Differs from [compute] in that we
-    // don't also need a baseline window; one prior entry is enough.
-    FillUp? referencePrev;
-    for (var i = idx - 1; i >= 0; i--) {
-      if (sorted[i].fuelType == current.fuelType) {
-        referencePrev = sorted[i];
-        break;
-      }
-    }
-    if (referencePrev == null) return null;
-    final distance = current.odometerKm - referencePrev.odometerKm;
-    if (distance <= 0) return null;
-    return current.liters / distance * 100;
+    return physicalTankWindows(
+      history,
+    ).closed.where((w) => w.closing.id == current.id).firstOrNull?.lPer100Km;
   }
 }

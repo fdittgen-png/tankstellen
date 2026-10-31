@@ -1718,6 +1718,10 @@
   "consumptionStatsOpenWindowBanner": "{count, plural, =1{1 Teilbetankung wartet auf nächste Volltankung — nicht im Durchschnitt} other{{count} Teilbetankungen warten auf nächste Volltankung — nicht im Durchschnitt}}",
   "consumptionStatsCorrectionShareHint": "{percent}% des Kraftstoffs aus Auto-Korrekturen — Einträge prüfen",
   "statCorrectionLiters": "Korrekturen: +{liters} L",
+  "consumptionStatsNeedsFullWindow": "Füge eine weitere Volltankung hinzu, um den Verbrauch zu messen.",
+  "@consumptionStatsNeedsFullWindow": {
+    "description": "Explains that pump consumption requires two qualified physical full fills (#4469)."
+  },
   "contentModerationReportAction": "Inhalt melden",
   "contentModerationBlockAction": "Autor blockieren",
   "contentModerationReportDialogTitle": "Diesen Inhalt melden?",

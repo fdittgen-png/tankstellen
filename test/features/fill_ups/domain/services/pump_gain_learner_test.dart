@@ -57,6 +57,30 @@ void main() {
     learner = PumpGainLearner(profileRepository: repo, now: () => _t0);
   });
 
+  test('#4469 a first partial cannot train the learner', () async {
+    final closing = _fill('b', 8, 10597, 27.2, trips: ['t']);
+    final outcome = await learner.evaluate(vehicleId: 'car', closing: closing,
+      fillUps: [_fill('a', 0, 10000, 15, full: false), closing],
+      tripSummariesById: {'t': _trip(500, 35, fuelKey: 'e85')});
+    expect(outcome.skipReason, PumpGainSkipReason.noWindow);
+    expect(outcome.period, isNull);
+    expect(repo.getById('car')!.pumpGainSamples, 0);
+  });
+
+  test('#4469 a physical blend is aggregate truth, not single-grade calibration', () async {
+    final closing = _fill('b', 8, 10597, 27.2, trips: ['t']);
+    final outcome = await learner.evaluate(vehicleId: 'car', closing: closing,
+      fillUps: [
+        _fill('a', 0, 10000, 40),
+        _fill('p', 3, 10250, 15, full: false).copyWith(fuelType: FuelType.e10),
+        closing,
+      ], tripSummariesById: {'t': _trip(500, 35, fuelKey: 'e85')});
+    expect(outcome.period!.liters, 42.2);
+    expect(outcome.skipReason, PumpGainSkipReason.mixedFuel);
+    expect(outcome.result, isNull);
+    expect(repo.getById('car')!.pumpGainSamples, 0);
+  });
+
   test('the field case: 559 km · 35.7 L pumped, recordings at 10.5 L/100 km '
       'over 81 % → gain 0.61, estimates come down 39 %', () async {
     // Recordings: 453 km (81 %) burning 47.6 L raw (10.5 L/100 km).

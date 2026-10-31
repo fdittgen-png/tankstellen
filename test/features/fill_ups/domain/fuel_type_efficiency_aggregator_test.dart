@@ -33,7 +33,7 @@ FillUp _f({
       date: date,
       liters: liters,
       totalCost: cost,
-      odometerKm: odo,
+      odometerKm: odo + 10000, // #4469: use known physical anchors, not unset zero.
       fuelType: fuelType,
       isFullTank: isFullTank,
       isCorrection: isCorrection,
@@ -262,8 +262,8 @@ void main() {
       final e85 = result.single;
       expect(e85.label, 'E85'); // pure, no mix despite the E10 correction
       expect(e85.isMix, isFalse);
-      // Interval litres include the correction (inherits the bucket).
-      expect(e85.avgL100km, closeTo((30 + 999) / 600 * 100, 1e-9));
+      // Only the physical 30 L refill establishes consumption (#4469).
+      expect(e85.avgL100km, closeTo(30 / 600 * 100, 1e-9));
       // Cost excludes the zero-cost correction.
       expect(e85.avgCostPerKm, closeTo(45 / 600, 1e-9));
       // fillCount counts only the non-correction fill (just the closing).
@@ -295,7 +295,7 @@ void main() {
       expect(FuelTypeEfficiencyAggregator.cheapestPerKm(result), isNull);
     });
 
-    test('odometer-reset (negative delta) clamps to 0 without crashing', () {
+    test('odometer-reset (negative delta) withholds an unqualified interval', () {
       final fills = [
         _f(id: 'a', date: _d(1), liters: 40, cost: 60, odo: 5000),
         _f(id: 'b', date: _d(2), liters: 30, cost: 45, odo: 100), // reset
@@ -305,11 +305,7 @@ void main() {
         () => result = FuelTypeEfficiencyAggregator.byFuelType(fills),
         returnsNormally,
       );
-      final e10 = result.single;
-      expect(e10.label, 'E10');
-      expect(e10.attributedIntervalCount, 1); // interval closed
-      expect(e10.avgL100km, isNull); // zero distance → null
-      expect(e10.avgCostPerKm, isNull);
+      expect(result, isEmpty); // no qualified reference may be counted
     });
 
     test('unsorted input is handled (sorts chronologically first)', () {
@@ -464,7 +460,7 @@ void main() {
       expect(_has(result, 'E85/E5'), isFalse);
     });
 
-    test('interval opening on a NON-plein first fill is legacy-attributed '
+    test('interval opening on a NON-plein first fill is excluded '
         'even with capacity; later plein-anchored intervals are not', () {
       final fills = [
         // First fill is PARTIAL → interval A's opening content unknowable.
@@ -481,9 +477,9 @@ void main() {
         tankCapacityL: capacity,
       );
       final e85 = _byLabel(result, 'E85');
-      expect(e85.attributedIntervalCount, 2);
-      expect(e85.legacyAttributedIntervalCount, 1,
-          reason: 'only the non-plein-opened interval fell back to v2');
+      expect(e85.attributedIntervalCount, 1);
+      expect(e85.legacyAttributedIntervalCount, 0,
+          reason: 'the non-plein-opened interval is not consumption truth');
     });
 
     test('partial fill inside the interval joins the burned-tank tally '

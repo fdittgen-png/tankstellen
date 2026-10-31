@@ -25,5 +25,9 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "description": "Explains that pump consumption requires two qualified physical full fills (#4469)."
   }
 }

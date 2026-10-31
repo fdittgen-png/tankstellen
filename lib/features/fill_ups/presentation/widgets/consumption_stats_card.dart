@@ -127,6 +127,13 @@ class ConsumptionStatsCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (stats.fillUpCount > 0 && stats.closedWindowCount == 0) ...[
+            Text(
+              l.consumptionStatsNeedsFullWindow,
+              style: AppText.body(context),
+            ),
+            const SizedBox(height: Spacing.md),
+          ],
           if (showOpenWindowBanner) ...[
             _OpenWindowBanner(
               text: l.consumptionStatsOpenWindowBanner(
@@ -195,7 +202,10 @@ class ConsumptionStatsCard extends ConsumerWidget {
                   icon: Icons.speed,
                   label: l.statAvgConsumption,
                   value: avgConsumption != null
-                      ? UnitFormatter.formatDecimal(avgConsumption, fractionDigits: 2)
+                      ? UnitFormatter.formatDecimal(
+                          avgConsumption,
+                          fractionDigits: 2,
+                        )
                       : '—',
                 ),
               ),
