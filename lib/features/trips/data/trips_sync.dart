@@ -1,7 +1,10 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
+
 import 'trip_history_repository.dart';
+import 'trip_history_payload_reader.dart';
 import '../../../core/sync/deletions_sync.dart';
 import '../../../core/sync/locally_retained_ids.dart';
 import '../../../core/sync/sync_pull_lease.dart';
@@ -227,7 +230,7 @@ class TripsSync {
   /// [localEntries] are already fully decoded.
   static Future<List<TripHistoryEntry>> merge(
     List<TripHistoryEntry> localEntries, {
-    TripHistoryEntry? Function(String id)? loadFull,
+    FutureOr<TripHistoryEntry?> Function(String id)? loadFull,
     SyncTransport? transport,
   }) async {
     final t = _transport(transport, 'merge');
@@ -281,11 +284,8 @@ class TripsSync {
       // upload still carries the samples/gpsd blob. A failed hydrate
       // falls back to the entry we have (summary heals, details retry
       // on the next pass — same as a pre-#3613 0-sample entry).
-      final uploadable = loadFull == null
-          ? localOnly
-          : localOnly
-              .map((e) => loadFull(e.id) ?? e)
-              .toList(growable: false);
+      final uploadable = await hydrateTripEntries(localOnly, loadFull);
+      SyncPullLease.current?.checkLive();
       await _uploadBatch(t, uploadable);
 
       // Decode server-only rows (off the UI isolate, #3451) and return the

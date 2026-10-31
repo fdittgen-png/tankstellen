@@ -49,7 +49,7 @@ Map<String, String> encodeTripRowsV2(Map<String, dynamic> json) {
   final meta = Map<String, dynamic>.of(json);
   final samples =
       (meta.remove('samples') as List?)?.cast<Map<String, dynamic>>() ??
-          const <Map<String, dynamic>>[];
+      const <Map<String, dynamic>>[];
   final gpsd = meta.remove('gpsd') as List?;
   final cols = <String>{};
   for (final m in samples) {
@@ -62,8 +62,11 @@ Map<String, String> encodeTripRowsV2(Map<String, dynamic> json) {
   final rows = <String, String>{id: jsonEncode(meta)};
   for (var i = 0, n = 0; i < samples.length; i += kTripChunkSamples, n++) {
     final end = i + kTripChunkSamples;
-    rows[tripChunkKey(id, n)] = jsonEncode(encodeTripChunkFromMaps(
-        samples.sublist(i, end > samples.length ? samples.length : end)));
+    rows[tripChunkKey(id, n)] = jsonEncode(
+      encodeTripChunkFromMaps(
+        samples.sublist(i, end > samples.length ? samples.length : end),
+      ),
+    );
   }
   if (gpsd != null && gpsd.isNotEmpty) {
     rows[tripGpsdKey(id)] = jsonEncode(gpsd);
@@ -89,7 +92,8 @@ Map<String, dynamic> decodeTripRowsV2(TripRowsV2 rows) {
   final samples = <Map<String, dynamic>>[];
   for (final c in rows.chunks) {
     samples.addAll(
-        decodeTripChunkMaps((jsonDecode(c) as Map).cast<String, dynamic>()));
+      decodeTripChunkMaps((jsonDecode(c) as Map).cast<String, dynamic>()),
+    );
   }
   if (samples.isNotEmpty) json['samples'] = samples;
   final gpsd = rows.gpsd;
@@ -101,20 +105,43 @@ Map<String, dynamic> decodeTripRowsV2(TripRowsV2 rows) {
 /// isolate boundary, the JSON strings never come back).
 TripHistoryEntry decodeTripRowsV2ToEntry(TripRowsV2 rows) {
   final cols = (jsonDecode(rows.meta) as Map)['cols'];
-  return TripHistoryEntry.fromJson(decodeTripRowsV2(rows)).withColumnsPresent(
-      (cols as List?)?.cast<String>().toSet());
+  return TripHistoryEntry.fromJson(
+    decodeTripRowsV2(rows),
+  ).withColumnsPresent((cols as List?)?.cast<String>().toSet());
 }
 
 /// Full entry from a legacy v1 row — `compute()` entry point.
 TripHistoryEntry decodeLegacyRowToEntry(String raw) =>
     TripHistoryEntry.fromJson((jsonDecode(raw) as Map).cast<String, dynamic>());
 
+/// Detect the layout and decode without parsing a legacy sample array on UI.
+({TripHistoryEntry entry, bool legacy}) decodeStoredTripRows(TripRowsV2 rows) {
+  final json = (jsonDecode(rows.meta) as Map).cast<String, dynamic>();
+  final legacy = json['v'] != kTripRowVersion;
+  return (
+    entry: legacy
+        ? TripHistoryEntry.fromJson(json)
+        : decodeTripRowsV2ToEntry(rows),
+    legacy: legacy,
+  );
+}
+
+/// Null for v2; legacy JSON parsing and encoding both stay in the worker.
+Map<String, String>? migrateLegacyTripRow(String raw) {
+  final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
+  return json['v'] == kTripRowVersion ? null : encodeTripRowsV2(json);
+}
+
 /// Column-selective read over v2 chunk strings.
 TripColumns decodeTripColumnsV2(List<String> chunks, Set<String> keys) {
   var out = TripColumns.empty;
   for (final c in chunks) {
-    out = out.append(decodeTripChunkColumns(
-        (jsonDecode(c) as Map).cast<String, dynamic>(), keys));
+    out = out.append(
+      decodeTripChunkColumns(
+        (jsonDecode(c) as Map).cast<String, dynamic>(),
+        keys,
+      ),
+    );
   }
   return out;
 }

@@ -91,7 +91,7 @@ final class SpeedConsumptionBinsProvider
 }
 
 String _$speedConsumptionBinsHash() =>
-    r'fb525dd285b7f09cf7ce0d7acfc3bd02fe185007';
+    r'7b9819ef884d569545179e8e228205bea33f7be4';
 
 /// The speed-vs-consumption histogram of the carbon Charts tab, over the
 /// trips [vehicleId] may claim (every trip when null; a trip with no

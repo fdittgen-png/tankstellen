@@ -135,9 +135,7 @@ class TripRecoveryPhase {
     );
     TripHistoryRepository? historyRepo;
     if (Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) {
-      historyRepo = TripHistoryRepository(
-        box: Hive.box<String>(HiveBoxes.obd2TripHistory),
-      );
+      historyRepo = TripHistoryRepository.fromOpenBox(HiveBoxes.obd2TripHistory);
     }
     final pausedOpen = Hive.isBoxOpen(HiveBoxes.obd2PausedTrips);
     final service = ActiveTripRecoveryService(
@@ -232,9 +230,7 @@ class TripRecoveryPhase {
     final pausedRepo = PausedTripRepository(
       box: Hive.box<String>(HiveBoxes.obd2PausedTrips),
     );
-    final historyRepo = TripHistoryRepository(
-      box: Hive.box<String>(HiveBoxes.obd2TripHistory),
-    );
+    final historyRepo = TripHistoryRepository.fromOpenBox(HiveBoxes.obd2TripHistory);
     final service = PausedTripRecoveryService(
       pausedRepo: pausedRepo,
       historyRepo: historyRepo,

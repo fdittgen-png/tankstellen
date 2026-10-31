@@ -64,7 +64,7 @@ The fields that matter for this procedure, all already in the document
 | `kpi.withinBudget` | `StartupKpi.isWithinBudget`, or absent if `kpi.ms` is absent |
 | `kpi.budgetMs` | `kColdStartBudget.limit`, carried so the row is self-contained |
 | `phases[]` | each `StartupTimer` milestone as a `{name, atMs, durationMs}` phase |
-| `boxOpens[]` | every timed Hive box open (first-frame AND deferred), with `durationMs` and `entries` — this is the dataset/box size column |
+| `boxOpens[]` | every timed Hive box open (first-frame AND deferred), with `durationMs` and `entries`; lazy-box entries count keys, not decrypted payloads |
 | `slowestBoxOpen` | the long-pole box for this run, if any opens were timed |
 | `spans[]` | post-first-frame launch-sync spans (TankSync, trip merge, ...) |
 | `appVersion` | `AppConstants.appVersion` |
@@ -101,7 +101,8 @@ run:
   just changes it).
 - Dataset / box sizes: after the FIRST run in a session, pull that run's
   export and read `boxOpens[].entries` per box; this is the per-box row
-  count the first-frame batch (or a deferred box) actually deserialized.
+  count for each box. Regular boxes deserialize values; lazy trip history
+  indexes keys and loads only compact metadata until detail is requested.
   Record it once per session unless deliberately varying the seeded
   dataset between runs (e.g. testing a populated vs. empty favorites box).
 
@@ -224,3 +225,36 @@ Attach to Epic #4316:
 Do not close the epic on a single green cell. The checkpoint is about the
 whole matrix, and a matrix with gaps is still worth filing with the gaps
 named.
+
+
+## Lazy encrypted trip history (#4504)
+
+The maintainer-supplied Android release trace (6.1.0+2026795211) reports
+589 ms initialization, a 1,633 ms deferred history open with 535 stored
+rows, and a later 9,794 ms delayed frame. These are separate observations:
+the trace does not prove history opening caused the entire later stall.
+No raw diagnostic export, location or private trip data is checked in.
+
+History now uses the same encrypted canonical Hive file as a LazyBox.
+Startup projects main rows into a small metadata index; sample chunks and
+GPS diagnostics stay out of that resident view. Legacy JSON projection and
+full sample decoding run on workers, while Hive remains on its owning
+isolate. Existing plaintext-to-encrypted upgrade safety is unchanged.
+
+Actual encrypted-file regressions seed 24 trips and 480 sample chunks.
+The real deferred opener decrypts 24 metadata rows rather than all 504
+rows; requesting a detail still returns its exact original samples. A
+mutation loading every key fails that regression (504 vs 24 decryptions).
+Controlled mutation barriers cover deleted legacy rows, mixed-version
+chunks, writes already pending, failed writes and erasure. Widget tests
+retain full telemetry for Delete/Undo and stop a disposed export screen;
+contention cannot produce a successful partial ZIP. Offline early readers
+refresh when metadata becomes ready, without requiring a sync event.
+
+The 2.5-second useful-price KPI records a painted price, including a price
+under the startup overlay. It does not prove the overlay was gone or the
+UI stayed responsive afterward. Compare the reveal and delayed frames
+as well as the KPI when rerunning the release/profile procedure above.
+A matched on-device before/after wall-time and memory comparison remains
+pending; synthetic correctness/decryption counts are not a device speed
+or a claim that the full reported 9.8-second freeze is resolved.

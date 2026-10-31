@@ -4,6 +4,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tankstellen/core/sharing/public_file_exporter.dart';
@@ -47,6 +49,31 @@ class _FixedTripHistoryList extends TripHistoryList {
   Future<void> save(TripHistoryEntry entry) async {
     saveCalls.add(entry);
   }
+}
+
+class _UnusedBox implements Box<String> {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _GatedCapture extends TripHistoryRepository {
+  _GatedCapture() : super(box: _UnusedBox());
+  final requested = Completer<void>();
+  final result = Completer<TripHistoryEntry?>();
+  @override
+  Future<TripHistoryEntry?> loadByIdAsync(String id) {
+    if (!requested.isCompleted) requested.complete();
+    return result.future;
+  }
+}
+
+class _ControlledLoader extends TripDetailLoader {
+  _ControlledLoader(this.entry);
+  final TripHistoryEntry entry;
+  @override
+  AsyncValue<TripHistoryEntry?> build(String id) => AsyncData(entry);
+  void loading() => state = const AsyncLoading();
+  void loaded() => state = AsyncData(entry);
 }
 
 class _FixedActiveVehicle extends ActiveVehicleProfile {
@@ -118,6 +145,8 @@ Future<({_FixedTripHistoryList tripsNotifier})> _pumpDetail(
   VehicleProfile? activeVehicle,
   List<VehicleProfile> vehicles = const [],
   List<TripDetailSample> samples = const [],
+  TripHistoryRepository? repository,
+  TripDetailLoader? loader,
 }) async {
   final tripsNotifier = _FixedTripHistoryList([entry]);
   final router = GoRouter(
@@ -148,6 +177,10 @@ Future<({_FixedTripHistoryList tripsNotifier})> _pumpDetail(
       routerConfig: router,
     ),
     overrides: [
+      if (repository != null)
+        tripHistoryRepositoryProvider.overrideWithValue(repository),
+      if (loader != null)
+        tripDetailLoaderProvider(entry.id).overrideWith(() => loader),
       tripHistoryListProvider.overrideWith(() => tripsNotifier),
       activeVehicleProfileProvider.overrideWith(
         () => _FixedActiveVehicle(activeVehicle),
@@ -655,6 +688,47 @@ void main() {
   });
 
   group('TripDetailScreen Delete action (#890)', () {
+    for (final captureSucceeds in [true, false]) {
+      testWidgets('pending loader: deletion waits for a full capture '
+          '(capture succeeds: $captureSucceeds)', (tester) async {
+        final base = _seedEntry();
+        final full = TripHistoryEntry(id: base.id, vehicleId: base.vehicleId,
+          summary: base.summary, samples: [
+            TripSample(timestamp: DateTime(2026), speedKmh: 41),
+            TripSample(timestamp: DateTime(2026, 1, 1, 0, 0, 1), speedKmh: 57),
+          ]);
+        final summary = TripHistoryEntry.summaryFromJson(full.toJson());
+        final loader = _ControlledLoader(full);
+        final repo = _GatedCapture();
+        final handles = await _pumpDetail(tester, entry: summary,
+          activeVehicle: vehicle, vehicles: const [vehicle],
+          repository: repo, loader: loader);
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('trip_detail_delete_button')));
+        await tester.pumpAndSettle();
+        loader.loading();
+        await tester.pump();
+        await tester.tap(find.byKey(const Key('trip_detail_delete_confirm')));
+        await tester.pump();
+        expect(repo.requested.isCompleted, isTrue);
+        expect(handles.tripsNotifier.deleteCallCount, 0,
+            reason: 'a summary cannot be the retained Undo copy');
+        repo.result.complete(captureSucceeds ? full : null);
+        loader.loaded();
+        await tester.pumpAndSettle();
+        if (captureSucceeds) {
+          expect(handles.tripsNotifier.deleteCallCount, 1);
+          await tester.tap(find.text('Undo'));
+          await tester.pumpAndSettle();
+          expect(handles.tripsNotifier.saveCalls.single.toJson(), full.toJson());
+        } else {
+          expect(handles.tripsNotifier.deleteCallCount, 0);
+          expect(find.byKey(const Key('trip_detail_delete_button')), findsOneWidget);
+          expect(find.text('An unexpected error occurred.'), findsOneWidget);
+        }
+      });
+    }
+
     testWidgets('confirm → delete called + pops back', (tester) async {
       final handles = await _pumpDetail(
         tester,

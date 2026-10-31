@@ -14,7 +14,7 @@ import '../../../../core/sync/trip_shares_sync_enabled_provider.dart';
 import '../../data/trips_sync.dart';
 import '../../../../core/widgets/page_scaffold.dart';
 import '../../../../core/widgets/snackbar_helper.dart';
-import '../../../../core/widgets/confirm_delete_dialog.dart';
+import 'trip_detail_deletion.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/domain/vehicle_profile.dart';
 import '../../../vehicle/providers/vehicle_providers.dart';
@@ -343,43 +343,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     }
   }
 
-  Future<void> _onDelete(
-    BuildContext context,
-    WidgetRef ref,
-    AppLocalizations l,
-  ) async {
-    // #3682 — the ONE shared destructive-action dialog (the stable
-    // per-surface test key rides on the confirm button).
-    final confirmed = await confirmDestructiveAction(
-      context,
-      title: l.trajetDetailDeleteConfirmTitle,
-      message: l.trajetDetailDeleteConfirmBody,
-      confirmLabel: l.trajetDetailDeleteConfirmConfirm,
-      confirmKey: const Key('trip_detail_delete_confirm'),
-    );
-    if (confirmed != true || !context.mounted) return;
-    // #3664 — capture-and-restore undo. The whole entry (summary +
-    // embedded detail) lives in one Hive row; hold it in this closure
-    // and Undo re-saves it losslessly. Messenger + strings are captured
-    // BEFORE the pop (SnackBarHelper contract) because this screen's
-    // context dies with it.
-    final notifier = ref.read(tripHistoryListProvider.notifier);
-    // #3741 — capture the FULL entry (summaries-only list would restore
-    // a sample-less trip on Undo, silently losing the charts/track).
-    final deleted = ref.read(tripHistoryDetailProvider(widget.tripId));
-    final messenger = ScaffoldMessenger.maybeOf(context);
-    final undoLabel = l.undo;
-    final message = l.trajetDeletedUndoSnackbar;
-    await notifier.delete(widget.tripId);
-    if (!context.mounted) return;
-    context.pop();
-    if (deleted == null || messenger == null) return;
-    messenger.showSnackBar(
-      SnackBarHelper.undoSnackBar(
-        message,
-        undoLabel: undoLabel,
-        onUndo: () => unawaited(notifier.save(deleted)),
-      ),
-    );
-  }
+  final _deletion = TripDetailDeletion();
+
+  Future<void> _onDelete(BuildContext context, WidgetRef ref, AppLocalizations l) =>
+      _deletion.run(context, ref, l, widget.tripId);
 }

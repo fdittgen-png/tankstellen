@@ -13,6 +13,7 @@ import '../data/storage_repository.dart';
 import '../feedback/feedback_consent.dart';
 import '../feedback/github_issue_reporter_provider.dart';
 import 'hive_boxes.dart';
+import 'hive_trip_history_index.dart';
 import 'secure_storage_options.dart';
 
 /// #3867 (Epic #3865, GDPR Art. 17) — the ONE local erasure.
@@ -64,11 +65,12 @@ class LocalDataEraser {
     await step('apiKeys', storage.deleteAllApiKeys);
     await step('supabaseAnonKey', storage.deleteSupabaseAnonKey);
     await step(
-        'githubToken',
-        () => const FlutterSecureStorage(
-              aOptions: kSecureStorageAndroidOptions,
-              iOptions: kSecureStorageIosOptions,
-            ).delete(key: kGithubFeedbackTokenKey));
+      'githubToken',
+      () => const FlutterSecureStorage(
+        aOptions: kSecureStorageAndroidOptions,
+        iOptions: kSecureStorageIosOptions,
+      ).delete(key: kGithubFeedbackTokenKey),
+    );
     await step('feedbackConsent', () async {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(FeedbackConsent.storageKey);
@@ -103,6 +105,30 @@ class LocalDataEraser {
   /// the running app); a closed box that exists on disk is deleted.
   static Future<void> _wipeBox(String name) async {
     if (Hive.isBoxOpen(name)) {
+      if (name == HiveBoxes.obd2TripHistory) {
+        try {
+          final box = Hive.lazyBox<String>(name);
+          if (HiveTripHistoryIndex.isReady(box)) {
+            await HiveTripHistoryIndex.of(box).clear();
+          } else {
+            await box.clear();
+          }
+          return;
+          // Hive reports regular/lazy mismatches as Error; tests use regular boxes.
+          // ignore: avoid_catching_errors
+        } on HiveError {
+          BoxBase<dynamic> box;
+          try {
+            box = Hive.box<String>(name);
+          // Legacy/test boxes may use dynamic instead of the production String.
+          // ignore: avoid_catching_errors
+          } on HiveError {
+            box = Hive.box<dynamic>(name);
+          }
+          await box.clear();
+          return;
+        }
+      }
       await Hive.box<dynamic>(name).clear();
     } else if (await Hive.boxExists(name)) {
       await Hive.deleteBoxFromDisk(name);

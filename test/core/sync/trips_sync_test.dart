@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -507,6 +508,48 @@ void main() {
 
     late FakeSyncTransport transport;
     setUp(() => transport = FakeSyncTransport(userId: 'user-7'));
+
+    test('async local-only hydration completes before detail upload', () async {
+      final full = trip('local-only', samples: [
+        TripSample(timestamp: started, speedKmh: 44, fuelRateLPerHour: 3),
+      ]);
+      final requested = Completer<void>();
+      final hydration = Completer<TripHistoryEntry?>();
+      final merging = TripsSync.merge(
+        [TripHistoryEntry.summaryFromJson(full.toJson())], transport: transport,
+        loadFull: (id) {
+          expect(id, 'local-only');
+          requested.complete();
+          return hydration.future;
+        },
+      );
+      await requested.future;
+      expect(transport.upsertCalls, isEmpty);
+      hydration.complete(full);
+      await merging;
+      final data = transport.upsertedRows('trip_details').single['data'] as Map;
+      expect(data['samples'], hasLength(1));
+      expect((data['samples'] as List).single['s'], 44);
+    });
+
+    test('an abandoned pass sends no writes after async local hydration', () async {
+      var current = true;
+      final requested = Completer<void>();
+      final hydration = Completer<TripHistoryEntry?>();
+      final local = [trip('local-only')];
+      final lease = SyncPullLease(tables: 'trip_summaries', generation: 1,
+          isCurrent: () => current, onDiscarded: (_, _) {});
+      final merging = lease.run(() => TripsSync.merge(local, transport: transport,
+          loadFull: (_) {
+            requested.complete();
+            return hydration.future;
+          }));
+      await requested.future;
+      current = false;
+      hydration.complete(trip('local-only', samples: [TripSample(timestamp: started, speedKmh: 44)]));
+      expect(await merging, same(local));
+      expect(transport.upsertCalls, isEmpty);
+    });
 
     test('uploadSummary upserts the summary row through the transport, '
         'scoped to ITS user; no details row without samples', () async {

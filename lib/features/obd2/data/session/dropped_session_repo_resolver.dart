@@ -51,9 +51,7 @@ class DroppedSessionRepoResolver {
     if (override != null) return override;
     if (!Hive.isBoxOpen(TripHistoryRepository.boxName)) return null;
     try {
-      return TripHistoryRepository(
-        box: Hive.box<String>(TripHistoryRepository.boxName),
-      );
+      return TripHistoryRepository.fromOpenBox(TripHistoryRepository.boxName);
     } catch (e, st) {
       log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'DroppedSessionManager history repo'});
       return null;

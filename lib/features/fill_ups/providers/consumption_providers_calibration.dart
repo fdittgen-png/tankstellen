@@ -103,7 +103,7 @@ mixin _FillUpListCalibration on _$FillUpList {
       // #3741 — `loadById` per linked trip; never full-decode history.
       final inWindow = <TripHistoryEntry>[];
       for (final id in fillUp.linkedTripIds) {
-        final t = tripHistory.loadById(id);
+        final t = await tripHistory.loadByIdAsync(id);
         if (t != null && t.summary.kind != TripKind.gpsPlusObd2) {
           inWindow.add(t);
         }

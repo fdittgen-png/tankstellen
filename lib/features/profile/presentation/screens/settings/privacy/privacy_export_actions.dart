@@ -63,53 +63,67 @@ mixin PrivacyExportActions<T extends ConsumerStatefulWidget>
   /// #3869 (Epic #3865, GDPR Art. 20) — one ZIP with everything.
   Future<void> exportAll() async {
     final l = AppLocalizations.of(context);
-    final consent = ref.read(gdprConsentProvider);
-    final syncConfig = ref.read(syncStateProvider);
-    final server =
-        syncConfig.userId != null ? await UserDataSync.fetchAll() : null;
-    if (!mounted) return;
-    Map<String, dynamic> box(String name) => Hive.isBoxOpen(name)
-        ? decodeJsonBox(Hive.box<String>(name).toMap())
-        : const {};
-    final input = FullDataExportInput(
-      appVersion: AppConstants.appVersion,
-      exportedAt: ref.read(appClockProvider).now(),
-      policyVersion: AppConstants.privacyPolicyVersion,
-      appDataJson: ref.read(exportPrivacyDataProvider),
-      vehicles: ref.read(vehicleProfileListProvider),
-      fillUps: ref.read(fillUpListProvider),
-      trips: ref.read(tripHistoryRepositoryProvider)?.loadAll() ?? const [],
-      chargingLogs: ref.read(chargingLogsProvider).asData?.value ?? const [],
-      serviceReminders: ref.read(serviceReminderRepositoryProvider).getAll(),
-      baselines: box(HiveBoxes.obd2Baselines),
-      obd2Caches: {
-        HiveBoxes.obd2SupportedPids: box(HiveBoxes.obd2SupportedPids),
-        HiveBoxes.obd2NegotiatedProtocol:
-            box(HiveBoxes.obd2NegotiatedProtocol),
-      },
-      inProgressTrips: {
-        HiveBoxes.obd2PausedTrips: box(HiveBoxes.obd2PausedTrips),
-        HiveBoxes.obd2ActiveTrip: box(HiveBoxes.obd2ActiveTrip),
-      },
-      consent: {
-        'location': consent.location,
-        'errorReporting': consent.errorReporting,
-        'cloudSync': consent.cloudSync,
-        'syncTrips': consent.syncTrips,
-        'vinOnlineDecode': consent.vinOnlineDecode,
-        'recordedAt': consent.recordedAt?.toIso8601String(),
-        'policyVersion': consent.policyVersion,
-      },
-      fleetDirectory: box(HiveBoxes.fleetDirectory), // #4212
-      fleetExpenses: box(HiveBoxes.fleetExpenses), // #4215
-      server: server,
-    );
-    final bytes = buildFullDataExportZip(input);
-    final stamp = input.exportedAt.toIso8601String().substring(0, 10);
-    final fileName = 'sparkilo-my-data-$stamp.zip';
     try {
+      final consent = ref.read(gdprConsentProvider);
+      final syncConfig = ref.read(syncStateProvider);
+      final server = syncConfig.userId != null
+          ? await UserDataSync.fetchAll()
+          : null;
+      if (!mounted) return;
+      final trips =
+          await ref.read(tripHistoryRepositoryProvider)?.loadAllAsync() ??
+          const [];
+      if (!mounted) return;
+      Map<String, dynamic> box(String name) => Hive.isBoxOpen(name)
+          ? decodeJsonBox(Hive.box<String>(name).toMap())
+          : const {};
+      final input = FullDataExportInput(
+        appVersion: AppConstants.appVersion,
+        exportedAt: ref.read(appClockProvider).now(),
+        policyVersion: AppConstants.privacyPolicyVersion,
+        appDataJson: ref.read(exportPrivacyDataProvider),
+        vehicles: ref.read(vehicleProfileListProvider),
+        fillUps: ref.read(fillUpListProvider),
+        trips: trips,
+        chargingLogs: ref.read(chargingLogsProvider).asData?.value ?? const [],
+        serviceReminders: ref.read(serviceReminderRepositoryProvider).getAll(),
+        baselines: box(HiveBoxes.obd2Baselines),
+        obd2Caches: {
+          HiveBoxes.obd2SupportedPids: box(HiveBoxes.obd2SupportedPids),
+          HiveBoxes.obd2NegotiatedProtocol: box(
+            HiveBoxes.obd2NegotiatedProtocol,
+          ),
+        },
+        inProgressTrips: {
+          HiveBoxes.obd2PausedTrips: box(HiveBoxes.obd2PausedTrips),
+          HiveBoxes.obd2ActiveTrip: box(HiveBoxes.obd2ActiveTrip),
+        },
+        consent: {
+          'location': consent.location,
+          'errorReporting': consent.errorReporting,
+          'cloudSync': consent.cloudSync,
+          'syncTrips': consent.syncTrips,
+          'vinOnlineDecode': consent.vinOnlineDecode,
+          'recordedAt': consent.recordedAt?.toIso8601String(),
+          'policyVersion': consent.policyVersion,
+        },
+        fleetDirectory: box(HiveBoxes.fleetDirectory), // #4212
+        fleetExpenses: box(HiveBoxes.fleetExpenses), // #4215
+        server: server,
+      );
+      final bytes = buildFullDataExportZip(input);
+      final stamp = input.exportedAt.toIso8601String().substring(0, 10);
+      final fileName = 'sparkilo-my-data-$stamp.zip';
       await PublicFileExporter.saveBytesToDownloads(
-          bytes: bytes, fileName: fileName, mimeType: 'application/zip');
+        bytes: bytes,
+        fileName: fileName,
+        mimeType: 'application/zip',
+      );
+      if (!mounted) return;
+      SnackBarHelper.showSuccess(
+        context,
+        l.privacyExportAllSuccess(fileName, fullDataExportEntryCount(input)),
+      );
     } on Object catch (e, st) {
       logFailure(
         e,
@@ -121,9 +135,6 @@ mixin PrivacyExportActions<T extends ConsumerStatefulWidget>
       SnackBarHelper.showError(context, l.privacyExportAllFailed);
       return;
     }
-    if (!mounted) return;
-    SnackBarHelper.showSuccess(context,
-        l.privacyExportAllSuccess(fileName, fullDataExportEntryCount(input)));
   }
 
   Future<void> exportJson() async {
@@ -270,7 +281,9 @@ mixin PrivacyExportActions<T extends ConsumerStatefulWidget>
       if (!mounted) return;
       if (!server.complete) {
         SnackBarHelper.showError(
-            context, l.serverErasurePartial(server.failedTables.join(', ')));
+          context,
+          l.serverErasurePartial(server.failedTables.join(', ')),
+        );
       }
     }
 
@@ -283,7 +296,9 @@ mixin PrivacyExportActions<T extends ConsumerStatefulWidget>
     ref.invalidate(deviceDataInventoryProvider);
     if (!result.complete) {
       SnackBarHelper.showError(
-          context, l.localErasurePartial(result.failedSteps.join(', ')));
+        context,
+        l.localErasurePartial(result.failedSteps.join(', ')),
+      );
     }
     context.go(RoutePaths.setup);
   }

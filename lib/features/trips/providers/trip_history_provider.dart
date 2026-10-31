@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/storage/hive_boxes.dart';
+import '../../../core/storage/hive_trip_history_index.dart';
 import '../../../core/sync/sync_events.dart';
 import '../data/trip_history_repository.dart';
 import '../domain/trip_sample.dart';
@@ -44,12 +45,11 @@ List<TripHistoryEntry> tripsForVehicle(Ref ref, String? vehicleId) {
       : trips
             .where((t) => t.vehicleId == null || t.vehicleId == vehicleId)
             .toList();
-  return filtered
-    ..sort((a, b) {
-      final ax = a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-      final bx = b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-      return bx.compareTo(ax);
-    });
+  return filtered..sort((a, b) {
+    final ax = a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+    final bx = b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+    return bx.compareTo(ax);
+  });
 }
 
 /// Whether [trip] is STRICTLY attributed to [vehicleId] (#4364).
@@ -75,12 +75,11 @@ List<TripHistoryEntry> tripsAttributedToVehicle(Ref ref, String vehicleId) {
       .watch(tripHistoryListProvider)
       .where((t) => tripIsAttributedTo(t, vehicleId))
       .toList();
-  return trips
-    ..sort((a, b) {
-      final ax = a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-      final bx = b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-      return bx.compareTo(ax);
-    });
+  return trips..sort((a, b) {
+    final ax = a.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+    final bx = b.summary.startedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+    return bx.compareTo(ax);
+  });
 }
 
 /// How many recorded trips carry no vehicle at all (#4364).
@@ -99,10 +98,39 @@ int unattributedTripCount(Ref ref) =>
 /// instead of a thrown error from the UI.
 @Riverpod(keepAlive: true)
 TripHistoryRepository? tripHistoryRepository(Ref ref) {
+  void onReady() {
+    if (ref.mounted) ref.invalidateSelf();
+  }
+  HiveTripHistoryIndex.readiness.addListener(onReady);
+  ref.onDispose(() => HiveTripHistoryIndex.readiness.removeListener(onReady));
   if (!Hive.isBoxOpen(HiveBoxes.obd2TripHistory)) return null;
-  final repo = TripHistoryRepository(
-    box: Hive.box<String>(HiveBoxes.obd2TripHistory),
-  );
+  LazyBox<String>? lazy;
+  try {
+    lazy = Hive.lazyBox<String>(HiveBoxes.obd2TripHistory);
+    // Hive uses Error for a regular/lazy type mismatch.
+    // ignore: avoid_catching_errors
+  } on HiveError {
+    // Test boxes are regular boxes.
+  }
+  if (lazy != null && !HiveTripHistoryIndex.isReady(lazy)) {
+    unawaited(
+      HiveTripHistoryIndex.prepare(lazy).then(
+        (_) {
+          if (ref.mounted) ref.invalidateSelf();
+        },
+        onError: (Object e, StackTrace st) {
+          log.error(
+            e,
+            st,
+            layer: ErrorLayer.storage,
+            context: const {'where': 'tripHistory metadata readiness'},
+          );
+        },
+      ),
+    );
+    return null;
+  }
+  final repo = TripHistoryRepository.fromOpenBox(HiveBoxes.obd2TripHistory);
   // #3882 — rewrite any legacy single-row trips into the v2 meta +
   // chunk layout, one row at a time off the critical path (a no-op —
   // no timers, no writes — once every row is v2).
@@ -132,8 +160,9 @@ class TripHistoryList extends _$TripHistoryList {
     // appeared one restart late. When this provider first built BEFORE
     // the deferred box opened, the keep-alive repository provider cached
     // `null` — invalidate it so the rebuild picks up the now-open box.
-    final sub =
-        SyncEvents.instance.forTable(SyncTables.tripSummaries).listen((_) {
+    final sub = SyncEvents.instance.forTable(SyncTables.tripSummaries).listen((
+      _,
+    ) {
       if (ref.read(tripHistoryRepositoryProvider) == null) {
         ref.invalidate(tripHistoryRepositoryProvider);
       } else {
@@ -167,17 +196,21 @@ class TripHistoryList extends _$TripHistoryList {
     // #3741 — the state list is summaries-only now (no samples); the
     // KPI join needs the per-tick data, so full-decode THIS trip only.
     try {
-      final entry = repo.loadById(id);
-      final features =
-          entry == null ? null : GpsDrivingFeatures.from(entry.samples);
-      await ref
-          .read(verdictCalibrationStoreProvider)
-          .record(verdict, features);
+      final entry = await repo.loadByIdAsync(id);
+      final features = entry == null
+          ? null
+          : GpsDrivingFeatures.from(entry.samples);
+      await ref.read(verdictCalibrationStoreProvider).record(verdict, features);
       ref.invalidate(gpsKpiBandsProvider);
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: const {
-        'where': 'TripHistoryList.setVerdict calibration record'
-      });
+      log.error(
+        e,
+        st,
+        layer: ErrorLayer.storage,
+        context: const {
+          'where': 'TripHistoryList.setVerdict calibration record',
+        },
+      );
     }
   }
 
@@ -222,7 +255,7 @@ TripHistoryEntry? tripHistoryDetail(Ref ref, String id) {
   final listed = ref.watch(_listedTripProvider(id));
   final repo = ref.watch(tripHistoryRepositoryProvider);
   if (repo == null) return listed;
-  return repo.loadById(id) ?? listed;
+  return ref.watch(tripDetailLoaderProvider(id)).asData?.value ?? listed;
 }
 
 /// The list's own (summary-only) entry for [id], rebuilt only when THIS
@@ -253,22 +286,27 @@ TripHistoryEntry? _listedTrip(Ref ref, String id) =>
 /// fixture-driven screens render on the first pump exactly as before.
 @riverpod
 class TripDetailLoader extends _$TripDetailLoader {
+  Object? _generation;
   @override
   AsyncValue<TripHistoryEntry?> build(String id) {
+    final generation = _generation = Object();
     // Keyed on the identity that changes the row's content, not on the
     // list instance.
     ref.watch(_listedTripKeyProvider(id));
     final listed = ref.read(_listedTripProvider(id));
     final repo = ref.read(tripHistoryRepositoryProvider);
     if (repo == null) return AsyncData(listed);
-    unawaited(_load(repo, listed));
+    unawaited(_load(repo, listed, generation));
     return const AsyncLoading();
   }
 
   Future<void> _load(
-      TripHistoryRepository repo, TripHistoryEntry? listed) async {
+    TripHistoryRepository repo,
+    TripHistoryEntry? listed,
+    Object generation,
+  ) async {
     final entry = await repo.loadByIdAsync(id);
-    if (!ref.mounted) return;
+    if (!ref.mounted || _generation != generation) return;
     state = AsyncData(entry ?? listed);
   }
 }
@@ -278,11 +316,11 @@ class TripDetailLoader extends _$TripDetailLoader {
 /// a 2-column read instead of the 34-column full decode. Refreshes with
 /// the list like [tripHistoryDetailProvider].
 @riverpod
-List<TripSample> tripSpeedFuelSamples(Ref ref, String id) {
+Future<List<TripSample>> tripSpeedFuelSamples(Ref ref, String id) async {
   ref.watch(_listedTripProvider(id));
   final repo = ref.watch(tripHistoryRepositoryProvider);
   if (repo == null) {
     return ref.watch(tripHistoryDetailProvider(id))?.samples ?? const [];
   }
-  return repo.loadSamplesWith(id, const {'s', 'f'});
+  return repo.loadSamplesWithAsync(id, const {'s', 'f'});
 }
