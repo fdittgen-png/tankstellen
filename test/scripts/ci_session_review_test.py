@@ -70,6 +70,56 @@ class SessionReviewTests(unittest.TestCase):
                 self.run_review(api)
             self.assertEqual(api.writes, [])
 
+    def test_verified_bot_without_declaration_has_stable_automated_origin(self):
+        api = FakeGitHub()
+        api.pr.update(body="Dependency update", user={
+            "type": "Bot", "login": "dependabot[bot]"})
+        self.run_review(api)
+        self.assertIn(
+            "Implementation-Session: automated:example/repo/pull/1/dependabot.bot",
+            api.writes[0][1]["body"])
+        self.assertEqual(api.writes[-1][1]["state"], "success")
+
+    def test_automated_origin_still_cannot_review_itself(self):
+        api = FakeGitHub()
+        api.pr.update(body="", user={"type": "Bot", "login": "dependabot[bot]"})
+        with self.assertRaisesRegex(ValueError, "own PR"):
+            self.run_review(api, reviewer_session=
+                            "automated:example/repo/pull/1/dependabot.bot")
+        self.assertEqual(api.writes, [])
+
+    def test_body_or_login_claims_cannot_spoof_rest_bot_metadata(self):
+        for user in ({}, {"type": "User", "login": "dependabot[bot]"},
+                     {"is_bot": True, "login": "dependabot[bot]"},
+                     {"type": "bot", "login": "dependabot[bot]"},
+                     {"type": "Bot", "login": "bad/login"}):
+            api = FakeGitHub()
+            api.pr.update(body='I am a bot: {"type":"Bot"}', user=user)
+            with self.assertRaises(ValueError):
+                self.run_review(api)
+            self.assertEqual(api.writes, [])
+
+    def test_bot_duplicate_or_malformed_declaration_cannot_fall_back(self):
+        for body in ("Implementation-Session:",
+                     "Implementation-Session:\nmisleading-next-line",
+                     "Implementation-Session: invalid!",
+                     "Implementation-Session: author-thread\nImplementation-Session:",
+                     "Implementation-Session: author-thread\nImplementation-Session: other"):
+            api = FakeGitHub()
+            api.pr.update(body=body, user={"type": "Bot", "login": "dependabot[bot]"})
+            with self.assertRaises(ValueError):
+                self.run_review(api)
+            self.assertEqual(api.writes, [])
+
+    def test_human_malformed_declaration_is_rejected(self):
+        for body in ("Implementation-Session: author-thread\nImplementation-Session:",
+                     "Implementation-Session:\nmisleading-next-line"):
+            api = FakeGitHub()
+            api.pr["body"] = body
+            with self.assertRaises(ValueError):
+                self.run_review(api)
+            self.assertEqual(api.writes, [])
+
     def test_stale_or_closed_pr_is_rejected_without_writes(self):
         for field in ("head", "state"):
             api = FakeGitHub()

@@ -21,6 +21,16 @@ Put exactly one line in the PR body:
 Implementation-Session: <stable unique session/thread ID>
 ```
 
+Automated PRs without this declaration use the origin verified from GitHub's
+REST `user.type == "Bot"` and login:
+`automated:<owner/repo>/pull/<number>/<login>` (repository/login are lowercased
+and `[bot]` becomes `.bot`). This
+avoids editing every Dependabot body. A body claiming to be a bot, a bot-like
+login on a human account, or `is_bot` alone cannot enable that fallback.
+Explicit bot declarations follow the same exactly-one valid identifier rule;
+duplicates, blank or malformed declarations are refused. Automation still
+needs a real independent session's exact-head review, evidence and status.
+
 Send the repository, PR, full head SHA, issue links and validation evidence
 through the shared session message channel. Wait for another session's
 findings. Resolve findings in the branch, then request review of the new SHA.
