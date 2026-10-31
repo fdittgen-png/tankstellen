@@ -166,9 +166,9 @@ void main() {
   });
 
   group('EcoScoreCalculator — same-fuel-type filtering', () {
-    test('interleaved e10 entries do not pollute a diesel baseline', () {
-      // Diesel fills alternate with e10 fills. The diesel baseline must
-      // use ONLY the preceding diesel entries, not average the two.
+    test('incompatible tank histories cannot establish a diesel baseline', () {
+      // Without independent tank identities this cannot establish prior
+      // measured diesel windows (#4469). Do not skip over petrol fills.
       final d1 = _f(id: 'd1', daysAgo: 50, odo: 10000, liters: 48);
       final p1 = _f(
           id: 'p1',
@@ -190,12 +190,7 @@ void main() {
         current: current,
         history: [d1, p1, d2, p2, d3, current],
       );
-      expect(score, isNotNull);
-      // Diesel distance current = 12400 - 11600 = 800; liters 48 →
-      // 6.0 L/100km. Baseline uses d1→d2 and d2→d3 deltas (800 km
-      // each, 48 L each → 6.0). Score should be stable.
-      expect(score!.direction, EcoScoreDirection.stable);
-      expect(score.rollingAverage, closeTo(6.0, 0.0001));
+      expect(score, isNull, reason: 'one qualified window has no trend baseline');
     });
   });
 

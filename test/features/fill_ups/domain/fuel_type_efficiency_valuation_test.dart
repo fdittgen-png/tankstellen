@@ -95,6 +95,19 @@ void main() {
       expect(b.avgPricePerLitre, closeTo(1.50, 1e-9));
     });
 
+    test('#4469 an unqualified late full cannot reprice earlier windows', () {
+      final before = _bucketOf(
+        FuelTypeEfficiencyAggregator.byFuelType(_steadyE10()), FuelType.e10);
+      final after = _bucketOf(FuelTypeEfficiencyAggregator.byFuelType([
+        ..._steadyE10(),
+        _f(id: 'bad-odo', date: DateTime(2026, 4, 1),
+          liters: 40, cost: 400, odo: 1900),
+      ]), FuelType.e10);
+      expect(after.attributedIntervalCount, 2);
+      expect(after.avgPricePerLitre, 1.5);
+      expect(after.intervalCost, before.intervalCost);
+    });
+
     test('the recorded purchase spend of the closed windows is unchanged',
         () {
       final before = _bucketOf(

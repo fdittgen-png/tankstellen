@@ -4160,6 +4160,10 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Raportează conținutul';
 
   @override

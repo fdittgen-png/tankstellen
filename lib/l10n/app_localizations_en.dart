@@ -4117,6 +4117,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Report content';
 
   @override
@@ -16501,6 +16505,10 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   String statCorrectionLiters(String liters) {
     return '⟦Çóřřéçŧîóñš: +$liters Ł ·····⟧';
   }
+
+  @override
+  String get consumptionStatsNeedsFullWindow =>
+      '⟦Áđđ áñóŧĥéř ƒúłł ƒîłł ŧó ɱéášúřé çóñšúɱƥŧîóñ. ·················⟧';
 
   @override
   String get contentModerationReportAction => '⟦Řéƥóřŧ çóñŧéñŧ ······⟧';

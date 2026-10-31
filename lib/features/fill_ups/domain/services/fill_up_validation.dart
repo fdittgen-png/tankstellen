@@ -153,7 +153,7 @@ class FillUpValidation {
       if (recordedKm > 0 &&
           recordedKm / period.distanceKm < kTankCalibrationMinCoverage)
         'lowCoverage',
-      if (stampedKeys.length > 1) 'mixedGrades',
+      if (period.hasMixedPhysicalFuel || stampedKeys.length > 1) 'mixedGrades',
       if (stampedKeys.isEmpty && recordedKm > 0) 'noRecordedGrade',
       if (!resolution.isCalibrated) 'uncalibrated',
       if (engineOff > 0) 'engineOffTransportExcluded',

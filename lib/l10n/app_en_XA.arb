@@ -1172,6 +1172,7 @@
   "consumptionStatsOpenWindowBanner": "⟦{count, plural, =1{1 partial fill pending plein complet — not in average} other{{count} partial fills pending plein complet — not in average}}⟧",
   "consumptionStatsCorrectionShareHint": "⟦{percent}% óƒ ƒúéł ƒřóɱ áúŧó-çóřřéçŧîóñš — řéṽîéŵ éñŧřîéš ·················⟧",
   "statCorrectionLiters": "⟦Çóřřéçŧîóñš: +{liters} Ł ·····⟧",
+  "consumptionStatsNeedsFullWindow": "⟦Áđđ áñóŧĥéř ƒúłł ƒîłł ŧó ɱéášúřé çóñšúɱƥŧîóñ. ·················⟧",
   "contentModerationReportAction": "⟦Řéƥóřŧ çóñŧéñŧ ······⟧",
   "contentModerationBlockAction": "⟦Ɓłóçķ áúŧĥóř ·····⟧",
   "contentModerationReportDialogTitle": "⟦Řéƥóřŧ ŧĥîš çóñŧéñŧ? ········⟧",

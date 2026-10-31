@@ -42,7 +42,7 @@ void main() {
         date: DateTime.utc(2026, month, day),
         liters: litres,
         totalCost: cost,
-        odometerKm: odo,
+        odometerKm: odo + 10000, // #4469: zero is unset; keep the physical deltas.
         fuelType: fuel,
         vehicleId: vehicleId,
         currency: currency,
@@ -198,7 +198,7 @@ void main() {
       expect(opening.openingFillId, 'a0');
       expect(opening.precedesPeriodStart, isTrue);
       expect(opening.openingFuel, FuelType.e10);
-      expect(opening.openingOdometerKm, 0);
+      expect(opening.openingOdometerKm, 10000);
     });
 
     test('the straddling window is counted whole under the default rule',

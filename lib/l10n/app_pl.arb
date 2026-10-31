@@ -12091,5 +12091,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

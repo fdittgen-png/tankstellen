@@ -7215,6 +7215,12 @@ abstract class AppLocalizations {
   /// **'Corrections: +{liters} L'**
   String statCorrectionLiters(String liters);
 
+  /// Explains that pump consumption requires two qualified physical full fills (#4469).
+  ///
+  /// In en, this message translates to:
+  /// **'Add another full fill to measure consumption.'**
+  String get consumptionStatsNeedsFullWindow;
+
   /// Action in the moderation sheet opened by long-pressing a piece of community content (e.g. a trip another account shared) that starts the report flow (#3726, Play UGC policy).
   ///
   /// In en, this message translates to:

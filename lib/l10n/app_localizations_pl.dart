@@ -4144,6 +4144,10 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Zgłoś treść';
 
   @override

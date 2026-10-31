@@ -3311,6 +3311,10 @@
       }
     }
   },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "description": "Explains that pump consumption requires two qualified physical full fills (#4469)."
+  },
   "contentModerationReportAction": "Report content",
   "@contentModerationReportAction": {
     "description": "Action in the moderation sheet opened by long-pressing a piece of community content (e.g. a trip another account shared) that starts the report flow (#3726, Play UGC policy)."

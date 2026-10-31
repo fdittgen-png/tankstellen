@@ -4174,6 +4174,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Ajoutez un nouveau plein complet pour mesurer la consommation.';
+
+  @override
   String get contentModerationReportAction => 'Signaler le contenu';
 
   @override

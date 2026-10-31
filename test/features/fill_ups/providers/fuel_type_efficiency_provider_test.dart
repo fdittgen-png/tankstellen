@@ -61,7 +61,7 @@ FillUp _f({
       date: DateTime(2026, 1, day),
       liters: liters,
       totalCost: cost,
-      odometerKm: odo,
+      odometerKm: odo + 10000, // #4469: zero is unset; keep the physical deltas.
       fuelType: fuelType,
       isFullTank: isFullTank,
       vehicleId: vehicleId,
