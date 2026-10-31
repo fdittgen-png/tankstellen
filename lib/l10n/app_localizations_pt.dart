@@ -4438,7 +4438,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Correspondência sintética: foi encontrada nas proximidades uma estação abaixo do seu objetivo.';
+    return 'Correspondência sintética: $station está abaixo do seu preço-alvo.';
   }
 
   @override

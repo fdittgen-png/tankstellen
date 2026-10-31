@@ -4453,7 +4453,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Correspondance synthétique : une station sous votre cible a été trouvée à proximité.';
+    return 'Correspondance synthétique : $station est sous votre prix cible.';
   }
 
   @override

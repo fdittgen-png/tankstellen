@@ -4433,7 +4433,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Sintetinis atitikmuo: netoliese rasta stotelė, mažesnė už jūsų tikslą.';
+    return 'Sintetinis atitikmuo: $station kaina mažesnė už jūsų tikslinę kainą.';
   }
 
   @override

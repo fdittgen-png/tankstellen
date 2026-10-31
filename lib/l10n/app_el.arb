@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Εκτέλεση δοκιμαστικής ροής ειδοποιήσεων",
   "developerToolsTestAlertFired": "Η δοκιμαστική ειδοποίηση ενεργοποιήθηκε — η ροή παρέδωσε {count} γνωστοποίηση/εις.",
   "developerToolsTestAlertTitle": "Δοκιμαστική ειδοποίηση τιμής",
-  "developerToolsTestAlertBody": "Συνθετική αντιστοίχιση: βρέθηκε κοντά ένας σταθμός κάτω από τον στόχο σας.",
+  "developerToolsTestAlertBody": "Συνθετική αντιστοίχιση: το {station} έχει τιμή κάτω από τον στόχο σας.",
   "developerToolsDiagnosticsGroupTitle": "Διαγνωστικά",
   "developerToolsFeatureFlagDump": "Επιθεωρητής σημαιών λειτουργιών",
   "developerToolsFlagOn": "Ενεργό",

@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Tesztriasztási folyamat futtatása",
   "developerToolsTestAlertFired": "Tesztriasztás aktiválva — a folyamat {count} értesítést kézbesített.",
   "developerToolsTestAlertTitle": "Tesztár-riasztás",
-  "developerToolsTestAlertBody": "Szintetikus egyezés: a közelben találtunk egy a céljánál olcsóbb állomást.",
+  "developerToolsTestAlertBody": "Szintetikus egyezés: {station} ára a célár alatt van.",
   "developerToolsDiagnosticsGroupTitle": "Diagnosztika",
   "developerToolsFeatureFlagDump": "Funkciójelzők vizsgálója",
   "developerToolsFlagOn": "Be",

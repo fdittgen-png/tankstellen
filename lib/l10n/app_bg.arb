@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Изпълнение на тестов поток за сигнали",
   "developerToolsTestAlertFired": "Тестовият сигнал е задействан — потокът достави {count} известия.",
   "developerToolsTestAlertTitle": "Тестов ценови сигнал",
-  "developerToolsTestAlertBody": "Синтетично съвпадение: наблизо е намерена станция под вашата цел.",
+  "developerToolsTestAlertBody": "Синтетично съвпадение: {station} е под целевата ви цена.",
   "developerToolsDiagnosticsGroupTitle": "Диагностика",
   "developerToolsFeatureFlagDump": "Инспектор на флаговете за функции",
   "developerToolsFlagOn": "Вкл.",

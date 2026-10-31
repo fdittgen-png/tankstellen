@@ -4406,7 +4406,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Syntetisk träff: en station under ditt mål hittades i närheten.';
+    return 'Syntetisk träff: $station ligger under ditt målpris.';
   }
 
   @override

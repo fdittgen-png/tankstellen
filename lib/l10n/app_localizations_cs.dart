@@ -4416,7 +4416,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Syntetická shoda: poblíž byla nalezena stanice pod vaším cílem.';
+    return 'Syntetická shoda: $station má cenu pod vaším cílem.';
   }
 
   @override

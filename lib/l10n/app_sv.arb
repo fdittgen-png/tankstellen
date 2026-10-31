@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Kör testvarningsflöde",
   "developerToolsTestAlertFired": "Testvarning utlöst — flödet levererade {count} avisering(ar).",
   "developerToolsTestAlertTitle": "Testprisvarning",
-  "developerToolsTestAlertBody": "Syntetisk träff: en station under ditt mål hittades i närheten.",
+  "developerToolsTestAlertBody": "Syntetisk träff: {station} ligger under ditt målpris.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostik",
   "developerToolsFeatureFlagDump": "Inspektör för funktionsflaggor",
   "developerToolsFlagOn": "På",

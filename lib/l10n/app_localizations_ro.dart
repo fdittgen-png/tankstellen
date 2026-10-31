@@ -4439,7 +4439,7 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Potrivire sintetică: a fost găsită în apropiere o stație sub ținta ta.';
+    return 'Potrivire sintetică: $station are un preț sub prețul tău țintă.';
   }
 
   @override

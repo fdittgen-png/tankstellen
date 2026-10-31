@@ -4426,7 +4426,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Syntetická zhoda: v okolí sa našla stanica pod vaším cieľom.';
+    return 'Syntetická zhoda: $station má cenu pod vašou cieľovou cenou.';
   }
 
   @override

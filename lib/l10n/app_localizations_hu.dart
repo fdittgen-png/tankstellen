@@ -4435,7 +4435,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Szintetikus egyezés: a közelben találtunk egy a céljánál olcsóbb állomást.';
+    return 'Szintetikus egyezés: $station ára a célár alatt van.';
   }
 
   @override

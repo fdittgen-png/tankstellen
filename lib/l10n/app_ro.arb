@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Rulează fluxul de alertă de test",
   "developerToolsTestAlertFired": "Alertă de test declanșată — fluxul a livrat {count} notificare(i).",
   "developerToolsTestAlertTitle": "Alertă de preț de test",
-  "developerToolsTestAlertBody": "Potrivire sintetică: a fost găsită în apropiere o stație sub ținta ta.",
+  "developerToolsTestAlertBody": "Potrivire sintetică: {station} are un preț sub prețul tău țintă.",
   "developerToolsDiagnosticsGroupTitle": "Diagnosticare",
   "developerToolsFeatureFlagDump": "Inspector de indicatori de funcții",
   "developerToolsFlagOn": "Activat",
