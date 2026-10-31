@@ -76,6 +76,20 @@ updates:
       - dependency-name: "test"
       - dependency-name: "test_api"
       - dependency-name: "test_core"
+      # SDK / platform holds from PR #4539 (2026-10-31): xml 7.1.0 and
+      # cached_network_image 4.0.5 (via material_ui 1.3) need Dart ^3.13;
+      # home_widget 0.10.0 calls Android 16 widget-preview APIs our
+      # compileSdk lacks. Lift with the next Flutter / compileSdk bump.
+      - dependency-name: "xml"
+        versions: [">=7.1.0"]
+      - dependency-name: "cached_network_image"
+        versions: [">=4.0.5"]
+      - dependency-name: "home_widget"
+        versions: [">=0.10.0"]
+      # sentry_flutter 10 requires minSdk 26; we keep minSdk 24 (Android
+      # 7.x) — maintainer decision 2026-10-31, closed PR #4540.
+      - dependency-name: "sentry_flutter"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
