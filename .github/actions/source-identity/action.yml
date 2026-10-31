@@ -1,0 +1,30 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Source identity
+description: Verify and record the exact source used for a build
+inputs:
+  sha:
+    description: Full expected commit SHA
+    required: true
+  leg:
+    description: Unique artifact suffix for this build leg
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        EXPECTED_SHA: ${{ inputs.sha }}
+      run: |
+        set -euo pipefail
+        [[ "$EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]
+        test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+        mkdir -p "$RUNNER_TEMP/source-identity"
+        git show -s --format='%H%n%T%n%cI' HEAD > "$RUNNER_TEMP/source-identity/source.txt"
+        echo "Source: $EXPECTED_SHA" >> "$GITHUB_STEP_SUMMARY"
+    - uses: actions/upload-artifact@v7
+      with:
+        name: source-identity-${{ inputs.leg }}-attempt-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/source-identity/source.txt
+        retention-days: 14
+        overwrite: true

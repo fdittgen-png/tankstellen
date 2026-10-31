@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/play-status.md
 
 name: Status · Play track
 
@@ -12,15 +13,19 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: play-store-deploy
+  group: play-status
   cancel-in-progress: false
 
 env:
   PACKAGE_NAME: de.tankstellen.fuelprices
 
+permissions:
+  contents: read
+
 jobs:
   status:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:

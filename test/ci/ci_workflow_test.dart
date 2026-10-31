@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:yaml/yaml.dart';
 
 /// Returns the body of the named top-level job in [workflowYaml] — the
 /// lines from the `<jobName>:` header (indented exactly two spaces) up to
@@ -58,8 +59,12 @@ void main() {
       // literal substring check became multi-token. Assert the
       // distinctive pieces individually.
       expect(ciYaml, contains('flutter test'));
-      expect(ciYaml, contains('--coverage'));
-      expect(ciYaml, contains('--total-shards=4'));
+      expect(
+        File('scripts/ci/run_shard.py').readAsStringSync(),
+        contains('--coverage'),
+      );
+      final jobs = (loadYaml(ciYaml) as YamlMap)['jobs'] as YamlMap;
+      expect(jobs['test']['strategy']['matrix']['shard'], [0, 1, 2, 3]);
       // Coverage threshold enforcement moved into the downstream
       // `coverage-merge` job (still in this workflow).
       expect(ciYaml, contains('Check coverage threshold'));
@@ -87,38 +92,53 @@ void main() {
       // #1580 — `test` removed from build-android's needs so it runs
       // in parallel with the (sharded, slow) test job. `analyze`
       // stays as a fast pre-gate against build-on-broken-syntax.
-      expect(ciYaml, contains('needs: [analyze]'));
+      expect(_jobBody(ciYaml, 'build-android'), contains('- analyze'));
+      expect(_jobBody(ciYaml, 'build-android'), contains('- changes'));
     });
 
     test('contains release job gated on build-android', () {
       expect(ciYaml, contains('release:'));
-      expect(ciYaml, contains('needs: [build-android]'));
+      expect(_jobBody(ciYaml, 'release'), contains('- build-android'));
+      expect(_jobBody(ciYaml, 'release'), contains('- test'));
     });
 
     test('runs on PRs to master and pushes to master', () {
       expect(ciYaml, contains('push:'));
       expect(ciYaml, contains('pull_request:'));
-      expect(ciYaml, contains('branches: [master]'));
+      final events = (loadYaml(ciYaml) as YamlMap)['on'] as YamlMap;
+      expect(events['pull_request']['branches'], ['master']);
+      expect(events['push']['branches'], ['master']);
     });
 
     test('has concurrency group to cancel redundant runs', () {
       expect(ciYaml, contains('concurrency:'));
-      expect(ciYaml, contains('cancel-in-progress: true'));
+      expect(
+        ciYaml,
+        contains(
+          "cancel-in-progress: \${{ github.event_name == 'pull_request' }}",
+        ),
+      );
     });
   });
 
   group('CI scripts exist', () {
     test('license_audit.sh exists and is non-empty', () {
       final script = File('scripts/license_audit.sh');
-      expect(script.existsSync(), isTrue,
-          reason: 'License audit script must exist');
+      expect(
+        script.existsSync(),
+        isTrue,
+        reason: 'License audit script must exist',
+      );
       expect(script.readAsStringSync().length, greaterThan(100));
     });
 
     test('pub_outdated_check.sh exists and is non-empty', () {
       final script = File('scripts/pub_outdated_check.sh');
-      expect(script.existsSync(), isTrue,
-          reason: 'Pub outdated check script must exist');
+      expect(
+        script.existsSync(),
+        isTrue,
+        reason: 'Pub outdated check script must exist',
+      );
       expect(script.readAsStringSync().length, greaterThan(100));
     });
   });
@@ -147,13 +167,15 @@ void main() {
       expect(licenseScript, contains('Unlicense'));
     });
 
-    test('checks allowed licenses before forbidden to avoid false positives',
-        () {
-      // MPL-2.0 mentions GPL in its compatibility section, so allowed
-      // must be checked first
-      expect(licenseScript, contains('classify_license'));
-      expect(licenseScript, contains('Mozilla Public License'));
-    });
+    test(
+      'checks allowed licenses before forbidden to avoid false positives',
+      () {
+        // MPL-2.0 mentions GPL in its compatibility section, so allowed
+        // must be checked first
+        expect(licenseScript, contains('classify_license'));
+        expect(licenseScript, contains('Mozilla Public License'));
+      },
+    );
 
     test('supports --report flag for generating license inventory', () {
       expect(licenseScript, contains('--report'));
@@ -214,8 +236,11 @@ void main() {
 
     setUpAll(() {
       codegenJob = _jobBody(ciYaml, 'codegen-drift');
-      expect(codegenJob, isNotEmpty,
-          reason: 'codegen-drift job must exist in ci.yml');
+      expect(
+        codegenJob,
+        isNotEmpty,
+        reason: 'codegen-drift job must exist in ci.yml',
+      );
     });
 
     test('codegen-drift job does NOT cache .dart_tool', () {
@@ -225,15 +250,25 @@ void main() {
           .split('\n')
           .where((l) => !l.trimLeft().startsWith('#'))
           .join('\n');
-      expect(executable.contains('.dart_tool'), isFalse,
-          reason: 'codegen-drift must start from a fresh .dart_tool so '
-              'build_runner regenerates honestly — see #2334.');
+      expect(
+        executable.contains('.dart_tool'),
+        isFalse,
+        reason:
+            'codegen-drift must start from a fresh .dart_tool so '
+            'build_runner regenerates honestly — see #2334.',
+      );
     });
 
     test('codegen-drift still caches ~/.pub-cache and regenerates', () {
-      expect(codegenJob, contains('~/.pub-cache'));
-      expect(codegenJob,
-          contains('dart run build_runner build --delete-conflicting-outputs'));
+      expect(codegenJob, contains('./.github/actions/flutter-setup'));
+      expect(
+        File('.github/actions/flutter-setup/action.yml').readAsStringSync(),
+        contains('~/.pub-cache'),
+      );
+      expect(
+        codegenJob,
+        contains('dart run build_runner build --delete-conflicting-outputs'),
+      );
     });
   });
 
@@ -254,8 +289,10 @@ void main() {
 
     test('diffs lib/l10n and runs the l10n + lint buckets', () {
       expect(l10nJob, contains('git diff --exit-code -- lib/l10n/'));
-      expect(l10nJob,
-          contains('flutter test test/l10n/ test/lint/ --exclude-tags=network'));
+      expect(
+        l10nJob,
+        contains('flutter test test/l10n/ test/lint/ --exclude-tags=network'),
+      );
     });
 
     test('does NOT run Android or build_runner (kept fast)', () {
@@ -264,60 +301,66 @@ void main() {
       expect(l10nJob.contains('flutter build'), isFalse);
     });
 
-    test('has a matching pass-through stub in ci-docs-stub.yml', () {
-      final stub = File('.github/workflows/ci-docs-stub.yml').readAsStringSync();
-      expect(_jobBody(stub, 'l10n-gate'), isNotEmpty,
-          reason: 'docs-only PRs need an l10n-gate stub — ci.yml is '
-              'path-ignored on them.');
+    test('uses current applicability, with no duplicate docs stub', () {
+      expect(l10nJob, contains("needs.changes.outputs.docs != 'true'"));
+      expect(File('.github/workflows/ci-docs-stub.yml').existsSync(), isFalse);
     });
   });
 
-  // #2333 / docs-PR safety — ci.yml is path-ignored on docs-only PRs, so
-  // the ONLY workflow that runs is ci-docs-stub.yml. Every context that
-  // is (or will be) a required status check must therefore have a stub
-  // job there whose name matches the context EXACTLY, or the docs PR
-  // sits BLOCKED forever.
-  group('ci-docs-stub covers every required check (#2333)', () {
-    late String stubYaml;
-
-    // The target required_status_checks set after the post-merge API
-    // change: build-android / integration / startup-budget / l10n-gate
-    // become required, the phantom coverage-merge is dropped. Matrix
-    // jobs (`test (0)..test (3)`) are covered by the `test` job header.
-    const requiredJobNames = <String>[
-      'analyze',
-      'test',
-      'codegen-drift',
-      'l10n-gate',
-      'build-android',
-      'integration',
-      'startup-budget',
-    ];
-
-    setUpAll(() {
-      final file = File('.github/workflows/ci-docs-stub.yml');
-      expect(file.existsSync(), isTrue,
-          reason: 'docs-stub workflow must exist');
-      stubYaml = file.readAsStringSync();
+  group('one authoritative required-check producer (#4451)', () {
+    test('every PR starts the main workflow without trigger path filters', () {
+      final workflow = loadYaml(ciYaml) as YamlMap;
+      final pr = workflow['on']['pull_request'] as YamlMap;
+      expect(pr.containsKey('paths'), isFalse);
+      expect(pr.containsKey('paths-ignore'), isFalse);
+      final jobs = workflow['jobs'] as YamlMap;
+      expect(jobs.containsKey('green-gate'), isFalse);
+      expect(jobs.containsKey('record-green'), isFalse);
+      expect(jobs['analyze']['if'], contains('always()'));
     });
 
-    test('declares a stub job for every required check name', () {
-      for (final job in requiredJobNames) {
-        expect(_jobBody(stubYaml, job), isNotEmpty,
-            reason: 'ci-docs-stub.yml must declare a `$job:` stub job so '
-                'the `$job` required context resolves on docs-only PRs.');
+    test('only ci.yml emits protected names on PR events', () {
+      const names = {
+        'analyze',
+        'test',
+        'codegen-drift',
+        'l10n-gate',
+        'build-android',
+        'integration',
+        'startup-budget',
+      };
+      for (final file in Directory(
+        '.github/workflows',
+      ).listSync().whereType<File>()) {
+        if (!file.path.endsWith('.yml') || file.path.endsWith('/ci.yml')) {
+          continue;
+        }
+        final workflow = loadYaml(file.readAsStringSync()) as YamlMap;
+        final events = workflow['on'] as YamlMap;
+        if (!events.containsKey('pull_request')) continue;
+        final jobs = workflow['jobs'] as YamlMap;
+        expect(
+          jobs.keys.toSet().intersection(names),
+          isEmpty,
+          reason: file.path,
+        );
       }
     });
 
-    test('the test stub keeps the 4-shard matrix so test (0..3) resolve',
-        () {
-      final testJob = _jobBody(stubYaml, 'test');
-      expect(testJob, contains('shard: [0, 1, 2, 3]'));
-    });
-
-    test('triggers only on docs paths (mirrors ci.yml paths-ignore)', () {
-      expect(stubYaml, contains("- '**/*.md'"));
-      expect(stubYaml, contains("- 'docs/**'"));
+    test('all workflow runbooks are linked in the catalog and wiki', () {
+      final index = File('.github/workflows/README.md').readAsStringSync();
+      final wiki = File(
+        'docs/wiki/Dev-CI-Workflow-Catalog.md',
+      ).readAsStringSync();
+      for (final file in Directory(
+        '.github/workflows',
+      ).listSync().whereType<File>()) {
+        if (!file.path.endsWith('.yml')) continue;
+        final stem = file.uri.pathSegments.last.replaceFirst('.yml', '');
+        expect(File('docs/ci/workflows/$stem.md').existsSync(), isTrue);
+        expect(index, contains('workflows/$stem.md'));
+        expect(wiki, contains('workflows/$stem.md'));
+      }
     });
   });
 
@@ -329,15 +372,22 @@ void main() {
 
     setUpAll(() {
       final file = File('scripts/configure_branch_protection.sh');
-      expect(file.existsSync(), isTrue,
-          reason: 'Branch-protection script must exist');
+      expect(
+        file.existsSync(),
+        isTrue,
+        reason: 'Branch-protection script must exist',
+      );
       final script = file.readAsStringSync();
       expect(script.length, greaterThan(200));
       expect(script, contains('TARGET_CHECKS=('));
-      final start = script.indexOf('TARGET_CHECKS=(') + 'TARGET_CHECKS=('.length;
+      final start =
+          script.indexOf('TARGET_CHECKS=(') + 'TARGET_CHECKS=('.length;
       final end = script.indexOf('\n)', start);
-      expect(end, greaterThan(start),
-          reason: 'TARGET_CHECKS must be closed with a bare )');
+      expect(
+        end,
+        greaterThan(start),
+        reason: 'TARGET_CHECKS must be closed with a bare )',
+      );
       targetChecks = RegExp(r'"([^"]+)"')
           .allMatches(script.substring(start, end))
           .map((m) => m.group(1)!)
@@ -347,14 +397,20 @@ void main() {
 
     // Incident #2360: codegen-drift was non-required → PR #2322 merged RED.
     test('includes codegen-drift (incident #2360)', () {
-      expect(targetChecks, contains('codegen-drift'),
-          reason: 'see #2360 — stale *.g.dart poisoned master when non-required');
+      expect(
+        targetChecks,
+        contains('codegen-drift'),
+        reason: 'see #2360 — stale *.g.dart poisoned master when non-required',
+      );
     });
 
     // Incident #2361: l10n-gate absent → ARB conflict recurred every wave.
     test('includes l10n-gate (incident #2361)', () {
-      expect(targetChecks, contains('l10n-gate'),
-          reason: 'see #2361 — broken ARB fan-out blocked rebases when absent');
+      expect(
+        targetChecks,
+        contains('l10n-gate'),
+        reason: 'see #2361 — broken ARB fan-out blocked rebases when absent',
+      );
     });
 
     test('includes core quality gates', () {
@@ -370,30 +426,36 @@ void main() {
     });
   });
 
-  // #2347 — both nightlies must pin the same Flutter version as ci.yml,
-  // so a floating stable-channel bump can't silently change the nightly
-  // SDK and spam the tracking issues with spurious red.
-  group('nightly Flutter version pin (#2347)', () {
-    // Single source of truth: whatever ci.yml pins, the nightlies match.
-    late String pinnedVersion;
-
-    setUpAll(() {
-      final match =
-          RegExp(r'''flutter-version:\s*["']([\d.]+)["']''').firstMatch(ciYaml);
-      expect(match, isNotNull,
-          reason: 'ci.yml must pin a flutter-version');
-      pinnedVersion = match!.group(1)!;
-    });
-
-    test('nightly-full pins the same flutter-version as ci.yml', () {
-      final yaml = File('.github/workflows/nightly-full.yml').readAsStringSync();
-      expect(yaml, contains('flutter-version: "$pinnedVersion"'));
-    });
-
-    test('nightly-flaky pins the same flutter-version as ci.yml', () {
-      final yaml =
-          File('.github/workflows/nightly-flaky.yml').readAsStringSync();
-      expect(yaml, contains('flutter-version: "$pinnedVersion"'));
+  group('one pinned SDK and dependency-only cache (#4451)', () {
+    test('all workflows use the shared pinned setup', () {
+      final shared = File(
+        '.github/actions/flutter-setup/action.yml',
+      ).readAsStringSync();
+      expect(shared, contains('flutter-version: "3.44.9"'));
+      expect(shared, contains('pub-cache: false'));
+      expect(shared, isNot(contains('.dart_tool\n')));
+      for (final file in Directory(
+        '.github/workflows',
+      ).listSync().whereType<File>()) {
+        if (!file.path.endsWith('.yml')) continue;
+        final text = file.readAsStringSync();
+        expect(
+          text,
+          isNot(contains('subosito/flutter-action')),
+          reason: file.path,
+        );
+        final workflow = loadYaml(text) as YamlMap;
+        final jobs = workflow['jobs'] as YamlMap;
+        for (final job in jobs.values.cast<YamlMap>()) {
+          if (!job.containsKey('steps')) continue;
+          for (final step in (job['steps'] as YamlList).cast<YamlMap>()) {
+            if (!'${step['uses']}'.startsWith('actions/cache')) continue;
+            final path = '${step['with']['path']}';
+            expect(path, isNot(contains('.dart_tool')), reason: file.path);
+            expect(path.trim(), isNot('build/'), reason: file.path);
+          }
+        }
+      }
     });
   });
 
@@ -428,47 +490,68 @@ void main() {
 
     test('release-train owns the only cron, at the Play-beta hour', () {
       final yaml = read('release-train.yml');
-      expect(hasOwnCron(yaml), isTrue,
-          reason: 'the train must carry the nightly schedule');
+      expect(
+        hasOwnCron(yaml),
+        isTrue,
+        reason: 'the train must carry the nightly schedule',
+      );
       expect(yaml, contains("- cron: '0 16 * * *'"));
     });
 
     test('neither store leg keeps its own cron', () {
       for (final leg in ['daily-beta.yml', 'ios-testflight.yml']) {
-        expect(hasOwnCron(read(leg)), isFalse,
-            reason: '$leg must NOT schedule itself — a second cron cuts a '
-                'different commit than the train and re-splits Android vs '
-                'iOS testers (and double-uploads to Play)');
+        expect(
+          hasOwnCron(read(leg)),
+          isFalse,
+          reason:
+              '$leg must NOT schedule itself — a second cron cuts a '
+              'different commit than the train and re-splits Android vs '
+              'iOS testers (and double-uploads to Play)',
+        );
       }
     });
 
     test('both store legs stay callable + manually dispatchable', () {
       for (final leg in ['daily-beta.yml', 'ios-testflight.yml']) {
         final yaml = read(leg);
-        expect(yaml, contains('workflow_call:'),
-            reason: '$leg must stay callable by the train');
-        expect(yaml, contains('workflow_dispatch:'),
-            reason: '$leg must stay dispatchable for single-store hotfixes');
+        expect(
+          yaml,
+          contains('workflow_call:'),
+          reason: '$leg must stay callable by the train',
+        );
+        expect(
+          yaml,
+          contains('workflow_dispatch:'),
+          reason: '$leg must stay dispatchable for single-store hotfixes',
+        );
       }
     });
 
-    test('the train ships BOTH stores on the beta channel, from one commit',
-        () {
-      final yaml = read('release-train.yml');
-      for (final leg in ['android-beta', 'ios-testflight']) {
-        expect(_jobBody(yaml, leg), contains("(inputs.channel || 'beta')"),
-            reason: 'a `schedule` event carries NO inputs, so a bare '
+    test(
+      'the train ships BOTH stores on the beta channel, from one commit',
+      () {
+        final yaml = read('release-train.yml');
+        for (final leg in ['android-beta', 'ios-testflight']) {
+          expect(
+            _jobBody(yaml, leg),
+            contains("(inputs.channel || 'beta')"),
+            reason:
+                'a `schedule` event carries NO inputs, so a bare '
                 '`inputs.channel == ...` guard skips the leg and the '
-                'nightly train would silently ship nothing');
-      }
-      expect(_jobBody(yaml, 'ios-testflight'), contains('distribute: true'),
-          reason: 'the nightly iOS build must reach the external testers');
-    });
+                'nightly train would silently ship nothing',
+          );
+        }
+        expect(
+          _jobBody(yaml, 'ios-testflight'),
+          contains('distribute: true'),
+          reason: 'the nightly iOS build must reach the external testers',
+        );
+      },
+    );
   });
 
   group('fdroid lockfile regen (#3806)', () {
-    String read(String n) =>
-        File('.github/workflows/$n').readAsStringSync();
+    String read(String n) => File('.github/workflows/$n').readAsStringSync();
 
     /// The workflow's `on:` block only — the file's own rationale comment
     /// names the trigger it deliberately avoids, and a whole-file match
@@ -489,39 +572,49 @@ void main() {
       return out.toString();
     }
 
-    test('the regen workflow is dispatch-only — never pull_request_target',
-        () {
+    test('the regen workflow is dispatch-only — never pull_request_target', () {
       final triggers = triggerBlock(read('lock-regen.yml'));
       expect(triggers, contains('workflow_dispatch:'));
-      expect(triggers, isNot(contains('pull_request_target')),
-          reason: 'that trigger would run `pub get` — and therefore '
-              'arbitrary package build hooks — from an untrusted branch '
-              'with a write-scoped token');
-      expect(triggers, isNot(contains('pull_request:')),
-          reason: 'a Dependabot PR token is read-only — it could not push');
+      expect(
+        triggers,
+        isNot(contains('pull_request_target')),
+        reason:
+            'that trigger would run `pub get` — and therefore '
+            'arbitrary package build hooks — from an untrusted branch '
+            'with a write-scoped token',
+      );
+      expect(
+        triggers,
+        isNot(contains('pull_request:')),
+        reason: 'a Dependabot PR token is read-only — it could not push',
+      );
     });
 
     test('it pins the SAME Flutter as ci.yml — a lock resolved by another '
         'SDK is not the one F-Droid reproduces', () {
-      final pin = RegExp('flutter-version:\\s*"([0-9.]+)"')
-          .firstMatch(read('ci.yml'))!
-          .group(1)!;
-      expect(read('lock-regen.yml'),
-          contains('flutter-version: "$pin"'));
+      expect(read('lock-regen.yml'), contains('actions/flutter-setup'));
+      expect(read('lock-regen.yml'), contains('github.workflow_sha'));
     });
 
     test('it verifies with the very step that fails in build-fdroid', () {
-      expect(read('lock-regen.yml'),
-          contains('flutter pub get --enforce-lockfile'),
-          reason: 'regenerating without re-checking would let a bad lock '
-              'through and the PR would still be red');
+      expect(
+        read('lock-regen.yml'),
+        contains('flutter pub get --enforce-lockfile'),
+        reason:
+            'regenerating without re-checking would let a bad lock '
+            'through and the PR would still be red',
+      );
     });
 
     test('build-fdroid names the fix when the lock is stale', () {
       final yaml = read('fdroid.yml');
-      expect(yaml, contains('Tools · Regenerate lockfiles'),
-          reason: 'the failure must point at the dispatch instead of '
-              'making the next person rediscover the cause');
+      expect(
+        yaml,
+        contains('Tools · Regenerate lockfiles'),
+        reason:
+            'the failure must point at the dispatch instead of '
+            'making the next person rediscover the cause',
+      );
       expect(yaml, contains('#3806'));
     });
   });
@@ -534,7 +627,9 @@ void main() {
       // version, selects a build or submits belongs in the deliver path,
       // behind the #3849 demo-video guard — never in a status check the
       // maintainer runs casually to answer a question.
-      final lane = fastfile.substring(fastfile.indexOf('lane :app_store_status'));
+      final lane = fastfile.substring(
+        fastfile.indexOf('lane :app_store_status'),
+      );
       final body = lane.substring(0, lane.indexOf('\n  lane :'));
       // Strip comments and string literals before looking for mutating
       // calls: the lane's own guidance text says "submit" and "submitting"
@@ -556,38 +651,64 @@ void main() {
         'deliver(',
         'pilot(',
       ]) {
-        expect(code, isNot(contains(call)),
-            reason: 'app_store_status called $call — a report that can '
-                'mutate is not a report; anything that creates a version, '
-                'selects a build or submits belongs in the deliver path '
-                'behind the #3849 demo-video guard');
+        expect(
+          code,
+          isNot(contains(call)),
+          reason:
+              'app_store_status called $call — a report that can '
+              'mutate is not a report; anything that creates a version, '
+              'selects a build or submits belongs in the deliver path '
+              'behind the #3849 demo-video guard',
+        );
       }
     });
 
     test('it names whether an editable version exists, not just a table', () {
       final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
-      expect(fastfile, contains('EDITABLE_APP_STORE_STATES'),
-          reason: 'the editable set must be declared once, not re-guessed '
-              'at each call site');
-      expect(fastfile, contains('PREPARE_FOR_SUBMISSION'),
-          reason: 'that is the state deliver --submit_for_review requires');
-      expect(fastfile, contains('NO editable version'),
-          reason: 'the whole point is a verdict line — a version table '
-              'leaves the reader to infer the answer, which is how the '
-              'question went unanswered in the first place');
+      expect(
+        fastfile,
+        contains('EDITABLE_APP_STORE_STATES'),
+        reason:
+            'the editable set must be declared once, not re-guessed '
+            'at each call site',
+      );
+      expect(
+        fastfile,
+        contains('PREPARE_FOR_SUBMISSION'),
+        reason: 'that is the state deliver --submit_for_review requires',
+      );
+      expect(
+        fastfile,
+        contains('NO editable version'),
+        reason:
+            'the whole point is a verdict line — a version table '
+            'leaves the reader to infer the answer, which is how the '
+            'question went unanswered in the first place',
+      );
     });
 
     test('the workflow is dispatch-only and needs no macOS runner', () {
-      final yaml =
-          File('.github/workflows/app-store-status.yml').readAsStringSync();
+      final yaml = File(
+        '.github/workflows/app-store-status.yml',
+      ).readAsStringSync();
       expect(yaml, contains('workflow_dispatch'));
-      expect(yaml, isNot(contains('schedule:')),
-          reason: 'a status report on a timer is noise nobody reads');
-      expect(yaml, contains('runs-on: ubuntu-latest'),
-          reason: 'API-only — a macOS runner would cost minutes for '
-              'nothing (the ios-testflight-status.yml precedent)');
-      expect(yaml, contains('rm -f'),
-          reason: 'the decoded ASC key must be cleaned up');
+      expect(
+        yaml,
+        isNot(contains('schedule:')),
+        reason: 'a status report on a timer is noise nobody reads',
+      );
+      expect(
+        yaml,
+        contains('runs-on: ubuntu-latest'),
+        reason:
+            'API-only — a macOS runner would cost minutes for '
+            'nothing (the ios-testflight-status.yml precedent)',
+      );
+      expect(
+        yaml,
+        contains('rm -f'),
+        reason: 'the decoded ASC key must be cleaned up',
+      );
     });
   });
 
@@ -600,33 +721,56 @@ void main() {
       // all, so the demo-video link cannot reach App Review however the
       // secret is set — a guaranteed repeat of the 6.0.0 guideline 2.1
       // rejection.
-      final notes =
-          File('ios/fastlane/metadata/review_information/notes.txt');
-      expect(notes.existsSync(), isTrue,
-          reason: 'deliver reads App Store review notes from '
-              'metadata/review_information/, NOT from the Fastfile '
-              'beta_review_notes that feeds TestFlight');
+      final notes = File('ios/fastlane/metadata/review_information/notes.txt');
+      expect(
+        notes.existsSync(),
+        isTrue,
+        reason:
+            'deliver reads App Store review notes from '
+            'metadata/review_information/, NOT from the Fastfile '
+            'beta_review_notes that feeds TestFlight',
+      );
       final text = notes.readAsStringSync();
-      expect(text, contains('anonymous auth'),
-          reason: 'App Review must be told no sign-in is needed, or they '
-              'ask for demo credentials that do not exist');
-      expect(text.toLowerCase(), contains('background'),
-          reason: 'the background location / Bluetooth justification is '
-              'what guideline 2.1 turned on');
+      expect(
+        text,
+        contains('anonymous auth'),
+        reason:
+            'App Review must be told no sign-in is needed, or they '
+            'ask for demo credentials that do not exist',
+      );
+      expect(
+        text.toLowerCase(),
+        contains('background'),
+        reason:
+            'the background location / Bluetooth justification is '
+            'what guideline 2.1 turned on',
+      );
       // The link itself is a secret and must never be committed.
-      expect(text, isNot(contains('http')),
-          reason: 'the demo-video URL belongs in the DEMO_VIDEO_URL '
-              'secret, appended at run time — never in git');
+      expect(
+        text,
+        isNot(contains('http')),
+        reason:
+            'the demo-video URL belongs in the DEMO_VIDEO_URL '
+            'secret, appended at run time — never in git',
+      );
     });
 
     test('submitting without a demo video is refused, not attempted', () {
       final yaml = readWorkflow('app-store-listing.yml');
-      expect(yaml, contains('DEMO_VIDEO_URL'),
-          reason: 'Apple: "updated demo videos will need to be provided '
-              'for EVERY app submission"');
-      expect(yaml, contains('secret is empty'),
-          reason: 'a submit with no video is a known repeatable rejection '
-              '— it must fail the run, not ship');
+      expect(
+        yaml,
+        contains('DEMO_VIDEO_URL'),
+        reason:
+            'Apple: "updated demo videos will need to be provided '
+            'for EVERY app submission"',
+      );
+      expect(
+        yaml,
+        contains('secret is empty'),
+        reason:
+            'a submit with no video is a known repeatable rejection '
+            '— it must fail the run, not ship',
+      );
       // The refusal has to happen BEFORE deliver runs, or the submission
       // is already away by the time anyone reads the error.
       // Anchor on the STEP declarations — 'fastlane deliver' also appears
@@ -636,28 +780,40 @@ void main() {
       final deliverStep = yaml.indexOf('- name: fastlane deliver');
       expect(guardStep, greaterThan(-1));
       expect(deliverStep, greaterThan(-1));
-      expect(guardStep, lessThan(deliverStep),
-          reason: 'the guard must precede the submission it guards');
+      expect(
+        guardStep,
+        lessThan(deliverStep),
+        reason: 'the guard must precede the submission it guards',
+      );
     });
 
     test('a submission names the build it means', () {
       final yaml = readWorkflow('app-store-listing.yml');
-      expect(yaml, contains('--app_version'),
-          reason: 'otherwise deliver acts on whatever version ASC has '
-              'open');
-      expect(yaml, contains('--build_number'),
-          reason: 'otherwise the submitted build is whatever happened to '
-              'be selected in the console');
+      expect(
+        yaml,
+        contains('--app_version'),
+        reason:
+            'otherwise deliver acts on whatever version ASC has '
+            'open',
+      );
+      expect(
+        yaml,
+        contains('--build_number'),
+        reason:
+            'otherwise the submitted build is whatever happened to '
+            'be selected in the console',
+      );
     });
 
     test('release notes exist for every shipped App Store locale', () {
-      final locales = Directory('ios/fastlane/metadata')
-          .listSync()
-          .whereType<Directory>()
-          .map((d) => d.path.split(Platform.pathSeparator).last)
-          .where((n) => n != 'review_information')
-          .toList()
-        ..sort();
+      final locales =
+          Directory('ios/fastlane/metadata')
+              .listSync()
+              .whereType<Directory>()
+              .map((d) => d.path.split(Platform.pathSeparator).last)
+              .where((n) => n != 'review_information')
+              .toList()
+            ..sort();
       expect(locales, isNotEmpty);
       for (final loc in locales) {
         final f = File('ios/fastlane/metadata/$loc/release_notes.txt');
@@ -665,47 +821,67 @@ void main() {
         final text = f.readAsStringSync().trim();
         expect(text, isNotEmpty, reason: '$loc release notes are empty');
         // App Store hard limit.
-        expect(text.length, lessThanOrEqualTo(4000),
-            reason: '$loc release notes exceed the App Store limit');
+        expect(
+          text.length,
+          lessThanOrEqualTo(4000),
+          reason: '$loc release notes exceed the App Store limit',
+        );
       }
     });
   });
 
   group('TestFlight delivery is asserted, not assumed (#3814)', () {
-    String read(String n) =>
-        File('.github/workflows/$n').readAsStringSync();
+    String read(String n) => File('.github/workflows/$n').readAsStringSync();
 
-    test('an externally-distributing iOS build asserts testers can install',
-        () {
-      final yaml = read('ios-testflight.yml');
-      expect(yaml, contains('testflight_assert_delivery'),
-          reason: 'pilot\'s "Successfully distributed build to External '
+    test(
+      'an externally-distributing iOS build asserts testers can install',
+      () {
+        final yaml = read('ios-testflight.yml');
+        expect(
+          yaml,
+          contains('testflight_assert_delivery'),
+          reason:
+              'pilot\'s "Successfully distributed build to External '
               'testers" means SUBMITTED, not DELIVERED — taking it as '
               'proof left the extern group on a 2026-07-04 build for '
-              'seven weeks with every run green');
-      // The assert needs the decoded key, so it must come BEFORE the
-      // cleanup step or it can only ever fail on auth.
-      expect(yaml.indexOf('testflight_assert_delivery'),
+              'seven weeks with every run green',
+        );
+        // The assert needs the decoded key, so it must come BEFORE the
+        // cleanup step or it can only ever fail on auth.
+        expect(
+          yaml.indexOf('testflight_assert_delivery'),
           lessThan(yaml.indexOf('Clean up decoded API key')),
-          reason: 'the assert must run while the ASC key still exists');
-    });
+          reason: 'the assert must run while the ASC key still exists',
+        );
+      },
+    );
 
-    test('a historical stranding backlog cannot pin the train red (#3823)',
-        () {
+    test('a historical stranding backlog cannot pin the train red (#3823)', () {
       final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
       // The guard's first live run found ELEVEN historical orphans and
       // failed the release train on them. Real, but unfixable in
       // retrospect — and a permanently red train is exactly as ignorable
       // as the green log line this guard replaced.
-      expect(fastfile, contains('fresh_stranded'),
-          reason: 'the stranding check must be scoped to the freshness '
-              'window so only a NEW stranding fails the run');
-      expect(fastfile, contains('old_stranded'),
-          reason: 'older orphans must still be reported, just not fatal');
+      expect(
+        fastfile,
+        contains('fresh_stranded'),
+        reason:
+            'the stranding check must be scoped to the freshness '
+            'window so only a NEW stranding fails the run',
+      );
+      expect(
+        fastfile,
+        contains('old_stranded'),
+        reason: 'older orphans must still be reported, just not fatal',
+      );
       final failIndex = fastfile.indexOf('never submitted for external review');
-      expect(fastfile.substring(0, failIndex), contains('partition'),
-          reason: 'the fatal branch must consume the partitioned fresh '
-              'set, not the whole history');
+      expect(
+        fastfile.substring(0, failIndex),
+        contains('partition'),
+        reason:
+            'the fatal branch must consume the partitioned fresh '
+            'set, not the whole history',
+      );
     });
 
     test('tester state is MEASURED via usage metrics, on absolute URLs', () {
@@ -713,41 +889,66 @@ void main() {
       // The roster resource never exposes invite state (verified on the
       // wire, #3814); per-tester usage is the only measurement of
       // "in the group but has never run a build". Keep it.
-      expect(fastfile, contains('metrics/betaTesterUsages'),
-          reason: 'without usage, the tester report is a roster — it '
-              'cannot say whether an identity has ever run a build');
-      expect(fastfile, contains('NEVER RAN A BUILD'),
-          reason: 'zero sessions must be named as the finding it is');
+      expect(
+        fastfile,
+        contains('metrics/betaTesterUsages'),
+        reason:
+            'without usage, the tester report is a roster — it '
+            'cannot say whether an identity has ever run a build',
+      );
+      expect(
+        fastfile,
+        contains('NEVER RAN A BUILD'),
+        reason: 'zero sessions must be named as the finding it is',
+      );
       // The raw client's hostname is the API root WITHOUT /v1/, so a
       // relative path is rejected as an unknown resource. Three runs
       // failed that way before the absolute URL fixed it.
-      expect(fastfile,
-          contains('https://api.appstoreconnect.apple.com/v1/apps/'),
-          reason: 'relative paths on the raw client 404 — keep the URL '
-              'absolute');
-      expect(fastfile, contains('def testflight_raw_client'),
-          reason: 'the accessor moves between spaceship versions; the '
-              'helper tries each known home rather than pinning one');
+      expect(
+        fastfile,
+        contains('https://api.appstoreconnect.apple.com/v1/apps/'),
+        reason:
+            'relative paths on the raw client 404 — keep the URL '
+            'absolute',
+      );
+      expect(
+        fastfile,
+        contains('def testflight_raw_client'),
+        reason:
+            'the accessor moves between spaceship versions; the '
+            'helper tries each known home rather than pinning one',
+      );
     });
 
     test('the assert lane exists and fails loudly rather than warning', () {
       final fastfile = File('ios/fastlane/Fastfile').readAsStringSync();
       expect(fastfile, contains('lane :testflight_assert_delivery'));
-      expect(fastfile, contains('UI.user_error!'),
-          reason: 'a warning would have been ignored for seven weeks just '
-              'as effectively as no check at all');
-      expect(fastfile, contains('READY_FOR_BETA_SUBMISSION'),
-          reason: 'build 2026061211 stranded in exactly that state while '
-              'its ~30 neighbours were approved');
-      expect(fastfile, contains('require "time"'),
-          reason: 'without it Time.parse raises, the rescue swallows it, '
-              'and the staleness check silently stops running');
+      expect(
+        fastfile,
+        contains('UI.user_error!'),
+        reason:
+            'a warning would have been ignored for seven weeks just '
+            'as effectively as no check at all',
+      );
+      expect(
+        fastfile,
+        contains('READY_FOR_BETA_SUBMISSION'),
+        reason:
+            'build 2026061211 stranded in exactly that state while '
+            'its ~30 neighbours were approved',
+      );
+      expect(
+        fastfile,
+        contains('require "time"'),
+        reason:
+            'without it Time.parse raises, the rescue swallows it, '
+            'and the staleness check silently stops running',
+      );
     });
   });
 
   group('build numbers — the #3513 shared wall-clock scheme (#3812)', () {
-    String read(String n) =>
-        File('.github/workflows/$n').readAsStringSync();
+    String read(String n) => File('.github/workflows/$n').readAsStringSync();
 
     // The formula both release-build workflows must share, character for
     // character: minutes since 2025-07-06 UTC on a 2026100000 base.
@@ -758,13 +959,21 @@ void main() {
       test('$wf derives its build number from wall clock, not a run '
           'counter', () {
         final yaml = read(wf);
-        expect(yaml, contains(formula),
-            reason: 'per-workflow counters leapfrog each other (#3513); '
-                'wall clock is the one source that cannot');
-        expect(yaml, isNot(contains(r'github.run_number }} * 10')),
-            reason: 'the old counter scheme — and under `workflow_call` '
-                '`run_number` is the CALLER\'s, which is exactly how '
-                '#3792 walked the iOS build number BACKWARDS (#3812)');
+        expect(
+          yaml,
+          contains(formula),
+          reason:
+              'per-workflow counters leapfrog each other (#3513); '
+              'wall clock is the one source that cannot',
+        );
+        expect(
+          yaml,
+          isNot(contains(r'github.run_number }} * 10')),
+          reason:
+              'the old counter scheme — and under `workflow_call` '
+              '`run_number` is the CALLER\'s, which is exactly how '
+              '#3792 walked the iOS build number BACKWARDS (#3812)',
+        );
       });
     }
 
@@ -774,16 +983,23 @@ void main() {
       // counter is really reading the train's.
       final train = read('release-train.yml');
       for (final wf in ['daily-beta.yml', 'ios-testflight.yml']) {
-        expect(train, contains('uses: ./.github/workflows/$wf'),
-            reason: 'the train is expected to call $wf');
+        expect(
+          train,
+          contains('uses: ./.github/workflows/$wf'),
+          reason: 'the train is expected to call $wf',
+        );
       }
       for (final wf in ['daily-beta.yml', 'ios-testflight.yml']) {
         final bnLines = read(wf)
             .split('\n')
             .where((l) => l.contains('BN=') && l.contains('run_number'));
-        expect(bnLines, isEmpty,
-            reason: '$wf must not compute a build number from a run '
-                'counter it does not own');
+        expect(
+          bnLines,
+          isEmpty,
+          reason:
+              '$wf must not compute a build number from a run '
+              'counter it does not own',
+        );
       }
     });
   });
@@ -807,8 +1023,11 @@ void main() {
     /// exists to catch. Only the committed bytes are evidence.
     Map<String, String> lockVersions(String path) {
       final show = Process.runSync('git', ['show', 'HEAD:$path']);
-      expect(show.exitCode, 0,
-          reason: 'could not read committed $path: ${show.stderr}');
+      expect(
+        show.exitCode,
+        0,
+        reason: 'could not read committed $path: ${show.stderr}',
+      );
       final versions = <String, String>{};
       final package = RegExp(r'^  ([A-Za-z0-9_]+):\s*$');
       final version = RegExp(r'^    version: "?([^"\n]+)"?\s*$');
@@ -853,28 +1072,39 @@ void main() {
         if (a == null || b == null) continue;
         if (a != b) disagreements.add('$p: pubspec.lock=$a fdroid=$b');
       }
-      expect(disagreements, isEmpty,
-          reason: 'pubspec.fdroid.lock is generated by a real '
-              '`flutter pub get`, so where the two disagree on an '
-              'SDK-pinned package it is pubspec.lock that is wrong — '
-              'regenerate it through Flutter, not `dart pub` (#3974). '
-              'Disagreements:\n${disagreements.join('\n')}');
+      expect(
+        disagreements,
+        isEmpty,
+        reason:
+            'pubspec.fdroid.lock is generated by a real '
+            '`flutter pub get`, so where the two disagree on an '
+            'SDK-pinned package it is pubspec.lock that is wrong — '
+            'regenerate it through Flutter, not `dart pub` (#3974). '
+            'Disagreements:\n${disagreements.join('\n')}',
+      );
     });
 
-    test('analyze enforces the lockfile rather than silently re-resolving',
-        () {
-      expect(read('ci.yml'), contains('flutter pub get --enforce-lockfile'),
-          reason: 'a plain `flutter pub get` rewrites the lock instead of '
-              'failing, so the drift stays invisible — the main flavour '
-              'needs the same gate build-fdroid always had');
+    test('analyze enforces the lockfile rather than silently re-resolving', () {
+      expect(
+        File('.github/actions/flutter-setup/action.yml').readAsStringSync(),
+        contains('flutter pub get --enforce-lockfile'),
+        reason:
+            'a plain `flutter pub get` rewrites the lock instead of '
+            'failing, so the drift stays invisible — the main flavour '
+            'needs the same gate build-fdroid always had',
+      );
     });
 
     test('the regen workflow owns BOTH lockfiles', () {
       final regen = read('lock-regen.yml');
       expect(regen, contains('pubspec.fdroid.lock'));
-      expect(regen, contains('Regenerate pubspec.lock'),
-          reason: 'regenerating only the fdroid lock leaves the main lock '
-              'to Dependabot, which is what caused #3974');
+      expect(
+        regen,
+        contains('Regenerate pubspec.lock'),
+        reason:
+            'regenerating only the fdroid lock leaves the main lock '
+            'to Dependabot, which is what caused #3974',
+      );
     });
   });
 
@@ -918,10 +1148,14 @@ void main() {
           offenders.add('${f.path}: "$name"');
         }
       }
-      expect(offenders, isEmpty,
-          reason: 'workflow names must read "<Group> · <what it does>" with '
-              'Group one of $groups — see #3972. Offenders:\n'
-              '${offenders.join('\n')}');
+      expect(
+        offenders,
+        isEmpty,
+        reason:
+            'workflow names must read "<Group> · <what it does>" with '
+            'Group one of $groups — see #3972. Offenders:\n'
+            '${offenders.join('\n')}',
+      );
     });
 
     test('no two workflows share a name', () {
@@ -931,10 +1165,14 @@ void main() {
         if (name != null) byName.putIfAbsent(name, () => []).add(f.path);
       }
       final dupes = byName.entries.where((e) => e.value.length > 1).toList();
-      expect(dupes, isEmpty,
-          reason: 'a duplicate workflow name is unreadable in the Actions '
-              'sidebar (ci.yml and ci-docs-stub.yml were both "CI"): '
-              '${dupes.map((e) => '"${e.key}" -> ${e.value}').join('; ')}');
+      expect(
+        dupes,
+        isEmpty,
+        reason:
+            'a duplicate workflow name is unreadable in the Actions '
+            'sidebar (ci.yml and ci-docs-stub.yml were both "CI"): '
+            '${dupes.map((e) => '"${e.key}" -> ${e.value}').join('; ')}',
+      );
     });
   });
   group('#4161 — production promotion is gated on a driven artifact', () {
@@ -975,21 +1213,23 @@ void main() {
       expect(text, contains('Start a recording'));
       expect(text, contains('Stop the recording'));
       expect(text, contains('#3590'));
-      expect(text, contains('Open Testing'),
-          reason: 'a sideloaded build has none of the transformation this '
-              'gate exists to exercise');
+      expect(
+        text,
+        contains('Open Testing'),
+        reason:
+            'a sideloaded build has none of the transformation this '
+            'gate exists to exercise',
+      );
     });
 
     test('the F-Droid release dex-scan gate is still wired', () {
       // #4161 adds a gate; it does not replace the one that covers the
       // other end of the artifact matrix.
       for (final wf in ['fdroid.yml', 'fdroid-publish.yml']) {
-        final text =
-            File('.github/workflows/$wf').readAsStringSync();
+        final text = File('.github/workflows/$wf').readAsStringSync();
         expect(text, contains('audit_no_gms.sh'), reason: wf);
         expect(text, contains('app-fdroid-release.apk'), reason: wf);
       }
     });
   });
-
 }

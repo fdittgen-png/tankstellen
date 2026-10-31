@@ -1,11 +1,12 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/fdroid.md
 
 # F-Droid no-GMS audit (#2575, hardened by #3480)
 #
 # ADVISORY workflow — proves the `fdroid` flavor ships ZERO proprietary Google
 # Mobile Services (and no Sentry). It is intentionally NOT a required check /
-# branch-protection context: it has no ci-docs-stub.yml coverage, and a
+# branch-protection context: it intentionally runs only for flavor-relevant changes, and a
 # transient Android/Gradle failure must never block `gh pr merge --auto`. The
 # authoritative gate is the dependency-graph layer (layer A of
 # scripts/audit_no_gms.sh), which is fast and deterministic; the RELEASE-APK
@@ -24,8 +25,32 @@ name: CI · F-Droid no-GMS audit
 
 on:
   pull_request:
+    paths:
+      - 'lib/**'
+      - 'android/**'
+      - 'third_party/**'
+      - 'assets/**'
+      - 'pubspec*'
+      - 'build.yaml'
+      - 'fdroid/**'
+      - 'tool/**'
+      - 'scripts/**'
+      - '.github/**'
+      - 'test/features/fdroid/**'
   push:
     branches: [master]
+    paths:
+      - 'lib/**'
+      - 'android/**'
+      - 'third_party/**'
+      - 'assets/**'
+      - 'pubspec*'
+      - 'build.yaml'
+      - 'fdroid/**'
+      - 'tool/**'
+      - 'scripts/**'
+      - '.github/**'
+      - 'test/features/fdroid/**'
   # #3971 — manual hatch, mirroring ci.yml's (#2128). Two cases need it:
   #
   #  * lock-regen.yml (#3806, #3974) pushes the regenerated
@@ -45,15 +70,20 @@ on:
 # Single self-contained job → exactly one status context ("build-fdroid"),
 # never gated per-step. Keep it OUT of required checks.
 concurrency:
-  group: fdroid-audit-${{ github.ref }}
-  cancel-in-progress: true
+  group: fdroid-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
   build-fdroid:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           # #4025 follow-up — the recipe lint below asserts the AntiFeature
           # against the commits the recipe PINS (#3968), which means resolving
           # `506fcf50…` locally. The default shallow clone does not have it, so
@@ -65,19 +95,11 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/flutter-setup
         with:
-          channel: stable
-          # Pin to the build-android-green SDK (matches ci.yml's build-android).
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
+          resolve: 'false'
+          lockfile: pubspec.fdroid.lock
+
       - uses: actions/cache@v6
         with:
           path: |
@@ -125,9 +147,11 @@ jobs:
       # DERIVED file left stale by Dependabot (which only updates
       # pubspec.lock), not anything wrong with the bump.
       - name: Enforce the libre lockfile
+        env:
+          SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           if ! flutter pub get --enforce-lockfile; then
-            echo "::error title=pubspec.fdroid.lock is stale::The F-Droid flavour pins its own lockfile and Dependabot only updates pubspec.lock. Fix it with one dispatch: Actions -> 'Tools · Regenerate lockfiles' -> branch=${{ github.head_ref || github.ref_name }} (#3806)."
+            echo "::error title=pubspec.fdroid.lock is stale::The F-Droid flavour pins its own lockfile and Dependabot only updates pubspec.lock. Fix it with one dispatch: Actions -> 'Tools · Regenerate lockfiles' -> branch=$SOURCE_BRANCH (#3806)."
             exit 1
           fi
       - run: dart run build_runner build --delete-conflicting-outputs
@@ -172,3 +196,9 @@ jobs:
       # back to `strings` if it cannot find it.
       - name: Audit — no GMS / MLKit / Play Core / Sentry (strict)
         run: bash scripts/audit_no_gms.sh build/app/outputs/flutter-apk/app-fdroid-release.apk
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fdroid-unsigned-apk-attempt-${{ github.run_attempt }}
+          path: build/app/outputs/flutter-apk/app-fdroid-release.apk
+          if-no-files-found: error
+          retention-days: 7

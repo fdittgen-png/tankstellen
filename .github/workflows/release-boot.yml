@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/release-boot.md
 
 # Release-launch aliveness check.
 #
@@ -53,37 +54,51 @@ on:
       - '.github/workflows/release-boot.yml'
 
 concurrency:
-  group: release-boot-${{ github.ref }}
-  cancel-in-progress: true
+  group: release-boot-${{ inputs.ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
   boot:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      - id: source
+        name: Resolve requested source once
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_REF: ${{ inputs.ref || github.sha }}
+        run: |
+          set -euo pipefail
+          SHA=$(gh api "repos/$GITHUB_REPOSITORY/commits/$SOURCE_REF" --jq .sha)
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]]
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+          ref: ${{ steps.source.outputs.sha }}
+      - name: Check out this workflow's shared actions
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .workflow-tools
+          persist-credentials: false
+
+      - uses: ./.workflow-tools/.github/actions/source-identity
+        with:
+          sha: ${{ steps.source.outputs.sha }}
+          leg: release-boot
 
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.workflow-tools/.github/actions/flutter-setup
         with:
-          channel: stable
-          # Pinned to the build-android-green SDK — same value as ci.yml.
-          flutter-version: "3.44.9"
-          cache: true
-
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
+          resolve: 'false'
 
       - uses: actions/cache@v6
         with:

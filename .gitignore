@@ -177,3 +177,10 @@ pubspec_overrides.yaml
 !docs/privacy/
 !docs/privacy/data_inventory.json
 .media-workbench/
+
+# Reviewed workflow runbooks and CI usage live with their implementation.
+!docs/ci/
+# Same-run CI evidence and trusted workflow helper checkout are ephemeral.
+/ci-plan/
+/ci-results/
+/.workflow-tools/

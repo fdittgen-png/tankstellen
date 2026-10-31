@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/ios-testflight.md
 
 name: Release · iOS TestFlight build
 
@@ -19,6 +20,10 @@ on:
   # #3720 — callable from the Release Train orchestrator.
   workflow_call:
     inputs:
+      source_sha:
+        description: Exact commit supplied by the release train
+        required: true
+        type: string
       release_notes:
         required: false
         type: string
@@ -59,6 +64,9 @@ concurrency:
   group: ios-testflight
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   build-and-upload:
     # Pinned (was macos-latest): the macos-latest label migrates to macOS 26
@@ -72,6 +80,19 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha || github.sha }}
+      - name: Check out this workflow's shared actions
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .workflow-tools
+          persist-credentials: false
+
+      - uses: ./.workflow-tools/.github/actions/source-identity
+        with:
+          sha: ${{ inputs.source_sha || github.sha }}
+          leg: ios
 
       - name: Compute monotonic build number
         id: bn
@@ -110,10 +131,9 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.workflow-tools/.github/actions/flutter-setup
         with:
-          channel: stable
-          cache: true
+          resolve: 'false'
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -238,7 +258,7 @@ jobs:
           TAG="v${VERSION}+${{ steps.bn.outputs.build_number }}-ios"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$TAG" -m "TestFlight build ${{ steps.bn.outputs.build_number }} — $GITHUB_SHA"
+          git tag -a "$TAG" -m "TestFlight build ${{ steps.bn.outputs.build_number }} — ${{ inputs.source_sha || github.sha }}"
           git push origin "$TAG"
           echo "Tagged $TAG"
 

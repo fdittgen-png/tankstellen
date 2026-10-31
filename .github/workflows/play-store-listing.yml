@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/play-store-listing.md
 
 name: Publish · Play Store listing
 
@@ -117,7 +118,7 @@ jobs:
         run: |
           set -euo pipefail
           SRC=docs/play-store/screenshots/published
-          if [ ! -d "$SRC" ] || [ -z "$(ls -A $SRC 2>/dev/null | grep -v -E '^(\.gitkeep|README\.md)$')" ]; then
+          if [ ! -d "$SRC" ] || ! find "$SRC" -maxdepth 1 -type f -name '*.png' -print -quit | grep -q .; then
             echo "No published screenshots — skipping screenshot upload (metadata-only run)."
             exit 0
           fi
@@ -128,10 +129,10 @@ jobs:
             for src in "$SRC"/[0-9][0-9]-*.png; do
               [ -f "$src" ] || continue
               base=$(basename "$src")
-              renamed=$(echo "$base" | sed 's/^\([0-9][0-9]\)-/\1_/')
+              renamed="${base:0:2}_${base:3}"
               cp "$src" "$dst/$renamed"
             done
-            echo "Mirrored $(ls $dst | wc -l) screenshots → $locale"
+            echo "Mirrored $(find "$dst" -maxdepth 1 -type f | wc -l) screenshots → $locale"
           done
 
       - name: Set up Ruby + bundler

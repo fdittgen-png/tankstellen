@@ -128,3 +128,14 @@ own the resulting CI red — is `SKIP_PREPUSH=1 git push`.
 For everything beyond these four rules — architecture, the service-chain
 pattern, the TDD pyramid, GitHub flow, the feature-enum cascade and the
 autonomous-agent batching doctrine — see the `tankstellen-conventions` skill.
+
+## CI and working-branch discipline
+
+Use a separate worktree per task from current `origin/master`; check the branch
+before edits, commits and pushes. Do not switch a shared checkout under another
+session. The installed pre-push hook checks actual pushed branch refs.
+Keep `strict=false` and serialize merges; update a branch only for an actual
+conflict, prerequisite or known semantic interaction, not every unrelated merge.
+Use whole-workflow retries for an unchanged CI candidate so the plan and shard
+reports share one attempt. Read [CI usage](ci/CI_USAGE.md) and the
+[workflow catalog](../.github/workflows/README.md) before dispatching a publisher.
