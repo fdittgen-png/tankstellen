@@ -105,34 +105,39 @@ class LocalDataEraser {
   /// the running app); a closed box that exists on disk is deleted.
   static Future<void> _wipeBox(String name) async {
     if (Hive.isBoxOpen(name)) {
-      if (name == HiveBoxes.obd2TripHistory) {
-        try {
-          final box = Hive.lazyBox<String>(name);
-          if (HiveTripHistoryIndex.isReady(box)) {
-            await HiveTripHistoryIndex.of(box).clear();
-          } else {
-            await box.clear();
-          }
-          return;
-          // Hive reports regular/lazy mismatches as Error; tests use regular boxes.
-          // ignore: avoid_catching_errors
-        } on HiveError {
-          BoxBase<dynamic> box;
-          try {
-            box = Hive.box<String>(name);
-          // Legacy/test boxes may use dynamic instead of the production String.
-          // ignore: avoid_catching_errors
-          } on HiveError {
-            box = Hive.box<dynamic>(name);
-          }
-          await box.clear();
-          return;
-        }
+      final box = _openRegisteredBox(name);
+      if (name == HiveBoxes.obd2TripHistory &&
+          box is LazyBox<String> &&
+          HiveTripHistoryIndex.isReady(box)) {
+        await HiveTripHistoryIndex.of(box).clear();
+      } else {
+        await box.clear();
       }
-      await Hive.box<dynamic>(name).clear();
     } else if (await Hive.boxExists(name)) {
       await Hive.deleteBoxFromDisk(name);
     }
+  }
+
+  /// Hive's public getters require the actual open value type. Probe only
+  /// getters for the registry's supported types; never catch a clear failure
+  /// as a type mismatch, close a live handle, or use Hive's private registry.
+  static BoxBase<dynamic> _openRegisteredBox(String name) {
+    for (final read in <BoxBase<dynamic> Function()>[
+      if (name == HiveBoxes.obd2TripHistory) () => Hive.lazyBox<String>(name),
+      () => Hive.box<dynamic>(name),
+      () => Hive.box<String>(name),
+      () => Hive.box<bool>(name),
+      () => Hive.box<int>(name),
+    ]) {
+      try {
+        return read();
+        // Hive reports generic/lazy mismatches as Error, not Exception.
+        // ignore: avoid_catching_errors
+      } on HiveError {
+        continue;
+      }
+    }
+    throw HiveError('Open box has an unsupported registered value type: $name');
   }
 }
 
