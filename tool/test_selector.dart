@@ -13,7 +13,9 @@
 // trip_recording_controller parts — selected no test at all. Measured on
 // the last 25 master commits, adding parts selects 0–2 more tests per PR.
 //
-// `export` edges are deliberately NOT followed. Following them is the
+// The legacy CLI does not follow `export` edges. CI opts into the complete
+// graph with `DependencyGraph.scan(followExports: true)` (#4451).
+// Historically these edges were deliberately NOT followed. Following them is the
 // sound compile graph, but barrels export whole features, so every test
 // that imports any barrel would depend on most of lib/: measured on the
 // same 25 commits, a typical lib/ PR would select ~950 of 1,825 tests
@@ -130,16 +132,17 @@ class SelectorDecision {
 class DependencyGraph {
   DependencyGraph._(this.edges, this.tests);
 
-  factory DependencyGraph.scan() {
+  factory DependencyGraph.scan({bool followExports = false}) {
     final edges = <String, Set<String>>{};
-    _scanDartFiles(_libRoot, edges);
-    _scanDartFiles(_testRoot, edges);
+    _scanDartFiles(_libRoot, edges, followExports: followExports);
+    _scanDartFiles(_testRoot, edges, followExports: followExports);
     // Only `_test.dart` files are emitted — helpers / fixtures in
     // `test/helpers/`, `test/mocks/`, etc. aren't directly runnable.
-    final tests = edges.keys
-        .where((k) => k.startsWith(_testRoot) && k.endsWith('_test.dart'))
-        .toList()
-      ..sort();
+    final tests =
+        edges.keys
+            .where((k) => k.startsWith(_testRoot) && k.endsWith('_test.dart'))
+            .toList()
+          ..sort();
     return DependencyGraph._(edges, tests);
   }
 
@@ -158,9 +161,8 @@ class DependencyGraph {
 
   /// `lib/` files at least one test transitively depends on.
   Set<String> libFilesReachedByTests() => {
-        for (final t in tests)
-          ...closureOf(t).where((f) => f.startsWith(_libRoot)),
-      };
+    for (final t in tests) ...closureOf(t).where((f) => f.startsWith(_libRoot)),
+  };
 }
 
 /// Compute the selection for [libChanged], **in process**.
@@ -204,7 +206,8 @@ SelectorDecision selectForChangedPaths(
   DependencyGraph? graph,
 }) {
   for (final p in changed) {
-    final fullSuite = _runAllSentinels.contains(p) ||
+    final fullSuite =
+        _runAllSentinels.contains(p) ||
         _runAllExactMatches.contains(p) ||
         _runAllPrefixes.any(p.startsWith);
     if (fullSuite) {
@@ -213,17 +216,21 @@ SelectorDecision selectForChangedPaths(
   }
 
   final dartChanged = changed
-      .where((p) =>
-          (p.startsWith(_libRoot) || p.startsWith(_testRoot)) &&
-          p.endsWith('.dart'))
+      .where(
+        (p) =>
+            (p.startsWith(_libRoot) || p.startsWith(_testRoot)) &&
+            p.endsWith('.dart'),
+      )
       .toSet();
   final g = graph ?? DependencyGraph.scan();
 
   // Runtime-loaded test data: the files that name it stand in for it.
-  final data = changed.where((p) =>
-      p.startsWith(_testRoot) &&
-      !p.endsWith('.dart') &&
-      !p.startsWith('${_testRoot}scripts/'));
+  final data = changed.where(
+    (p) =>
+        p.startsWith(_testRoot) &&
+        !p.endsWith('.dart') &&
+        !p.startsWith('${_testRoot}scripts/'),
+  );
   for (final p in data) {
     final name = p.substring(p.lastIndexOf('/') + 1);
     final readers = g.edges.keys
@@ -261,8 +268,10 @@ Future<void> main(List<String> argv) async {
 
   final changed = readStdin ? _readStdinPaths() : _gitDiff(base);
   if (changed.isEmpty) {
-    stderr.writeln('test_selector: no changed paths detected, '
-        'caller should run the full suite');
+    stderr.writeln(
+      'test_selector: no changed paths detected, '
+      'caller should run the full suite',
+    );
     exit(2);
   }
 
@@ -281,9 +290,11 @@ Future<void> main(List<String> argv) async {
 /// was read, so a multi-path list silently selected for one path).
 List<String> _readStdinPaths() {
   final paths = <String>[];
-  for (String? line = stdin.readLineSync();
-      line != null;
-      line = stdin.readLineSync()) {
+  for (
+    String? line = stdin.readLineSync();
+    line != null;
+    line = stdin.readLineSync()
+  ) {
     final trimmed = line.trim();
     if (trimmed.isNotEmpty) paths.add(trimmed);
   }
@@ -291,11 +302,11 @@ List<String> _readStdinPaths() {
 }
 
 List<String> _gitDiff(String base) {
-  final r = Process.runSync(
-    'git',
-    ['diff', '--name-only', '$base...HEAD'],
-    runInShell: false,
-  );
+  final r = Process.runSync('git', [
+    'diff',
+    '--name-only',
+    '$base...HEAD',
+  ], runInShell: false);
   if (r.exitCode != 0) {
     stderr.writeln('git diff failed: ${r.stderr}');
     return const [];
@@ -318,11 +329,15 @@ void _emitFullSuite() {
   }
 }
 
-void _scanDartFiles(String root, Map<String, Set<String>> edges) {
+void _scanDartFiles(
+  String root,
+  Map<String, Set<String>> edges, {
+  bool followExports = false,
+}) {
   _walk(root, (p) {
     if (!p.endsWith('.dart')) return;
     final content = File(p).readAsStringSync();
-    edges[p] = extractDependencies(p, content);
+    edges[p] = extractDependencies(p, content, followExports: followExports);
   });
 }
 
@@ -345,10 +360,14 @@ final RegExp _partRe = RegExp(
 /// The edges the selector follows from [file]: every branch of its
 /// `import` directives and its `part` files (#4347). `export` directives
 /// are skipped on purpose — see the header for the measured cost.
-Set<String> extractDependencies(String file, String content) {
+Set<String> extractDependencies(
+  String file,
+  String content, {
+  bool followExports = false,
+}) {
   final result = <String>{};
   for (final directive in parseDirectives(content)) {
-    if (directive.isExport) continue;
+    if (directive.isExport && !followExports) continue;
     for (final uri in directive.uris) {
       final resolved = _resolve(file, uri);
       if (resolved != null) result.add(resolved);

@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/daily-github-release.md
 
 name: Release · GitHub release (daily)
 
@@ -46,8 +47,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: master
+          ref: ${{ github.sha }}
           fetch-depth: 0
+      - uses: ./.github/actions/source-identity
+        with:
+          sha: ${{ github.sha }}
+          leg: daily-1
 
       - name: Find previous nightly tag
         id: prev
@@ -113,17 +118,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: master
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/source-identity
+        with:
+          sha: ${{ github.sha }}
+          leg: daily-2
 
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/flutter-setup
         with:
-          channel: stable
-          cache: true
+          resolve: 'false'
 
       - name: Decode signing keystore
         env:
@@ -237,7 +245,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: master
+          ref: ${{ github.sha }}
+      - uses: ./.github/actions/source-identity
+        with:
+          sha: ${{ github.sha }}
+          leg: daily-3
 
       - name: Select Xcode 26+
         # See ios-testflight.yml for the long-form rationale: Apple rejects
@@ -247,10 +259,9 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/flutter-setup
         with:
-          channel: stable
-          cache: true
+          resolve: 'false'
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -340,8 +351,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: master
+          ref: ${{ github.sha }}
           fetch-depth: 0
+      - uses: ./.github/actions/source-identity
+        with:
+          sha: ${{ github.sha }}
+          leg: daily-4
 
       - name: Download Android artifacts
         uses: actions/download-artifact@v8

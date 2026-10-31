@@ -1,1115 +1,526 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/ci.md
 
 name: CI · Analyze, test & build
-
 on:
   push:
-    branches: [master]
-    tags: ['v*']
-    paths-ignore:
-      - '**/*.md'
-      - 'docs/**'
-      - 'LICENSE'
-      - '.gitignore'
-      # #2568 — store-metadata-only changes never affect the Dart/Android
-      # build, so skip the heavy matrix. ci-docs-stub.yml triggers on these
-      # same paths and re-emits every required context so auto-merge fires.
-      - 'ios/fastlane/**'
-      - 'fastlane/metadata/**'
+    branches:
+    - master
+    tags:
+    - v*
   pull_request:
-    branches: [master]
-    paths-ignore:
-      - '**/*.md'
-      - 'docs/**'
-      - 'LICENSE'
-      - '.gitignore'
-      # #2568 — see the push trigger above; mirrored by ci-docs-stub.yml.
-      - 'ios/fastlane/**'
-      - 'fastlane/metadata/**'
+    branches:
+    - master
   schedule:
-    - cron: '0 6 * * 0'
-  # #2128 — manual hatch so maintainers can re-fire CI on the active
-  # ref without an empty-commit nudge. Useful after a `gh pr update-
-  # branch` (which uses GITHUB_TOKEN and so doesn't auto-trigger the
-  # downstream workflow) or to retry a flaky run.
+  - cron: 0 6 * * 0
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Reason for the manual run (audit trail)'
+        description: Reason for the manual run (audit trail)
         required: false
-        default: 'manual'
-
+        default: manual validation (no signing or publication)
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
-  # #2417 — green-tree skip. The heavy leaf jobs (test ×4, build-android,
-  # integration, startup-budget, codegen-drift, l10n-gate) are a pure
-  # function of the build-relevant source tree. `record-green` (below)
-  # saves a first-party `actions/cache` marker keyed on a hash of that
-  # exact tree after a full real pass; `green-gate` probes that marker on
-  # the next PR run with `lookup-only`. On a HIT (identical tree already
-  # proved green — e.g. a rebase, a base-branch retarget, or an
-  # empty-commit re-fire) every gated leaf job is skipped via its `if:`.
-  #
-  # Why this is safe for `gh pr merge --auto`: a job skipped via a
-  # job-level `if:` reports a `skipped` check conclusion, and branch
-  # protection (strict=false) counts `skipped` as a satisfied required
-  # context — the same load-bearing fact the `changes` paths-gate below
-  # already relies on. So the PR stays mergeable with no heavy work.
-  #
-  # Fail-safe by construction: only `pull_request` events probe (master
-  # push / tag / weekly schedule leave `cache-hit` empty ⇒ `cached !=
-  # 'true'` ⇒ everything runs and master is never skipped). A cache miss
-  # or eviction is likewise empty ⇒ full run. The marker key MUST stay
-  # byte-identical between `green-gate` and `record-green` (same
-  # hashFiles glob set) or a save can never be probed back as a hit.
-  green-gate:
-    runs-on: ubuntu-latest
-    outputs:
-      cached: ${{ steps.probe.outputs.cache-hit }}
-    steps:
-      - uses: actions/checkout@v7
-      - id: probe
-        if: github.event_name == 'pull_request'
-        uses: actions/cache/restore@v6
-        with:
-          path: .green-marker
-          key: green-checks-v1-${{ hashFiles('lib/**', 'test/**', 'tool/**', 'scripts/**', 'assets/**', 'pubspec.yaml', 'pubspec.lock', 'l10n.yaml', 'analysis_options.yaml', 'dart_test.yaml', 'android/**', 'ios/**', '.github/workflows/ci.yml') }}
-          lookup-only: true
-
-  # #1810 / #1813 — paths gate. Detects, for a PR, which downstream
-  # jobs can be skipped because the PR can't affect them:
-  #   - `deps`  → `pubspec.*` changed → run the dependency-audit jobs.
-  #   - `code`  → a file that can affect the app build changed → run
-  #               `build-android`. Test-only / workflow / docs PRs skip.
-  # Uses `git diff` against the PR base — same pattern as the `test`
-  # job's affected-test selector — so no new third-party action is
-  # introduced. Non-PR events (master push, weekly schedule) always
-  # resolve to `true` so every gate keeps running there.
   changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
-      deps: ${{ steps.filter.outputs.deps }}
-      code: ${{ steps.filter.outputs.code }}
+      docs: ${{ steps.plan.outputs.docs }}
+      code: ${{ steps.plan.outputs.code }}
+      deps: ${{ steps.plan.outputs.deps }}
+      applicable: ${{ steps.plan.outputs.applicable }}
     steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - id: filter
-        name: Detect dependency-set + build-relevant changes
-        run: |
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "deps=true" >> "$GITHUB_OUTPUT"
-            echo "code=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
-          if echo "$CHANGED" | grep -qE '^pubspec\.(yaml|lock)$'; then
-            echo "deps=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "deps=false" >> "$GITHUB_OUTPUT"
-          fi
-          # `code` = at least one changed file that is NOT purely a
-          # test, a workflow, or documentation — i.e. something that
-          # could affect the Android app build.
-          if echo "$CHANGED" | grep -qvE '^(test/|\.github/|docs/)|\.md$'; then
-            echo "code=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "code=false" >> "$GITHUB_OUTPUT"
-          fi
-
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: ./.github/actions/flutter-setup
+      with:
+        resolve: 'false'
+        cache-pub: 'false'
+    - name: CI script regressions
+      run: python3 -m unittest discover -s test/scripts -p 'ci_*_test.py'
+    - id: plan
+      name: Create one complete test and coverage plan
+      env:
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      run: python3 scripts/ci/plan.py build
+    - uses: actions/upload-artifact@v7
+      with:
+        name: ci-plan-attempt-${{ github.run_attempt }}
+        path: ci-plan/
+        if-no-files-found: error
+        retention-days: 7
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      # #3974 — `pubspec.lock` must be the resolution the SDK actually
-      # produces. Dependabot maintains it with plain `dart pub`, which
-      # cannot resolve `sdk: flutter` and so ignores the versions Flutter
-      # exact-pins (`meta: 1.18.0`, `vector_math: 2.2.0` in
-      # packages/flutter/pubspec.yaml; `matcher: 0.12.19` in
-      # packages/flutter_test/pubspec.yaml). A plain `flutter pub get`
-      # silently RE-RESOLVES and rewrites the lock instead of failing, so
-      # the drift was invisible: every job quietly ran versions the file
-      # did not name. `--enforce-lockfile` is the same gate `build-fdroid`
-      # has always applied to pubspec.fdroid.lock — the main flavour's
-      # lock simply never had one.
-      #
-      # When this fails on a Dependabot PR the bump is not wrong, the
-      # derived file is stale: dispatch "Tools · Regenerate lockfiles".
-      - name: Install deps, enforcing pubspec.lock
-        run: |
-          if ! flutter pub get --enforce-lockfile; then
-            echo "::error title=pubspec.lock is not the SDK's resolution::\
-          pubspec.lock names versions Flutter's exact pins forbid. Fix it \
-          with one dispatch: Actions -> 'Tools · Regenerate lockfiles' -> \
-          branch=${{ github.head_ref || github.ref_name }} (#3974)."
-            exit 1
-          fi
-      # #1730 — no `build_runner build` here. The .g.dart / .freezed.dart
-      # outputs are committed and kept honest by the `codegen-drift` job
-      # below, so `analyze` trusts the checked-in generated files instead
-      # of paying a redundant codegen pass.
-      # #3161 — fatal infos: the lint phase-in is over, the tree is
-      # info-clean, and every deliberate exception carries an explicit
-      # `// ignore:` with a reason. A new info is a build failure.
-      - run: flutter analyze
-      - name: Check feature-module boundaries
-        run: bash scripts/check_module_boundaries.sh
-
-  # #1730 — committed-codegen guard. Every `.g.dart` / `.freezed.dart`
-  # is committed to the repo, so the `analyze`, `test` and
-  # `startup-budget` jobs trust the checked-in files instead of
-  # regenerating them (which previously cost ~6 redundant build_runner
-  # passes per CI run). This job is what keeps that trust honest: it
-  # regenerates from a clean checkout and fails if the committed output
-  # is stale — i.e. someone edited a `@riverpod` / `@freezed` class but
-  # forgot to run build_runner. Before this gate the staleness was
-  # invisible: every other job regenerated over the top of the stale
-  # files, so CI went green and the drift rotted in the repo.
+    - name: Require successful current plan
+      env:
+        PLAN_RESULT: ${{ needs.changes.result }}
+      run: test "$PLAN_RESULT" = success
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+      if: needs.changes.outputs.docs != 'true'
+    - uses: ./.github/actions/flutter-setup
+      if: needs.changes.outputs.docs != 'true'
+    - run: flutter analyze
+      if: needs.changes.outputs.docs != 'true'
+    - name: Check feature-module boundaries
+      run: bash scripts/check_module_boundaries.sh
+      if: needs.changes.outputs.docs != 'true'
+    timeout-minutes: 15
+    needs:
+    - changes
+    if: ${{ always() }}
   codegen-drift:
-    needs: [green-gate]  # #2417 — skip when the build-relevant tree already passed
-    if: ${{ needs.green-gate.outputs.cached != 'true' }}
+    needs:
+    - changes
+    if: ${{ needs.changes.outputs.docs != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      # #2334 — deliberately do NOT cache `.dart_tool` here (only
-      # `~/.pub-cache`). The cache key is `hashFiles('pubspec.lock')`,
-      # so two PRs with the same lockfile but different `@riverpod` /
-      # `@freezed` source share build_runner's cached asset graph under
-      # `.dart_tool/build`. An *incremental* `build_runner build` then
-      # sees "no input changed", re-emits the prior `.g.dart`, and the
-      # `git diff` check passes against identically-stale committed
-      # files — the exact stale-hash vector that poisoned master in
-      # #2322 / #2245 (and `feedback_codegen_drift_local_gate.md`).
-      # Starting from a fresh `.dart_tool` forces a full, honest
-      # regeneration every run. `--delete-conflicting-outputs` only
-      # resolves output collisions, not stale internal hashes, so it is
-      # not a substitute. Cost is ~+30s — well under the ~2.5 min budget.
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
-      - name: Fail if committed codegen is stale
-        run: |
-          if ! git diff --exit-code -- '*.g.dart' '*.freezed.dart'; then
-            echo "::error::Committed generated files are stale. Run 'dart run build_runner build --delete-conflicting-outputs' locally and commit the result." >&2
-            exit 1
-          fi
-
-  # #2336 — fast, dedicated localization gate. Surfaces stale ARB
-  # fan-out and l10n/lint regressions in ~90s at push time instead of
-  # 7-8 min into the sharded test job (and, crucially, a check that
-  # actually exists on a DIRTY ARB PR — branch protection can require
-  # it, so a fan-out-conflict PR can no longer auto-merge unrun).
-  # NO Android, NO build_runner — pure ARB regen + diff + the
-  # l10n/lint test buckets. Steps:
-  #   1. Rebuild the canonical ARB from `_fragments/` + the pseudo
-  #      locale + Flutter's generated localizations.
-  #   2. `git diff --exit-code -- lib/l10n/` fails if any of step 1's
-  #      output differs from what was committed (someone edited a
-  #      fragment without rerunning the tooling).
-  #   3. Run the l10n + lint suites (network-tagged tests excluded;
-  #      they hit live APIs and live in other buckets).
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - uses: ./.github/actions/flutter-setup
+    - run: dart run build_runner build --delete-conflicting-outputs
+    - name: Fail if committed codegen is stale
+      run: |
+        if ! git diff --exit-code -- '*.g.dart' '*.freezed.dart'; then
+          echo "::error::Committed generated files are stale. Run 'dart run build_runner build --delete-conflicting-outputs' locally and commit the result." >&2
+          exit 1
+        fi
+    timeout-minutes: 15
   l10n-gate:
-    needs: [green-gate]  # #2417 — skip when the build-relevant tree already passed
-    if: ${{ needs.green-gate.outputs.cached != 'true' }}
+    needs:
+    - changes
+    if: ${{ needs.changes.outputs.docs != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter (see ci.yml analyze job). Coupled to the
-          # ci.yml pin; bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
-      - name: Rebuild ARB + pseudo-locale + generated localizations
-        run: |
-          dart tool/build_arb.dart
-          dart tool/gen_pseudo_arb.dart
-          flutter gen-l10n
-      - name: Fail if committed ARB fan-out is stale
-        run: |
-          if ! git diff --exit-code -- lib/l10n/; then
-            echo "::error::Generated ARB / l10n output is stale. Run 'dart tool/build_arb.dart && dart tool/gen_pseudo_arb.dart && flutter gen-l10n' locally and commit the result." >&2
-            exit 1
-          fi
-      - name: Run l10n + lint test buckets
-        run: flutter test test/l10n/ test/lint/ --exclude-tags=network
-
-  # #1581 — Test job sharded 4× across parallel runners. Each shard
-  # runs `flutter test --total-shards=4 --shard-index=N` so every
-  # test in the suite runs exactly once across the matrix. Wall clock
-  # for the test phase drops from ~30 min to ~7-8 min; total billed
-  # minutes go up ~4× (acceptable trade — same quality).
-  #
-  # #1582 — `--coverage` is dropped on PR runs (it doubles per-shard
-  # wall clock for a report no one reviews mid-PR). Master pushes and
-  # the weekly schedule still produce coverage so the lcov artefact
-  # and threshold check stay current. Startup-budget enforcement
-  # moved to its own job so PRs still get that gate.
-  #
-  # #1584 — `--exclude-tags=flaky` (plus the existing `network`
-  # exclusion) on PR + master + scheduled runs. The flaky tag covers
-  # plugin tests (share_plus, etc.) whose channel timing is unreliable
-  # in the headless test environment. The nightly flaky-suite workflow
-  # re-runs those with the tag so a real regression still surfaces.
-  #
-  # #1585 — Cache the `build/` directory keyed on pubspec + lib hash
-  # so re-runs of the same branch avoid recompiling Dart sources
-  # untouched since the last run.
-  #
-  # #1594 — On `pull_request` events a `dart run tool/test_selector.dart`
-  # pre-step writes the affected-test list to `affected_tests.txt`. The
-  # shard then either runs ONLY those tests (sharded across the matrix)
-  # or, if the selector emits an empty list (or fails), falls back to
-  # the full suite as a paranoia net. Master pushes + the weekly cron
-  # ignore the selector entirely.
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - uses: ./.github/actions/flutter-setup
+    - name: Rebuild ARB + pseudo-locale + generated localizations
+      run: |
+        dart tool/build_arb.dart
+        dart tool/gen_pseudo_arb.dart
+        flutter gen-l10n
+    - name: Fail if committed ARB fan-out is stale
+      run: |
+        if ! git diff --exit-code -- lib/l10n/; then
+          echo "::error::Generated ARB / l10n output is stale. Run 'dart tool/build_arb.dart && dart tool/gen_pseudo_arb.dart && flutter gen-l10n' locally and commit the result." >&2
+          exit 1
+        fi
+    - name: Run l10n + lint test buckets
+      run: flutter test test/l10n/ test/lint/ --exclude-tags=network
+    timeout-minutes: 15
   test:
-    # #2417 — a MATRIX job must NOT be skipped at job level: a skipped
-    # matrix never expands, so the required `test (0..3)` contexts are
-    # never reported and branch protection blocks the PR forever (auto-
-    # merge can never fire). So the job always runs (the four contexts
-    # always exist) and each heavy STEP below is gated on the green-gate
-    # cache — on a hit every step skips and each shard reports `success`
-    # in seconds (just the checkout). Single-context leaf jobs
-    # (build-android, integration, …) keep the cheaper job-level skip,
-    # whose `skipped` conclusion branch protection counts as a pass.
-    needs: [green-gate]
+    needs:
+    - changes
     runs-on: ubuntu-latest
     strategy:
-      # Don't cancel sibling shards when one fails — we want every
-      # failing shard's output visible in a single CI run.
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3]
+        shard:
+        - 0
+        - 1
+        - 2
+        - 3
     steps:
-      - uses: actions/checkout@v7
-        with:
-          # #1594 — selector needs `git diff master...HEAD` to work.
-          # Shallow clone (default) has no master tip locally.
-          fetch-depth: 0
-      - uses: subosito/flutter-action@v2
-        if: ${{ needs.green-gate.outputs.cached != 'true' }}
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        if: ${{ needs.green-gate.outputs.cached != 'true' }}
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      # #1585 — Cache compiled artefacts. Same-branch reruns and rebase
-      # rounds reuse the compiled Dart output keyed on the source state.
-      - uses: actions/cache@v6
-        if: ${{ needs.green-gate.outputs.cached != 'true' }}
-        with:
-          path: build/
-          key: ${{ runner.os }}-build-${{ hashFiles('pubspec.lock', 'lib/**/*.dart') }}
-          restore-keys: ${{ runner.os }}-build-
-      - if: ${{ needs.green-gate.outputs.cached != 'true' }}
-        run: flutter pub get
-      # #1730 — no `build_runner build` here. Committed generated files
-      # are trusted; the `codegen-drift` job gates their freshness.
-      # #1594 — Compute the affected-test list once per shard. Fast
-      # (pure Dart, file-walk) and per-shard so the selector cost is
-      # parallelised. Empty output triggers a full-suite fallback in
-      # the run step.
-      - name: Compute affected tests (PR only)
-        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
-        run: |
-          # `dart run` emits `Running build hooks...` progress text to stdout
-          # (with `\r` overwrites). Naively redirecting `> affected_tests.txt`
-          # captures that prefix and concatenates it with the first real test
-          # path, so the shard then tries to load a bogus path like
-          # `.../Running build hooks...test/foo_test.dart` and every shard fails
-          # at suite-load time. Filter the stream to lines that look like test
-          # files so the selector output stays clean even if dart prepends
-          # noise. Empty output still triggers the full-suite fallback below.
-          dart run tool/test_selector.dart \
-            --base origin/${{ github.base_ref }} \
-            2>/dev/null \
-            | grep -E '^test/.*_test\.dart$' \
-            > affected_tests.txt || true
-          if [ -s affected_tests.txt ]; then
-            echo "Selector produced $(wc -l < affected_tests.txt) test files"
-            head -20 affected_tests.txt
-          else
-            echo "Selector emitted empty list — shard will fall back to full suite"
-          fi
-      # #4347 — the changed-line coverage policy judges coverage produced by
-      # the PR's own shards. Whether a shard collects any is decided from
-      # the diff by the policy tool (one definition of "maintained source");
-      # test-, docs- and generated-only PRs run exactly as before.
-      - name: Decide changed-line coverage (PR only)
-        id: cov
-        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: |
-          set -euo pipefail
-          git diff --unified=0 --no-color -M "origin/${BASE_REF}...HEAD" -- lib/ > changed-lines.diff
-          dart tool/coverage_policy.dart --diff changed-lines.diff --applicable-only >> "$GITHUB_OUTPUT"
-      # Excludes the `network` + `flaky` tags — those tests hit real
-      # third-party APIs (Argentina, Italy MIMIT) or platform plugins
-      # (share_plus) that intermittently fail and cannot block PRs.
-      # The nightly-flaky workflow re-runs both buckets.
-      - name: Run test shard ${{ matrix.shard }} of 4 (PR — affected only, coverage for tests of changed lib/)
-        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
-        shell: bash
-        env:
-          COLLECT_COVERAGE: ${{ steps.cov.outputs.applicable }}
-          SHARD: ${{ matrix.shard }}
-        run: |
-          if [ "$COLLECT_COVERAGE" != "true" ]; then
-            if [ -s affected_tests.txt ]; then
-              # Read into a bash array so flutter test receives all
-              # files in a single invocation; sharding then splits
-              # this stable, sorted list deterministically across
-              # the 4 matrix runners.
-              mapfile -t TESTS < affected_tests.txt
-              flutter test "${TESTS[@]}" \
-                --exclude-tags=network,flaky \
-                --total-shards=4 \
-                --shard-index="$SHARD"
-            else
-              # Empty selector output ⇒ paranoia: run full suite.
-              flutter test \
-                --exclude-tags=network,flaky \
-                --total-shards=4 \
-                --shard-index="$SHARD"
-            fi
-            exit $?
-          fi
-
-          # #4347 — coverage costs 1.8–2.3× test time (matched full-suite
-          # PR vs master shards), so only the tests that DEPEND on a changed
-          # maintained lib/ file run with --coverage; everything else the
-          # selector picked (always-run bucket included) runs as before.
-          if [ -s affected_tests.txt ]; then
-            cp affected_tests.txt run_tests.txt
-          else
-            find test -name '*_test.dart' | LC_ALL=C sort > run_tests.txt
-          fi
-          dart tool/coverage_policy.dart --diff changed-lines.diff --coverage-tests > coverage_tests.txt
-          grep -Fxf coverage_tests.txt run_tests.txt > measured_tests.txt || true
-          grep -vFxf coverage_tests.txt run_tests.txt > other_tests.txt || true
-          # File-level split of the coverage subset, so a shard with no
-          # slice is visible (and writes an empty report) instead of
-          # tripping flutter's no-tests exit.
-          awk -v shard="$SHARD" '(NR - 1) % 4 == shard' measured_tests.txt > measured_mine.txt
-          REST=(); MINE=()
-          while IFS= read -r t; do REST+=("$t"); done < other_tests.txt
-          while IFS= read -r t; do MINE+=("$t"); done < measured_mine.txt
-          echo "Coverage subset: $(wc -l < measured_tests.txt) files (${#MINE[@]} on this shard); without coverage: ${#REST[@]}"
-
-          status=0
-          if [ "${#REST[@]}" -gt 0 ]; then
-            flutter test "${REST[@]}" \
-              --exclude-tags=network,flaky \
-              --total-shards=4 \
-              --shard-index="$SHARD" || status=$?
-          fi
-          rm -rf coverage
-          if [ "${#MINE[@]}" -gt 0 ]; then
-            code=0
-            flutter test "${MINE[@]}" --coverage --exclude-tags=network,flaky || code=$?
-            # 79 = every test in the slice was tag-excluded: nothing ran.
-            if [ "$code" -ne 0 ] && [ "$code" -ne 79 ]; then status=$code; fi
-          fi
-          mkdir -p coverage
-          [ -f coverage/lcov.info ] || : > coverage/lcov.info
-          exit "$status"
-      - name: Upload PR shard coverage (#4347)
-        if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' && steps.cov.outputs.applicable == 'true' }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: pr-coverage-shard-${{ matrix.shard }}
-          path: coverage/lcov.info
-          # A shard that should have measured and did not must not look
-          # like "nothing to measure" downstream.
-          if-no-files-found: error
-          retention-days: 1
-      - name: Run test shard ${{ matrix.shard }} of 4 (master/nightly — full suite + coverage)
-        if: github.event_name != 'pull_request'
-        run: |
-          flutter test \
-            --coverage \
-            --exclude-tags=network,flaky \
-            --total-shards=4 \
-            --shard-index=${{ matrix.shard }}
-      - name: Upload shard coverage
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v7
-        with:
-          name: coverage-shard-${{ matrix.shard }}
-          path: coverage/lcov.info
-          if-no-files-found: error
-          retention-days: 1
-
-  # Aggregates the 4 shard coverage reports into one merged lcov.info
-  # and enforces the project-wide threshold over the unified view.
-  # #1582 — Only runs on master push + the weekly schedule. PRs skip
-  # this job; coverage is regenerated when a PR's commits land on master.
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/download-artifact@v8
+      with:
+        name: ci-plan-attempt-${{ github.run_attempt }}
+        path: ci-plan
+    - name: Verify candidate and same-attempt plan
+      run: python3 scripts/ci/plan.py verify
+    - uses: ./.github/actions/flutter-setup
+    - name: Run planned shard (plain + measured files once)
+      env:
+        SHARD: ${{ matrix.shard }}
+      run: python3 scripts/ci/run_shard.py --shard "$SHARD"
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: test-results-${{ matrix.shard }}-attempt-${{ github.run_attempt }}
+        path: ci-results/
+        if-no-files-found: error
+        retention-days: 7
+    - uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.applicable == 'true') }}
+      with:
+        name: ${{ github.event_name == 'pull_request' && 'pr-coverage' || 'coverage' }}-shard-${{ matrix.shard }}-attempt-${{
+          github.run_attempt }}
+        path: coverage/lcov.info
+        if-no-files-found: error
+        retention-days: 1
+    timeout-minutes: 80
   coverage-merge:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    needs: [test]
+    needs:
+    - test
     steps:
-      - uses: actions/checkout@v7
-        with:
-          # #4347 — the drift check below diffs the pushed range.
-          fetch-depth: 0
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
-      - name: Install lcov
-        run: sudo apt-get update && sudo apt-get install -y lcov
-      - name: Download shard coverage artifacts
-        uses: actions/download-artifact@v8
-        with:
-          pattern: coverage-shard-*
-          path: coverage-shards
-      - name: Merge shard lcov files
-        run: |
-          mkdir -p coverage
-          ARGS=()
-          for f in coverage-shards/coverage-shard-*/lcov.info; do
-            ARGS+=(-a "$f")
-          done
-          lcov "${ARGS[@]}" -o coverage/lcov.info
-          echo "Merged ${#ARGS[@]} shard lcov files into coverage/lcov.info"
-      - name: Check coverage threshold
-        # EXPLICIT threshold (PROJECT_OVERVIEW §22-A): this used to pass no
-        # --threshold, silently enforcing the script's default while three
-        # documents claimed 45%. The number is now stated where it is
-        # enforced; raising it is a one-line, reviewable change. NB: this
-        # job runs only on non-PR events (see the job-level `if:`), so
-        # coverage is checked after merge — a deliberate autonomy trade
-        # (#2338 removed it from required checks), not an oversight.
-        run: bash scripts/check_coverage.sh --threshold 40
-      # #4347 — drift detection for the pre-merge policy. The PR gate
-      # judged this change on its affected tests' coverage; the full suite
-      # judges it again here. A disagreement is reported, not enforced:
-      # the change is already on master, and the 40 % floor above stays
-      # the post-merge gate.
-      - name: Changed-line policy on full-suite coverage (drift report)
-        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
-        env:
-          BEFORE: ${{ github.event.before }}
-        run: |
-          set -uo pipefail
-          if ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-            echo "::notice::push base $BEFORE is not in this clone (force push?) — no drift report"
-            exit 0
-          fi
-          git diff --unified=0 --no-color -M "$BEFORE" "$GITHUB_SHA" -- lib/ > pushed-lines.diff
-          dart tool/coverage_policy.dart --diff pushed-lines.diff --lcov coverage/lcov.info --summary "$GITHUB_STEP_SUMMARY"
-          code=$?
-          if [ "$code" -ne 0 ]; then
-            echo "::warning::Full-suite coverage judges this push differently from the pre-merge policy (exit $code) — see the job summary (#4347)."
-          fi
-
-  # #4347 — pre-merge changed-line coverage, ADVISORY for now (maintainer
-  # decision): the job reports its verdict in the step summary and as
-  # `::warning::` annotations listing the uncovered changed lines, and its
-  # conclusion stays green. Policy, denominator and allowances:
-  # tool/coverage_policy.dart. Missing or corrupt coverage (tool exit 2)
-  # is reported the same way. It is not a required check and
-  # `record-green` does not depend on it.
-  #
-  # TO ENFORCE: set COVERAGE_POLICY_ENFORCE below to 'true' (policy
-  # failures and missing evidence then fail the job), add
-  # "coverage-policy" to TARGET_CHECKS in
-  # scripts/configure_branch_protection.sh plus a pass-through stub in
-  # ci-docs-stub.yml, and make record-green require its success.
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: ./.github/actions/flutter-setup
+    - name: Install lcov
+      run: sudo apt-get update && sudo apt-get install -y lcov
+    - name: Download shard coverage artifacts
+      uses: actions/download-artifact@v8
+      with:
+        pattern: coverage-shard-*-attempt-${{ github.run_attempt }}
+        path: coverage-shards
+    - name: Merge shard lcov files
+      run: |
+        mkdir -p coverage
+        ARGS=()
+        for shard in 0 1 2 3; do
+          f="coverage-shards/coverage-shard-${shard}-attempt-${{ github.run_attempt }}/lcov.info"
+          test -f "$f" || { echo "::error::Missing coverage shard $shard"; exit 1; }
+          ARGS+=(-a "$f")
+        done
+        lcov "${ARGS[@]}" -o coverage/lcov.info
+        echo "Merged ${#ARGS[@]} shard lcov files into coverage/lcov.info"
+    - name: Check coverage threshold
+      run: bash scripts/check_coverage.sh --threshold 40
+    - name: Changed-line policy on full-suite coverage (drift report)
+      if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+      env:
+        BEFORE: ${{ github.event.before }}
+      run: |
+        set -uo pipefail
+        if ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+          echo "::notice::push base $BEFORE is not in this clone (force push?) — no drift report"
+          exit 0
+        fi
+        git diff --unified=0 --no-color -M "$BEFORE" "$GITHUB_SHA" -- lib/ > pushed-lines.diff
+        dart tool/coverage_policy.dart --follow-exports --diff pushed-lines.diff --lcov coverage/lcov.info --summary "$GITHUB_STEP_SUMMARY"
+        code=$?
+        if [ "$code" -ne 0 ]; then
+          echo "::warning::Full-suite coverage judges this push differently from the pre-merge policy (exit $code) — see the job summary (#4347)."
+        fi
+    timeout-minutes: 15
   coverage-policy:
-    needs: [green-gate, test]
-    if: ${{ github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' }}
+    needs:
+    - changes
+    - test
+    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.docs != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       COVERAGE_POLICY_ENFORCE: 'false'
     steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: subosito/flutter-action@v2
-        # Advisory: an infrastructure hiccup here must not paint the PR red.
-        continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
-        with:
-          channel: stable
-          flutter-version: "3.44.9"
-          cache: true
-      - name: Changed lines against the PR base
-        id: cov
-        continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: |
-          set -euo pipefail
-          git diff --unified=0 --no-color -M "origin/${BASE_REF}...HEAD" -- lib/ > changed-lines.diff
-          dart tool/coverage_policy.dart --diff changed-lines.diff --applicable-only >> "$GITHUB_OUTPUT"
-      - name: Download PR shard coverage
-        if: steps.cov.outputs.applicable == 'true'
-        continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
-        uses: actions/download-artifact@v8
-        with:
-          pattern: pr-coverage-shard-*
-          path: pr-coverage
-      - name: Changed-line coverage policy
-        env:
-          APPLICABLE: ${{ steps.cov.outputs.applicable }}
-        run: |
-          set -uo pipefail
-          ENFORCE="${COVERAGE_POLICY_ENFORCE:-false}"
-          LEVEL=warning
-          if [ "$ENFORCE" = "true" ]; then LEVEL=error; fi
-          ARGS=(--diff changed-lines.diff --summary "$GITHUB_STEP_SUMMARY" --annotation-level "$LEVEL")
-          if [ "$APPLICABLE" = "true" ]; then
-            # Every shard's report is named: a missing one is exit 2.
-            for shard in 0 1 2 3; do
-              ARGS+=(--lcov "pr-coverage/pr-coverage-shard-${shard}/lcov.info")
-            done
-          fi
-          code=0
-          dart tool/coverage_policy.dart "${ARGS[@]}" || code=$?
-          if [ "$code" -eq 0 ]; then
-            exit 0
-          fi
-          if [ "$ENFORCE" = "true" ]; then
-            exit "$code"
-          fi
-          case "$code" in
-            1) why="the changed lines break the coverage policy" ;;
-            2) why="coverage evidence is missing or corrupt" ;;
-            *) why="the policy tool crashed" ;;
-          esac
-          echo "::warning title=Changed-line coverage (advisory)::${why} (exit ${code}). Advisory while COVERAGE_POLICY_ENFORCE is not 'true' — see the job summary (#4347)."
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/download-artifact@v8
+      continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
+      with:
+        name: ci-plan-attempt-${{ github.run_attempt }}
+        path: ci-plan
+    - name: Verify candidate and same-attempt plan
+      run: |-
+        python3 scripts/ci/plan.py verify
+        cp ci-plan/changed-lines.diff changed-lines.diff
+      continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
+    - uses: ./.github/actions/flutter-setup
+      continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
+    - name: Download PR shard coverage
+      if: needs.changes.outputs.applicable == 'true'
+      continue-on-error: ${{ env.COVERAGE_POLICY_ENFORCE != 'true' }}
+      uses: actions/download-artifact@v8
+      with:
+        pattern: pr-coverage-shard-*-attempt-${{ github.run_attempt }}
+        path: pr-coverage
+    - name: Changed-line coverage policy
+      env:
+        APPLICABLE: ${{ needs.changes.outputs.applicable }}
+        ATTEMPT: ${{ github.run_attempt }}
+      run: |
+        set -uo pipefail
+        ENFORCE="${COVERAGE_POLICY_ENFORCE:-false}"
+        LEVEL=warning
+        if [ "$ENFORCE" = "true" ]; then LEVEL=error; fi
+        ARGS=(--follow-exports --diff changed-lines.diff --summary "$GITHUB_STEP_SUMMARY" --annotation-level "$LEVEL")
+        if [ "$APPLICABLE" = "true" ]; then
+          # Every shard's report is named: a missing one is exit 2.
+          for shard in 0 1 2 3; do
+            ARGS+=(--lcov "pr-coverage/pr-coverage-shard-${shard}-attempt-${ATTEMPT}/lcov.info")
+          done
+        fi
+        code=0
+        dart tool/coverage_policy.dart "${ARGS[@]}" || code=$?
+        if [ "$code" -eq 0 ]; then
           exit 0
-
-  # #1582 — Startup-budget gate split out of coverage-merge so PRs
-  # still enforce it. Cheap: runs only the test/core/perf/ subset.
+        fi
+        if [ "$ENFORCE" = "true" ]; then
+          exit "$code"
+        fi
+        case "$code" in
+          1) why="the changed lines break the coverage policy" ;;
+          2) why="coverage evidence is missing or corrupt" ;;
+          *) why="the policy tool crashed" ;;
+        esac
+        echo "::warning title=Changed-line coverage (advisory)::${why} (exit ${code}). Advisory while COVERAGE_POLICY_ENFORCE is not 'true' — see the job summary (#4347)."
+        exit 0
   startup-budget:
     runs-on: ubuntu-latest
-    needs: [analyze, green-gate]  # #2417 — green-gate skips when the tree already passed
-    if: ${{ needs.green-gate.outputs.cached != 'true' }}
+    needs:
+    - changes
+    if: ${{ needs.changes.outputs.docs != 'true' }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
-      # #1730 — no `build_runner build` here. Committed generated files
-      # are trusted; the `codegen-drift` job gates their freshness.
-      - name: Check startup time budget
-        run: bash scripts/check_startup_budget.sh
-
-  # #1612 — end-to-end integration journeys. The files under
-  # `test/integration/` drive full vertical feature slices (OBD2 trip
-  # recording, fill-up + receipt-scan reconciliation, cross-device
-  # TankSync) wired with fakes only at the boundary. They are kept
-  # headless under `test/` rather than `integration_test/` — the
-  # latter forces an Android emulator, which would be slow and flaky —
-  # so this stays a fast, deterministic check. A dedicated job gives
-  # the integration suite a named CI signal; it is cheap (three small
-  # files) and `needs: [analyze]` so it fails fast on broken analysis.
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - uses: ./.github/actions/flutter-setup
+    - name: Check startup time budget
+      run: bash scripts/check_startup_budget.sh
+    timeout-minutes: 15
   integration:
-    needs: [analyze, green-gate]  # #2417 — green-gate skips when the tree already passed
-    if: ${{ needs.green-gate.outputs.cached != 'true' }}
+    needs:
+    - changes
+    if: ${{ needs.changes.outputs.docs != 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
-      - name: Run end-to-end integration journeys
-        run: flutter test test/integration/
-
-  # #1810 — security-scan / license-audit / dependency-check are pure
-  # functions of `pubspec.*`. They skip on PRs that don't touch the
-  # dependency set; master push + the weekly schedule always run them,
-  # so a newly-disclosed CVE against an unchanged lockfile still
-  # surfaces within a week. A job-level `if:` skip reports a `skipped`
-  # check conclusion, which branch protection counts as a pass — so
-  # `gh pr merge --auto` is unaffected even if these are required.
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - uses: ./.github/actions/flutter-setup
+    - name: Run end-to-end integration journeys
+      run: flutter test test/integration/
+    timeout-minutes: 15
   security-scan:
-    needs: [changes]
-    if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
+    needs:
+    - changes
+    if: ${{ needs.changes.outputs.deps == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - run: flutter pub get
-      - name: OSV vulnerability scan
-        uses: google/osv-scanner-action/osv-scanner-action@v2.7.0
-        with:
-          scan-args: |-
-            --lockfile=pubspec.lock
-
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - name: OSV vulnerability scan
+      uses: google/osv-scanner-action/osv-scanner-action@v2.7.0
+      with:
+        scan-args: --lockfile=pubspec.lock
+    timeout-minutes: 15
   license-audit:
-    needs: [changes]  # #1810 — see security-scan
-    if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
+    needs:
+    - changes
+    if: ${{ needs.changes.outputs.deps == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
-      - name: Audit dependency licenses
-        run: bash scripts/license_audit.sh
-
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - uses: ./.github/actions/flutter-setup
+    - name: Audit dependency licenses
+      run: bash scripts/license_audit.sh
+    timeout-minutes: 15
   dependency-check:
-    needs: [changes]  # #1810 — see security-scan
-    if: ${{ needs.changes.outputs.deps == 'true' || github.event_name != 'pull_request' }}
+    needs:
+    - changes
+    if: ${{ needs.changes.outputs.deps == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
-      - name: Check outdated dependencies and advisories
-        run: bash scripts/pub_outdated_check.sh
-
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - uses: ./.github/actions/flutter-setup
+    - name: Check outdated dependencies and advisories
+      run: bash scripts/pub_outdated_check.sh
+    timeout-minutes: 15
   build-android:
     runs-on: ubuntu-latest
-    # #1580 — `test` removed from `needs:` so build-android runs in
-    # parallel with the ~30-min test job instead of waiting for it.
-    # The two jobs share no artefacts; build doesn't consume test
-    # output. `analyze` is kept (cheap, fails fast) so we don't pay
-    # the Android build cost when static analysis is broken.
-    # #1813 — `changes` added so a test-only / workflow / docs PR skips
-    # the build entirely (a skipped job counts as a passing required
-    # check, so `gh pr merge --auto` is unaffected).
-    # #2417 — `green-gate` added so an already-passed identical tree
-    # skips the build too.
-    needs: [analyze, changes, green-gate]
-    if: ${{ needs.green-gate.outputs.cached != 'true' && (needs.changes.outputs.code == 'true' || github.event_name != 'pull_request') }}
+    needs:
+    - analyze
+    - changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v6
-        with:
-          distribution: temurin
-          java-version: 17
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          # #1936 — pin Flutter. A floating `channel: stable` picked up
-          # a newer SDK whose bundled Gradle plugin hard-fails on the
-          # tflite_flutter Java(11)/Kotlin(17) JVM-target mismatch.
-          # The tflite_flutter mismatch is normalised in
-          # android/build.gradle.kts (a global subprojects JavaCompile
-          # JVM-17 override), so the pin is about determinism, not that
-          # workaround. 3.44.9 = Dart 3.12.2, the floor shimmer 4 needs
-          # (#3801). Bump deliberately, not by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      # #1585 — Cache compiled Flutter artefacts for same-branch reruns.
-      - uses: actions/cache@v6
-        with:
-          path: build/
-          key: ${{ runner.os }}-build-android-${{ hashFiles('pubspec.lock', 'lib/**/*.dart', 'android/**') }}
-          restore-keys: ${{ runner.os }}-build-android-
-      # #1813 — cache the Gradle home (downloaded Android dependencies,
-      # the wrapper distribution, and the Gradle build cache). Warm runs
-      # skip re-downloading the Android toolchain — the single biggest
-      # lever on build-android wall-clock.
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
-      # #3543 — the AGP's on-demand NDK download (flutter_zxing needs
-      # ndk;27.0.12077973) flaked 4× on 2026-07-09 alone (corrupt zip /
-      # InstallFailedException), killing otherwise-green runs and stalling
-      # serialized auto-merges. Restore the installed NDK from cache; on a
-      # miss, pre-install with bounded retries so a transient CDN failure
-      # never reaches the Gradle layer. ANDROID_HOME is
-      # /usr/local/lib/android/sdk on the ubuntu runner images.
-      - name: Cache Android NDK
-        id: ndk-cache
-        uses: actions/cache@v6
-        with:
-          path: /usr/local/lib/android/sdk/ndk/27.0.12077973
-          key: ${{ runner.os }}-ndk-27.0.12077973
-      - name: Pre-install Android NDK (bounded retries)
-        if: steps.ndk-cache.outputs.cache-hit != 'true'
-        run: |
-          for attempt in 1 2 3; do
-            if "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'ndk;27.0.12077973' < /dev/null > /dev/null; then
-              break
-            fi
-            echo "NDK install attempt $attempt failed — cleaning + retrying in 20s (#3543)"
-            rm -rf "$ANDROID_HOME/ndk/27.0.12077973"
-            sleep 20
-          done
-          if [ ! -d "$ANDROID_HOME/ndk/27.0.12077973" ]; then
-            echo "::error::NDK 27.0.12077973 install failed after 3 attempts (#3543)" >&2
-            exit 1
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - uses: actions/setup-java@v6
+      with:
+        distribution: temurin
+        java-version: 17
+    - uses: ./.github/actions/flutter-setup
+    - uses: actions/cache@v6
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties')
+          }}
+        restore-keys: ${{ runner.os }}-gradle-
+    - name: Cache Android NDK
+      id: ndk-cache
+      uses: actions/cache@v6
+      with:
+        path: /usr/local/lib/android/sdk/ndk/27.0.12077973
+        key: ${{ runner.os }}-ndk-27.0.12077973
+    - name: Pre-install Android NDK (bounded retries)
+      if: steps.ndk-cache.outputs.cache-hit != 'true'
+      run: |
+        for attempt in 1 2 3; do
+          if "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install 'ndk;27.0.12077973' < /dev/null > /dev/null; then
+            break
           fi
-      - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
-      # #48 — Decode the release keystore from a GitHub secret into a temp
-      # file, then export the three env vars gradle's resolveReleaseSigning()
-      # helper reads. The keystore file is written to a runner-local path
-      # outside the checkout so it never ends up in an artifact.
-      #
-      # #1813 — only the release path (master push / tag / weekly
-      # schedule) needs the keystore. PR validation builds an unsigned
-      # debug APK below, so this step — and the Dependabot "no secrets
-      # for bots" edge case it used to guard — is skipped on every
-      # `pull_request` event.
-      - name: Decode signing keystore
-        if: github.event_name != 'pull_request'
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-        run: |
-          if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ]; then
-            echo "::error::Missing one of ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_ALIAS secrets. Release builds require all three — see #48." >&2
-            exit 1
-          fi
-          KEYSTORE_PATH="$RUNNER_TEMP/tankstellen-release.jks"
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
-          if ! [ -s "$KEYSTORE_PATH" ]; then
-            echo "::error::Decoded keystore is empty or invalid base64" >&2
-            exit 1
-          fi
-          echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
-          echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
-          # #3740 — the keystore PASSWORD is deliberately NOT exported to
-          # GITHUB_ENV: that exposes it to every subsequent step (and any
-          # compromised action). It is scoped to the build steps' env: blocks.
-      # #1813 — PR validation builds a single unsigned debug APK: it
-      # compiles + links all Dart and Kotlin (catching the breakage a
-      # PR can realistically introduce) without paying for R8-minified
-      # release output across 3 ABIs plus a separate AAB. The signed
-      # release APK + AAB are built only on master push / tag / the
-      # weekly schedule, where the `release` job actually consumes them.
-      - name: Build APK (debug — PR validation)
-        if: github.event_name == 'pull_request'
-        run: flutter build apk --debug --flavor play
-      - name: Compute monotonic versionCode
-        if: github.event_name != 'pull_request'
-        id: bn
-        # #3513 — ONE shared, wall-clock-derived versionCode across every
-        # release-build workflow: minutes since 2025-07-06 UTC on a 2026100000
-        # base. Strictly monotonic across ALL workflows (the per-workflow
-        # run_number counters could leapfrog each other and trip Play's
-        # no-downgrade rule, as the v6.0.3 tag deploy did), above every shipped
-        # code, ~230 years under Android's 2_147_483_647 cap. The official
-        # F-Droid catalog keeps pubspec's static codes (separate install base).
-        run: |
-          BN=$(( 2026100000 + ( $(date -u +%s) - 1751760000 ) / 60 ))
-          echo "build_number=$BN" >> "$GITHUB_OUTPUT"
-          echo "versionCode: $BN"
-      - name: Build APK (release, split per ABI)
-        if: github.event_name != 'pull_request'
-        env:
-          # #3740 — keystore password scoped to the signing build steps only.
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-        run: flutter build apk --release --split-per-abi --flavor play --build-number=${{ steps.bn.outputs.build_number }}
-      - name: Build App Bundle (release)
-        if: github.event_name != 'pull_request'
-        env:
-          # #3740 — keystore password scoped to the signing build steps only.
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-        run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
-      # #3661 — size visible on every build; fails on an implausibly
-      # small artifact (llmwiki page 25).
-      - name: Artifact sizes -> job summary
-        if: github.event_name != 'pull_request'
-        run: bash scripts/report_artifact_sizes.sh 'build/app/outputs/flutter-apk/app-*-play-release.apk' 'build/app/outputs/bundle/playRelease/app-play-release.aab'
-      # #2947 — assert the MERGED play manifest declares ZERO
-      # FOREGROUND_SERVICE* permissions, so a future accidental FGS re-merge
-      # (the Android Auto v2 live bridge is a BOUND service, no FGS) trips CI
-      # here instead of surfacing as the opaque #1498 Play 403 on the
-      # Open-Testing upload. Mirrors the fdroid no-GMS gate pattern. The PR
-      # build produces playDebug's merged manifest; the master/tag build
-      # produces playRelease's. Audit whichever exists.
-      #
-      # #4352 (Epic #4351) — the same step now also audits the CHECKED-IN
-      # FGS-approved overlays with expect-EXACTLY. `FGS_FORM_APPROVED` is not
-      # set on this repository, so the Play artifact ships WITHOUT the
-      # foreground service while F-Droid and dev APKs ship with it; those
-      # overlays are the only statement of what a capable artifact would
-      # declare, and they are what `RecordingProtectionBuild.supports()`
-      # claims in Dart. Auditing source-set files needs no build, no emulator
-      # and no new matrix job — deliberately extra invocations in this ONE
-      # step, because a job-level skip of a matrix job blocks required checks
-      # forever.
-      - name: Audit — FOREGROUND_SERVICE declarations per artifact (play)
-        if: always()
-        run: |
-          DEBUG_MANIFEST="build/app/intermediates/merged_manifests/playDebug/processPlayDebugManifest/AndroidManifest.xml"
-          RELEASE_MANIFEST="build/app/intermediates/merged_manifests/playRelease/processPlayReleaseManifest/AndroidManifest.xml"
-          if [ -f "$RELEASE_MANIFEST" ]; then
-            bash scripts/audit_fgs_declarations.sh --expect-zero --merged "$RELEASE_MANIFEST"
-          elif [ -f "$DEBUG_MANIFEST" ]; then
-            bash scripts/audit_fgs_declarations.sh --expect-zero --merged "$DEBUG_MANIFEST"
-          else
-            echo "::error::No merged play manifest found to audit for FGS permissions." >&2
-            exit 1
-          fi
-          bash scripts/audit_fgs_declarations.sh --profile play-fgs-approved
-          bash scripts/audit_fgs_declarations.sh --profile fdroid-fgs-approved
-      - name: Clean up decoded keystore
-        if: always()
-        run: rm -f "$RUNNER_TEMP/tankstellen-release.jks"
-      - uses: actions/upload-artifact@v7
-        if: github.event_name != 'pull_request'
-        with:
-          name: android-apk
-          path: build/app/outputs/flutter-apk/app-*-play-release.apk
-      - uses: actions/upload-artifact@v7
-        if: github.event_name != 'pull_request'
-        with:
-          name: android-aab
-          path: build/app/outputs/bundle/playRelease/app-play-release.aab
-
-  # build-ios:
-  #   runs-on: macos-latest
-  #   needs: [analyze, test]
-  #   Disabled: iOS build not ready (no code signing, no Apple Developer enrollment)
-  #   Re-enable when iOS distribution is set up.
-
+          echo "NDK install attempt $attempt failed — cleaning + retrying in 20s (#3543)"
+          rm -rf "$ANDROID_HOME/ndk/27.0.12077973"
+          sleep 20
+        done
+        if [ ! -d "$ANDROID_HOME/ndk/27.0.12077973" ]; then
+          echo "::error::NDK 27.0.12077973 install failed after 3 attempts (#3543)" >&2
+          exit 1
+        fi
+    - name: Decode signing keystore
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      env:
+        ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      run: |
+        if [ -z "$ANDROID_KEYSTORE_BASE64" ] || [ -z "$ANDROID_KEYSTORE_PASSWORD" ] || [ -z "$ANDROID_KEY_ALIAS" ]; then
+          echo "::error::Missing one of ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD / ANDROID_KEY_ALIAS secrets. Release builds require all three — see #48." >&2
+          exit 1
+        fi
+        KEYSTORE_PATH="$RUNNER_TEMP/tankstellen-release.jks"
+        echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+        if ! [ -s "$KEYSTORE_PATH" ]; then
+          echo "::error::Decoded keystore is empty or invalid base64" >&2
+          exit 1
+        fi
+        echo "ANDROID_KEYSTORE_PATH=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+        echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
+        # #3740 — the keystore PASSWORD is deliberately NOT exported to
+        # GITHUB_ENV: that exposes it to every subsequent step (and any
+        # compromised action). It is scoped to the build steps' env: blocks.
+    - name: Build APK (debug — PR validation)
+      if: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) }}
+      run: flutter build apk --debug --flavor play
+    - name: Compute monotonic versionCode
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      id: bn
+      run: |
+        BN=$(( 2026100000 + ( $(date -u +%s) - 1751760000 ) / 60 ))
+        echo "build_number=$BN" >> "$GITHUB_OUTPUT"
+        echo "versionCode: $BN"
+    - name: Build APK (release, split per ABI)
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      env:
+        ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      run: flutter build apk --release --split-per-abi --flavor play --build-number=${{ steps.bn.outputs.build_number }}
+    - name: Build App Bundle (release)
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      env:
+        ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      run: flutter build appbundle --release --flavor play --build-number=${{ steps.bn.outputs.build_number }}
+    - name: Artifact sizes -> job summary
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      run: bash scripts/report_artifact_sizes.sh 'build/app/outputs/flutter-apk/app-*-play-release.apk' 'build/app/outputs/bundle/playRelease/app-play-release.aab'
+    - name: Audit — FOREGROUND_SERVICE declarations per artifact (play)
+      if: always()
+      run: |
+        DEBUG_MANIFEST="build/app/intermediates/merged_manifests/playDebug/processPlayDebugManifest/AndroidManifest.xml"
+        RELEASE_MANIFEST="build/app/intermediates/merged_manifests/playRelease/processPlayReleaseManifest/AndroidManifest.xml"
+        if [ -f "$RELEASE_MANIFEST" ]; then
+          bash scripts/audit_fgs_declarations.sh --expect-zero --merged "$RELEASE_MANIFEST"
+        elif [ -f "$DEBUG_MANIFEST" ]; then
+          bash scripts/audit_fgs_declarations.sh --expect-zero --merged "$DEBUG_MANIFEST"
+        else
+          echo "::error::No merged play manifest found to audit for FGS permissions." >&2
+          exit 1
+        fi
+        bash scripts/audit_fgs_declarations.sh --profile play-fgs-approved
+        bash scripts/audit_fgs_declarations.sh --profile fdroid-fgs-approved
+    - name: Clean up decoded keystore
+      if: always()
+      run: rm -f "$RUNNER_TEMP/tankstellen-release.jks"
+    - uses: actions/upload-artifact@v7
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      with:
+        name: android-apk
+        path: build/app/outputs/flutter-apk/app-*-play-release.apk
+    - uses: actions/upload-artifact@v7
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      with:
+        name: android-aab
+        path: build/app/outputs/bundle/playRelease/app-play-release.aab
+    - uses: actions/upload-artifact@v7
+      if: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) }}
+      with:
+        name: android-play-debug-attempt-${{ github.run_attempt }}
+        path: build/app/outputs/flutter-apk/app-play-debug.apk
+        if-no-files-found: error
+        retention-days: 7
+    timeout-minutes: 40
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build-android]
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+    needs:
+    - build-android
+    - analyze
+    - test
+    - codegen-drift
+    - l10n-gate
+    - integration
+    - startup-budget
+    - coverage-merge
+    - security-scan
+    - license-audit
+    - dependency-check
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
-      - name: Extract version from tag
-        id: version
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
-      - name: Generate release body
-        id: body
-        run: |
-          {
-            echo 'body<<RELEASE_EOF'
-            echo "## Tankstellen v${{ steps.version.outputs.version }}"
-            echo ""
-            echo "### Artifacts"
-            echo "- **APK (split per ABI):** Install directly on Android devices"
-            echo "- **AAB (App Bundle):** For Google Play Store upload"
-            echo ""
-            echo "### Installation"
-            echo "Download the APK matching your device architecture:"
-            echo "- \`app-arm64-v8a-play-release.apk\` — Most modern phones (ARM 64-bit)"
-            echo "- \`app-armeabi-v7a-play-release.apk\` — Older phones (ARM 32-bit)"
-            echo "- \`app-x86_64-play-release.apk\` — Emulators and x86 devices"
-            echo ""
-            echo "---"
-            echo "*Auto-generated release from tag \`v${{ steps.version.outputs.version }}\`*"
-            echo 'RELEASE_EOF'
-          } >> "$GITHUB_OUTPUT"
-      - uses: softprops/action-gh-release@v3
-        with:
-          name: v${{ steps.version.outputs.version }}
-          body: ${{ steps.body.outputs.body }}
-          generate_release_notes: true
-          files: |
-            android-apk/app-*.apk
-            android-aab/app-play-release.aab
-
-  # #2417 — saves the green-tree marker after a real full PR pass so the
-  # NEXT run on an identical tree can skip the heavy leaf jobs (see the
-  # `green-gate` header above). Runs only on `pull_request`, only when
-  # this run was itself a full pass (`cached != 'true'` — we never
-  # re-save on a HIT), and only after the gated jobs reported success.
-  #
-  # `!cancelled()` is REQUIRED: a legitimately-skipped `build-android`
-  # (test-only PR where `changes.code == 'false'`) reports `skipped`, and
-  # without `!cancelled()` that would skip-propagate to this job and
-  # prevent the marker being saved for an otherwise fully-green tree. The
-  # `build-android.result != 'failure' && != 'cancelled'` pair therefore
-  # accepts both `success` and `skipped` while still refusing a real
-  # failure. This job is a NEW non-required check — do NOT add it to
-  # branch protection.
-  #
-  # The hashFiles glob set below MUST stay byte-identical to `green-gate`
-  # (same cache key) — keep the two lists in sync.
-  record-green:
-    runs-on: ubuntu-latest
-    needs: [green-gate, analyze, codegen-drift, l10n-gate, test, integration, startup-budget, build-android]
-    if: ${{ !cancelled() && github.event_name == 'pull_request' && needs.green-gate.outputs.cached != 'true' && needs.analyze.result == 'success' && needs.codegen-drift.result == 'success' && needs.l10n-gate.result == 'success' && needs.test.result == 'success' && needs.integration.result == 'success' && needs.startup-budget.result == 'success' && needs.build-android.result != 'failure' && needs.build-android.result != 'cancelled' }}
-    steps:
-      - uses: actions/checkout@v7
-      - run: mkdir -p .green-marker && echo "$GITHUB_SHA" > .green-marker/sha
-      - uses: actions/cache/save@v6
-        with:
-          path: .green-marker
-          key: green-checks-v1-${{ hashFiles('lib/**', 'test/**', 'tool/**', 'scripts/**', 'assets/**', 'pubspec.yaml', 'pubspec.lock', 'l10n.yaml', 'analysis_options.yaml', 'dart_test.yaml', 'android/**', 'ios/**', '.github/workflows/ci.yml') }}
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+    - uses: actions/download-artifact@v8
+      with:
+        pattern: android-*
+    - name: Extract version from tag
+      id: version
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+    - name: Generate release body
+      id: body
+      run: |
+        {
+          echo 'body<<RELEASE_EOF'
+          echo "## Tankstellen v${{ steps.version.outputs.version }}"
+          echo ""
+          echo "### Artifacts"
+          echo "- **APK (split per ABI):** Install directly on Android devices"
+          echo "- **AAB (App Bundle):** For Google Play Store upload"
+          echo ""
+          echo "### Installation"
+          echo "Download the APK matching your device architecture:"
+          echo "- \`app-arm64-v8a-play-release.apk\` — Most modern phones (ARM 64-bit)"
+          echo "- \`app-armeabi-v7a-play-release.apk\` — Older phones (ARM 32-bit)"
+          echo "- \`app-x86_64-play-release.apk\` — Emulators and x86 devices"
+          echo ""
+          echo "---"
+          echo "*Auto-generated release from tag \`v${{ steps.version.outputs.version }}\`*"
+          echo 'RELEASE_EOF'
+        } >> "$GITHUB_OUTPUT"
+    - uses: softprops/action-gh-release@v3
+      with:
+        name: v${{ steps.version.outputs.version }}
+        body: ${{ steps.body.outputs.body }}
+        generate_release_notes: true
+        files: |
+          android-apk/app-*.apk
+          android-aab/app-play-release.aab
+    timeout-minutes: 15
+permissions:
+  contents: read

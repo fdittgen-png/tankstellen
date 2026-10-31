@@ -8,7 +8,8 @@ GitHub Flow (not Git Flow). `master` is always deployable. Work lives on short-l
 - **Naming**: `feat/`, `fix/`, `refactor/`, `test/`, `docs/`, `chore/`, `ci/` — prefix matches conventional commit type.
 - **One concern per branch** — don't mix a bug fix with a refactor.
 - **Short-lived** — 1 to 3 days max. If you need longer, split the work.
-- **Rebase on master before pushing**: `git fetch origin master && git rebase origin/master`
+- **Use a separate worktree per task**, created from current `origin/master`. Verify the branch before editing, committing and pushing.
+- **Do not rebase after every merge.** Protection uses `strict=false`; update only for a real conflict, prerequisite or known interaction. Merge PRs one at a time. See the [CI usage guide](https://github.com/fdittgen-png/tankstellen/blob/master/docs/ci/CI_USAGE.md).
 
 ## Commits
 
@@ -80,7 +81,7 @@ Closes #NN
 - Use `gh pr merge --squash --auto <num>` to arm auto-merge once CI is green — the standing pattern for keeping the merge cycle hands-off. Never use `--auto` on a stacked PR whose base is a feature branch: the auto-merge fires the moment the base is unprotected and balloons the parent PR.
 - Auto-delete head branches is enabled.
 - One commit per closed issue, even when bundled into a single PR — the PR title summarises the bundle, the individual commits preserve per-issue rationale forever.
-- After merge: `git checkout master && git pull`.
+- After merge: start the next task in a fresh worktree from `origin/master`. Keep the completed worktree until its changes are saved; avoid switching another session's checkout.
 
 ## Releases
 
@@ -90,8 +91,8 @@ Closes #NN
    git tag -a v5.0.0 -m "Release 5.0.0"
    git push origin v5.0.0
    ```
-3. `release.yml` creates the GitHub Release with auto-generated notes and uploads the APK/AAB artefacts from the last master build.
-4. Play Console upload is manual — see the build-release skill.
+3. `ci.yml` validates the tag and publishes its signed APK/AAB with a GitHub Release. `deploy.yml` verifies the exact tag/source run before Play internal upload.
+4. For normal tester releases use the pinned-SHA release train. Production promotion requires the existing Play-signed artifact validation record. See the [CI catalog](Dev-CI-Workflow-Catalog).
 
 ## Labels
 

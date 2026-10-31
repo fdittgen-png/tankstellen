@@ -3,6 +3,12 @@
   SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
+Implementation-Session: <!-- unique session/thread ID; reviewer must differ -->
+
+<!-- A different session reviews this exact head and records the required
+independent-session-review status. See docs/ci/independent-review.md.
+Never record your own approval, bypass the gate, or reuse a prior SHA's review. -->
+
 ## What
 <!-- One sentence describing the change -->
 
