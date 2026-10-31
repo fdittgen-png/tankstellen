@@ -117,7 +117,7 @@ dependencies:
   flutter_secure_storage: ^11.2.0
   package_info_plus: ^10.2.2
   sentry_flutter: ^9.30.0
-  home_widget: ^0.10.0
+  home_widget: ^0.9.4
   workmanager: ^0.10.10
   shimmer: ^4.0.0
   flutter_tts: ^4.2.0
