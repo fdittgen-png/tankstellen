@@ -104,10 +104,12 @@ void _walk(
   final inside = <FillUp>[];
   // A same-time partial may sort AFTER the closing ID. Detect collisions
   // before walking, otherwise that partial disappears from a "valid" tank.
-  final seenTimes = <DateTime>{};
-  final ambiguousTimes = <DateTime>{};
+  // Match compareTo/isAfter by instant, including mixed UTC/local values.
+  final seenTimes = <int>{};
+  final ambiguousTimes = <int>{};
   for (final f in sorted.where((f) => !f.isCorrection)) {
-    if (!seenTimes.add(f.date)) ambiguousTimes.add(f.date);
+    final instant = f.date.microsecondsSinceEpoch;
+    if (!seenTimes.add(instant)) ambiguousTimes.add(instant);
   }
   for (final fill in sorted) {
     if (opening == null) {
@@ -123,7 +125,10 @@ void _walk(
     inside.add(fill);
     if (fill.isCorrection || !fill.isFullTank) continue;
     final physical = [opening, ...inside.where((f) => !f.isCorrection)];
-    final reason = physical.any((f) => ambiguousTimes.contains(f.date))
+    final reason =
+        physical.any(
+          (f) => ambiguousTimes.contains(f.date.microsecondsSinceEpoch),
+        )
         ? PhysicalWindowRejection.ambiguousFills
         : _rejection(physical, liquidOnly);
     if (reason == null) {

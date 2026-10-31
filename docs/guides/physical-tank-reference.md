@@ -17,7 +17,9 @@ report windows. Purchase totals remain separate; synthetic records are retained.
 - Synthetic corrections contribute neither volume nor boundaries. Accounting
   correction tallies and the original saved records remain available.
 - Invalid quantities, invalid odometers, ambiguous duplicate/time ordering and
-  independent tank combinations produce explicit rejection categories. Duplicate
+  independent tank combinations produce explicit rejection categories. Collision
+  keys use epoch microseconds, so UTC/local representations of the same instant
+  cannot hide a partial after the closing event ID. Duplicate
   identical IDs count once; conflicting copies cannot establish pump truth.
 - Known vehicles are reconstructed independently. The existing single-vehicle
   legacy-unassigned convention is preserved; an unassigned record is never

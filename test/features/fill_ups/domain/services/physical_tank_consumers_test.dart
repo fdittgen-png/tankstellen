@@ -114,6 +114,23 @@ void main() {
           isNull,
         );
       });
+      test('UTC and local representations cannot hide a same-time partial', () {
+        final opening = physicalFill('a', 1, 40, 10000);
+        final closing = physicalFill('b', 8, 27.2, 10597);
+        final partial = physicalFill(
+          'z-partial',
+          8,
+          15,
+          10300,
+          full: false,
+        ).copyWith(date: closing.date.toLocal());
+        expect(closing.date.isUtc, isTrue);
+        expect(partial.date.isUtc, isFalse);
+        expect(closing.date.isAtSameMomentAs(partial.date), isTrue);
+        // Keep closing last in the supplied list so the history consumer
+        // explicitly reads it; production sorts the partial AFTER its ID.
+        expect(consumer.value([opening, partial, closing]), isNull);
+      });
       test('a petrol blend remains valid aggregate pump consumption', () {
         expect(
           consumer.value([
