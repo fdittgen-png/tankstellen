@@ -22,6 +22,9 @@ part of 'trip_ve_recompute_provider.dart';
 /// [VehicleProfileList] notifier, so its converging per-fill-up
 /// micro-adjustments never reach this provider — only a deliberate
 /// edit through the notifier does, which is the intended trigger.
+/// #4544 — not strictly: a later `mergeFrom` (TankSync vehicles pull)
+/// or an invalidate re-reads the learned η_v and fires it too, which is
+/// why the recompute reads summaries and loads full trips off-isolate.
 ///
 /// Instantiated once at startup (`app_initializer`) so the listener is
 /// live for the whole session; it holds no state of its own.
@@ -41,6 +44,9 @@ final tripVeRecomputeListenerProvider = TripVeRecomputeListenerProvider._();
 /// [VehicleProfileList] notifier, so its converging per-fill-up
 /// micro-adjustments never reach this provider — only a deliberate
 /// edit through the notifier does, which is the intended trigger.
+/// #4544 — not strictly: a later `mergeFrom` (TankSync vehicles pull)
+/// or an invalidate re-reads the learned η_v and fires it too, which is
+/// why the recompute reads summaries and loads full trips off-isolate.
 ///
 /// Instantiated once at startup (`app_initializer`) so the listener is
 /// live for the whole session; it holds no state of its own.
@@ -58,6 +64,9 @@ final class TripVeRecomputeListenerProvider
   /// [VehicleProfileList] notifier, so its converging per-fill-up
   /// micro-adjustments never reach this provider — only a deliberate
   /// edit through the notifier does, which is the intended trigger.
+  /// #4544 — not strictly: a later `mergeFrom` (TankSync vehicles pull)
+  /// or an invalidate re-reads the learned η_v and fires it too, which is
+  /// why the recompute reads summaries and loads full trips off-isolate.
   ///
   /// Instantiated once at startup (`app_initializer`) so the listener is
   /// live for the whole session; it holds no state of its own.
@@ -89,7 +98,7 @@ final class TripVeRecomputeListenerProvider
 }
 
 String _$tripVeRecomputeListenerHash() =>
-    r'581ac7254ccea375570ae4dfd6e8604be2c08696';
+    r'4f61708a7da445284d6975667c60ca08a5a2c97b';
 
 /// #1858 — retroactive η_v recompute trigger.
 ///
@@ -103,6 +112,9 @@ String _$tripVeRecomputeListenerHash() =>
 /// [VehicleProfileList] notifier, so its converging per-fill-up
 /// micro-adjustments never reach this provider — only a deliberate
 /// edit through the notifier does, which is the intended trigger.
+/// #4544 — not strictly: a later `mergeFrom` (TankSync vehicles pull)
+/// or an invalidate re-reads the learned η_v and fires it too, which is
+/// why the recompute reads summaries and loads full trips off-isolate.
 ///
 /// Instantiated once at startup (`app_initializer`) so the listener is
 /// live for the whole session; it holds no state of its own.
