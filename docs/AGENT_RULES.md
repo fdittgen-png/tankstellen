@@ -131,6 +131,15 @@ autonomous-agent batching doctrine — see the `tankstellen-conventions` skill.
 
 ## CI and working-branch discipline
 
+Every PR needs review by a different session on the exact current head SHA.
+Declare `Implementation-Session: <unique-ID>` in the PR body. Only the reviewing
+session records the required `independent-session-review` status, using
+[`session_review.py`](../scripts/ci/session_review.py) after checking the diff,
+issue acceptance and validation. Never approve your own work, impersonate a
+reviewer, reuse a previous head's review or bypass protection as administrator.
+New commits require fresh review; unrelated master updates do not require a
+rebase. See [independent review](ci/independent-review.md).
+
 Use a separate worktree per task from current `origin/master`; check the branch
 before edits, commits and pushes. Do not switch a shared checkout under another
 session. The installed pre-push hook checks actual pushed branch refs.

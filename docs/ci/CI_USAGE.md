@@ -13,6 +13,12 @@ is complete. The approach follows Deskilo's complete change classification,
 source identity and dependency-only caching, while preserving Sparkilo's ten
 existing protected check names.
 
+The owner added a separate required `independent-session-review` commit status
+on 2026-10-31. Every PR needs another session's review of its current head before
+merge. [Review protocol and helper](independent-review.md) describe how the
+reviewer records evidence; no extra CI/model invocation or forced rebase is
+introduced. Administrators are subject to the protections too.
+
 ## Start on the intended branch
 
 Use a separate worktree for each task. This preserves another session's branch

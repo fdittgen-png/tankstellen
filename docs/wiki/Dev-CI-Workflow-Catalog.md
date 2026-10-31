@@ -5,6 +5,11 @@
 
 # CI workflow catalog
 
+Every PR additionally needs an independent session's review of its current head
+SHA. The required `independent-session-review` status links the review evidence;
+new pushes need fresh review, without forcing rebases after unrelated merges.
+See the [review protocol](https://github.com/fdittgen-png/tankstellen/blob/master/docs/ci/independent-review.md).
+
 Every GitHub Actions workflow has a dedicated runbook: triggers, inputs,
 platform/flavor, required or advisory status, permissions, configured secrets,
 artifacts, publication effects and recovery. Read [CI/CD Pipeline](Dev-CI-CD-Pipeline)

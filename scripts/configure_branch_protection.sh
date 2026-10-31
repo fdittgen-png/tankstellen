@@ -44,6 +44,7 @@ TARGET_CHECKS=(
   "integration"
   "startup-budget"
   "l10n-gate"
+  "independent-session-review"
 )
 
 require_gh() {
@@ -70,10 +71,11 @@ live_strict() {
 
 verify() {
   require_gh
-  local target live strict status=0
+  local target live strict admins status=0
   target="$(target_sorted)"
   live="$(live_sorted)"
   strict="$(live_strict)"
+  admins="$(gh api "repos/${REPO}/branches/${BRANCH}/protection/enforce_admins" --jq '.enabled')"
 
   echo "=== branch protection --verify: ${REPO}@${BRANCH} ==="
   echo "strict (live): ${strict}   (target: false)"
@@ -81,6 +83,10 @@ verify() {
 
   if [ "$strict" != "false" ]; then
     echo "DRIFT: strict mode is '${strict}', target is 'false'." >&2
+    status=1
+  fi
+  if [ "$admins" != "true" ]; then
+    echo "DRIFT: administrator enforcement must be enabled." >&2
     status=1
   fi
 
@@ -120,6 +126,7 @@ apply() {
     --input - <<JSON
 { "strict": false, "contexts": ${contexts_json} }
 JSON
+  gh api -X POST "repos/${REPO}/branches/${BRANCH}/protection/enforce_admins"
   echo "Done. Verifying..."
   verify
 }

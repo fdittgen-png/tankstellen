@@ -5,6 +5,14 @@
 
 # CI refactor validation — 2026-10-31
 
+Owner follow-up: required independent review was enabled on `master` and read
+back on 2026-10-31: eleven contexts (the ten CI checks plus
+`independent-session-review`), `strict=false`, administrator enforcement enabled.
+The reviewer helper/protection reapply regressions pass all 20 Python tests;
+the affected workflow suite plus repository lints pass 233 tests. Clean
+codegen and ARB/pseudo/localization regeneration produce no drift. These
+follow-up checks do not replace the outstanding matched performance evidence.
+
 Branch `ci/4451-pragmatic-workflows`, based on master
 `13f2809838b6b947b931ef2a94faab9a0ea96a47`, in an isolated worktree.
 The original checkout's `analysis_options.yaml` and `pubspec.lock` edits were
