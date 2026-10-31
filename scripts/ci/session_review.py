@@ -16,7 +16,7 @@ import re
 import subprocess
 
 CONTEXT = "independent-session-review"
-SESSION_LINE = re.compile(r"^Implementation-Session:[ \t]*(\S+)[ \t]*$", re.MULTILINE)
+SESSION_LINE = re.compile(r"^Implementation-Session:[ \t]*(\S+)[ \t]*\r?$", re.MULTILINE)
 SESSION_ID = re.compile(r"[A-Za-z0-9._:/-]{3,160}")
 DECLARATION = re.compile(r"^[ \t]*Implementation-Session\b[^\n]*$", re.MULTILINE)
 

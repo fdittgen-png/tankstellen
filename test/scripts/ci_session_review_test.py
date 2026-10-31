@@ -120,6 +120,16 @@ class SessionReviewTests(unittest.TestCase):
                 self.run_review(api)
             self.assertEqual(api.writes, [])
 
+    def test_crlf_single_explicit_declaration_for_humans_and_bots(self):
+        for user in ({"type": "User", "login": "author"},
+                     {"type": "Bot", "login": "dependabot[bot]"}):
+            api = FakeGitHub()
+            api.pr.update(body="Summary\r\nImplementation-Session: author-thread\r\n",
+                          user=user)
+            self.run_review(api)
+            self.assertIn("Implementation-Session: author-thread\n",
+                          api.writes[0][1]["body"])
+
     def test_stale_or_closed_pr_is_rejected_without_writes(self):
         for field in ("head", "state"):
             api = FakeGitHub()
