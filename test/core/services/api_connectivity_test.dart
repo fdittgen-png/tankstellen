@@ -25,14 +25,16 @@ void main() {
   late Dio dio;
 
   setUp(() {
-    dio = retryingDio(BaseOptions(
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
-    ));
+    dio = retryingDio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 30),
+        headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
+      ),
+    );
   });
 
-  tearDown(() => dio.close());
+  tearDown(() => dio.close(force: true));
 
   group('API Connectivity', () {
     test('Germany — Tankerkoenig API is reachable', () async {
@@ -57,32 +59,32 @@ void main() {
       expect(response.data.containsKey('ok'), isTrue);
     });
 
-    test('France — Prix-Carburants API is reachable and returns stations', () async {
-      final response = await dio.get<dynamic>(
-        'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets'
-        '/prix-des-carburants-en-france-flux-instantane-v2/records',
-        queryParameters: {
-          'limit': 1,
-          'where': 'cp="75001"',
-        },
-      );
+    test(
+      'France — Prix-Carburants API is reachable and returns stations',
+      () async {
+        final response = await dio.get<dynamic>(
+          'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets'
+          '/prix-des-carburants-en-france-flux-instantane-v2/records',
+          queryParameters: {'limit': 1, 'where': 'cp="75001"'},
+        );
 
-      expect(response.statusCode, 200);
-      expect(response.data, isA<Map<dynamic, dynamic>>());
-      expect(response.data['results'], isA<List<dynamic>>());
+        expect(response.statusCode, 200);
+        expect(response.data, isA<Map<dynamic, dynamic>>());
+        expect(response.data['results'], isA<List<dynamic>>());
 
-      // The Paris 75001 query intermittently returns 0 rows as the open-data
-      // endpoint rebuilds its index. Reachability + schema is the goal — only
-      // validate field shape when the response happens to be non-empty.
-      final results = response.data['results'] as List;
-      if (results.isNotEmpty) {
-        final station = results.first;
-        expect(station.containsKey('id'), isTrue);
-        expect(station.containsKey('adresse'), isTrue);
-        expect(station.containsKey('ville'), isTrue);
-        expect(station.containsKey('cp'), isTrue);
-      }
-    });
+        // The Paris 75001 query intermittently returns 0 rows as the open-data
+        // endpoint rebuilds its index. Reachability + schema is the goal — only
+        // validate field shape when the response happens to be non-empty.
+        final results = response.data['results'] as List;
+        if (results.isNotEmpty) {
+          final station = results.first;
+          expect(station.containsKey('id'), isTrue);
+          expect(station.containsKey('adresse'), isTrue);
+          expect(station.containsKey('ville'), isTrue);
+          expect(station.containsKey('cp'), isTrue);
+        }
+      },
+    );
 
     test('Austria — E-Control API is reachable and returns stations', () async {
       final response = await dio.get<dynamic>(
@@ -151,17 +153,24 @@ void main() {
     });
 
     test('Italy — MIMIT station CSV is reachable and parseable', () async {
-      final csvDio = retryingDio(BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 60),
-        headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
-        responseType: ResponseType.plain,
-      ));
+      final csvDio = retryingDio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 60),
+          headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
+          responseType: ResponseType.plain,
+        ),
+      );
+
+      addTearDown(() => csvDio.close(force: true));
 
       // Only download first 10KB to verify format (full file is ~5MB)
-      final response = await csvDio.get<String>(
-        'https://www.mimit.gov.it/images/exportCSV/anagrafica_impianti_attivi.csv',
-        options: Options(headers: {'Range': 'bytes=0-10240'}),
+      final response = await withNetworkDeadline(
+        (token) => csvDio.get<String>(
+          'https://www.mimit.gov.it/images/exportCSV/anagrafica_impianti_attivi.csv',
+          options: Options(headers: {'Range': 'bytes=0-10240'}),
+          cancelToken: token,
+        ),
       );
 
       expect(response.statusCode, anyOf(200, 206));
@@ -184,16 +193,23 @@ void main() {
     });
 
     test('Italy — MIMIT price CSV is reachable and parseable', () async {
-      final csvDio = retryingDio(BaseOptions(
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 60),
-        headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
-        responseType: ResponseType.plain,
-      ));
+      final csvDio = retryingDio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 60),
+          headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
+          responseType: ResponseType.plain,
+        ),
+      );
 
-      final response = await csvDio.get<String>(
-        'https://www.mimit.gov.it/images/exportCSV/prezzo_alle_8.csv',
-        options: Options(headers: {'Range': 'bytes=0-4096'}),
+      addTearDown(() => csvDio.close(force: true));
+
+      final response = await withNetworkDeadline(
+        (token) => csvDio.get<String>(
+          'https://www.mimit.gov.it/images/exportCSV/prezzo_alle_8.csv',
+          options: Options(headers: {'Range': 'bytes=0-4096'}),
+          cancelToken: token,
+        ),
       );
 
       expect(response.statusCode, anyOf(200, 206));
@@ -249,30 +265,41 @@ void main() {
       expect(station.containsKey('brand'), isTrue);
     });
 
-    test('Argentina — Energía CSV is reachable and has coordinates', () async {
-      final csvDio = retryingDio(BaseOptions(
-        connectTimeout: const Duration(seconds: 20),
-        receiveTimeout: const Duration(seconds: 60),
-        headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
-        responseType: ResponseType.plain,
-      ));
+    test(
+      'Argentina — Energía CSV is reachable and has coordinates',
+      () async {
+        final csvDio = retryingDio(
+          BaseOptions(
+            connectTimeout: const Duration(seconds: 20),
+            receiveTimeout: const Duration(seconds: 60),
+            headers: {'User-Agent': 'de.tankstellen.app/1.0.0'},
+            responseType: ResponseType.plain,
+          ),
+        );
 
-      final response = await csvDio.get<String>(
-        'http://datos.energia.gob.ar/dataset/'
-        '1c181390-5045-475e-94dc-410429be4b17/resource/'
-        '80ac25de-a44a-4445-9215-090cf55cfda5/download/'
-        'precios-en-surtidor-resolucin-3142016.csv',
-        options: Options(headers: {'Range': 'bytes=0-4096'}),
-      );
+        addTearDown(() => csvDio.close(force: true));
 
-      expect(response.statusCode, anyOf(200, 206));
-      final csv = response.data!;
-      // Verify header contains expected columns
-      expect(csv.toLowerCase(), contains('producto'));
-      expect(csv.toLowerCase(), contains('precio'));
-      expect(csv.toLowerCase(), contains('latitud'));
-      expect(csv.toLowerCase(), contains('longitud'));
-    }, timeout: const Timeout(Duration(seconds: 90)));
+        final response = await withNetworkDeadline(
+          (token) => csvDio.get<String>(
+            'http://datos.energia.gob.ar/dataset/'
+            '1c181390-5045-475e-94dc-410429be4b17/resource/'
+            '80ac25de-a44a-4445-9215-090cf55cfda5/download/'
+            'precios-en-surtidor-resolucin-3142016.csv',
+            options: Options(headers: {'Range': 'bytes=0-4096'}),
+            cancelToken: token,
+          ),
+        );
+
+        expect(response.statusCode, anyOf(200, 206));
+        final csv = response.data!;
+        // Verify header contains expected columns
+        expect(csv.toLowerCase(), contains('producto'));
+        expect(csv.toLowerCase(), contains('precio'));
+        expect(csv.toLowerCase(), contains('latitud'));
+        expect(csv.toLowerCase(), contains('longitud'));
+      },
+      timeout: const Timeout(Duration(seconds: 90)),
+    );
   });
 
   group('City Search (Nominatim) for all countries', () {
@@ -298,18 +325,33 @@ void main() {
           },
         );
 
-        expect(response.statusCode, 200,
-            reason: '${entry.key}: Nominatim returned non-200');
-        expect(response.data, isA<List<dynamic>>(),
-            reason: '${entry.key}: Response is not a list');
-        expect((response.data as List).length, greaterThan(0),
-            reason: '${entry.key}: No results for ${entry.value}');
+        expect(
+          response.statusCode,
+          200,
+          reason: '${entry.key}: Nominatim returned non-200',
+        );
+        expect(
+          response.data,
+          isA<List<dynamic>>(),
+          reason: '${entry.key}: Response is not a list',
+        );
+        expect(
+          (response.data as List).length,
+          greaterThan(0),
+          reason: '${entry.key}: No results for ${entry.value}',
+        );
 
         final result = (response.data as List).first;
-        expect(double.tryParse(result['lat']?.toString() ?? ''), isNotNull,
-            reason: '${entry.key}: lat not parseable');
-        expect(double.tryParse(result['lon']?.toString() ?? ''), isNotNull,
-            reason: '${entry.key}: lon not parseable');
+        expect(
+          double.tryParse(result['lat']?.toString() ?? ''),
+          isNotNull,
+          reason: '${entry.key}: lat not parseable',
+        );
+        expect(
+          double.tryParse(result['lon']?.toString() ?? ''),
+          isNotNull,
+          reason: '${entry.key}: lon not parseable',
+        );
       }
     });
   });

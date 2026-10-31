@@ -8,8 +8,8 @@
 This project keeps a small set of tests that hit **real, third-party**
 endpoints — country fuel APIs, the Play Store, public URL constants,
 and (when credentials are configured) a live Supabase project. They are
-isolated behind the `@Tags(['network'])` directive so the default
-`flutter test` invocation never runs them.
+marked with `@Tags(['network'])` so CI can exclude them explicitly with
+`--exclude-tags=network`. A plain `flutter test` still selects them.
 
 This doc is the contract. Read it before adding, removing, or rerunning
 a network-tagged test.
@@ -109,8 +109,9 @@ Nominatim city search for every supported country.
 - **Probes**: each country's upstream root endpoint with a small
   query, asserts HTTP status + a handful of schema invariants
   (field names, list lengths, parseable lat/lng).
-- **Expected runtime**: 30 – 90 s end-to-end. The Argentina CSV step
-  has a 90-second timeout; everything else is 15 – 30 s.
+- **Bounds**: each MIMIT/Argentina CSV probe has a 25-second total
+  request-and-retry deadline. Cancellation and force-closing its owned Dio
+  prevent a timed-out request from leaking into the next test (#4541).
 - **Re-run trigger**: after touching any
   `lib/features/station_services/<country>/*_station_service.dart`,
   after a Nominatim user-agent or rate-limit change, or as a sanity
@@ -125,8 +126,9 @@ distance calc) returns >0 stations for Rome and Milan.
 - **Probes**: `MiseStationService.searchStations()` against
   `mimit.gov.it/images/exportCSV/anagrafica_impianti_attivi.csv`
   + the price CSV.
-- **Expected runtime**: 30 – 60 s per test (60 s timeout). The CSV
-  is ~5 MB and the parser is purely client-side.
+- **Bounds**: a 55-second request-and-retry deadline precedes the runner's
+  60-second timeout. Both downloads share cancellation; the test owns and
+  force-closes its injected Dio. A persistent outage still fails the test.
 - **Re-run trigger**: any change to `mise_station_service.dart`,
   `mise_csv_parser.dart`, or the Italian bounding box. Also rerun
   if a user reports "Italy returns no results" — that's the bug
