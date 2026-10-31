@@ -9,8 +9,11 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tankstellen/core/storage/hive_boxes.dart';
+import 'package:tankstellen/core/storage/hive_trip_history_index.dart';
 import 'package:tankstellen/core/storage/local_data_eraser.dart';
 
 import '../../fakes/fake_storage_repository.dart';
@@ -18,23 +21,26 @@ import '../../helpers/hive_temp_dir.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  test('every box constant in hive_boxes.dart is in HiveBoxes.allBoxes',
-      () {
+  test('every box constant in hive_boxes.dart is in HiveBoxes.allBoxes', () {
     final source = File('lib/core/storage/hive_boxes.dart').readAsStringSync();
-    final declared = RegExp(r"static const String \w+ = '([a-z0-9_]+)';")
-        .allMatches(source)
-        .map((m) => m.group(1)!)
-        .toSet();
+    final declared = RegExp(
+      r"static const String \w+ = '([a-z0-9_]+)';",
+    ).allMatches(source).map((m) => m.group(1)!).toSet();
     expect(declared, isNotEmpty);
     final missing = declared.difference(HiveBoxes.allBoxes);
-    expect(missing, isEmpty,
-        reason: 'box(es) declared but not registered for erasure: $missing '
-            '— add them to HiveBoxes.allBoxes (and the export, #3869)');
+    expect(
+      missing,
+      isEmpty,
+      reason:
+          'box(es) declared but not registered for erasure: $missing '
+          '— add them to HiveBoxes.allBoxes (and the export, #3869)',
+    );
   });
 
   test('the error-trace box name matches TraceStorage', () {
-    final source =
-        File('lib/core/telemetry/storage/trace_storage.dart').readAsStringSync();
+    final source = File(
+      'lib/core/telemetry/storage/trace_storage.dart',
+    ).readAsStringSync();
     expect(source, contains("'${HiveBoxes.errorTraces}'"));
   });
 
@@ -48,8 +54,7 @@ void main() {
       await closeHiveAndDeleteTemp(dir);
     });
 
-    test('clears every open box and deletes closed ones from disk',
-        () async {
+    test('clears every open box and deletes closed ones from disk', () async {
       final open = await Hive.openBox<dynamic>(HiveBoxes.obd2TripHistory);
       await open.put('trip-1', '{"gps": true}');
       final closed = await Hive.openBox<dynamic>(HiveBoxes.serviceReminders);
@@ -62,24 +67,106 @@ void main() {
       final result = await LocalDataEraser.eraseBoxesForTest();
 
       expect(open.isEmpty, isTrue, reason: 'open boxes are cleared in place');
-      expect(await Hive.boxExists(HiveBoxes.serviceReminders), isFalse,
-          reason: 'closed boxes are deleted from disk');
+      expect(
+        await Hive.boxExists(HiveBoxes.serviceReminders),
+        isFalse,
+        reason: 'closed boxes are deleted from disk',
+      );
       expect(result.complete, isTrue, reason: result.failedSteps.toString());
     });
+
+    test(
+      'full erasure clears typed production boxes without closing handles',
+      () async {
+        FlutterSecureStorage.setMockInitialValues({});
+        SharedPreferences.setMockInitialValues({});
+        final cipher = HiveAesCipher(List.generate(32, (i) => i));
+        final settings = await Hive.openBox<dynamic>(HiveBoxes.settings);
+        final reminders = await Hive.openBox<String>(
+          HiveBoxes.serviceReminders,
+          encryptionCipher: cipher,
+        );
+        final flags = await Hive.openBox<bool>(HiveBoxes.featureFlags);
+        final schema = await Hive.openBox<int>(HiveBoxes.boxSchema);
+        final history = await Hive.openLazyBox<String>(
+          HiveBoxes.obd2TripHistory,
+          encryptionCipher: cipher,
+        );
+        await settings.put('private', 'owner');
+        await reminders.put('private', 'appointment');
+        await flags.put('private', true);
+        await schema.put('private', 42);
+        await history.put('trip', '{"id":"trip","samples":[]}');
+        await HiveTripHistoryIndex.prepare(history);
+        final index = HiveTripHistoryIndex.of(history);
+        expect(index.get('trip'), isNotNull);
+
+        final result = await LocalDataEraser.eraseAll(
+          storage: FakeStorageRepository(),
+        );
+        expect(result.complete, isTrue, reason: result.failedSteps.toString());
+        for (final box in <BoxBase<dynamic>>[
+          settings,
+          reminders,
+          flags,
+          schema,
+          history,
+        ]) {
+          expect(box.isOpen, isTrue);
+          expect(box.isEmpty, isTrue);
+        }
+        expect(index.get('trip'), isNull);
+        await reminders.put('probe', 'still usable');
+        expect(reminders.get('probe'), 'still usable');
+        await reminders.delete('probe');
+        await Hive.close();
+        final reopened = await Hive.openBox<String>(
+          HiveBoxes.serviceReminders,
+          encryptionCipher: cipher,
+        );
+        expect(reopened.isEmpty, isTrue);
+        final reopenedHistory = await Hive.openLazyBox<String>(
+          HiveBoxes.obd2TripHistory,
+          encryptionCipher: cipher,
+        );
+        expect(reopenedHistory.isEmpty, isTrue);
+      },
+    );
+
+    test(
+      'unsupported open type is reported while other boxes still erase',
+      () async {
+        final supported = await Hive.openBox<String>(
+          HiveBoxes.serviceReminders,
+        );
+        final unsupported = await Hive.openBox<double>(
+          HiveBoxes.trafficSignalsCache,
+        );
+        await supported.put('private', 'appointment');
+        await unsupported.put('private', 1.5);
+        final result = await LocalDataEraser.eraseBoxesForTest();
+        expect(result.failedSteps, ['box:${HiveBoxes.trafficSignalsCache}']);
+        expect(supported.isEmpty, isTrue);
+        expect(unsupported.get('private'), 1.5);
+        expect(unsupported.isOpen, isTrue);
+      },
+    );
   });
 
-  test('a throwing extra wipe is reported, not propagated (never-throws)',
-      () async {
-    final dir = Directory.systemTemp.createTempSync('eraser_fault_');
-    Hive.init(dir.path);
-    addTearDown(() async {
-      await closeHiveAndDeleteTemp(dir);
-    });
-    final result = await LocalDataEraser.eraseAll(
-      storage: FakeStorageRepository(),
-      extraWipes: [() async => throw StateError('widget host gone')],
-    );
-    expect(result.complete, isFalse);
-    expect(result.failedSteps, contains('extra:0'));
-  });
+  test(
+    'a throwing extra wipe is reported, not propagated (never-throws)',
+    () async {
+      final dir = Directory.systemTemp.createTempSync('eraser_fault_');
+      Hive.init(dir.path);
+      addTearDown(() async {
+        await closeHiveAndDeleteTemp(dir);
+      });
+      final result = await LocalDataEraser.eraseAll(
+        storage: FakeStorageRepository(),
+        extraWipes: [() async => throw StateError('widget host gone')],
+      );
+      expect(result.complete, isFalse);
+      expect(result.failedSteps, contains('extra:0'));
+    },
+  );
 }

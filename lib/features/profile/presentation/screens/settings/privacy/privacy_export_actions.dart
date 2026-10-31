@@ -53,6 +53,10 @@ ShareSink? debugPrivacyShareSinkOverride;
 @visibleForTesting
 ShareTempDirectoryProvider? debugPrivacyTempDirectoryOverride;
 
+/// Isolate feature-owned platform wipes in UI tests; core erasure stays real.
+@visibleForTesting
+List<Future<void> Function()>? debugPrivacyErasureExtraWipesOverride;
+
 /// The export / error-log / delete handlers of the "Export or delete"
 /// screen (#3912, Epic #3907) — moved verbatim from the former Privacy
 /// Dashboard state so every write path (ZIP #3869, JSON, CSV, the
@@ -289,7 +293,9 @@ mixin PrivacyExportActions<T extends ConsumerStatefulWidget>
 
     final result = await LocalDataEraser.eraseAll(
       storage: storage,
-      extraWipes: [clearHomeWidgetData, ActiveTripSampleWal.instance.clear],
+      extraWipes:
+          debugPrivacyErasureExtraWipesOverride ??
+          [clearHomeWidgetData, ActiveTripSampleWal.instance.clear],
     );
     if (!mounted) return;
     ref.invalidate(storageManagementProvider);
