@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/app/startup/runtime_services_phase.dart';
 import 'package:tankstellen/core/background/background_price_fetcher.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
+import 'package:tankstellen/core/perf/jank_frame_recorder.dart';
 import 'package:tankstellen/core/perf/startup_timer.dart';
 import 'package:tankstellen/core/telemetry/models/error_trace.dart';
 import 'package:tankstellen/core/telemetry/trace_recorder.dart';
@@ -72,6 +73,7 @@ void main() {
     errorLogger.resetForTest();
     RuntimeServicesPhase.resetForTest();
     StartupTimer.instance.reset();
+    JankFrameRecorder.instance.reset();
   });
 
   group('failure isolation', () {
@@ -217,6 +219,17 @@ void main() {
       await tester.pumpWidget(const SizedBox(width: 1));
 
       expect(inits, 1);
+    });
+
+    testWidgets('the first real frame arms the worst-frame ring (#4546)',
+        (tester) async {
+      RuntimeServicesPhase.scheduleAfterFirstFrame(_services());
+      expect(JankFrameRecorder.instance.isListening, isFalse,
+          reason: 'it must not observe before the first frame');
+
+      await tester.pumpWidget(const SizedBox());
+
+      expect(JankFrameRecorder.instance.isListening, isTrue);
     });
   });
 

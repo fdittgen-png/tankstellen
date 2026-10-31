@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../../core/logging/error_logger.dart';
+import '../../core/perf/jank_frame_recorder.dart';
 import '../../core/perf/startup_timer.dart';
 
 /// The platform-plugin and scheduler housekeeping that used to gate the
@@ -82,8 +83,13 @@ abstract final class RuntimeServicesPhase {
   static void scheduleAfterFirstFrame(RuntimeServices services) {
     if (_scheduled) return;
     _scheduled = true;
-    SchedulerBinding.instance
-        .addPostFrameCallback((_) => unawaited(run(services)));
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      // #4546 — the worst-frame ring starts with the first real frame
+      // (the startup trace's own anchor) and closes itself after its
+      // window; once per process, like this phase.
+      JankFrameRecorder.instance.arm();
+      unawaited(run(services));
+    });
   }
 
   /// Test isolation only.

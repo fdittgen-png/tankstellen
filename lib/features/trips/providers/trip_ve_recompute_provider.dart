@@ -26,6 +26,9 @@ part 'trip_ve_recompute_provider.g.dart';
 /// [VehicleProfileList] notifier, so its converging per-fill-up
 /// micro-adjustments never reach this provider — only a deliberate
 /// edit through the notifier does, which is the intended trigger.
+/// #4544 — not strictly: a later `mergeFrom` (TankSync vehicles pull)
+/// or an invalidate re-reads the learned η_v and fires it too, which is
+/// why the recompute reads summaries and loads full trips off-isolate.
 ///
 /// Instantiated once at startup (`app_initializer`) so the listener is
 /// live for the whole session; it holds no state of its own.
@@ -69,14 +72,25 @@ class TripVeRecomputeListener extends _$TripVeRecomputeListener {
       final repo = ref.read(tripHistoryRepositoryProvider);
       if (repo == null) return;
       var changed = false;
-      for (final trip in repo.loadAll()) {
-        if (trip.vehicleId != vehicleId) continue;
-        final updated = recomputeTripForVe(trip, newVe);
-        // `recomputeTripForVe` returns the same instance when the trip
-        // is not recalculable / already at newVe.
-        if (identical(updated, trip)) continue;
-        await repo.save(updated);
-        changed = true;
+      // #4544 — decide on summaries (meta rows only, no samples); the
+      // old synchronous `loadAll()` decoded every chunk of every trip
+      // on the UI isolate. `recomputeTripForVe` returns the same
+      // instance when a trip is not recalculable / already at newVe.
+      final ids = [
+        for (final s in repo.loadSummaries())
+          if (s.vehicleId == vehicleId &&
+              !identical(recomputeTripForVe(s, newVe), s))
+            s.id,
+      ];
+      for (final id in ids) {
+        // Never save the summary-only entry: its empty samples would
+        // wipe the trip's telemetry. Load the full one off-isolate.
+        final full = await repo.loadByIdAsync(id);
+        if (full != null) {
+          await repo.save(recomputeTripForVe(full, newVe));
+          changed = true;
+        }
+        await Future<void>.delayed(Duration.zero);
       }
       if (changed) {
         // Refresh the in-memory list so any open trip-history UI
