@@ -70,9 +70,12 @@ FillUp _fill(String id, String vehicleId, int day, double odo,
     );
 
 List<FillUp> _history({String? currencyB = 'EUR'}) => [
-      _fill('a0', 'a', 1, 0),
-      _fill('a1', 'a', 10, 600, litres: 36, cost: 60),
-      _fill('a2', 'a', 20, 1000, litres: 28, cost: 48),
+      // #4469 — nominal comparison needs two physical windows. Zero is an
+      // unset odometer under the shipped entry/reference contract; preserve
+      // these 600/400 km intervals with valid absolute readings.
+      _fill('a0', 'a', 1, 10000),
+      _fill('a1', 'a', 10, 10600, litres: 36, cost: 60),
+      _fill('a2', 'a', 20, 11000, litres: 28, cost: 48),
       _fill('b0', 'b', 1, 5000, litres: 45, cost: 70, currency: currencyB),
       _fill('b1', 'b', 10, 5500, litres: 40, cost: 70, currency: currencyB),
       _fill('b2', 'b', 20, 6000, litres: 40, cost: 70, currency: currencyB),
@@ -132,6 +135,37 @@ void main() {
     expect(find.byKey(const Key('veh_compare_column_a')), findsOneWidget);
     expect(find.byKey(const Key('veh_compare_column_b')), findsOneWidget);
     expect(find.text('6.4 L/100 km'), findsOneWidget);
+  });
+
+  testWidgets('an unset opening odometer cannot inflate comparison evidence', (
+    tester,
+  ) async {
+    final fills = [
+      for (final fill in _history())
+        fill.vehicleId == 'a'
+            ? fill.copyWith(odometerKm: fill.odometerKm - 10000)
+            : fill,
+    ];
+    final container = await _pump(tester, overrides: _overrides(fills: fills));
+    final comparison = container.read(selectedVehicleComparisonProvider);
+    final column = comparison.columnFor('a')!;
+    expect(column.matchedWindowCount, 1);
+    expect(column.matchedDistanceKm, 400);
+    expect(column.consumptionPer100Km.valueOrNull, closeTo(7, 1e-9));
+    expect(find.text('7.0 L/100 km'), findsOneWidget);
+    expect(find.text('6.4 L/100 km'), findsNothing);
+    // One qualified window is an observation, not enough to crown a winner.
+    expect(
+      find.byKey(const Key('veh_compare_winner_consumption')),
+      findsNothing,
+    );
+
+    await tester.tap(
+      find.byKey(const Key('veh_compare_sources_a_consumption')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('a2'), findsWidgets);
+    expect(find.text('a1'), findsNothing);
   });
 
   testWidgets('toggling a column never changes the active vehicle (box 1)',

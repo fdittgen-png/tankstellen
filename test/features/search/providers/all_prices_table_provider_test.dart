@@ -297,9 +297,9 @@ void main() {
     );
 
     test('a correction entry does not create a bucket of its own', () {
-      // 2 + 28 = 30 L over 500 km; the E85 correction inherits the E10
-      // bucket and never enters the composition tally. #3945 — E85 is now
-      // ESTIMATED from the measured E10, never measured from the correction.
+      // #4469 — only the physically pumped 28 L over 500 km are measured.
+      // The synthetic 2 L correction remains visible in accounting, but
+      // neither increases pump truth nor creates a measured E85 bucket.
       final c = container(
         activeVehicle:
             vehicle(preferredFuelType: 'e10', multiFuelCapable: true),
@@ -314,8 +314,12 @@ void main() {
       );
 
       final byFuel = c.read(allPricesFuelCostModelProvider).consumptionByFuel;
-      expect(byFuel[FuelType.e10], const FuelConsumptionFigure.measured(6.0));
+      expect(byFuel[FuelType.e10]?.isEstimated, isFalse);
+      expect(byFuel[FuelType.e10]?.litersPer100km, closeTo(5.6, 1e-9));
       expect(byFuel[FuelType.e85]?.isEstimated, isTrue);
+      final stats = c.read(consumptionStatsProvider);
+      expect(stats.totalLiters, 68);
+      expect(stats.correctionLitersTotal, 2);
     });
 
     test('no baseline at all — a mix-only history without a declared fuel '
