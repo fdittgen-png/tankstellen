@@ -2,14 +2,15 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 name: Epic
-description: Multi-PR / multi-subsystem piece of work (needs breakdown + validation gate before children are filed)
+description: New broad program with a validated breakdown; reuse already-approved finite checkpoints
 labels: ["type/epic"]
 body:
   - type: markdown
     attributes:
       value: |
         ## Before you file
-        - Run `/epic-triage` in Claude Code first to confirm this qualifies as an Epic.
+        - New broad programs need triage; an already-approved checkpoint is not another epic.
+        - Use the [Ready/Done/closure contract](https://github.com/fdittgen-png/tankstellen/blob/master/docs/guides/issue-exit-contract.md) for scope, actual consumers, evidence and the STOP condition.
         - Assign a **Milestone** (iteration) before saving — the board burn-down depends on it.
         - File child issues only after the breakdown has been validated by the maintainer.
 
@@ -62,7 +63,7 @@ body:
     id: validation_gate
     attributes:
       label: Validation gate
-      description: How will we know the Epic is done? List observable acceptance criteria.
+      description: Observable acceptance, named leaf evidence and a finite STOP condition. Separate code completion from required device/provider/store qualification.
       placeholder: |
         - [ ] <criterion 1>
         - [ ] <criterion 2>
@@ -88,8 +89,8 @@ body:
     attributes:
       label: Sequencing note
       description: |
-        List any ordering constraints between child issues (decision-first, TDD, ARB-before-UI, etc.).
-        One PR in-flight at a time (see memory: serialize autonomous auto-merge PRs).
+        Name the exact producer checkpoint needed before coding, release-evidence gates and coordination links separately.
+        Serialize shared-file writers/merges; disjoint work may proceed without waiting for whole-epic closure.
       placeholder: |
         1. #XXXX (decision / interface) — must merge first
         2. #XXXX, #XXXX — can be bundled in one PR

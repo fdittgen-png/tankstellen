@@ -4,16 +4,20 @@ Every feature, bug, and chore should be an issue before work starts. Issues are 
 
 ## Templates
 
-`.github/ISSUE_TEMPLATE/` provides three structured templates:
+`.github/ISSUE_TEMPLATE/` provides bug, feature/improvement, epic, documentation
+and new-country forms. All link the single
+[Ready/Done/STOP and closure contract](https://github.com/fdittgen-png/tankstellen/blob/master/docs/guides/issue-exit-contract.md).
+Reporters describe the symptom; implementers add bounded acceptance and proof
+during triage. The same brief applies to API-created issues.
 
 ### 🐛 Bug Report
 
 - **Expected behaviour**
 - **Actual behaviour**
 - **Steps to reproduce** — numbered, minimal
-- **Screenshots** (if UI)
+- **Screenshots** (optional, redacted)
 - **Device / app version** (use the app's *Settings → About → Copy diagnostics* button)
-- **Relevant error trace** (from *Settings → Diagnostics → Export*)
+- **Relevant error trace** (optional, redacted; never publish secrets or private trips)
 
 Automatically labeled `type/bug`, `needs-triage`.
 
@@ -94,8 +98,8 @@ Common tasks against the open-issue list:
 
 - **Full backlog** — `gh issue list --limit 200 --json number,title,labels,milestone,updatedAt`
 - **Pick next task** — sort the backlog by priority label (`P0 > P1 > P2 > P3`) then effort label (`effort/small > medium > large`); top of the list is the next task. Filter out anything labelled `blocked`.
-- **Start work** — open a branch named `<type>/<short-slug>-<issue-number>` (e.g. `feat/wait-time-pings-1119`), include `Refs #<issue>` in commit footers, and `Closes #<issue>` in the PR body.
-- **Ship** — run `flutter analyze` + `flutter test`, push the branch, open the PR with the closing keyword in the body, then update the GitHub Project board column manually if needed.
+- **Start work** — use a separate short-lived worktree for the approved checkpoint and `Refs #<issue>` in commit footers. Do not recursively decompose an already-approved leaf.
+- **Ship** — run applicable current-candidate checks and independent review. Use `Refs` for partial work; a closing keyword requires the whole acceptance, including required external proof. Verify default-branch merge before reporting closure.
 
 See the project conventions doc (`docs/CONVENTIONS.md` if it exists, otherwise this wiki's `Dev-GitHub-Workflow` page) for the full specification.
 

@@ -43,10 +43,11 @@ terms — the [Developer Certificate of Origin](https://developercertificate.org
 
 ## Before you write code
 
-**Every change traces to a GitHub issue.** Large, multi-PR or
-multi-subsystem work is an Epic: file the Epic parent first and get the
-breakdown validated before filing children. This is not ceremony — it is
-how the project keeps a reviewable history of *why*, not just *what*.
+**Every change traces to a GitHub issue.** New broad programs need a validated
+breakdown; existing approved checkpoints do not need recursive epic triage.
+Use the [Ready/Done/STOP and closure contract](docs/guides/issue-exit-contract.md)
+for implementation briefs, API-created issues and finite evidence-backed exits.
+An ordinary bug report can start with the symptom; triage adds technical proof.
 
 ## The rules that will fail your build
 

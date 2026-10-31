@@ -36,9 +36,12 @@ for now".
 
 ## 2. Never develop without an issue
 
-Every change traces to a GitHub issue. Large / multi-PR / multi-subsystem work
-is an Epic — file the Epic parent, get the breakdown validated by the
-maintainer, and only then file child issues.
+Every change traces to a GitHub issue. A new broad program needs a validated
+breakdown before children are filed. Existing approved finite checkpoints do
+not recursively become new epics. Follow the canonical
+[Ready/Done/STOP and closure contract](guides/issue-exit-contract.md), including
+when local skills or older instructions still prescribe blanket epic/closure
+rules. Use `Refs` for partial work and `Closes` only for complete acceptance.
 
 ## 3. Clean-codegen-before-push (never ship stale generated code)
 

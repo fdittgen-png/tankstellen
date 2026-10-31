@@ -65,14 +65,14 @@ The reason — user impact, bug consequence, or refactor motivation.
 ## Screenshots
 (before / after for UI PRs)
 
-Closes #NN
+Refs #NN (partial checkpoint); Closes #NN only when all acceptance is met
 ```
 
 ### Rules
 
 - **Under 400 lines changed** (excluding generated files). Split if larger.
 - **CI must pass.** `analyze` and `test` green before request-review.
-- **Link an issue.** `Closes #NN` or `Fixes #NN` in the body. If no issue exists, consider opening one first — the `/backlog` skill can audit.
+- **Link an issue.** Use `Refs` for partial work, `Closes`/`Fixes` for whole acceptance. Follow the [Ready/Done/STOP contract](https://github.com/fdittgen-png/tankstellen/blob/master/docs/guides/issue-exit-contract.md); required external proof can remain pending after code is verified.
 - **No review-amended force-pushes if discussion is ongoing.** Reviewers need to see the diff you responded to.
 
 ## Merging
