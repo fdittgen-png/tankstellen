@@ -4,7 +4,9 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/obd2/data/diagnostics/obd2_diagnostic_recordings.dart';
 import 'package:tankstellen/features/obd2/data/diagnostics/obd2_diagnostic_trace.dart';
+import 'package:tankstellen/features/obd2/data/protocol/diagnostics/diagnostic_health_plan.dart';
 import 'package:tankstellen/features/obd2/data/session/trip_full_diagnostics.dart';
 import 'package:tankstellen/features/obd2/domain/pid_scheduler.dart';
 
@@ -29,6 +31,25 @@ void main() {
     await d.begin();
     return d;
   }
+
+  test('#4556 — the default trace lands in the recordings directory; '
+      'mark annotates it; the voltage watch runs at 1 s', () async {
+    Obd2DiagnosticRecordings.debugDirectoryOverride = dir;
+    addTearDown(() => Obd2DiagnosticRecordings.debugDirectoryOverride = null);
+    final diag = TripFullDiagnostics(header: const {'automatic': true});
+    expect(diag.trace, isNull);
+    await diag.begin();
+    expect(diag.trace, isNotNull);
+    expect(diag.trace!.file.parent.path, dir.path);
+    diag.mark('identity', {'vin': 'VF3TEST'});
+    expect(diag.voltageInterval, DiagnosticHealthRates.batteryVoltageInterval);
+    await diag.end(reason: 'userStop');
+    expect(diag.trace, isNull);
+    final text = diag.debugTraceFile!.readAsStringSync();
+    expect(text, contains('"automatic":true'));
+    expect(text, contains('"p":"identity"'));
+    expect(text, contains('"vin":"VF3TEST"'));
+  });
 
   PidScheduler scheduler() =>
       PidScheduler(transport: (_) async => 'NO DATA', tickRate: const Duration(hours: 1));
