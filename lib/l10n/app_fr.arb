@@ -1665,7 +1665,7 @@
   "developerToolsRunTestAlert": "Lancer le pipeline d'alerte de test",
   "developerToolsTestAlertFired": "Alerte de test déclenchée — le pipeline a généré {count} notification(s).",
   "developerToolsTestAlertTitle": "Alerte de prix de test",
-  "developerToolsTestAlertBody": "Correspondance synthétique : une station sous votre cible a été trouvée à proximité.",
+  "developerToolsTestAlertBody": "Correspondance synthétique : {station} est sous votre prix cible.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostics",
   "developerToolsFeatureFlagDump": "Inspecteur de drapeaux de fonctionnalités",
   "developerToolsFlagOn": "Activé",

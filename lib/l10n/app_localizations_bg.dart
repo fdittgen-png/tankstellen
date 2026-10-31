@@ -4437,7 +4437,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Синтетично съвпадение: наблизо е намерена станция под вашата цел.';
+    return 'Синтетично съвпадение: $station е под целевата ви цена.';
   }
 
   @override

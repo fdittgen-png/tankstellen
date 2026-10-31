@@ -4422,7 +4422,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Corrispondenza sintetica: è stata trovata nelle vicinanze una stazione sotto il tuo obiettivo.';
+    return 'Corrispondenza sintetica: $station è sotto il tuo prezzo obiettivo.';
   }
 
   @override
