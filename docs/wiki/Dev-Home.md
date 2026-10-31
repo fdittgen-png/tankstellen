@@ -43,6 +43,7 @@ Tankstellen (publicly **Sparkilo**) targets the running cost of a car through th
 
 ### Workflow
 - [CI/CD Pipeline](Dev-CI-CD-Pipeline) — GitHub Actions, artefacts, release tagging, daily 18:00 Paris open-testing release
+- [CI workflow catalog](Dev-CI-Workflow-Catalog) — runbook for every action
 - [GitHub Workflow](Dev-GitHub-Workflow) — Git flow, conventional commits, squash-merge, PR rules
 - [Creating Issues](Dev-Creating-Issues) — Templates, labels, milestones, triage
 - [Contributing](Dev-Contributing) — Fork, branch, submit, customise for personal use

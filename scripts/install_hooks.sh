@@ -68,8 +68,16 @@ cd "$REPO_ROOT"
 # rediscover the repo from $REPO_ROOT (cwd) just fine.
 unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_PREFIX
 
+# Validate the actual pushed ref, not just the directory name. Older branches
+# may predate the guard, so the shared hook remains usable in those worktrees.
+if [ -f scripts/ci/branch_guard.py ]; then
+  python3 scripts/ci/branch_guard.py || exit 1
+fi
+
 # Flutter/Dart are not on the default PATH in this environment.
-export PATH="/Users/floriandittgen/development/flutter/bin:/opt/homebrew/bin:$PATH"
+if ! command -v flutter >/dev/null 2>&1; then
+  export PATH="/Users/floriandittgen/development/flutter/bin:/opt/homebrew/bin:$PATH"
+fi
 
 if ! command -v flutter >/dev/null 2>&1; then
   echo "pre-push ERROR: flutter not found on PATH." >&2

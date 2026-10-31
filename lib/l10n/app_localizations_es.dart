@@ -4432,7 +4432,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Coincidencia sintética: se encontró cerca una estación por debajo de tu objetivo.';
+    return 'Coincidencia sintética: $station está por debajo de tu precio objetivo.';
   }
 
   @override

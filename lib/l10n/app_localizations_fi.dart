@@ -4408,7 +4408,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Synteettinen osuma: lähistöltä löytyi tavoitettasi halvempi asema.';
+    return 'Synteettinen osuma: $station alittaa tavoitehintasi.';
   }
 
   @override

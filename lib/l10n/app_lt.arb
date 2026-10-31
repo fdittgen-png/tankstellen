@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Vykdyti bandomąją įspėjimų giją",
   "developerToolsTestAlertFired": "Bandomasis įspėjimas suaktyvintas — gija pristatė {count} pranešimų.",
   "developerToolsTestAlertTitle": "Bandomasis kainos įspėjimas",
-  "developerToolsTestAlertBody": "Sintetinis atitikmuo: netoliese rasta stotelė, mažesnė už jūsų tikslą.",
+  "developerToolsTestAlertBody": "Sintetinis atitikmuo: {station} kaina mažesnė už jūsų tikslinę kainą.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostika",
   "developerToolsFeatureFlagDump": "Funkcijų vėliavėlių inspektorius",
   "developerToolsFlagOn": "Įjungta",

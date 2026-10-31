@@ -86,7 +86,7 @@ bash scripts/install_hooks.sh
 
 ## Getting set up
 
-Flutter is pinned — check `.github/workflows/ci.yml` for the exact
+Flutter is pinned — check `.github/actions/flutter-setup/action.yml` for the exact
 version rather than assuming your local SDK matches.
 
 ```bash
@@ -107,3 +107,7 @@ flutter test
 - Say what you verified and what you did not. A PR that reports a
   skipped step honestly is worth more than one that implies coverage it
   does not have.
+
+CI commands, safe worktrees, retry rules and every workflow runbook live in
+[docs/ci/CI_USAGE.md](docs/ci/CI_USAGE.md). Protection stays `strict=false`: do
+not rebase a green, conflict-free PR after every unrelated merge.

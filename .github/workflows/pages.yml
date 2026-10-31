@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/pages.md
 
 name: Publish · GitHub Pages (site + F-Droid repo)
 
@@ -39,6 +40,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       # Combine: marketing landing page at the root, privacy policy at
@@ -79,7 +81,7 @@ jobs:
               for apk in $(python3 -c "import json; d=json.load(open('_site/fdroid/repo/index-v1.json')); [print(p['apkName']) for v in d.get('packages',{}).values() for p in v]" 2>/dev/null); do
                 curl -fsSL "$FDROID_BASE/$apk" -o "_site/fdroid/repo/$apk" 2>/dev/null || true
               done
-              echo "Preserved $(ls _site/fdroid/repo | wc -l) live F-Droid repo file(s)."
+              echo "Preserved $(find _site/fdroid/repo -mindepth 1 -maxdepth 1 | wc -l) live F-Droid repo file(s)."
             else
               echo "::warning::Live F-Droid repo unreachable — skipping preserve; the next fdroid-publish (v* tag / dispatch) restores /fdroid."
               rmdir _site/fdroid/repo 2>/dev/null || true

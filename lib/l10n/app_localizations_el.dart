@@ -4438,7 +4438,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Συνθετική αντιστοίχιση: βρέθηκε κοντά ένας σταθμός κάτω από τον στόχο σας.';
+    return 'Συνθετική αντιστοίχιση: το $station έχει τιμή κάτω από τον στόχο σας.';
   }
 
   @override

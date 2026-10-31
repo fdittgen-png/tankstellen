@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/deploy.md
 
 name: Release · Play Store deploy
 
@@ -42,23 +43,27 @@ on:
           - internal
         default: beta
       aab_run_id:
-        description: 'CI run ID to download AAB from (for deploy-internal, leave empty for latest)'
+        description: 'CI run ID to download AAB from (for deploy-internal, required for a manual upload; must match the selected source commit)'
         required: false
         type: string
 
 concurrency:
-  group: play-store-deploy
+  group: deploy
   cancel-in-progress: false
 
 env:
   AAB_PATH: app-play-release.aab
   PACKAGE_NAME: de.tankstellen.fuelprices
 
+permissions:
+  contents: read
+
 jobs:
   # --- Job 1: Deploy AAB to Play Store internal track ---
   deploy-internal:
     if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy-internal')
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     permissions:
       contents: read
       actions: read
@@ -95,50 +100,42 @@ jobs:
           fi
           echo "CHANGELOG entry found for ${SEMVER}."
 
-      - name: Wait for CI build to complete
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          echo "Waiting for CI workflow to produce AAB artifact..."
-          # Give CI time to start
-          sleep 30
-          # Poll for up to 30 minutes
-          for i in $(seq 1 60); do
-            RUN_ID=$(gh run list --workflow=ci.yml --branch="${{ steps.version.outputs.tag }}" \
-              --json databaseId,status --jq '.[] | select(.status == "completed") | .databaseId' \
-              | head -1)
-            if [[ -n "$RUN_ID" ]]; then
-              echo "CI run $RUN_ID completed."
-              echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
-              break
-            fi
-            echo "Attempt $i/60 — CI not done yet, waiting 30s..."
-            sleep 30
-          done
-          if [[ -z "$RUN_ID" ]]; then
-            echo "::error::CI build did not complete within 30 minutes"
-            exit 1
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Resolve and verify the exact signed CI artifact
         id: ci_run
-
-      - name: Download AAB artifact
-        run: |
-          if [[ -n "${{ github.event.inputs.aab_run_id }}" ]]; then
-            RUN_ID="${{ github.event.inputs.aab_run_id }}"
-          elif [[ -n "${{ steps.ci_run.outputs.run_id }}" ]]; then
-            RUN_ID="${{ steps.ci_run.outputs.run_id }}"
-          else
-            # Find latest successful CI run
-            RUN_ID=$(gh run list --workflow=ci.yml --status=success \
-              --json databaseId --jq '.[0].databaseId')
-          fi
-          echo "Downloading AAB from CI run $RUN_ID"
-          gh run download "$RUN_ID" --name android-aab --dir ./artifact
-          cp ./artifact/${{ env.AAB_PATH }} ./${{ env.AAB_PATH }}
-          ls -lh ./${{ env.AAB_PATH }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_TAG: ${{ steps.version.outputs.tag }}
+          REQUESTED_RUN: ${{ inputs.aab_run_id }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          RUN_ID="$REQUESTED_RUN"
+          if [ "$EVENT" = push ]; then
+            # Poll metadata only; never download an unrelated "latest" build.
+            for attempt in $(seq 1 60); do
+              echo "Waiting for signed source build ($attempt/60)"
+              RUN=$(gh run list --workflow ci.yml --event push --commit "$SOURCE_SHA" \
+                --limit 50 --json databaseId,status,conclusion,headBranch \
+                | jq --arg tag "$SOURCE_TAG" '[.[] | select(.headBranch == $tag)][0]')
+              if [ "$(jq -r '.status // ""' <<< "$RUN")" = completed ]; then
+                test "$(jq -r .conclusion <<< "$RUN")" = success
+                RUN_ID=$(jq -r .databaseId <<< "$RUN")
+                break
+              fi
+              sleep 30
+            done
+          fi
+          [[ "$RUN_ID" =~ ^[0-9]+$ ]] || {
+            echo "::error::No successful signed run for this source; manual uploads require aab_run_id."
+            exit 1
+          }
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" \
+            | jq -e --arg sha "$SOURCE_SHA" \
+              '.head_sha == $sha and .conclusion == "success" and .event == "push" and .path == ".github/workflows/ci.yml" and (.head_branch | startswith("v"))'
+          echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+          gh run download "$RUN_ID" --name android-aab --dir ./artifact
+          cp "./artifact/$AAB_PATH" "./$AAB_PATH"
 
       - name: Upload AAB to Play Store (internal track)
         uses: r0adkll/upload-google-play@v1
@@ -152,20 +149,23 @@ jobs:
 
       - name: Summary
         run: |
-          echo "## Play Store Deploy Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Version:** ${{ steps.version.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Track:** internal" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Status:** Uploaded successfully" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "### Next steps" >> "$GITHUB_STEP_SUMMARY"
-          echo "1. Test on internal track for 3-5 days" >> "$GITHUB_STEP_SUMMARY"
-          echo "2. Promote via workflow dispatch: *promote-rollout* with desired percentage" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Play Store Deploy Summary"
+            echo ""
+            echo "- **Version:** ${{ steps.version.outputs.tag }}"
+            echo "- **Track:** internal"
+            echo "- **Status:** Uploaded successfully"
+            echo ""
+            echo "### Next steps"
+            echo "1. Test on internal track for 3-5 days"
+            echo "2. Promote via workflow dispatch: *promote-rollout* with desired percentage"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   # --- Job 2: Promote release through tracks / staged rollout ---
   promote-rollout:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'promote-rollout'
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
 
@@ -194,11 +194,13 @@ jobs:
           else
             TARGET="production (${PERCENT}% staged rollout)"
           fi
-          echo "## Rollout Promotion Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **From track:** $FROM" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **To:** $TARGET" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Rollout Promotion Summary"
+            echo ""
+            echo "- **From track:** $FROM"
+            echo "- **To:** $TARGET"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
           if [[ "$PERCENT" != "100" ]]; then
             echo "### Next rollout stage" >> "$GITHUB_STEP_SUMMARY"
             echo "Run this workflow again with a higher percentage when ready." >> "$GITHUB_STEP_SUMMARY"
