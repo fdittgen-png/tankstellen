@@ -16,7 +16,31 @@ import re
 import subprocess
 
 CONTEXT = "independent-session-review"
-SESSION_LINE = re.compile(r"^Implementation-Session:\s*(\S+)\s*$", re.MULTILINE)
+SESSION_LINE = re.compile(r"^Implementation-Session:[ \t]*(\S+)[ \t]*\r?$", re.MULTILINE)
+SESSION_ID = re.compile(r"[A-Za-z0-9._:/-]{3,160}")
+DECLARATION = re.compile(r"^[ \t]*Implementation-Session\b[^\n]*$", re.MULTILINE)
+
+
+def implementation_session(pr, repo, pr_number):
+    body = pr.get("body") or ""
+    declarations = DECLARATION.findall(body)
+    authors = SESSION_LINE.findall(body)
+    if declarations:
+        if len(declarations) != 1 or len(authors) != 1:
+            raise ValueError("PR body must declare exactly one Implementation-Session")
+        if not SESSION_ID.fullmatch(authors[0]):
+            raise ValueError("Malformed Implementation-Session identifier")
+        return authors[0]
+    # Only authenticated REST metadata identifies an automated author. Body
+    # claims, login spelling and the GraphQL is_bot hint are not this proof.
+    user = pr.get("user") or {}
+    login = user.get("login", "") if isinstance(user, dict) else ""
+    if (isinstance(user, dict) and user.get("type") == "Bot"
+            and isinstance(login, str) and re.fullmatch(
+            r"[A-Za-z0-9][A-Za-z0-9_-]*(?:\[bot\])?", login)):
+        return "automated:{}/pull/{}/{}".format(
+            repo.lower(), pr_number, login.lower().replace("[bot]", ".bot"))
+    raise ValueError("PR body must declare exactly one Implementation-Session")
 
 
 def gh_api(endpoint, method="GET", payload=None):
@@ -33,7 +57,7 @@ def gh_api(endpoint, method="GET", payload=None):
 def publish_review(repo, pr_number, sha, reviewer_session, verdict, report, api=gh_api):
     if not re.fullmatch(r"[0-9a-f]{40}", sha):
         raise ValueError("Use the full 40-character reviewed commit SHA")
-    if not re.fullmatch(r"[A-Za-z0-9._:/-]{3,160}", reviewer_session):
+    if not SESSION_ID.fullmatch(reviewer_session):
         raise ValueError("Use a stable, unique reviewer session identifier")
     if len(report.strip()) < 40:
         raise ValueError("Include findings, validation and issue-acceptance evidence")
@@ -41,17 +65,15 @@ def publish_review(repo, pr_number, sha, reviewer_session, verdict, report, api=
         raise ValueError("Verdict must be approve or changes")
     endpoint = "repos/{}/pulls/{}".format(repo, pr_number)
     pr = api(endpoint)
-    authors = SESSION_LINE.findall(pr.get("body") or "")
-    if len(authors) != 1:
-        raise ValueError("PR body must declare exactly one Implementation-Session")
-    if authors[0] == reviewer_session:
+    author = implementation_session(pr, repo, pr_number)
+    if author == reviewer_session:
         raise ValueError("The implementation session cannot review its own PR")
     if pr["head"]["sha"] != sha or pr["state"] != "open":
         raise ValueError("Review is stale or PR is no longer open; review the current head")
     body = (
         "Independent session review: **{}**\n\n"
         "Implementation-Session: {}\nReviewer-Session: {}\nReviewed-Head: {}\n\n{}"
-    ).format(verdict.upper(), authors[0], reviewer_session, sha, report.strip())
+    ).format(verdict.upper(), author, reviewer_session, sha, report.strip())
     # COMMENT permits independent sessions sharing the PR author's account.
     # It is deliberately not presented as a second GitHub user's approval.
     review = api(endpoint + "/reviews", "POST", {

@@ -112,11 +112,14 @@ class _RetryInterceptor extends Interceptor {
     final attempt = (err.requestOptions.extra['retry_attempt'] as int?) ?? 0;
     if (_isTransient(err) && attempt < maxRetries) {
       await Future<void>.delayed(_baseDelay * (attempt + 1));
+      final cancelled = err.requestOptions.cancelToken?.cancelError;
+      if (cancelled != null) return handler.reject(cancelled);
       final opts = err.requestOptions..extra['retry_attempt'] = attempt + 1;
       try {
         return handler.resolve(await _dio.fetch<dynamic>(opts));
-      } catch (_) {
-        return handler.next(err);
+      } on DioException catch (retryError) {
+        // Forward the original exception, including its transport stack.
+        return handler.next(retryError);
       }
     }
     return handler.next(err);
@@ -142,15 +145,20 @@ Future<T> retryNetwork<T>(
   Future<T> Function() body, {
   int attempts = 3,
   Duration baseDelay = const Duration(seconds: 2),
+  CancelToken? cancelToken,
 }) async {
   Object? lastError;
   StackTrace? lastStack;
   for (var i = 0; i < attempts; i++) {
+    final cancelled = cancelToken?.cancelError;
+    if (cancelled != null) throw cancelled;
     try {
       return await body();
     } on TestFailure {
       rethrow;
     } catch (e, st) {
+      final cancelled = cancelToken?.cancelError;
+      if (cancelled != null) throw cancelled;
       if (e is DioException && !_isTransient(e)) rethrow;
       lastError = e;
       lastStack = st;
@@ -158,4 +166,31 @@ Future<T> retryNetwork<T>(
     }
   }
   Error.throwWithStackTrace(lastError!, lastStack!);
+}
+
+/// Bound the complete probe, including all retry delays (#4541).
+///
+/// A test-runner timeout does not cancel Dio or service-owned requests. Keep
+/// this deadline below that timeout so the probe fails normally and every
+/// request sharing the token is cancelled before the next test starts.
+Future<T> withNetworkDeadline<T>(
+  Future<T> Function(CancelToken token) body, {
+  Duration timeout = const Duration(seconds: 25),
+}) async {
+  final token = CancelToken();
+  try {
+    return await Future<T>.sync(() => body(token)).timeout(
+      timeout,
+      onTimeout: () {
+        final error = TimeoutException(
+          'Network probe exceeded its deadline',
+          timeout,
+        );
+        token.cancel(error);
+        throw error;
+      },
+    );
+  } finally {
+    if (!token.isCancelled) token.cancel('Network probe completed');
+  }
 }
