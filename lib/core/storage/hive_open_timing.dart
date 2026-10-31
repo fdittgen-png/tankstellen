@@ -69,10 +69,20 @@ abstract final class HiveOpenTiming {
   /// Times [open]. Only [firstFramePhase] opens feed [slowest] and
   /// [openedBoxes] — those answer questions about the batch the first
   /// frame waits for, and a deferred open must not change their meaning.
-  static Future<Box<T>> timed<T>(String name, Future<Box<T>> Function() open,
-      {String phase = firstFramePhase}) async {
+  static Future<Box<T>> timed<T>(
+    String name,
+    Future<Box<T>> Function() open, {
+    String phase = firstFramePhase,
+  }) => timedBox(name, open, phase: phase);
+
+  /// Also accepts lazy boxes, whose entry count includes unloaded payloads.
+  static Future<B> timedBox<B extends BoxBase<dynamic>>(
+    String name,
+    Future<B> Function() open, {
+    String phase = firstFramePhase,
+  }) async {
     final sw = Stopwatch()..start();
-    Box<T>? box;
+    B? box;
     try {
       return box = await open();
     } finally {
@@ -89,14 +99,14 @@ abstract final class HiveOpenTiming {
 
   /// [opens] as export rows.
   static List<Map<String, Object?>> exportRows() => [
-        for (final r in _records)
-          {
-            'box': r.name,
-            'phase': r.phase,
-            'durationMs': r.ms,
-            if (r.entries != null) 'entries': r.entries,
-          },
-      ];
+    for (final r in _records)
+      {
+        'box': r.name,
+        'phase': r.phase,
+        'durationMs': r.ms,
+        if (r.entries != null) 'entries': r.entries,
+      },
+  ];
 }
 
 /// One timed box open (#4318).

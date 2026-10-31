@@ -39,7 +39,7 @@ Future<List<SpeedConsumptionBin>> speedConsumptionBins(
     ]);
   }
   if (ids.isEmpty) return aggregateSpeedConsumption(const []);
-  return compute(speedConsumptionBinsFromSources, repo.columnSources(ids));
+  return compute(speedConsumptionBinsFromSources, await repo.columnSourcesAsync(ids));
 }
 
 /// Decode + fold for [speedConsumptionBins] — a top-level `compute` entry.

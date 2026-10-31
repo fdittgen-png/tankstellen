@@ -423,7 +423,7 @@ final class TripHistoryRepositoryProvider
 }
 
 String _$tripHistoryRepositoryHash() =>
-    r'd3d80dd4010d0e9e337b2664342440ac7ebe137f';
+    r'92e83cf5e5978bc72097347c321f2123c7633a7d';
 
 /// List of finalised trips, newest-first. Empty when the box is
 /// closed or carries no entries. Refreshed by callers after they
@@ -494,7 +494,7 @@ final class TripHistoryListProvider
   }
 }
 
-String _$tripHistoryListHash() => r'3f4e6a9a181d579e71c2f1c47733567789f8ef74';
+String _$tripHistoryListHash() => r'70c876a7f4a0d53b89bb3ee94ffa602759aed402';
 
 /// List of finalised trips, newest-first. Empty when the box is
 /// closed or carries no entries. Refreshed by callers after they
@@ -635,7 +635,7 @@ final class TripHistoryDetailProvider
   }
 }
 
-String _$tripHistoryDetailHash() => r'ef875ce19c7fd15795829547b7168641a3eef2e7';
+String _$tripHistoryDetailHash() => r'f89e833aff96bf7bed3ed69f58f82ccc7a6a38aa';
 
 /// Full decode of ONE persisted trip — samples materialised (#3741).
 ///
@@ -971,7 +971,7 @@ final class TripDetailLoaderProvider
   }
 }
 
-String _$tripDetailLoaderHash() => r'3807d0e64fa861c5753fb301e612f08e6c1c28d4';
+String _$tripDetailLoaderHash() => r'6d99e901d574eb50f4dbc49bd2b8d3bb12d95133';
 
 /// #3882 — the trip-detail screen's loader: the FULL entry decoded on a
 /// background isolate ([TripHistoryRepository.loadByIdAsync]), exposed as
@@ -1077,11 +1077,11 @@ final tripSpeedFuelSamplesProvider = TripSpeedFuelSamplesFamily._();
 final class TripSpeedFuelSamplesProvider
     extends
         $FunctionalProvider<
+          AsyncValue<List<TripSample>>,
           List<TripSample>,
-          List<TripSample>,
-          List<TripSample>
+          FutureOr<List<TripSample>>
         >
-    with $Provider<List<TripSample>> {
+    with $FutureModifier<List<TripSample>>, $FutureProvider<List<TripSample>> {
   /// #3882 — only the speed + fuel-rate columns of one trip, as light
   /// samples, for the speed-consumption histogram (the carbon charts tab):
   /// a 2-column read instead of the 34-column full decode. Refreshes with
@@ -1109,21 +1109,14 @@ final class TripSpeedFuelSamplesProvider
 
   @$internal
   @override
-  $ProviderElement<List<TripSample>> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
+  $FutureProviderElement<List<TripSample>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  List<TripSample> create(Ref ref) {
+  FutureOr<List<TripSample>> create(Ref ref) {
     final argument = this.argument as String;
     return tripSpeedFuelSamples(ref, argument);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<TripSample> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<List<TripSample>>(value),
-    );
   }
 
   @override
@@ -1138,7 +1131,7 @@ final class TripSpeedFuelSamplesProvider
 }
 
 String _$tripSpeedFuelSamplesHash() =>
-    r'983ca9e1414b80d1feea17e396066d4e273fbe8e';
+    r'c52884a42a1f7c68e538f279c7a5bf93e2fcbb5d';
 
 /// #3882 — only the speed + fuel-rate columns of one trip, as light
 /// samples, for the speed-consumption histogram (the carbon charts tab):
@@ -1146,7 +1139,7 @@ String _$tripSpeedFuelSamplesHash() =>
 /// the list like [tripHistoryDetailProvider].
 
 final class TripSpeedFuelSamplesFamily extends $Family
-    with $FunctionalFamilyOverride<List<TripSample>, String> {
+    with $FunctionalFamilyOverride<FutureOr<List<TripSample>>, String> {
   TripSpeedFuelSamplesFamily._()
     : super(
         retry: null,

@@ -127,7 +127,7 @@ class VehicleAggregateUpdater {
     final samples = <TripSample>[];
     for (final t in trips) {
       if (t.sampleCount > 0) {
-        samples.addAll(tripRepo.loadSamplesWith(t.id, const {'s', 'f'}));
+        samples.addAll(await tripRepo.loadSamplesWithAsync(t.id, const {'s', 'f'}));
       }
     }
 

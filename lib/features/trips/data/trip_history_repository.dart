@@ -6,6 +6,8 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import '../../../core/storage/hive_trip_history_index.dart';
+import '../../../core/storage/hive_box_mutation_epoch.dart';
 
 import '../domain/trip_sample.dart';
 import '../domain/trip_verdict.dart';
@@ -13,7 +15,8 @@ import 'trip_column_chunk.dart';
 import 'trip_dedup.dart';
 import 'trip_history_entry.dart';
 import 'trip_history_store_v2.dart';
-import 'trip_sample_codec.dart';
+import 'trip_history_column_source.dart';
+import 'trip_history_payload_reader.dart';
 import '../../../core/logging/error_logger.dart';
 import '../../../core/logging/app_log.dart';
 
@@ -21,6 +24,7 @@ import '../../../core/logging/app_log.dart';
 // under the 400-line cap; the re-export keeps every existing
 // `trip_history_repository.dart` import working.
 export 'trip_history_entry.dart';
+export 'trip_history_column_source.dart';
 export 'trip_history_entry_columns.dart'; // #3882
 export 'trip_column_chunk.dart' show TripColumns;
 
@@ -31,20 +35,14 @@ const int kTripSaveComputeSampleThreshold = 2000;
 
 /// Hive-backed list of finalised trips (#726).
 ///
-/// Stores at most [cap] trips keyed by a stable trip id (ISO start
-/// timestamp). Oldest entries drop off when the cap is hit — trip
-/// history is a rolling log, not an archive.
+/// Stores at most [cap] trips under stable IDs, dropping the oldest entries.
 ///
-/// #3882 — trip detail v2: a trip is a META row (`<id>`) plus columnar
-/// CHUNK rows (`<id>::chunk::<n>`, ≤ 300 samples each) and a diagnostics
-/// row (`<id>::gpsd`), see `trip_history_store_v2.dart`. The summary list
-/// reads meta rows only; [loadById] assembles the chunks; [loadByIdAsync]
-/// does so in an isolate; [loadColumns] reads only the arrays asked for.
-/// Legacy v1 rows (one JSON string with `samples`) keep decoding and are
-/// rewritten to v2 on their first full read ([migrateLegacyRow]) or by
-/// the background [migrateLegacyRowsInBackground] sweep.
+/// Metadata stays synchronously available; [loadByIdAsync] and
+/// [columnSourcesAsync] read payloads on demand. JSON runs on workers,
+/// Hive stays on its owner. Legacy rows migrate via [migrateLegacyRow].
 class TripHistoryRepository {
-  final Box<String> _box;
+  final BoxBase<String> _box;
+  final HiveTripHistoryIndex? _index;
   final int cap;
 
   /// Optional hook fired after a successful [save] when the saved
@@ -57,7 +55,38 @@ class TripHistoryRepository {
     required Box<String> box,
     this.cap = 100,
     this.onSavedHook,
-  }) : _box = box; // ignore: prefer_initializing_formals
+    // The public constructor keeps its existing named `box` argument.
+    // ignore: prefer_initializing_formals
+  }) : _box = box,
+       _index = null;
+
+  TripHistoryRepository.lazy({
+    required LazyBox<String> box,
+    this.cap = 100,
+    this.onSavedHook,
+  }) : _box = box,
+       _index = HiveTripHistoryIndex.of(box);
+
+  /// Resolves the production lazy box, or a regular box used by tests.
+  static TripHistoryRepository fromOpenBox(String name) {
+    try {
+      return TripHistoryRepository.lazy(box: Hive.lazyBox<String>(name));
+      // Hive uses Error for its regular/lazy type mismatch, not Exception.
+      // ignore: avoid_catching_errors
+    } on HiveError {
+      return TripHistoryRepository(box: Hive.box<String>(name));
+    }
+  }
+
+  String? _get(Object key) =>
+      _index == null ? (_box as Box<String>).get(key) : _index.get(key);
+  TripHistoryPayloadReader get _payload => TripHistoryPayloadReader(_box);
+  HiveBoxMutationEpoch get _epoch => HiveBoxMutationEpoch.of(_box);
+  Future<String?> _read(Object key) => _payload.read(key);
+  Future<void> _putAll(Map<dynamic, String> rows) =>
+      _index?.putAll(rows) ?? _epoch.mutate(() => _box.putAll(rows));
+  Future<void> _deleteAll(Iterable<dynamic> keys) =>
+      _index?.deleteAll(keys) ?? _epoch.mutate(() => _box.deleteAll(keys));
 
   /// Box name used by the production wiring.
   static const String boxName = 'obd2_trip_history';
@@ -84,12 +113,22 @@ class TripHistoryRepository {
       );
       if (skip) return true; // its sampled twin is already in history
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save ghost-guard'});
+      log.error(
+        e,
+        st,
+        layer: ErrorLayer.storage,
+        context: const {'where': 'TripHistoryRepository.save ghost-guard'},
+      );
     }
     try {
       await _writeRows(entry);
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save'});
+      log.error(
+        e,
+        st,
+        layer: ErrorLayer.storage,
+        context: const {'where': 'TripHistoryRepository.save'},
+      );
       return false;
     }
     await _trim();
@@ -99,7 +138,12 @@ class TripHistoryRepository {
       try {
         hook(entry);
       } catch (e, st) {
-        log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.save onSavedHook'});
+        log.error(
+          e,
+          st,
+          layer: ErrorLayer.storage,
+          context: const {'where': 'TripHistoryRepository.save onSavedHook'},
+        );
       }
     }
     return true;
@@ -112,8 +156,10 @@ class TripHistoryRepository {
     final rows = entry.samples.length > kTripSaveComputeSampleThreshold
         ? await compute(encodeTripRowsV2, json)
         : encodeTripRowsV2(json);
-    await _deleteSidecars(entry.id, keep: rows.keys.toSet());
-    await _box.putAll(rows);
+    await _epoch.mutate(() async {
+      await _deleteSidecars(entry.id, keep: rows.keys.toSet());
+      await _putAll(rows);
+    });
   }
 
   Future<void> _deleteSidecars(String id, {Set<String> keep = const {}}) async {
@@ -121,52 +167,40 @@ class TripHistoryRepository {
       for (final k in _box.keys.whereType<String>())
         if (isTripSidecarKey(k) && tripIdOfKey(k) == id && !keep.contains(k)) k,
     ];
-    if (stale.isNotEmpty) await _box.deleteAll(stale);
+    if (stale.isNotEmpty) await _deleteAll(stale);
   }
 
-  /// The raw rows of trip [id], or null when absent.
-  TripRowsV2? _rowsOf(String id, String meta) =>
-      TripRowsV2(meta: meta, chunks: _chunksOf(id), gpsd: _box.get(tripGpsdKey(id)));
-
-  /// The v2 chunk rows of trip [id] in order (none for a legacy row).
-  List<String> _chunksOf(String id) {
-    final chunks = <String>[];
-    for (var i = 0;; i++) {
-      final c = _box.get(tripChunkKey(id, i));
-      if (c == null) break;
-      chunks.add(c);
-    }
-    return chunks;
-  }
-
-  /// The raw rows [decodeTripColumnSource] reads, for every present trip
-  /// in [ids] — box reads only, nothing decoded, so a caller folding MANY
-  /// trips can hand the whole batch to one worker isolate.
-  List<TripColumnSource> columnSources(Iterable<String> ids) => [
-        for (final id in ids)
-          if (_box.get(id) case final raw? when raw.isNotEmpty)
-            (row: raw, chunks: _chunksOf(id)),
-      ];
+  /// Synchronous compatibility reads for regular (non-lazy) test boxes.
+  List<TripColumnSource> columnSources(Iterable<String> ids) =>
+      _payload.sourcesSync(ids);
 
   static bool _isV2(Map<String, dynamic> json) => json['v'] == kTripRowVersion;
 
   /// Deserialise the trip stored under [key], or null when absent or
   /// corrupt (a single bad row is logged + skipped, never thrown).
   TripHistoryEntry? _decode(Object key, {bool summaryOnly = false}) {
-    final raw = _box.get(key);
+    final raw = _get(key);
     if (raw == null || raw.isEmpty || isTripSidecarKey(key)) return null;
     try {
       final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
       if (_isV2(json)) {
         if (summaryOnly) return TripHistoryEntry.summaryFromJson(json);
-        return decodeTripRowsV2ToEntry(_rowsOf(key as String, raw)!);
+        return decodeTripRowsV2ToEntry(_payload.rowsSync(key as String, raw));
       }
       if (summaryOnly) return TripHistoryEntry.summaryFromJson(json);
       // Legacy v1 row: decode as before and rewrite it in the background.
       _scheduleMigration(key as String);
       return TripHistoryEntry.fromJson(json);
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository._decode: skipping $key', 'entity': key});
+      log.error(
+        e,
+        st,
+        layer: ErrorLayer.storage,
+        context: {
+          'where': 'TripHistoryRepository._decode: skipping $key',
+          'entity': key,
+        },
+      );
       return null;
     }
   }
@@ -174,26 +208,38 @@ class TripHistoryRepository {
   final Set<String> _migrating = {};
   void _scheduleMigration(String id) {
     if (!_migrating.add(id)) return;
-    unawaited(Future<void>(() => migrateLegacyRow(id))
-        .whenComplete(() => _migrating.remove(id)));
+    unawaited(
+      Future<void>(
+        () => migrateLegacyRow(id),
+      ).whenComplete(() => _migrating.remove(id)),
+    );
   }
 
   /// #3882 — rewrite a legacy v1 row into meta + chunks. No-op on a v2
   /// row or a missing/corrupt one. Returns true when a rewrite happened.
   Future<bool> migrateLegacyRow(String id) async {
     try {
-      final raw = _box.get(id);
+      await _epoch.whenIdle;
+      final generation = _epoch.generation;
+      final raw = await _read(id);
       if (raw == null || raw.isEmpty) return false;
-      final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      if (_isV2(json)) return false;
-      final rows = json['samples'] is List &&
-              (json['samples'] as List).length > kTripSaveComputeSampleThreshold
-          ? await compute(encodeTripRowsV2, json)
-          : encodeTripRowsV2(json);
-      await _box.putAll(rows);
+      final rows = await compute(migrateLegacyTripRow, raw);
+      // A delete/edit while the worker was running owns the newer row.
+      if (rows == null || generation != _epoch.generation || !_epoch.isIdle) {
+        return false;
+      }
+      await _putAll(rows);
       return true;
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository.migrateLegacyRow $id', 'entity': id});
+      log.error(
+        e,
+        st,
+        layer: ErrorLayer.storage,
+        context: {
+          'where': 'TripHistoryRepository.migrateLegacyRow $id',
+          'entity': id,
+        },
+      );
       return false;
     }
   }
@@ -201,8 +247,9 @@ class TripHistoryRepository {
   /// #3882 — low-priority sweep: migrate every legacy row, one at a time,
   /// yielding [pause] between rows so the UI isolate stays responsive.
   /// Returns the number of rows rewritten. Never throws.
-  Future<int> migrateLegacyRowsInBackground(
-      {Duration pause = const Duration(milliseconds: 50)}) async {
+  Future<int> migrateLegacyRowsInBackground({
+    Duration pause = const Duration(milliseconds: 50),
+  }) async {
     var n = 0;
     for (final id in storedIds.toList()) {
       if (await migrateLegacyRow(id)) n++;
@@ -237,42 +284,57 @@ class TripHistoryRepository {
     return dedupe ? dedupeGhostTrips(result) : result;
   }
 
-  /// O(1) lookup of one persisted trip by [id] (#2304), samples assembled
-  /// from its chunks on the calling isolate. Prefer [loadByIdAsync] on
-  /// the UI isolate for long trips.
+  /// Compatibility full read for regular boxes; lazy stores use [loadByIdAsync].
   TripHistoryEntry? loadById(String id) => _decode(id);
 
   /// #3882 — full decode of one trip on a background isolate: only the
   /// raw strings cross to the worker, the finished entry comes back.
-  Future<TripHistoryEntry?> loadByIdAsync(String id) async {
-    final raw = _box.get(id);
-    if (raw == null || raw.isEmpty) return null;
+  Future<TripHistoryEntry?> loadByIdAsync(String id) => _loadById(id, false);
+
+  Future<TripHistoryEntry?> _loadById(
+    String id,
+    bool requireStableSnapshot,
+  ) async {
     try {
-      final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
-      if (_isV2(json)) {
-        return await compute(decodeTripRowsV2ToEntry, _rowsOf(id, raw)!);
-      }
-      _scheduleMigration(id);
-      return await compute(decodeLegacyRowToEntry, raw);
+      final result = await _payload.decode(id);
+      if (result == null) return null;
+      if (result.legacy) _scheduleMigration(id);
+      return result.entry;
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository.loadByIdAsync $id', 'entity': id});
+      if (requireStableSnapshot && e is HiveBoxSnapshotConflict) rethrow;
+      log.error(
+        e,
+        st,
+        layer: ErrorLayer.storage,
+        context: {
+          'where': 'TripHistoryRepository.loadByIdAsync $id',
+          'entity': id,
+        },
+      );
       return null;
     }
+  }
+
+  Future<List<TripColumnSource>> columnSourcesAsync(Iterable<String> ids) =>
+      _payload.sources(ids);
+
+  Future<List<TripSample>> loadSamplesWithAsync(String id, Set<String> keys) =>
+      _payload.samples(id, keys);
+
+  Future<List<TripHistoryEntry>> loadAllAsync() async {
+    final entries = <TripHistoryEntry>[];
+    for (final summary in loadSummaries()) {
+      final entry = await _loadById(summary.id, true);
+      if (entry != null) entries.add(entry);
+    }
+    return entries;
   }
 
   /// #3882 — only the requested sample columns of one trip (codec keys
   /// such as `s`, `f`, `la`), without materialising samples. Legacy rows
   /// decode fully and are projected. Empty when the trip is absent.
-  TripColumns loadColumns(String id, Set<String> keys) {
-    final raw = _box.get(id);
-    if (raw == null || raw.isEmpty) return TripColumns.empty;
-    try {
-      return decodeTripColumnSource((row: raw, chunks: _chunksOf(id)), keys);
-    } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: {'where': 'TripHistoryRepository.loadColumns $id', 'entity': id});
-      return TripColumns.empty;
-    }
-  }
+  TripColumns loadColumns(String id, Set<String> keys) =>
+      _payload.safeColumnsSync(id, keys);
 
   /// #3882 — a light sample list carrying only [keys] (plus timestamps),
   /// for readers such as the speed/consumption aggregator that take
@@ -280,36 +342,48 @@ class TripHistoryRepository {
   List<TripSample> loadSamplesWith(String id, Set<String> keys) =>
       samplesFromColumns(loadColumns(id, keys), keys);
 
-  Future<void> delete(String id) async {
-    await _box.delete(id);
+  Future<void> delete(String id) => _epoch.mutate(() async {
+    await _deleteAll([id]);
     await _deleteSidecars(id);
-  }
+  });
 
   /// #3501 — persist the driver's post-trip verdict onto an existing entry.
   /// #3882 — a v2 row rewrites its META row only (the chunks are untouched).
   Future<bool> saveVerdict(String id, TripVerdict verdict) async {
     try {
-      final raw = _box.get(id);
+      await _epoch.whenIdle;
+      final generation = _epoch.generation;
+      final raw = await _read(id);
       if (raw == null) return false;
       final json = (jsonDecode(raw) as Map).cast<String, dynamic>();
+      if (generation != _epoch.generation || !_epoch.isIdle) return false;
       if (_isV2(json)) {
         json['verdict'] = verdict.wireName;
-        await _box.put(id, jsonEncode(json));
+        await _putAll({id: jsonEncode(json)});
         return true;
       }
       final entry = TripHistoryEntry.fromJson(json);
-      await _box.put(
-          id, jsonEncode(entry.copyWith(verdict: verdict.wireName).toJson()));
+      await _putAll({
+        id: jsonEncode(entry.copyWith(verdict: verdict.wireName).toJson()),
+      });
       return true;
     } catch (e, st) {
-      log.error(e, st, layer: ErrorLayer.storage, context: const {'where': 'TripHistoryRepository.saveVerdict'});
+      log.error(
+        e,
+        st,
+        layer: ErrorLayer.storage,
+        context: const {'where': 'TripHistoryRepository.saveVerdict'},
+      );
       return false;
     }
   }
 
   /// Wipe every persisted trip (#2571) — backup RESTORE (replace mode).
   Future<void> clearAll() async {
-    await _box.clear();
+    await (_index?.clear() ??
+        _epoch.mutate(() async {
+          await _box.clear();
+        }));
   }
 
   Future<void> _trim() async {
@@ -320,30 +394,3 @@ class TripHistoryRepository {
     }
   }
 }
-
-/// One trip's raw rows: its main row (v2 meta or a legacy v1 blob) and its
-/// v2 chunk rows. Plain strings, so it crosses an isolate boundary.
-typedef TripColumnSource = ({String row, List<String> chunks});
-
-/// The [keys] columns of one trip from its raw rows. A legacy row decodes
-/// fully and is projected. Pure — safe on a worker isolate.
-TripColumns decodeTripColumnSource(TripColumnSource src, Set<String> keys) {
-  final json = (jsonDecode(src.row) as Map).cast<String, dynamic>();
-  if (json['v'] == kTripRowVersion) return decodeTripColumnsV2(src.chunks, keys);
-  final samples = (json['samples'] as List?)
-          ?.map((e) => (e as Map).cast<String, dynamic>())
-          .toList(growable: false) ??
-      const <Map<String, dynamic>>[];
-  return decodeTripChunkColumns(encodeTripChunkFromMaps(samples), keys);
-}
-
-/// Light samples carrying only [keys] (plus timestamps) from [cols].
-List<TripSample> samplesFromColumns(TripColumns cols, Set<String> keys) => [
-      for (var i = 0; i < cols.length; i++)
-        sampleFromJson({
-          't': cols.timestampsMs[i],
-          's': cols.values['s']?[i] ?? 0.0,
-          for (final k in keys)
-            if (k != 's' && cols.values[k]?[i] != null) k: cols.values[k]![i],
-        }),
-    ];

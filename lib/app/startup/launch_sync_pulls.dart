@@ -113,15 +113,13 @@ class LaunchSyncPulls {
     if (!container.read(tripsSyncEnabledProvider)) return 0;
     var changed = 0;
     try {
-      final repo = TripHistoryRepository(
-        box: Hive.box<String>(HiveBoxes.obd2TripHistory),
-      );
+      final repo = TripHistoryRepository.fromOpenBox(HiveBoxes.obd2TripHistory);
       // #3613 — the merge input is summary-only decoded; the details-heal
       // upload inside TripsSync.merge re-hydrates the (rare) local-only
       // entries one by one via loadById.
       changed = await mergeAndPruneTrips(
         repo,
-        (local) => TripsSync.merge(local, loadFull: repo.loadById),
+        (local) => TripsSync.merge(local, loadFull: repo.loadByIdAsync),
       );
       await TripsSync.pruneOldDetails();
     } catch (e, st) {

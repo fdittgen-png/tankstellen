@@ -7,11 +7,16 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:hive/hive.dart';
+import 'package:tankstellen/core/storage/hive_box_mutation_epoch.dart';
+import 'package:tankstellen/features/trips/data/trip_history_repository.dart';
+import 'package:tankstellen/features/trips/providers/trip_history_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tankstellen/core/logging/error_logger.dart';
 import 'package:tankstellen/core/sharing/public_file_exporter.dart';
@@ -26,6 +31,22 @@ import '../../../../../../helpers/pump_app.dart';
 import '../../../../../../mocks/mocks.dart';
 import 'privacy_test_support.dart';
 
+class _UnusedTripBox implements Box<String> {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _GatedTripExport extends TripHistoryRepository {
+  _GatedTripExport() : super(box: _UnusedTripBox());
+  final reached = Completer<void>();
+  final result = Completer<List<TripHistoryEntry>>();
+  @override
+  Future<List<TripHistoryEntry>> loadAllAsync() {
+    reached.complete();
+    return result.future;
+  }
+}
+
 /// #3912 (Epic #3907) — "Export or delete": the format chooser routes to
 /// the right export, the error-log row keeps its size-gated export
 /// (#1301) and clear (#1971), the delete flow keeps its confirmation.
@@ -36,13 +57,14 @@ void main() {
     // #2146 — catches route through errorLogger; in tests Hive isn't
     // initialised so the spool's default path throws — point the override
     // at a no-op recorder.
-    errorLogger.spoolEnqueueOverride = ({
-      required String isolateTaskName,
-      required Object error,
-      StackTrace? stack,
-      Map<String, dynamic>? contextMap,
-      DateTime? timestamp,
-    }) async {};
+    errorLogger.spoolEnqueueOverride =
+        ({
+          required String isolateTaskName,
+          required Object error,
+          StackTrace? stack,
+          Map<String, dynamic>? contextMap,
+          DateTime? timestamp,
+        }) async {};
     addTearDown(errorLogger.resetForTest);
 
     mockStorage = MockStorageRepository();
@@ -60,6 +82,7 @@ void main() {
   Future<AppLocalizations> pump(
     WidgetTester tester, {
     StubTraceStorage? traces,
+    TripHistoryRepository? trips,
   }) async {
     await tester.binding.setSurfaceSize(const Size(600, 1600));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -67,33 +90,81 @@ void main() {
       tester,
       const PrivacyExportDeleteScreen(),
       overrides: [
+        if (trips != null)
+          tripHistoryRepositoryProvider.overrideWithValue(trips),
         storageRepositoryProvider.overrideWithValue(mockStorage),
         syncStateProvider.overrideWith(DisabledSyncState.new),
         traceStorageProvider.overrideWithValue(traces ?? StubTraceStorage()),
       ],
     );
     return AppLocalizations.of(
-        tester.element(find.byType(PrivacyExportDeleteScreen)));
+      tester.element(find.byType(PrivacyExportDeleteScreen)),
+    );
   }
 
   void wireClipboardCapture(void Function(Map<String, dynamic>) onCopy) {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (call) async {
-      if (call.method == 'Clipboard.setData') {
-        onCopy(Map<String, dynamic>.from(call.arguments as Map));
-      }
-      return null;
-    });
-    addTearDown(() => TestDefaultBinaryMessengerBinding
-        .instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, null));
+          if (call.method == 'Clipboard.setData') {
+            onCopy(Map<String, dynamic>.from(call.arguments as Map));
+          }
+          return null;
+        });
+    addTearDown(
+      () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null),
+    );
   }
 
+  testWidgets('leaving during the trip export read uses no disposed ref', (
+    tester,
+  ) async {
+    final repo = _GatedTripExport();
+    await pump(tester, trips: repo);
+    await tester.tap(find.byKey(const ValueKey('privacy-export-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('privacyExportZipOption')));
+    await tester.pumpAndSettle();
+    expect(repo.reached.isCompleted, isTrue);
+    await tester.pumpWidget(const SizedBox.shrink());
+    repo.result.complete(const []);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'a contended trip export reports failure without publishing a partial ZIP',
+    (tester) async {
+      final repo = _GatedTripExport();
+      var writes = 0;
+      debugPublicFileExporterOverride =
+          ({required bytes, required fileName, required mimeType}) async {
+            writes++;
+            return '/Downloads/$fileName';
+          };
+      addTearDown(() => debugPublicFileExporterOverride = null);
+      final l = await pump(tester, trips: repo);
+      await tester.tap(find.byKey(const ValueKey('privacy-export-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('privacyExportZipOption')));
+      await tester.pumpAndSettle();
+      expect(repo.reached.isCompleted, isTrue);
+      repo.result.completeError(const HiveBoxSnapshotConflict());
+      await tester.pumpAndSettle();
+      expect(find.text(l.privacyExportAllFailed), findsOneWidget);
+      expect(writes, 0);
+    },
+  );
+
   group('export sheet', () {
-    testWidgets('one export button opens the three-format sheet',
-        (tester) async {
+    testWidgets('one export button opens the three-format sheet', (
+      tester,
+    ) async {
       final l = await pump(tester);
-      expect(find.byKey(const ValueKey('privacy-export-button')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('privacy-export-button')),
+        findsOneWidget,
+      );
       expect(find.text(l.privacyExportMyData), findsOneWidget);
       // The three former buttons are gone from the screen itself.
       expect(find.byKey(const Key('privacyExportZipOption')), findsNothing);
@@ -109,16 +180,17 @@ void main() {
       expect(find.text(l.privacyExportCsvSubtitle), findsOneWidget);
     });
 
-    testWidgets('JSON option runs the JSON export (clipboard + Downloads)',
-        (tester) async {
+    testWidgets('JSON option runs the JSON export (clipboard + Downloads)', (
+      tester,
+    ) async {
       Map<String, dynamic>? copied;
       wireClipboardCapture((m) => copied = m);
       final saved = <String>[];
       debugPublicFileExporterOverride =
           ({required bytes, required fileName, required mimeType}) async {
-        saved.add('$fileName|$mimeType');
-        return '/Downloads/$fileName';
-      };
+            saved.add('$fileName|$mimeType');
+            return '/Downloads/$fileName';
+          };
       addTearDown(() => debugPublicFileExporterOverride = null);
 
       final l = await pump(tester);
@@ -140,9 +212,9 @@ void main() {
       final saved = <String>[];
       debugPublicFileExporterOverride =
           ({required bytes, required fileName, required mimeType}) async {
-        saved.add('$fileName|$mimeType');
-        return '/Downloads/$fileName';
-      };
+            saved.add('$fileName|$mimeType');
+            return '/Downloads/$fileName';
+          };
       addTearDown(() => debugPublicFileExporterOverride = null);
 
       await pump(tester);
@@ -158,22 +230,26 @@ void main() {
   });
 
   group('error log row', () {
-    testWidgets('shows the count; Clear is disabled when the log is empty',
-        (tester) async {
+    testWidgets('shows the count; Clear is disabled when the log is empty', (
+      tester,
+    ) async {
       final l = await pump(tester);
       expect(find.text(l.privacyErrorLogCount(0)), findsOneWidget);
       final clear = tester.widget<TextButton>(
-          find.byKey(const ValueKey('privacy-clear-error-log-button')));
+        find.byKey(const ValueKey('privacy-clear-error-log-button')),
+      );
       expect(clear.onPressed, isNull);
     });
 
-    testWidgets('Clear empties the traces and confirms (#1971)',
-        (tester) async {
+    testWidgets('Clear empties the traces and confirms (#1971)', (
+      tester,
+    ) async {
       final stub = StubTraceStorage(stubCount: 7);
       final l = await pump(tester, traces: stub);
       expect(find.text(l.privacyErrorLogCount(7)), findsOneWidget);
-      await tester
-          .tap(find.byKey(const ValueKey('privacy-clear-error-log-button')));
+      await tester.tap(
+        find.byKey(const ValueKey('privacy-clear-error-log-button')),
+      );
       await tester.pumpAndSettle();
       expect(stub.clearAllCalled, isTrue);
       expect(find.text(l.privacyErrorLogCleared), findsOneWidget);
@@ -185,8 +261,9 @@ void main() {
       // outcome instead of sleeping a fixed interval — an 80 KB temp-file
       // write under a loaded test host outruns any constant delay.
       await tester.runAsync(() async {
-        await tester
-            .tap(find.byKey(const ValueKey('privacy-export-error-log-button')));
+        await tester.tap(
+          find.byKey(const ValueKey('privacy-export-error-log-button')),
+        );
         var waited = 0;
         while (!done() && waited < 5000) {
           await Future<void>.delayed(const Duration(milliseconds: 25));
@@ -214,15 +291,22 @@ void main() {
       });
 
       const smallJson = '{"traceCount":1,"traces":[{"id":"a"}]}';
-      await pump(tester,
-          traces: StubTraceStorage(
-              stubCount: 1, stubParsedCount: 1, stubExport: smallJson));
+      await pump(
+        tester,
+        traces: StubTraceStorage(
+          stubCount: 1,
+          stubParsedCount: 1,
+          stubExport: smallJson,
+        ),
+      );
       await tapSave(tester, () => copied != null);
 
       expect(copied?['text'], smallJson);
       expect(shared, isNull);
-      expect(find.textContaining('Error log copied to clipboard'),
-          findsOneWidget);
+      expect(
+        find.textContaining('Error log copied to clipboard'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('large log: Save hands off to the share sheet with a JSON '
@@ -238,9 +322,14 @@ void main() {
       });
 
       final bigPayload = '{"traceCount":1,"big":"${'x' * (80 * 1024)}"}';
-      await pump(tester,
-          traces: StubTraceStorage(
-              stubCount: 1, stubParsedCount: 1, stubExport: bigPayload));
+      await pump(
+        tester,
+        traces: StubTraceStorage(
+          stubCount: 1,
+          stubParsedCount: 1,
+          stubExport: bigPayload,
+        ),
+      );
       await tapSave(tester, () => shared != null);
 
       expect(shared?.files, hasLength(1));
@@ -254,8 +343,10 @@ void main() {
         'dialog; Cancel keeps everything', (tester) async {
       final l = await pump(tester);
       expect(find.text(l.privacyDangerZoneBody), findsOneWidget);
-      expect(find.byKey(const ValueKey('privacy-delete-all-button')),
-          findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('privacy-delete-all-button')),
+        findsOneWidget,
+      );
       expect(find.text(l.privacyDeleteAllMyData), findsOneWidget);
 
       await tester.tap(find.byKey(const ValueKey('privacy-delete-all-button')));

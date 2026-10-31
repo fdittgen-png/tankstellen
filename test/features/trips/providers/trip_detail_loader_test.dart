@@ -53,7 +53,7 @@ void main() {
     final v = container.read(tripDetailLoaderProvider('a'));
     expect(v.hasValue, isTrue);
     expect(v.value!.samples, hasLength(3));
-    expect(container.read(tripSpeedFuelSamplesProvider('a')), hasLength(3));
+    expect(await container.read(tripSpeedFuelSamplesProvider('a').future), hasLength(3));
   });
 
   group('with a box', () {
@@ -101,7 +101,7 @@ void main() {
       expect(seen.last.value!.verdict, TripVerdict.smooth.wireName);
 
       // Column reader: two columns, same length.
-      expect(container.read(tripSpeedFuelSamplesProvider('a')), hasLength(700));
+      expect(await container.read(tripSpeedFuelSamplesProvider('a').future), hasLength(700));
     });
   });
 }

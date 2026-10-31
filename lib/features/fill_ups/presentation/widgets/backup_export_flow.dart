@@ -43,7 +43,8 @@ class BackupExportFlow {
         final vehicles = ref.read(vehicleProfileListProvider);
         final fillUps = ref.read(fillUpListProvider);
         final tripsRepo = ref.read(tripHistoryRepositoryProvider);
-        final trips = tripsRepo?.loadAll() ?? const [];
+        final trips = await tripsRepo?.loadAllAsync() ?? const [];
+        if (!context.mounted) return;
         final chargingLogs =
             ref.read(chargingLogsProvider).asData?.value ?? const [];
 

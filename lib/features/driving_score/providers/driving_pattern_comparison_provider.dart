@@ -121,16 +121,16 @@ Future<DrivingPatternComparison> drivingPatternComparison(
 /// A decode failure yields null (the trip contributes nothing) rather
 /// than taking the whole comparison down: one unreadable row must not
 /// blank a year of history.
-DrivingPatternTotals? _totalsFor(
+Future<DrivingPatternTotals?> _totalsFor(
   TripHistoryEntry entry,
   TripHistoryRepository? repo,
   DrivingPatternCache cache,
-) {
+) async {
   final hit = cache.read(entry);
   if (hit != null) return hit;
   if (repo == null) return null;
   try {
-    final samples = repo.loadSamplesWith(entry.id, kDrivingPatternColumns);
+    final samples = await repo.loadSamplesWithAsync(entry.id, kDrivingPatternColumns);
     if (samples.length < 2) return null;
     final totals = computeDrivingDimensions(
       samples,

@@ -17,6 +17,7 @@ import 'hive_open_timing.dart';
 import 'hive_schema_migration.dart';
 import 'hive_test_boxes.dart';
 import 'hive_trip_box_encryption.dart';
+import 'hive_deferred_box_opener.dart';
 
 /// Thrown by [HiveBoxes.init] when a persistent box cannot be opened —
 /// its file is damaged beyond Hive's own crash recovery (#1686).
@@ -32,7 +33,8 @@ class HiveCorruptionException implements Exception {
   const HiveCorruptionException(this.message);
 
   @override
-  String toString() => 'HiveCorruptionException: $message — the box file '
+  String toString() =>
+      'HiveCorruptionException: $message — the box file '
       'is left on disk for recovery, not deleted.';
 }
 
@@ -154,12 +156,29 @@ class HiveBoxes {
   /// scans this file's `static const String` declarations and fails when
   /// one is missing from this set.
   static const Set<String> allBoxes = {
-    settings, favorites, cache, profiles, priceHistory, alerts,
-    obd2Baselines, obd2TripHistory, obd2SupportedPids,
-    obd2NegotiatedProtocol, serviceReminders, obd2PausedTrips,
-    obd2ActiveTrip, priceSnapshots, isolateErrorSpool, trafficSignalsCache,
-    featureFlags, appProfile, boxSchema, errorTraces, datasets,
-    fleetDirectory, fleetExpenses,
+    settings,
+    favorites,
+    cache,
+    profiles,
+    priceHistory,
+    alerts,
+    obd2Baselines,
+    obd2TripHistory,
+    obd2SupportedPids,
+    obd2NegotiatedProtocol,
+    serviceReminders,
+    obd2PausedTrips,
+    obd2ActiveTrip,
+    priceSnapshots,
+    isolateErrorSpool,
+    trafficSignalsCache,
+    featureFlags,
+    appProfile,
+    boxSchema,
+    errorTraces,
+    datasets,
+    fleetDirectory,
+    fleetExpenses,
   };
 
   /// Meta box recording the schema version of each persistent box
@@ -202,8 +221,10 @@ class HiveBoxes {
   /// Test hook for [HiveLegacyMigration.migrateToEncrypted] (#1686).
   @visibleForTesting
   static Future<void> migrateToEncryptedForTest(
-          String boxName, Box<dynamic> plain, HiveAesCipher cipher) =>
-      HiveLegacyMigration.migrateToEncrypted(boxName, plain, cipher);
+    String boxName,
+    Box<dynamic> plain,
+    HiveAesCipher cipher,
+  ) => HiveLegacyMigration.migrateToEncrypted(boxName, plain, cipher);
 
   /// Boxes only read by deep OBD2 / trip / badge / snapshot / glide
   /// features — none is needed to paint the landing search screen, so
@@ -270,7 +291,10 @@ class HiveBoxes {
     // in Phase 2 because the flag has to be readable before the decision;
     // Phase 2's open of it is then a no-op on an already-open box.
     await HiveLegacyMigration.runOnce(
-        _encryptedBoxes, cipher, await Hive.openBox<int>(boxSchema));
+      _encryptedBoxes,
+      cipher,
+      await Hive.openBox<int>(boxSchema),
+    );
     StartupTimer.instance.mark('hive_migrate');
 
     await HiveDatasetRepair.runOnce(HiveDirectoryResolver.hivePath, cipher);
@@ -302,11 +326,19 @@ class HiveBoxes {
   /// case anyway.
   @visibleForTesting
   static List<String> get mainIsolateOwnedBoxes => [
-        settings, profiles, favorites, cache, priceHistory, alerts,
-        isolateErrorSpool, featureFlags, appProfile, boxSchema,
-        ..._deferredBoxes,
-        datasets,
-      ];
+    settings,
+    profiles,
+    favorites,
+    cache,
+    priceHistory,
+    alerts,
+    isolateErrorSpool,
+    featureFlags,
+    appProfile,
+    boxSchema,
+    ..._deferredBoxes,
+    datasets,
+  ];
 
   /// Stamps + migrates the persistent boxes against [currentSchemaVersion]
   /// (#1686 stamp + #2922 cache eviction). Delegates to [HiveSchemaMigration];
@@ -343,37 +375,14 @@ class HiveBoxes {
   static Future<void> initDeferred() => _deferredInit ??= _openDeferred()
       .whenComplete(() => HiveIsolateOwnership.markOwned(_deferredBoxes));
 
-  static Future<void> _openDeferred() async {
-    final cipher = await HiveCipherLoader.loadGuarded();
-    // The per-box migrations are independent — run in parallel (#1764).
-    await Future.wait(_encryptedDeferredBoxes
-        .map((name) => HiveTripBoxEncryption.migrate(name, cipher)));
-    await Future.wait([
-      // #4546 — timed, so the startup trace's `boxOpens` shows what each
-      // deferred open (e.g. the encrypted trip history) costs.
-      for (final name in _deferredBoxes)
-        HiveOpenTiming.timed(
-            name,
-            () => Hive.openBox<String>(name,
-                encryptionCipher:
-                    _encryptedDeferredBoxes.contains(name) ? cipher : null),
-            phase: HiveOpenTiming.deferredPhase),
-      // Country datasets open on first async read/write, not on every launch.
-      ...HiveDeferredUserBoxes.names.map(HiveDeferredUserBoxes.settled),
-    ]);
-    // #3882 — the deferred trip boxes carry a schema stamp too (the trip
-    // history box changed its row layout to meta + columnar chunks; the
-    // rewrite of legacy rows is opportunistic + background in
-    // `TripHistoryRepository`, so the stamp only records the version).
-    if (Hive.isBoxOpen(boxSchema)) {
-      await HiveSchemaMigration.ensureSchemaVersions(
-        boxSchema: boxSchema,
-        encryptedBoxes: _encryptedDeferredBoxes,
-        cacheBox: cache,
-        currentSchemaVersion: currentSchemaVersion,
-      );
-    }
-  }
+  static Future<void> _openDeferred() => HiveDeferredBoxOpener.open(
+    _deferredBoxes,
+    _encryptedDeferredBoxes,
+    tripHistoryBox: obd2TripHistory,
+    boxSchema: boxSchema,
+    cacheBox: cache,
+    schemaVersion: currentSchemaVersion,
+  );
 
   /// Initialize Hive in a background isolate with proper encryption. #3689 —
   /// [HiveIsolateBoxes] pins never-compact so a BG isolate can't rename files.
