@@ -36,6 +36,7 @@ class LocationService {
         // English diagnostic per exceptions.dart contract (#2316).
         throw const LocationException(
           message: 'Location permission denied.',
+          permissionDenied: true,
         );
       }
     }
@@ -43,6 +44,7 @@ class LocationService {
     if (permission == LocationPermission.deniedForever) {
       throw const LocationException(
         message: 'Location permission permanently denied.',
+        permissionDenied: true,
       );
     }
 

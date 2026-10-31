@@ -26,7 +26,7 @@ class ErrorLocalizer {
     }
 
     if (error is LocationException) {
-      return l10n.errorLocation;
+      return error.permissionDenied ? l10n.locationDenied : l10n.errorLocation;
     }
 
     if (error is NoApiKeyException) {
