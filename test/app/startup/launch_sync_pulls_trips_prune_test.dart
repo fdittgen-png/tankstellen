@@ -125,6 +125,65 @@ void main() {
         {'trip-local', 'trip-downloaded'});
   });
 
+  // #4543 — the server holds more trips than the local cap. Saving
+  // every server-only trip wrote and trimmed the same (S − cap) old trips
+  // on EVERY launch/resume pull. Only trips that survive the cap when
+  // ranked with the local ones newest-first may be saved, and a second
+  // pull with the same server state must be a no-op.
+  test('server trips beyond the local cap are not re-saved on every pull '
+      '(#4543)', () async {
+    const cap = 20;
+    final capped = TripHistoryRepository(box: box, cap: cap);
+    final t0 = DateTime(2026, 1, 1);
+    TripHistoryEntry at(String id, int hour) => TripHistoryEntry(
+          id: id,
+          vehicleId: 'v-1',
+          summary: TripSummary(
+            distanceKm: 12,
+            maxRpm: 2800,
+            highRpmSeconds: 12,
+            idleSeconds: 30,
+            harshBrakes: 1,
+            harshAccelerations: 2,
+            fuelLitersConsumed: 0.8,
+            startedAt: t0.add(Duration(hours: hour)),
+            endedAt: t0.add(Duration(hours: hour, minutes: 20)),
+          ),
+        );
+    // Local: hours 100..119 (the newest window of the box).
+    for (var h = 100; h < 100 + cap; h++) {
+      await capped.save(at('local-$h', h));
+    }
+    // Server: every local trip + 30 OLDER ones + 2 NEWER ones (S = 52).
+    final server = [
+      ...capped.loadSummaries(),
+      for (var h = 0; h < 30; h++) at('old-$h', h),
+      at('new-200', 200),
+      at('new-201', 201),
+    ];
+    // Shaped like TripsSync.merge: local ∪ server, by id.
+    Future<List<TripHistoryEntry>> merge(List<TripHistoryEntry> local) async {
+      final localIds = local.map((e) => e.id).toSet();
+      return [...local, ...server.where((e) => !localIds.contains(e.id))];
+    }
+
+    final first = await LaunchSyncPulls.mergeAndPruneTrips(capped, merge);
+
+    expect(first, 2,
+        reason: 'only the two newer trips survive the cap; the 30 older '
+            'ones would be trimmed right after their save');
+    final ids = capped.storedIds.toSet();
+    expect(ids, hasLength(cap));
+    expect(ids, containsAll(['new-200', 'new-201']));
+    expect(ids.where((id) => id.startsWith('old-')), isEmpty);
+
+    final second = await LaunchSyncPulls.mergeAndPruneTrips(capped, merge);
+    expect(second, 0,
+        reason: 'a second pull with the same server state must not '
+            'write (and trim) anything');
+    expect(capped.storedIds.toSet(), ids);
+  });
+
   test('a failed/unauthenticated merge (input returned unchanged) '
       'removes NOTHING', () async {
     await repo.save(entry('trip-a', day: 1));

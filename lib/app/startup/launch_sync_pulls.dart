@@ -166,9 +166,14 @@ class LaunchSyncPulls {
     final local = repo.loadSummaries();
     final merged = await merge(local);
     final mergedIds = merged.map((e) => e.id).toSet();
+    final keep = _idsWithinCap(merged, repo.cap);
     var changed = 0;
     for (final entry in merged) {
       if (localIds.contains(entry.id)) continue;
+      // #4543 — a server-only trip the cap would trim right after its
+      // save is skipped: otherwise the same (S − cap) old trips are
+      // written and deleted again on every launch and resume pull.
+      if (!keep.contains(entry.id)) continue;
       await repo.save(entry);
       // #3451 — don't starve frame production during a big first pull.
       await yieldToEventLoopEvery(changed);
@@ -181,6 +186,22 @@ class LaunchSyncPulls {
       changed++;
     }
     return changed;
+  }
+
+  /// #4543 — the ids of the newest [cap] trips in [merged] (the local
+  /// trips that survive the pull plus the server-only ones), ranked by
+  /// `summary.startedAt` newest-first exactly like
+  /// `TripHistoryRepository.loadSummaries` (null start = epoch), so a
+  /// trip outside this set is one the repository's trim would delete
+  /// straight after saving it.
+  static Set<String> _idsWithinCap(List<TripHistoryEntry> merged, int cap) {
+    final epoch = DateTime.fromMillisecondsSinceEpoch(0);
+    final candidates = <String, DateTime>{
+      for (final e in merged) e.id: e.summary.startedAt ?? epoch,
+    };
+    final ranked = candidates.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return {for (final e in ranked.take(cap)) e.key};
   }
 
   /// #3447 — favorites + ignored stations now pull at launch/resume too
