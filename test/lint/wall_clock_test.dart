@@ -300,7 +300,7 @@ void main() {
     'test/features/obd2/data/trip_recording_controller_test.dart': 4,
     'test/features/obd2/obd2_link_standdown_test.dart': 1,
     'test/features/obd2/providers/obd2_recording_pipeline_test.dart': 2,
-    'test/features/price_history/data/repositories/price_history_repository_test.dart': 8,
+    'test/features/price_history/data/repositories/price_history_repository_test.dart': 6,
     'test/features/price_history/providers/fill_up_guidance_provider_test.dart': 2,
     'test/features/price_history/providers/price_history_provider_test.dart': 14,
     'test/features/profile/presentation/screens/developer_tools/developer_tools_screen_test.dart': 1,

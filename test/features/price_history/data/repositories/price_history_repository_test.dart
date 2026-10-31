@@ -12,6 +12,9 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 class _FakePriceHistoryStorage implements PriceHistoryStorage {
   final Map<String, List<Map<String, dynamic>>> _store = {};
 
+  /// Every station id passed to [savePriceRecords], in call order.
+  final List<String> savedStations = [];
+
   @override
   List<Map<String, dynamic>> getPriceRecords(String stationId) =>
       _store[stationId] ?? const [];
@@ -19,6 +22,7 @@ class _FakePriceHistoryStorage implements PriceHistoryStorage {
   @override
   Future<void> savePriceRecords(
       String stationId, List<Map<String, dynamic>> records) async {
+    savedStations.add(stationId);
     _store[stationId] = records;
   }
 
@@ -104,9 +108,12 @@ void main() {
   });
 
   group('evictOldRecords', () {
+    // One wall-clock read per test: the repository's cutoff is real time.
+    late DateTime now;
+    setUp(() => now = DateTime.now());
+
     test('removes records older than the cutoff and returns the count',
         () async {
-      final now = DateTime.now();
       await repo.recordPrice(record('s1', now, e5: 1.7));
       await repo.recordPrice(
           record('s1', now.subtract(const Duration(days: 50)), e5: 1.5));
@@ -116,7 +123,6 @@ void main() {
     });
 
     test('clears a station whose every record aged out', () async {
-      final now = DateTime.now();
       await repo.recordPrice(
           record('s1', now.subtract(const Duration(days: 99)), e5: 1.5));
       final removed = await repo.evictOldRecords(days: 30);
@@ -125,8 +131,34 @@ void main() {
     });
 
     test('returns 0 when nothing is stale', () async {
-      await repo.recordPrice(record('s1', DateTime.now(), e5: 1.7));
+      await repo.recordPrice(record('s1', now, e5: 1.7));
       expect(await repo.evictOldRecords(days: 30), 0);
+    });
+
+    // #4545 — the running total made every station AFTER the first
+    // removal re-serialise and re-save even when nothing left it.
+    test('re-saves only stations that actually lost a record', () async {
+      await repo.recordPrice(record('s1', now, e5: 1.7));
+      await repo.recordPrice(
+          record('s1', now.subtract(const Duration(days: 50)), e5: 1.5));
+      await repo.recordPrice(record('s2', now, e5: 1.8));
+      storage.savedStations.clear();
+
+      final removed = await repo.evictOldRecords(days: 30);
+
+      expect(removed, 1);
+      expect(storage.savedStations, ['s1'],
+          reason: 's2 kept every record, so it must not be rewritten');
+    });
+
+    test('evicts across many stations (yields between batches)', () async {
+      for (var i = 0; i < 45; i++) {
+        await repo.recordPrice(record('s$i', now, e5: 1.7));
+        await repo.recordPrice(
+            record('s$i', now.subtract(const Duration(days: 40)), e5: 1.6));
+      }
+      expect(await repo.evictOldRecords(days: 30), 45);
+      expect(storage.priceHistoryEntryCount, 45);
     });
   });
 

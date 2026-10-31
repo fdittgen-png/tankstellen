@@ -4,6 +4,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../../core/domain/fuel_type.dart';
 import '../../../../core/data/storage_repository.dart';
+import '../../../../core/utils/event_loop_yield.dart';
 import '../../../../core/utils/num_extensions.dart';
 import '../../domain/entities/price_stats.dart';
 import '../models/price_record.dart';
@@ -19,6 +20,10 @@ class PriceHistoryRepository {
   final PriceHistoryStorage _storage;
 
   PriceHistoryRepository(this._storage);
+
+  /// #4545 — stations decoded between two event-loop yields in
+  /// [evictOldRecords].
+  static const int _evictYieldEvery = 20;
 
   /// Save a price snapshot for a station.
   ///
@@ -51,13 +56,19 @@ class PriceHistoryRepository {
   /// Evict records older than [days] days across all stations.
   ///
   /// Returns the number of records removed.
+  ///
+  /// #4545 — runs post-first-frame at every launch on the UI isolate:
+  /// a station is re-saved only when IT lost a record (the old running
+  /// total re-serialised every station after the first removal), and the
+  /// loop yields to the event loop every [_evictYieldEvery] stations.
   Future<int> evictOldRecords({int days = 30}) async {
     final cutoff = DateTime.now().subtract(Duration(days: days));
     int removed = 0;
 
     // Iterate all stored station keys
     final allKeys = _storage.getPriceHistoryKeys();
-    for (final stationId in allKeys) {
+    for (var i = 0; i < allKeys.length; i++) {
+      final stationId = allKeys[i];
       final records = _loadRecords(stationId);
       final before = records.length;
       records.removeWhere((r) => r.recordedAt.isBefore(cutoff));
@@ -65,9 +76,10 @@ class PriceHistoryRepository {
 
       if (records.isEmpty) {
         await _storage.clearPriceHistoryForStation(stationId);
-      } else if (removed > 0) {
+      } else if (before != records.length) {
         await _saveRecords(stationId, records);
       }
+      await yieldToEventLoopEvery(i, every: _evictYieldEvery);
     }
 
     return removed;
