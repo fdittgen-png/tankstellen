@@ -209,6 +209,12 @@ class StorageKeys {
   static const String obd2DebugSessionLoggingEnabled =
       'obd2_debug_session_logging_enabled';
 
+  /// #4548 (Epic #4547) — opt-in full diagnostic recording: when on, each
+  /// OBD2 trip also writes a raw per-command trace and polls every health
+  /// PID the car exposes. Defaults to `false`.
+  static const String obd2FullDiagnosticRecordingEnabled =
+      'obd2_full_diagnostic_recording_enabled';
+
   /// #1396 — prefix for the per-vehicle "we already nudged this user
   /// to re-pick their catalog row" Hive flag. The full key is
   /// `<prefix><vehicleId>` and stores a `bool true` once the snackbar

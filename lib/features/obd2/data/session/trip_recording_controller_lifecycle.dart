@@ -154,6 +154,7 @@ mixin _TripRecordingLifecycle
     // (the auto-vs-manual flag rides the entry + the export's session
     // block, so the timeline needn't repeat it)
     _sessionJournal.start(at: _startedAt);
+    await _fullDiag?.begin(); // #4548 — before any OBD work
     // #3858 (Epic #3855) — the vehicle's power state decides how a
     // recording begins. EVs have no rpm to trust; tell the model.
     final power = Obd2VehiclePower.instance;
@@ -177,7 +178,7 @@ mixin _TripRecordingLifecycle
         detail: power.detail,
       );
       _scheduler = _schedulerOverride ?? _buildScheduler();
-      _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
+      _subscribeAllTiers(_scheduler!);
       _parkedWatch.armEngineOffSince(_startedAt);
       _droppedSession.enterEngineOffWait();
       _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
@@ -193,9 +194,10 @@ mixin _TripRecordingLifecycle
     // of them at once. No-op when the bus is already confirmed.
     if (!await _run.alive(_ensureVehicleProtocol(where: 'trip-start'))) return;
     if (!await _run.alive(_readTripIdentity())) return;
+    if (!await _run.alive(_fullDiagSnapshot('start'))) return; // #4550
 
     _scheduler = _schedulerOverride ?? _buildScheduler();
-    _liveSampleSnapshot.subscribeAllTiers(_scheduler!);
+    _subscribeAllTiers(_scheduler!);
     _scheduler!.start();
 
     _emitTimer = Timer.periodic(_pollInterval, (_) => _emit());
@@ -266,6 +268,7 @@ mixin _TripRecordingLifecycle
     // #1925 — finalise the opt-in OBD2 debug session so its summary
     // (duration, reconnects, data gaps) is complete for export.
     Obd2DebugSessionRecorder.endSession();
+    if (_run.isRecording) await _fullDiagSnapshot('stop'); // #4550
     _haltSampling(); // #4329 — the step a self-finalised trip takes too
     await _droppedSession.stopReconnectScanner();
     _dropDetector.reset();
@@ -277,7 +280,9 @@ mixin _TripRecordingLifecycle
       await _liveController.close();
     }
     _distance.publishGateRejectionTally(); // #3253 — once-per-trip tally
-    return _finaliseSummary();
+    final summary = _finaliseSummary();
+    await _fullDiag?.end(reason: _termination?.reason.name); // #4548
+    return summary;
   }
 
   /// #4329 — the trip is over, and nothing samples it or fires after it

@@ -192,6 +192,9 @@ class PidScheduler {
     );
   }
 
+  /// #4549 — the commands currently in the rotation.
+  Set<String> get subscribedCommands => _subs.keys.toSet();
+
   /// Remove [command] from the rotation. A no-op if it isn't subscribed.
   /// Also drops any governor demotion / read-window held against it so a
   /// re-subscribe starts clean.

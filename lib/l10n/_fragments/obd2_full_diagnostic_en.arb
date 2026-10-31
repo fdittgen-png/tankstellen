@@ -1,0 +1,405 @@
+{
+  "obd2FullDiagnosticTitle": "Full diagnostic recording",
+  "@obd2FullDiagnosticTitle": {
+    "description": "Title of the opt-in switch in the OBD2 Troubleshooting settings group that records everything the car exposes over OBD2 on every trip (#4548)."
+  },
+  "obd2FullDiagnosticSubtitle": "Records every OBD2 value, fault code and adapter reply of each trip, to analyse a car fault. Uses more adapter bandwidth and storage, so live values may refresh more slowly.",
+  "@obd2FullDiagnosticSubtitle": {
+    "description": "Helper text under the full diagnostic recording switch: what is recorded and the cost (#4548)."
+  },
+  "obd2DiagnosticRecordingsTitle": "Diagnostic recordings",
+  "@obd2DiagnosticRecordingsTitle": {
+    "description": "Heading of the list of stored full-diagnostic trip recordings under the switch (#4551)."
+  },
+  "obd2DiagnosticRecordingsEmpty": "No recordings yet. Drive a trip with the switch on.",
+  "@obd2DiagnosticRecordingsEmpty": {
+    "description": "Shown under the diagnostic recordings heading when no recording is stored yet (#4551)."
+  },
+  "obd2DiagnosticRecordingDownload": "Download recording",
+  "@obd2DiagnosticRecordingDownload": {
+    "description": "Tooltip of the button that saves one diagnostic recording to the Downloads folder (#4551)."
+  },
+  "obd2DiagnosticRecordingDelete": "Delete recording",
+  "@obd2DiagnosticRecordingDelete": {
+    "description": "Tooltip of the button that deletes one diagnostic recording (#4551)."
+  },
+  "obd2DiagnosticRecordingExportFailed": "Could not save the recording",
+  "@obd2DiagnosticRecordingExportFailed": {
+    "description": "Snackbar when saving a diagnostic recording to Downloads failed (#4551)."
+  },
+  "obd2ReportTitle": "Recording report",
+  "@obd2ReportTitle": {
+    "description": "Title of the health report screen of one diagnostic recording (#4552)."
+  },
+  "obd2ReportSummary": "{minutes} min recorded · {readings} readings · {values} values",
+  "@obd2ReportSummary": {
+    "description": "Summary line on top of the report. Placeholders are pre-formatted numbers (#4552).",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "readings": {
+        "type": "String"
+      },
+      "values": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportDisclaimer": "These verdicts are rules of thumb from what the car reported over OBD2. They point a garage in the right direction; they are not a repair diagnosis.",
+  "@obd2ReportDisclaimer": {
+    "description": "Honest caveat under the report summary (#4552)."
+  },
+  "obd2ReportVerdictGood": "Good",
+  "@obd2ReportVerdictGood": {
+    "description": "Verdict chip: the system looks healthy (#4552)."
+  },
+  "obd2ReportVerdictCheck": "Check",
+  "@obd2ReportVerdictCheck": {
+    "description": "Verdict chip: worth a check (#4552)."
+  },
+  "obd2ReportVerdictProblem": "Problem",
+  "@obd2ReportVerdictProblem": {
+    "description": "Verdict chip: a likely problem (#4552)."
+  },
+  "obd2ReportVerdictNotReported": "Not reported",
+  "@obd2ReportVerdictNotReported": {
+    "description": "Verdict chip: the car did not report this system (#4552)."
+  },
+  "obd2ReportNotReported": "The car or the adapter did not report these values.",
+  "@obd2ReportNotReported": {
+    "description": "Card body when a system has no data (#4552)."
+  },
+  "obd2ReportElectricalTitle": "Battery & charging",
+  "@obd2ReportElectricalTitle": {
+    "description": "Card title (#4552)."
+  },
+  "obd2ReportElectricalGood": "Charging looks healthy: {avg} V on average while the engine ran (lowest {min} V). A healthy alternator gives 13.2–14.8 V.",
+  "@obd2ReportElectricalGood": {
+    "description": "Electrical card, good (#4552). avg/min are pre-formatted volts.",
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportElectricalLow": "Charging voltage is low: {avg} V on average while the engine ran (lowest {min} V). A healthy alternator gives 13.2–14.8 V — have the battery and alternator tested.",
+  "@obd2ReportElectricalLow": {
+    "description": "Electrical card, low charging (#4552).",
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportElectricalDips": "With the engine running the voltage dropped below 12 V {count} times (lowest {min} V). Gearbox and engine computers can misbehave on such dips — check the battery, alternator and ground straps.",
+  "@obd2ReportElectricalDips": {
+    "description": "Electrical card, voltage dips (#4552).",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportElectricalRest": "With the engine off the battery rested at {volts} V (healthy: 12.4 V or more).",
+  "@obd2ReportElectricalRest": {
+    "description": "Electrical card, resting voltage (#4552).",
+    "placeholders": {
+      "volts": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportDriveTitle": "Gearbox & drive",
+  "@obd2ReportDriveTitle": {
+    "description": "Card title (#4552)."
+  },
+  "obd2ReportDriveGood": "No moment where the engine idled while you asked for power at low speed.",
+  "@obd2ReportDriveGood": {
+    "description": "Drive card, no episode (#4552)."
+  },
+  "obd2ReportDriveEpisodes": "{count} moments where power did not reach the wheels: the engine stayed near idle at low speed although the pedal asked for power — the gearbox may have slipped or dropped to neutral.",
+  "@obd2ReportDriveEpisodes": {
+    "description": "Drive card, episodes found (#4552). count is a pre-formatted number.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportDriveEpisode": "{time} · {speed} km/h · {rpm} rpm · {volts}",
+  "@obd2ReportDriveEpisode": {
+    "description": "One episode row: offset into the trip, speed, engine speed, supply voltage at that moment (#4552).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      },
+      "rpm": {
+        "type": "String"
+      },
+      "volts": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportDriveNoGear": "This car does not report the selected gear over standard OBD2, so moments are detected from speed, engine speed and pedal.",
+  "@obd2ReportDriveNoGear": {
+    "description": "Drive card note (#4552)."
+  },
+  "obd2ReportEngineTitle": "Engine",
+  "@obd2ReportEngineTitle": {
+    "description": "Card title (#4552)."
+  },
+  "obd2ReportEngineGood": "Coolant reached {max} °C — normal.",
+  "@obd2ReportEngineGood": {
+    "description": "Engine card, good (#4552).",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportEngineHot": "Coolant reached {max} °C — the engine is running too hot.",
+  "@obd2ReportEngineHot": {
+    "description": "Engine card, overheating (#4552).",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportEngineCold": "Coolant stayed at {max} °C after {minutes} min of driving — the thermostat may be stuck open.",
+  "@obd2ReportEngineCold": {
+    "description": "Engine card, never warmed up (#4552).",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportMixtureTitle": "Fuel & mixture",
+  "@obd2ReportMixtureTitle": {
+    "description": "Card title (#4552)."
+  },
+  "obd2ReportMixtureGood": "Fuel trims average {trim} % — the mixture is balanced.",
+  "@obd2ReportMixtureGood": {
+    "description": "Mixture card, good (#4552). trim is a signed pre-formatted percent.",
+    "placeholders": {
+      "trim": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportMixtureRich": "Fuel trims average {trim} %: the engine runs rich and the computer is removing fuel. This fits a fuel smell — injectors, fuel-pressure regulator or the purge valve.",
+  "@obd2ReportMixtureRich": {
+    "description": "Mixture card, rich (#4552).",
+    "placeholders": {
+      "trim": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportMixtureLean": "Fuel trims average {trim} %: the engine runs lean and the computer is adding fuel — possible air leak or weak fuel delivery.",
+  "@obd2ReportMixtureLean": {
+    "description": "Mixture card, lean (#4552).",
+    "placeholders": {
+      "trim": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportEmissionsTitle": "Emissions & fuel vapour",
+  "@obd2ReportEmissionsTitle": {
+    "description": "Card title (#4552)."
+  },
+  "obd2ReportCatalyst": "Catalyst temperature peaked at {max} °C.",
+  "@obd2ReportCatalyst": {
+    "description": "Emissions card, catalyst normal (#4552).",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportCatalystHot": "Catalyst reached {max} °C — misfires or a rich mixture can overheat it.",
+  "@obd2ReportCatalystHot": {
+    "description": "Emissions card, catalyst hot (#4552).",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportEvap": "Fuel-vapour system pressure ranged from {min} to {max} Pa.",
+  "@obd2ReportEvap": {
+    "description": "Emissions card, EVAP range (#4552).",
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportFaultsTitle": "Fault codes",
+  "@obd2ReportFaultsTitle": {
+    "description": "Card title (#4552)."
+  },
+  "obd2ReportFaultsNone": "No fault codes, and the engine warning light is off.",
+  "@obd2ReportFaultsNone": {
+    "description": "Faults card, clean (#4552)."
+  },
+  "obd2ReportFaultsMil": "The engine warning light is ON.",
+  "@obd2ReportFaultsMil": {
+    "description": "Faults card, MIL on (#4552)."
+  },
+  "obd2ReportFaultsStored": "Stored",
+  "@obd2ReportFaultsStored": {
+    "description": "Fault-code list label: confirmed codes (#4552)."
+  },
+  "obd2ReportFaultsPending": "Pending",
+  "@obd2ReportFaultsPending": {
+    "description": "Fault-code list label: pending codes (#4552)."
+  },
+  "obd2ReportFaultsPermanent": "Permanent",
+  "@obd2ReportFaultsPermanent": {
+    "description": "Fault-code list label: permanent codes (#4552)."
+  },
+  "obd2ReportFaultsFreezeFrame": "Caused the freeze frame",
+  "@obd2ReportFaultsFreezeFrame": {
+    "description": "Fault-code list label: the code that triggered the freeze frame (#4552)."
+  },
+  "dtcGroupFuelAir": "fuel and air metering",
+  "@dtcGroupFuelAir": {
+    "description": "DTC group of P00–P02 codes (#4552)."
+  },
+  "dtcGroupIgnition": "ignition / misfire",
+  "@dtcGroupIgnition": {
+    "description": "DTC group of P03 codes (#4552)."
+  },
+  "dtcGroupEmissions": "emission controls",
+  "@dtcGroupEmissions": {
+    "description": "DTC group of P04 codes (#4552)."
+  },
+  "dtcGroupIdleElectrical": "speed, idle and electrical",
+  "@dtcGroupIdleElectrical": {
+    "description": "DTC group of P05 codes (#4552)."
+  },
+  "dtcGroupComputer": "computer and outputs",
+  "@dtcGroupComputer": {
+    "description": "DTC group of P06 codes (#4552)."
+  },
+  "dtcGroupTransmission": "transmission",
+  "@dtcGroupTransmission": {
+    "description": "DTC group of P07–P09 codes (#4552)."
+  },
+  "dtcGroupChassis": "chassis",
+  "@dtcGroupChassis": {
+    "description": "DTC group of C codes (#4552)."
+  },
+  "dtcGroupBody": "body",
+  "@dtcGroupBody": {
+    "description": "DTC group of B codes (#4552)."
+  },
+  "dtcGroupNetwork": "network / communication",
+  "@dtcGroupNetwork": {
+    "description": "DTC group of U codes (#4552)."
+  },
+  "dtcGroupOther": "other",
+  "@dtcGroupOther": {
+    "description": "DTC group fallback (#4552)."
+  },
+  "obd2ReportUnanswered": "Not reported by this car: {commands}",
+  "@obd2ReportUnanswered": {
+    "description": "Footer listing the raw OBD2 requests the car never answered (#4552).",
+    "placeholders": {
+      "commands": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportFailed": "Could not read this recording",
+  "@obd2ReportFailed": {
+    "description": "Shown when the report could not be computed (#4552)."
+  },
+  "obd2RecordingSizeKb": "{size} KB",
+  "@obd2RecordingSizeKb": {
+    "description": "Size of a diagnostic recording in kilobytes (#4551).",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2RecordingSizeMb": "{size} MB",
+  "@obd2RecordingSizeMb": {
+    "description": "Size of a diagnostic recording in megabytes (#4551).",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportVolts": "{volts} V",
+  "@obd2ReportVolts": {
+    "description": "A supply voltage on a report row (#4552).",
+    "placeholders": {
+      "volts": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportVoltsUnknown": "no voltage",
+  "@obd2ReportVoltsUnknown": {
+    "description": "Episode row when no voltage was read at that moment (#4552)."
+  },
+  "obd2ReportDriveEpisodeNeutral": "{time} · {speed} km/h · {rpm} rpm · {volts} · neutral reported",
+  "@obd2ReportDriveEpisodeNeutral": {
+    "description": "Episode row when the gearbox itself reported neutral (#4552).",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      },
+      "rpm": {
+        "type": "String"
+      },
+      "volts": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportFaultRow": "{label}: {code} · {group}",
+  "@obd2ReportFaultRow": {
+    "description": "One fault code row: list label, code, the system its number encodes (#4552).",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "group": {
+        "type": "String"
+      }
+    }
+  }
+}

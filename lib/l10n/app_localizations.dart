@@ -13515,6 +13515,388 @@ abstract class AppLocalizations {
   /// **'Implausible frames: {voltage} battery voltage · {odometer} odometer'**
   String obd2DiagnosticsImplausibleFramesLine(int voltage, int odometer);
 
+  /// Title of the opt-in switch in the OBD2 Troubleshooting settings group that records everything the car exposes over OBD2 on every trip (#4548).
+  ///
+  /// In en, this message translates to:
+  /// **'Full diagnostic recording'**
+  String get obd2FullDiagnosticTitle;
+
+  /// Helper text under the full diagnostic recording switch: what is recorded and the cost (#4548).
+  ///
+  /// In en, this message translates to:
+  /// **'Records every OBD2 value, fault code and adapter reply of each trip, to analyse a car fault. Uses more adapter bandwidth and storage, so live values may refresh more slowly.'**
+  String get obd2FullDiagnosticSubtitle;
+
+  /// Heading of the list of stored full-diagnostic trip recordings under the switch (#4551).
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnostic recordings'**
+  String get obd2DiagnosticRecordingsTitle;
+
+  /// Shown under the diagnostic recordings heading when no recording is stored yet (#4551).
+  ///
+  /// In en, this message translates to:
+  /// **'No recordings yet. Drive a trip with the switch on.'**
+  String get obd2DiagnosticRecordingsEmpty;
+
+  /// Tooltip of the button that saves one diagnostic recording to the Downloads folder (#4551).
+  ///
+  /// In en, this message translates to:
+  /// **'Download recording'**
+  String get obd2DiagnosticRecordingDownload;
+
+  /// Tooltip of the button that deletes one diagnostic recording (#4551).
+  ///
+  /// In en, this message translates to:
+  /// **'Delete recording'**
+  String get obd2DiagnosticRecordingDelete;
+
+  /// Snackbar when saving a diagnostic recording to Downloads failed (#4551).
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the recording'**
+  String get obd2DiagnosticRecordingExportFailed;
+
+  /// Title of the health report screen of one diagnostic recording (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Recording report'**
+  String get obd2ReportTitle;
+
+  /// Summary line on top of the report. Placeholders are pre-formatted numbers (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min recorded · {readings} readings · {values} values'**
+  String obd2ReportSummary(String minutes, String readings, String values);
+
+  /// Honest caveat under the report summary (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'These verdicts are rules of thumb from what the car reported over OBD2. They point a garage in the right direction; they are not a repair diagnosis.'**
+  String get obd2ReportDisclaimer;
+
+  /// Verdict chip: the system looks healthy (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get obd2ReportVerdictGood;
+
+  /// Verdict chip: worth a check (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Check'**
+  String get obd2ReportVerdictCheck;
+
+  /// Verdict chip: a likely problem (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Problem'**
+  String get obd2ReportVerdictProblem;
+
+  /// Verdict chip: the car did not report this system (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Not reported'**
+  String get obd2ReportVerdictNotReported;
+
+  /// Card body when a system has no data (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'The car or the adapter did not report these values.'**
+  String get obd2ReportNotReported;
+
+  /// Card title (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Battery & charging'**
+  String get obd2ReportElectricalTitle;
+
+  /// Electrical card, good (#4552). avg/min are pre-formatted volts.
+  ///
+  /// In en, this message translates to:
+  /// **'Charging looks healthy: {avg} V on average while the engine ran (lowest {min} V). A healthy alternator gives 13.2–14.8 V.'**
+  String obd2ReportElectricalGood(String avg, String min);
+
+  /// Electrical card, low charging (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Charging voltage is low: {avg} V on average while the engine ran (lowest {min} V). A healthy alternator gives 13.2–14.8 V — have the battery and alternator tested.'**
+  String obd2ReportElectricalLow(String avg, String min);
+
+  /// Electrical card, voltage dips (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'With the engine running the voltage dropped below 12 V {count} times (lowest {min} V). Gearbox and engine computers can misbehave on such dips — check the battery, alternator and ground straps.'**
+  String obd2ReportElectricalDips(String count, String min);
+
+  /// Electrical card, resting voltage (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'With the engine off the battery rested at {volts} V (healthy: 12.4 V or more).'**
+  String obd2ReportElectricalRest(String volts);
+
+  /// Card title (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Gearbox & drive'**
+  String get obd2ReportDriveTitle;
+
+  /// Drive card, no episode (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'No moment where the engine idled while you asked for power at low speed.'**
+  String get obd2ReportDriveGood;
+
+  /// Drive card, episodes found (#4552). count is a pre-formatted number.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} moments where power did not reach the wheels: the engine stayed near idle at low speed although the pedal asked for power — the gearbox may have slipped or dropped to neutral.'**
+  String obd2ReportDriveEpisodes(String count);
+
+  /// One episode row: offset into the trip, speed, engine speed, supply voltage at that moment (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'{time} · {speed} km/h · {rpm} rpm · {volts}'**
+  String obd2ReportDriveEpisode(
+    String time,
+    String speed,
+    String rpm,
+    String volts,
+  );
+
+  /// Drive card note (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'This car does not report the selected gear over standard OBD2, so moments are detected from speed, engine speed and pedal.'**
+  String get obd2ReportDriveNoGear;
+
+  /// Card title (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Engine'**
+  String get obd2ReportEngineTitle;
+
+  /// Engine card, good (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Coolant reached {max} °C — normal.'**
+  String obd2ReportEngineGood(String max);
+
+  /// Engine card, overheating (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Coolant reached {max} °C — the engine is running too hot.'**
+  String obd2ReportEngineHot(String max);
+
+  /// Engine card, never warmed up (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Coolant stayed at {max} °C after {minutes} min of driving — the thermostat may be stuck open.'**
+  String obd2ReportEngineCold(String max, String minutes);
+
+  /// Card title (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel & mixture'**
+  String get obd2ReportMixtureTitle;
+
+  /// Mixture card, good (#4552). trim is a signed pre-formatted percent.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel trims average {trim} % — the mixture is balanced.'**
+  String obd2ReportMixtureGood(String trim);
+
+  /// Mixture card, rich (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel trims average {trim} %: the engine runs rich and the computer is removing fuel. This fits a fuel smell — injectors, fuel-pressure regulator or the purge valve.'**
+  String obd2ReportMixtureRich(String trim);
+
+  /// Mixture card, lean (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel trims average {trim} %: the engine runs lean and the computer is adding fuel — possible air leak or weak fuel delivery.'**
+  String obd2ReportMixtureLean(String trim);
+
+  /// Card title (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Emissions & fuel vapour'**
+  String get obd2ReportEmissionsTitle;
+
+  /// Emissions card, catalyst normal (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst temperature peaked at {max} °C.'**
+  String obd2ReportCatalyst(String max);
+
+  /// Emissions card, catalyst hot (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst reached {max} °C — misfires or a rich mixture can overheat it.'**
+  String obd2ReportCatalystHot(String max);
+
+  /// Emissions card, EVAP range (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel-vapour system pressure ranged from {min} to {max} Pa.'**
+  String obd2ReportEvap(String min, String max);
+
+  /// Card title (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Fault codes'**
+  String get obd2ReportFaultsTitle;
+
+  /// Faults card, clean (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'No fault codes, and the engine warning light is off.'**
+  String get obd2ReportFaultsNone;
+
+  /// Faults card, MIL on (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'The engine warning light is ON.'**
+  String get obd2ReportFaultsMil;
+
+  /// Fault-code list label: confirmed codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Stored'**
+  String get obd2ReportFaultsStored;
+
+  /// Fault-code list label: pending codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get obd2ReportFaultsPending;
+
+  /// Fault-code list label: permanent codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent'**
+  String get obd2ReportFaultsPermanent;
+
+  /// Fault-code list label: the code that triggered the freeze frame (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Caused the freeze frame'**
+  String get obd2ReportFaultsFreezeFrame;
+
+  /// DTC group of P00–P02 codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'fuel and air metering'**
+  String get dtcGroupFuelAir;
+
+  /// DTC group of P03 codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'ignition / misfire'**
+  String get dtcGroupIgnition;
+
+  /// DTC group of P04 codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'emission controls'**
+  String get dtcGroupEmissions;
+
+  /// DTC group of P05 codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'speed, idle and electrical'**
+  String get dtcGroupIdleElectrical;
+
+  /// DTC group of P06 codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'computer and outputs'**
+  String get dtcGroupComputer;
+
+  /// DTC group of P07–P09 codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'transmission'**
+  String get dtcGroupTransmission;
+
+  /// DTC group of C codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'chassis'**
+  String get dtcGroupChassis;
+
+  /// DTC group of B codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'body'**
+  String get dtcGroupBody;
+
+  /// DTC group of U codes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'network / communication'**
+  String get dtcGroupNetwork;
+
+  /// DTC group fallback (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'other'**
+  String get dtcGroupOther;
+
+  /// Footer listing the raw OBD2 requests the car never answered (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Not reported by this car: {commands}'**
+  String obd2ReportUnanswered(String commands);
+
+  /// Shown when the report could not be computed (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read this recording'**
+  String get obd2ReportFailed;
+
+  /// Size of a diagnostic recording in kilobytes (#4551).
+  ///
+  /// In en, this message translates to:
+  /// **'{size} KB'**
+  String obd2RecordingSizeKb(String size);
+
+  /// Size of a diagnostic recording in megabytes (#4551).
+  ///
+  /// In en, this message translates to:
+  /// **'{size} MB'**
+  String obd2RecordingSizeMb(String size);
+
+  /// A supply voltage on a report row (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'{volts} V'**
+  String obd2ReportVolts(String volts);
+
+  /// Episode row when no voltage was read at that moment (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'no voltage'**
+  String get obd2ReportVoltsUnknown;
+
+  /// Episode row when the gearbox itself reported neutral (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'{time} · {speed} km/h · {rpm} rpm · {volts} · neutral reported'**
+  String obd2ReportDriveEpisodeNeutral(
+    String time,
+    String speed,
+    String rpm,
+    String volts,
+  );
+
+  /// One fault code row: list label, code, the system its number encodes (#4552).
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {code} · {group}'**
+  String obd2ReportFaultRow(String label, String code, String group);
+
   /// Snackbar shown after the OBD2 picker falls back from a silent pinned-MAC connect to the manual sheet (#1188). The placeholder is the display name of the previously paired adapter so the user knows which one was unreachable.
   ///
   /// In en, this message translates to:

@@ -257,7 +257,9 @@ class ElmSession {
     // worked) from the zero-traffic corpse-adopt flap shape. Keepalive
     // ATRVs are AT commands and deliberately never count.
     _successfulObdSends++;
-    switch (classifyObd2Response(reply)) {
+    final cls = isDiagnosticModePositiveReply(command, reply) // #4550 DTC/09
+        ? ResponseClass.ok : classifyObd2Response(reply);
+    switch (cls) {
       case ResponseClass.ok:
       case ResponseClass.noData:
         // NO DATA = the ECU answered but had nothing — a LIVE link

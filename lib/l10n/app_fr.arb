@@ -7946,5 +7946,266 @@
         "type": "String"
       }
     }
+  },
+  "obd2FullDiagnosticTitle": "Enregistrement de diagnostic complet",
+  "obd2FullDiagnosticSubtitle": "Enregistre à chaque trajet toutes les valeurs OBD2, les codes défaut et les réponses de l’adaptateur, pour analyser une panne du véhicule. Utilise plus de bande passante de l’adaptateur et de stockage : les valeurs en direct peuvent se rafraîchir plus lentement.",
+  "obd2DiagnosticRecordingsTitle": "Enregistrements de diagnostic",
+  "obd2DiagnosticRecordingsEmpty": "Aucun enregistrement pour l’instant. Faites un trajet avec l’option activée.",
+  "obd2DiagnosticRecordingDownload": "Télécharger l’enregistrement",
+  "obd2DiagnosticRecordingDelete": "Supprimer l’enregistrement",
+  "obd2DiagnosticRecordingExportFailed": "Impossible d’enregistrer le fichier",
+  "obd2ReportTitle": "Rapport d’enregistrement",
+  "obd2ReportSummary": "{minutes} min enregistrées · {readings} mesures · {values} valeurs",
+  "@obd2ReportSummary": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      },
+      "readings": {
+        "type": "String"
+      },
+      "values": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportDisclaimer": "Ces verdicts sont des règles empiriques tirées de ce que le véhicule a transmis en OBD2. Ils orientent un garage, ils ne remplacent pas un diagnostic de réparation.",
+  "obd2ReportVerdictGood": "Bon",
+  "obd2ReportVerdictCheck": "À vérifier",
+  "obd2ReportVerdictProblem": "Problème",
+  "obd2ReportVerdictNotReported": "Non transmis",
+  "obd2ReportNotReported": "Le véhicule ou l’adaptateur n’a pas transmis ces valeurs.",
+  "obd2ReportElectricalTitle": "Batterie et charge",
+  "obd2ReportElectricalGood": "La charge semble saine : {avg} V en moyenne moteur tournant (minimum {min} V). Un alternateur sain fournit 13,2 à 14,8 V.",
+  "@obd2ReportElectricalGood": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportElectricalLow": "La tension de charge est basse : {avg} V en moyenne moteur tournant (minimum {min} V). Un alternateur sain fournit 13,2 à 14,8 V : faites tester la batterie et l’alternateur.",
+  "@obd2ReportElectricalLow": {
+    "placeholders": {
+      "avg": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportElectricalDips": "Moteur tournant, la tension est tombée sous 12 V {count} fois (minimum {min} V). Les calculateurs de boîte et moteur peuvent mal réagir à ces chutes : vérifiez la batterie, l’alternateur et les tresses de masse.",
+  "@obd2ReportElectricalDips": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportElectricalRest": "Moteur arrêté, la batterie était à {volts} V (sain : 12,4 V ou plus).",
+  "@obd2ReportElectricalRest": {
+    "placeholders": {
+      "volts": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportDriveTitle": "Boîte de vitesses et transmission",
+  "obd2ReportDriveGood": "Aucun moment où le moteur restait au ralenti alors que vous accélériez à basse vitesse.",
+  "obd2ReportDriveEpisodes": "{count} moments où la puissance n’arrivait pas aux roues : le moteur restait proche du ralenti à basse vitesse alors que vous accélériez. La boîte a peut-être patiné ou est passée au point mort.",
+  "@obd2ReportDriveEpisodes": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportDriveEpisode": "{time} · {speed} km/h · {rpm} tr/min · {volts}",
+  "@obd2ReportDriveEpisode": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      },
+      "rpm": {
+        "type": "String"
+      },
+      "volts": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportDriveNoGear": "Ce véhicule ne transmet pas le rapport engagé en OBD2 standard : les moments sont détectés à partir de la vitesse, du régime et de la pédale.",
+  "obd2ReportEngineTitle": "Moteur",
+  "obd2ReportEngineGood": "Le liquide de refroidissement a atteint {max} °C : normal.",
+  "@obd2ReportEngineGood": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportEngineHot": "Le liquide de refroidissement a atteint {max} °C : le moteur chauffe trop.",
+  "@obd2ReportEngineHot": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportEngineCold": "Le liquide est resté à {max} °C après {minutes} min de conduite : le thermostat est peut-être bloqué ouvert.",
+  "@obd2ReportEngineCold": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportMixtureTitle": "Carburant et mélange",
+  "obd2ReportMixtureGood": "Les corrections de carburant sont en moyenne de {trim} % : le mélange est équilibré.",
+  "@obd2ReportMixtureGood": {
+    "placeholders": {
+      "trim": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportMixtureRich": "Les corrections sont en moyenne de {trim} % : le moteur tourne riche et le calculateur retire du carburant. Cela correspond à une odeur d’essence : injecteurs, régulateur de pression ou électrovanne de purge.",
+  "@obd2ReportMixtureRich": {
+    "placeholders": {
+      "trim": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportMixtureLean": "Les corrections sont en moyenne de {trim} % : le moteur tourne pauvre et le calculateur ajoute du carburant. Prise d’air possible ou alimentation en carburant faible.",
+  "@obd2ReportMixtureLean": {
+    "placeholders": {
+      "trim": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportEmissionsTitle": "Émissions et vapeurs de carburant",
+  "obd2ReportCatalyst": "La température du catalyseur a culminé à {max} °C.",
+  "@obd2ReportCatalyst": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportCatalystHot": "Le catalyseur a atteint {max} °C : des ratés ou un mélange riche peuvent le surchauffer.",
+  "@obd2ReportCatalystHot": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportEvap": "La pression du circuit des vapeurs de carburant variait de {min} à {max} Pa.",
+  "@obd2ReportEvap": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportFaultsTitle": "Codes défaut",
+  "obd2ReportFaultsNone": "Aucun code défaut et le voyant moteur est éteint.",
+  "obd2ReportFaultsMil": "Le voyant moteur est ALLUMÉ.",
+  "obd2ReportFaultsStored": "Mémorisés",
+  "obd2ReportFaultsPending": "En attente",
+  "obd2ReportFaultsPermanent": "Permanents",
+  "obd2ReportFaultsFreezeFrame": "A déclenché l’image figée",
+  "dtcGroupFuelAir": "dosage air et carburant",
+  "dtcGroupIgnition": "allumage / ratés",
+  "dtcGroupEmissions": "contrôle des émissions",
+  "dtcGroupIdleElectrical": "vitesse, ralenti et électrique",
+  "dtcGroupComputer": "calculateur et sorties",
+  "dtcGroupTransmission": "transmission",
+  "dtcGroupChassis": "châssis",
+  "dtcGroupBody": "carrosserie",
+  "dtcGroupNetwork": "réseau / communication",
+  "dtcGroupOther": "autre",
+  "obd2ReportUnanswered": "Non transmis par ce véhicule : {commands}",
+  "@obd2ReportUnanswered": {
+    "placeholders": {
+      "commands": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportFailed": "Impossible de lire cet enregistrement",
+  "obd2RecordingSizeKb": "{size} Ko",
+  "@obd2RecordingSizeKb": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2RecordingSizeMb": "{size} Mo",
+  "@obd2RecordingSizeMb": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportVolts": "{volts} V",
+  "@obd2ReportVolts": {
+    "placeholders": {
+      "volts": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportVoltsUnknown": "pas de tension",
+  "obd2ReportDriveEpisodeNeutral": "{time} · {speed} km/h · {rpm} tr/min · {volts} · point mort signalé",
+  "@obd2ReportDriveEpisodeNeutral": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      },
+      "rpm": {
+        "type": "String"
+      },
+      "volts": {
+        "type": "String"
+      }
+    }
+  },
+  "obd2ReportFaultRow": "{label} : {code} · {group}",
+  "@obd2ReportFaultRow": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      },
+      "group": {
+        "type": "String"
+      }
+    }
   }
 }

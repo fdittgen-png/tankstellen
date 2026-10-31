@@ -185,6 +185,10 @@ void main() {
       // OBD2 stack on (obd2TripRecording) + loyalty + glide-coach + its
       // prereq so every group and both coaching toggles render. Override
       // glideCoachEnabledProvider directly so the toggle is visible.
+      // #4548 — the Troubleshooting group grew the full-diagnostic
+      // switch; a taller view keeps this an IA test, not a fit test.
+      tester.view.physicalSize = const Size(2400, 6000); // 800×2000 dp
+      addTearDown(tester.view.resetPhysicalSize);
       await pumpApp(
         tester,
         const DrivingSettingsSection(),
@@ -238,6 +242,8 @@ void main() {
             'The OBD2 debug-logging diagnostic lives in the '
             'Troubleshooting group, shown only when the OBD2 stack is on.',
       );
+      expect(find.byKey(const Key('obd2FullDiagnosticToggle')), findsOneWidget,
+          reason: 'The #4548 full-diagnostic switch sits beside it.');
 
       // The two coaching toggles must sit together, eco-coach first then
       // glide-coach, between the Coaching and Rewards headers.

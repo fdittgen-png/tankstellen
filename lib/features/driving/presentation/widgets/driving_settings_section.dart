@@ -160,6 +160,8 @@ class DrivingSettingsSection extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(0, Spacing.sm, 0, Spacing.sm),
           ),
           const _Obd2DebugLoggingToggleTile(),
+          // #4548 — opt-in full diagnostic recording + its recordings.
+          const Obd2FullDiagnosticSection(),
         ],
       ],
     );

@@ -8234,6 +8234,255 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get obd2FullDiagnosticTitle => 'Vollständige Diagnoseaufzeichnung';
+
+  @override
+  String get obd2FullDiagnosticSubtitle =>
+      'Zeichnet bei jeder Fahrt alle OBD2-Werte, Fehlercodes und Adapterantworten auf, um einen Fahrzeugfehler zu analysieren. Braucht mehr Adapterbandbreite und Speicher, Live-Werte aktualisieren sich daher eventuell langsamer.';
+
+  @override
+  String get obd2DiagnosticRecordingsTitle => 'Diagnoseaufzeichnungen';
+
+  @override
+  String get obd2DiagnosticRecordingsEmpty =>
+      'Noch keine Aufzeichnungen. Fahre eine Fahrt mit eingeschaltetem Schalter.';
+
+  @override
+  String get obd2DiagnosticRecordingDownload => 'Aufzeichnung herunterladen';
+
+  @override
+  String get obd2DiagnosticRecordingDelete => 'Aufzeichnung löschen';
+
+  @override
+  String get obd2DiagnosticRecordingExportFailed =>
+      'Die Aufzeichnung konnte nicht gespeichert werden';
+
+  @override
+  String get obd2ReportTitle => 'Aufzeichnungsbericht';
+
+  @override
+  String obd2ReportSummary(String minutes, String readings, String values) {
+    return '$minutes Min. aufgezeichnet · $readings Messungen · $values Werte';
+  }
+
+  @override
+  String get obd2ReportDisclaimer =>
+      'Diese Bewertungen sind Faustregeln aus den Werten, die das Auto über OBD2 gemeldet hat. Sie geben einer Werkstatt eine Richtung, sind aber keine Reparaturdiagnose.';
+
+  @override
+  String get obd2ReportVerdictGood => 'Gut';
+
+  @override
+  String get obd2ReportVerdictCheck => 'Prüfen';
+
+  @override
+  String get obd2ReportVerdictProblem => 'Problem';
+
+  @override
+  String get obd2ReportVerdictNotReported => 'Nicht gemeldet';
+
+  @override
+  String get obd2ReportNotReported =>
+      'Auto oder Adapter haben diese Werte nicht gemeldet.';
+
+  @override
+  String get obd2ReportElectricalTitle => 'Batterie & Ladung';
+
+  @override
+  String obd2ReportElectricalGood(String avg, String min) {
+    return 'Die Ladung sieht gesund aus: im Schnitt $avg V bei laufendem Motor (niedrigster Wert $min V). Eine gesunde Lichtmaschine liefert 13,2–14,8 V.';
+  }
+
+  @override
+  String obd2ReportElectricalLow(String avg, String min) {
+    return 'Die Ladespannung ist niedrig: im Schnitt $avg V bei laufendem Motor (niedrigster Wert $min V). Eine gesunde Lichtmaschine liefert 13,2–14,8 V — Batterie und Lichtmaschine prüfen lassen.';
+  }
+
+  @override
+  String obd2ReportElectricalDips(String count, String min) {
+    return 'Bei laufendem Motor fiel die Spannung $count-mal unter 12 V (niedrigster Wert $min V). Getriebe- und Motorsteuergerät können bei solchen Einbrüchen Fehler machen — Batterie, Lichtmaschine und Massebänder prüfen.';
+  }
+
+  @override
+  String obd2ReportElectricalRest(String volts) {
+    return 'Bei ausgeschaltetem Motor lag die Batterie bei $volts V (gesund: 12,4 V oder mehr).';
+  }
+
+  @override
+  String get obd2ReportDriveTitle => 'Getriebe & Antrieb';
+
+  @override
+  String get obd2ReportDriveGood =>
+      'Kein Moment, in dem der Motor bei niedriger Geschwindigkeit im Leerlauf blieb, obwohl Gas gegeben wurde.';
+
+  @override
+  String obd2ReportDriveEpisodes(String count) {
+    return '$count Momente, in denen die Kraft nicht an den Rädern ankam: der Motor blieb bei niedriger Geschwindigkeit nahe Leerlauf, obwohl Gas gegeben wurde — das Getriebe hat eventuell durchgerutscht oder in Neutral geschaltet.';
+  }
+
+  @override
+  String obd2ReportDriveEpisode(
+    String time,
+    String speed,
+    String rpm,
+    String volts,
+  ) {
+    return '$time · $speed km/h · $rpm U/min · $volts';
+  }
+
+  @override
+  String get obd2ReportDriveNoGear =>
+      'Dieses Auto meldet den eingelegten Gang nicht über Standard-OBD2; die Momente werden aus Geschwindigkeit, Drehzahl und Pedal erkannt.';
+
+  @override
+  String get obd2ReportEngineTitle => 'Motor';
+
+  @override
+  String obd2ReportEngineGood(String max) {
+    return 'Das Kühlmittel erreichte $max °C — normal.';
+  }
+
+  @override
+  String obd2ReportEngineHot(String max) {
+    return 'Das Kühlmittel erreichte $max °C — der Motor wird zu heiß.';
+  }
+
+  @override
+  String obd2ReportEngineCold(String max, String minutes) {
+    return 'Das Kühlmittel blieb nach $minutes Min. Fahrt bei $max °C — das Thermostat klemmt eventuell offen.';
+  }
+
+  @override
+  String get obd2ReportMixtureTitle => 'Kraftstoff & Gemisch';
+
+  @override
+  String obd2ReportMixtureGood(String trim) {
+    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim % — das Gemisch ist ausgeglichen.';
+  }
+
+  @override
+  String obd2ReportMixtureRich(String trim) {
+    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: der Motor läuft fett und das Steuergerät nimmt Kraftstoff weg. Das passt zu Benzingeruch — Einspritzdüsen, Druckregler oder Tankentlüftungsventil.';
+  }
+
+  @override
+  String obd2ReportMixtureLean(String trim) {
+    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: der Motor läuft mager und das Steuergerät gibt Kraftstoff dazu — mögliches Falschluft-Leck oder schwache Kraftstoffversorgung.';
+  }
+
+  @override
+  String get obd2ReportEmissionsTitle => 'Abgas & Kraftstoffdampf';
+
+  @override
+  String obd2ReportCatalyst(String max) {
+    return 'Die Katalysatortemperatur erreichte höchstens $max °C.';
+  }
+
+  @override
+  String obd2ReportCatalystHot(String max) {
+    return 'Der Katalysator erreichte $max °C — Zündaussetzer oder ein fettes Gemisch können ihn überhitzen.';
+  }
+
+  @override
+  String obd2ReportEvap(String min, String max) {
+    return 'Der Druck im Kraftstoffdampfsystem lag zwischen $min und $max Pa.';
+  }
+
+  @override
+  String get obd2ReportFaultsTitle => 'Fehlercodes';
+
+  @override
+  String get obd2ReportFaultsNone =>
+      'Keine Fehlercodes, die Motorkontrollleuchte ist aus.';
+
+  @override
+  String get obd2ReportFaultsMil => 'Die Motorkontrollleuchte ist AN.';
+
+  @override
+  String get obd2ReportFaultsStored => 'Gespeichert';
+
+  @override
+  String get obd2ReportFaultsPending => 'Ausstehend';
+
+  @override
+  String get obd2ReportFaultsPermanent => 'Permanent';
+
+  @override
+  String get obd2ReportFaultsFreezeFrame => 'Hat den Freeze-Frame ausgelöst';
+
+  @override
+  String get dtcGroupFuelAir => 'Kraftstoff- und Luftzumessung';
+
+  @override
+  String get dtcGroupIgnition => 'Zündung / Zündaussetzer';
+
+  @override
+  String get dtcGroupEmissions => 'Abgasregelung';
+
+  @override
+  String get dtcGroupIdleElectrical => 'Geschwindigkeit, Leerlauf und Elektrik';
+
+  @override
+  String get dtcGroupComputer => 'Steuergerät und Ausgänge';
+
+  @override
+  String get dtcGroupTransmission => 'Getriebe';
+
+  @override
+  String get dtcGroupChassis => 'Fahrwerk';
+
+  @override
+  String get dtcGroupBody => 'Karosserie';
+
+  @override
+  String get dtcGroupNetwork => 'Netzwerk / Kommunikation';
+
+  @override
+  String get dtcGroupOther => 'sonstiges';
+
+  @override
+  String obd2ReportUnanswered(String commands) {
+    return 'Von diesem Auto nicht gemeldet: $commands';
+  }
+
+  @override
+  String get obd2ReportFailed =>
+      'Diese Aufzeichnung konnte nicht gelesen werden';
+
+  @override
+  String obd2RecordingSizeKb(String size) {
+    return '$size KB';
+  }
+
+  @override
+  String obd2RecordingSizeMb(String size) {
+    return '$size MB';
+  }
+
+  @override
+  String obd2ReportVolts(String volts) {
+    return '$volts V';
+  }
+
+  @override
+  String get obd2ReportVoltsUnknown => 'keine Spannung';
+
+  @override
+  String obd2ReportDriveEpisodeNeutral(
+    String time,
+    String speed,
+    String rpm,
+    String volts,
+  ) {
+    return '$time · $speed km/h · $rpm U/min · $volts · Neutral gemeldet';
+  }
+
+  @override
+  String obd2ReportFaultRow(String label, String code, String group) {
+    return '$label: $code · $group';
+  }
+
+  @override
   String obd2PickerPinnedFallback(String adapterName) {
     return 'Konnte \'$adapterName\' nicht erreichen — wähle einen anderen Adapter';
   }
