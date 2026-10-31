@@ -4159,6 +4159,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Tartalom jelentése';
 
   @override
@@ -4431,7 +4435,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Szintetikus egyezés: a közelben találtunk egy a céljánál olcsóbb állomást.';
+    return 'Szintetikus egyezés: $station ára a célár alatt van.';
   }
 
   @override

@@ -33,6 +33,9 @@
 // which does not exist yet: `test/fixtures` holds 38 provider fixtures
 // and zero trip traces. Those thresholds stay with #4231's successor.
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tankstellen/features/fill_ups/domain/services/tank_report.dart';
+
+import '../../fill_ups/fixtures/physical_tank_fixtures.dart';
 import 'package:tankstellen/core/domain/pump_gain_entry.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/trips/data/trip_summary_codec.dart';
@@ -76,6 +79,23 @@ TripSummary _trip({
     );
 
 void main() {
+  test('#4469 pump truth uses physical litres and odometer, not recordings', () {
+    final measured = _trip(km: 421, liters: 30, dominant: 'pid5E');
+    final closing = physicalFill('b', 8, 27.2, 10597)
+        .copyWith(linkedTripIds: ['trip']);
+    final report = buildTankReport(fillUps: [
+      physicalFill('a', 1, 40, 10000),
+      physicalFill('p', 3, 15, 10250, full: false),
+      physicalFill('synthetic', 4, 6, 10300, correction: true),
+      closing,
+    ], tripSummariesById: {'trip': measured});
+    expect(report.latest!.liters, 42.2);
+    expect(report.latest!.distanceKm, 597);
+    expect(report.latest!.lPer100Km, closeTo(7.0686767169, 1e-9));
+    expect(report.latestBehavior.coverageShare, closeTo(421 / 597, 1e-12));
+    expect(measured.fuelLitersConsumed, 30);
+    expect(measured.dominantFuelSource, 'pid5E');
+  });
   const calibrated =
       VehicleProfile(id: 'v', name: 'x', pumpGain: 0.72, pumpGainSamples: 1);
 

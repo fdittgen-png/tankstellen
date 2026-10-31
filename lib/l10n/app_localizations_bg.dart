@@ -4160,6 +4160,10 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Докладване на съдържание';
 
   @override
@@ -4437,7 +4441,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Синтетично съвпадение: наблизо е намерена станция под вашата цел.';
+    return 'Синтетично съвпадение: $station е под целевата ви цена.';
   }
 
   @override

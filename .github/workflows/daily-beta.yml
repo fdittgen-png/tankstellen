@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/daily-beta.md
 
 name: Release · Play open-testing (daily)
 
@@ -25,6 +26,10 @@ on:
   # #3720 — callable from the Release Train orchestrator.
   workflow_call:
     inputs:
+      source_sha:
+        description: Exact commit supplied by the release train
+        required: true
+        type: string
       track:
         required: false
         type: string
@@ -68,8 +73,11 @@ on:
         default: false
 
 concurrency:
-  group: daily-open-testing
+  group: daily-beta
   cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   build-and-upload:
@@ -82,7 +90,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: master
+          ref: ${{ inputs.source_sha || github.sha }}
+      - name: Check out this workflow's shared actions
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .workflow-tools
+          persist-credentials: false
+
+      - uses: ./.workflow-tools/.github/actions/source-identity
+        with:
+          sha: ${{ inputs.source_sha || github.sha }}
+          leg: play
 
       - name: Compute build number
         id: bn
@@ -104,10 +123,9 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.workflow-tools/.github/actions/flutter-setup
         with:
-          channel: stable
-          cache: true
+          resolve: 'false'
 
       - name: Decode signing keystore
         env:
@@ -275,9 +293,9 @@ jobs:
           TAG="v${VERSION}+${{ steps.bn.outputs.build_number }}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$TAG" -m "Beta build ${{ steps.bn.outputs.build_number }} (track: ${{ inputs.track || 'beta' }}) — $GITHUB_SHA"
+          git tag -a "$TAG" -m "Beta build ${{ steps.bn.outputs.build_number }} (track: ${{ inputs.track || 'beta' }}) — ${{ inputs.source_sha || github.sha }}"
           if ! git push origin "$TAG"; then
-            echo "::warning::Tag push rejected (workflow-file race, #3710). The build IS shipped. Push the tag manually: SKIP_PREPUSH=1 git tag -a '$TAG' $GITHUB_SHA -m 'Beta build ${{ steps.bn.outputs.build_number }}' && SKIP_PREPUSH=1 git push origin '$TAG'"
+            echo "::warning::Tag push rejected (workflow-file race, #3710). The build IS shipped. Push the tag manually: SKIP_PREPUSH=1 git tag -a '$TAG' ${{ inputs.source_sha || github.sha }} -m 'Beta build ${{ steps.bn.outputs.build_number }}' && SKIP_PREPUSH=1 git push origin '$TAG'"
             exit 1
           fi
           echo "Tagged $TAG"
@@ -285,8 +303,10 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## Daily Open-Testing Release" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Build number:** ${{ steps.bn.outputs.build_number }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Track:** ${{ inputs.track || 'beta' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Trigger:** ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Daily Open-Testing Release"
+            echo ""
+            echo "- **Build number:** ${{ steps.bn.outputs.build_number }}"
+            echo "- **Track:** ${{ inputs.track || 'beta' }}"
+            echo "- **Trigger:** ${{ github.event_name }}"
+          } >> "$GITHUB_STEP_SUMMARY"

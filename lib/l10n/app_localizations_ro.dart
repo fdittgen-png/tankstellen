@@ -4160,6 +4160,10 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Raportează conținutul';
 
   @override
@@ -4435,7 +4439,7 @@ class AppLocalizationsRo extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Potrivire sintetică: a fost găsită în apropiere o stație sub ținta ta.';
+    return 'Potrivire sintetică: $station are un preț sub prețul tău țintă.';
   }
 
   @override

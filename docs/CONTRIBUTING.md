@@ -12,6 +12,9 @@ comparison app for Europe and beyond.
 > (no hard-coded strings, issue-first, clean-codegen-before-push, 23-locale ARB
 > fan-out) plus the local pre-push hook install pointer.
 
+Issue intake, implementation briefs and evidence-pending exits follow the
+[canonical Ready/Done/STOP contract](guides/issue-exit-contract.md).
+
 ## Development Setup
 
 1. **Flutter SDK** 3.41.5+ installed and on your PATH
@@ -60,7 +63,8 @@ We follow **GitHub Flow** with conventional commits and squash merges.
 1. Branch off `master` -- one concern per branch, keep it short-lived (1-3 days).
 2. Use branch prefixes: `feat/`, `fix/`, `refactor/`, `test/`, `docs/`, `chore/`.
 3. Write conventional commit messages: `feat:`, `fix:`, `docs:`, `refactor:`, etc.
-4. Push and open a PR against `master` -- link issues with `Closes #N`.
+4. Push and open a PR against `master` -- `Refs #N` for partial delivery;
+   `Closes #N` only when all acceptance and required evidence are satisfied.
 5. All PRs are squash-merged. Auto-delete of head branches is enabled.
 
 ## Code Style

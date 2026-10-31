@@ -4158,6 +4158,10 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Ziņot par saturu';
 
   @override
@@ -4430,7 +4434,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Sintētiska atbilstība: tuvumā tika atrasta stacija zem jūsu mērķa.';
+    return 'Sintētiska atbilstība: $station cena ir zemāka par jūsu mērķa cenu.';
   }
 
   @override

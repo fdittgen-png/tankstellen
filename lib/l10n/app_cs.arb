@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Spustit testovací proces upozornění",
   "developerToolsTestAlertFired": "Testovací upozornění spuštěno — proces doručil {count} oznámení.",
   "developerToolsTestAlertTitle": "Testovací cenové upozornění",
-  "developerToolsTestAlertBody": "Syntetická shoda: poblíž byla nalezena stanice pod vaším cílem.",
+  "developerToolsTestAlertBody": "Syntetická shoda: {station} má cenu pod vaším cílem.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostika",
   "developerToolsFeatureFlagDump": "Inspektor příznaků funkcí",
   "developerToolsFlagOn": "Zapnuto",
@@ -12092,5 +12092,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

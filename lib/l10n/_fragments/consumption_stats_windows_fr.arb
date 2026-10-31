@@ -1,0 +1,6 @@
+{
+  "consumptionStatsNeedsFullWindow": "Ajoutez un nouveau plein complet pour mesurer la consommation.",
+  "@consumptionStatsNeedsFullWindow": {
+    "description": "Explains that pump consumption requires two qualified physical full fills (#4469)."
+  }
+}

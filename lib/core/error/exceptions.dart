@@ -66,7 +66,13 @@ class CacheException extends AppException {
 class LocationException extends AppException {
   @override
   final String message;
-  const LocationException({required this.message});
+
+  /// Permission refusal has a different recovery from an unavailable fix.
+  final bool permissionDenied;
+  const LocationException({
+    required this.message,
+    this.permissionDenied = false,
+  });
 
   @override
   String toString() => 'LocationException: $message';

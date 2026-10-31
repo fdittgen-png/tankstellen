@@ -41,7 +41,8 @@
 //     blank, not a comment, not a directive, not a lone bracket) count as
 //     executable and uncovered. "No test loads it" is not coverage. A
 //     file tests reach only through a barrel export lands here too: the
-//     selector does not follow exports, so no evidence was collected.
+//     legacy CLI does not follow exports unless --follow-exports is given.
+//     CI uses the complete graph for both planning and evaluation.
 //   * some test depends on it → it has no executable line (an enum, a
 //     const table, an abstract interface): Dart emits no record for such
 //     a library, so it contributes nothing. Measured on run 35178170681,
@@ -123,8 +124,10 @@ class CoverageEvidenceException implements Exception {
 /// Parses lcov into `file -> line -> hits`, summing duplicate records
 /// (the `lcov -a` merge). Throws [CoverageEvidenceException] on anything
 /// malformed: a truncated or garbled report must not read as coverage.
-Map<String, Map<int, int>> parseLcov(String content,
-    [Map<String, Map<int, int>>? into]) {
+Map<String, Map<int, int>> parseLcov(
+  String content, [
+  Map<String, Map<int, int>>? into,
+]) {
   final result = into ?? <String, Map<int, int>>{};
   String? current;
   var lineNo = 0;
@@ -135,7 +138,8 @@ Map<String, Map<int, int>> parseLcov(String content,
     if (line.startsWith('SF:')) {
       if (current != null) {
         throw CoverageEvidenceException(
-            'lcov line $lineNo: SF before end_of_record of $current');
+          'lcov line $lineNo: SF before end_of_record of $current',
+        );
       }
       current = line.substring(3);
       result.putIfAbsent(current, () => <int, int>{});
@@ -150,7 +154,8 @@ Map<String, Map<int, int>> parseLcov(String content,
     } else if (line == 'end_of_record') {
       if (current == null) {
         throw CoverageEvidenceException(
-            'lcov line $lineNo: end_of_record without SF');
+          'lcov line $lineNo: end_of_record without SF',
+        );
       }
       current = null;
     }
@@ -195,7 +200,8 @@ Map<String, Set<int>> parseChangedLines(String diff) {
 }
 
 final _nonCode = RegExp(
-    r'^\s*($|//|/\*|\*|\*/|import\s|export\s|part\s|part of\s|library\b|[{}()\[\];,]+\s*$)');
+  r'^\s*($|//|/\*|\*|\*/|import\s|export\s|part\s|part of\s|library\b|[{}()\[\];,]+\s*$)',
+);
 
 /// Whether a source line could hold executable code — used only for a
 /// changed file no test depends on, which has no `DA:` records.
@@ -218,6 +224,7 @@ class CoverageVerdict {
   final int executable;
   final int covered;
   final Map<String, List<int>> uncoveredByFile;
+
   /// Changed files no test depends on (their code-like lines count).
   final List<String> unmeasuredFiles;
   final int criticalUncovered;
@@ -233,8 +240,10 @@ class CoverageVerdict {
     if (!applicable) {
       return (b
             ..writeln()
-            ..writeln('NOT APPLICABLE — the diff changes no maintained lib/ '
-                'source line (generated, test, docs or deletions only).'))
+            ..writeln(
+              'NOT APPLICABLE — the diff changes no maintained lib/ '
+              'source line (generated, test, docs or deletions only).',
+            ))
           .toString();
     }
     b
@@ -246,10 +255,12 @@ class CoverageVerdict {
       ..writeln('| Changed-line coverage | ${percent.toStringAsFixed(2)} % |')
       ..writeln('| Uncovered under critical paths | $criticalUncovered |')
       ..writeln()
-      ..writeln('Policy: outside critical paths fail when more than '
-          '$uncoveredLineAllowance lines are uncovered AND coverage is below '
-          '$minimumChangedLinePercent %; critical paths tolerate '
-          '$criticalUncoveredAllowance uncovered lines.')
+      ..writeln(
+        'Policy: outside critical paths fail when more than '
+        '$uncoveredLineAllowance lines are uncovered AND coverage is below '
+        '$minimumChangedLinePercent %; critical paths tolerate '
+        '$criticalUncoveredAllowance uncovered lines.',
+      )
       ..writeln()
       ..writeln(passed ? '**PASS**' : '**FAIL**');
     for (final f in failures) {
@@ -268,8 +279,10 @@ class CoverageVerdict {
         ..writeln()
         ..writeln('Uncovered changed lines:');
       for (final e in uncoveredByFile.entries) {
-        b.writeln('- `${e.key}`${isCriticalPath(e.key) ? ' (critical)' : ''}: '
-            '${e.value.join(', ')}');
+        b.writeln(
+          '- `${e.key}`${isCriticalPath(e.key) ? ' (critical)' : ''}: '
+          '${e.value.join(', ')}',
+        );
       }
     }
     return b.toString();
@@ -308,8 +321,9 @@ CoverageVerdict evaluateCoveragePolicy({
   };
   if (measured.isEmpty) {
     throw CoverageEvidenceException(
-        'the diff changes ${changed.length} maintained source file(s) but '
-        'the coverage report has no maintained-source line records');
+      'the diff changes ${changed.length} maintained source file(s) but '
+      'the coverage report has no maintained-source line records',
+    );
   }
 
   var executable = 0;
@@ -356,17 +370,21 @@ CoverageVerdict evaluateCoveragePolicy({
 
   final failures = <String>[];
   if (criticalUncovered > criticalUncoveredAllowance) {
-    failures.add('$criticalUncovered changed executable line(s) under a '
-        'critical path are not executed by any test (allowance '
-        '$criticalUncoveredAllowance)');
+    failures.add(
+      '$criticalUncovered changed executable line(s) under a '
+      'critical path are not executed by any test (allowance '
+      '$criticalUncoveredAllowance)',
+    );
   }
   final nonCriticalUncovered = executable - covered - criticalUncovered;
   final percent = executable == 0 ? 100.0 : covered * 100 / executable;
   if (nonCriticalUncovered > uncoveredLineAllowance &&
       percent < minimumChangedLinePercent) {
-    failures.add('$nonCriticalUncovered uncovered changed executable lines '
-        '(allowance $uncoveredLineAllowance) and changed-line coverage '
-        '${percent.toStringAsFixed(2)} % < $minimumChangedLinePercent %');
+    failures.add(
+      '$nonCriticalUncovered uncovered changed executable lines '
+      '(allowance $uncoveredLineAllowance) and changed-line coverage '
+      '${percent.toStringAsFixed(2)} % < $minimumChangedLinePercent %',
+    );
   }
   return CoverageVerdict(
     applicable: true,
@@ -386,7 +404,10 @@ CoverageVerdict evaluateCoveragePolicy({
 /// (matched full-suite PR vs master shards, runs 35164989389/35167458858
 /// and 35179469326/35181995111), so the always-run bucket and every
 /// other selected test keep running without it.
-List<String> coverageTests(Iterable<String> changedPaths, DependencyGraph graph) {
+List<String> coverageTests(
+  Iterable<String> changedPaths,
+  DependencyGraph graph,
+) {
   final changed = changedPaths.where(isMaintainedSource).toSet();
   if (changed.isEmpty) return const [];
   return [
@@ -402,12 +423,15 @@ int runCoveragePolicy(List<String> args, {StringSink? out}) {
   String? summaryPath;
   var applicableOnly = false;
   var coverageTestsOnly = false;
+  var followExports = false;
   // `error` when the gate enforces, `warning` while it is advisory.
   var level = 'error';
   final lcovPaths = <String>[];
   for (var i = 0; i < args.length; i++) {
     final value = i + 1 < args.length ? args[i + 1] : null;
     switch (args[i]) {
+      case '--follow-exports':
+        followExports = true;
       case '--applicable-only':
         applicableOnly = true;
       case '--coverage-tests':
@@ -421,8 +445,7 @@ int runCoveragePolicy(List<String> args, {StringSink? out}) {
       case '--summary' when value != null:
         summaryPath = value;
         i++;
-      case '--annotation-level'
-          when value == 'error' || value == 'warning':
+      case '--annotation-level' when value == 'error' || value == 'warning':
         level = value!;
         i++;
       default:
@@ -431,8 +454,10 @@ int runCoveragePolicy(List<String> args, {StringSink? out}) {
     }
   }
   if (diffPath == null || !File(diffPath).existsSync()) {
-    sink.writeln('::$level::--diff file missing: $diffPath — the changed '
-        'lines are the policy input; refusing to guess');
+    sink.writeln(
+      '::$level::--diff file missing: $diffPath — the changed '
+      'lines are the policy input; refusing to guess',
+    );
     return 2;
   }
   final changedLines = parseChangedLines(File(diffPath).readAsStringSync());
@@ -443,7 +468,10 @@ int runCoveragePolicy(List<String> args, {StringSink? out}) {
     return 0;
   }
   if (coverageTestsOnly) {
-    for (final t in coverageTests(changedLines.keys, DependencyGraph.scan())) {
+    for (final t in coverageTests(
+      changedLines.keys,
+      DependencyGraph.scan(followExports: followExports),
+    )) {
       sink.writeln(t);
     }
     return 0;
@@ -471,21 +499,24 @@ int runCoveragePolicy(List<String> args, {StringSink? out}) {
     verdict = evaluateCoveragePolicy(
       changedLines: changedLines,
       coverage: coverage,
-      reachedByTests: (path) => (reached ??=
-              DependencyGraph.scan().libFilesReachedByTests())
-          .contains(path),
+      reachedByTests: (path) => (reached ??= DependencyGraph.scan(
+        followExports: followExports,
+      ).libFilesReachedByTests()).contains(path),
       readSource: (path) {
         final f = File(path);
         return f.existsSync() ? f.readAsLinesSync() : null;
       },
     );
   } on CoverageEvidenceException catch (e) {
-    sink.writeln('::$level::Changed-line coverage has no trustworthy '
-        'evidence: $e');
+    sink.writeln(
+      '::$level::Changed-line coverage has no trustworthy '
+      'evidence: $e',
+    );
     if (summaryPath != null) {
       File(summaryPath).writeAsStringSync(
-          '## Changed-line coverage (#4347)\n\n**NO EVIDENCE** — $e\n',
-          mode: FileMode.append);
+        '## Changed-line coverage (#4347)\n\n**NO EVIDENCE** — $e\n',
+        mode: FileMode.append,
+      );
     }
     return 2;
   }
@@ -500,9 +531,11 @@ int runCoveragePolicy(List<String> args, {StringSink? out}) {
   for (final MapEntry(key: path, value: lines)
       in verdict.uncoveredByFile.entries) {
     final kind = isCriticalPath(path) ? 'critical' : 'other';
-    sink.writeln('::warning file=$path,line=${lines.first}::'
-        '${lines.length} uncovered changed line(s) ($kind): '
-        '${lines.join(', ')}');
+    sink.writeln(
+      '::warning file=$path,line=${lines.first}::'
+      '${lines.length} uncovered changed line(s) ($kind): '
+      '${lines.join(', ')}',
+    );
   }
   if (!verdict.passed) {
     for (final f in verdict.failures) {

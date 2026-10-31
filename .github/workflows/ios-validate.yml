@@ -1,0 +1,44 @@
+# Copyright (c) 2026 Florian DITTGEN
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/ios-validate.md
+name: CI · iOS simulator build
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'ios/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/actions/flutter-setup/**'
+      - '.github/workflows/ios-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: ios-validate-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  ios-simulator:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: ./.github/actions/flutter-setup
+      - name: Build without signing or store access
+        run: flutter build ios --simulator --debug --no-codesign --no-pub
+      - name: Package simulator application
+        run: ditto -c -k --keepParent build/ios/iphonesimulator "$RUNNER_TEMP/ios-simulator.zip"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ios-simulator-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ios-simulator.zip
+          if-no-files-found: error
+          retention-days: 7

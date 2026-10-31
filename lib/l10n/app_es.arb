@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Ejecutar canalización de alerta de prueba",
   "developerToolsTestAlertFired": "Alerta de prueba activada: la canalización generó {count} notificación(es).",
   "developerToolsTestAlertTitle": "Alerta de precio de prueba",
-  "developerToolsTestAlertBody": "Coincidencia sintética: se encontró cerca una estación por debajo de tu objetivo.",
+  "developerToolsTestAlertBody": "Coincidencia sintética: {station} está por debajo de tu precio objetivo.",
   "developerToolsDiagnosticsGroupTitle": "Diagnósticos",
   "developerToolsFeatureFlagDump": "Inspector de indicadores de funciones",
   "developerToolsFlagOn": "Activado",
@@ -11599,5 +11599,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -56,6 +56,19 @@ void main() {
     'b': _trip(153, 16.07, veUsed: 0.85),
   };
 
+  test('#4469 known physical blend cannot use a single-grade restatement', () {
+    final report = buildTankReport(fillUps: [
+      _fill('a', 0, 10000),
+      _fill('p', 3, 10250).copyWith(
+        liters: 15, isFullTank: false, fuelType: FuelType.e10),
+      _fill('b', 8, 10597, trips: ['a']).copyWith(liters: 27.2),
+    ], tripSummariesById: trips);
+    expect(report.latest!.liters, 42.2);
+    expect(report.latest!.hasMixedPhysicalFuel, isTrue);
+    expect(calibratedTankRecording(report.latest!, trips,
+      const VehicleProfile(id: 'car', name: 'x', pumpGain: 0.7)), isNull);
+  });
+
   test('uncalibrated vehicle: the stored figure, residual +64 %', () {
     final r = calibratedTankRecording(
         period, trips, const VehicleProfile(id: 'car', name: 'x'))!;

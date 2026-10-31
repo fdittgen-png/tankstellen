@@ -62,7 +62,7 @@ FillUp _fill(String id, String vehicleId, int day, double odo,
       date: DateTime.utc(2026, 1, day),
       liters: litres,
       totalCost: cost,
-      odometerKm: odo,
+      odometerKm: odo + 10000, // #4469: zero is unset; keep the physical deltas.
       fuelType: FuelType.e10,
       vehicleId: vehicleId,
       currency: 'EUR',

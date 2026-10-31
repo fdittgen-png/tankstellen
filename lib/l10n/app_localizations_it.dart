@@ -4149,6 +4149,10 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Segnala contenuto';
 
   @override
@@ -4422,7 +4426,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Corrispondenza sintetica: è stata trovata nelle vicinanze una stazione sotto il tuo obiettivo.';
+    return 'Corrispondenza sintetica: $station è sotto il tuo prezzo obiettivo.';
   }
 
   @override

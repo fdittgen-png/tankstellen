@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/nightly-flaky.md
 
 name: Nightly · Flaky & network suite
 
@@ -32,6 +33,10 @@ concurrency:
   group: nightly-flaky
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   flaky-suite:
     runs-on: ubuntu-latest
@@ -39,33 +44,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: master
+          persist-credentials: false
+          ref: ${{ github.sha }}
           # #4108 — the #3968 F-Droid guard resolves the SHAs the
           # fdroiddata recipe pins, which a shallow clone does not
           # contain: "commit 506fcf5… is not in this clone". ci.yml
           # already checks out at full depth for the same reason.
           fetch-depth: 0
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/flutter-setup
         with:
-          channel: stable
-          # #2347 — pin Flutter in lock-step with ci.yml. A floating
-          # `channel: stable` picked up an SDK whose Gradle plugin
-          # hard-failed on the tflite_flutter JVM-target mismatch
-          # (#1936); an unpinned nightly repeats that risk every night
-          # stable bumps, producing spurious red that masks real
-          # regressions and spams #1584. Keep this value identical to
-          # the ci.yml pin; bump both together, never by drift.
-          flutter-version: "3.44.9"
-          cache: true
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-      - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
+          resolve: 'false'
+
+      - run: flutter pub get --enforce-lockfile
       - name: Run flaky + network suites
         # #2003 — the comma form `--tags=flaky,network` is parsed by
         # `package:test` (which `flutter test --tags=` delegates to) as
@@ -160,7 +150,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: master
+          persist-credentials: false
+          ref: ${{ github.sha }}
           # #4108 — the #3968 F-Droid guard resolves the SHAs the
           # fdroiddata recipe pins, which a shallow clone does not
           # contain: "commit 506fcf5… is not in this clone". ci.yml

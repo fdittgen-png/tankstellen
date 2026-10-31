@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Pokreni testni tijek upozorenja",
   "developerToolsTestAlertFired": "Testno upozorenje pokrenuto — tijek je isporučio {count} obavijesti.",
   "developerToolsTestAlertTitle": "Testno cjenovno upozorenje",
-  "developerToolsTestAlertBody": "Sintetičko podudaranje: u blizini je pronađena postaja ispod vašeg cilja.",
+  "developerToolsTestAlertBody": "Sintetičko podudaranje: {station} ima cijenu ispod vaše ciljne cijene.",
   "developerToolsDiagnosticsGroupTitle": "Dijagnostika",
   "developerToolsFeatureFlagDump": "Inspektor zastavica značajki",
   "developerToolsFlagOn": "Uključeno",
@@ -12092,5 +12092,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

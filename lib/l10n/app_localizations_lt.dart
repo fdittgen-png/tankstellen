@@ -4156,6 +4156,10 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Pranešti apie turinį';
 
   @override
@@ -4429,7 +4433,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Sintetinis atitikmuo: netoliese rasta stotelė, mažesnė už jūsų tikslą.';
+    return 'Sintetinis atitikmuo: $station kaina mažesnė už jūsų tikslinę kainą.';
   }
 
   @override

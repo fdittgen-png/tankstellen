@@ -4130,6 +4130,10 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Teata sisust';
 
   @override
@@ -4401,7 +4405,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Sünteetiline vaste: läheduses leiti sinu sihist odavam jaam.';
+    return 'Sünteetiline vaste: $station on sinu sihthinnast odavam.';
   }
 
   @override

@@ -5,6 +5,10 @@ name: New Country API
 description: Request or propose support for a new country's fuel price data
 labels: ["type/feature", "new-country"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Follow the [Ready/Done/closure contract](https://github.com/fdittgen-png/tankstellen/blob/master/docs/guides/issue-exit-contract.md). Triage separates a tested producer/consumer from required live-provider qualification; unavailable evidence stays NOT RUN/BLOCKED.
   - type: input
     id: country
     attributes:

@@ -38,7 +38,7 @@ void main() {
         date: day(d),
         liters: litres,
         totalCost: litres * price,
-        odometerKm: odo,
+        odometerKm: odo + 10000, // #4469: zero denotes an unset odometer.
         fuelType: fuel,
         vehicleId: vehicleId,
         isFullTank: full,

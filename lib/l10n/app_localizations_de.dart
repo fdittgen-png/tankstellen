@@ -4158,6 +4158,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Füge eine weitere Volltankung hinzu, um den Verbrauch zu messen.';
+
+  @override
   String get contentModerationReportAction => 'Inhalt melden';
 
   @override

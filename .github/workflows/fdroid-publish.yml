@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/fdroid-publish.md
 
 # F-Droid self-hosted repo publish (#2576)
 #
@@ -20,6 +21,11 @@ on:
   workflow_dispatch:
   # #3720 — callable from the Release Train orchestrator.
   workflow_call:
+    inputs:
+      source_sha:
+        description: Exact commit supplied by the release train
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -33,20 +39,34 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha || github.sha }}
+      - name: Check out this workflow's shared actions
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .workflow-tools
+          persist-credentials: false
+
+      - uses: ./.workflow-tools/.github/actions/source-identity
+        with:
+          sha: ${{ inputs.source_sha || github.sha }}
+          leg: fdroid
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
-      - uses: subosito/flutter-action@v2
+      - uses: ./.workflow-tools/.github/actions/flutter-setup
         with:
-          channel: stable
-          flutter-version: "3.44.9"
-          cache: true
+          resolve: 'false'
+          lockfile: pubspec.fdroid.lock
+
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
@@ -82,9 +102,11 @@ jobs:
           APP_KEYSTORE="$RUNNER_TEMP/tankstellen-release.jks"
           echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$APP_KEYSTORE"
           [ -s "$APP_KEYSTORE" ] || { echo "::error::Decoded app keystore empty" >&2; exit 1; }
-          echo "ANDROID_KEYSTORE_PATH=$APP_KEYSTORE" >> "$GITHUB_ENV"
-          echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
-          echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS" >> "$GITHUB_ENV"
+          {
+            echo "ANDROID_KEYSTORE_PATH=$APP_KEYSTORE"
+            echo "ANDROID_KEYSTORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
+            echo "ANDROID_KEY_ALIAS=$ANDROID_KEY_ALIAS"
+          } >> "$GITHUB_ENV"
 
       # --- Decode the F-DROID REPO signing key (NEW secrets) -----------------
       - name: Decode F-Droid repo keystore

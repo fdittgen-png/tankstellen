@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Uruchom potok alertu testowego",
   "developerToolsTestAlertFired": "Wyzwolono alert testowy — potok dostarczył {count} powiadomień.",
   "developerToolsTestAlertTitle": "Testowy alert cenowy",
-  "developerToolsTestAlertBody": "Dopasowanie syntetyczne: w pobliżu znaleziono stację poniżej Twojego celu.",
+  "developerToolsTestAlertBody": "Dopasowanie syntetyczne: cena na stacji {station} jest niższa od ceny docelowej.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostyka",
   "developerToolsFeatureFlagDump": "Inspektor flag funkcji",
   "developerToolsFlagOn": "Wł.",
@@ -12091,5 +12091,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

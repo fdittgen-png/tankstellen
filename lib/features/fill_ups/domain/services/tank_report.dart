@@ -15,7 +15,7 @@
 ///    always accompanied by the coverage figure below
 ///    [kTankCaveatCoverage].
 ///  * Window semantics mirror `ConsumptionStats.fromFillUps` (#1362)
-///    exactly: a window opens at a plein (or the very first fill), closes
+///    exactly: a window opens at a physical plein, closes
 ///    at the next plein, litres count every fill strictly after the
 ///    opening up to and including the closing plein, distance is the
 ///    odometer delta. Divergent math here would make the two surfaces
@@ -31,9 +31,9 @@ import '../../../../core/domain/vehicle_profile.dart';
 import '../entities/fill_up.dart';
 import '../../../trips/api.dart';
 import 'tank_behavior.dart';
+import 'physical_tank_windows.dart';
 
 export 'tank_behavior.dart' show TankBehavior, TankExplanation, TankFactor;
-
 
 /// Minimum recorded-distance share of a tank before behavior deltas may
 /// be offered as explanations at all.
@@ -47,14 +47,6 @@ const double kTankCaveatCoverage = 0.8;
 /// calibration factor — a thin slice of recorded driving cannot speak
 /// for the whole tank's litres.
 const double kTankCalibrationMinCoverage = 0.6;
-
-/// Plausibility bounds for a closed window (guards odometer typos):
-/// distance within (3, 3000] km and consumption within (1, 40] L/100km.
-bool _plausiblePeriod(double distanceKm, double lPer100Km) =>
-    distanceKm > 3 &&
-    distanceKm <= 3000 &&
-    lPer100Km > 1 &&
-    lPer100Km <= 40;
 
 /// One CLOSED plein-to-plein window.
 class TankPeriod {
@@ -73,10 +65,11 @@ class TankPeriod {
     required this.liters,
     required this.pumpedCost,
     this.pumpedSpend = MoneyTally.empty,
+    this.hasMixedPhysicalFuel = false,
   }) : assert(distanceKm > 0, 'a tank window needs a positive distance'),
        assert(liters >= 0, 'a tank window cannot consume negative litres');
 
-  /// The plein (or very first fill) that opened the window.
+  /// The physical full tank that opened the window.
   final FillUp opening;
 
   /// The plein that closed the window — its `linkedTripIds` carry the
@@ -87,8 +80,8 @@ class TankPeriod {
   final double distanceKm;
 
   /// Σ litres of every fill strictly after the opening up to and
-  /// including the closing plein (partials + corrections included —
-  /// identical to the #1362 walker).
+  /// including the closing plein. Physical partials count; synthetic
+  /// bookkeeping corrections never count as pumped fuel (#4469).
   final double liters;
 
   /// Σ pumped cost over the same fills (corrections carry cost 0).
@@ -102,6 +95,10 @@ class TankPeriod {
   /// foreign fill counts as what the card statement charged. Empty on a
   /// period built by hand (tests), where [pumpedCost] is all there is.
   final MoneyTally pumpedSpend;
+
+  /// A physical partial changed the tank's grade before the closing fill.
+  /// Aggregate litres remain valid, but one grade cannot own its calibration.
+  final bool hasMixedPhysicalFuel;
 
   /// The tank's true pump consumption.
   double get lPer100Km => liters / distanceKm * 100.0;
@@ -178,48 +175,31 @@ class TankReport {
 }
 
 /// Every closed, plausible plein-to-plein window of [fillUps], oldest
-/// first — the #1362 walk, shared by the tank report and the fuel
+/// first — the shared physical reference (#4469), used by the tank report and fuel
 /// behaviour evidence (#4276) so the two can never disagree on a window.
 /// [fillUps] must already be scoped to one vehicle.
-List<TankPeriod> closedTankPeriods(List<FillUp> fillUps) {
-  if (fillUps.length < 2) return const [];
-  final sorted = [...fillUps]..sort((a, b) => a.date.compareTo(b.date));
-
-  // Walk the #1362 windows: opening plein/first fill → closing plein.
-  final periods = <TankPeriod>[];
-  FillUp opening = sorted.first;
-  var liters = 0.0, cost = 0.0;
-  var spend = MoneyTally.empty;
-  for (final f in sorted.skip(1)) {
-    liters += f.liters;
-    if (!f.isCorrection) cost += f.totalCost;
-    if (!f.isCorrection && f.totalCost > 0) {
-      final (amount, currency) = f.bookedSpend;
-      spend = spend.plus(amount, currency);
-    }
-    if (f.isFullTank && !f.isCorrection) {
-      final distance = f.odometerKm - opening.odometerKm;
-      if (distance > 0) {
-        final period = TankPeriod(
-          opening: opening,
-          closing: f,
-          distanceKm: distance,
-          liters: liters,
-          pumpedCost: cost,
-          pumpedSpend: spend,
-        );
-        if (_plausiblePeriod(distance, period.lPer100Km)) {
-          periods.add(period);
-        }
-      }
-      opening = f;
-      liters = 0.0;
-      cost = 0.0;
-      spend = MoneyTally.empty;
-    }
-  }
-  return periods;
-}
+List<TankPeriod> closedTankPeriods(List<FillUp> fillUps) => [
+  for (final window in physicalTankWindows(fillUps).closed)
+    TankPeriod(
+      opening: window.opening,
+      closing: window.closing,
+      distanceKm: window.distanceKm,
+      liters: window.liters,
+      hasMixedPhysicalFuel: window.fills.any(
+        (f) =>
+            !f.isCorrection &&
+            f.id != window.closing.id &&
+            f.fuelType != window.opening.fuelType,
+      ),
+      pumpedCost: window.fills
+          .where((f) => !f.isCorrection)
+          .fold(0.0, (sum, f) => sum + f.totalCost),
+      pumpedSpend: MoneyTally.of([
+        for (final f in window.fills)
+          if (!f.isCorrection && f.totalCost > 0) f.bookedSpend,
+      ]),
+    ),
+];
 
 /// Build the report. [fillUps] must already be scoped to one vehicle
 /// (the provider layer owns that); [tripSummariesById] resolves the
@@ -232,11 +212,11 @@ TankReport buildTankReport({
   if (periods.isEmpty) return TankReport.empty;
 
   TankBehavior behaviorOf(TankPeriod p) => TankBehavior.fromTrips(
-        p,
-        p.closing.linkedTripIds
-            .map((id) => tripSummariesById[id])
-            .whereType<TripSummary>(),
-      );
+    p,
+    p.closing.linkedTripIds
+        .map((id) => tripSummariesById[id])
+        .whereType<TripSummary>(),
+  );
 
   final latest = periods.last;
   final latestBehavior = behaviorOf(latest);
@@ -280,6 +260,7 @@ PumpCalibration? _calibration(
       ? periods
       : periods.sublist(periods.length - 5);
   for (final p in tail) {
+    if (p.hasMixedPhysicalFuel) continue;
     final b = behaviorOf(p);
     final recorded = b.recordedLPer100Km;
     if (recorded == null || b.coverageShare < kTankCalibrationMinCoverage) {
@@ -311,7 +292,9 @@ String burnedFuelKey(
 ) {
   final keys = <String>{};
   for (final id in period.closing.linkedTripIds) {
-    final key = normalizePumpGainFuelKey(tripSummariesById[id]?.pumpGainFuelKey);
+    final key = normalizePumpGainFuelKey(
+      tripSummariesById[id]?.pumpGainFuelKey,
+    );
     if (key != null) keys.add(key);
   }
   if (keys.length == 1) return keys.single;
@@ -324,12 +307,16 @@ String burnedFuelKey(
   Map<String, TripSummary> tripSummariesById,
   VehicleProfile? vehicle,
 ) {
+  // A known physical blend has no single grade whose gain may restate
+  // every linked recording. The card keeps the stored aggregate instead.
+  if (period.hasMixedPhysicalFuel) return null;
   var liters = 0.0, km = 0.0;
   final fuelKey = burnedFuelKey(period, tripSummariesById);
   for (final id in period.closing.linkedTripIds) {
     final t = tripSummariesById[id];
     if (t == null || t.isVirtual || isEngineOffTransport(t)) continue;
-    final l = CalibratedTripFigures.of(t, vehicle, fuelKey: fuelKey).liters ??
+    final l =
+        CalibratedTripFigures.of(t, vehicle, fuelKey: fuelKey).liters ??
         tripConsumedLitersOrNull(t);
     if (l == null || l <= 0 || t.distanceKm <= 0) continue;
     liters += l;

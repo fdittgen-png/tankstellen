@@ -4140,6 +4140,10 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Prijavi sadržaj';
 
   @override
@@ -4413,7 +4417,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Sintetičko podudaranje: u blizini je pronađena postaja ispod vašeg cilja.';
+    return 'Sintetičko podudaranje: $station ima cijenu ispod vaše ciljne cijene.';
   }
 
   @override

@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Suorita testihälytysputki",
   "developerToolsTestAlertFired": "Testihälytys laukaistu — putki toimitti {count} ilmoitusta.",
   "developerToolsTestAlertTitle": "Testihintahälytys",
-  "developerToolsTestAlertBody": "Synteettinen osuma: lähistöltä löytyi tavoitettasi halvempi asema.",
+  "developerToolsTestAlertBody": "Synteettinen osuma: {station} alittaa tavoitehintasi.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostiikka",
   "developerToolsFeatureFlagDump": "Ominaisuuslippujen tarkastelu",
   "developerToolsFlagOn": "Päällä",
@@ -12091,5 +12091,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

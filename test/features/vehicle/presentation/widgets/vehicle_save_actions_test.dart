@@ -14,6 +14,8 @@ import 'package:tankstellen/core/domain/fuel_type.dart';
 import 'package:tankstellen/core/domain/vehicle_profile.dart';
 import 'package:tankstellen/features/vehicle/presentation/widgets/vehicle_save_actions.dart';
 import 'package:tankstellen/features/vehicle/providers/vehicle_providers.dart';
+import 'package:tankstellen/features/profile/providers/effective_fuel_type_provider.dart';
+import 'package:tankstellen/features/vehicle/presentation/widgets/vehicle_form_controllers.dart';
 
 /// Unit + harness tests for `vehicle_save_actions.dart` (#561 coverage).
 ///
@@ -243,6 +245,66 @@ void main() {
   // -------------------------------------------------------------------------
 
   group('VehicleSaveActions.syncActiveProfile', () {
+    for (final editing in [false, true]) {
+      testWidgets('#4513 ${editing ? 'editing' : 'adding'} a vehicle without '
+          'choosing fuel preserves the Diesel search preference', (
+        tester,
+      ) async {
+        final form = VehicleFormControllers();
+        addTearDown(form.dispose);
+        final existing = editing ? _vehicle(id: 'v1') : null;
+        if (existing != null) form.load(existing);
+        form.nameController.text = 'Manual vehicle';
+        final vehicle = form.buildProfile(
+          existing: existing,
+          type: VehicleType.combustion,
+          connectors: const {},
+          adapterMac: null,
+          adapterName: null,
+          engineDisplacementCc: null,
+          engineCylinders: null,
+          curbWeightKg: null,
+        );
+        final repo = _MockProfileRepository();
+        when(() => repo.updateProfile(any())).thenAnswer((_) async {});
+        final ref = await _pumpAndCaptureRef(
+          tester,
+          overrides: [
+            profileRepositoryProvider.overrideWithValue(repo),
+            activeProfileProvider.overrideWith(
+              () => _FakeActiveProfile(
+                _userProfile(
+                  defaultVehicleId: existing?.id,
+                  preferredFuelType: FuelType.diesel,
+                ),
+              ),
+            ),
+          ],
+        );
+        await ref.syncActiveProfile(vehicle);
+        final saved =
+            verify(() => repo.updateProfile(captureAny())).captured.single
+                as UserProfile;
+        final consumer = ProviderContainer(
+          overrides: [
+            activeProfileProvider.overrideWith(() => _FakeActiveProfile(saved)),
+            vehicleProfileListProvider.overrideWith(
+              () => _FakeVehicleList([vehicle]),
+            ),
+          ],
+        );
+        addTearDown(consumer.dispose);
+        expect(saved.preferredFuelType, FuelType.diesel);
+        expect(saved.defaultVehicleId, vehicle.id);
+        expect(
+          vehicle.preferredFuelType,
+          isNull,
+          reason: 'no fuel was selected in the vehicle form',
+        );
+        expect(consumer.read(effectiveFuelTypeProvider), FuelType.diesel);
+      });
+    }
+
     testWidgets('no active profile → does nothing', (tester) async {
       final repo = _MockProfileRepository();
       final fakeActive = _FakeActiveProfile(null);

@@ -36,9 +36,12 @@ for now".
 
 ## 2. Never develop without an issue
 
-Every change traces to a GitHub issue. Large / multi-PR / multi-subsystem work
-is an Epic — file the Epic parent, get the breakdown validated by the
-maintainer, and only then file child issues.
+Every change traces to a GitHub issue. A new broad program needs a validated
+breakdown before children are filed. Existing approved finite checkpoints do
+not recursively become new epics. Follow the canonical
+[Ready/Done/STOP and closure contract](guides/issue-exit-contract.md), including
+when local skills or older instructions still prescribe blanket epic/closure
+rules. Use `Refs` for partial work and `Closes` only for complete acceptance.
 
 ## 3. Clean-codegen-before-push (never ship stale generated code)
 
@@ -128,3 +131,23 @@ own the resulting CI red — is `SKIP_PREPUSH=1 git push`.
 For everything beyond these four rules — architecture, the service-chain
 pattern, the TDD pyramid, GitHub flow, the feature-enum cascade and the
 autonomous-agent batching doctrine — see the `tankstellen-conventions` skill.
+
+## CI and working-branch discipline
+
+Every PR needs review by a different session on the exact current head SHA.
+Declare `Implementation-Session: <unique-ID>` in the PR body. Only the reviewing
+session records the required `independent-session-review` status, using
+[`session_review.py`](../scripts/ci/session_review.py) after checking the diff,
+issue acceptance and validation. Never approve your own work, impersonate a
+reviewer, reuse a previous head's review or bypass protection as administrator.
+New commits require fresh review; unrelated master updates do not require a
+rebase. See [independent review](ci/independent-review.md).
+
+Use a separate worktree per task from current `origin/master`; check the branch
+before edits, commits and pushes. Do not switch a shared checkout under another
+session. The installed pre-push hook checks actual pushed branch refs.
+Keep `strict=false` and serialize merges; update a branch only for an actual
+conflict, prerequisite or known semantic interaction, not every unrelated merge.
+Use whole-workflow retries for an unchanged CI candidate so the plan and shard
+reports share one attempt. Read [CI usage](ci/CI_USAGE.md) and the
+[workflow catalog](../.github/workflows/README.md) before dispatching a publisher.

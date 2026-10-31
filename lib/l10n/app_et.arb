@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Käivita testhoiatuse konveier",
   "developerToolsTestAlertFired": "Testhoiatus käivitatud — konveier edastas {count} teatist.",
   "developerToolsTestAlertTitle": "Testhinnahoiatus",
-  "developerToolsTestAlertBody": "Sünteetiline vaste: läheduses leiti sinu sihist odavam jaam.",
+  "developerToolsTestAlertBody": "Sünteetiline vaste: {station} on sinu sihthinnast odavam.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostika",
   "developerToolsFeatureFlagDump": "Funktsioonilippude inspektor",
   "developerToolsFlagOn": "Sees",
@@ -12092,5 +12092,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

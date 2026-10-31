@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/promote-release.md
 
 name: Release · Promote track
 
@@ -54,6 +55,9 @@ concurrency:
   group: promote-release
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   promote:
     runs-on: ubuntu-latest
@@ -94,7 +98,9 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## Promote Release" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **${{ inputs.from_track }} → ${{ inputs.to_track }}** at 100% (status: completed)" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Dry run: ${{ inputs.dry_run }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Managed publishing: check the publishing overview after review for the final publish click." >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "## Promote Release"
+            echo "- **${{ inputs.from_track }} → ${{ inputs.to_track }}** at 100% (status: completed)"
+            echo "- Dry run: ${{ inputs.dry_run }}"
+            echo "- Managed publishing: check the publishing overview after review for the final publish click."
+          } >> "$GITHUB_STEP_SUMMARY"

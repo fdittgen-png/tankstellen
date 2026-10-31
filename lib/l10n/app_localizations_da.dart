@@ -4132,6 +4132,10 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Anmeld indhold';
 
   @override
@@ -4403,7 +4407,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Syntetisk match: en station under dit mål blev fundet i nærheden.';
+    return 'Syntetisk match: $station ligger under din målpris.';
   }
 
   @override

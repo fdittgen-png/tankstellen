@@ -4160,6 +4160,10 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Αναφορά περιεχομένου';
 
   @override
@@ -4438,7 +4442,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Συνθετική αντιστοίχιση: βρέθηκε κοντά ένας σταθμός κάτω από τον στόχο σας.';
+    return 'Συνθετική αντιστοίχιση: το $station έχει τιμή κάτω από τον στόχο σας.';
   }
 
   @override

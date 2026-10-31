@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/endpoint-canary.md
 
 name: Nightly · Endpoint canary
 
@@ -41,10 +42,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.github/actions/flutter-setup
         with:
-          channel: stable
-          cache: true
+          resolve: 'false'
 
       - name: Probe country endpoints
         id: canary

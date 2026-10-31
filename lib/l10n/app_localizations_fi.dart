@@ -4135,6 +4135,10 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Ilmoita sisällöstä';
 
   @override
@@ -4408,7 +4412,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Synteettinen osuma: lähistöltä löytyi tavoitettasi halvempi asema.';
+    return 'Synteettinen osuma: $station alittaa tavoitehintasi.';
   }
 
   @override

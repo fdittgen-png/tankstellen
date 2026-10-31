@@ -52,8 +52,23 @@ void main() {
         const LocationException(message: 'GPS off'),
         l10nEn,
       );
-      expect(msg, contains('location'));
+      expect(msg, l10nEn.errorLocation);
     });
+
+    test(
+      'denied location permission offers postal search, not a failed fix',
+      () {
+        final msg = ErrorLocalizer.localize(
+          const LocationException(
+            message: 'permission denied',
+            permissionDenied: true,
+          ),
+          l10nEn,
+        );
+        expect(msg, l10nEn.locationDenied);
+        expect(msg, isNot(l10nEn.errorLocation));
+      },
+    );
 
     test('NoApiKeyException returns setup message', () {
       final msg = ErrorLocalizer.localize(const NoApiKeyException(), l10nEn);

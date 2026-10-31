@@ -5,6 +5,20 @@ name: Feature Request
 description: Suggest a new feature or improvement
 labels: ["type/feature", "needs-triage"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the affected user, current limitation and expected outcome. Triage adds the finite producer/consumer brief, applicable evidence and STOP rule from the [Ready/Done/closure contract](https://github.com/fdittgen-png/tankstellen/blob/master/docs/guides/issue-exit-contract.md).
+
+  - type: dropdown
+    id: change_kind
+    attributes:
+      label: Kind of change
+      options:
+        - Improvement to an existing journey
+        - New capability
+    validations:
+      required: true
   - type: textarea
     id: problem
     attributes:

@@ -61,8 +61,8 @@ void main() {
         engineRunningSeconds: engineRunningSeconds,
       );
 
-  test('two pleins close a window whose figures mirror the #1362 walker '
-      '(partials + corrections in litres, opening excluded)', () {
+  test('two physical pleins close a qualified window '
+      '(partials included, corrections and opening excluded)', () {
     final report = buildTankReport(
       fillUps: [
         fill(day: 0, liters: 40, odo: 1000),
@@ -74,9 +74,9 @@ void main() {
     );
     final p = report.latest!;
     expect(p.distanceKm, 600);
-    expect(p.liters, 50); // 10 + 2 + 38 — opening 40 belongs upstream
+    expect(p.liters, 48); // 10 + 38 — synthetic 2 L and opening excluded
     expect(p.pumpedCost, 88);
-    expect(p.lPer100Km, closeTo(8.33, 0.01));
+    expect(p.lPer100Km, closeTo(8.0, 0.01));
     expect(report.evolution, isNull,
         reason: 'one closed window — no evolution yet');
   });

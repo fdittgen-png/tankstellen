@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Palaist testa brīdinājumu plūsmu",
   "developerToolsTestAlertFired": "Testa brīdinājums aktivizēts — plūsma piegādāja {count} paziņojumus.",
   "developerToolsTestAlertTitle": "Testa cenas brīdinājums",
-  "developerToolsTestAlertBody": "Sintētiska atbilstība: tuvumā tika atrasta stacija zem jūsu mērķa.",
+  "developerToolsTestAlertBody": "Sintētiska atbilstība: {station} cena ir zemāka par jūsu mērķa cenu.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostika",
   "developerToolsFeatureFlagDump": "Funkciju karodziņu inspektors",
   "developerToolsFlagOn": "Ieslēgts",
@@ -12096,5 +12096,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

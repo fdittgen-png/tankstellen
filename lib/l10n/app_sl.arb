@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Zaženi testni cevovod opozoril",
   "developerToolsTestAlertFired": "Testno opozorilo sproženo — cevovod je dostavil {count} obvestil.",
   "developerToolsTestAlertTitle": "Testno cenovno opozorilo",
-  "developerToolsTestAlertBody": "Sintetično ujemanje: v bližini je bila najdena postaja pod vašim ciljem.",
+  "developerToolsTestAlertBody": "Sintetično ujemanje: {station} ima ceno pod vašo ciljno ceno.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostika",
   "developerToolsFeatureFlagDump": "Pregledovalnik zastavic funkcij",
   "developerToolsFlagOn": "Vklopljeno",
@@ -12096,5 +12096,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

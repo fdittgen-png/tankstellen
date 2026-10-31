@@ -109,6 +109,7 @@ docs/*
 !docs/AGENT_RULES.md
 docs/guides/*
 !docs/guides/NETWORK_TESTS.md
+!docs/guides/physical-tank-reference.md
 !docs/guides/NEW_COUNTRY.md
 !docs/guides/ARB_FRAGMENTS.md
 !docs/guides/BLOCKER-IOS-PROVISIONING.md
@@ -146,6 +147,7 @@ docs/guides/*
 !docs/guides/play-fgs-declaration.md
 !docs/guides/wiki-mirror.md
 !docs/guides/startup-kpi-measurement.md
+!docs/guides/issue-exit-contract.md
 
 # Development-only assets (screenshots, mockups)
 assets_dev/
@@ -177,3 +179,10 @@ pubspec_overrides.yaml
 !docs/privacy/
 !docs/privacy/data_inventory.json
 .media-workbench/
+
+# Reviewed workflow runbooks and CI usage live with their implementation.
+!docs/ci/
+# Same-run CI evidence and trusted workflow helper checkout are ephemeral.
+/ci-plan/
+/ci-results/
+/.workflow-tools/

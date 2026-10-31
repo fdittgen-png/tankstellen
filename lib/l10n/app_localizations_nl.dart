@@ -4147,6 +4147,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get consumptionStatsNeedsFullWindow =>
+      'Add another full fill to measure consumption.';
+
+  @override
   String get contentModerationReportAction => 'Inhoud melden';
 
   @override
@@ -4419,7 +4423,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String developerToolsTestAlertBody(String station) {
-    return 'Synthetische match: er is in de buurt een station onder je doel gevonden.';
+    return 'Synthetische match: $station zit onder je doelprijs.';
   }
 
   @override

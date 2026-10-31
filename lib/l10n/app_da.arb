@@ -1539,7 +1539,7 @@
   "developerToolsRunTestAlert": "Kør testadvarselsforløb",
   "developerToolsTestAlertFired": "Testadvarsel udløst — forløbet leverede {count} notifikation(er).",
   "developerToolsTestAlertTitle": "Testprisadvarsel",
-  "developerToolsTestAlertBody": "Syntetisk match: en station under dit mål blev fundet i nærheden.",
+  "developerToolsTestAlertBody": "Syntetisk match: {station} ligger under din målpris.",
   "developerToolsDiagnosticsGroupTitle": "Diagnostik",
   "developerToolsFeatureFlagDump": "Inspektør for funktionsflag",
   "developerToolsFlagOn": "Til",
@@ -11599,5 +11599,10 @@
         "type": "String"
       }
     }
+  },
+  "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
+  "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
   }
 }

@@ -7,6 +7,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../../core/domain/money_tally.dart';
 import '../../../../core/services/co2_calculator.dart';
 import 'fill_up.dart';
+import '../services/physical_tank_windows.dart';
 
 part 'consumption_stats.freezed.dart';
 
@@ -18,9 +19,8 @@ part 'consumption_stats.freezed.dart';
 ///
 /// Since #1362 the consumption average walks plein-to-plein **windows**
 /// instead of trusting the naive first-to-last odometer delta. A window
-/// opens at a plein-complet (or at the very first fill, when no prior
-/// plein exists) and closes on the next plein. Partials and corrections
-/// inside the window count toward that window's liters total. The
+/// opens at a physical full tank and closes on the next physical full tank.
+/// Physical partials count; synthetic bookkeeping corrections are separate. The
 /// in-progress window after the latest plein is excluded from the
 /// average and surfaced separately via [openWindowFillCount] /
 /// [openWindowLiters], so partial fills no longer silently corrupt the
@@ -124,10 +124,9 @@ abstract class ConsumptionStats with _$ConsumptionStats {
   /// Compute aggregated stats from a list of fill-ups.
   ///
   /// Consumption is computed by walking plein-to-plein windows: each
-  /// window opens with a plein-complet (or with the very first fill
-  /// when no prior plein exists) and closes at the next plein. The
-  /// liters of every fill INSIDE the window — including partials and
-  /// auto-corrections — are summed against the odometer delta from
+  /// window opens with a physical full tank and closes at the next full tank. The
+  /// liters of every fill INSIDE the window — including physical partials but excluding
+  /// synthetic corrections — are summed against the odometer delta from
   /// the opening fill to the closing plein. The in-progress window
   /// after the latest plein is excluded from the average; its fills
   /// are surfaced via [openWindowFillCount] / [openWindowLiters] so
@@ -141,7 +140,7 @@ abstract class ConsumptionStats with _$ConsumptionStats {
 
     // Work on an immutable, chronologically-ordered copy so callers may
     // pass data in any order.
-    final sorted = [...fillUps]..sort((a, b) => a.date.compareTo(b.date));
+    final sorted = [...fillUps]..sort(comparePhysicalFills);
 
     // #2446 — Total L honesty (Epic #2439 decision #4). The headline
     // "Total L" reflects only what the user actually PUMPED, so
@@ -178,70 +177,33 @@ abstract class ConsumptionStats with _$ConsumptionStats {
 
     final firstOdo = sorted.first.odometerKm;
     final lastOdo = sorted.last.odometerKm;
-    final totalDistance =
-        (lastOdo - firstOdo).clamp(0, double.infinity).toDouble();
+    final totalDistance = (lastOdo - firstOdo)
+        .clamp(0, double.infinity)
+        .toDouble();
 
-    // ─── Window walker ────────────────────────────────────────────────
-    // Every closed window starts at an "opening" fill (the first fill
-    // of the entire list, OR the previous closing plein) and ends at
-    // a closing plein. We accumulate per-window liters/distance/etc.
-    // for fills strictly AFTER the opening — the opening fill's liters
-    // belong to the previous window's tally (or are excluded when the
-    // opening is the very first fill).
-    var closedLitersSum = 0.0;
-    var closedDistanceSum = 0.0;
-    var closedSpend = MoneyTally.empty;
-    var closedUnpricedFills = 0;
-    var closedCorrectionLiters = 0.0;
-    var windowsClosed = 0;
-
-    var openingIndex = 0;
-    var pendingLiters = 0.0;
-    final pendingCost = <(double, String?)>[];
-    var pendingUnpriced = 0;
-    var pendingCorrectionLiters = 0.0;
-    var pendingFillCount = 0; // fills strictly after the opening
-
-    for (var i = 1; i < sorted.length; i++) {
-      final fill = sorted[i];
-      pendingLiters += fill.liters;
-      pendingFillCount += 1;
-      if (fill.isCorrection) {
-        pendingCorrectionLiters += fill.liters;
-      } else if (fill.totalCost > 0) {
-        pendingCost.add(fill.bookedSpend);
-      } else {
-        pendingUnpriced += 1;
-      }
-      if (fill.isFullTank) {
-        // Window closes here.
-        final dist = (fill.odometerKm - sorted[openingIndex].odometerKm)
-            .clamp(0, double.infinity)
-            .toDouble();
-        closedLitersSum += pendingLiters;
-        closedDistanceSum += dist;
-        for (final (amount, currency) in pendingCost) {
-          closedSpend = closedSpend.plus(amount, currency);
-        }
-        closedUnpricedFills += pendingUnpriced;
-        closedCorrectionLiters += pendingCorrectionLiters;
-        windowsClosed += 1;
-
-        openingIndex = i;
-        pendingLiters = 0;
-        pendingCost.clear();
-        pendingUnpriced = 0;
-        pendingCorrectionLiters = 0;
-        pendingFillCount = 0;
-      }
-    }
-
-    // Anything left in the "pending" buckets after the loop belongs to
-    // the in-progress (open) window — i.e. fills logged after the most
-    // recent plein. These are EXCLUDED from the average but surfaced
-    // separately so the UI can warn the user.
-    final openWindowFillCount = pendingFillCount;
-    final openWindowLiters = pendingLiters;
+    // #4469 — report, reference and stats share qualified physical windows.
+    // Accounting corrections stay visible but are never pump-measured fuel.
+    final windows = physicalTankWindows(sorted);
+    final closedFills = [for (final w in windows.closed) ...w.fills];
+    final physicalClosed = closedFills.where((f) => !f.isCorrection).toList();
+    final closedLitersSum = windows.closed.fold(0.0, (n, w) => n + w.liters);
+    final closedDistanceSum = windows.closed.fold(
+      0.0,
+      (n, w) => n + w.distanceKm,
+    );
+    final closedSpend = MoneyTally.of([
+      for (final f in physicalClosed)
+        if (f.totalCost > 0) f.bookedSpend,
+    ]);
+    final closedUnpricedFills = physicalClosed
+        .where((f) => f.totalCost <= 0)
+        .length;
+    final closedCorrectionLiters = closedFills
+        .where((f) => f.isCorrection)
+        .fold(0.0, (n, f) => n + f.liters);
+    final windowsClosed = windows.closed.length;
+    final openWindowFillCount = windows.pending.length;
+    final openWindowLiters = windows.pending.fold(0.0, (n, f) => n + f.liters);
 
     double? avgL100;
     double? avgCostKm;
@@ -269,7 +231,7 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     // all-plein case, walk the closed windows again for fuel-type-aware
     // CO2 — same fills the liter walker already counted.
     if (closedDistanceSum > 0) {
-      final closedCo2 = _closedWindowsCo2(sorted);
+      final closedCo2 = Co2Calculator.cumulativeCo2(physicalClosed);
       if (closedCo2 > 0) {
         avgCo2Km = closedCo2 / closedDistanceSum;
       }
@@ -288,7 +250,9 @@ abstract class ConsumptionStats with _$ConsumptionStats {
     // [totalLiters] no longer carries correction litres.
     final litersInclCorrections = totalLiters + closedCorrectionLiters;
     final correctionShare = litersInclCorrections > 0
-        ? (closedCorrectionLiters / litersInclCorrections).clamp(0, 1).toDouble()
+        ? (closedCorrectionLiters / litersInclCorrections)
+              .clamp(0, 1)
+              .toDouble()
         : 0.0;
 
     debugPrint(
@@ -323,27 +287,5 @@ abstract class ConsumptionStats with _$ConsumptionStats {
       pricedLiters: pricedLiters,
       closedWindowCount: windowsClosed,
     );
-  }
-
-  /// Sum CO2 across fills inside CLOSED plein-to-plein windows — i.e.
-  /// every fill EXCEPT the first one and the in-progress tail after
-  /// the latest plein. Mirrors the liter walker so per-km math stays
-  /// internally consistent.
-  static double _closedWindowsCo2(List<FillUp> sorted) {
-    if (sorted.length < 2) return 0;
-    // Find the index of the LAST plein-complet — fills after it are
-    // the open window and don't count.
-    var lastPleinIdx = -1;
-    for (var i = sorted.length - 1; i >= 0; i--) {
-      if (sorted[i].isFullTank) {
-        lastPleinIdx = i;
-        break;
-      }
-    }
-    if (lastPleinIdx <= 0) return 0;
-    // Fills 1..lastPleinIdx (inclusive) — first is excluded as the
-    // opening of the first window.
-    final closedFills = sorted.sublist(1, lastPleinIdx + 1);
-    return Co2Calculator.cumulativeCo2(closedFills);
   }
 }

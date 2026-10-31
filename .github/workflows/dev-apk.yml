@@ -1,5 +1,6 @@
 # Copyright (c) 2026 Florian DITTGEN
 # SPDX-License-Identifier: AGPL-3.0-or-later
+# Documentation: docs/ci/workflows/dev-apk.md
 
 name: Tools · Dev APK (arm64)
 
@@ -26,8 +27,8 @@ on:
         type: string
 
 concurrency:
-  group: dev-apk-${{ github.event.inputs.ref }}
-  cancel-in-progress: true
+  group: dev-apk-${{ inputs.ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -37,27 +38,40 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - id: source
+        name: Resolve requested source once
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_REF: ${{ inputs.ref || github.sha }}
+        run: |
+          set -euo pipefail
+          SHA=$(gh api "repos/$GITHUB_REPOSITORY/commits/$SOURCE_REF" --jq .sha)
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]]
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.inputs.ref }}
+          persist-credentials: false
+          ref: ${{ steps.source.outputs.sha }}
+      - name: Check out this workflow's shared actions
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: .workflow-tools
+          persist-credentials: false
+
+      - uses: ./.workflow-tools/.github/actions/source-identity
+        with:
+          sha: ${{ steps.source.outputs.sha }}
+          leg: dev-apk
 
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 17
 
-      - uses: subosito/flutter-action@v2
+      - uses: ./.workflow-tools/.github/actions/flutter-setup
         with:
-          channel: stable
-          cache: true
-
-      - uses: actions/cache@v6
-        with:
-          path: |
-            ~/.pub-cache
-            .dart_tool
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
+          resolve: 'false'
 
       - name: Decode signing keystore
         env:

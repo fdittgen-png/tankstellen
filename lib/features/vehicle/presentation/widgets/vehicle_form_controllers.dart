@@ -39,8 +39,8 @@ class VehicleFormControllers {
   // pick (no-clobber: only when the user hasn't typed a value), fully
   // editable. PS is derived for display, never stored.
   final powerKwController = TextEditingController();
-  // #710 — pre-fill E10 so the Preferred-fuel dropdown isn't "Not set".
-  final fuelTypeController = TextEditingController(text: 'e10');
+  // #4513 — unknown fuel stays unset; never invent a profile override.
+  final fuelTypeController = TextEditingController();
   final minSocController = TextEditingController(text: '20');
   final maxSocController = TextEditingController(text: '80');
   final vinController = TextEditingController();
@@ -138,18 +138,12 @@ class VehicleFormControllers {
       fuelCompatibilityFamily(fuel) == FuelCompatibilityFamily.petrol &&
       (fuel == FuelType.e10 || fuel == FuelType.e85);
 
-  static String _preferredFuelTypeFor(String catalogFuelType) {
-    switch (catalogFuelType.toLowerCase()) {
-      case 'diesel':
-        return 'diesel';
-      case 'electric':
-        return '';
-      case 'hybrid':
-      case 'petrol':
-      default:
-        return 'e10';
-    }
-  }
+  static String _preferredFuelTypeFor(String catalogFuelType) =>
+      switch (catalogFuelType.toLowerCase()) {
+        'diesel' => 'diesel',
+        'hybrid' || 'petrol' => 'e10',
+        _ => '',
+      };
 
   /// Construct a [VehicleProfile] from the current controller values
   /// combined with the non-controller state passed in by the caller.
