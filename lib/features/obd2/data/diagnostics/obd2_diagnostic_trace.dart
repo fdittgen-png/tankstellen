@@ -145,7 +145,7 @@ class Obd2DiagnosticTrace {
   void _noteDtcs(String command, String reply) {
     final c = command.toUpperCase();
     if (c != '03' && c != '07' && c != '0A' && c != '020200') return;
-    if (reply.toUpperCase().contains('NO DATA')) return;
+    if (!isCompleteDtcReply(c, reply)) return;
     final codes = decodeDtcReply(c, reply);
     final previous = _lastDtcs[c];
     if (previous != null && listEquals(previous, codes)) return;

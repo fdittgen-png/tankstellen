@@ -80,7 +80,7 @@ void main() {
       reply('0106', '41 06 88');
       reply('0106', '41 06 90', 9000);
       expect(signal('stftBank1')['maxGapMs'], 8000);
-    expect(signal('stftBank1')['maxAtEpochMs'], 9000);
+      expect(signal('stftBank1')['maxAtEpochMs'], 9000);
       expect(
         (evidence.toJson()['fuelSystemStatus'] as Map)['counts'],
         containsPair('system1_0x02', 1),
@@ -92,4 +92,17 @@ void main() {
       expect(evidence.toJson()['malformedLines'], 1);
     },
   );
+  test('truncated positive replies do not clear codes or claim usable readings', () {
+    reply('03', '43 01 71');
+    reply('03', '43', 2000);
+    reply('03', '43 02 01 71', 3000);
+    reply('0124', '41 24 80');
+    final stored = (evidence.toJson()['faults'] as Map)['stored'] as Map;
+    expect(stored['latestCodes'], ['P0171']);
+    expect(stored['outcomes'], {'answered': 1, 'invalidReply': 2});
+    expect((evidence.toJson()['faults'] as Map)['changes'], hasLength(1));
+    expect(signal('widebandVoltageSensor1Phi')['status'], 'requestedWithoutUsableReply');
+    expect(signal('widebandVoltageSensor1Phi')['outcomes'], {'invalidReply': 1});
+  });
+
 }

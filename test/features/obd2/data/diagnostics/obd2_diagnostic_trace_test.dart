@@ -136,4 +136,14 @@ void main() {
       expect(Obd2DiagnosticTrace.current, isNull);
     },
   );
+  test('a truncated DTC response never publishes a false cleared-code mark', () async {
+    final trace = (await Obd2DiagnosticTrace.begin(header: {}, directory: dir))!;
+    await trace.observe('03', Future.value('43 01 01 71>'));
+    await trace.observe('03', Future.value('43>'));
+    await Obd2DiagnosticTrace.end();
+    final marks = lines(trace.file).where((m) => m['p'] == 'dtc').toList();
+    expect(marks, hasLength(1));
+    expect(marks.single['codes'], ['P0171']);
+  });
+
 }

@@ -73,16 +73,20 @@ class DiagnosticEvidence {
       final pid = int.tryParse(c.substring(2), radix: 16);
       final b = pid == null ? null : mode01Bytes(r, pid);
       if (b != null) {
-        outcome = 'answered';
         for (final d in healthSignalDefinitions.where((d) => d.pid == pid)) {
           if (b.length < d.bytes) continue;
           final value = d.decode(b);
           if (value != null && value.isFinite && t != null) {
             (_signals[d.name] ??= _Signal()).add(value, t);
+            outcome = 'answered';
           }
         }
-        if (pid == 0x13 || pid == 0x1D) _oxygenPresence[c] = b[0];
-        if (pid == 0x03) {
+        if (pid == 0x13 || pid == 0x1D) {
+          _oxygenPresence[c] = b[0];
+          outcome = 'answered';
+        }
+        if (pid == 0x03 && b.length >= 2) {
+          outcome = 'answered';
           for (var bank = 0; bank < b.length && bank < 2; bank++) {
             final state =
                 'system${bank + 1}_0x${b[bank].toRadixString(16).padLeft(2, '0')}';
@@ -90,6 +94,7 @@ class DiagnosticEvidence {
           }
         }
         if (pid == 0x01 && b.length >= 4) {
+          outcome = 'answered';
           _mil = b[0] & 0x80 != 0;
           _reportedDtcCount = b[0] & 0x7F;
           _readinessBytes = b.take(4).toList();
@@ -104,14 +109,7 @@ class DiagnosticEvidence {
         outcome = 'answered';
       }
     } else if (const ['03', '07', '0A', '020200'].contains(c)) {
-      final echo = c == '020200'
-          ? '42 02'
-          : c == '03'
-          ? '43'
-          : c == '07'
-          ? '47'
-          : '4A';
-      if (RegExp('(^|[\\s|:])$echo([\\s|>]|\$)').hasMatch(r)) {
+      if (isCompleteDtcReply(c, r)) {
         final codes = decodeDtcReply(c, r.replaceAll('|', '\n'));
         (_dtcs[c] ??= {}).addAll(codes);
         if (jsonEncode(_latestDtcs[c]) != jsonEncode(codes)) {
