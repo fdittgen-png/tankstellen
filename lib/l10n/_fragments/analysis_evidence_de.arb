@@ -1,0 +1,14 @@
+{
+  "analysisLowGearInferredTitle": "Geschätzter niedriger Gang ({minutes} Min.)",
+  "analysisLowGearAdvice": "Bei passender Last und Straßenlage kann ein höherer Gang die Drehzahl senken. Diese Schätzung weist kein Fahren mit zu niedriger Drehzahl nach.",
+  "analysisHighRpmAdvice": "Zeit über 3000 U/min ist ein heuristischer Hinweis, kein Nachweis falscher Fahrweise. Motor, Last und Straßenlage sind zu berücksichtigen.",
+  "analysisClimbContextAdvice": "Steigungen benötigen auch bei ruhiger Fahrweise mehr Energie. Diese Streckenkosten sind kein Fahrfehler.",
+  "analysisRestartContextAdvice": "Verkehr oder Ampeln können diese Stopps erfordern. Der Energiebedarf beweist nicht, dass die Stopps vermeidbar waren.",
+  "analysisFuelTrimAddition": "Positive gesamte Kraftstoffkorrektur; mittlerer LTFT-Betrag {pctTrim} %",
+  "analysisFuelTrimRemoval": "Negative gesamte Kraftstoffkorrektur; mittlerer LTFT-Betrag {pctTrim} %",
+  "analysisFuelTrimAdvice": "Das Steuergerät passt die Kraftstoffzufuhr an. Dies weist weder ein defektes Bauteil noch ein weiterhin zu mageres oder fettes Gemisch nach. Messwerte, Betriebszustand und Fehlercodes prüfen.",
+  "analysisCommandedEnrichment": "Steuergerät fordert Anreicherung an ({pctShare} % der warmen Messwerte)",
+  "analysisCommandedEnrichmentAdvice": "Anreicherung kann den Motor unter Last schützen. Die Aufzeichnung allein weist weder einen Defekt noch vermeidbaren Mehrverbrauch nach.",
+  "analysisCommandedEnrichmentTrip": "Steuergerät fordert Anreicherung an ({pctShare} % der Fahrtdauer)",
+  "analysisTransmissionScope": "Standard-OBD-Beobachtungen beurteilen weder ein automatisiertes Schaltgetriebe noch die Stellkraft. Für einen fehlgeschlagenen Gangwechsel sind getriebespezifische Fehler sowie Soll- und Istwerte von Gang, Kupplung und Schaltung nötig."
+}

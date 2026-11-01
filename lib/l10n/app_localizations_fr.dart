@@ -3459,6 +3459,59 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Rapport court estimé ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'Un rapport supérieur peut réduire le régime si la charge et la route le permettent. Cette estimation ne prouve pas un sous-régime.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Le temps au-dessus de 3 000 tr/min est un indicateur heuristique, pas une preuve de mauvais usage. Tenir compte du moteur, de la charge et de la route.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Une montée demande davantage d’énergie même avec une conduite fluide. Ce coût du parcours n’est pas une faute de conduite.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'La circulation ou la signalisation ont pu imposer ces arrêts. Leur coût énergétique ne prouve pas qu’ils étaient évitables.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Correction totale positive du carburant ; amplitude moyenne LTFT $pctTrim %';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Correction totale négative du carburant ; amplitude moyenne LTFT $pctTrim %';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'Le calculateur ajuste l’injection. Cela ne désigne pas une pièce défaillante et ne prouve pas que le mélange final reste pauvre ou riche. Vérifier les valeurs enregistrées, les conditions moteur et les codes défaut.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'Enrichissement commandé par le calculateur ($pctShare % des lectures moteur chaud)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'L’enrichissement peut protéger le moteur sous charge. Cet enregistrement seul ne démontre ni un défaut ni un gaspillage évitable.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'Enrichissement commandé ($pctShare % de la durée du trajet)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Les observations OBD standard n’évaluent ni une boîte robotisée ni la force des actionneurs. Un refus de passage nécessite les défauts propres à la boîte et les consignes comparées aux valeurs réelles du rapport, de l’embrayage et de la sélection.';
+
+  @override
   String get approachOverlaySection => 'Overlay à l\'approche d\'une station';
 
   @override
@@ -4576,25 +4629,12 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Sous-régime en rapport bas ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Coupez le moteur lors des arrêts prolongés au lieu de le laisser tourner au ralenti.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Passez les rapports plus tôt pour garder le moteur hors de la plage de régime élevé.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Accélérez en douceur : une accélération progressive consomme moins de carburant.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Passez la vitesse supérieure plus tôt pour que le moteur tourne à un régime plus bas et plus économique.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4627,10 +4667,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Une charge lourde et prolongée enrichit le mélange — passez les vitesses tôt et réduisez l\'accélération dans les longues montées pour maintenir un mélange pauvre.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4640,58 +4676,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Prenez de l\'élan avant la côte et appuyez progressivement sur l\'accélérateur — accélérer en montée brûle du carburant supplémentaire.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count redémarrages stop-and-go : $liters L gaspillés';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Anticipez le trafic et laissez rouler vers les arrêts pour éviter de redémarrer — repartir d\'un arrêt complet est la phase la plus gourmande du stop-and-go.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Le mélange semble un peu pauvre — le moteur a ajouté du carburant (correction de $pctTrim %) pour compenser';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Le mélange semble pauvre — le moteur a maintenu un ajout de carburant important de $pctTrim %, une inefficacité possible';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Le mélange semble un peu riche — le moteur a retiré du carburant (correction de $pctTrim %) pour compenser';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Le mélange semble riche — le moteur a maintenu une réduction de carburant importante de $pctTrim %, une inefficacité possible';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Le moteur a roulé riche sous charge ($pctShare % du trajet à chaud) — carburant possiblement gaspillé';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Signal de santé heuristique, pas un diagnostic';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Une correction prolongée vers un mélange trop pauvre peut indiquer une prise d\'air à l\'admission, une alimentation en carburant faible ou un capteur vieillissant. Si la consommation ou l\'agrément se dégrade, un diagnostic en atelier peut confirmer.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Une correction prolongée vers un mélange trop riche peut indiquer un injecteur qui fuit, une pression de carburant élevée ou un capteur qui surévalue. Si la consommation ou l\'agrément se dégrade, un diagnostic en atelier peut confirmer.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Rouler en mélange riche sous forte charge brûle du carburant en plus. Passez les rapports plus tôt et levez le pied sur les longues accélérations pour que le moteur reste proche d\'un mélange stœchiométrique.';
 
   @override
   String get lessonTransportTitle =>
@@ -4719,11 +4710,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override
@@ -8367,7 +8353,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get obd2ReportDriveNoGear =>
-      'Ce véhicule ne transmet pas le rapport engagé en OBD2 standard : les moments sont détectés à partir de la vitesse, du régime et de la pédale.';
+      'Aucune valeur de rapport exploitable n’a été enregistrée. Les moments affichés sont déduits de la vitesse, du régime et de la pédale ; ils ne démontrent pas un défaut de boîte.';
 
   @override
   String get obd2ReportEngineTitle => 'Moteur';
@@ -8397,12 +8383,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String obd2ReportMixtureRich(String trim) {
-    return 'Les corrections sont en moyenne de $trim % : le moteur tourne riche et le calculateur retire du carburant. Cela correspond à une odeur d’essence : injecteurs, régulateur de pression ou électrovanne de purge.';
+    return 'Les corrections sont en moyenne de $trim % : le calculateur retire du carburant. Cette correction ne prouve ni que le mélange final reste riche ni qu’une pièce est défaillante.';
   }
 
   @override
   String obd2ReportMixtureLean(String trim) {
-    return 'Les corrections sont en moyenne de $trim % : le moteur tourne pauvre et le calculateur ajoute du carburant. Prise d’air possible ou alimentation en carburant faible.';
+    return 'Les corrections sont en moyenne de $trim % : le calculateur ajoute du carburant. Cette correction ne prouve ni que le mélange final reste pauvre ni qu’une pièce est défaillante.';
   }
 
   @override

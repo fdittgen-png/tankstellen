@@ -240,14 +240,10 @@ class BaselineRollingState {
   /// **1.0** when its PID is null, so a car that surfaces none of these
   /// signals sees exactly today's behaviour — no regression:
   ///
-  ///  * **λ-term** ([TripLiveReading.lambda], PID 0x44 commanded
-  ///    equivalence ratio φ = AFR/AFR_stoich): `λ` when `λ ∈ [0.5, 1.5]`,
-  ///    else 1.0. Enrichment (`λ < 1`) injects extra fuel for the same
-  ///    air charge, so scaling the measured rate *down* by λ divides that
-  ///    extra fuel back out and leaves the stoichiometric demand; a lean
-  ///    cruise (`λ > 1`) scales the other way. (An enriched λ=0.9 sample
-  ///    therefore yields a sub-1.0 factor → a lower learned mean than the
-  ///    raw rate, which is the precision win.)
+  ///  * **phi-term** ([TripLiveReading.lambda], legacy field name): PID44
+  ///    stores raw lambda = AFR/AFR_stoich. Multiplying by lambda removes
+  ///    commanded enrichment from the fuel-rate observation. Lambda < 1
+  ///    is rich and yields a factor < 1; lambda > 1 gives a factor > 1. Missing/non-finite/out-of-band values give identity.
   ///  * **trim-term** ([TripLiveReading.stft] PID 0x06 +
   ///    [TripLiveReading.ltft] PID 0x07, each −20..+20 %):
   ///    `(1 + (stft + ltft) / 100)`, clamped to `[0.7, 1.3]` so a
@@ -256,18 +252,17 @@ class BaselineRollingState {
   ///    manifold absolute pressure as an air-density proxy):
   ///    `clamp(mapKpa / 100, 0.6, 1.2)`.
   static double fuelMassCorrectionFactor(TripLiveReading r) {
-    return _lambdaTerm(r.lambda) *
+    return _lambdaNormalization(r.lambda) *
         _trimTerm(r.stft, r.ltft) *
         _densityTerm(r.mapKpa);
   }
 
-  /// λ-term: scale the measured rate by λ so commanded enrichment
-  /// (λ < 1, extra fuel) is divided back out and the baseline reflects
-  /// stoichiometric demand. Identity outside the plausible `[0.5, 1.5]`
-  /// band (or when PID 0x44 is absent).
-  static double _lambdaTerm(double? lambda) {
-    if (lambda == null) return 1;
-    if (lambda < 0.5 || lambda > 1.5) return 1;
+  /// Normalize raw stored lambda to stoichiometric demand, preserving the
+  /// original baseline coefficients and historical normalization convention.
+  static double _lambdaNormalization(double? lambda) {
+    if (lambda == null || !lambda.isFinite || lambda < 0.5 || lambda > 1.5) {
+      return 1;
+    }
     return lambda;
   }
 

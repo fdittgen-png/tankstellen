@@ -35,6 +35,7 @@ library;
 import 'dart:math' as math;
 
 import 'trip_sample.dart';
+import 'fuel_signal_evidence.dart';
 
 /// Event classes the attribution detects. [coasting] is the one
 /// positive class (litres SAVED, not wasted).
@@ -381,8 +382,8 @@ List<FuelEvent> _detectCoasting(List<TripSample> sorted) => _runs(
         // A fuel CUT requires a measured rate — an absent signal must
         // never be praised as coasting.
         final rate = prev.fuelRateLPerHour;
-        return rate != null &&
-            rate <= kFuelCutRateLPerHour &&
+        return isFuelCutObservable(prev) &&
+            rate! <= kFuelCutRateLPerHour &&
             prev.speedKmh >= kCoastingMinSpeedKmh;
       },
       minSeconds: kCoastingMinSeconds,

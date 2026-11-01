@@ -166,9 +166,9 @@ List<DrivingInsight> analyzeTrip(
     }
 
     // λ-enrichment cost: commanded mixture richer than stoichiometric
-    // (λ < 1). The extra fuel over a stoich counterfactual is the waste.
+    // (stored lambda < 1). The extra fuel over a stoich counterfactual is the waste.
     final lambda = prev.lambda;
-    if (lambda != null && lambda > 0 && lambda < 1.0) {
+    if (isRichCommandedLambda(lambda)) {
       lambdaEnrichSeconds += dt;
       final measuredRate = prev.fuelRateLPerHour;
       if (measuredRate != null && measuredRate > 0) {

@@ -122,10 +122,11 @@ class _ReportBody extends StatelessWidget {
   Obd2ReportSystemCard _drive(AppLocalizations l) {
     final t = report.transmission;
     final lines = <String>[
+      l.analysisTransmissionScope,
       if (t.verdict == HealthVerdict.good) l.obd2ReportDriveGood,
       if (t.episodes.isNotEmpty)
         l.obd2ReportDriveEpisodes(formatWhole(t.episodes.length)),
-      if (t.verdict != HealthVerdict.notReported && !t.gearReported)
+      if (!t.gearReported)
         l.obd2ReportDriveNoGear,
     ];
     final details = [

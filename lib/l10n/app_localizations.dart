@@ -6094,6 +6094,78 @@ abstract class AppLocalizations {
     String consumption,
   );
 
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Inferred low gear ({minutes} min)'**
+  String analysisLowGearInferredTitle(String minutes);
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.'**
+  String get analysisLowGearAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.'**
+  String get analysisHighRpmAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.'**
+  String get analysisClimbContextAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.'**
+  String get analysisRestartContextAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive combined fuel correction; mean LTFT magnitude {pctTrim}%'**
+  String analysisFuelTrimAddition(String pctTrim);
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative combined fuel correction; mean LTFT magnitude {pctTrim}%'**
+  String analysisFuelTrimRemoval(String pctTrim);
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.'**
+  String get analysisFuelTrimAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'ECU commanded enrichment ({pctShare}% of warm samples)'**
+  String analysisCommandedEnrichment(String pctShare);
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.'**
+  String get analysisCommandedEnrichmentAdvice;
+
+  /// Neutral commanded lambda enrichment exposure over total trip duration, not proof of avoidable waste.
+  ///
+  /// In en, this message translates to:
+  /// **'ECU commanded enrichment ({pctShare}% of trip duration)'**
+  String analysisCommandedEnrichmentTrip(String pctShare);
+
+  /// Limits of standard OBD for robotized-transmission diagnosis (#4572).
+  ///
+  /// In en, this message translates to:
+  /// **'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.'**
+  String get analysisTransmissionScope;
+
   /// Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661).
   ///
   /// In en, this message translates to:
@@ -7821,35 +7893,17 @@ abstract class AppLocalizations {
   /// **'+{liters} L'**
   String insightTrailingLitersWasted(String liters);
 
-  /// Coaching line on the driving-insights card when secondsBelowOptimalGear > 60 (#1263 phase 3). Tells the driver they spent significant time in too-low a gear, raising fuel consumption. Placeholder is the integer minute count.
-  ///
-  /// In en, this message translates to:
-  /// **'Labouring in low gear ({minutes} min)'**
-  String insightLowGear(String minutes);
-
   /// How-to-improve advice for the idling lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export; the trip-detail card keeps its existing percent-of-trip caption.
   ///
   /// In en, this message translates to:
   /// **'Turn the engine off at long stops instead of letting it idle.'**
   String get lessonAdviceIdling;
 
-  /// How-to-improve advice for the high-RPM lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export.
-  ///
-  /// In en, this message translates to:
-  /// **'Shift up earlier to keep the engine out of the high-RPM band.'**
-  String get lessonAdviceHighRpm;
-
   /// How-to-improve advice for the hard-acceleration lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export.
   ///
   /// In en, this message translates to:
   /// **'Ease onto the throttle — smooth acceleration uses less fuel.'**
   String get lessonAdviceHardAccel;
-
-  /// How-to-improve advice for the low-gear lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export.
-  ///
-  /// In en, this message translates to:
-  /// **'Shift up sooner so the engine settles into a lower, more efficient gear.'**
-  String get lessonAdviceLowGear;
 
   /// High-speed-band lesson headline (#2287) for trips with no fuel-consumption figure (GPS-only / no fuel-rate PID) — same coaching without the wasted-litres clause.
   ///
@@ -7893,12 +7947,6 @@ abstract class AppLocalizations {
   /// **'Rich mixture under load ({pctTime}% of trip): wasted {liters} L'**
   String insightLambdaEnrichment(String pctTime, String liters);
 
-  /// How-to-improve advice for the lambda-enrichment lesson (#2461). Embedded in the GPX recording export.
-  ///
-  /// In en, this message translates to:
-  /// **'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.'**
-  String get lessonAdviceLambdaEnrichment;
-
   /// Cost-line copy for the climbing-fuel insight on the Trip detail screen (#2693 C6) — extra fuel burned over a flat-road counterfactual while on a confident uphill grade. Placeholders are pre-formatted strings.
   ///
   /// In en, this message translates to:
@@ -7909,77 +7957,17 @@ abstract class AppLocalizations {
     String liters,
   );
 
-  /// How-to-improve advice for the climbing-fuel lesson (#2693 C6). Embedded in the GPX recording export.
-  ///
-  /// In en, this message translates to:
-  /// **'Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.'**
-  String get lessonAdviceClimbingCost;
-
   /// Cost-line copy for the stop-and-go restart insight on the Trip detail screen (#2694 C8) — extra fuel from accelerating a fully-stopped car back up to speed. Placeholders are pre-formatted strings.
   ///
   /// In en, this message translates to:
   /// **'{count} stop-and-go restarts: wasted {liters} L'**
   String insightRestartCost(String count, String liters);
 
-  /// How-to-improve advice for the stop-and-go restart lesson (#2694 C8). Embedded in the GPX recording export.
-  ///
-  /// In en, this message translates to:
-  /// **'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.'**
-  String get lessonAdviceRestartCost;
-
-  /// Combustion-health HEURISTIC headline (#2931), borderline lean case. Deliberately tentative ('looks a little lean', 'compensate') — a coarse health signal from sustained positive fuel trim, NOT a diagnosis of a fault. Placeholder is the pre-formatted mean total-trim percent.
-  ///
-  /// In en, this message translates to:
-  /// **'Mixture looks a little lean — the engine added fuel ({pctTrim}% trim) to compensate'**
-  String lessonCombustionHealthLeanBorderline(String pctTrim);
-
-  /// Combustion-health HEURISTIC headline (#2931), marked lean case (large sustained positive trim). Still tentative ('looks', 'possible inefficiency') — never claims a definite fault. Placeholder is the pre-formatted mean total-trim percent.
-  ///
-  /// In en, this message translates to:
-  /// **'Mixture looks lean — the engine sustained a large {pctTrim}% fuel addition, a possible inefficiency'**
-  String lessonCombustionHealthLeanMarked(String pctTrim);
-
-  /// Combustion-health HEURISTIC headline (#2931), borderline rich case. Deliberately tentative — a coarse health signal from sustained negative fuel trim, NOT a diagnosis. Placeholder is the pre-formatted mean total-trim percent (magnitude).
-  ///
-  /// In en, this message translates to:
-  /// **'Mixture looks a little rich — the engine pulled fuel ({pctTrim}% trim) to compensate'**
-  String lessonCombustionHealthRichBorderline(String pctTrim);
-
-  /// Combustion-health HEURISTIC headline (#2931), marked rich case (large sustained negative trim). Still tentative ('looks', 'possible inefficiency') — never claims a definite fault. Placeholder is the pre-formatted mean total-trim percent (magnitude).
-  ///
-  /// In en, this message translates to:
-  /// **'Mixture looks rich — the engine sustained a large {pctTrim}% fuel cut, a possible inefficiency'**
-  String lessonCombustionHealthRichMarked(String pctTrim);
-
-  /// Combustion-health HEURISTIC headline (#2931), commanded-enrichment case — the ECU commanded a rich mixture (lambda < 1) for a large share of the warm engine window. Tentative ('possible wasted fuel'). Placeholder is the pre-formatted percent of the warm drive spent enriched.
-  ///
-  /// In en, this message translates to:
-  /// **'Engine ran rich under load ({pctShare}% of the warm drive) — possible wasted fuel'**
-  String lessonCombustionHealthEnrichment(String pctShare);
-
   /// Subtitle under every combustion-health lesson (#2931) making it explicit that the line is a coarse heuristic from fuel trims / commanded lambda, NOT a per-cylinder diagnosis or a diagnostic certainty.
   ///
   /// In en, this message translates to:
   /// **'Heuristic health signal, not a diagnosis'**
   String get lessonCombustionHealthSubtitle;
-
-  /// How-to-improve advice for the lean combustion-health heuristic (#2931). Frames it as a heads-up to confirm with a proper scan, never as a definite fault. Embedded in the GPX recording export.
-  ///
-  /// In en, this message translates to:
-  /// **'A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.'**
-  String get lessonAdviceCombustionHealthLean;
-
-  /// How-to-improve advice for the rich combustion-health heuristic (#2931). Frames it as a heads-up to confirm with a proper scan, never as a definite fault. Embedded in the GPX recording export.
-  ///
-  /// In en, this message translates to:
-  /// **'A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.'**
-  String get lessonAdviceCombustionHealthRich;
-
-  /// How-to-improve advice for the commanded-enrichment combustion-health heuristic (#2931). Points at the driving that triggers enrichment. Embedded in the GPX recording export.
-  ///
-  /// In en, this message translates to:
-  /// **'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.'**
-  String get lessonAdviceCombustionHealthEnrichment;
 
   /// #3599 info lesson: the engine reported no activity while the car covered real distance — cause unknown (failed OBD2 stream, or the car moved without driving); shown instead of coaching
   ///
@@ -8016,12 +8004,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Full throttle ({pctTime}% of trip)'**
   String insightFullThrottleShare(String pctTime);
-
-  /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
-  ///
-  /// In en, this message translates to:
-  /// **'Rich mixture under load ({pctTime}% of trip)'**
-  String insightLambdaEnrichmentShare(String pctTime);
 
   /// #4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.
   ///
@@ -13673,7 +13655,7 @@ abstract class AppLocalizations {
   /// Drive card note (#4552).
   ///
   /// In en, this message translates to:
-  /// **'This car does not report the selected gear over standard OBD2, so moments are detected from speed, engine speed and pedal.'**
+  /// **'No usable gear reading was recorded. The displayed moments are inferred from speed, engine speed and pedal; they do not establish a gearbox fault.'**
   String get obd2ReportDriveNoGear;
 
   /// Card title (#4552).
@@ -13715,13 +13697,13 @@ abstract class AppLocalizations {
   /// Mixture card, rich (#4552).
   ///
   /// In en, this message translates to:
-  /// **'Fuel trims average {trim} %: the engine runs rich and the computer is removing fuel. This fits a fuel smell — injectors, fuel-pressure regulator or the purge valve.'**
+  /// **'Fuel trims average {trim} %: the ECU is removing fuel. This correction does not establish that the final mixture remains rich or identify a failed component.'**
   String obd2ReportMixtureRich(String trim);
 
   /// Mixture card, lean (#4552).
   ///
   /// In en, this message translates to:
-  /// **'Fuel trims average {trim} %: the engine runs lean and the computer is adding fuel — possible air leak or weak fuel delivery.'**
+  /// **'Fuel trims average {trim} %: the ECU is adding fuel. This correction does not establish that the final mixture remains lean or identify a failed component.'**
   String obd2ReportMixtureLean(String trim);
 
   /// Card title (#4552).

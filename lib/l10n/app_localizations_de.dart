@@ -3448,6 +3448,59 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Geschätzter niedriger Gang ($minutes Min.)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'Bei passender Last und Straßenlage kann ein höherer Gang die Drehzahl senken. Diese Schätzung weist kein Fahren mit zu niedriger Drehzahl nach.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Zeit über 3000 U/min ist ein heuristischer Hinweis, kein Nachweis falscher Fahrweise. Motor, Last und Straßenlage sind zu berücksichtigen.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Steigungen benötigen auch bei ruhiger Fahrweise mehr Energie. Diese Streckenkosten sind kein Fahrfehler.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Verkehr oder Ampeln können diese Stopps erfordern. Der Energiebedarf beweist nicht, dass die Stopps vermeidbar waren.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive gesamte Kraftstoffkorrektur; mittlerer LTFT-Betrag $pctTrim %';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative gesamte Kraftstoffkorrektur; mittlerer LTFT-Betrag $pctTrim %';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'Das Steuergerät passt die Kraftstoffzufuhr an. Dies weist weder ein defektes Bauteil noch ein weiterhin zu mageres oder fettes Gemisch nach. Messwerte, Betriebszustand und Fehlercodes prüfen.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'Steuergerät fordert Anreicherung an ($pctShare % der warmen Messwerte)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Anreicherung kann den Motor unter Last schützen. Die Aufzeichnung allein weist weder einen Defekt noch vermeidbaren Mehrverbrauch nach.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'Steuergerät fordert Anreicherung an ($pctShare % der Fahrtdauer)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard-OBD-Beobachtungen beurteilen weder ein automatisiertes Schaltgetriebe noch die Stellkraft. Für einen fehlgeschlagenen Gangwechsel sind getriebespezifische Fehler sowie Soll- und Istwerte von Gang, Kupplung und Schaltung nötig.';
+
+  @override
   String get approachOverlaySection => 'Tankstellen-Radar';
 
   @override
@@ -4558,25 +4611,12 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Im niedrigen Gang gefahren ($minutes Min.)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Bei längeren Stopps den Motor ausschalten statt im Leerlauf laufen zu lassen.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Früher hochschalten, um den Motor aus dem hohen Drehzahlbereich zu halten.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Sanfter Gas geben – gleichmäßiges Beschleunigen spart Sprit.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4610,10 +4650,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Hohe Dauerlast lässt den Motor anfetten – früher hochschalten und an langen Steigungen Gas wegnehmen, damit das Gemisch mager bleibt.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4623,58 +4659,13 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Vor Steigungen Schwung mitnehmen und gleichmäßig Gas geben – schub­weises Beschleunigen am Berg kostet zusätzlich Sprit.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count Anfahrten aus dem Stand: $liters L verschwendet';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Vorausschauend fahren und vor Stopps ausrollen, statt anzuhalten – das Anfahren aus dem Stand verbraucht im Stop-and-go am meisten.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Gemisch wirkt etwas mager – der Motor hat zum Ausgleich Sprit zugegeben ($pctTrim% Korrektur)';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Gemisch wirkt mager – der Motor hielt dauerhaft eine große Spritzugabe von $pctTrim% – mögliche Ineffizienz';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Gemisch wirkt etwas fett – der Motor hat zum Ausgleich Sprit weggenommen ($pctTrim% Korrektur)';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Gemisch wirkt fett – der Motor hielt dauerhaft eine große Spritreduktion von $pctTrim% – mögliche Ineffizienz';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Motor lief unter Last fett ($pctShare% der warmen Fahrt) – möglicherweise verschwendeter Sprit';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristisches Gesundheitssignal, keine Diagnose';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Eine dauerhafte Magerkorrektur kann auf ein Falschluftleck, eine schwache Spritzufuhr oder einen alternden Sensor hindeuten. Bei steigendem Verbrauch oder schlechterem Lauf bringt eine Werkstattdiagnose Klarheit.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Eine dauerhafte Fettkorrektur kann auf eine undichte Einspritzdüse, zu hohen Spritdruck oder einen falsch messenden Sensor hindeuten. Bei steigendem Verbrauch oder schlechterem Lauf bringt eine Werkstattdiagnose Klarheit.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Fettes Laufen unter hoher Last verbraucht zusätzlich Sprit. Früher hochschalten und bei langen Zügen Gas wegnehmen, damit der Motor näher am stöchiometrischen Gemisch bleibt.';
 
   @override
   String get lessonTransportTitle =>
@@ -4702,11 +4693,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Vollgas ($pctTime% der Fahrt)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Fettes Gemisch unter Last ($pctTime% der Fahrt)';
   }
 
   @override
@@ -8336,7 +8322,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2ReportDriveNoGear =>
-      'Dieses Auto meldet den eingelegten Gang nicht über Standard-OBD2; die Momente werden aus Geschwindigkeit, Drehzahl und Pedal erkannt.';
+      'Es wurde kein nutzbarer Gangwert aufgezeichnet. Die angezeigten Momente werden aus Geschwindigkeit, Drehzahl und Pedal abgeleitet; sie belegen keinen Getriebefehler.';
 
   @override
   String get obd2ReportEngineTitle => 'Motor';
@@ -8366,12 +8352,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String obd2ReportMixtureRich(String trim) {
-    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: der Motor läuft fett und das Steuergerät nimmt Kraftstoff weg. Das passt zu Benzingeruch — Einspritzdüsen, Druckregler oder Tankentlüftungsventil.';
+    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: das Steuergerät nimmt Kraftstoff weg. Diese Korrektur belegt weder ein weiterhin fettes Gemisch noch ein defektes Bauteil.';
   }
 
   @override
   String obd2ReportMixtureLean(String trim) {
-    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: der Motor läuft mager und das Steuergerät gibt Kraftstoff dazu — mögliches Falschluft-Leck oder schwache Kraftstoffversorgung.';
+    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: das Steuergerät gibt Kraftstoff dazu. Diese Korrektur belegt weder ein weiterhin mageres Gemisch noch ein defektes Bauteil.';
   }
 
   @override

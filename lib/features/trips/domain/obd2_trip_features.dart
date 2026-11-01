@@ -2,8 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../../obd2/api.dart'
-    show SignalPlausibility, classifyBaroKpa, classifyCommandedPhi;
+    show SignalPlausibility, classifyBaroKpa, classifyCommandedLambda;
 import 'trip_sample.dart';
+import 'trip_fuel_source.dart';
+import 'obd2_health_features.dart';
+import 'obd2_signal_distribution.dart';
+export 'obd2_signal_distribution.dart';
 
 /// Per-trip aggregate of the **OBD2** telemetry a trip actually captured —
 /// the engine-side counterpart to [GpsDrivingFeatures] (#3402 child 1).
@@ -34,8 +38,10 @@ class Obd2TripFeatures {
   final double obd2Coverage;
 
   /// Where the trip's fuel figure came from:
-  /// - `measured` — at least one real fuel PID landed (PID 5E / MAF / MAP).
-  /// - `estimated` — no fuel PID; the GPS-physics fallback supplied it.
+  /// - `measured` — fuel rate comes directly from ECU fuel-flow PIDs.
+  /// - `estimated` — MAF, speed-density or GPS-derived fuel.
+  /// - `mixed` — direct ECU rates and estimates both occurred.
+  /// - `unknown` — fuel samples lack provenance (legacy trips).
   /// - `none` — neither; no per-distance fuel figure is meaningful.
   final Obd2FuelSource fuelSource;
 
@@ -69,7 +75,7 @@ class Obd2TripFeatures {
   /// burns proportionally more fuel for warm-up.
   final bool reachedOperatingTemp;
 
-  /// Measured wideband equivalence ratio φ (PIDs 0x24–0x2B / 0x34–0x3B,
+  /// Measured wideband raw lambda (legacy Phi name; PIDs 0x24–0x2B / 0x34–0x3B,
   /// #3427 / #3433). All-null on cars without a wideband sensor.
   final Obd2SignalDistribution measuredPhi;
 
@@ -91,19 +97,22 @@ class Obd2TripFeatures {
 
   /// Per-signal capture fraction: for each OBD2 field, the share of samples
   /// that carried it. This is the at-a-glance "what did this adapter / ECU
-  /// actually expose" map — a `0.0` means the PID is unsupported (or the link
-  /// was down), a `1.0` a fully-streamed signal.
+  /// actually expose" map — a `0.0` means no value was stored, which alone does not prove
+  /// the PID is unsupported, a `1.0` a fully-streamed signal.
   final Map<String, double> signalCoverage;
 
   /// #4159 — per stored signal with a clamp band, the share of the
   /// samples CARRYING it whose value sits outside the band the fuel math
-  /// clamps to: `lambda` (commanded φ — the petrol band; a diesel never
+  /// clamps to: `lambda` (raw commanded lambda — reciprocal of the petrol phi band; a diesel never
   /// applies commanded φ) and `baroKpa`. A key is absent when
   /// the trip never carried the signal. The fuel figures are unchanged —
   /// this names the adapter / sensor fault the clamp would hide. Measured
   /// wideband φ is not here: its band depends on the resolved fuel, which
   /// the samples do not record (the live `SignalReading` marks it).
   final Map<String, double> implausibleShare;
+
+  /// Numeric evidence retained in trip samples, independent of raw traces.
+  final Map<String, Object?> healthSignals;
 
   const Obd2TripFeatures({
     required this.sampleCount,
@@ -125,6 +134,7 @@ class Obd2TripFeatures {
     required this.dominantFuelSource,
     required this.signalCoverage,
     this.implausibleShare = const {},
+    this.healthSignals = const {},
   });
 
   /// Build the aggregate from a trip's samples, or `null` when no sample
@@ -155,18 +165,9 @@ class Obd2TripFeatures {
       }
     }
 
-    final hasMeasuredFuel = samples.any((s) => s.fuelRateLPerHour != null);
-    final hasEstimatedFuel =
-        samples.any((s) => s.estimatedFuelRateLPerHour != null);
-    final fuelSource = hasMeasuredFuel
-        ? Obd2FuelSource.measured
-        : hasEstimatedFuel
-            ? Obd2FuelSource.estimated
-            : Obd2FuelSource.none;
-
-    final coolants = [for (final s in samples) s.coolantTempC]
-        .whereType<double>()
-        .toList();
+    final coolants = [
+      for (final s in samples) s.coolantTempC,
+    ].whereType<double>().toList();
     final coolantMax = coolants.isEmpty
         ? null
         : coolants.reduce((a, b) => a > b ? a : b);
@@ -198,8 +199,8 @@ class Obd2TripFeatures {
       sampleCount: n,
       obd2SampleCount: obd2Count,
       obd2Coverage: obd2Count / n,
-      fuelSource: fuelSource,
-      rpm: Obd2SignalDistribution.from(rpms),
+      fuelSource: _fuelSource(samples),
+      rpm: Obd2SignalDistribution.from(rpms, totalSamples: n),
       engineLoadPercent: _distOf(samples, (s) => s.engineLoadPercent),
       throttlePercent: _distOf(samples, (s) => s.throttlePercent),
       pedalPercent: _distOf(samples, (s) => s.pedalPercent),
@@ -232,52 +233,58 @@ class Obd2TripFeatures {
         'oilTempC': _coverage(samples, (s) => s.oilTempC),
         'ambientTempC': _coverage(samples, (s) => s.ambientTempC),
       },
+      healthSignals: obd2HealthFeatures(samples),
       implausibleShare: {
-        'lambda': ?_implausible(samples, (s) => s.lambda, classifyCommandedPhi),
+        'lambda': ?_implausible(samples, (s) => s.lambda,
+          classifyCommandedLambda,
+        ),
         'baroKpa': ?_implausible(samples, (s) => s.baroKpa, classifyBaroKpa),
       },
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'sampleCount': sampleCount,
-        'obd2SampleCount': obd2SampleCount,
-        'obd2Coverage': _r(obd2Coverage, 3),
-        'fuelSource': fuelSource.name,
-        'rpm': rpm.toJson(),
-        'rpmShareAbove3000': _r(rpmShareAbove3000, 3),
-        'idleShare': _r(idleShare, 3),
-        'engineLoadPercent': engineLoadPercent.toJson(),
-        'throttlePercent': throttlePercent.toJson(),
-        'pedalPercent': pedalPercent.toJson(),
-        'absLoadPercent': absLoadPercent.toJson(),
-        'coolantMaxC': coolantMaxC == null ? null : _r(coolantMaxC!, 1),
-        'reachedOperatingTemp': reachedOperatingTemp,
-        // #3433 — Epic #3416 precision signals: measured wideband φ,
-        // ethanol %, and which fuel branch dominated the trip. Additive
-        // keys (schema bumped in DrivingAnalysisTrace).
-        'measuredPhi': measuredPhi.toJson(),
-        'ethanolPercent': ethanolPercent.toJson(),
-        'fuelSourceShares': {
-          for (final e in fuelSourceShares.entries) e.key: _r(e.value, 3),
-        },
-        'dominantFuelSource': dominantFuelSource,
-        'signalCoverage': {
-          for (final e in signalCoverage.entries) e.key: _r(e.value, 3),
-        },
-        // #4159 — additive key.
-        'implausibleShare': {
-          for (final e in implausibleShare.entries) e.key: _r(e.value, 3),
-        },
-      };
+    'sampleCount': sampleCount,
+    'obd2SampleCount': obd2SampleCount,
+    'obd2Coverage': _r(obd2Coverage, 3),
+    'fuelSource': fuelSource.name,
+    'rpm': rpm.toJson(),
+    'rpmShareAbove3000': _r(rpmShareAbove3000, 3),
+    'idleShare': _r(idleShare, 3),
+    'engineLoadPercent': engineLoadPercent.toJson(),
+    'throttlePercent': throttlePercent.toJson(),
+    'pedalPercent': pedalPercent.toJson(),
+    'absLoadPercent': absLoadPercent.toJson(),
+    'coolantMaxC': coolantMaxC == null ? null : _r(coolantMaxC!, 1),
+    'reachedOperatingTemp': reachedOperatingTemp,
+    // #3433 — Epic #3416 precision signals: measured wideband φ,
+    // ethanol %, and which fuel branch dominated the trip. Additive
+    // keys (schema bumped in DrivingAnalysisTrace).
+    'measuredPhi': measuredPhi.toJson(),
+    'measuredLambda': measuredPhi.toJson(),
+    'ratioConvention': 'rawLambda; measuredPhi is a legacy key, phi = 1/lambda',
+    'ethanolPercent': ethanolPercent.toJson(),
+    'fuelSourceShares': {
+      for (final e in fuelSourceShares.entries) e.key: _r(e.value, 3),
+    },
+    'dominantFuelSource': dominantFuelSource,
+    'healthSignals': healthSignals,
+    'signalCoverage': {
+      for (final e in signalCoverage.entries) e.key: _r(e.value, 3),
+    },
+    // #4159 — additive key.
+    'implausibleShare': {
+      for (final e in implausibleShare.entries) e.key: _r(e.value, 3),
+    },
+  };
 
   static Obd2SignalDistribution _distOf(
     List<TripSample> samples,
     double? Function(TripSample) pick,
-  ) =>
-      Obd2SignalDistribution.from(
-        [for (final s in samples) pick(s)].whereType<double>().toList(),
-      );
+  ) => Obd2SignalDistribution.from(
+    [for (final s in samples) pick(s)].whereType<double>().toList(),
+    totalSamples: samples.length,
+  );
 
   /// Share of the samples carrying [pick] that [classify] marks
   /// implausible; null when no sample carried it.
@@ -308,43 +315,34 @@ class Obd2TripFeatures {
 }
 
 /// Provenance of a trip's fuel figure (see [Obd2TripFeatures.fuelSource]).
-enum Obd2FuelSource { measured, estimated, none }
+enum Obd2FuelSource { measured, estimated, mixed, unknown, none }
 
-/// A minimal mean / p95 / coverage summary of one optional signal.
-/// `null` fields when the signal was never present so the export omits a
-/// fabricated zero.
-class Obd2SignalDistribution {
-  final double? mean;
-  final double? p95;
-
-  /// Fraction of the supplied (already non-null) values — 0.0 when the signal
-  /// was absent across the whole trip.
-  final double coverage;
-
-  const Obd2SignalDistribution({this.mean, this.p95, required this.coverage});
-
-  /// Build from the non-null values of one signal. [coverage] here is whether
-  /// any value was present (1.0) or none (0.0); the per-trip fraction lives in
-  /// [Obd2TripFeatures.signalCoverage].
-  factory Obd2SignalDistribution.from(List<double> values) {
-    if (values.isEmpty) {
-      return const Obd2SignalDistribution(coverage: 0.0);
-    }
-    final sum = values.fold<double>(0, (a, b) => a + b);
-    final sorted = [...values]..sort();
-    final p95Index = ((sorted.length - 1) * 0.95).ceil();
-    return Obd2SignalDistribution(
-      mean: sum / values.length,
-      p95: sorted[p95Index],
-      coverage: 1.0,
-    );
+Obd2FuelSource _fuelSource(List<TripSample> samples) {
+  final rates = samples.where((s) => s.fuelRateLPerHour != null).toList();
+  if (rates.isEmpty) {
+    return samples.any((s) => s.estimatedFuelRateLPerHour != null)
+        ? Obd2FuelSource.estimated
+        : Obd2FuelSource.none;
   }
-
-  Map<String, dynamic> toJson() => {
-        'mean': mean == null ? null : _r(mean!, 1),
-        'p95': p95 == null ? null : _r(p95!, 1),
-        'coverage': _r(coverage, 3),
-      };
+  // Untagged legacy fuel is not proof of an ECU fuel-flow measurement.
+  if (rates.any(
+    (s) =>
+        !kMeasuredFuelSourceTags.contains(s.fuelSource) &&
+        !kEstimatedFuelSourceTags.contains(s.fuelSource),
+  )) {
+    return Obd2FuelSource.unknown;
+  }
+  final measured = rates.any(
+    (s) => kMeasuredFuelSourceTags.contains(s.fuelSource),
+  );
+  final estimated =
+      rates.any((s) => kEstimatedFuelSourceTags.contains(s.fuelSource)) ||
+      samples.any((s) => s.estimatedFuelRateLPerHour != null);
+  return measured && estimated
+      ? Obd2FuelSource.mixed
+      : measured
+      ? Obd2FuelSource.measured
+      : Obd2FuelSource.estimated;
 }
 
 double _r(double v, int places) {

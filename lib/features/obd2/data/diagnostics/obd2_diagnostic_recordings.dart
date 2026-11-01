@@ -46,8 +46,11 @@ abstract final class Obd2DiagnosticRecordings {
   /// The recordings directory, created on first use.
   static Future<Directory> directory() async {
     final override = debugDirectoryOverride;
-    final base = override ?? Directory(
-        '${(await getApplicationSupportDirectory()).path}/$folderName');
+    final base =
+        override ??
+        Directory(
+          '${(await getApplicationSupportDirectory()).path}/$folderName',
+        );
     if (!base.existsSync()) await base.create(recursive: true);
     return base;
   }
@@ -58,13 +61,15 @@ abstract final class Obd2DiagnosticRecordings {
     final u = startedAt.toUtc();
     String two(int v) => v.toString().padLeft(2, '0');
     return '$prefix${u.year}${two(u.month)}${two(u.day)}T'
-        '${two(u.hour)}${two(u.minute)}${two(u.second)}Z.ndjson';
+        '${two(u.hour)}${two(u.minute)}${two(u.second)}'
+        '${u.microsecond + u.millisecond * 1000 == 0 ? '' : '-${(u.microsecond + u.millisecond * 1000).toString().padLeft(6, '0')}'}Z.ndjson';
   }
 
   /// The trip start encoded in [fileName], or null for a foreign file.
   static DateTime? startedAtOf(String fileName) {
-    final m = RegExp(r'^obd2-diagnostic-(\d{8})T(\d{6})Z\.ndjson$')
-        .firstMatch(fileName);
+    final m = RegExp(
+      r'^obd2-diagnostic-(\d{8})T(\d{6})(?:-(\d{6}))?Z\.ndjson$',
+    ).firstMatch(fileName);
     if (m == null) return null;
     final d = m.group(1)!;
     final t = m.group(2)!;
@@ -75,6 +80,8 @@ abstract final class Obd2DiagnosticRecordings {
       int.parse(t.substring(0, 2)),
       int.parse(t.substring(2, 4)),
       int.parse(t.substring(4, 6)),
+      0,
+      int.parse(m.group(3) ?? '0'),
     );
   }
 
@@ -87,11 +94,13 @@ abstract final class Obd2DiagnosticRecordings {
       final name = entity.uri.pathSegments.last;
       final startedAt = startedAtOf(name);
       if (startedAt == null) continue;
-      out.add(Obd2DiagnosticRecording(
-        file: entity,
-        startedAt: startedAt,
-        sizeBytes: await entity.length(),
-      ));
+      out.add(
+        Obd2DiagnosticRecording(
+          file: entity,
+          startedAt: startedAt,
+          sizeBytes: await entity.length(),
+        ),
+      );
     }
     out.sort((a, b) => b.startedAt.compareTo(a.startedAt));
     return out;

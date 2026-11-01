@@ -1,7 +1,11 @@
 // Copyright (c) 2026 Florian DITTGEN
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:tankstellen/core/sharing/public_file_exporter.dart';
+import 'package:tankstellen/features/trips/domain/trip_sample.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tankstellen/features/driving_score/domain/driving_score.dart';
@@ -30,17 +34,20 @@ TripSummary _summary() => const TripSummary(
       kind: TripKind.gpsOnly,
     );
 
-Widget _host(Set<Feature> features) => ProviderScope(
+Widget _host(Set<Feature> features, {
+  List<TripSample> samples = const [],
+  TripSummary? summary,
+}) => ProviderScope(
       overrides: [enabledFeaturesProvider.overrideWithValue(features)],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: DrivingAnalysisTraceCard(
-            summary: _summary(),
+            summary: summary ?? _summary(),
             score: _score,
             lessons: const [],
-            samples: const [],
+            samples: samples,
           ),
         ),
       ),
@@ -67,4 +74,52 @@ void main() {
     final button = tester.widget<FilledButton>(find.byType(FilledButton));
     expect(button.onPressed, isNotNull);
   });
+  testWidgets(
+    'OBD export action includes kinematic KPIs, typed totals and score evidence',
+    (tester) async {
+      Map<String, dynamic>? exported;
+      final done = Completer<void>.sync();
+      debugPublicFileExporterOverride =
+          ({required bytes, required fileName, required mimeType}) async {
+        exported = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
+        done.complete();
+        return 'content://downloads/$fileName';
+      };
+      addTearDown(() => debugPublicFileExporterOverride = null);
+      final samples = [
+        for (var i = 0; i < 31; i++)
+          TripSample(
+            timestamp: DateTime.utc(2026).add(Duration(seconds: i)),
+            speedKmh: 50.0 + i,
+            rpm: 2000,
+            hAccuracyM: 3,
+            fuelRateLPerHour: 4,
+            fuelSource: 'speedDensity',
+          ),
+      ];
+      await tester.pumpWidget(
+        _host(
+          const {Feature.debugMode},
+          samples: samples,
+          summary: _summary().copyWith(kind: TripKind.gpsPlusObd2),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final button = tester.widget<FilledButton>(find.byType(FilledButton));
+      await tester.runAsync(() async {
+        button.onPressed!();
+        await done.future.timeout(const Duration(seconds: 10));
+      });
+      await tester.pump();
+      expect(exported!['gpsFeatures'], isNotNull);
+      expect((exported!['kinematicTimeline'] as Map)['rows'], hasLength(31));
+      expect((exported!['patternEvidence'] as Map)['modelVersion'], 2);
+      expect((exported!['score'] as Map)['calculation'], isNotNull);
+      expect(
+        (exported!['imu'] as Map)['recordDefinitions'],
+        contains('droppedEvents'),
+      );
+      expect(exported!['mixtureLessonEvidence'], isNotNull);
+    },
+  );
 }

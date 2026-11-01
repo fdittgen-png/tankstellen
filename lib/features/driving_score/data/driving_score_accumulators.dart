@@ -100,15 +100,13 @@ class _Accumulators {
 
     // λ-enrichment: commanded mixture richer than stoichiometric.
     final lambda = prev.lambda;
-    if (lambda != null && lambda > 0 && lambda < 1.0) {
+    if (isRichCommandedLambda(lambda)) {
       lambdaEnrichSeconds += dt;
     }
 
     // Eco-credit: fuel-cut coasting (detected, now credited).
-    final fuelRate = prev.fuelRateLPerHour;
-    if (fuelRate != null &&
-        fuelRate < _coastFuelRateLPerHour &&
-        prev.speedKmh > _coastMinSpeedKmh) {
+    if (isObservedFuelCut(prev, maximumRate: _coastFuelRateLPerHour,
+        minimumSpeed: _coastMinSpeedKmh)) {
       coastSeconds += dt;
     }
   }

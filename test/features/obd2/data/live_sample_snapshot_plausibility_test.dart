@@ -61,22 +61,25 @@ void main() {
   const diesel =
       VehicleProfile(id: 'd', name: 'd', preferredFuelType: 'diesel');
 
-  test('commanded φ 1.9: marked implausible, stored unclamped, fuel as the '
-      'clamp made it', () {
+  test(
+    'commanded lambda 0.4: marked implausible, stored unclamped, fuel as the '
+    'clamp made it', () {
     final a = _snapshot();
     a.deliver('0110\r', '41 10 04 00');
-    a.deliver('0144\r', '41 44 F3 33'); // 0xF333 / 32768 ≈ 1.9
-    final r = a.snapshot.reading(VehicleSignal.commandedPhi);
+    a.deliver('0144\r', '41 44 33 33'); // 0x3333 / 32768 ≈ 0.4
+      final r = a.snapshot.reading(VehicleSignal.commandedPhi);
     expect(r.plausibility, SignalPlausibility.implausible);
-    expect(a.snapshot.latestCommandedPhi, 0xF333 / 32768.0);
+    expect(a.snapshot.latestCommandedPhi, 0x3333 / 32768.0);
 
     final b = _snapshot();
     b.deliver('0110\r', '41 10 04 00');
-    b.deliver('0144\r', '41 44 C0 00'); // exactly 1.5, the clamp edge
-    expect(b.snapshot.reading(VehicleSignal.commandedPhi).plausibility,
+    b.deliver('0144\r',
+        '41 44 55 56',
+      ); // lambda just above 2/3, the true-phi 1.5 clamp edge
+      expect(b.snapshot.reading(VehicleSignal.commandedPhi).plausibility,
         SignalPlausibility.plausible);
     expect(a.snapshot.deriveFuelRateLPerHour(),
-        b.snapshot.deriveFuelRateLPerHour());
+        closeTo(b.snapshot.deriveFuelRateLPerHour()!, 0.001));
   });
 
   test('baro 50 kPa is implausible; 95 kPa is plausible', () {
@@ -89,16 +92,18 @@ void main() {
         SignalPlausibility.plausible);
   });
 
-  test('measured φ 0.1 is plausible on a diesel, implausible on petrol', () {
-    const frame = '41 24 0C CD 00 00'; // 0x0CCD / 32768 ≈ 0.1
+  test('measured lambda 0.8 is plausible on petrol, implausible on diesel', () {
+    const frame = '41 24 66 66 00 00'; // 0x6666 / 32768 ≈ 0.8
     final d = _snapshot(vehicle: diesel);
     d.deliver('0124\r', frame);
     expect(d.snapshot.reading(VehicleSignal.widebandPhi).plausibility,
-        SignalPlausibility.plausible);
+        SignalPlausibility.implausible,
+    );
     final p = _snapshot();
     p.deliver('0124\r', frame);
     expect(p.snapshot.reading(VehicleSignal.widebandPhi).plausibility,
-        SignalPlausibility.implausible);
+        SignalPlausibility.plausible,
+    );
   });
 
   test('signals without a band stay unchecked; nothing landed stays '

@@ -44,10 +44,11 @@ class LowGearRule implements DrivingLessonRule {
     final minutes = math.max(1, (seconds / 60).round()).toString();
     return DrivingLesson(
       id: id,
+      polarity: LessonPolarity.info,
       impact: _lowGearImpact,
       metricValue: seconds,
-      title: l.insightLowGear(minutes),
-      advice: l.lessonAdviceLowGear,
+      title: l.analysisLowGearInferredTitle(minutes),
+      advice: l.analysisLowGearAdvice,
     );
   }
 }

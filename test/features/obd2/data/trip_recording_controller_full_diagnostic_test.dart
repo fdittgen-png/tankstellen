@@ -29,6 +29,8 @@ const _responses = {
   '010C': '41 0C 1A F8>',
   '010D': '41 0D 32>',
   '0142': '41 42 36 B0>',
+  '0106': '41 06 90>',
+  '0107': '41 07 88>',
   '03': '43 01 07 30>',
 };
 
@@ -41,8 +43,9 @@ void main() {
     await dir.delete(recursive: true);
   });
 
-  Future<(TripRecordingController, FakeObd2Transport)> controller(
-      {required bool full}) async {
+  Future<(TripRecordingController, FakeObd2Transport)> controller({
+    required bool full,
+  }) async {
     final transport = FakeObd2Transport({..._responses});
     final svc = Obd2Service(transport);
     await svc.connect();
@@ -66,21 +69,40 @@ void main() {
     final (ctl, transport) = await controller(full: true);
     await ctl.start();
     await Future<void>.delayed(const Duration(milliseconds: 600));
+    ctl.debugEmitNow();
+    expect(ctl.capturedSamples.last.stft, 12.5,
+        reason: 'full diagnostic mode preserves trims without the old debug flag');
+    expect(ctl.capturedSamples.last.ltft, 6.25);
     await ctl.stop();
 
     final files = dir.listSync().whereType<File>().toList();
     expect(files, hasLength(1));
+    expect(
+      ctl.sessionJournal.diagnosticRecordingFile,
+      files.single.uri.pathSegments.last,
+    );
     final lines = [
-      for (final l in const LineSplitter().convert(files.single.readAsStringSync()))
+      for (final l in const LineSplitter().convert(
+        files.single.readAsStringSync(),
+      ))
         jsonDecode(l) as Map<String, dynamic>,
     ];
     final cmds = lines.where((l) => l['k'] == 'cmd').map((l) => l['c']).toSet();
-    expect(cmds, containsAll(['010C', '010D', '0142', '03', '0902', 'ATH1', 'ATH0']));
-    final phases = lines.where((l) => l['k'] == 'mark').map((l) => l['p']);
-    expect(phases, containsAll(['snapshot-start', 'snapshot-stop', 'health-plan', 'end']));
     expect(
-        lines.any((l) => l['p'] == 'dtc' && (l['codes'] as List).contains('P0730')),
-        isTrue);
+      cmds,
+      containsAll(['010C', '010D', '0142', '03', '0902', 'ATH1', 'ATH0']),
+    );
+    final phases = lines.where((l) => l['k'] == 'mark').map((l) => l['p']);
+    expect(
+      phases,
+      containsAll(['snapshot-start', 'snapshot-stop', 'health-plan', 'end']),
+    );
+    expect(
+      lines.any(
+        (l) => l['p'] == 'dtc' && (l['codes'] as List).contains('P0730'),
+      ),
+      isTrue,
+    );
     final sent = transport.sentCommands;
     expect(sent.lastIndexOf('ATH0'), greaterThan(sent.lastIndexOf('ATH1')));
   });

@@ -69,10 +69,11 @@ SignalReading markPlausibility(SignalReading reading, {required bool isDiesel}) 
   final v = reading.valueOrNull;
   if (v == null) return reading;
   return switch (reading.signal) {
-    VehicleSignal.commandedPhi => reading.marked(classifyCommandedPhi(v)),
+    VehicleSignal.commandedPhi => reading.marked(classifyCommandedLambda(v)),
     VehicleSignal.baroPressure => reading.marked(classifyBaroKpa(v)),
     VehicleSignal.widebandPhi =>
-      reading.marked(classifyMeasuredPhi(v, isDiesel: isDiesel)),
+      reading.marked(
+        classifyMeasuredLambda(v, isDiesel: isDiesel)),
     _ => reading,
   };
 }

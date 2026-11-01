@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:async';
+import 'dart:convert';
+import '../../../obd2/api.dart' show loadDiagnosticEvidence;
 
 import '../../../../core/logging/error_logger.dart';
 import '../../../../core/sharing/public_file_exporter.dart';
@@ -19,11 +21,18 @@ class DrivingAnalysisTraceExport {
   /// Writes the trace JSON to the Downloads folder. Returns `true` when the
   /// write succeeded, `false` (logged) otherwise.
   static Future<bool> export(DrivingAnalysisTrace trace) async {
-    final json = formatDrivingAnalysisTraceJson(trace);
-    final stamp =
-        trace.capturedAt.toIso8601String().replaceAll(RegExp(r'[:.]'), '-');
+    final stamp = trace.capturedAt.toIso8601String().replaceAll(
+      RegExp(r'[:.]'),
+      '-',
+    );
     final fileName = 'tankstellen-driving-$stamp.json';
     try {
+      final evidence = await loadDiagnosticEvidence(
+        trace.sessionJournal?.diagnosticRecordingFile,
+      );
+      final json = const JsonEncoder.withIndent(
+        '  ',
+      ).convert({...trace.toJson(), 'vehicleHealth': evidence});
       await PublicFileExporter.saveTextToDownloads(
         text: json,
         fileName: fileName,
@@ -31,9 +40,16 @@ class DrivingAnalysisTraceExport {
       );
       return true;
     } on Object catch (e, st) {
-      unawaited(errorLogger.log(ErrorLayer.storage, e, st, context: const {
-        'where': 'DrivingAnalysisTraceExport.export: json write',
-      }));
+      unawaited(
+        errorLogger.log(
+          ErrorLayer.storage,
+          e,
+          st,
+          context: const {
+            'where': 'DrivingAnalysisTraceExport.export: json write',
+          },
+        ),
+      );
       return false;
     }
   }

@@ -101,14 +101,14 @@ class TripSample {
   // trips. Each persists with an `if(!=null)` compact-key guard so a car
   // without the PID adds zero bytes (see `trip_sample_codec.dart`).
 
-  /// Commanded fuel–air equivalence ratio φ (PID 0x44, #2456 / persisted
-  /// #2459). The ECU's real commanded mixture; feeds the effective-AFR
+  /// Raw commanded lambda (PID 0x44, #2456 / persisted
+  /// #2459). The ECU's commanded mixture; feeds the effective-AFR
   /// fuel refinement. Null when the car doesn't expose PID 0x44.
-  /// (Field name kept from the pre-#3426 λ naming for persistence
-  /// compatibility — the stored value is φ, SAE convention: > 1 rich.)
+  /// Stored lm has always carried wire lambda: <1 rich, >1 lean.
+  /// True phi is its reciprocal; do not invert the historical codec.
   final double? lambda;
 
-  /// MEASURED wideband fuel–air equivalence ratio φ (PIDs 0x24–0x2B /
+  /// MEASURED wideband lambda (legacy property name measuredPhi) (PIDs 0x24–0x2B /
   /// 0x34–0x3B, #3427). The real sensed mixture, preferred over the
   /// commanded [lambda] in the fuel math. Null when the car has no
   /// wideband sensor (or the reading went stale that tick).

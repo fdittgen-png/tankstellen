@@ -48,13 +48,16 @@ class RecordingSessionJournal {
   static const int maxEvents = 60;
 
   RecordingSessionJournal({DateTime Function()? now})
-      : _now = now ?? DateTime.now;
+    : _now = now ?? DateTime.now;
 
   final DateTime Function() _now;
   final List<RecordingSessionEvent> _events = <RecordingSessionEvent>[];
 
   DateTime? _startedAt;
   int _dropped = 0;
+
+  /// Exact diagnostic artifact for this session; null on legacy/disabled trips.
+  String? diagnosticRecordingFile;
 
   /// The recorded timeline, oldest first.
   List<RecordingSessionEvent> get events =>
@@ -99,11 +102,13 @@ class RecordingSessionJournal {
     final started = _startedAt;
     if (started == null) return;
     final delta = _now().difference(started).inMilliseconds;
-    _events.add(RecordingSessionEvent(
-      kind: kind,
-      tMs: delta < 0 ? 0 : delta,
-      detail: detail,
-    ));
+    _events.add(
+      RecordingSessionEvent(
+        kind: kind,
+        tMs: delta < 0 ? 0 : delta,
+        detail: detail,
+      ),
+    );
     while (_events.length > maxEvents) {
       _events.removeAt(0);
       _dropped++;
@@ -113,14 +118,16 @@ class RecordingSessionJournal {
   /// Compact JSON for the trip row + the exports. `ev` is the timeline,
   /// `dr` the eviction count (omitted when nothing was dropped).
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'ev': _events.map((e) => e.toJson()).toList(growable: false),
-        if (_dropped > 0) 'dr': _dropped,
-      };
+    'ev': _events.map((e) => e.toJson()).toList(growable: false),
+    if (_dropped > 0) 'dr': _dropped,
+    if (diagnosticRecordingFile != null) 'df': diagnosticRecordingFile,
+  };
 
   /// Rehydrate a persisted timeline (read-only use: the clock anchor is
   /// not restored, so a decoded journal must not be appended to).
   static RecordingSessionJournal fromJson(Map<String, dynamic> json) {
     final j = RecordingSessionJournal();
+    j.diagnosticRecordingFile = json['df'] as String?;
     final raw = json['ev'] as List?;
     if (raw != null) {
       for (final e in raw) {

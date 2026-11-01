@@ -42,7 +42,7 @@ import 'package:meta/meta.dart';
 /// measures changes: every cached per-trip total keyed under an older
 /// version is a miss, so a model change re-derives rather than silently
 /// mixing two definitions in one average (#4366).
-const int kDrivingPatternModelVersion = 1;
+const int kDrivingPatternModelVersion = 2; // direct-fuel-only coasting exposure
 
 /// A numerator that counts **discrete events**. Never seconds.
 enum DrivingEventCounter {

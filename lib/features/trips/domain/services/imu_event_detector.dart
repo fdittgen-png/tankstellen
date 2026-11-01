@@ -196,6 +196,7 @@ class ImuEventDetector {
     // records BEFORE scoring, so a confirmation in this same tick lands
     // on the already-open stretch.
     _stretches.onSample(
+      timestamp: s.t,
       strong: strong,
       dt: dt,
       horizMag: horizMag,

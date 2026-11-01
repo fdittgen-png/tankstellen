@@ -13,7 +13,7 @@ const String lambdaEnrichmentLessonId = 'lambdaEnrichment';
 /// `insightLambdaEnrichment` cost line).
 ///
 /// Fires when the analyzer saw the ECU command a mixture richer than
-/// stoichiometric (λ < 1, PID 0x44) for long enough that the extra fuel
+/// stoichiometric (stored lambda < 1, PID 0x44) for long enough that the extra fuel
 /// over a stoich counterfactual cleared the noise floor. Enrichment is
 /// triggered by heavy, sustained load (flooring it / long climbs), so the
 /// advice points at the underlying driving rather than the symptom.
@@ -31,10 +31,11 @@ class LambdaEnrichmentRule implements DrivingLessonRule {
     final pct = formatLessonPercent(insight.percentOfTrip);
     return DrivingLesson(
       id: id,
+      polarity: LessonPolarity.info,
       impact: insight.percentOfTrip,
       metricValue: (insight.metadata['lambdaEnrichSeconds'] ?? 0).toDouble(),
-      title: l.insightLambdaEnrichmentShare(pct),
-      advice: l.lessonAdviceLambdaEnrichment,
+      title: l.analysisCommandedEnrichmentTrip(pct),
+      advice: l.analysisCommandedEnrichmentAdvice,
       subtitle: l.insightSubtitlePctOfTrip(pct),
       trailing: approxLitersTrailing(insight, l), // #4221
     );

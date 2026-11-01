@@ -904,11 +904,8 @@
   "insightIdling": "Tyhjäkäynti ({pctTime}% matkasta): hukattu {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% matkasta",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Kynsi alhaisella vaihteella ({minutes} min)",
   "lessonAdviceIdling": "Sammuta moottori pitkien pysähdysten ajaksi sen sijaan, että annat sen käydä tyhjäkäynnillä.",
-  "lessonAdviceHighRpm": "Vaihda aiemmin suuremmalle vaihteelle pitääksesi moottorin pois korkean kierrosluvun alueelta.",
   "lessonAdviceHardAccel": "Paina kaasua pehmeästi — tasainen kiihdytys kuluttaa vähemmän polttoainetta.",
-  "lessonAdviceLowGear": "Vaihda aiemmin suuremmalle, jotta moottori asettuu matalammille ja taloudellisemmille kierroksille.",
   "drivingScoreCardTitle": "Ajopisteet",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Yhdistelmäpisteet tyhjäkäynnistä, voimakkaista kiihdytyksistä, kovasta jarrutuksesta ja korkean RPM:n ajasta. \"Parempi kuin X% aiemmista matkoista\" -vertailu tulee seuraavassa julkaisussa.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Raskas ja pitkäkestoinen kuormitus tekee seoksesta rikkaan — vaihdayhteen ylöspäin ajoissa ja vähennä kaasua pitkillä nousuilla, jotta seos pysyy laihana.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Erittäin hyvä",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Ota vauhti nousua ennen ja syötä kaasua tasaisesti — nousun aikana kaasuaminen kuluttaa ylimääräistä polttoainetta.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} pysähdys-ja-lähtö-käynnistystä: tuhlattiin {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Ennakoi liikenne ja liuku pysähdystä kohti, jotta pyörät pyörivät pysähtymisen sijaan — liikenteessä paikaltaan lähteminen on polttoaineintensiteetiltään kalleinta.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS-tehokkuus",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Seos vaikuttaa hieman laihalta — moottori lisäsi polttoainetta ({pctTrim} % korjaus) kompensoidakseen",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Seos vaikuttaa laihalta — moottori piti yllä suurta {pctTrim} % polttoainelisäystä, mahdollinen tehottomuus",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Seos vaikuttaa hieman rikkaalta — moottori vähensi polttoainetta ({pctTrim} % korjaus) kompensoidakseen",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Seos vaikuttaa rikkaalta — moottori piti yllä suurta {pctTrim} % polttoainevähennystä, mahdollinen tehottomuus",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Moottori kävi rikkaalla kuormitettuna ({pctShare} % lämpimästä ajosta) — mahdollisesti hukattua polttoainetta",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristinen kuntosignaali, ei diagnoosi",
-  "lessonAdviceCombustionHealthLean": "Pitkäkestoinen korjaus laihan seoksen suuntaan voi tarkoittaa imuilmavuotoa, heikkoa polttoaineensyöttöä tai ikääntynyttä anturia. Jos kulutus tai käynti heikkenee, korjaamon diagnoosi voi vahvistaa asian.",
-  "lessonAdviceCombustionHealthRich": "Pitkäkestoinen korjaus rikkaan seoksen suuntaan voi tarkoittaa vuotavaa suutinta, liian korkeaa polttoaineen painetta tai liikaa näyttävää anturia. Jos kulutus tai käynti heikkenee, korjaamon diagnoosi voi vahvistaa asian.",
-  "lessonAdviceCombustionHealthEnrichment": "Rikas seos suurella kuormalla polttaa ylimääräistä polttoainetta. Vaihda isommalle aiemmin ja kevennä kaasua pitkissä kiihdytyksissä, jotta moottori pysyy lähellä stoikiometristä seosta.",
   "pipTapToRestore": "Avaa koko sovellus napauttamalla",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
@@ -12094,6 +12026,91 @@
   },
   "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
   "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisLowGearInferredTitle": "Inferred low gear ({minutes} min)",
+  "@analysisLowGearInferredTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisLowGearAdvice": "A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.",
+  "@analysisLowGearAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisHighRpmAdvice": "Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.",
+  "@analysisHighRpmAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisClimbContextAdvice": "Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.",
+  "@analysisClimbContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisRestartContextAdvice": "Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.",
+  "@analysisRestartContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisFuelTrimAddition": "Positive combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimAddition": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimRemoval": "Negative combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimRemoval": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimAdvice": "The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.",
+  "@analysisFuelTrimAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichment": "ECU commanded enrichment ({pctShare}% of warm samples)",
+  "@analysisCommandedEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCommandedEnrichmentAdvice": "Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.",
+  "@analysisCommandedEnrichmentAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichmentTrip": "ECU commanded enrichment ({pctShare}% of trip duration)",
+  "@analysisCommandedEnrichmentTrip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTransmissionScope": "Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.",
+  "@analysisTransmissionScope": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

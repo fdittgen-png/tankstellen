@@ -21,7 +21,7 @@ void main() {
   test('share per signal among the samples carrying it', () {
     final f = Obd2TripFeatures.fromSamples([
       _s(0, lambda: 1.0, baroKpa: 95),
-      _s(1, lambda: 1.9, baroKpa: 95),
+      _s(1, lambda: 0.4, baroKpa: 95),
       _s(2, lambda: 0.3, baroKpa: 30),
       _s(3, lambda: 1.5),
       _s(4), // carries neither — not in either denominator

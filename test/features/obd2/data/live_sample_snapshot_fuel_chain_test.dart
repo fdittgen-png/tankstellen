@@ -248,29 +248,40 @@ void main() {
     });
   });
 
-  group('commanded φ 0x44 and baro 0x33 (#2456 / #3426)', () {
+  group('commanded wire lambda 0x44 and baro 0x33 (#2456 / #3426)', () {
     double mafWith0x44(String frame) => _rate({..._maf10, '0144': frame})!;
 
-    test('φ = 1.2 derives ~20 % more fuel than stoich (≈ 4.067 L/h)', () {
-      expect(mafWith0x44('41 44 99 9A'), closeTo(4.067, 0.02));
+    test('lambda = 1.2 is lean and derives less fuel (≈ 2.824 L/h)', () {
+      expect(mafWith0x44('41 44 99 9A'), closeTo(2.824, 0.02));
     });
 
-    test('φ = 0.9 derives less fuel (≈ 3.050 L/h)', () {
-      expect(mafWith0x44('41 44 73 33'), closeTo(3.050, 0.02));
+    test('lambda = 0.9 is rich and derives more fuel (≈ 3.766 L/h)', () {
+      expect(mafWith0x44('41 44 73 33'), closeTo(3.766, 0.02));
     });
 
-    test('raw lean frame (41 44 66 66) yields ~20 % less fuel than stoich '
+    test('raw rich frame (41 44 66 66) yields ~25 % more fuel than stoich '
         '(41 44 80 00) — the SAE direction, end to end', () {
-      final lean = mafWith0x44('41 44 66 66');
+      final rich = mafWith0x44('41 44 66 66');
       final stoich = mafWith0x44('41 44 80 00');
-      expect(lean, lessThan(stoich));
-      expect(lean / stoich, closeTo(0.7999, 0.005));
+      expect(rich, greaterThan(stoich));
+      expect(rich / stoich, closeTo(1 / 0.7999, 0.005));
       expect(stoich, closeTo(_petrolMaf, 1e-9));
     });
 
-    test('raw rich frame (41 44 99 9A) yields ~20 % more than stoich', () {
+    test('raw lean frame (41 44 99 9A) yields less than stoich', () {
       expect(mafWith0x44('41 44 99 9A') / mafWith0x44('41 44 80 00'),
-          closeTo(1.2, 0.005));
+          closeTo(1 / 1.2, 0.005),
+      );
+    });
+
+    test(
+      'actual speed-density path also honors rich/lean wire lambda direction',
+      () {
+        final stoich = _rate({..._sdIdle, '0144': '41 44 80 00'})!;
+        final rich = _rate({..._sdIdle, '0144': '41 44 66 66'})!;
+        final lean = _rate({..._sdIdle, '0144': '41 44 99 9A'})!;
+        expect(rich / stoich, closeTo(1 / 0.8, 0.005));
+        expect(lean / stoich, closeTo(1 / 1.2, 0.005));
     });
 
     test('speed-density at altitude (baro 84 kPa) scales by 84 / 101.325',

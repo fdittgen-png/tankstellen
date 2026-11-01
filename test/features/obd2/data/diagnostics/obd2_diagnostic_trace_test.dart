@@ -25,14 +25,16 @@ void main() {
   });
 
   List<Map<String, dynamic>> lines(File f) => [
-        for (final l in const LineSplitter().convert(f.readAsStringSync()))
-          jsonDecode(l) as Map<String, dynamic>,
-      ];
+    for (final l in const LineSplitter().convert(f.readAsStringSync()))
+      jsonDecode(l) as Map<String, dynamic>,
+  ];
 
   test('header, one cmd line per reply and per error, end mark', () async {
     var clock = DateTime.utc(2026, 10, 31, 8, 15);
     final trace = (await Obd2DiagnosticTrace.begin(
-      header: {'vehicle': {'make': 'Peugeot'}},
+      header: {
+        'vehicle': {'make': 'Peugeot'},
+      },
       directory: dir,
       now: () => clock,
     ))!;
@@ -43,13 +45,16 @@ void main() {
     reply.complete('41 0C 1A F8\r>');
     expect(await pending, '41 0C 1A F8\r>');
     await expectLater(
-        trace.observe('0142', Future<String>.error(TimeoutException('x'))),
-        throwsA(isA<TimeoutException>()));
+      trace.observe('0142', Future<String>.error(TimeoutException('x'))),
+      throwsA(isA<TimeoutException>()),
+    );
     await Obd2DiagnosticTrace.end();
     expect(Obd2DiagnosticTrace.current, isNull);
 
-    expect(trace.file.uri.pathSegments.last,
-        'obd2-diagnostic-20261031T081500Z.ndjson');
+    expect(
+      trace.file.uri.pathSegments.last,
+      'obd2-diagnostic-20261031T081500Z.ndjson',
+    );
     final l = lines(trace.file);
     expect(l.first['k'], 'header');
     expect(l.first['vehicle'], {'make': 'Peugeot'});
@@ -60,38 +65,85 @@ void main() {
     expect(l.last['p'], 'end');
   });
 
-  test('a DTC reply becomes a decoded dtc mark only when the set changes',
-      () async {
-    final trace = (await Obd2DiagnosticTrace.begin(header: {}, directory: dir))!;
-    await trace.observe('03', Future.value('43 01 07 30>'));
-    await trace.observe('03', Future.value('43 01 07 30>'));
-    await trace.observe('03', Future.value('43 00>'));
-    await Obd2DiagnosticTrace.end();
-    final marks = lines(trace.file).where((m) => m['p'] == 'dtc').toList();
-    expect(marks.map((m) => m['codes']), [
-      ['P0730'],
-      <String>[],
-    ]);
-  });
+  test(
+    'a DTC reply becomes a decoded dtc mark only when the set changes',
+    () async {
+      final trace = (await Obd2DiagnosticTrace.begin(
+        header: {},
+        directory: dir,
+      ))!;
+      await trace.observe('03', Future.value('43 01 07 30>'));
+      await trace.observe('03', Future.value('43 01 07 30>'));
+      await trace.observe('03', Future.value('43 00>'));
+      await Obd2DiagnosticTrace.end();
+      final marks = lines(trace.file).where((m) => m['p'] == 'dtc').toList();
+      expect(marks.map((m) => m['codes']), [
+        ['P0730'],
+        <String>[],
+      ]);
+    },
+  );
+
+  test(
+    'subsecond file names distinguish consecutive recordings and retain legacy names',
+    () {
+      final a = DateTime.utc(2026, 11, 1, 12, 0, 0, 1, 2);
+      final b = a.add(const Duration(microseconds: 1));
+      expect(
+        Obd2DiagnosticRecordings.fileNameFor(a),
+        isNot(Obd2DiagnosticRecordings.fileNameFor(b)),
+      );
+      expect(
+        Obd2DiagnosticRecordings.startedAtOf(
+          Obd2DiagnosticRecordings.fileNameFor(a),
+        ),
+        a,
+      );
+      expect(
+        Obd2DiagnosticRecordings.startedAtOf(
+          'obd2-diagnostic-20261031T081500Z.ndjson',
+        ),
+        DateTime.utc(2026, 10, 31, 8, 15),
+      );
+    },
+  );
 
   test('retention keeps the newest recordings', () async {
     for (var i = 0; i < Obd2DiagnosticRecordings.keepNewest + 3; i++) {
-      File('${dir.path}/${Obd2DiagnosticRecordings.fileNameFor(DateTime.utc(2026, 1, 1).add(Duration(hours: i)))}')
-          .writeAsStringSync('{}');
+      File(
+        '${dir.path}/${Obd2DiagnosticRecordings.fileNameFor(DateTime.utc(2026, 1, 1).add(Duration(hours: i)))}',
+      ).writeAsStringSync('{}');
     }
     File('${dir.path}/unrelated.txt').writeAsStringSync('keep me');
     await Obd2DiagnosticRecordings.prune(dir);
     final left = await Obd2DiagnosticRecordings.list(dir);
     expect(left, hasLength(Obd2DiagnosticRecordings.keepNewest - 1));
-    expect(left.first.startedAt, DateTime.utc(2026, 1, 1).add(const Duration(hours: 22)));
+    expect(
+      left.first.startedAt,
+      DateTime.utc(2026, 1, 1).add(const Duration(hours: 22)),
+    );
     expect(File('${dir.path}/unrelated.txt').existsSync(), isTrue);
   });
 
-  test('a directory that cannot be written yields no trace, never a throw',
-      () async {
-    final missing = Directory('${dir.path}/gone');
-    await expectLater(
-        Obd2DiagnosticTrace.begin(header: {}, directory: missing), completion(isNull));
-    expect(Obd2DiagnosticTrace.current, isNull);
+  test(
+    'a directory that cannot be written yields no trace, never a throw',
+    () async {
+      final missing = Directory('${dir.path}/gone');
+      await expectLater(
+        Obd2DiagnosticTrace.begin(header: {}, directory: missing),
+        completion(isNull),
+      );
+      expect(Obd2DiagnosticTrace.current, isNull);
+    },
+  );
+  test('a truncated DTC response never publishes a false cleared-code mark', () async {
+    final trace = (await Obd2DiagnosticTrace.begin(header: {}, directory: dir))!;
+    await trace.observe('03', Future.value('43 01 01 71>'));
+    await trace.observe('03', Future.value('43>'));
+    await Obd2DiagnosticTrace.end();
+    final marks = lines(trace.file).where((m) => m['p'] == 'dtc').toList();
+    expect(marks, hasLength(1));
+    expect(marks.single['codes'], ['P0171']);
   });
+
 }

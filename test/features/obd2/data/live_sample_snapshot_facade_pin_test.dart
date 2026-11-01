@@ -257,9 +257,9 @@ void main() {
       ]) {
         h.deliver(c);
       }
-      final afr = effectiveAfrForMixture(kPetrolAfr,
-          measuredPhi: 0x6666 * 2.0 / 65536.0,
-          commandedPhi: 0x8CCD / 32768.0,
+      final afr = effectiveAfrForObdMixture(kPetrolAfr,
+        measuredLambda: 0x6666 * 2.0 / 65536.0,
+        commandedLambda: 0x8CCD / 32768.0,
           isDiesel: false);
       final raw = 42.0 * 3600.0 / (afr * kPetrolDensityGPerL);
       expect(
@@ -297,8 +297,8 @@ void main() {
         rpm: 1726.0,
         engineDisplacementCc: 1000,
         volumetricEfficiency: 0.85,
-        afr: effectiveAfrForMixture(kPetrolAfr,
-            commandedPhi: 0x8CCD / 32768.0, isDiesel: false),
+        afr: effectiveAfrForObdMixture(kPetrolAfr,
+          commandedLambda: 0x8CCD / 32768.0, isDiesel: false),
         fuelDensityGPerL: kPetrolDensityGPerL,
         baroKpa: 95.0,
       );

@@ -314,7 +314,7 @@ class _Analyzer {
 
   TransmissionHealth _transmission() {
     final sawDrive = _answered.contains('010D') && _answered.contains('010C');
-    if (!sawDrive) {
+    if (!sawDrive || (!_gearReported && _episodes.isEmpty)) {
       return const TransmissionHealth(
           verdict: HealthVerdict.notReported, gearReported: false);
     }
