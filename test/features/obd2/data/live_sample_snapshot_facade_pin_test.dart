@@ -100,8 +100,8 @@ const _frames = <String, String>{
 
 class _Harness {
   _Harness(Set<int> supported)
-      : clock = _Clock(DateTime.utc(2026, 9, 16, 12)),
-        scheduler = _Capture() {
+    : clock = _Clock(DateTime.utc(2026, 9, 16, 12)),
+      scheduler = _Capture() {
     snapshot = LiveSampleSnapshot(
       service: _Service(supported),
       breadcrumbCollector: collector,
@@ -119,8 +119,7 @@ class _Harness {
   final speeds = <double>[];
   late final LiveSampleSnapshot snapshot;
 
-  void deliver(String command) =>
-      scheduler.deliver(command, _frames[command]!);
+  void deliver(String command) => scheduler.deliver(command, _frames[command]!);
 }
 
 class _Service extends Obd2Service {
@@ -133,22 +132,31 @@ double _pct(int byte) => byte * 100.0 / 255.0;
 double _trim(int byte) => (byte - 128) * 100.0 / 128.0;
 
 void main() {
-  test('before anything lands every getter is null and no branch resolves',
-      () {
+  test('before anything lands every getter is null and no branch resolves', () {
     final h = _Harness(_everything);
     final s = h.snapshot;
-    expect(
-      [
-        s.latestSpeedKmh, s.latestRpm, s.latestThrottlePercent,
-        s.latestEngineLoadPercent, s.latestCoolantTempC,
-        s.latestFuelLevelPercent, s.latestCommandedPhi, s.latestBaroKpa,
-        s.latestAbsLoadPercent, s.latestMeasuredPhi, s.latestEthanolPercent,
-        s.latestPedalPercent, s.latestOilTempC, s.latestAmbientTempC,
-        s.latestIatCelsius, s.latestTimingAdvanceDeg, s.latestMaf,
-        s.latestMapKpa, s.latestStft, s.latestLtft,
-      ],
-      everyElement(isNull),
-    );
+    expect([
+      s.latestSpeedKmh,
+      s.latestRpm,
+      s.latestThrottlePercent,
+      s.latestEngineLoadPercent,
+      s.latestCoolantTempC,
+      s.latestFuelLevelPercent,
+      s.latestCommandedPhi,
+      s.latestBaroKpa,
+      s.latestAbsLoadPercent,
+      s.latestMeasuredPhi,
+      s.latestEthanolPercent,
+      s.latestPedalPercent,
+      s.latestOilTempC,
+      s.latestAmbientTempC,
+      s.latestIatCelsius,
+      s.latestTimingAdvanceDeg,
+      s.latestMaf,
+      s.latestMapKpa,
+      s.latestStft,
+      s.latestLtft,
+    ], everyElement(isNull));
     expect(s.lastFuelRateSource, isNull);
     expect(s.deriveFuelRateLPerHour(), isNull);
     expect(s.lastFuelRateSource, FuelRateSourceTag.none);
@@ -181,8 +189,11 @@ void main() {
     expect(s.latestFuelLevelPercent, _pct(0xB3));
     expect(s.latestOilTempC, 90.0);
     expect(s.latestAmbientTempC, 10.0);
-    expect(s.latestMeasuredPhi, 0x6666 * 2.0 / 65536.0,
-        reason: '0x24 over 0x34');
+    expect(
+      s.latestMeasuredPhi,
+      0x6666 * 2.0 / 65536.0,
+      reason: '0x24 over 0x34',
+    );
     expect(s.latestEthanolPercent, _pct(0xD9));
 
     // The silent-failure observer hears rpm, speed, throttle, 5E, MAF and
@@ -191,10 +202,14 @@ void main() {
     expect(h.speeds, [60.0]);
 
     // 0x9D is the top branch; E85-range ethanol picks the blended density.
-    final mixture =
-        resolveMixtureConstants(null, measuredEthanolPercent: _pct(0xD9));
-    expect(s.deriveFuelRateLPerHour(),
-        closeTo(10.0 * 3600.0 / mixture.densityGPerL, 1e-9));
+    final mixture = resolveMixtureConstants(
+      null,
+      measuredEthanolPercent: _pct(0xD9),
+    );
+    expect(
+      s.deriveFuelRateLPerHour(),
+      closeTo(10.0 * 3600.0 / mixture.densityGPerL, 1e-9),
+    );
     expect(s.lastFuelRateSource, FuelRateSourceTag.pid9D);
     expect(s.lastFuelRateBranch, Obd2BranchTag.pid5E);
     expect(s.lastFuelRateVe, isNull);
@@ -212,8 +227,7 @@ void main() {
     expect(h.highPriority, [1726.0, null]);
   });
 
-  test('pedal is the max of the channels that landed, not a running max',
-      () {
+  test('pedal is the max of the channels that landed, not a running max', () {
     final h = _Harness(_everything);
     h.scheduler.deliver('0149\r', '41 49 66'); // D 102/255
     expect(h.snapshot.latestPedalPercent, _pct(0x66));
@@ -257,19 +271,23 @@ void main() {
       ]) {
         h.deliver(c);
       }
-      final afr = effectiveAfrForMixture(kPetrolAfr,
-          measuredPhi: 0x6666 * 2.0 / 65536.0,
-          commandedPhi: 0x8CCD / 32768.0,
-          isDiesel: false);
+      final afr = effectiveAfrForObdMixture(
+        kPetrolAfr,
+        measuredLambda: 0x6666 * 2.0 / 65536.0,
+        commandedLambda: 0x8CCD / 32768.0,
+        isDiesel: false,
+      );
       final raw = 42.0 * 3600.0 / (afr * kPetrolDensityGPerL);
       expect(
         h.snapshot.deriveFuelRateLPerHour(),
         closeTo(
-          applyFuelTrimCorrection(raw,
-              stft: _trim(0x8D),
-              ltft: _trim(0x7A),
-              stftBank2: _trim(0x84),
-              ltftBank2: _trim(0x7C)),
+          applyFuelTrimCorrection(
+            raw,
+            stft: _trim(0x8D),
+            ltft: _trim(0x7A),
+            stftBank2: _trim(0x84),
+            ltftBank2: _trim(0x7C),
+          ),
           1e-9,
         ),
       );
@@ -281,8 +299,10 @@ void main() {
     test('MAF 0x10 alone is tagged maf', () {
       final h = _Harness(_everything);
       h.deliver('0110\r');
-      expect(h.snapshot.deriveFuelRateLPerHour(),
-          closeTo(10.24 * 3600.0 / (kPetrolAfr * kPetrolDensityGPerL), 1e-9));
+      expect(
+        h.snapshot.deriveFuelRateLPerHour(),
+        closeTo(10.24 * 3600.0 / (kPetrolAfr * kPetrolDensityGPerL), 1e-9),
+      );
       expect(h.snapshot.lastFuelRateSource, FuelRateSourceTag.maf);
     });
 
@@ -297,8 +317,11 @@ void main() {
         rpm: 1726.0,
         engineDisplacementCc: 1000,
         volumetricEfficiency: 0.85,
-        afr: effectiveAfrForMixture(kPetrolAfr,
-            commandedPhi: 0x8CCD / 32768.0, isDiesel: false),
+        afr: effectiveAfrForObdMixture(
+          kPetrolAfr,
+          commandedLambda: 0x8CCD / 32768.0,
+          isDiesel: false,
+        ),
         fuelDensityGPerL: kPetrolDensityGPerL,
         baroKpa: 95.0,
       );

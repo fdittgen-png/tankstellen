@@ -28,8 +28,8 @@ void main() {
       expect(signal('ltftBank1')['mean'], 6.25);
       expect(signal('fuelPressureGauge')['mean'], 300.0);
       expect(signal('ignitionTimingAdvance')['mean'], 12.0);
-      expect(signal('widebandVoltageSensor1Phi')['mean'], 1.0);
-      expect(signal('widebandCurrentSensor1Phi')['mean'], isNull);
+      expect(signal('widebandVoltageSensor1Lambda')['mean'], 1.0);
+      expect(signal('widebandCurrentSensor1Lambda')['mean'], isNull);
     },
   );
 
@@ -51,8 +51,8 @@ void main() {
     expect(signal('fuelPressureGauge')['decodedReadings'], 1);
     expect(signal('stftBank1')['status'], 'requestedWithoutUsableReply');
     expect(signal('ltftBank1')['status'], 'notRequested');
-    expect(signal('widebandVoltageSensor1Phi')['decodedReadings'], 0);
-    expect(signal('widebandVoltageSensor1Phi')['mean'], isNull);
+    expect(signal('widebandVoltageSensor1Lambda')['decodedReadings'], 0);
+    expect(signal('widebandVoltageSensor1Lambda')['mean'], isNull);
   });
 
   test(
@@ -92,17 +92,57 @@ void main() {
       expect(evidence.toJson()['malformedLines'], 1);
     },
   );
-  test('truncated positive replies do not clear codes or claim usable readings', () {
-    reply('03', '43 01 71');
-    reply('03', '43', 2000);
-    reply('03', '43 02 01 71', 3000);
-    reply('0124', '41 24 80');
-    final stored = (evidence.toJson()['faults'] as Map)['stored'] as Map;
-    expect(stored['latestCodes'], ['P0171']);
-    expect(stored['outcomes'], {'answered': 1, 'invalidReply': 2});
-    expect((evidence.toJson()['faults'] as Map)['changes'], hasLength(1));
-    expect(signal('widebandVoltageSensor1Phi')['status'], 'requestedWithoutUsableReply');
-    expect(signal('widebandVoltageSensor1Phi')['outcomes'], {'invalidReply': 1});
-  });
+  test(
+    'truncated positive replies do not clear codes or claim usable readings',
+    () {
+      reply('03', '43 01 71');
+      reply('03', '43', 2000);
+      reply('03', '43 02 01 71', 3000);
+      reply('0124', '41 24 80');
+      final stored = (evidence.toJson()['faults'] as Map)['stored'] as Map;
+      expect(stored['latestCodes'], ['P0171']);
+      expect(stored['outcomes'], {'answered': 1, 'invalidReply': 2});
+      expect((evidence.toJson()['faults'] as Map)['changes'], hasLength(1));
+      expect(
+        signal('widebandVoltageSensor1Lambda')['status'],
+        'requestedWithoutUsableReply',
+      );
+      expect(signal('widebandVoltageSensor1Lambda')['outcomes'], {
+        'invalidReply': 1,
+      });
+    },
+  );
 
+  test(
+    'decoded sensor timeline keeps real request timestamps without resampling',
+    () {
+      reply('0106', '41 06 90', 1234);
+      reply('0107', '41 07 88', 1678);
+      reply('0103', '41 03 02 00', 1900);
+      final timeline = evidence.toJson()['sensorTimeline'] as Map;
+      final rows = timeline['rows'] as List;
+      expect(rows, hasLength(3));
+      expect(rows[0], containsPair('atEpochMs', 1234));
+      expect((rows[0] as Map)['values'], containsPair('stftBank1', 12.5));
+      expect((rows[1] as Map)['values'], containsPair('ltftBank1', 6.25));
+      expect(timeline['resampled'], isFalse);
+      expect(timeline['omittedRows'], 0);
+    },
+  );
+
+  test(
+    'timeline cap is explicit while statistics still include later readings',
+    () {
+      for (var i = 0; i < DiagnosticEvidence.timelineRowCap + 2; i++) {
+        reply('0106', '41 06 90', i);
+      }
+      final timeline = evidence.toJson()['sensorTimeline'] as Map;
+      expect(timeline['rows'], hasLength(DiagnosticEvidence.timelineRowCap));
+      expect(timeline['omittedRows'], 2);
+      expect(
+        signal('stftBank1')['decodedReadings'],
+        DiagnosticEvidence.timelineRowCap + 2,
+      );
+    },
+  );
 }

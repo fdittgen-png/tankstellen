@@ -56,6 +56,9 @@ void main() {
         mag: 4.0,
         startSpeedKmh: 30,
         speedStepKmh: 0.5);
+    final record = det.eventRecords.first;
+    expect(record.startedAt, t0.add(cadence));
+    expect(ImuEventRecord.fromJson(record.toJson())!.startedAt, record.startedAt);
     expect(det.hardAccelCount, 1,
         reason: 'one sustained episode counts once, not per-sample');
     expect(det.hardBrakeCount, 0);

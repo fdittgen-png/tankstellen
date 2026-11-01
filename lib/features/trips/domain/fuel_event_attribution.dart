@@ -35,6 +35,7 @@ library;
 import 'dart:math' as math;
 
 import 'trip_sample.dart';
+import 'fuel_signal_evidence.dart';
 
 /// Event classes the attribution detects. [coasting] is the one
 /// positive class (litres SAVED, not wasted).
@@ -130,8 +131,10 @@ class FuelAttribution {
 
   const FuelAttribution({required this.events, required this.totalSeconds});
 
-  static const FuelAttribution empty =
-      FuelAttribution(events: [], totalSeconds: 0);
+  static const FuelAttribution empty = FuelAttribution(
+    events: [],
+    totalSeconds: 0,
+  );
 
   Iterable<FuelEvent> eventsOf(FuelEventType type) =>
       events.where((e) => e.type == type);
@@ -236,11 +239,9 @@ double _integrateLiters(
 }) {
   var liters = 0.0;
   for (var i = startIdx; i < endIdx; i++) {
-    final dt = sorted[i + 1]
-            .timestamp
-            .difference(sorted[i].timestamp)
-            .inMicroseconds /
-        Duration.microsecondsPerSecond;
+    final dt =
+        sorted[i + 1].timestamp.difference(sorted[i].timestamp).inMicroseconds /
+            Duration.microsecondsPerSecond;
     if (dt <= 0) continue;
     final measured = sorted[i].fuelRateLPerHour;
     var rate =
@@ -262,7 +263,11 @@ List<FuelEvent> _detectIdle(List<TripSample> sorted) => _runs(
         start: sorted[startIdx].timestamp,
         end: sorted[endIdx].timestamp,
         liters: _integrateLiters(
-            sorted, startIdx, endIdx, kIdleFuelRateAssumptionLPerHour),
+          sorted,
+          startIdx,
+          endIdx,
+          kIdleFuelRateAssumptionLPerHour,
+        ),
       ),
     );
 
@@ -301,8 +306,7 @@ List<FuelEvent> _detectHarshAccel(List<TripSample> sorted) {
     // capped at kAccelEventMaxSeconds.
     var end = i;
     while (end + 1 < sorted.length) {
-      final p =
-          sorted[end + 1].pedalPercent ?? sorted[end + 1].throttlePercent;
+      final p = sorted[end + 1].pedalPercent ?? sorted[end + 1].throttlePercent;
       if (p == null || p < kAccelPedalSpikePercent) break;
       final span = sorted[end + 1]
               .timestamp
@@ -332,12 +336,14 @@ List<FuelEvent> _detectHarshAccel(List<TripSample> sorted) {
       liters = kAccelFallbackLitersPerEvent;
     }
 
-    events.add(FuelEvent(
-      type: FuelEventType.harshAccel,
-      start: sorted[i].timestamp,
-      end: sorted[end].timestamp,
-      liters: liters,
-    ));
+    events.add(
+      FuelEvent(
+        type: FuelEventType.harshAccel,
+        start: sorted[i].timestamp,
+        end: sorted[end].timestamp,
+        liters: liters,
+      ),
+    );
     i = end + 1;
   }
   return events;
@@ -381,8 +387,8 @@ List<FuelEvent> _detectCoasting(List<TripSample> sorted) => _runs(
         // A fuel CUT requires a measured rate — an absent signal must
         // never be praised as coasting.
         final rate = prev.fuelRateLPerHour;
-        return rate != null &&
-            rate <= kFuelCutRateLPerHour &&
+        return isFuelCutObservable(prev) &&
+            rate! <= kFuelCutRateLPerHour &&
             prev.speedKmh >= kCoastingMinSpeedKmh;
       },
       minSeconds: kCoastingMinSeconds,

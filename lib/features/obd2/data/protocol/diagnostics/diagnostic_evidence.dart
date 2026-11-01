@@ -24,6 +24,17 @@ class DiagnosticEvidence {
   final Map<String, int> _oxygenPresence = {};
   bool _truncated = false, _ended = false;
   int _malformed = 0;
+  static const int timelineRowCap = 20000;
+  final List<Map<String, Object?>> _timeline = [];
+  int _omittedTimelineRows = 0;
+
+  void _recordTimeline(Map<String, Object?> row) {
+    if (_timeline.length < timelineRowCap) {
+      _timeline.add(row);
+    } else {
+      _omittedTimelineRows++;
+    }
+  }
 
   void addLine(String line) {
     try {
@@ -64,6 +75,7 @@ class DiagnosticEvidence {
     final c = (m['c'] as String).toUpperCase().replaceAll(' ', '');
     final r = m['r'] is String ? (m['r'] as String).toUpperCase() : '';
     final t = m['t'] is num ? (m['t'] as num).toInt() : null;
+    final values = <String, Object?>{};
     var outcome = 'invalidReply';
     if (m.containsKey('e')) {
       outcome = 'error';
@@ -78,15 +90,18 @@ class DiagnosticEvidence {
           final value = d.decode(b);
           if (value != null && value.isFinite && t != null) {
             (_signals[d.name] ??= _Signal()).add(value, t);
+            values[d.name] = value;
             outcome = 'answered';
           }
         }
         if (pid == 0x13 || pid == 0x1D) {
           _oxygenPresence[c] = b[0];
+          values['oxygenSensorPresenceByte'] = b[0];
           outcome = 'answered';
         }
         if (pid == 0x03 && b.length >= 2) {
           outcome = 'answered';
+          values['fuelSystemStatusBytes'] = b.take(2).toList();
           for (var bank = 0; bank < b.length && bank < 2; bank++) {
             final state =
                 'system${bank + 1}_0x${b[bank].toRadixString(16).padLeft(2, '0')}';
@@ -98,6 +113,7 @@ class DiagnosticEvidence {
           _mil = b[0] & 0x80 != 0;
           _reportedDtcCount = b[0] & 0x7F;
           _readinessBytes = b.take(4).toList();
+          values['monitorStatusBytes'] = _readinessBytes;
         }
       }
     } else if (c == 'ATRV') {
@@ -106,6 +122,7 @@ class DiagnosticEvidence {
       );
       if (v != null && v.isFinite && v > 0 && v < 30 && t != null) {
         (_signals['adapterVoltage'] ??= _Signal()).add(v, t);
+        values['adapterVoltage'] = v;
         outcome = 'answered';
       }
     } else if (const ['03', '07', '0A', '020200'].contains(c)) {
@@ -125,6 +142,14 @@ class DiagnosticEvidence {
     } else if (c.startsWith('02') && r.contains('42 ')) {
       _freezeFrames[c] = r;
       outcome = 'answered';
+    }
+    if (t != null && values.isNotEmpty) {
+      _recordTimeline({
+        'atEpochMs': t,
+        'command': c,
+        'values': values,
+        if (m['ms'] is num) 'roundTripMs': m['ms'],
+      });
     }
     final counts = _outcomes[c] ??= {};
     counts[outcome] = (counts[outcome] ?? 0) + 1;
@@ -146,6 +171,24 @@ class DiagnosticEvidence {
 
   Map<String, Object?> toJson() => {
     'schema': 1,
+    'systemScope': {
+      'standardObd': 'Engine/emissions and supported standard signals only',
+      'electrical': 'Supply-voltage evidence, not an electronics/module scan',
+      'robotizedTransmission': {
+        'assessment': 'notAssessed',
+        'missingManufacturerSpecificEvidence': [
+          'TCU fault scan', 'requested versus engaged gear',
+          'clutch and selector requested versus actual position',
+          'actuator current or force and adaptation state',
+        ],
+        'limits': 'Engine RPM/speed scores cannot establish a failed downshift, '
+            'actuator force or engine power loss. Generic gear observations, '
+            'when available, are not a complete transmission assessment.',
+      },
+      'absAirbagBodyModules': 'notAssessed',
+      'ethanol': 'Only a supported measured PID52 establishes ethanol percentage; '
+          'a profile fuel label or owner-reported E10 is not a measurement.',
+    },
     'status': 'recorded',
     'vehicle': _vehicle,
     'completeTrace': _ended && !_truncated && _malformed == 0,
@@ -200,6 +243,17 @@ class DiagnosticEvidence {
         },
     },
     'freezeFrameReplies': _freezeFrames,
+    'sensorTimeline': {
+      'rows': _timeline,
+      'rowCap': timelineRowCap,
+      'omittedRows': _omittedTimelineRows,
+      'resampled': false,
+      'timeBasis':
+          'adapter request epoch milliseconds; roundTripMs gives reply latency',
+      'limits':
+          'First rows retained when capped; statistics use all decoded readings. '
+          'The separately downloadable raw NDJSON keeps the original command series.',
+    },
     'limits':
         'First replying ECU per Mode01 command; diagnostic rates can be '
         'reduced on slow adapters. No answer is not proof of no fault. '

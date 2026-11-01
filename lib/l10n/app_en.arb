@@ -2352,6 +2352,79 @@
       }
     }
   },
+  "analysisLowGearInferredTitle": "Inferred low gear ({minutes} min)",
+  "@analysisLowGearInferredTitle": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisLowGearAdvice": "A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.",
+  "@analysisLowGearAdvice": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault."
+  },
+  "analysisHighRpmAdvice": "Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.",
+  "@analysisHighRpmAdvice": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault."
+  },
+  "analysisClimbContextAdvice": "Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.",
+  "@analysisClimbContextAdvice": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault."
+  },
+  "analysisRestartContextAdvice": "Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.",
+  "@analysisRestartContextAdvice": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault."
+  },
+  "analysisFuelTrimAddition": "Positive combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimAddition": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimRemoval": "Negative combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimRemoval": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimAdvice": "The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.",
+  "@analysisFuelTrimAdvice": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault."
+  },
+  "analysisCommandedEnrichment": "ECU commanded enrichment ({pctShare}% of warm samples)",
+  "@analysisCommandedEnrichment": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCommandedEnrichmentAdvice": "Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.",
+  "@analysisCommandedEnrichmentAdvice": {
+    "description": "Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault."
+  },
+  "analysisCommandedEnrichmentTrip": "ECU commanded enrichment ({pctShare}% of trip duration)",
+  "@analysisCommandedEnrichmentTrip": {
+    "description": "Neutral commanded lambda enrichment exposure over total trip duration, not proof of avoidable waste.",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTransmissionScope": "Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.",
+  "@analysisTransmissionScope": {
+    "description": "Limits of standard OBD for robotized-transmission diagnosis (#4572)."
+  },
   "approachOverlaySection": "Fuel Station Radar",
   "@approachOverlaySection": {
     "description": "Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661)."
@@ -8866,7 +8939,7 @@
       }
     }
   },
-  "obd2ReportDriveNoGear": "This car does not report the selected gear over standard OBD2, so moments are detected from speed, engine speed and pedal.",
+  "obd2ReportDriveNoGear": "No usable gear reading was recorded. The displayed moments are inferred from speed, engine speed and pedal; they do not establish a gearbox fault.",
   "@obd2ReportDriveNoGear": {
     "description": "Drive card note (#4552)."
   },
@@ -8917,7 +8990,7 @@
       }
     }
   },
-  "obd2ReportMixtureRich": "Fuel trims average {trim} %: the engine runs rich and the computer is removing fuel. This fits a fuel smell — injectors, fuel-pressure regulator or the purge valve.",
+  "obd2ReportMixtureRich": "Fuel trims average {trim} %: the ECU is removing fuel. This correction does not establish that the final mixture remains rich or identify a failed component.",
   "@obd2ReportMixtureRich": {
     "description": "Mixture card, rich (#4552).",
     "placeholders": {
@@ -8926,7 +8999,7 @@
       }
     }
   },
-  "obd2ReportMixtureLean": "Fuel trims average {trim} %: the engine runs lean and the computer is adding fuel — possible air leak or weak fuel delivery.",
+  "obd2ReportMixtureLean": "Fuel trims average {trim} %: the ECU is adding fuel. This correction does not establish that the final mixture remains lean or identify a failed component.",
   "@obd2ReportMixtureLean": {
     "description": "Mixture card, lean (#4552).",
     "placeholders": {

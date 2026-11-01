@@ -137,14 +137,14 @@ class Elm327Parsers {
   static FrameDecode<double> decodeOdometer(String raw) {
     final bytes = parseModeOneBody(raw, 0xA6, minBytes: 6);
     if (bytes == null) return const FrameDecode.absent();
-    final value = (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
+    final value =
+        (bytes[2] << 24) | (bytes[3] << 16) | (bytes[4] << 8) | bytes[5];
     return odometerFrameDecode(value / 10.0); // 1/10 km resolution
   }
 
   /// Parse calculated engine load from Mode 01 PID 04 response (#717).
   /// Formula: load% = value × 100 / 255. Response: "41 04 XX".
-  static double? parseEngineLoad(String raw) =>
-      _parse1BytePercent(raw, 0x04);
+  static double? parseEngineLoad(String raw) => _parse1BytePercent(raw, 0x04);
 
   /// Parse absolute throttle position from Mode 01 PID 11 response
   /// (#717). Formula: throttle% = value × 100 / 255. Response:
@@ -195,16 +195,9 @@ class Elm327Parsers {
     return bytes[2].toDouble();
   }
 
-  /// Parse the commanded fuel–air equivalence ratio φ from a Mode 01
-  /// PID 44 response (#2456, convention verified #3426). Formula:
-  /// φ = (256·A + B) × 2 / 65536 (= /32768, dimensionless). Response:
-  /// "41 44 XX YY". SAE J1979 defines PID 0x44 as the *fuel–air*
-  /// equivalence ratio φ = (F/A)/(F/A)stoich: φ ≈ 1.0 at stoichiometry;
-  /// **φ < 1 is LEAN** (less fuel per unit air), **φ > 1 is RICH**
-  /// (power-enrichment); λ = 1/φ. The effective AFR the engine is
-  /// actually targeting is `stoichAFR / φ` (≡ `stoichAFR × λ`) — see
-  /// `effectiveAfrForPhi` — which the fuel-rate estimator uses in place
-  /// of the assumed-stoich AFR when this PID is available.
+  /// Parse raw commanded LAMBDA from Mode01 PID44: (256*A+B)/32768.
+  /// Lambda < 1 is rich; > 1 is lean. The live mixture adapter converts
+  /// this raw value to true phi once at the fuel-math boundary (#4572).
   static double? parseCommandedEquivalenceRatio(String raw) {
     final bytes = parseModeOneBody(raw, 0x44, minBytes: 4);
     if (bytes == null) return null;
@@ -253,8 +246,7 @@ class Elm327Parsers {
   /// Parse long-term fuel trim bank 1 from Mode 01 PID 07 response
   /// (#813). Same formula as STFT — captures persistent mixture
   /// offsets rather than the fast-feedback loop.
-  static double? parseLongTermFuelTrim(String raw) =>
-      _parseFuelTrim(raw, 0x07);
+  static double? parseLongTermFuelTrim(String raw) => _parseFuelTrim(raw, 0x07);
 
   /// Parse short-term fuel trim bank 2 from Mode 01 PID 08 response
   /// (#2458). Identical encoding to bank-1 STFT; only V / boxer engines

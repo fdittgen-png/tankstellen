@@ -151,8 +151,8 @@ class ImuEventDetector {
     _sampleCount++;
     if (lastT == null) return; // first sample seeds the dt anchor only.
 
-    final dt = s.t.difference(lastT).inMicroseconds /
-        Duration.microsecondsPerSecond;
+    final dt =
+        s.t.difference(lastT).inMicroseconds / Duration.microsecondsPerSecond;
     // A non-positive dt (duplicate / out-of-order) or a long gap (a sensor
     // dropout / paused trip) breaks every running episode so no integral
     // spans it — the same guard the speed-derivative gate uses.
@@ -196,6 +196,7 @@ class ImuEventDetector {
     // records BEFORE scoring, so a confirmation in this same tick lands
     // on the already-open stretch.
     _stretches.onSample(
+      timestamp: s.t,
       strong: strong,
       dt: dt,
       horizMag: horizMag,
@@ -338,18 +339,15 @@ class ImuEventDetector {
     }
   }
 
-  void _emit(
-    HarshEventType type,
-    double magMps2,
-    DateTime t,
-    double speedKmh,
-  ) {
-    onEvent?.call(HarshEvent(
-      timestamp: t,
-      magnitudeG: magMps2 / standardGravityMps2,
-      speedKmh: speedKmh,
-      type: type,
-    ));
+  void _emit(HarshEventType type, double magMps2, DateTime t, double speedKmh) {
+    onEvent?.call(
+      HarshEvent(
+        timestamp: t,
+        magnitudeG: magMps2 / standardGravityMps2,
+        speedKmh: speedKmh,
+        type: type,
+      ),
+    );
   }
 
   void _breakEpisodes() {

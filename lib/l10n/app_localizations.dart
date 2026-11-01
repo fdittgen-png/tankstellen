@@ -6094,6 +6094,78 @@ abstract class AppLocalizations {
     String consumption,
   );
 
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Inferred low gear ({minutes} min)'**
+  String analysisLowGearInferredTitle(String minutes);
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.'**
+  String get analysisLowGearAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.'**
+  String get analysisHighRpmAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.'**
+  String get analysisClimbContextAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.'**
+  String get analysisRestartContextAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive combined fuel correction; mean LTFT magnitude {pctTrim}%'**
+  String analysisFuelTrimAddition(String pctTrim);
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Negative combined fuel correction; mean LTFT magnitude {pctTrim}%'**
+  String analysisFuelTrimRemoval(String pctTrim);
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.'**
+  String get analysisFuelTrimAdvice;
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'ECU commanded enrichment ({pctShare}% of warm samples)'**
+  String analysisCommandedEnrichment(String pctShare);
+
+  /// Source-aware trip analysis wording (#4572); evidence is not a mechanical diagnosis or proof of driver fault.
+  ///
+  /// In en, this message translates to:
+  /// **'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.'**
+  String get analysisCommandedEnrichmentAdvice;
+
+  /// Neutral commanded lambda enrichment exposure over total trip duration, not proof of avoidable waste.
+  ///
+  /// In en, this message translates to:
+  /// **'ECU commanded enrichment ({pctShare}% of trip duration)'**
+  String analysisCommandedEnrichmentTrip(String pctShare);
+
+  /// Limits of standard OBD for robotized-transmission diagnosis (#4572).
+  ///
+  /// In en, this message translates to:
+  /// **'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.'**
+  String get analysisTransmissionScope;
+
   /// Section title in the profile edit sheet for the in-trip Fuel Station Radar settings (#2067 / Epic #2065 / #2661).
   ///
   /// In en, this message translates to:
@@ -13673,7 +13745,7 @@ abstract class AppLocalizations {
   /// Drive card note (#4552).
   ///
   /// In en, this message translates to:
-  /// **'This car does not report the selected gear over standard OBD2, so moments are detected from speed, engine speed and pedal.'**
+  /// **'No usable gear reading was recorded. The displayed moments are inferred from speed, engine speed and pedal; they do not establish a gearbox fault.'**
   String get obd2ReportDriveNoGear;
 
   /// Card title (#4552).
@@ -13715,13 +13787,13 @@ abstract class AppLocalizations {
   /// Mixture card, rich (#4552).
   ///
   /// In en, this message translates to:
-  /// **'Fuel trims average {trim} %: the engine runs rich and the computer is removing fuel. This fits a fuel smell — injectors, fuel-pressure regulator or the purge valve.'**
+  /// **'Fuel trims average {trim} %: the ECU is removing fuel. This correction does not establish that the final mixture remains rich or identify a failed component.'**
   String obd2ReportMixtureRich(String trim);
 
   /// Mixture card, lean (#4552).
   ///
   /// In en, this message translates to:
-  /// **'Fuel trims average {trim} %: the engine runs lean and the computer is adding fuel — possible air leak or weak fuel delivery.'**
+  /// **'Fuel trims average {trim} %: the ECU is adding fuel. This correction does not establish that the final mixture remains lean or identify a failed component.'**
   String obd2ReportMixtureLean(String trim);
 
   /// Card title (#4552).

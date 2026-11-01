@@ -72,10 +72,11 @@ mixin _LiveSampleSnapshotLatches {
         signal == VehicleSignal.widebandPhi
             ? _precision.measuredPhiReading()
             : _signals.reading(signal),
-        isDiesel: resolveMixtureConstants(_vehicle,
-                    sessionFuelTypeKey: sessionFuelTypeKey,
-                    measuredEthanolPercent: _precision.ethanolPercent)
-                .kind ==
+        isDiesel: resolveMixtureConstants(
+              _vehicle,
+              sessionFuelTypeKey: sessionFuelTypeKey,
+              measuredEthanolPercent: _precision.ethanolPercent,
+            ).kind ==
             ResolvedFuelKind.diesel,
       );
 
@@ -97,8 +98,8 @@ mixin _LiveSampleSnapshotLatches {
   // controller's `_emit` persists onto each TripSample (#2459). The
   // raw mixture inputs (MAF / MAP / STFT / LTFT) are read here too so the
   // diagnostic-capture path can stamp them for post-hoc re-derivation.
-  // (Named λ pre-#3426; the commanded wire value is the SAE fuel–air
-  // equivalence ratio φ — see `effectiveAfrForPhi`.)
+  // Legacy *Phi getters retain raw OBD lambda for codec/live compatibility.
+  // The fuel-math input adapter converts lambda to true phi exactly once.
   double? get latestCommandedPhi => _latest(VehicleSignal.commandedPhi);
   double? get latestBaroKpa => _latest(VehicleSignal.baroPressure);
   double? get latestAbsLoadPercent => _latest(VehicleSignal.absoluteLoad);
@@ -127,6 +128,7 @@ mixin _LiveSampleSnapshotLatches {
     }
     return best;
   }
+
   double? get latestOilTempC => _latest(VehicleSignal.oilTemp);
   double? get latestAmbientTempC => _latest(VehicleSignal.ambientAirTemp);
 
@@ -152,7 +154,8 @@ mixin _LiveSampleSnapshotLatches {
     _latestLatitude = latitude;
     _latestLongitude = longitude;
     // #2692 C4-B — chokepoint isFinite guard (NaN altitude poisoned grade math).
-    _latestAltitudeM = (altitudeM != null && altitudeM.isFinite) ? altitudeM : null;
+    _latestAltitudeM =
+        (altitudeM != null && altitudeM.isFinite) ? altitudeM : null;
     _latestHAccuracyM = hAccuracyM;
     _latestBearingDeg = bearingDeg;
   }

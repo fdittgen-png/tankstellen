@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:convert';
+import 'driving_score_evidence.dart';
 
 import '../../../../core/domain/consumption_estimate.dart';
 import '../../domain/driving_score.dart';
@@ -73,7 +74,7 @@ class DrivingAnalysisTrace {
   /// Purely additive; v5 readers that ignore unknown keys still parse.
   /// v7: health signal summaries and provenance classes; exported files also
   /// attach the exact session's optional diagnostic evidence.
-  static const int schema = 7;
+  static const int schema = 8;
 
   final DateTime capturedAt;
 
@@ -133,6 +134,9 @@ class DrivingAnalysisTrace {
     this.automatic = false,
     this.roadLoad,
     this.dimensions,
+    this.patternEvidence,
+    this.mixtureLessonEvidence,
+    this.kinematicTimeline,
   });
 
   /// #3795 — how the recording ended. Null for trips saved before the
@@ -167,6 +171,9 @@ class DrivingAnalysisTrace {
 
   /// #4205 — the behaviour dimensions (value + confidence + evidence).
   final Map<String, Object?>? dimensions;
+  final Map<String, Object?>? patternEvidence;
+  final Map<String, Object?>? mixtureLessonEvidence;
+  final Map<String, Object?>? kinematicTimeline;
 
   /// #4233 — the trip's consumption as the canonical contract. No vehicle:
   /// the export records the stored figure, never a re-expression.
@@ -223,12 +230,44 @@ class DrivingAnalysisTrace {
           // near-misses) for threshold calibration against verdicts.
           'events': [for (final r in summary.imuEventRecords) r.toJson()],
           'droppedEvents': summary.imuEventRecordsDropped,
+          'recordDefinitions': {
+            't':
+                'first observed strong sample, epoch milliseconds; absent on legacy records',
+            'o': 'outcome: confirmed accel/brake/corner or rejection reason',
+            'p': 'peak horizontal acceleration, m/s2',
+            'd': 'duration, seconds',
+            's': 'speed at start, km/h',
+            'n': 'net speed change, km/h',
+            'y': 'peak absolute yaw rate, rad/s',
+            'droppedEvents': 'bounded diagnostic stretch records omitted due to '
+                'micro-jolt filtering or record caps; not lost sensor samples '
+                'and not confirmed harsh manoeuvre counts',
+            'totalRecordCap': kImuEventRecordCap,
+            'unconfirmedRecordCap': kImuUnconfirmedRecordCap,
+          },
         },
         'roadLoad': roadLoad,
         'dimensions': dimensions,
+        'patternEvidence': patternEvidence,
+        'mixtureLessonEvidence': mixtureLessonEvidence,
+        'kinematicTimeline': kinematicTimeline,
         'gpsFeatures': gpsFeatures == null
             ? null
             : {
+                'definitions': {
+                  'source':
+                      'stored trip speed/position samples; available on OBD trips too',
+                  'rpa':
+                      'm/s2, positive acceleration weighted by speed / distance',
+                  'pke':
+                      'm/s2, sum of positive squared-speed changes / distance',
+                  'vapos': 'm2/s3, mean positive speed * acceleration',
+                  'coastShare':
+                      'speed-derived gentle slowing share; not injector shutoff',
+                  'calibration':
+                      'Do not use a verdict inferred from these detectors '
+                          'as independent ground truth for tuning the same detectors.',
+                },
                 'rpa': _round(gpsFeatures!.relativePositiveAcceleration, 4),
                 'pke': _round(gpsFeatures!.positiveKineticEnergy, 4),
                 'vapos': _round(gpsFeatures!.meanPositiveVa, 4),
@@ -246,9 +285,8 @@ class DrivingAnalysisTrace {
                 // through the accuracy/min-speed gates.
                 'gates': const {
                   'maxAccelG': 'instantaneous sample-to-sample peak, clamped',
-                  'events':
-                      'sustained >=1.0s at >=3.0 (accel) / >=3.5 (brake) '
-                          'm/s2, accuracy- and min-speed-gated',
+                  'events': 'sustained >=1.0s at >=3.0 (accel) / >=3.5 (brake) '
+                      'm/s2, accuracy- and min-speed-gated',
                 },
                 'meanSpeedKmh': _round(gpsFeatures!.meanSpeedKmh, 1),
                 'speedBandSeconds': {
@@ -271,8 +309,7 @@ class DrivingAnalysisTrace {
         // termination is unknown, so "not recorded" is explicit rather
         // than a missing key the reader has to interpret.
         'session': {
-          'terminationReason':
-              termination?.reason.name ?? 'unrecorded',
+          'terminationReason': termination?.reason.name ?? 'unrecorded',
           if (termination?.detail != null)
             'terminationDetail': termination!.detail,
           'automatic': automatic,
@@ -280,6 +317,9 @@ class DrivingAnalysisTrace {
           if (adapterMac != null) 'adapterMac': adapterMac,
           'startedAt': summary.startedAt?.toIso8601String(),
           'endedAt': summary.endedAt?.toIso8601String(),
+          'timelineOrigin': 'obd2Link.t is milliseconds since controller start, '
+              'before protocol/identity reads; summary times bound retained samples. '
+              'The ended link event may include bounded shutdown work.',
         },
         // #3797/#3798 — the correlated lifecycle timeline. Null (not an
         // empty object) when the trip never recorded one, so a legacy
@@ -309,30 +349,18 @@ class DrivingAnalysisTrace {
         // when there is no track to judge; the gap list inside is capped
         // at [GpsCoverageReport.kExportGapCap] entries.
         'gpsCoverage': gpsCoverage?.toJson(),
-        'score': {
-          'overall': score.score,
-          'styleClass': score.styleClass.name,
-          // #3350 — the counts the penalties were ACTUALLY computed from,
-          // read straight off the score so they can never disagree with the
-          // penalty. #3029 sourced these from `summary.harshAccelerations`,
-          // but on an OBD2 trip with the IMU inactive the score's penalty is
-          // driven by the sample-derived gate, not the (suppressed→0) summary
-          // figure — so a 15-pt penalty showed alongside count 0 (the phantom
-          // this fixes). The `imu.*Count` block above stays the inertial-sensor
-          // truth.
-          'hardAccelCount': score.hardAccelEvents,
-          'hardBrakeCount': score.hardBrakeEvents,
-          'hardAccelPenalty': _round(score.hardAccelPenalty, 2),
-          'hardBrakePenalty': _round(score.hardBrakePenalty, 2),
-          'idlingPenalty': _round(score.idlingPenalty, 2),
-          'highRpmPenalty': _round(score.highRpmPenalty, 2),
-          'luggingPenalty': _round(score.luggingPenalty, 2),
-        },
+        'score': drivingScoreEvidence(score),
         // What the app currently TELLS the user — so an annotation that
         // disagrees pinpoints exactly which judgment to retune.
         'lessons': [
           for (final l in lessons)
-            {'id': l.id, 'polarity': l.polarity.name, 'title': l.title},
+            {
+              'id': l.id,
+              'polarity': l.polarity.name,
+              'title': l.title,
+              'metricValue': l.metricValue,
+              'advice': l.advice,
+            },
         ],
       };
 

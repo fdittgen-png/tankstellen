@@ -185,14 +185,14 @@ void main() {
       );
     });
 
-    test('enrichment (λ=0.9) yields a factor < 1.0', () {
+    test('enrichment (lambda=0.9) yields a factor < 1.0', () {
       final f = BaselineRollingState.fuelMassCorrectionFactor(
           precisionReading(lambda: 0.9));
       expect(f, lessThan(1.0));
       expect(f, closeTo(0.9, 1e-9));
     });
 
-    test('lean cruise (λ=1.1) yields a factor > 1.0', () {
+    test('lean cruise (lambda=1.1) yields a factor > 1.0', () {
       final f = BaselineRollingState.fuelMassCorrectionFactor(
           precisionReading(lambda: 1.1));
       expect(f, greaterThan(1.0));

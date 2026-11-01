@@ -35,14 +35,17 @@ class _Capture extends PidScheduler {
   _Capture() : super(transport: (_) async => 'NO DATA');
   final Map<String, void Function(String)> callbacks = {};
   @override
-  void subscribe(String command, ScheduledPid config,
-      void Function(String response) onResult) {
+  void subscribe(
+    String command,
+    ScheduledPid config,
+    void Function(String response) onResult,
+  ) {
     callbacks[command] = onResult;
   }
 }
 
 ({LiveSampleSnapshot snapshot, void Function(String, String) deliver})
-    _snapshot({VehicleProfile? vehicle}) {
+_snapshot({VehicleProfile? vehicle}) {
   final scheduler = _Capture();
   final snapshot = LiveSampleSnapshot(
     service: _Service(),
@@ -51,63 +54,85 @@ class _Capture extends PidScheduler {
     onSpeedSample: (_) {},
     clock: () => DateTime.utc(2026, 9, 16, 12),
   )..subscribeAllTiers(scheduler);
-  return (
-    snapshot: snapshot,
-    deliver: (c, f) => scheduler.callbacks[c]!(f),
-  );
+  return (snapshot: snapshot, deliver: (c, f) => scheduler.callbacks[c]!(f));
 }
 
 void main() {
-  const diesel =
-      VehicleProfile(id: 'd', name: 'd', preferredFuelType: 'diesel');
+  const diesel = VehicleProfile(
+    id: 'd',
+    name: 'd',
+    preferredFuelType: 'diesel',
+  );
 
-  test('commanded φ 1.9: marked implausible, stored unclamped, fuel as the '
-      'clamp made it', () {
-    final a = _snapshot();
-    a.deliver('0110\r', '41 10 04 00');
-    a.deliver('0144\r', '41 44 F3 33'); // 0xF333 / 32768 ≈ 1.9
-    final r = a.snapshot.reading(VehicleSignal.commandedPhi);
-    expect(r.plausibility, SignalPlausibility.implausible);
-    expect(a.snapshot.latestCommandedPhi, 0xF333 / 32768.0);
+  test(
+    'commanded lambda 0.4: marked implausible, stored unclamped, fuel as the '
+    'clamp made it',
+    () {
+      final a = _snapshot();
+      a.deliver('0110\r', '41 10 04 00');
+      a.deliver('0144\r', '41 44 33 33'); // 0x3333 / 32768 ≈ 0.4
+      final r = a.snapshot.reading(VehicleSignal.commandedPhi);
+      expect(r.plausibility, SignalPlausibility.implausible);
+      expect(a.snapshot.latestCommandedPhi, 0x3333 / 32768.0);
 
-    final b = _snapshot();
-    b.deliver('0110\r', '41 10 04 00');
-    b.deliver('0144\r', '41 44 C0 00'); // exactly 1.5, the clamp edge
-    expect(b.snapshot.reading(VehicleSignal.commandedPhi).plausibility,
-        SignalPlausibility.plausible);
-    expect(a.snapshot.deriveFuelRateLPerHour(),
-        b.snapshot.deriveFuelRateLPerHour());
-  });
+      final b = _snapshot();
+      b.deliver('0110\r', '41 10 04 00');
+      b.deliver(
+        '0144\r',
+        '41 44 55 56',
+      ); // lambda just above 2/3, the true-phi 1.5 clamp edge
+      expect(
+        b.snapshot.reading(VehicleSignal.commandedPhi).plausibility,
+        SignalPlausibility.plausible,
+      );
+      expect(
+        a.snapshot.deriveFuelRateLPerHour(),
+        closeTo(b.snapshot.deriveFuelRateLPerHour()!, 0.001),
+      );
+    },
+  );
 
   test('baro 50 kPa is implausible; 95 kPa is plausible', () {
     final s = _snapshot();
     s.deliver('0133\r', '41 33 32');
-    expect(s.snapshot.reading(VehicleSignal.baroPressure).plausibility,
-        SignalPlausibility.implausible);
+    expect(
+      s.snapshot.reading(VehicleSignal.baroPressure).plausibility,
+      SignalPlausibility.implausible,
+    );
     s.deliver('0133\r', '41 33 5F');
-    expect(s.snapshot.reading(VehicleSignal.baroPressure).plausibility,
-        SignalPlausibility.plausible);
+    expect(
+      s.snapshot.reading(VehicleSignal.baroPressure).plausibility,
+      SignalPlausibility.plausible,
+    );
   });
 
-  test('measured φ 0.1 is plausible on a diesel, implausible on petrol', () {
-    const frame = '41 24 0C CD 00 00'; // 0x0CCD / 32768 ≈ 0.1
+  test('measured lambda 0.8 is plausible on petrol, implausible on diesel', () {
+    const frame = '41 24 66 66 00 00'; // 0x6666 / 32768 ≈ 0.8
     final d = _snapshot(vehicle: diesel);
     d.deliver('0124\r', frame);
-    expect(d.snapshot.reading(VehicleSignal.widebandPhi).plausibility,
-        SignalPlausibility.plausible);
+    expect(
+      d.snapshot.reading(VehicleSignal.widebandPhi).plausibility,
+      SignalPlausibility.implausible,
+    );
     final p = _snapshot();
     p.deliver('0124\r', frame);
-    expect(p.snapshot.reading(VehicleSignal.widebandPhi).plausibility,
-        SignalPlausibility.implausible);
+    expect(
+      p.snapshot.reading(VehicleSignal.widebandPhi).plausibility,
+      SignalPlausibility.plausible,
+    );
   });
 
   test('signals without a band stay unchecked; nothing landed stays '
       'unchecked', () {
     final s = _snapshot();
     s.deliver('0105\r', '41 05 FF');
-    expect(s.snapshot.reading(VehicleSignal.coolantTemp).plausibility,
-        SignalPlausibility.notChecked);
-    expect(s.snapshot.reading(VehicleSignal.baroPressure).plausibility,
-        SignalPlausibility.notChecked);
+    expect(
+      s.snapshot.reading(VehicleSignal.coolantTemp).plausibility,
+      SignalPlausibility.notChecked,
+    );
+    expect(
+      s.snapshot.reading(VehicleSignal.baroPressure).plausibility,
+      SignalPlausibility.notChecked,
+    );
   });
 }

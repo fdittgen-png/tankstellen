@@ -40,6 +40,7 @@ void main() {
         speedKmh: speed,
         rpm: rpm,
         fuelRateLPerHour: rate,
+        fuelSource: rate == null ? null : 'pid5E',
         pedalPercent: pedal,
       );
 

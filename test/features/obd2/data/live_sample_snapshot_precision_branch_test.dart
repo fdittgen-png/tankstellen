@@ -72,8 +72,8 @@ void main() {
   const maf66A = '41 66 01 05 40>'; // PID 0x66 sensor A: 42 g/s
   const rate9d = '41 9D 01 F4 00 00>'; // 10.0 g/s engine fuel
   const cylRate = '41 A2 02 80>'; // 20 mg/stroke
-  const phiLean = '41 24 66 66 32 DD>'; // measured φ ≈ 0.7999
-  const phiRich44 = '41 44 99 9A>'; // commanded φ ≈ 1.2
+  const lambdaRich = '41 24 66 66 32 DD>'; // measured lambda ≈ 0.7999, rich
+  const lambdaLean44 = '41 44 99 9A>'; // commanded lambda ≈ 1.2, lean
   const ethanol85 = '41 52 D9>'; // 0xD9=217 → ≈ 85.1 %
   const stftPlus10 = '41 06 8D>'; // +10.16 %
   const ltftZero = '41 07 80>'; // 0 %
@@ -148,34 +148,38 @@ void main() {
   });
 
   group('measured φ over commanded (#3427) — live path', () {
-    test('fresh wideband φ (0x24) beats commanded 0x44 in the MAF branch',
-        () async {
-      final snap = await _filledSnapshot(
-        supported: {0x10, 0x24, 0x44},
-        responses: {'0110': maf10, '0124': phiLean, '0144': phiRich44},
-      );
-      final rate = snap.deriveFuelRateLPerHour();
-      // effAFR = 14.7 / 0.7999 (measured LEAN), not 14.7 / 1.2.
-      const effAfr = kPetrolAfr / (0x6666 * 2.0 / 65536.0);
-      expect(
-        rate,
-        closeTo(10.24 * 3600.0 / (effAfr * kPetrolDensityGPerL), 0.02),
-      );
-    });
+    test(
+      'fresh wideband φ (0x24) beats commanded 0x44 in the MAF branch',
+      () async {
+        final snap = await _filledSnapshot(
+          supported: {0x10, 0x24, 0x44},
+          responses: {'0110': maf10, '0124': lambdaRich, '0144': lambdaLean44},
+        );
+        final rate = snap.deriveFuelRateLPerHour();
+        // effAFR = 14.7 * 0.7999 (measured rich), not 14.7 * 1.2.
+        const effAfr = kPetrolAfr * (0x6666 * 2.0 / 65536.0);
+        expect(
+          rate,
+          closeTo(10.24 * 3600.0 / (effAfr * kPetrolDensityGPerL), 0.02),
+        );
+      },
+    );
 
-    test('commanded 0x44 remains the fallback without a wideband sensor',
-        () async {
-      final snap = await _filledSnapshot(
-        supported: {0x10, 0x44},
-        responses: {'0110': maf10, '0144': phiRich44},
-      );
-      final rate = snap.deriveFuelRateLPerHour();
-      const effAfr = kPetrolAfr / (0x999A * 2.0 / 65536.0);
-      expect(
-        rate,
-        closeTo(10.24 * 3600.0 / (effAfr * kPetrolDensityGPerL), 0.02),
-      );
-    });
+    test(
+      'commanded 0x44 remains the fallback without a wideband sensor',
+      () async {
+        final snap = await _filledSnapshot(
+          supported: {0x10, 0x44},
+          responses: {'0110': maf10, '0144': lambdaLean44},
+        );
+        final rate = snap.deriveFuelRateLPerHour();
+        const effAfr = kPetrolAfr * (0x999A * 2.0 / 65536.0);
+        expect(
+          rate,
+          closeTo(10.24 * 3600.0 / (effAfr * kPetrolDensityGPerL), 0.02),
+        );
+      },
+    );
   });
 
   group('diesel gating (#3430) — live path', () {
@@ -185,33 +189,36 @@ void main() {
       preferredFuelType: 'diesel',
     );
 
-    test('diesel skips STFT/LTFT trim AND the commanded-φ adjustment', () async {
-      final snap = await _filledSnapshot(
-        supported: {0x10, 0x44, 0x06, 0x07},
-        responses: {
-          '0110': maf10,
-          '0144': phiRich44, // must NOT be applied on diesel
-          '0106': stftPlus10, // must NOT be applied on diesel
-          '0107': ltftZero,
-        },
-        vehicle: diesel,
-      );
-      final rate = snap.deriveFuelRateLPerHour();
-      // Pure stoich diesel math — no trim factor, no φ.
-      expect(
-        rate,
-        closeTo(10.24 * 3600.0 / (kDieselAfr * kDieselDensityGPerL), 0.01),
-      );
-    });
+    test(
+      'diesel skips STFT/LTFT trim AND the commanded-φ adjustment',
+      () async {
+        final snap = await _filledSnapshot(
+          supported: {0x10, 0x44, 0x06, 0x07},
+          responses: {
+            '0110': maf10,
+            '0144': lambdaLean44, // must NOT be applied on diesel
+            '0106': stftPlus10, // must NOT be applied on diesel
+            '0107': ltftZero,
+          },
+          vehicle: diesel,
+        );
+        final rate = snap.deriveFuelRateLPerHour();
+        // Pure stoich diesel math — no trim factor, no φ.
+        expect(
+          rate,
+          closeTo(10.24 * 3600.0 / (kDieselAfr * kDieselDensityGPerL), 0.01),
+        );
+      },
+    );
 
-    test('diesel USES a measured wideband φ (deep-lean allowed)', () async {
+    test('diesel USES measured lean wideband lambda 1.6', () async {
       final snap = await _filledSnapshot(
         supported: {0x10, 0x24},
-        responses: {'0110': maf10, '0124': phiLean},
+        responses: {'0110': maf10, '0124': '41 24 CC CD 32 DD>'},
         vehicle: diesel,
       );
       final rate = snap.deriveFuelRateLPerHour();
-      const effAfr = kDieselAfr / (0x6666 * 2.0 / 65536.0);
+      const effAfr = kDieselAfr * (0xCCCD / 32768.0);
       expect(
         rate,
         closeTo(10.24 * 3600.0 / (effAfr * kDieselDensityGPerL), 0.02),
@@ -224,13 +231,13 @@ void main() {
         supported: {0x10, 0x44, 0x06, 0x07},
         responses: {
           '0110': maf10,
-          '0144': phiRich44,
+          '0144': lambdaLean44,
           '0106': stftPlus10,
           '0107': ltftZero,
         },
       );
       final rate = snap.deriveFuelRateLPerHour();
-      const effAfr = kPetrolAfr / (0x999A * 2.0 / 65536.0);
+      const effAfr = kPetrolAfr * (0x999A * 2.0 / 65536.0);
       const raw = 10.24 * 3600.0 / (effAfr * kPetrolDensityGPerL);
       const stft = (0x8D - 128) * 100.0 / 128.0;
       expect(rate, closeTo(raw * (1.0 + stft / 100.0), 0.02));
@@ -238,20 +245,22 @@ void main() {
   });
 
   group('ethanol blend + session fuel type (#3429) — live path', () {
-    test('measured 0x52 ≈ 85 % swaps the petrol constants for the blend',
-        () async {
-      final snap = await _filledSnapshot(
-        supported: {0x10, 0x52},
-        responses: {'0110': maf10, '0152': ethanol85},
-      );
-      final rate = snap.deriveFuelRateLPerHour();
-      final blend = blendedAfrDensityForEthanol(217 * 100.0 / 255.0);
-      expect(
-        rate,
-        closeTo(10.24 * 3600.0 / (blend.afr * blend.densityGPerL), 0.03),
-      );
-      expect(snap.latestEthanolPercent, closeTo(85.1, 0.1));
-    });
+    test(
+      'measured 0x52 ≈ 85 % swaps the petrol constants for the blend',
+      () async {
+        final snap = await _filledSnapshot(
+          supported: {0x10, 0x52},
+          responses: {'0110': maf10, '0152': ethanol85},
+        );
+        final rate = snap.deriveFuelRateLPerHour();
+        final blend = blendedAfrDensityForEthanol(217 * 100.0 / 255.0);
+        expect(
+          rate,
+          closeTo(10.24 * 3600.0 / (blend.afr * blend.densityGPerL), 0.03),
+        );
+        expect(snap.latestEthanolPercent, closeTo(85.1, 0.1));
+      },
+    );
 
     test('session 0x51 key (diesel) beats a petrol profile key', () async {
       const petrolProfile = VehicleProfile(

@@ -136,20 +136,15 @@ const double kMinCommandedPhi = 0.5;
 const double kMaxCommandedPhi = 1.5;
 
 /// Translate a stoichiometric AFR into the effective AFR the engine is
-/// actually running, given the fuel–air equivalence ratio φ (PID 0x44
+/// actually running, given the true fuel–air equivalence ratio φ (reciprocal of PID 0x44
 /// commanded, or a measured wideband 0x24–0x2B / 0x34–0x3B value —
 /// #2456, convention verified + renamed in #3426).
 ///
-/// **Convention (SAE J1979 / J1979-DA):** PID 0x44 is the *"Fuel–Air
-/// commanded equivalence ratio"* — φ = (F/A)actual / (F/A)stoich. So
-/// **φ > 1 is RICH** (power enrichment: more fuel per unit air →
-/// effective AFR *lower*) and **φ < 1 is LEAN** (cruise / DFCO approach:
-/// less fuel → effective AFR *higher*). λ, the excess-air ratio
-/// (AFR_actual / AFR_stoich), is the reciprocal: λ = 1/φ. This function
-/// therefore computes `effAFR = stoichAFR / φ` — algebraically identical
-/// to `stoichAFR × λ`. (Pre-#3426 the code computed exactly this but
-/// CALLED the value λ, and one parser doc said "× λ" — the math was
-/// correct for the φ wire value; only the naming/docs were inverted.)
+/// This helper accepts TRUE phi = 1/lambda, NOT the raw J1979 value.
+/// J1979 PID44 and wideband PIDs encode lambda (AFR_actual/AFR_stoich):
+/// lambda < 1 is rich, > 1 is lean. `effectiveAfrForObdMixture` reciprocates
+/// the raw/stored lambda exactly once before calling this true-phi API.
+/// Thus `stoichAFR / phi` equals `stoichAFR * lambda`.
 ///
 /// Because the fuel-rate math divides the air mass by the AFR, the
 /// derived fuel scales up with φ (φ = 1.2 → ~20 % more fuel) and down
@@ -291,9 +286,9 @@ double applyFuelTrimCorrection(
 ///
 /// #2456 — two optional ECU signals refine the estimate when available
 /// and leave it byte-for-byte unchanged when absent:
-///   - [phi] (fuel–air equivalence ratio, PID 0x44 / wideband — #3426):
+///   - [phi] (true fuel–air equivalence ratio, reciprocal of wire lambda):
 ///     the [afr] is replaced with [effectiveAfrForPhi]`(afr, phi)`, so a
-///     richer mixture (φ > 1, SAE J1979 convention) yields
+///     richer mixture (true φ > 1) yields
 ///     proportionally more fuel and a lean commanded mixture (φ < 1)
 ///     less. Null → the assumed stoich [afr].
 ///   - [baroKpa] (absolute barometric pressure, PID 0x33): the air mass
@@ -332,17 +327,19 @@ double? estimateFuelRateLPerHourFromMap({
   // Kilograms of air per second (ideal gas law × VE).
   final airMassKgPerS =
       (mapPa * displacementM3 * intakesPerSecond * etaV) /
-          (_gasConstant * iatKelvin);
+      (_gasConstant * iatKelvin);
   // #2456 — ambient air-density correction. A measured baro below sea
   // level (altitude) thins the charge, above raises it; clamped so a
   // garbage reading can't invert or blow up the air mass. Null → 1.0,
   // i.e. the pre-#2456 sea-level assumption, unchanged.
   final baroFactor = baroKpa == null
       ? 1.0
-      : (baroKpa / kSeaLevelBaroKpa)
-          .clamp(kMinBaroDensityFactor, kMaxBaroDensityFactor);
+      : (baroKpa / kSeaLevelBaroKpa).clamp(
+          kMinBaroDensityFactor,
+          kMaxBaroDensityFactor,
+        );
   final airMassGPerS = airMassKgPerS * 1000.0 * baroFactor;
-  // #2456 / #3426 — when φ (PID 0x44, SAE fuel–air equivalence ratio) is
+  // #2456 / #3426 — when true φ (reciprocal of PID 0x44 lambda) is
   // present, divide by the effective AFR (`afr / φ`) instead of the
   // assumed stoich AFR. Null → [afr].
   final effectiveAfr = effectiveAfrForPhi(afr, phi);

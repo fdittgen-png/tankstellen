@@ -112,7 +112,7 @@ void main() {
       );
       final json = jsonDecode(utf8.decode(writes.single.bytes)) as Map;
       final health = json['vehicleHealth'] as Map;
-      expect(json['schema'], 7);
+      expect(json['schema'], 8);
       expect(health['status'], 'recorded');
       expect(health['completeTrace'], isTrue);
       expect(

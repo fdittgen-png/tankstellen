@@ -9,7 +9,7 @@ import 'elm327_decode_util.dart';
 ///
 ///   - **Wideband O2 equivalence ratio** — PIDs 0x24–0x2B (ratio + voltage)
 ///     and 0x34–0x3B (ratio + current), #3427. Bytes A/B carry the MEASURED
-///     fuel–air equivalence ratio φ; C/D carry the sensor voltage / current
+///     lambda; C/D carry the sensor voltage / current
 ///     (not needed for fuel math, ignored here).
 ///   - **MAF sensor A/B** — PID 0x66 (#3428), the modern dual-sensor MAF.
 ///   - **Engine fuel rate (g/s)** — PID 0x9D (#3428), the direct mass-based
@@ -18,17 +18,12 @@ import 'elm327_decode_util.dart';
 ///   - **Ethanol fuel %** — PID 0x52 (#3429), drives the dynamic petrol↔E85
 ///     AFR / density blend.
 ///
-/// ## The equivalence-ratio convention (SAE J1979 / J1979-DA, #3426)
+/// ## Wire convention (#4572)
 ///
-/// SAE J1979-DA names PIDs 0x24–0x2B / 0x34–0x3B / 0x44 the *"Fuel–Air
-/// equivalence ratio"*: φ = (F/A)actual / (F/A)stoich. **φ > 1 is RICH**
-/// (more fuel per unit air), **φ < 1 is LEAN**; λ (the excess-air ratio,
-/// AFR_actual / AFR_stoich) is its reciprocal, λ = 1/φ. The wire encoding
-/// for the ratio bytes is `(256·A + B) × 2 / 65536` (= `/ 32768`), range
-/// 0 … <2, with 1.0 = stoichiometry. Every parser in this file returns the
-/// raw φ value under that convention — see `effectiveAfrForPhi` in
-/// `fuel_rate_estimator.dart` for how it becomes an effective AFR
-/// (`stoichAFR / φ`, equivalently `stoichAFR × λ`).
+/// PIDs 0x24–0x2B / 0x34–0x3B / 0x44 encode lambda = AFR_actual / AFR_stoich
+/// as `(256*A+B)/32768`. Lambda < 1 is rich and > 1 is lean. Historical
+/// Phi-named parser/getter/codec aliases retain this raw lambda. Only the
+/// fuel-math adapter reciprocates it into true phi = 1/lambda.
 class Elm327PrecisionPids {
   const Elm327PrecisionPids._();
 
@@ -37,7 +32,14 @@ class Elm327PrecisionPids {
   /// ECU-specific, but sensor 1 (0x24) is bank-1-sensor-1 on virtually
   /// every production layout — the primary fuel-control sensor.
   static const List<int> widebandVoltagePids = [
-    0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B,
+    0x24,
+    0x25,
+    0x26,
+    0x27,
+    0x28,
+    0x29,
+    0x2A,
+    0x2B,
   ];
 
   /// Wideband O2 sensor PIDs whose C/D bytes are the sensor CURRENT
@@ -45,7 +47,14 @@ class Elm327PrecisionPids {
   /// bytes A/B as [widebandVoltagePids]; only the paired electrical
   /// channel differs.
   static const List<int> widebandCurrentPids = [
-    0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B,
+    0x34,
+    0x35,
+    0x36,
+    0x37,
+    0x38,
+    0x39,
+    0x3A,
+    0x3B,
   ];
 
   /// Every wideband equivalence-ratio PID, voltage-paired sensors first.
@@ -81,22 +90,15 @@ class Elm327PrecisionPids {
   /// Request ethanol fuel percentage. Mode 01, PID 0x52 (#3429).
   static const ethanolPercentCommand = '0152\r';
 
-  /// Parse the MEASURED fuel–air equivalence ratio φ from a wideband O2
-  /// response (#3427). Response: `"41 <pid> AA BB CC DD"`; the ratio is
-  /// `(256·A + B) × 2 / 65536` (dimensionless, 0 … <2, 1.0 = stoich;
-  /// φ > 1 rich, φ < 1 lean — SAE J1979-DA, see the class doc). The C/D
-  /// voltage / current bytes are ignored. Only the A/B bytes are required
-  /// (`minBytes: 4`) so an adapter that clips the trailing electrical
-  /// channel still yields the ratio.
-  ///
-  /// Returns null on NO DATA / malformed frames AND on an all-zero ratio:
-  /// φ = 0 encodes "ratio not available from this sensor right now", not a
-  /// real mixture, and letting it through would zero the derived fuel.
+  /// Parse raw measured wideband LAMBDA, (256*A+B)/32768. The historical
+  /// method name says Phi, but the returned wire value and stored mq
+  /// column remain lambda for compatibility. Fuel math explicitly inverts
+  /// it at its input boundary. Zero means unavailable.
   static double? parseEquivalenceRatioPhi(String raw, int pid) {
     final bytes = parseModeOneBody(raw, pid, minBytes: 4);
     if (bytes == null) return null;
-    final phi = ((bytes[2] * 256) + bytes[3]) * 2.0 / 65536.0;
-    return phi <= 0 ? null : phi;
+    final lambda = ((bytes[2] * 256) + bytes[3]) * 2.0 / 65536.0;
+    return lambda <= 0 ? null : lambda;
   }
 
   /// Parse total mass air flow (g/s) from a Mode 01 PID 0x66 response

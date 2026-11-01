@@ -100,9 +100,11 @@ double? _rate(
   Map<String, String> frames, {
   VehicleProfile? vehicle,
   ReferenceVehicle? reference,
-}) =>
-    _snapshot(frames, vehicle: vehicle, reference: reference)
-        .deriveFuelRateLPerHour();
+}) => _snapshot(
+  frames,
+  vehicle: vehicle,
+  reference: reference,
+).deriveFuelRateLPerHour();
 
 // Raw fixtures (real ELM327 Mode 01 wire format).
 const _maf10 = {'0110': '41 10 04 00'}; // 10.24 g/s
@@ -125,16 +127,15 @@ double _sd2500Rate({
   required double ve,
   double afr = kPetrolAfr,
   double density = kPetrolDensityGPerL,
-}) =>
-    estimateFuelRateLPerHourFromMap(
-      mapKpa: 65,
-      iatCelsius: 30,
-      rpm: 2500,
-      engineDisplacementCc: cc,
-      volumetricEfficiency: ve,
-      afr: afr,
-      fuelDensityGPerL: density,
-    )!;
+}) => estimateFuelRateLPerHourFromMap(
+  mapKpa: 65,
+  iatCelsius: 30,
+  rpm: 2500,
+  engineDisplacementCc: cc,
+  volumetricEfficiency: ve,
+  afr: afr,
+  fuelDensityGPerL: density,
+)!;
 
 void main() {
   group('branch chain (#717 / #800 / #813)', () {
@@ -168,9 +169,10 @@ void main() {
     test('speed-density with IAT missing returns null and records a none '
         'crumb carrying the partial inputs', () {
       final collector = Obd2BreadcrumbCollector();
-      final snap = _snapshot(
-          {'010B': '41 0B 40', '010C': '41 0C 0C 80'},
-          collector: collector);
+      final snap = _snapshot({
+        '010B': '41 0B 40',
+        '010C': '41 0C 0C 80',
+      }, collector: collector);
       expect(snap.deriveFuelRateLPerHour(), isNull);
       expect(collector.entries.last.branch, Obd2BranchTag.none);
       expect(collector.entries.last.mapKpa, closeTo(64, 0.01));
@@ -224,8 +226,10 @@ void main() {
     });
 
     test('dieselPremium routes through the diesel constants', () {
-      expect(_rate(_maf10, vehicle: fuel('dieselPremium')),
-          closeTo(3.056, 0.01));
+      expect(
+        _rate(_maf10, vehicle: fuel('dieselPremium')),
+        closeTo(3.056, 0.01),
+      );
     });
 
     test('cng reuses the petrol-equivalent pair', () {
@@ -248,33 +252,45 @@ void main() {
     });
   });
 
-  group('commanded φ 0x44 and baro 0x33 (#2456 / #3426)', () {
+  group('commanded wire lambda 0x44 and baro 0x33 (#2456 / #3426)', () {
     double mafWith0x44(String frame) => _rate({..._maf10, '0144': frame})!;
 
-    test('φ = 1.2 derives ~20 % more fuel than stoich (≈ 4.067 L/h)', () {
-      expect(mafWith0x44('41 44 99 9A'), closeTo(4.067, 0.02));
+    test('lambda = 1.2 is lean and derives less fuel (≈ 2.824 L/h)', () {
+      expect(mafWith0x44('41 44 99 9A'), closeTo(2.824, 0.02));
     });
 
-    test('φ = 0.9 derives less fuel (≈ 3.050 L/h)', () {
-      expect(mafWith0x44('41 44 73 33'), closeTo(3.050, 0.02));
+    test('lambda = 0.9 is rich and derives more fuel (≈ 3.766 L/h)', () {
+      expect(mafWith0x44('41 44 73 33'), closeTo(3.766, 0.02));
     });
 
-    test('raw lean frame (41 44 66 66) yields ~20 % less fuel than stoich '
+    test('raw rich frame (41 44 66 66) yields ~25 % more fuel than stoich '
         '(41 44 80 00) — the SAE direction, end to end', () {
-      final lean = mafWith0x44('41 44 66 66');
+      final rich = mafWith0x44('41 44 66 66');
       final stoich = mafWith0x44('41 44 80 00');
-      expect(lean, lessThan(stoich));
-      expect(lean / stoich, closeTo(0.7999, 0.005));
+      expect(rich, greaterThan(stoich));
+      expect(rich / stoich, closeTo(1 / 0.7999, 0.005));
       expect(stoich, closeTo(_petrolMaf, 1e-9));
     });
 
-    test('raw rich frame (41 44 99 9A) yields ~20 % more than stoich', () {
-      expect(mafWith0x44('41 44 99 9A') / mafWith0x44('41 44 80 00'),
-          closeTo(1.2, 0.005));
+    test('raw lean frame (41 44 99 9A) yields less than stoich', () {
+      expect(
+        mafWith0x44('41 44 99 9A') / mafWith0x44('41 44 80 00'),
+        closeTo(1 / 1.2, 0.005),
+      );
     });
 
-    test('speed-density at altitude (baro 84 kPa) scales by 84 / 101.325',
-        () {
+    test(
+      'actual speed-density path also honors rich/lean wire lambda direction',
+      () {
+        final stoich = _rate({..._sdIdle, '0144': '41 44 80 00'})!;
+        final rich = _rate({..._sdIdle, '0144': '41 44 66 66'})!;
+        final lean = _rate({..._sdIdle, '0144': '41 44 99 9A'})!;
+        expect(rich / stoich, closeTo(1 / 0.8, 0.005));
+        expect(lean / stoich, closeTo(1 / 1.2, 0.005));
+      },
+    );
+
+    test('speed-density at altitude (baro 84 kPa) scales by 84 / 101.325', () {
       final sea = _rate(_sdIdle)!;
       final altitude = _rate({..._sdIdle, '0133': '41 33 54'})!;
       expect(altitude, lessThan(sea));
@@ -353,18 +369,22 @@ void main() {
         manualFuelDensityGPerLOverride: 800.0,
       );
       final (rate, ve) = sd(profile, duster);
-      expect(rate,
-          closeTo(_sd2500Rate(cc: 1700, ve: 0.92, afr: 14.0, density: 800), 1e-9));
+      expect(
+        rate,
+        closeTo(_sd2500Rate(cc: 1700, ve: 0.92, afr: 14.0, density: 800), 1e-9),
+      );
       expect(ve, 0.92);
       expect(
-          (rate -
-                  _sd2500Rate(
-                      cc: 1461,
-                      ve: 0.86,
-                      afr: kDieselAfr,
-                      density: kDieselDensityGPerL))
-              .abs(),
-          greaterThan(0.1));
+        (rate -
+                _sd2500Rate(
+                  cc: 1461,
+                  ve: 0.86,
+                  afr: kDieselAfr,
+                  density: kDieselDensityGPerL,
+                ))
+            .abs(),
+        greaterThan(0.1),
+      );
     });
 
     test('no overrides → the profile fields', () {
@@ -376,14 +396,17 @@ void main() {
         preferredFuelType: 'diesel',
       );
       expect(
-          sd(profile, duster).$1,
-          closeTo(
-              _sd2500Rate(
-                  cc: 1500,
-                  ve: 0.90,
-                  afr: kDieselAfr,
-                  density: kDieselDensityGPerL),
-              1e-9));
+        sd(profile, duster).$1,
+        closeTo(
+          _sd2500Rate(
+            cc: 1500,
+            ve: 0.90,
+            afr: kDieselAfr,
+            density: kDieselDensityGPerL,
+          ),
+          1e-9,
+        ),
+      );
     });
 
     test('only the AFR overridden: displacement, η_v and density keep their '
@@ -397,11 +420,17 @@ void main() {
         manualAfrOverride: 14.0,
       );
       expect(
-          sd(profile, duster).$1,
-          closeTo(
-              _sd2500Rate(
-                  cc: 1461, ve: 0.86, afr: 14.0, density: kDieselDensityGPerL),
-              1e-9));
+        sd(profile, duster).$1,
+        closeTo(
+          _sd2500Rate(
+            cc: 1461,
+            ve: 0.86,
+            afr: 14.0,
+            density: kDieselDensityGPerL,
+          ),
+          1e-9,
+        ),
+      );
     });
 
     test('profile 1600 cc × 0.88 differs clearly from the 1000 cc × 0.85 '
@@ -419,17 +448,27 @@ void main() {
     });
 
     test('profile displacement with the model-default η_v 0.85', () {
-      const profile =
-          VehicleProfile(id: 'v2', name: '1.6L', engineDisplacementCc: 1600);
-      expect(sd(profile, null).$1,
-          closeTo(_sd2500Rate(cc: 1600, ve: 0.85), 1e-9));
+      const profile = VehicleProfile(
+        id: 'v2',
+        name: '1.6L',
+        engineDisplacementCc: 1600,
+      );
+      expect(
+        sd(profile, null).$1,
+        closeTo(_sd2500Rate(cc: 1600, ve: 0.85), 1e-9),
+      );
     });
 
     test('no profile displacement → 1000 cc; the profile η_v still wins', () {
-      const profile =
-          VehicleProfile(id: 'v3', name: 'no cc', volumetricEfficiency: 0.72);
-      expect(sd(profile, null).$1,
-          closeTo(_sd2500Rate(cc: 1000, ve: 0.72), 1e-9));
+      const profile = VehicleProfile(
+        id: 'v3',
+        name: 'no cc',
+        volumetricEfficiency: 0.72,
+      );
+      expect(
+        sd(profile, null).$1,
+        closeTo(_sd2500Rate(cc: 1000, ve: 0.72), 1e-9),
+      );
     });
 
     test('doubling the displacement doubles the rate', () {
@@ -438,30 +477,46 @@ void main() {
         '010F': '41 0F 41', // IAT 25 °C
         '010C': '41 0C 0E A6', // 939.5 rpm
       };
-      final oneLitre = _rate(frames,
-          vehicle: const VehicleProfile(
-              id: 'a', name: '1.0L', engineDisplacementCc: 1000))!;
-      final twoLitre = _rate(frames,
-          vehicle: const VehicleProfile(
-              id: 'b', name: '2.0L', engineDisplacementCc: 2000))!;
+      final oneLitre = _rate(
+        frames,
+        vehicle: const VehicleProfile(
+          id: 'a',
+          name: '1.0L',
+          engineDisplacementCc: 1000,
+        ),
+      )!;
+      final twoLitre = _rate(
+        frames,
+        vehicle: const VehicleProfile(
+          id: 'b',
+          name: '2.0L',
+          engineDisplacementCc: 2000,
+        ),
+      )!;
       expect(twoLitre / oneLitre, closeTo(2.0, 0.01));
     });
 
     test('the catalog displacement is NOT consulted: a profile without one '
         'uses 1000 cc (#4315 — the pull reader used the catalog row)', () {
       const profile = VehicleProfile(
-          id: 'v', name: 'Duster (catalog)', preferredFuelType: 'diesel');
+        id: 'v',
+        name: 'Duster (catalog)',
+        preferredFuelType: 'diesel',
+      );
       final (rate, ve) = sd(profile, duster);
       expect(ve, 0.85);
       expect(
-          rate,
-          closeTo(
-              _sd2500Rate(
-                  cc: 1000,
-                  ve: 0.85,
-                  afr: kDieselAfr,
-                  density: kDieselDensityGPerL),
-              1e-9));
+        rate,
+        closeTo(
+          _sd2500Rate(
+            cc: 1000,
+            ve: 0.85,
+            afr: kDieselAfr,
+            density: kDieselDensityGPerL,
+          ),
+          1e-9,
+        ),
+      );
     });
 
     test('a profile displacement still beats the catalog, with the profile '
@@ -472,8 +527,10 @@ void main() {
         engineDisplacementCc: 1800,
         volumetricEfficiency: 0.92,
       );
-      expect(sd(profile, peugeot208).$1,
-          closeTo(_sd2500Rate(cc: 1800, ve: 0.92), 1e-9));
+      expect(
+        sd(profile, peugeot208).$1,
+        closeTo(_sd2500Rate(cc: 1800, ve: 0.92), 1e-9),
+      );
     });
 
     group('η_v engine-tech defaults (#1422 phase 1)', () {
@@ -521,38 +578,54 @@ void main() {
         expect(ve, 0.95);
         const diesel = (afr: kDieselAfr, density: kDieselDensityGPerL);
         expect(
-            rate,
-            closeTo(
-                _sd2500Rate(
-                    cc: 1461,
-                    ve: 0.95,
-                    afr: diesel.afr,
-                    density: diesel.density),
-                1e-9));
+          rate,
+          closeTo(
+            _sd2500Rate(
+              cc: 1461,
+              ve: 0.95,
+              afr: diesel.afr,
+              density: diesel.density,
+            ),
+            1e-9,
+          ),
+        );
         expect(
-            rate,
-            greaterThan(_sd2500Rate(
-                cc: 1461,
-                ve: 0.85,
-                afr: diesel.afr,
-                density: diesel.density)));
+          rate,
+          greaterThan(
+            _sd2500Rate(
+              cc: 1461,
+              ve: 0.85,
+              afr: diesel.afr,
+              density: diesel.density,
+            ),
+          ),
+        );
       });
 
       test('cold-start profile + turbo-DI petrol → 0.93', () {
         const profile = VehicleProfile(
-            id: 'v', name: '208 cold', engineDisplacementCc: 1199);
+          id: 'v',
+          name: '208 cold',
+          engineDisplacementCc: 1199,
+        );
         expect(sd(profile, peugeot208).$2, 0.93);
       });
 
       test('cold-start profile + Atkinson → 0.70', () {
         const profile = VehicleProfile(
-            id: 'v', name: 'Yaris cold', engineDisplacementCc: 1490);
+          id: 'v',
+          name: 'Yaris cold',
+          engineDisplacementCc: 1490,
+        );
         expect(sd(profile, yarisHybrid).$2, 0.70);
       });
 
       test('no catalog match → the 0.85 hard fallback', () {
         const profile = VehicleProfile(
-            id: 'v', name: 'niche import', engineDisplacementCc: 1500);
+          id: 'v',
+          name: 'niche import',
+          engineDisplacementCc: 1500,
+        );
         final (rate, ve) = sd(profile, null);
         expect(ve, 0.85);
         expect(rate, closeTo(_sd2500Rate(cc: 1500, ve: 0.85), 1e-9));
@@ -583,8 +656,9 @@ void main() {
   group('breadcrumbs and sanity bounds (#1395)', () {
     test('a 5E tick records a 5E crumb with the rate and the constants', () {
       final collector = Obd2BreadcrumbCollector();
-      final rate = _snapshot({'015E': '41 5E 00 50'}, collector: collector)
-          .deriveFuelRateLPerHour();
+      final rate = _snapshot({
+        '015E': '41 5E 00 50',
+      }, collector: collector).deriveFuelRateLPerHour();
       expect(rate, closeTo(4.0, 0.01));
       expect(collector.entries, hasLength(1));
       final crumb = collector.entries.single;
@@ -603,17 +677,20 @@ void main() {
         collector: collector,
       ).deriveFuelRateLPerHour();
       expect(rate, closeTo(0.2, 0.01));
-      expect(collector.entries.single.flag,
-          Obd2BreadcrumbCollector.flagSuspiciousLow);
+      expect(
+        collector.entries.single.flag,
+        Obd2BreadcrumbCollector.flagSuspiciousLow,
+      );
       expect(collector.entries.single.rpm, closeTo(2176, 0.5));
       expect(collector.suspiciousSampleCount, 1);
     });
 
     test('bound A: the same low rate at idle is not flagged', () {
       final collector = Obd2BreadcrumbCollector();
-      _snapshot({'015E': '41 5E 00 04', '010C': '41 0C 0C 80'},
-              collector: collector)
-          .deriveFuelRateLPerHour();
+      _snapshot({
+        '015E': '41 5E 00 04',
+        '010C': '41 0C 0C 80',
+      }, collector: collector).deriveFuelRateLPerHour();
       expect(collector.entries.single.flag, isNull);
       expect(collector.suspiciousSampleCount, 0);
     });
@@ -624,11 +701,12 @@ void main() {
         '015E': '41 5E 01 40', // 16.0 L/h vs MAF-derived ≈ 3.39
         ..._maf10,
         '010C': '41 0C 0C 80',
-      }, collector: collector)
-          .deriveFuelRateLPerHour();
+      }, collector: collector).deriveFuelRateLPerHour();
       expect(collector.entries, hasLength(1));
-      expect(collector.entries.single.flag,
-          Obd2BreadcrumbCollector.flag5eVsMafDivergent);
+      expect(
+        collector.entries.single.flag,
+        Obd2BreadcrumbCollector.flag5eVsMafDivergent,
+      );
       expect(collector.suspiciousSampleCount, 1);
     });
 
@@ -638,8 +716,7 @@ void main() {
         '015E': '41 5E 00 44', // 3.4 L/h
         ..._maf10,
         '010C': '41 0C 0C 80',
-      }, collector: collector)
-          .deriveFuelRateLPerHour();
+      }, collector: collector).deriveFuelRateLPerHour();
       expect(collector.entries.single.flag, isNull);
       expect(collector.suspiciousSampleCount, 0);
     });

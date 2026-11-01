@@ -3448,6 +3448,59 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Geschätzter niedriger Gang ($minutes Min.)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'Bei passender Last und Straßenlage kann ein höherer Gang die Drehzahl senken. Diese Schätzung weist kein Fahren mit zu niedriger Drehzahl nach.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Zeit über 3000 U/min ist ein heuristischer Hinweis, kein Nachweis falscher Fahrweise. Motor, Last und Straßenlage sind zu berücksichtigen.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Steigungen benötigen auch bei ruhiger Fahrweise mehr Energie. Diese Streckenkosten sind kein Fahrfehler.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Verkehr oder Ampeln können diese Stopps erfordern. Der Energiebedarf beweist nicht, dass die Stopps vermeidbar waren.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive gesamte Kraftstoffkorrektur; mittlerer LTFT-Betrag $pctTrim %';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative gesamte Kraftstoffkorrektur; mittlerer LTFT-Betrag $pctTrim %';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'Das Steuergerät passt die Kraftstoffzufuhr an. Dies weist weder ein defektes Bauteil noch ein weiterhin zu mageres oder fettes Gemisch nach. Messwerte, Betriebszustand und Fehlercodes prüfen.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'Steuergerät fordert Anreicherung an ($pctShare % der warmen Messwerte)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Anreicherung kann den Motor unter Last schützen. Die Aufzeichnung allein weist weder einen Defekt noch vermeidbaren Mehrverbrauch nach.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'Steuergerät fordert Anreicherung an ($pctShare % der Fahrtdauer)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard-OBD-Beobachtungen beurteilen weder ein automatisiertes Schaltgetriebe noch die Stellkraft. Für einen fehlgeschlagenen Gangwechsel sind getriebespezifische Fehler sowie Soll- und Istwerte von Gang, Kupplung und Schaltung nötig.';
+
+  @override
   String get approachOverlaySection => 'Tankstellen-Radar';
 
   @override
@@ -8336,7 +8389,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get obd2ReportDriveNoGear =>
-      'Dieses Auto meldet den eingelegten Gang nicht über Standard-OBD2; die Momente werden aus Geschwindigkeit, Drehzahl und Pedal erkannt.';
+      'Es wurde kein nutzbarer Gangwert aufgezeichnet. Die angezeigten Momente werden aus Geschwindigkeit, Drehzahl und Pedal abgeleitet; sie belegen keinen Getriebefehler.';
 
   @override
   String get obd2ReportEngineTitle => 'Motor';
@@ -8366,12 +8419,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String obd2ReportMixtureRich(String trim) {
-    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: der Motor läuft fett und das Steuergerät nimmt Kraftstoff weg. Das passt zu Benzingeruch — Einspritzdüsen, Druckregler oder Tankentlüftungsventil.';
+    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: das Steuergerät nimmt Kraftstoff weg. Diese Korrektur belegt weder ein weiterhin fettes Gemisch noch ein defektes Bauteil.';
   }
 
   @override
   String obd2ReportMixtureLean(String trim) {
-    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: der Motor läuft mager und das Steuergerät gibt Kraftstoff dazu — mögliches Falschluft-Leck oder schwache Kraftstoffversorgung.';
+    return 'Die Kraftstoffkorrektur liegt im Schnitt bei $trim %: das Steuergerät gibt Kraftstoff dazu. Diese Korrektur belegt weder ein weiterhin mageres Gemisch noch ein defektes Bauteil.';
   }
 
   @override

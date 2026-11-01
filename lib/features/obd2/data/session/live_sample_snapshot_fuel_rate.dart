@@ -50,7 +50,10 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
   /// #4159 — the last [deriveFuelRateLPerHour] figure with provenance (see
   /// `fuelRateReadingOf`). Reads only: records no breadcrumb.
   SignalReading fuelRateReading() => fuelRateReadingOf(
-      _lastFuelRateLPerHour, _lastFuelRateSource, at: _lastFuelRateAt);
+        _lastFuelRateLPerHour,
+        _lastFuelRateSource,
+        at: _lastFuelRateAt,
+      );
 
   /// Derive the current fuel rate (L/h) from whatever snapshot
   /// values have landed so far — the scheduler has already done the
@@ -92,7 +95,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     final afr = mixture.afr;
     final density = mixture.densityGPerL;
     // #3430 — diesel gate: skip the petrol stoich-feedback corrections
-    // (STFT/LTFT trims + commanded φ); only a measured wideband φ is
+    // (STFT/LTFT trims + commanded φ); only a measured wideband lambda is
     // trusted. See the accuracy-limit doc in `fuel_mixture_model.dart`.
     final isDiesel = mixture.kind == ResolvedFuelKind.diesel;
     // #3888 — on an ethanol fuel the enrichment is already in the AFR the
@@ -110,16 +113,18 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     );
     _lastPumpGainResolution = gainResolution;
     final pumpGain = gainResolution.gain;
-    final displacement = _vehicle?.manualEngineDisplacementCcOverride
-            ?.round() ??
-        _vehicle?.engineDisplacementCc ??
-        1000;
+    final displacement =
+        _vehicle?.manualEngineDisplacementCcOverride?.round() ??
+            _vehicle?.engineDisplacementCc ??
+            1000;
     // #1422 phase 1 — manual override → stored profile (when learned or
     // non-default) → engine-tech helper on the reference catalog row →
     // hard 0.85 fallback.
     final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
-        profileVolumetricEfficiency(_vehicle,
-            hasReferenceVehicle: _referenceVehicle != null) ??
+        profileVolumetricEfficiency(
+          _vehicle,
+          hasReferenceVehicle: _referenceVehicle != null,
+        ) ??
         (_referenceVehicle != null
             ? defaultVolumetricEfficiency(_referenceVehicle)
             : 0.85);
@@ -156,7 +161,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
           collector?.recordFlag(
             Obd2BreadcrumbCollector.flag9dVs5eDivergent,
             'rate9d=${lph.toStringAsFixed(2)};'
-                'pid5e=${direct5e.toStringAsFixed(2)}',
+            'pid5e=${direct5e.toStringAsFixed(2)}',
           );
         }
         _lastFuelRateBranch = Obd2BranchTag.pid5E;
@@ -226,13 +231,12 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       final mafSnapshot = _latest(VehicleSignal.maf);
       if (mafSnapshot != null) {
         final mafDerived = mafSnapshot * 3600.0 / (afr * density);
-        if (mafDerived > 0 &&
-            (direct - mafDerived).abs() / mafDerived > 0.5) {
+        if (mafDerived > 0 && (direct - mafDerived).abs() / mafDerived > 0.5) {
           collector?.recordFlag(
             Obd2BreadcrumbCollector.flag5eVsMafDivergent,
             'direct=${direct.toStringAsFixed(2)};'
-                'mafDerived=${mafDerived.toStringAsFixed(2)};'
-                'maf=${mafSnapshot.toStringAsFixed(2)}',
+            'mafDerived=${mafDerived.toStringAsFixed(2)};'
+            'maf=${mafSnapshot.toStringAsFixed(2)}',
           );
         }
       }
@@ -245,16 +249,16 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // #3428 — the dual-sensor PID 0x66 total is preferred over the legacy
     // PID 0x10 when both landed (0x66 carries per-bank resolution).
     // #2456 / #3427 / #3430 — the assumed stoich AFR is replaced with the
-    // mixture-resolved effective AFR: freshest MEASURED wideband φ beats
-    // commanded φ (0x44); diesel trusts only the measured value. All
+    // mixture-resolved effective AFR: freshest MEASURED wideband lambda beats
+    // commanded lambda (0x44); diesel trusts only the measured value. All
     // null → `effectiveAfr == afr`, i.e. unchanged.
     final maf66 = _precision.mafSensorGPerS;
     final maf = maf66 ?? _latest(VehicleSignal.maf);
     if (maf != null) {
-      final effectiveAfr = effectiveAfrForMixture(
+      final effectiveAfr = effectiveAfrForObdMixture(
         afr,
-        measuredPhi: latestMeasuredPhi,
-        commandedPhi: _latest(VehicleSignal.commandedPhi),
+        measuredLambda: latestMeasuredPhi,
+        commandedLambda: _latest(VehicleSignal.commandedPhi),
         isDiesel: isDiesel,
       );
       final raw = maf * 3600.0 / (effectiveAfr * density);
@@ -262,8 +266,11 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       // diesel (they don't model a lean-burn mixture).
       // #4233 — through the fuzzy stage, which applies the gain once.
       final corrected = estimatedFuelRateLPerHour(
-          skipTrim ? raw : _applyTrim(raw), FuzzyPhysicsBasis.maf,
-          pumpGain: pumpGain, context: _fuzzyContext());
+        skipTrim ? raw : _applyTrim(raw),
+        FuzzyPhysicsBasis.maf,
+        pumpGain: pumpGain,
+        context: _fuzzyContext(),
+      );
       collector?.record(
         branch: Obd2BranchTag.maf,
         fuelRateLPerHour: corrected,
@@ -304,7 +311,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // #2456 / #3427 / #3430 — feed the measured baro (PID 0x33) + the
     // mixture-resolved effective AFR into the speed-density math when
     // available: baro scales the air charge for altitude / weather; the
-    // effective AFR prefers measured wideband φ over commanded 0x44
+    // effective AFR prefers measured wideband lambda over commanded 0x44
     // (diesel: measured only — see fuel_mixture_model.dart for why an
     // unthrottled engine's speed-density fuel is otherwise an upper
     // bound). All null → byte-for-byte the pre-#2456 result. The
@@ -312,10 +319,10 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     // the real denominator; φ is passed pre-resolved (`phi: null`) so the
     // estimator can't double-apply it.
     final baroKpa = _latest(VehicleSignal.baroPressure);
-    final effectiveAfr = effectiveAfrForMixture(
+    final effectiveAfr = effectiveAfrForObdMixture(
       afr,
-      measuredPhi: latestMeasuredPhi,
-      commandedPhi: _latest(VehicleSignal.commandedPhi),
+      measuredLambda: latestMeasuredPhi,
+      commandedLambda: _latest(VehicleSignal.commandedPhi),
       isDiesel: isDiesel,
     );
     final raw = Obd2Service.estimateFuelRateLPerHourFromMap(
@@ -335,8 +342,11 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     }
     // #3430 — trim correction skipped on diesel (petrol stoich feedback).
     final corrected = estimatedFuelRateLPerHour(
-        skipTrim ? raw : _applyTrim(raw), FuzzyPhysicsBasis.speedDensity,
-        pumpGain: pumpGain, context: _fuzzyContext()); // #4233 — as MAF
+      skipTrim ? raw : _applyTrim(raw),
+      FuzzyPhysicsBasis.speedDensity,
+      pumpGain: pumpGain,
+      context: _fuzzyContext(),
+    ); // #4233 — as MAF
     collector?.record(
       branch: Obd2BranchTag.speedDensity,
       fuelRateLPerHour: corrected,

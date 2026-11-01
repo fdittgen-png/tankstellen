@@ -33,7 +33,7 @@ void main() {
       expect(health['ltftBank1Pct'], containsPair('mean', 10.156));
       final warm = health['warmPairedFuelTrim'] as Map;
       expect(warm['totalPct'], containsPair('mean', 13.281));
-      expect(health['measuredEquivalenceRatioPhi'], containsPair('mean', null));
+      expect(health['measuredLambda'], containsPair('mean', null));
       expect(health['intakeAirTempC'], containsPair('mean', 25.0));
     },
   );

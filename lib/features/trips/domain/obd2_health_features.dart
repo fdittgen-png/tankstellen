@@ -61,11 +61,11 @@ Map<String, Object?> obd2HealthFeatures(List<TripSample> samples) {
     'oilTempC': dist((s) => s.oilTempC),
     'baroKpa': dist((s) => s.baroKpa),
     'batteryVoltageV': dist((s) => s.batteryVoltageV),
-    'commandedEquivalenceRatioPhi': dist((s) => s.lambda),
-    'measuredEquivalenceRatioPhi': dist((s) => s.measuredPhi),
+    'commandedLambda': dist((s) => s.lambda),
+    'measuredLambda': dist((s) => s.measuredPhi),
     'fuelRateLPerHour': dist((s) => s.fuelRateLPerHour),
     'interpretation':
-        'Null means not stored, not zero. Commanded phi is not an '
+        'Null means not stored, not zero. Commanded lambda is not an '
         'oxygen-sensor measurement. Sparse fuel/trim samples are not time coverage. '
         'Speed-density and MAF fuel rates are estimates, not measured fuel flow.',
   };

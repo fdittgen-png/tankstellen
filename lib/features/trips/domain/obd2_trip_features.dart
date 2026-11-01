@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import '../../obd2/api.dart'
-    show SignalPlausibility, classifyBaroKpa, classifyCommandedPhi;
+    show SignalPlausibility, classifyBaroKpa, classifyCommandedLambda;
 import 'trip_sample.dart';
 import 'trip_fuel_source.dart';
 import 'obd2_health_features.dart';
@@ -75,7 +75,7 @@ class Obd2TripFeatures {
   /// burns proportionally more fuel for warm-up.
   final bool reachedOperatingTemp;
 
-  /// Measured wideband equivalence ratio φ (PIDs 0x24–0x2B / 0x34–0x3B,
+  /// Measured wideband raw lambda (legacy Phi name; PIDs 0x24–0x2B / 0x34–0x3B,
   /// #3427 / #3433). All-null on cars without a wideband sensor.
   final Obd2SignalDistribution measuredPhi;
 
@@ -103,7 +103,7 @@ class Obd2TripFeatures {
 
   /// #4159 — per stored signal with a clamp band, the share of the
   /// samples CARRYING it whose value sits outside the band the fuel math
-  /// clamps to: `lambda` (commanded φ — the petrol band; a diesel never
+  /// clamps to: `lambda` (raw commanded lambda — reciprocal of the petrol phi band; a diesel never
   /// applies commanded φ) and `baroKpa`. A key is absent when
   /// the trip never carried the signal. The fuel figures are unchanged —
   /// this names the adapter / sensor fault the clamp would hide. Measured
@@ -235,7 +235,11 @@ class Obd2TripFeatures {
       },
       healthSignals: obd2HealthFeatures(samples),
       implausibleShare: {
-        'lambda': ?_implausible(samples, (s) => s.lambda, classifyCommandedPhi),
+        'lambda': ?_implausible(
+          samples,
+          (s) => s.lambda,
+          classifyCommandedLambda,
+        ),
         'baroKpa': ?_implausible(samples, (s) => s.baroKpa, classifyBaroKpa),
       },
     );
@@ -259,6 +263,8 @@ class Obd2TripFeatures {
     // ethanol %, and which fuel branch dominated the trip. Additive
     // keys (schema bumped in DrivingAnalysisTrace).
     'measuredPhi': measuredPhi.toJson(),
+    'measuredLambda': measuredPhi.toJson(),
+    'ratioConvention': 'rawLambda; measuredPhi is a legacy key, phi = 1/lambda',
     'ethanolPercent': ethanolPercent.toJson(),
     'fuelSourceShares': {
       for (final e in fuelSourceShares.entries) e.key: _r(e.value, 3),

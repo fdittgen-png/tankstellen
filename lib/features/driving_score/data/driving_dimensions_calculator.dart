@@ -100,7 +100,7 @@ DrivingDimensions computeDrivingDimensions(
     }
 
     final accel = points[i - 1].accelMps2;
-    if (accel != null && accel < -0.3 && prev.fuelRateLPerHour != null) {
+    if (accel != null && accel < -0.3 && isFuelCutObservable(prev)) {
       fuelRateDecelSec += dt;
       if (prev.fuelRateLPerHour! < 0.1 && prev.speedKmh > 20) fuelCutSec += dt;
     }
@@ -116,7 +116,8 @@ DrivingDimensions computeDrivingDimensions(
     if (prev.speedKmh >= 50) cruiseSpeeds.add(prev.speedKmh);
   }
   idle.endRun();
-  if (highRunSec >= kSustainedHighSpeed.inSeconds) sustainedHighSec += highRunSec;
+  if (highRunSec >= kSustainedHighSpeed.inSeconds)
+    sustainedHighSec += highRunSec;
 
   final dims = <DrivingDimensionKind, DrivingDimension>{};
   void put(DrivingDimension d) => dims[d.kind] = d;
@@ -125,64 +126,86 @@ DrivingDimensions computeDrivingDimensions(
   final accel = countAccelEvents([
     for (final s in sorted)
       AccelSamplePoint(
-          timestamp: s.timestamp, speedKmh: s.speedKmh, hAccuracyM: s.hAccuracyM),
+        timestamp: s.timestamp,
+        speedKmh: s.speedKmh,
+        hAccuracyM: s.hAccuracyM,
+      ),
   ]);
   if (movingSec <= 0) {
-    put(const DrivingDimension.unknown(DrivingDimensionKind.accelerationDemand,
-        context: 'no movement'));
+    put(
+      const DrivingDimension.unknown(
+        DrivingDimensionKind.accelerationDemand,
+        context: 'no movement',
+      ),
+    );
   } else {
     final perKm = distanceKm > 0 ? accel.accelEvents / distanceKm : 0.0;
     final fullShare = demandSec > 0 ? fullThrottleSec / demandSec : 0.0;
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.accelerationDemand,
-      value: _clamp01(1 - perKm * 0.5 - fullShare * 2),
-      confidence: demandSec > 0
-          ? DimensionConfidence.high
-          : DimensionConfidence.medium,
-      evidenceCount: accel.accelEvents + fullThrottleSec.round(),
-      context: demandSec > 0 ? 'pedal/throttle + events' : 'events only',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.accelerationDemand,
+        value: _clamp01(1 - perKm * 0.5 - fullShare * 2),
+        confidence: demandSec > 0
+            ? DimensionConfidence.high
+            : DimensionConfidence.medium,
+        evidenceCount: accel.accelEvents + fullThrottleSec.round(),
+        context: demandSec > 0 ? 'pedal/throttle + events' : 'events only',
+      ),
+    );
   }
 
   // Braking anticipation: hard brakes that do not end in a stop and fall in
   // an oscillation or a late-brake curve are the avoidable ones.
   final brakes = _hardBrakeMoments(points);
   if (brakes.isEmpty) {
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.brakingAnticipation,
-      value: 1,
-      confidence: movingSec >= 300
-          ? DimensionConfidence.medium
-          : DimensionConfidence.low,
-      evidenceCount: 0,
-      context: 'no hard braking',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.brakingAnticipation,
+        value: 1,
+        confidence: movingSec >= 300
+            ? DimensionConfidence.medium
+            : DimensionConfidence.low,
+        evidenceCount: 0,
+        context: 'no hard braking',
+      ),
+    );
   } else {
     avoidableBrakes = brakes.where((t) {
-      final endsInStop = road.stops.any((s) =>
-          !s.start.isBefore(t) && s.start.difference(t) <= kBrakeToStopWindow);
+      final endsInStop = road.stops.any(
+        (s) =>
+            !s.start.isBefore(t) && s.start.difference(t) <= kBrakeToStopWindow,
+      );
       if (endsInStop) return false;
       final inOscillation = road.oscillations.any(
-          (o) => !t.isBefore(o.start) && !t.isAfter(o.end));
-      final lateCurve = road.curves.any((c) =>
-          c.approach == CurveApproach.lateBrakeHardExit &&
-          !t.isAfter(c.end) &&
-          c.start.difference(t) <= kCurveLateBrakeWindow);
+        (o) => !t.isBefore(o.start) && !t.isAfter(o.end),
+      );
+      final lateCurve = road.curves.any(
+        (c) =>
+            c.approach == CurveApproach.lateBrakeHardExit &&
+            !t.isAfter(c.end) &&
+            c.start.difference(t) <= kCurveLateBrakeWindow,
+      );
       return inOscillation || lateCurve;
     }).length;
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.brakingAnticipation,
-      value: _clamp01(1 - avoidableBrakes / brakes.length),
-      confidence: _byEvidence(brakes.length),
-      evidenceCount: brakes.length,
-      context: '$avoidableBrakes of ${brakes.length} avoidable',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.brakingAnticipation,
+        value: _clamp01(1 - avoidableBrakes / brakes.length),
+        confidence: _byEvidence(brakes.length),
+        evidenceCount: brakes.length,
+        context: '$avoidableBrakes of ${brakes.length} avoidable',
+      ),
+    );
   }
 
   // Speed stability: sustained high-speed exposure + cruise speed variation.
   if (movingSec < 60) {
-    put(const DrivingDimension.unknown(DrivingDimensionKind.speedStability,
-        context: 'too little driving'));
+    put(
+      const DrivingDimension.unknown(
+        DrivingDimensionKind.speedStability,
+        context: 'too little driving',
+      ),
+    );
   } else {
     final share = sustainedHighSec / movingSec;
     var cv = 0.0;
@@ -194,121 +217,164 @@ DrivingDimensions computeDrivingDimensions(
           cruiseSpeeds.length;
       cv = math.sqrt(variance) / mean;
     }
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.speedStability,
-      value: _clamp01(1 - share * 1.5 - cv),
-      confidence: movingSec >= 300
-          ? DimensionConfidence.high
-          : DimensionConfidence.medium,
-      evidenceCount: movingSec.round(),
-      context: 'sustained>110: ${sustainedHighSec.round()} s',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.speedStability,
+        value: _clamp01(1 - share * 1.5 - cv),
+        confidence: movingSec >= 300
+            ? DimensionConfidence.high
+            : DimensionConfidence.medium,
+        evidenceCount: movingSec.round(),
+        context: 'sustained>110: ${sustainedHighSec.round()} s',
+      ),
+    );
   }
 
   // Avoidable idle: only unbroken long idles, only when the engine is known.
   if (!engineKnown) {
-    put(const DrivingDimension.unknown(DrivingDimensionKind.avoidableIdle,
-        context: 'engine state unknown (GPS-only)'));
+    put(
+      const DrivingDimension.unknown(
+        DrivingDimensionKind.avoidableIdle,
+        context: 'engine state unknown (GPS-only)',
+      ),
+    );
   } else {
     final base = math.max(movingSec, 1.0);
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.avoidableIdle,
-      value: _clamp01(1 - idle.seconds / base * 5),
-      confidence: DimensionConfidence.high,
-      evidenceCount: idle.seconds.round(),
-      context: '${idle.episodes} long idle(s)',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.avoidableIdle,
+        value: _clamp01(1 - idle.seconds / base * 5),
+        confidence: DimensionConfidence.high,
+        evidenceCount: idle.seconds.round(),
+        context: '${idle.episodes} long idle(s)',
+      ),
+    );
   }
 
   // Curve approach: smooth vs late brake + hard exit.
   final judged =
       road.curves.where((c) => c.approach != CurveApproach.unknown).toList();
   if (judged.isEmpty) {
-    put(DrivingDimension.unknown(DrivingDimensionKind.curveApproach,
+    put(
+      DrivingDimension.unknown(
+        DrivingDimensionKind.curveApproach,
         context: road.curvatureConfidenceShare < 0.5
             ? 'bearing not trustworthy'
-            : 'no curves'));
+            : 'no curves',
+      ),
+    );
   } else {
     lateCurves = judged
         .where((c) => c.approach == CurveApproach.lateBrakeHardExit)
         .length;
     judgedCurves = judged.length;
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.curveApproach,
-      value: 1 - lateCurves / judgedCurves,
-      confidence: _byEvidence(judgedCurves, medium: 2, high: 6),
-      evidenceCount: judgedCurves,
-      context: '$lateCurves late of $judgedCurves',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.curveApproach,
+        value: 1 - lateCurves / judgedCurves,
+        confidence: _byEvidence(judgedCurves, medium: 2, high: 6),
+        evidenceCount: judgedCurves,
+        context: '$lateCurves late of $judgedCurves',
+      ),
+    );
   }
 
   // Hill behaviour: full demand on climbs BEYOND the driver's own flat-road
   // habit — the climb itself is never the penalty.
   if (climbSec < 60) {
-    put(const DrivingDimension.unknown(DrivingDimensionKind.hillBehaviour,
-        context: 'no confident climb'));
+    put(
+      const DrivingDimension.unknown(
+        DrivingDimensionKind.hillBehaviour,
+        context: 'fewer than 60 s of confident climb with demand evidence',
+      ),
+    );
   } else {
     final climbShare = climbFullSec / climbSec;
     final flatShare = flatSec > 0 ? flatFullSec / flatSec : 0.0;
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.hillBehaviour,
-      value: _clamp01(1 - (climbShare - flatShare) * 3),
-      confidence: climbSec >= 180
-          ? DimensionConfidence.high
-          : DimensionConfidence.medium,
-      evidenceCount: climbSec.round(),
-      context: 'full demand climbing ${(climbShare * 100).round()} % vs '
-          'flat ${(flatShare * 100).round()} %',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.hillBehaviour,
+        value: _clamp01(1 - (climbShare - flatShare) * 3),
+        confidence: climbSec >= 180
+            ? DimensionConfidence.high
+            : DimensionConfidence.medium,
+        evidenceCount: climbSec.round(),
+        context: 'full demand climbing ${(climbShare * 100).round()} % vs '
+            'flat ${(flatShare * 100).round()} %',
+      ),
+    );
   }
 
   // Powertrain operation: high RPM + lugging, only with engine data.
   if (rpmSec <= 0) {
-    put(const DrivingDimension.unknown(
+    put(
+      const DrivingDimension.unknown(
         DrivingDimensionKind.powertrainOperation,
-        context: 'no engine data'));
+        context: 'no engine data',
+      ),
+    );
   } else {
     final lugShare = (secondsBelowOptimalGear ?? 0) / math.max(movingSec, 1.0);
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.powertrainOperation,
-      value: _clamp01(1 - (highRpmSec / rpmSec) * 2 - lugShare),
-      confidence: secondsBelowOptimalGear == null
-          ? DimensionConfidence.medium
-          : DimensionConfidence.high,
-      evidenceCount: rpmSec.round(),
-      context: 'high RPM ${highRpmSec.round()} s',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.powertrainOperation,
+        value: _clamp01(1 - (highRpmSec / rpmSec) * 2 - lugShare),
+        confidence: secondsBelowOptimalGear == null
+            ? DimensionConfidence.medium
+            : DimensionConfidence.high,
+        evidenceCount: rpmSec.round(),
+        context:
+            'uniform >3000 rpm exposure ${highRpmSec.round()} s; inferred low-gear ${(secondsBelowOptimalGear ?? 0).round()} s',
+      ),
+    );
   }
 
   // Energy oscillation: accelerate → brake → accelerate episodes per 10 km.
   if (distanceKm < 1) {
-    put(const DrivingDimension.unknown(DrivingDimensionKind.energyOscillation,
-        context: 'too short'));
+    put(
+      const DrivingDimension.unknown(
+        DrivingDimensionKind.energyOscillation,
+        context: 'too short',
+      ),
+    );
   } else {
     final per10Km = road.oscillations.length / distanceKm * 10;
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.energyOscillation,
-      value: _clamp01(1 - per10Km * 0.25),
-      confidence: distanceKm >= 5
-          ? DimensionConfidence.medium
-          : DimensionConfidence.low,
-      evidenceCount: road.oscillations.length,
-      context: '${road.oscillations.length} episode(s)',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.energyOscillation,
+        value: _clamp01(1 - per10Km * 0.25),
+        confidence: distanceKm >= 5
+            ? DimensionConfidence.medium
+            : DimensionConfidence.low,
+        evidenceCount: road.oscillations.length,
+        context: '${road.oscillations.length} episode(s)',
+      ),
+    );
   }
 
   // Coasting: decelerations taken as fuel cut — needs a fuel-rate signal.
   if (fuelRateDecelSec < 10) {
-    put(const DrivingDimension.unknown(DrivingDimensionKind.coasting,
-        context: 'no fuel-rate signal while slowing'));
+    put(
+      const DrivingDimension.unknown(
+        DrivingDimensionKind.coasting,
+        context:
+            'fuel cut unavailable: no direct fuel-flow evidence while slowing',
+      ),
+    );
   } else {
-    put(DrivingDimension(
-      kind: DrivingDimensionKind.coasting,
-      value: _clamp01(fuelCutSec / fuelRateDecelSec),
-      confidence: _byEvidence(fuelRateDecelSec.round(), medium: 30, high: 120),
-      evidenceCount: fuelRateDecelSec.round(),
-      context: 'fuel cut ${fuelCutSec.round()} s',
-    ));
+    put(
+      DrivingDimension(
+        kind: DrivingDimensionKind.coasting,
+        value: _clamp01(fuelCutSec / fuelRateDecelSec),
+        confidence: _byEvidence(
+          fuelRateDecelSec.round(),
+          medium: 30,
+          high: 120,
+        ),
+        evidenceCount: fuelRateDecelSec.round(),
+        context: 'fuel cut ${fuelCutSec.round()} s',
+      ),
+    );
   }
 
   return DrivingDimensions(

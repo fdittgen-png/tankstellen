@@ -11,11 +11,9 @@ import '../lesson_format.dart';
 /// non-localized.
 const String combustionHealthLessonId = 'combustionHealth';
 
-/// Coolant temperature (°C) at/above which the engine is considered warm
-/// enough that the O2 sensors are active and the ECU runs **closed-loop**
-/// (#2931). Canonical with `TripRecorder`'s cold-start warm threshold so
-/// every surface agrees on "warmed up". Below this the trims are open-loop
-/// guesses, not a mixture-error signal — we never coach on them.
+/// Warm-running coolant proxy (C), shared with the recorder. This gate
+/// does not prove closed-loop operation; fuel-system status must be inspected
+/// separately in the diagnostic recording.
 const double kCombustionWarmCoolantC = 70.0;
 
 /// Borderline total-fuel-trim magnitude (|STFT + LTFT|, percent) at/above
@@ -30,14 +28,11 @@ const double kCombustionTrimBorderlinePct = 10.0;
 /// off" to "looks rich/lean". Still a *heuristic*, never a diagnosis.
 const double kCombustionTrimMarkedPct = 15.0;
 
-/// Commanded equivalence ratio (λ, PID 0x44) at/below which the ECU is
-/// deliberately running **rich** (#2931). 0.97 leaves a small dead-band
-/// around stoichiometric (λ = 1.0) so sensor noise around stoich doesn't
-/// read as enrichment; sustained values under it are real commanded
-/// enrichment = wasted fuel.
+/// Commanded lambda below this stoichiometric dead band indicates enrichment.
+/// Its purpose and avoidability require operating context.
 const double kCombustionRichLambda = 0.97;
 
-/// Minimum number of qualifying **warm, closed-loop** samples a signal
+/// Minimum number of qualifying warm-running samples a signal
 /// needs before the heuristic fires (#2931). A brief trim spike or one
 /// enrichment tick must NOT trigger coaching — the line only appears when
 /// the condition is *sustained* across enough of the warm engine window.
@@ -58,14 +53,14 @@ enum CombustionHealthKind {
   richCompensation,
 
   /// Sustained commanded enrichment (λ < ~0.97) under load — deliberate
-  /// rich running that wastes fuel even on a healthy engine.
+  /// rich running whose purpose and avoidability require context.
   commandedEnrichment,
 }
 
 /// Result of the combustion-health scan over a trip's samples (#2931).
 ///
 /// [fired] is false for every honest "no signal" case — too few warm
-/// closed-loop samples, a cold engine, unknown coolant, or normal trims.
+/// warm-running samples, a cold engine, unknown coolant, or normal trims.
 /// When it fires, [kind] says which signal dominated and [magnitudePct]
 /// carries the representative number (mean |LTFT|, the *sustained* trim, for
 /// the trim kinds; the percent of the warm window spent enriched for the
@@ -81,8 +76,9 @@ class CombustionHealthSignal {
   });
 
   /// The honest no-signal result.
-  static const CombustionHealthSignal none =
-      CombustionHealthSignal(fired: false);
+  static const CombustionHealthSignal none = CombustionHealthSignal(
+    fired: false,
+  );
 
   /// Whether the heuristic surfaced a combustion-health line at all.
   final bool fired;
@@ -98,7 +94,7 @@ class CombustionHealthSignal {
   /// the enrichment kind. Drives the stronger ARB wording.
   final bool marked;
 
-  /// How many warm closed-loop samples sustained the firing condition.
+  /// How many warm-running samples sustained the firing condition.
   final int sustainedSamples;
 }
 
@@ -131,8 +127,8 @@ class CombustionHealthSignal {
 ///     escalates the wording.
 ///   * **Enrichment signal** (secondary, always available because λ is
 ///     stamped on every sample): a large share of the warm window spent
-///     with commanded λ < [kCombustionRichLambda] = sustained deliberate
-///     rich running = wasted fuel.
+///     with commanded lambda < [kCombustionRichLambda] = sustained commanded
+///     enrichment; not proof of a mechanical fault or avoidable waste.
 ///
 /// The trim signal wins when both fire (it is the more reliable mixture
 /// indicator). The lesson is [LessonPolarity.info] — a neutral health
@@ -188,20 +184,16 @@ class CombustionHealthRule implements DrivingLessonRule {
     final pct = formatLessonPercent(signal.magnitudePct);
     final (String title, String advice) = switch (signal.kind!) {
       CombustionHealthKind.leanCompensation => (
-          signal.marked
-              ? l.lessonCombustionHealthLeanMarked(pct)
-              : l.lessonCombustionHealthLeanBorderline(pct),
-          l.lessonAdviceCombustionHealthLean,
+          l.analysisFuelTrimAddition(pct),
+          l.analysisFuelTrimAdvice,
         ),
       CombustionHealthKind.richCompensation => (
-          signal.marked
-              ? l.lessonCombustionHealthRichMarked(pct)
-              : l.lessonCombustionHealthRichBorderline(pct),
-          l.lessonAdviceCombustionHealthRich,
+          l.analysisFuelTrimRemoval(pct),
+          l.analysisFuelTrimAdvice,
         ),
       CombustionHealthKind.commandedEnrichment => (
-          l.lessonCombustionHealthEnrichment(pct),
-          l.lessonAdviceCombustionHealthEnrichment,
+          l.analysisCommandedEnrichment(pct),
+          l.analysisCommandedEnrichmentAdvice,
         ),
     };
 
@@ -278,9 +270,10 @@ CombustionHealthSignal combustionHealthSignal(List<TripSample> samples) {
     }
 
     final lambda = s.lambda;
-    if (lambda != null && lambda > 0) {
+    if (lambda != null && lambda.isFinite && lambda > 0 && lambda < 2) {
       lambdaSamples++;
-      if (lambda < kCombustionRichLambda) enrichedSamples++;
+      if (isRichCommandedLambda(lambda, threshold: kCombustionRichLambda))
+        enrichedSamples++;
     }
   }
 

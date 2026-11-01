@@ -3459,6 +3459,59 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Rapport court estimé ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'Un rapport supérieur peut réduire le régime si la charge et la route le permettent. Cette estimation ne prouve pas un sous-régime.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Le temps au-dessus de 3 000 tr/min est un indicateur heuristique, pas une preuve de mauvais usage. Tenir compte du moteur, de la charge et de la route.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Une montée demande davantage d’énergie même avec une conduite fluide. Ce coût du parcours n’est pas une faute de conduite.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'La circulation ou la signalisation ont pu imposer ces arrêts. Leur coût énergétique ne prouve pas qu’ils étaient évitables.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Correction totale positive du carburant ; amplitude moyenne LTFT $pctTrim %';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Correction totale négative du carburant ; amplitude moyenne LTFT $pctTrim %';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'Le calculateur ajuste l’injection. Cela ne désigne pas une pièce défaillante et ne prouve pas que le mélange final reste pauvre ou riche. Vérifier les valeurs enregistrées, les conditions moteur et les codes défaut.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'Enrichissement commandé par le calculateur ($pctShare % des lectures moteur chaud)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'L’enrichissement peut protéger le moteur sous charge. Cet enregistrement seul ne démontre ni un défaut ni un gaspillage évitable.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'Enrichissement commandé ($pctShare % de la durée du trajet)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Les observations OBD standard n’évaluent ni une boîte robotisée ni la force des actionneurs. Un refus de passage nécessite les défauts propres à la boîte et les consignes comparées aux valeurs réelles du rapport, de l’embrayage et de la sélection.';
+
+  @override
   String get approachOverlaySection => 'Overlay à l\'approche d\'une station';
 
   @override
@@ -8367,7 +8420,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get obd2ReportDriveNoGear =>
-      'Ce véhicule ne transmet pas le rapport engagé en OBD2 standard : les moments sont détectés à partir de la vitesse, du régime et de la pédale.';
+      'Aucune valeur de rapport exploitable n’a été enregistrée. Les moments affichés sont déduits de la vitesse, du régime et de la pédale ; ils ne démontrent pas un défaut de boîte.';
 
   @override
   String get obd2ReportEngineTitle => 'Moteur';
@@ -8397,12 +8450,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String obd2ReportMixtureRich(String trim) {
-    return 'Les corrections sont en moyenne de $trim % : le moteur tourne riche et le calculateur retire du carburant. Cela correspond à une odeur d’essence : injecteurs, régulateur de pression ou électrovanne de purge.';
+    return 'Les corrections sont en moyenne de $trim % : le calculateur retire du carburant. Cette correction ne prouve ni que le mélange final reste riche ni qu’une pièce est défaillante.';
   }
 
   @override
   String obd2ReportMixtureLean(String trim) {
-    return 'Les corrections sont en moyenne de $trim % : le moteur tourne pauvre et le calculateur ajoute du carburant. Prise d’air possible ou alimentation en carburant faible.';
+    return 'Les corrections sont en moyenne de $trim % : le calculateur ajoute du carburant. Cette correction ne prouve ni que le mélange final reste pauvre ni qu’une pièce est défaillante.';
   }
 
   @override

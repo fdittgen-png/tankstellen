@@ -154,7 +154,7 @@
       }
     }
   },
-  "obd2ReportDriveNoGear": "This car does not report the selected gear over standard OBD2, so moments are detected from speed, engine speed and pedal.",
+  "obd2ReportDriveNoGear": "No usable gear reading was recorded. The displayed moments are inferred from speed, engine speed and pedal; they do not establish a gearbox fault.",
   "@obd2ReportDriveNoGear": {
     "description": "Drive card note (#4552)."
   },
@@ -205,7 +205,7 @@
       }
     }
   },
-  "obd2ReportMixtureRich": "Fuel trims average {trim} %: the engine runs rich and the computer is removing fuel. This fits a fuel smell — injectors, fuel-pressure regulator or the purge valve.",
+  "obd2ReportMixtureRich": "Fuel trims average {trim} %: the ECU is removing fuel. This correction does not establish that the final mixture remains rich or identify a failed component.",
   "@obd2ReportMixtureRich": {
     "description": "Mixture card, rich (#4552).",
     "placeholders": {
@@ -214,7 +214,7 @@
       }
     }
   },
-  "obd2ReportMixtureLean": "Fuel trims average {trim} %: the engine runs lean and the computer is adding fuel — possible air leak or weak fuel delivery.",
+  "obd2ReportMixtureLean": "Fuel trims average {trim} %: the ECU is adding fuel. This correction does not establish that the final mixture remains lean or identify a failed component.",
   "@obd2ReportMixtureLean": {
     "description": "Mixture card, lean (#4552).",
     "placeholders": {

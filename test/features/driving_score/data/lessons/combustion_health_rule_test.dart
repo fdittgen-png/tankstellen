@@ -216,8 +216,8 @@ void main() {
       expect(lesson!.id, combustionHealthLessonId);
       // Marked lean wording, with the SUSTAINED (LTFT) 16% figure — not the
       // +22% STFT+LTFT sum (#2931).
-      expect(lesson.title, l.lessonCombustionHealthLeanMarked('16'));
-      expect(lesson.advice, l.lessonAdviceCombustionHealthLean);
+      expect(lesson.title, l.analysisFuelTrimAddition('16'));
+      expect(lesson.advice, l.analysisFuelTrimAdvice);
       // Honesty: subtitle explicitly labels it a heuristic, not a diagnosis.
       expect(lesson.subtitle, l.lessonCombustionHealthSubtitle);
       // A neutral health note — not waste-red, not praise-green.
@@ -282,8 +282,8 @@ void main() {
           rule.evaluate(ctx(warmSamples(count: 14, stft: -6, ltft: -16)), l);
       expect(lesson, isNotNull);
       // Sustained (LTFT) 16% figure, not the -22% STFT+LTFT sum (#2931).
-      expect(lesson!.title, l.lessonCombustionHealthRichMarked('16'));
-      expect(lesson.advice, l.lessonAdviceCombustionHealthRich);
+      expect(lesson!.title, l.analysisFuelTrimRemoval('16'));
+      expect(lesson.advice, l.analysisFuelTrimAdvice);
     });
 
     test('does NOT fire on normal trims (±3%)', () {
@@ -312,8 +312,8 @@ void main() {
       final lesson =
           rule.evaluate(ctx(warmSamples(count: 12, lambda: 0.88)), l);
       expect(lesson, isNotNull);
-      expect(lesson!.title, l.lessonCombustionHealthEnrichment('100'));
-      expect(lesson.advice, l.lessonAdviceCombustionHealthEnrichment);
+      expect(lesson!.title, l.analysisCommandedEnrichment('100'));
+      expect(lesson.advice, l.analysisCommandedEnrichmentAdvice);
     });
   });
 }

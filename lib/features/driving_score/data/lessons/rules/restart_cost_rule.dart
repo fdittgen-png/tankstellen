@@ -30,10 +30,11 @@ class RestartCostRule implements DrivingLessonRule {
     final count = (insight.metadata['restartCount'] ?? 0).toInt().toString();
     return DrivingLesson(
       id: id,
+      polarity: LessonPolarity.info,
       impact: (insight.metadata['restartCount'] ?? 0).toDouble(),
       metricValue: (insight.metadata['restartCount'] ?? 0).toDouble(),
       title: l.insightRestartEvents(count),
-      advice: l.lessonAdviceRestartCost,
+      advice: l.analysisRestartContextAdvice,
       trailing: approxLitersTrailing(insight, l), // #4221
     );
   }

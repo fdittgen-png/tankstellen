@@ -291,7 +291,7 @@ void main() {
       // block: artifact channel + FGS capability + session verdict).
       // #3794 had bumped it to 5 (session + obd2Link); #3499/#3501 to 4
       // (obd2Coverage + verdict); the #3433 precision keys are unchanged.
-      expect(json['schema'], 7);
+      expect(json['schema'], 8);
       final block = json['obd2Features'] as Map<String, dynamic>;
       expect((block['measuredPhi'] as Map)['mean'], 1.0);
       expect((block['ethanolPercent'] as Map)['mean'], 10.0);

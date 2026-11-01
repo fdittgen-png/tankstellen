@@ -22,6 +22,7 @@ double _u16(List<int> b) => (b[0] * 256 + b[1]).toDouble();
 double _trim(List<int> b) => (b[0] - 128) * 100 / 128;
 
 final healthSignalDefinitions = <HealthSignalDefinition>[
+  HealthSignalDefinition(0x04, 'engineLoad', '%', 1, (b) => b[0] * 100 / 255),
   HealthSignalDefinition(0x0C, 'rpm', 'rpm', 2, (b) => _u16(b) / 4),
   HealthSignalDefinition(0x0D, 'speed', 'km/h', 1, (b) => b[0].toDouble()),
   HealthSignalDefinition(0x05, 'coolant', 'degC', 1, (b) => b[0] - 40.0),
@@ -87,8 +88,8 @@ final healthSignalDefinitions = <HealthSignalDefinition>[
   HealthSignalDefinition(0x49, 'pedal', '%', 1, (b) => b[0] * 100 / 255),
   HealthSignalDefinition(
     0x44,
-    'commandedPhi',
-    'equivalenceRatio',
+    'commandedLambda',
+    'lambda',
     2,
     (b) => _u16(b) / 32768,
   ),
@@ -111,16 +112,16 @@ final healthSignalDefinitions = <HealthSignalDefinition>[
   for (var pid = 0x24; pid <= 0x2B; pid++)
     HealthSignalDefinition(
       pid,
-      'widebandVoltageSensor${pid - 0x23}Phi',
-      'equivalenceRatio',
+      'widebandVoltageSensor${pid - 0x23}Lambda',
+      'lambda',
       4,
       (b) => _u16(b) / 32768,
     ),
   for (var pid = 0x34; pid <= 0x3B; pid++)
     HealthSignalDefinition(
       pid,
-      'widebandCurrentSensor${pid - 0x33}Phi',
-      'equivalenceRatio',
+      'widebandCurrentSensor${pid - 0x33}Lambda',
+      'lambda',
       4,
       (b) => _u16(b) / 32768,
     ),

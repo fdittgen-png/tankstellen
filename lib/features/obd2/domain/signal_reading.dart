@@ -40,11 +40,8 @@ final class SignalReading {
   double? get valueOrNull => value.valueOrNull;
 
   /// This reading with [plausibility] replaced.
-  SignalReading marked(SignalPlausibility plausibility) => SignalReading(
-        signal: signal,
-        value: value,
-        plausibility: plausibility,
-      );
+  SignalReading marked(SignalPlausibility plausibility) =>
+      SignalReading(signal: signal, value: value, plausibility: plausibility);
 
   @override
   bool operator ==(Object other) =>
@@ -65,14 +62,18 @@ final class SignalReading {
 /// commanded φ and baro always, measured wideband φ by the resolved fuel
 /// ([isDiesel] picks the diesel band). Other signals, and readings with
 /// no value, are returned unchanged.
-SignalReading markPlausibility(SignalReading reading, {required bool isDiesel}) {
+SignalReading markPlausibility(
+  SignalReading reading, {
+  required bool isDiesel,
+}) {
   final v = reading.valueOrNull;
   if (v == null) return reading;
   return switch (reading.signal) {
-    VehicleSignal.commandedPhi => reading.marked(classifyCommandedPhi(v)),
+    VehicleSignal.commandedPhi => reading.marked(classifyCommandedLambda(v)),
     VehicleSignal.baroPressure => reading.marked(classifyBaroKpa(v)),
-    VehicleSignal.widebandPhi =>
-      reading.marked(classifyMeasuredPhi(v, isDiesel: isDiesel)),
+    VehicleSignal.widebandPhi => reading.marked(
+        classifyMeasuredLambda(v, isDiesel: isDiesel),
+      ),
     _ => reading,
   };
 }
@@ -99,7 +100,10 @@ SignalReading fuelRateReadingOf(
           FuelRateSourceTag.maf66 ||
           FuelRateSourceTag.maf ||
           FuelRateSourceTag.speedDensity =>
-            DataValue.estimated(litresPerHour, basis: DataBasis.derived),
+            DataValue.estimated(
+              litresPerHour,
+              basis: DataBasis.derived,
+            ),
           FuelRateSourceTag.none || null => unknown,
         };
   return SignalReading(signal: VehicleSignal.fuelRate, value: value);

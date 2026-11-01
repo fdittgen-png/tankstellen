@@ -154,8 +154,8 @@ ResolvedFuelKind fuelKindForKey(String? key) {
       sessionFuelTypeKey ?? vehicle?.preferredFuelType ?? fallbackFuelType;
   final kind = fuelKindForKey(key);
   var mapped = afrDensityForKind(kind);
-  final ethanolApplies = kind == ResolvedFuelKind.petrol ||
-      kind == ResolvedFuelKind.e85;
+  final ethanolApplies =
+      kind == ResolvedFuelKind.petrol || kind == ResolvedFuelKind.e85;
   if (measuredEthanolPercent != null && ethanolApplies) {
     mapped = blendedAfrDensityForEthanol(measuredEthanolPercent);
   }
@@ -200,11 +200,33 @@ double effectiveAfrForMixture(
 }) {
   if (isDiesel) {
     if (measuredPhi == null) return stoichAfr;
-    final clamped =
-        measuredPhi.clamp(kMinDieselMeasuredPhi, kMaxDieselMeasuredPhi);
+    final clamped = measuredPhi.clamp(
+      kMinDieselMeasuredPhi,
+      kMaxDieselMeasuredPhi,
+    );
     return stoichAfr / clamped;
   }
   return effectiveAfrForPhi(stoichAfr, measuredPhi ?? commandedPhi);
+}
+
+/// Adapter for actual J1979 wire/stored LAMBDA (PID44, 24–2B, 34–3B).
+/// Keep raw lambda in existing codecs/live aliases; convert once into the
+/// true-phi math API. Lambda < 1 is rich, so AFR = stoichAFR * lambda.
+/// Zero/non-finite ratios mean unavailable, never zero fuel.
+double effectiveAfrForObdMixture(
+  double stoichAfr, {
+  double? measuredLambda,
+  double? commandedLambda,
+  required bool isDiesel,
+}) {
+  double? phi(double? lambda) =>
+      lambda != null && lambda.isFinite && lambda > 0 ? 1 / lambda : null;
+  return effectiveAfrForMixture(
+    stoichAfr,
+    measuredPhi: phi(measuredLambda),
+    commandedPhi: phi(commandedLambda),
+    isDiesel: isDiesel,
+  );
 }
 
 /// Convert a fuel MASS flow (g/s — PID 0x9D, or 0xA2 after
