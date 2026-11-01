@@ -904,11 +904,8 @@
   "insightIdling": "Volnoběh ({pctTime}% cesty): zbytečně spotřebováno {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% cesty",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Jízda na nízký převod ({minutes} min)",
   "lessonAdviceIdling": "Při dlouhých zastávkách vypínejte motor, místo abyste jej nechávali běžet na volnoběh.",
-  "lessonAdviceHighRpm": "Řaďte dříve nahoru, abyste udrželi motor mimo pásmo vysokých otáček.",
   "lessonAdviceHardAccel": "Plynule přidávejte plyn — plynulá akcelerace spotřebuje méně paliva.",
-  "lessonAdviceLowGear": "Řaďte nahoru dříve, aby se motor usadil v nižších, úspornějších otáčkách.",
   "drivingScoreCardTitle": "Skóre jízdy",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Souhrnné skóre z volnoběhu, prudkých zrychlení, prudkého brzdění a času při vysokém RPM. Srovnání „lepší než X % předchozích cest\" přijde v budoucí verzi.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Silné trvalé zatížení způsobuje přeobohacení směsi — přeřazujte dříve a ubírejte plyn při dlouhých stoupáních, aby směs zůstala chudá.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Velmi dobrý",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Nabírejte hybnost před kopcem a plynně přidávejte plyn — prudké přidání na stoupání spaluje více paliva.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} zastavení a opětovných rozjezdů: zbytečně spotřebováno {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Anticipujte provoz a kolejte k zastavení, abyste spíše dojeli než startovali — rozjezd z klidu je nejnáročnější část stop-and-go jízdy.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "Efektivita GPS",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Směs se zdá mírně chudá — motor přidával palivo (korekce {pctTrim} %), aby to vyrovnal",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Směs se zdá chudá — motor trvale přidával velké množství paliva ({pctTrim} %), možná neefektivita",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Směs se zdá mírně bohatá — motor ubíral palivo (korekce {pctTrim} %), aby to vyrovnal",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Směs se zdá bohatá — motor trvale ubíral velké množství paliva ({pctTrim} %), možná neefektivita",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Motor běžel při zatížení na bohatou směs ({pctShare} % zahřáté jízdy) — možné plýtvání palivem",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristický signál stavu, ne diagnóza",
-  "lessonAdviceCombustionHealthLean": "Trvalá korekce směrem k chudé směsi může znamenat přisávání vzduchu v sání, slabé zásobování palivem nebo stárnoucí snímač. Pokud se spotřeba nebo chod zhorší, diagnostika v servisu to může potvrdit.",
-  "lessonAdviceCombustionHealthRich": "Trvalá korekce směrem k bohaté směsi může znamenat netěsný vstřikovač, vysoký tlak paliva nebo snímač, který nadhodnocuje. Pokud se spotřeba nebo chod zhorší, diagnostika v servisu to může potvrdit.",
-  "lessonAdviceCombustionHealthEnrichment": "Bohatá směs při vysokém zatížení spaluje palivo navíc. Řaďte nahoru dříve a při dlouhém zrychlování uberte plyn, aby motor zůstal blízko stechiometrické směsi.",
   "pipTapToRestore": "Klepnutím otevřete celou aplikaci",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

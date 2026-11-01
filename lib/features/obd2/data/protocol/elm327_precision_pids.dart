@@ -32,14 +32,7 @@ class Elm327PrecisionPids {
   /// ECU-specific, but sensor 1 (0x24) is bank-1-sensor-1 on virtually
   /// every production layout — the primary fuel-control sensor.
   static const List<int> widebandVoltagePids = [
-    0x24,
-    0x25,
-    0x26,
-    0x27,
-    0x28,
-    0x29,
-    0x2A,
-    0x2B,
+    0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B,
   ];
 
   /// Wideband O2 sensor PIDs whose C/D bytes are the sensor CURRENT
@@ -47,14 +40,7 @@ class Elm327PrecisionPids {
   /// bytes A/B as [widebandVoltagePids]; only the paired electrical
   /// channel differs.
   static const List<int> widebandCurrentPids = [
-    0x34,
-    0x35,
-    0x36,
-    0x37,
-    0x38,
-    0x39,
-    0x3A,
-    0x3B,
+    0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3A, 0x3B,
   ];
 
   /// Every wideband equivalence-ratio PID, voltage-paired sensors first.

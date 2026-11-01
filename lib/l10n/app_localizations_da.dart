@@ -4581,25 +4581,12 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Kørsel i lavt gear ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Sluk motoren ved lange stop i stedet for at lade den gå i tomgang.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Skift tidligere op for at holde motoren uden for det høje omdrejningsområde.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Giv blødt gas — jævn acceleration bruger mindre brændstof.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Skift op tidligere, så motoren falder til ro i et lavere, mere økonomisk gear.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4632,10 +4619,6 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Kraftig, vedvarende belastning gør motoren fedkørende — skift op tidligt og lad op ved lange stigninger for at holde blandingen mager.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4645,58 +4628,13 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Bevar farten op ad bakken og giv jævnt gas — at surge på en stigning brænder ekstra brændstof.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count stop-og-kør-genstarter: spildte $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Forudse trafikken og frihjul mod stop, så du ruller i stedet for at starte fra stilstand — at køre fra stillestående er den mest brændstofkrævende del af stop-og-kør.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Blandingen ser lidt mager ud — motoren tilførte brændstof ($pctTrim % korrektion) for at kompensere';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Blandingen ser mager ud — motoren fastholdt en stor brændstoftilførsel på $pctTrim %, en mulig ineffektivitet';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Blandingen ser lidt fed ud — motoren trak brændstof fra ($pctTrim % korrektion) for at kompensere';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Blandingen ser fed ud — motoren fastholdt en stor brændstofreduktion på $pctTrim %, en mulig ineffektivitet';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Motoren kørte fedt under belastning ($pctShare % af den varme kørsel) — muligt brændstofspild';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristisk sundhedssignal, ikke en diagnose';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'En vedvarende korrektion mod mager blanding kan betyde en luftlækage i indsugningen, svag brændstofforsyning eller en ældet sensor. Bliver forbruget eller motorgangen dårligere, kan en værkstedsdiagnose bekræfte det.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'En vedvarende korrektion mod fed blanding kan betyde en utæt indsprøjtningsdyse, for højt brændstoftryk eller en sensor, der viser for meget. Bliver forbruget eller motorgangen dårligere, kan en værkstedsdiagnose bekræfte det.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Fed blanding under høj belastning brænder ekstra brændstof. Skift op tidligt, og let på speederen ved lange accelerationer, så motoren kan holde sig tæt på en støkiometrisk blanding.';
 
   @override
   String get lessonTransportTitle =>
@@ -4724,11 +4662,6 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

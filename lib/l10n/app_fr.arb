@@ -1385,11 +1385,8 @@
   "insightIdling": "Ralenti ({pctTime} % du trajet) : {liters} L gaspillés",
   "insightSubtitlePctOfTrip": "{pctTime} % du trajet",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Sous-régime en rapport bas ({minutes} min)",
   "lessonAdviceIdling": "Coupez le moteur lors des arrêts prolongés au lieu de le laisser tourner au ralenti.",
-  "lessonAdviceHighRpm": "Passez les rapports plus tôt pour garder le moteur hors de la plage de régime élevé.",
   "lessonAdviceHardAccel": "Accélérez en douceur : une accélération progressive consomme moins de carburant.",
-  "lessonAdviceLowGear": "Passez la vitesse supérieure plus tôt pour que le moteur tourne à un régime plus bas et plus économique.",
   "drivingScoreCardTitle": "Score de conduite",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Score composite basé sur le ralenti, les accélérations brusques, les freinages brusques et le temps à haut régime. Une comparaison « meilleur que X % des trajets passés » arrivera dans une prochaine version.",
@@ -2120,10 +2117,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceLambdaEnrichment": "Une charge lourde et prolongée enrichit le mélange — passez les vitesses tôt et réduisez l'accélération dans les longues montées pour maintenir un mélange pauvre.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
   },
   "drivingScoreClassVeryGood": "Très bien",
   "@drivingScoreClassVeryGood": {
@@ -3126,10 +3119,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Prenez de l'élan avant la côte et appuyez progressivement sur l'accélérateur — accélérer en montée brûle du carburant supplémentaire.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} redémarrages stop-and-go : {liters} L gaspillés",
   "@insightRestartCost": {
     "description": "Cost-line copy for the stop-and-go restart insight on the Trip detail screen (#2694 C8) — extra fuel from accelerating a fully-stopped car back up to speed. Placeholders are pre-formatted strings.",
@@ -3141,10 +3130,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Anticipez le trafic et laissez rouler vers les arrêts pour éviter de redémarrer — repartir d'un arrêt complet est la phase la plus gourmande du stop-and-go.",
-  "@lessonAdviceRestartCost": {
-    "description": "How-to-improve advice for the stop-and-go restart lesson (#2694 C8). Embedded in the GPX recording export."
   },
   "gpsKpiCardTitle": "Efficacité GPS",
   "@gpsKpiCardTitle": {
@@ -3739,50 +3724,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Le mélange semble un peu pauvre — le moteur a ajouté du carburant (correction de {pctTrim} %) pour compenser",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Le mélange semble pauvre — le moteur a maintenu un ajout de carburant important de {pctTrim} %, une inefficacité possible",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Le mélange semble un peu riche — le moteur a retiré du carburant (correction de {pctTrim} %) pour compenser",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Le mélange semble riche — le moteur a maintenu une réduction de carburant importante de {pctTrim} %, une inefficacité possible",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Le moteur a roulé riche sous charge ({pctShare} % du trajet à chaud) — carburant possiblement gaspillé",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Signal de santé heuristique, pas un diagnostic",
-  "lessonAdviceCombustionHealthLean": "Une correction prolongée vers un mélange trop pauvre peut indiquer une prise d'air à l'admission, une alimentation en carburant faible ou un capteur vieillissant. Si la consommation ou l'agrément se dégrade, un diagnostic en atelier peut confirmer.",
-  "lessonAdviceCombustionHealthRich": "Une correction prolongée vers un mélange trop riche peut indiquer un injecteur qui fuit, une pression de carburant élevée ou un capteur qui surévalue. Si la consommation ou l'agrément se dégrade, un diagnostic en atelier peut confirmer.",
-  "lessonAdviceCombustionHealthEnrichment": "Rouler en mélange riche sous forte charge brûle du carburant en plus. Passez les rapports plus tôt et levez le pied sur les longues accélérations pour que le moteur reste proche d'un mélange stœchiométrique.",
   "pipTapToRestore": "Touchez pour ouvrir l'application complète",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -6544,16 +6486,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

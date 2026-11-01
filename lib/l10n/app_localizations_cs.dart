@@ -4591,25 +4591,12 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Jízda na nízký převod ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Při dlouhých zastávkách vypínejte motor, místo abyste jej nechávali běžet na volnoběh.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Řaďte dříve nahoru, abyste udrželi motor mimo pásmo vysokých otáček.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Plynule přidávejte plyn — plynulá akcelerace spotřebuje méně paliva.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Řaďte nahoru dříve, aby se motor usadil v nižších, úspornějších otáčkách.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4642,10 +4629,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Silné trvalé zatížení způsobuje přeobohacení směsi — přeřazujte dříve a ubírejte plyn při dlouhých stoupáních, aby směs zůstala chudá.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4655,58 +4638,13 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Nabírejte hybnost před kopcem a plynně přidávejte plyn — prudké přidání na stoupání spaluje více paliva.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count zastavení a opětovných rozjezdů: zbytečně spotřebováno $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Anticipujte provoz a kolejte k zastavení, abyste spíše dojeli než startovali — rozjezd z klidu je nejnáročnější část stop-and-go jízdy.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Směs se zdá mírně chudá — motor přidával palivo (korekce $pctTrim %), aby to vyrovnal';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Směs se zdá chudá — motor trvale přidával velké množství paliva ($pctTrim %), možná neefektivita';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Směs se zdá mírně bohatá — motor ubíral palivo (korekce $pctTrim %), aby to vyrovnal';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Směs se zdá bohatá — motor trvale ubíral velké množství paliva ($pctTrim %), možná neefektivita';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Motor běžel při zatížení na bohatou směs ($pctShare % zahřáté jízdy) — možné plýtvání palivem';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristický signál stavu, ne diagnóza';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Trvalá korekce směrem k chudé směsi může znamenat přisávání vzduchu v sání, slabé zásobování palivem nebo stárnoucí snímač. Pokud se spotřeba nebo chod zhorší, diagnostika v servisu to může potvrdit.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Trvalá korekce směrem k bohaté směsi může znamenat netěsný vstřikovač, vysoký tlak paliva nebo snímač, který nadhodnocuje. Pokud se spotřeba nebo chod zhorší, diagnostika v servisu to může potvrdit.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Bohatá směs při vysokém zatížení spaluje palivo navíc. Řaďte nahoru dříve a při dlouhém zrychlování uberte plyn, aby motor zůstal blízko stechiometrické směsi.';
 
   @override
   String get lessonTransportTitle =>
@@ -4734,11 +4672,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

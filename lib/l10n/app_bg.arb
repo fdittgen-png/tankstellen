@@ -904,11 +904,8 @@
   "insightIdling": "Празен ход ({pctTime}% от пътуването): изразходвано {liters} л",
   "insightSubtitlePctOfTrip": "{pctTime}% от пътуването",
   "insightTrailingLitersWasted": "+{liters} л",
-  "insightLowGear": "Работа на ниска предавка ({minutes} мин)",
   "lessonAdviceIdling": "Изключвайте двигателя при дълги престои, вместо да го оставяте на празен ход.",
-  "lessonAdviceHighRpm": "Превключвайте по-рано нагоре, за да държите двигателя извън зоната на високите обороти.",
   "lessonAdviceHardAccel": "Натискайте газта плавно — равномерното ускоряване изразходва по-малко гориво.",
-  "lessonAdviceLowGear": "Превключвайте нагоре по-рано, за да влезе двигателят в по-нисък и по-икономичен режим.",
   "drivingScoreCardTitle": "Резултат за шофиране",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Съставен резултат от празен ход, рязки ускорения, рязко спиране и работа при високи RPM. Сравнение 'по-добре от X% от минали пътувания' ще бъде добавено в следващо издание.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Тежкото, продължително натоварване обогатява сместа — превключвайте рано и намалете при дълги изкачвания.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Много добро",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Натрупайте инерция преди изкачването и подавайте газ плавно — рязкото газуване при изкачване изразходва допълнително гориво.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} спирания и тръгвания: похарчено {liters} л",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Предвиждайте трафика и се движете по инерция към спиранията, за да се търкаляте, а не да тръгвате от нула — тръгването от мъртво место е най-прожорливата część от задръстването.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS ефективност",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Сместа изглежда леко бедна — двигателят добавяше гориво (корекция {pctTrim} %), за да компенсира",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Сместа изглежда бедна — двигателят поддържаше голямо добавяне на гориво от {pctTrim} %, възможна неефективност",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Сместа изглежда леко богата — двигателят отнемаше гориво (корекция {pctTrim} %), за да компенсира",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Сместа изглежда богата — двигателят поддържаше голямо намаляване на горивото от {pctTrim} %, възможна неефективност",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Двигателят работеше с богата смес под натоварване ({pctShare} % от шофирането със загрят двигател) — възможно похабено гориво",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Евристичен сигнал за състояние, не диагноза",
-  "lessonAdviceCombustionHealthLean": "Продължителна корекция към бедна смес може да означава подсмукване на въздух във всмукателната система, слабо подаване на гориво или остаряващ сензор. Ако разходът или работата се влошат, диагностика в сервиз може да потвърди.",
-  "lessonAdviceCombustionHealthRich": "Продължителна корекция към богата смес може да означава течащ инжектор, високо налягане на горивото или сензор, който отчита повече. Ако разходът или работата се влошат, диагностика в сервиз може да потвърди.",
-  "lessonAdviceCombustionHealthEnrichment": "Богата смес при голямо натоварване гори допълнително гориво. Превключвайте по-рано на по-висока предавка и отпускайте газта при дълги ускорения, за да остане двигателят близо до стехиометрична смес.",
   "pipTapToRestore": "Докоснете, за да отворите цялото приложение",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

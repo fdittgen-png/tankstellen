@@ -103,9 +103,10 @@ List<DrivingInsight> analyzeTrip(
     ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
   // Total trip duration — used to compute percentages.
-  final totalDt =
-      sorted.last.timestamp.difference(sorted.first.timestamp).inMicroseconds /
-          Duration.microsecondsPerSecond;
+  final totalDt = sorted.last.timestamp
+          .difference(sorted.first.timestamp)
+          .inMicroseconds /
+      Duration.microsecondsPerSecond;
   if (totalDt <= 0) return const [];
 
   // Hard-accel EPISODES via the ONE shared gate (#2667) — same count the
@@ -130,9 +131,7 @@ List<DrivingInsight> analyzeTrip(
   bool sawFuelRateInHighRpm = false;
 
   // #4221 — only unbroken long idles count; short stops are traffic.
-  final idle = AvoidableIdle(
-    fallbackRateLPerHour: _idleFuelRateAssumptionLPerHour,
-  );
+  final idle = AvoidableIdle(fallbackRateLPerHour: _idleFuelRateAssumptionLPerHour);
 
   // #2461 — full-throttle (pedal else throttle ≥ 90 %) and λ-enrichment
   // (commanded mixture richer than stoich) cost lines.
@@ -147,8 +146,9 @@ List<DrivingInsight> analyzeTrip(
   for (var i = 1; i < sorted.length; i++) {
     final prev = sorted[i - 1];
     final cur = sorted[i];
-    final dt = cur.timestamp.difference(prev.timestamp).inMicroseconds /
-        Duration.microsecondsPerSecond;
+    final dt =
+        cur.timestamp.difference(prev.timestamp).inMicroseconds /
+            Duration.microsecondsPerSecond;
     if (dt <= 0) continue;
 
     // Full-throttle cost: pedal (PID 0x49-0x4B, driver intent) preferred,
@@ -228,19 +228,17 @@ List<DrivingInsight> analyzeTrip(
         : _fallbackHighRpmWaste(highRpmSeconds);
     final pctTime = highRpmSeconds / totalDt * 100.0;
     if (liters >= _noiseFloorLiters) {
-      candidates.add(
-        DrivingInsight(
-          labelKey: 'insightHighRpm',
-          litersWasted: liters,
-          litersMeasured: sawFuelRateInHighRpm,
-          percentOfTrip: pctTime,
-          metadata: {
-            'aboveRpm': _highRpmThreshold,
-            'highRpmSeconds': highRpmSeconds,
-            'pctTime': pctTime,
-          },
-        ),
-      );
+      candidates.add(DrivingInsight(
+        labelKey: 'insightHighRpm',
+        litersWasted: liters,
+        litersMeasured: sawFuelRateInHighRpm,
+        percentOfTrip: pctTime,
+        metadata: {
+          'aboveRpm': _highRpmThreshold,
+          'highRpmSeconds': highRpmSeconds,
+          'pctTime': pctTime,
+        },
+      ));
     }
   }
 
@@ -254,37 +252,33 @@ List<DrivingInsight> analyzeTrip(
     // #2963 — strictly `>` (not `>=`): one event's 0.05 L exactly equals the
     // floor, clears `>=`, then renders "0.1 L" (a 2× overstatement).
     if (liters > _noiseFloorLiters) {
-      candidates.add(
-        DrivingInsight(
-          labelKey: 'insightHardAccel',
-          litersWasted: liters,
-          percentOfTrip: pctTime,
-          metadata: {
-            'eventCount': hardAccelEvents,
-            'thresholdMps2': kHardAccelThresholdMps2,
-            'pctTime': pctTime,
-          },
-        ),
-      );
+      candidates.add(DrivingInsight(
+        labelKey: 'insightHardAccel',
+        litersWasted: liters,
+        percentOfTrip: pctTime,
+        metadata: {
+          'eventCount': hardAccelEvents,
+          'thresholdMps2': kHardAccelThresholdMps2,
+          'pctTime': pctTime,
+        },
+      ));
     }
   }
 
   // Idling cost line.
   if (idle.episodes > 0) {
     final pctTime = idle.seconds / totalDt * 100.0;
-    candidates.add(
-      DrivingInsight(
-        labelKey: 'insightIdling',
-        litersWasted: idle.liters,
-        litersMeasured: idle.measured,
-        percentOfTrip: pctTime,
-        metadata: {
-          'idleSeconds': idle.seconds,
-          'longIdleEpisodes': idle.episodes,
-          'pctTime': pctTime,
-        },
-      ),
-    );
+    candidates.add(DrivingInsight(
+      labelKey: 'insightIdling',
+      litersWasted: idle.liters,
+      litersMeasured: idle.measured,
+      percentOfTrip: pctTime,
+      metadata: {
+        'idleSeconds': idle.seconds,
+        'longIdleEpisodes': idle.episodes,
+        'pctTime': pctTime,
+      },
+    ));
   }
 
   // Full-throttle cost line (#2461).
@@ -297,18 +291,16 @@ List<DrivingInsight> analyzeTrip(
             3600.0;
     final pctTime = fullThrottleSeconds / totalDt * 100.0;
     if (liters >= _noiseFloorLiters) {
-      candidates.add(
-        DrivingInsight(
-          labelKey: 'insightFullThrottle',
-          litersWasted: liters,
-          litersMeasured: sawFuelRateInFullThrottle,
-          percentOfTrip: pctTime,
-          metadata: {
-            'fullThrottleSeconds': fullThrottleSeconds,
-            'pctTime': pctTime,
-          },
-        ),
-      );
+      candidates.add(DrivingInsight(
+        labelKey: 'insightFullThrottle',
+        litersWasted: liters,
+        litersMeasured: sawFuelRateInFullThrottle,
+        percentOfTrip: pctTime,
+        metadata: {
+          'fullThrottleSeconds': fullThrottleSeconds,
+          'pctTime': pctTime,
+        },
+      ));
     }
   }
 
@@ -322,18 +314,16 @@ List<DrivingInsight> analyzeTrip(
             3600.0;
     final pctTime = lambdaEnrichSeconds / totalDt * 100.0;
     if (liters >= _noiseFloorLiters) {
-      candidates.add(
-        DrivingInsight(
-          labelKey: 'insightLambdaEnrichment',
-          litersWasted: liters,
-          litersMeasured: sawFuelRateInLambda,
-          percentOfTrip: pctTime,
-          metadata: {
-            'lambdaEnrichSeconds': lambdaEnrichSeconds,
-            'pctTime': pctTime,
-          },
-        ),
-      );
+      candidates.add(DrivingInsight(
+        labelKey: 'insightLambdaEnrichment',
+        litersWasted: liters,
+        litersMeasured: sawFuelRateInLambda,
+        percentOfTrip: pctTime,
+        metadata: {
+          'lambdaEnrichSeconds': lambdaEnrichSeconds,
+          'pctTime': pctTime,
+        },
+      ));
     }
   }
 
@@ -343,19 +333,17 @@ List<DrivingInsight> analyzeTrip(
   final climb = detectClimbCost(sorted);
   if (climb.climbingLiters >= _noiseFloorLiters) {
     final pctTime = climb.climbSeconds / totalDt * 100.0;
-    candidates.add(
-      DrivingInsight(
-        labelKey: 'insightClimbingCost',
-        litersWasted: climb.climbingLiters,
-        litersMeasured: climb.measured,
-        percentOfTrip: pctTime,
-        metadata: {
-          'gradePercent': climb.peakGradePercent,
-          'climbSeconds': climb.climbSeconds,
-          'pctTime': pctTime,
-        },
-      ),
-    );
+    candidates.add(DrivingInsight(
+      labelKey: 'insightClimbingCost',
+      litersWasted: climb.climbingLiters,
+      litersMeasured: climb.measured,
+      percentOfTrip: pctTime,
+      metadata: {
+        'gradePercent': climb.peakGradePercent,
+        'climbSeconds': climb.climbSeconds,
+        'pctTime': pctTime,
+      },
+    ));
   }
 
   // Stop-and-go restart cost line (#2694 C8). Counts genuine
@@ -363,23 +351,22 @@ List<DrivingInsight> analyzeTrip(
   // attributes the extra litres of accelerating a stopped car from rest.
   final restart = detectRestartCost(sorted);
   if (restart.restartLiters >= _noiseFloorLiters) {
-    candidates.add(
-      DrivingInsight(
-        labelKey: 'insightRestartCost',
-        litersWasted: restart.restartLiters,
-        // percentOfTrip is not meaningful for a count-based category; the
-        // metadata carries the restart count for the subtitle.
-        percentOfTrip: 0,
-        metadata: {'restartCount': restart.restartCount},
-      ),
-    );
+    candidates.add(DrivingInsight(
+      labelKey: 'insightRestartCost',
+      litersWasted: restart.restartLiters,
+      // percentOfTrip is not meaningful for a count-based category; the
+      // metadata carries the restart count for the subtitle.
+      percentOfTrip: 0,
+      metadata: {
+        'restartCount': restart.restartCount,
+      },
+    ));
   }
 
   // #4221 — rank by evidence (share of the trip), never by litres a model
   // invented; ties keep the declaration order above.
-  final ranked = [
-    for (var i = 0; i < candidates.length; i++) (i, candidates[i])
-  ]..sort((a, b) {
+  final ranked = [for (var i = 0; i < candidates.length; i++) (i, candidates[i])]
+    ..sort((a, b) {
       final byShare = b.$2.percentOfTrip.compareTo(a.$2.percentOfTrip);
       return byShare != 0 ? byShare : a.$1.compareTo(b.$1);
     });

@@ -904,11 +904,8 @@
   "insightIdling": "Tühikäik ({pctTime}% reisist): raisati {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% reisist",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Madala käiguga pingutamine ({minutes} min)",
   "lessonAdviceIdling": "Pikkadel peatustel lülita mootor välja, selle asemel et seda tühikäigul töötada lasta.",
-  "lessonAdviceHighRpm": "Vaheta varem kõrgemale käigule, et hoida mootor kõrgete pöörete tsoonist eemal.",
   "lessonAdviceHardAccel": "Vajuta gaasi sujuvalt — ühtlane kiirendus kulutab vähem kütust.",
-  "lessonAdviceLowGear": "Vaheta varem kõrgemale käigule, et mootor töötaks madalamatel ja säästlikumatel pööretel.",
   "drivingScoreCardTitle": "Sõiduhinnang",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Koondhinne tühikäigu, järsu kiirenduse, järsu pidurduse ja kõrge RPM aja põhjal. „Parem kui X% varasematest reisidest\" võrdlus lisatakse järgmises versioonis.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Raske pikaajaline koormus rikastab segu — lülitage varem ümber ja vähendage gaasi pikkadel tõusudel, et hoida segu lahjana.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Väga hea",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Kandke hoogu tõusu eel ja andke gaasi sujuvalt — tõusul kiirendamine kulutab lisakütust.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} stop-and-go taaskäivitust: raisatud {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Ennetage liiklust ja libisege peatuste poole, et veereksite pigem kui taaskäivitate — täielikust peatusest edasiliikumine on stop-and-go kõige kulukam osa.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS-i tõhusus",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Segu tundub veidi lahja — mootor lisas kütust ({pctTrim} % korrektsioon), et kompenseerida",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Segu tundub lahja — mootor hoidis püsivalt suurt kütuselisandit ({pctTrim} %), võimalik ebatõhusus",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Segu tundub veidi rikas — mootor võttis kütust vähemaks ({pctTrim} % korrektsioon), et kompenseerida",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Segu tundub rikas — mootor hoidis püsivalt suurt kütusevähendust ({pctTrim} %), võimalik ebatõhusus",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Mootor töötas koormuse all rikkalt ({pctShare} % soojast sõidust) — võimalik kütuse raiskamine",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristiline seisundisignaal, mitte diagnoos",
-  "lessonAdviceCombustionHealthLean": "Püsiv korrektsioon lahja segu suunas võib tähendada õhuleket sisselaskes, nõrka kütusetoidet või vananevat andurit. Kui kulu või töö halveneb, saab töökoja diagnostika seda kinnitada.",
-  "lessonAdviceCombustionHealthRich": "Püsiv korrektsioon rikka segu suunas võib tähendada lekkivat pihustit, liiga kõrget kütuserõhku või liiga palju näitavat andurit. Kui kulu või töö halveneb, saab töökoja diagnostika seda kinnitada.",
-  "lessonAdviceCombustionHealthEnrichment": "Rikas segu suure koormuse all põletab lisakütust. Lülitage kõrgem käik varem sisse ja laske pikkadel kiirendustel gaasi lahti, et mootor püsiks stöhhiomeetrilise segu lähedal.",
   "pipTapToRestore": "Puudutage täisrakenduse avamiseks",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

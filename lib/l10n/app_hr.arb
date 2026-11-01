@@ -904,11 +904,8 @@
   "insightIdling": "Mirovanje ({pctTime}% vožnje): izgubljeno {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% vožnje",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Vožnja u niskom stupnju ({minutes} min)",
   "lessonAdviceIdling": "Na duljim zaustavljanjima ugasite motor umjesto da ga ostavljate raditi u praznom hodu.",
-  "lessonAdviceHighRpm": "Mijenjajte ranije u viši stupanj kako biste motor držali izvan zone visokih okretaja.",
   "lessonAdviceHardAccel": "Lagano pritišćite papučicu gasa — ravnomjerno ubrzavanje troši manje goriva.",
-  "lessonAdviceLowGear": "Mijenjajte u viši stupanj ranije kako bi motor radio na nižim, ekonomičnijim okretajima.",
   "drivingScoreCardTitle": "Ocjena vožnje",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Složena ocjena od mirovanja, naglih ubrzanja, naglih kočenja i vremena visokog RPM-a. Usporedba 'bolji od X% prošlih vožnji' stići će u nadolazećoj verziji.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Jako, dugotrajno opterećenje čini motor prebogatim — kratko mjenjajte brzinu i pустите na dugim usponima da smjesa ostane siromašna.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Odlično",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Zadržite zamah pri ulasku u uspon i ravnomjerno povećavajte gas — nagle promjene na usponu troše više goriva.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} zaustavljanja i ponovnih kretanja: izgubljeno {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Predvidite promet i kližite prema zaustavljanjima kako biste klizali, a ne stajali — kretanje s mjesta najtroši više goriva u stop-start vožnji.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS učinkovitost",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Smjesa se čini malo siromašnom — motor je dodavao gorivo (korekcija {pctTrim} %) da nadoknadi",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Smjesa se čini siromašnom — motor je trajno dodavao mnogo goriva ({pctTrim} %), moguća neučinkovitost",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Smjesa se čini malo bogatom — motor je oduzimao gorivo (korekcija {pctTrim} %) da nadoknadi",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Smjesa se čini bogatom — motor je trajno oduzimao mnogo goriva ({pctTrim} %), moguća neučinkovitost",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Motor je radio bogato pod opterećenjem ({pctShare} % zagrijane vožnje) — moguće rasipanje goriva",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristički signal stanja, ne dijagnoza",
-  "lessonAdviceCombustionHealthLean": "Trajna korekcija prema siromašnoj smjesi može značiti propuštanje zraka u usisu, slab dovod goriva ili ostarjeli senzor. Ako se potrošnja ili rad pogoršaju, dijagnostika u servisu to može potvrditi.",
-  "lessonAdviceCombustionHealthRich": "Trajna korekcija prema bogatoj smjesi može značiti brizgaljku koja propušta, previsok tlak goriva ili senzor koji pokazuje previše. Ako se potrošnja ili rad pogoršaju, dijagnostika u servisu to može potvrditi.",
-  "lessonAdviceCombustionHealthEnrichment": "Bogata smjesa pod velikim opterećenjem troši dodatno gorivo. Prebacujte ranije u viši stupanj i popustite gas pri dugim ubrzanjima kako bi motor ostao blizu stehiometrijske smjese.",
   "pipTapToRestore": "Dodirnite za otvaranje cijele aplikacije",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

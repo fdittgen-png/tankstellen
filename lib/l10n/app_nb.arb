@@ -904,11 +904,8 @@
   "insightIdling": "Tomgang ({pctTime}% av turen): bortkastet {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% av turen",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Sliter i lavt gir ({minutes} min)",
   "lessonAdviceIdling": "Slå av motoren ved lange stopp i stedet for å la den gå på tomgang.",
-  "lessonAdviceHighRpm": "Gir opp tidligere for å holde motoren utenfor det høye turtallsområdet.",
   "lessonAdviceHardAccel": "Gi mykt gass — jevn akselerasjon bruker mindre drivstoff.",
-  "lessonAdviceLowGear": "Gir opp tidligere slik at motoren legger seg på et lavere og mer økonomisk turtall.",
   "drivingScoreCardTitle": "Kjørescore",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Sammensatt score fra tomgang, harde akselerasjoner, hard bremsing og høy RPM-tid. En «bedre enn X% av tidligere turer»-sammenligning kommer i en fremtidig versjon.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Tung, vedvarende belastning gjør at motoren kjører rik — kortsift og lette av ved lange bakker for å holde blandingen mager.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Svært bra",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Bygg opp fart mot en bakke og gi gass jevnt — rykk under klatring brenner ekstra drivstoff.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} stopp-og-kjør-starter: kastet bort {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Forutse trafikk og frirull mot stopp slik at du ruller i stedet for å starte på nytt — å kjøre fra stillestående er den mest drivstoffkrevende delen av saktegående trafikk.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS-effektivitet",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Blandingen ser litt mager ut — motoren tilførte drivstoff ({pctTrim} % korreksjon) for å kompensere",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Blandingen ser mager ut — motoren holdt et stort drivstofftillegg på {pctTrim} %, en mulig ineffektivitet",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Blandingen ser litt fet ut — motoren trakk fra drivstoff ({pctTrim} % korreksjon) for å kompensere",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Blandingen ser fet ut — motoren holdt en stor drivstoffreduksjon på {pctTrim} %, en mulig ineffektivitet",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Motoren gikk fett under belastning ({pctShare} % av den varme kjøringen) — mulig drivstoffsløsing",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristisk helsesignal, ikke en diagnose",
-  "lessonAdviceCombustionHealthLean": "En vedvarende korreksjon mot mager blanding kan bety en luftlekkasje i innsuget, svak drivstofftilførsel eller en aldrende sensor. Blir forbruket eller motorgangen dårligere, kan en verksteddiagnose bekrefte det.",
-  "lessonAdviceCombustionHealthRich": "En vedvarende korreksjon mot fet blanding kan bety en lekkende injektor, for høyt drivstofftrykk eller en sensor som viser for mye. Blir forbruket eller motorgangen dårligere, kan en verksteddiagnose bekrefte det.",
-  "lessonAdviceCombustionHealthEnrichment": "Fet blanding under høy belastning brenner ekstra drivstoff. Gir opp tidlig og lett på gassen ved lange akselerasjoner, så motoren kan holde seg nær en støkiometrisk blanding.",
   "pipTapToRestore": "Trykk for å åpne hele appen",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

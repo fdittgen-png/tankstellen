@@ -4593,25 +4593,12 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Vožnja u niskom stupnju ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Na duljim zaustavljanjima ugasite motor umjesto da ga ostavljate raditi u praznom hodu.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Mijenjajte ranije u viši stupanj kako biste motor držali izvan zone visokih okretaja.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Lagano pritišćite papučicu gasa — ravnomjerno ubrzavanje troši manje goriva.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Mijenjajte u viši stupanj ranije kako bi motor radio na nižim, ekonomičnijim okretajima.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4644,10 +4631,6 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Jako, dugotrajno opterećenje čini motor prebogatim — kratko mjenjajte brzinu i pустите na dugim usponima da smjesa ostane siromašna.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4657,58 +4640,13 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Zadržite zamah pri ulasku u uspon i ravnomjerno povećavajte gas — nagle promjene na usponu troše više goriva.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count zaustavljanja i ponovnih kretanja: izgubljeno $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Predvidite promet i kližite prema zaustavljanjima kako biste klizali, a ne stajali — kretanje s mjesta najtroši više goriva u stop-start vožnji.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Smjesa se čini malo siromašnom — motor je dodavao gorivo (korekcija $pctTrim %) da nadoknadi';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Smjesa se čini siromašnom — motor je trajno dodavao mnogo goriva ($pctTrim %), moguća neučinkovitost';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Smjesa se čini malo bogatom — motor je oduzimao gorivo (korekcija $pctTrim %) da nadoknadi';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Smjesa se čini bogatom — motor je trajno oduzimao mnogo goriva ($pctTrim %), moguća neučinkovitost';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Motor je radio bogato pod opterećenjem ($pctShare % zagrijane vožnje) — moguće rasipanje goriva';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristički signal stanja, ne dijagnoza';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Trajna korekcija prema siromašnoj smjesi može značiti propuštanje zraka u usisu, slab dovod goriva ili ostarjeli senzor. Ako se potrošnja ili rad pogoršaju, dijagnostika u servisu to može potvrditi.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Trajna korekcija prema bogatoj smjesi može značiti brizgaljku koja propušta, previsok tlak goriva ili senzor koji pokazuje previše. Ako se potrošnja ili rad pogoršaju, dijagnostika u servisu to može potvrditi.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Bogata smjesa pod velikim opterećenjem troši dodatno gorivo. Prebacujte ranije u viši stupanj i popustite gas pri dugim ubrzanjima kako bi motor ostao blizu stehiometrijske smjese.';
 
   @override
   String get lessonTransportTitle =>
@@ -4736,11 +4674,6 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

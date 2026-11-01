@@ -154,8 +154,8 @@ ResolvedFuelKind fuelKindForKey(String? key) {
       sessionFuelTypeKey ?? vehicle?.preferredFuelType ?? fallbackFuelType;
   final kind = fuelKindForKey(key);
   var mapped = afrDensityForKind(kind);
-  final ethanolApplies =
-      kind == ResolvedFuelKind.petrol || kind == ResolvedFuelKind.e85;
+  final ethanolApplies = kind == ResolvedFuelKind.petrol ||
+      kind == ResolvedFuelKind.e85;
   if (measuredEthanolPercent != null && ethanolApplies) {
     mapped = blendedAfrDensityForEthanol(measuredEthanolPercent);
   }
@@ -200,10 +200,8 @@ double effectiveAfrForMixture(
 }) {
   if (isDiesel) {
     if (measuredPhi == null) return stoichAfr;
-    final clamped = measuredPhi.clamp(
-      kMinDieselMeasuredPhi,
-      kMaxDieselMeasuredPhi,
-    );
+    final clamped =
+        measuredPhi.clamp(kMinDieselMeasuredPhi, kMaxDieselMeasuredPhi);
     return stoichAfr / clamped;
   }
   return effectiveAfrForPhi(stoichAfr, measuredPhi ?? commandedPhi);

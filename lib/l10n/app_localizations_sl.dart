@@ -4585,25 +4585,12 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Napenjanje v nizki prestavi ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Ob daljših postankih ugasnite motor, namesto da ga pustite v prostem teku.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Prej prestavite navzgor, da motor ostane zunaj območja visokih vrtljajev.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Plin pritiskajte nežno — enakomerno pospeševanje porabi manj goriva.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Prej prestavite navzgor, da se motor umiri pri nižjih in varčnejših vrtljajih.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4636,10 +4623,6 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Velika, trajna obremenitev povzroči bogato mešanico — pri dolgih vzponih prestavljajte zgodaj in rahljajte plin, da ohranite pusto mešanico.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4649,58 +4632,13 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Ohranite zagon pred vzponom in enakomerno dodajajte plin — hitri sunki na vzponu povečajo porabo goriva.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count ponovnih zagonov po ustavitvi: zapravljenih $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Predvidite promet in se drsno približajte postanku, da se kotalite namesto da se ustavite — odhod z mesta mirovanja je najtežji del vožnje z ustavljanjem.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Zmes se zdi nekoliko revna — motor je dodajal gorivo (korekcija $pctTrim %), da bi to nadomestil';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Zmes se zdi revna — motor je trajno dodajal veliko goriva ($pctTrim %), možna neučinkovitost';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Zmes se zdi nekoliko bogata — motor je odvzemal gorivo (korekcija $pctTrim %), da bi to nadomestil';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Zmes se zdi bogata — motor je trajno odvzemal veliko goriva ($pctTrim %), možna neučinkovitost';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Motor je pod obremenitvijo tekel bogato ($pctShare % ogrete vožnje) — možna potrata goriva';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Hevristični signal stanja, ne diagnoza';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Trajna korekcija proti revni zmesi lahko pomeni uhajanje zraka v sesalnem delu, šibko oskrbo z gorivom ali starajoč se senzor. Če se poraba ali tek poslabšata, lahko diagnostika v delavnici to potrdi.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Trajna korekcija proti bogati zmesi lahko pomeni puščajočo šobo, previsok tlak goriva ali senzor, ki kaže preveč. Če se poraba ali tek poslabšata, lahko diagnostika v delavnici to potrdi.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Bogata zmes pri veliki obremenitvi porabi dodatno gorivo. Prestavljajte navzgor prej in pri dolgih pospeševanjih popustite plin, da motor ostane blizu stehiometrične zmesi.';
 
   @override
   String get lessonTransportTitle =>
@@ -4728,11 +4666,6 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

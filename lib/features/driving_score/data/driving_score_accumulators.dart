@@ -105,11 +105,8 @@ class _Accumulators {
     }
 
     // Eco-credit: fuel-cut coasting (detected, now credited).
-    if (isObservedFuelCut(
-      prev,
-      maximumRate: _coastFuelRateLPerHour,
-      minimumSpeed: _coastMinSpeedKmh,
-    )) {
+    if (isObservedFuelCut(prev, maximumRate: _coastFuelRateLPerHour,
+        minimumSpeed: _coastMinSpeedKmh)) {
       coastSeconds += dt;
     }
   }
@@ -122,11 +119,8 @@ class _Accumulators {
     bool gpsOnly = false,
     int? enginePowerKw,
   }) {
-    final idlingPenalty = _clamp(
-      idleSeconds / totalDt * _idlingCap,
-      0,
-      _idlingCap,
-    );
+    final idlingPenalty =
+        _clamp(idleSeconds / totalDt * _idlingCap, 0, _idlingCap);
     // #2695 C9 — source-aware re-weight. On a GPS-only trip there is no
     // engine signal, so the engine-derived penalties (high-RPM, lugging,
     // hard-shift) carry no information — zero them rather than scoring a
@@ -143,17 +137,12 @@ class _Accumulators {
     // penalised more; a high-power car less. `null` power (unknown / legacy)
     // → factor 1.0 → byte-identical to before. Only this term is power-aware.
     final hardAccelPenalty = _clamp(
-      hardAccelEvents *
-          _hardAccelPerEvent *
-          enginePowerAccelFactor(enginePowerKw),
+      hardAccelEvents * _hardAccelPerEvent * enginePowerAccelFactor(enginePowerKw),
       0,
       _hardAccelCap,
     );
-    final hardBrakePenalty = _clamp(
-      hardBrakeEvents * _hardBrakePerEvent,
-      0,
-      _hardBrakeCap,
-    );
+    final hardBrakePenalty =
+        _clamp(hardBrakeEvents * _hardBrakePerEvent, 0, _hardBrakeCap);
     final fullThrottlePenalty = _clamp(
       fullThrottleSeconds / totalDt * _fullThrottleCap,
       0,
@@ -185,11 +174,8 @@ class _Accumulators {
       0,
       _lambdaEnrichmentCap,
     );
-    final ecoCreditCoast = _clamp(
-      coastSeconds / totalDt * _ecoCreditCap,
-      0,
-      _ecoCreditCap,
-    );
+    final ecoCreditCoast =
+        _clamp(coastSeconds / totalDt * _ecoCreditCap, 0, _ecoCreditCap);
 
     final raw = 100.0 -
         idlingPenalty -

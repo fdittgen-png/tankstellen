@@ -904,11 +904,8 @@
   "insightIdling": "Tomgång ({pctTime}% av resan): slösade {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% av resan",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Kör tungt i låg växel ({minutes} min)",
   "lessonAdviceIdling": "Stäng av motorn vid långa stopp i stället för att låta den gå på tomgång.",
-  "lessonAdviceHighRpm": "Växla upp tidigare för att hålla motorn utanför det höga varvtalsområdet.",
   "lessonAdviceHardAccel": "Ge mjukt gas — jämn acceleration drar mindre bränsle.",
-  "lessonAdviceLowGear": "Växla upp tidigare så att motorn lägger sig på ett lägre och mer bränslesnålt varvtal.",
   "drivingScoreCardTitle": "Körpoäng",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Sammansatt poäng från tomgång, hårda accelerationer, hård inbromsning och tid vid högt RPM. En jämförelse 'bättre än X% av tidigare resor' kommer i en kommande release.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Tung, ihållande belastning gör att motorn kör med fet blandning — korta upp och dra av vid långa uppförsbackar för att hålla blandningen mager.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Mycket bra",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Ta med fart in i en backe och tryck varsamt på gasen — att rusa i en uppförsbacke bränner extra bränsle.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} stopp-och-körningar: slösade {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Förutse trafiken och frihjula mot stoppen så att du rullar istället för att starta om — att köra iväg från stillastående är den mest bränsletörstiga delen av stopp-och-körning.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS-effektivitet",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Blandningen verkar lite mager — motorn tillförde bränsle ({pctTrim} % korrigering) för att kompensera",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Blandningen verkar mager — motorn höll ett stort bränsletillskott på {pctTrim} %, en möjlig ineffektivitet",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Blandningen verkar lite fet — motorn drog bort bränsle ({pctTrim} % korrigering) för att kompensera",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Blandningen verkar fet — motorn höll en stor bränsleminskning på {pctTrim} %, en möjlig ineffektivitet",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Motorn gick fett under belastning ({pctShare} % av den varma körningen) — möjligt bränsleslöseri",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristisk hälsosignal, ingen diagnos",
-  "lessonAdviceCombustionHealthLean": "En ihållande korrigering mot mager blandning kan tyda på ett luftläckage i insuget, svag bränsletillförsel eller en åldrad sensor. Om förbrukningen eller gången försämras kan en verkstadsdiagnos bekräfta det.",
-  "lessonAdviceCombustionHealthRich": "En ihållande korrigering mot fet blandning kan tyda på en läckande insprutare, för högt bränsletryck eller en sensor som visar för mycket. Om förbrukningen eller gången försämras kan en verkstadsdiagnos bekräfta det.",
-  "lessonAdviceCombustionHealthEnrichment": "Fet blandning under hög belastning bränner extra bränsle. Växla upp tidigt och lätta på gasen vid långa accelerationer så att motorn kan hålla sig nära en stökiometrisk blandning.",
   "pipTapToRestore": "Tryck för att öppna hela appen",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

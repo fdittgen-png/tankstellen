@@ -235,9 +235,7 @@ class Obd2TripFeatures {
       },
       healthSignals: obd2HealthFeatures(samples),
       implausibleShare: {
-        'lambda': ?_implausible(
-          samples,
-          (s) => s.lambda,
+        'lambda': ?_implausible(samples, (s) => s.lambda,
           classifyCommandedLambda,
         ),
         'baroKpa': ?_implausible(samples, (s) => s.baroKpa, classifyBaroKpa),

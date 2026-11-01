@@ -904,11 +904,8 @@
   "insightIdling": "Ρελαντί ({pctTime}% ταξιδιού): σπατάλη {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% ταξιδιού",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Βαριά φόρτωση σε χαμηλή ταχύτητα ({minutes} λεπτά)",
   "lessonAdviceIdling": "Σβήνετε τον κινητήρα στις μεγάλες στάσεις αντί να τον αφήνετε στο ρελαντί.",
-  "lessonAdviceHighRpm": "Αλλάζετε νωρίτερα σε υψηλότερη σχέση για να κρατάτε τον κινητήρα εκτός της ζώνης υψηλών στροφών.",
   "lessonAdviceHardAccel": "Πατάτε απαλά το γκάζι — η ομαλή επιτάχυνση καταναλώνει λιγότερο καύσιμο.",
-  "lessonAdviceLowGear": "Αλλάζετε νωρίτερα σε υψηλότερη σχέση ώστε ο κινητήρας να σταθεροποιείται σε χαμηλότερες, πιο οικονομικές στροφές.",
   "drivingScoreCardTitle": "Βαθμολογία οδήγησης",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Σύνθετη βαθμολογία από ρελαντί, δυνατές επιταχύνσεις, δυνατό φρενάρισμα και χρόνο υψηλών στροφών. Η σύγκριση \"καλύτερος από X% των προηγούμενων ταξιδιών\" θα έρθει σε επόμενη ενημέρωση.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Βαρύ, παρατεταμένο φορτίο κάνει τον κινητήρα να τρέχει πλούσια — αλλάξτε σχέση νωρίς και χαλαρώστε στις μεγάλες ανηφόρες για να διατηρήσετε το μείγμα λεπτό.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Πολύ καλό",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Διατηρήστε ορμή στην ανηφόρα και δώστε γκάζι ομαλά — η εκρηκτική επιτάχυνση σε ανηφόρα κατανώνει επιπλέον καύσιμο.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} επανεκκινήσεις stop-and-go: σπάταλα {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Προβλέψτε την κίνηση και αφεθείτε σε αδράνεια προς τις στάσεις ώστε να κυλάτε αντί να ξεκινάτε εκ νέου — η εκκίνηση από ακινησία είναι το πιο ενεργοβόρο στάδιο της stop-and-go κυκλοφορίας.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "Αποδοτικότητα GPS",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Το μείγμα φαίνεται λίγο φτωχό — ο κινητήρας πρόσθεσε καύσιμο (διόρθωση {pctTrim} %) για να αντισταθμίσει",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Το μείγμα φαίνεται φτωχό — ο κινητήρας διατήρησε μεγάλη προσθήκη καυσίμου {pctTrim} %, πιθανή αναποτελεσματικότητα",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Το μείγμα φαίνεται λίγο πλούσιο — ο κινητήρας αφαίρεσε καύσιμο (διόρθωση {pctTrim} %) για να αντισταθμίσει",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Το μείγμα φαίνεται πλούσιο — ο κινητήρας διατήρησε μεγάλη μείωση καυσίμου {pctTrim} %, πιθανή αναποτελεσματικότητα",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Ο κινητήρας δούλεψε πλούσια υπό φορτίο ({pctShare} % της ζεστής οδήγησης) — πιθανή σπατάλη καυσίμου",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Ευρετικό σήμα κατάστασης, όχι διάγνωση",
-  "lessonAdviceCombustionHealthLean": "Μια παρατεταμένη διόρθωση προς φτωχό μείγμα μπορεί να σημαίνει διαρροή αέρα στην εισαγωγή, αδύναμη τροφοδοσία καυσίμου ή γερασμένο αισθητήρα. Αν επιδεινωθεί η κατανάλωση ή η λειτουργία, μια διάγνωση σε συνεργείο μπορεί να το επιβεβαιώσει.",
-  "lessonAdviceCombustionHealthRich": "Μια παρατεταμένη διόρθωση προς πλούσιο μείγμα μπορεί να σημαίνει μπεκ που στάζει, υψηλή πίεση καυσίμου ή αισθητήρα που μετρά παραπάνω. Αν επιδεινωθεί η κατανάλωση ή η λειτουργία, μια διάγνωση σε συνεργείο μπορεί να το επιβεβαιώσει.",
-  "lessonAdviceCombustionHealthEnrichment": "Το πλούσιο μείγμα υπό μεγάλο φορτίο καίει επιπλέον καύσιμο. Αλλάξτε σχέση νωρίτερα και ξεγκαζώστε στις παρατεταμένες επιταχύνσεις, ώστε ο κινητήρας να μένει κοντά σε στοιχειομετρικό μείγμα.",
   "pipTapToRestore": "Πατήστε για να ανοίξετε την πλήρη εφαρμογή",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

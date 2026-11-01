@@ -152,7 +152,8 @@ class DrivingPatternTotals {
   double durationSeconds(DrivingDurationCounter c) => seconds[c] ?? 0;
   double exposureOf(DrivingExposureBasis b) => exposure[b] ?? 0;
 
-  bool get isEmpty => events.isEmpty && seconds.isEmpty && exposure.isEmpty;
+  bool get isEmpty =>
+      events.isEmpty && seconds.isEmpty && exposure.isEmpty;
 
   /// Sum of two trips' evidence. Only totals of the same
   /// [modelVersion] may be added — mixing definitions inside one average
@@ -160,11 +161,10 @@ class DrivingPatternTotals {
   DrivingPatternTotals operator +(DrivingPatternTotals other) {
     if (other.modelVersion != modelVersion) {
       throw ArgumentError.value(
-        other.modelVersion,
-        'modelVersion',
-        'cannot add driving-pattern totals of model version '
-            '${other.modelVersion} to version $modelVersion',
-      );
+          other.modelVersion,
+          'modelVersion',
+          'cannot add driving-pattern totals of model version '
+              '${other.modelVersion} to version $modelVersion');
     }
     return DrivingPatternTotals(
       modelVersion: modelVersion,
@@ -237,10 +237,8 @@ class DrivingMeasureSpec {
     this.eventNumerator,
     this.durationNumerator,
     this.contextDependent = false,
-  }) : assert(
-          (eventNumerator == null) != (durationNumerator == null),
-          'a measure counts events or seconds, never both',
-        );
+  }) : assert((eventNumerator == null) != (durationNumerator == null),
+            'a measure counts events or seconds, never both');
 
   final DrivingMeasureId id;
   final DrivingMeasureUnit unit;

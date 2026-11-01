@@ -3926,30 +3926,13 @@
       }
     }
   },
-  "insightLowGear": "Labouring in low gear ({minutes} min)",
-  "@insightLowGear": {
-    "description": "Coaching line on the driving-insights card when secondsBelowOptimalGear > 60 (#1263 phase 3). Tells the driver they spent significant time in too-low a gear, raising fuel consumption. Placeholder is the integer minute count.",
-    "placeholders": {
-      "minutes": {
-        "type": "String"
-      }
-    }
-  },
   "lessonAdviceIdling": "Turn the engine off at long stops instead of letting it idle.",
   "@lessonAdviceIdling": {
     "description": "How-to-improve advice for the idling lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export; the trip-detail card keeps its existing percent-of-trip caption."
   },
-  "lessonAdviceHighRpm": "Shift up earlier to keep the engine out of the high-RPM band.",
-  "@lessonAdviceHighRpm": {
-    "description": "How-to-improve advice for the high-RPM lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export."
-  },
   "lessonAdviceHardAccel": "Ease onto the throttle — smooth acceleration uses less fuel.",
   "@lessonAdviceHardAccel": {
     "description": "How-to-improve advice for the hard-acceleration lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export."
-  },
-  "lessonAdviceLowGear": "Shift up sooner so the engine settles into a lower, more efficient gear.",
-  "@lessonAdviceLowGear": {
-    "description": "How-to-improve advice for the low-gear lesson in the post-trip lessons registry (#2251). Embedded in the GPX recording export."
   },
   "insightHighSpeedBandNoFuel": "Sustained high speed ({pctTime}% of trip)",
   "@insightHighSpeedBandNoFuel": {
@@ -4000,10 +3983,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "How-to-improve advice for the lambda-enrichment lesson (#2461). Embedded in the GPX recording export."
-  },
   "insightClimbingCost": "Climbing at {gradePercent}% grade ({pctTime}% of trip): wasted {liters} L",
   "@insightClimbingCost": {
     "description": "Cost-line copy for the climbing-fuel insight on the Trip detail screen (#2693 C6) — extra fuel burned over a flat-road counterfactual while on a confident uphill grade. Placeholders are pre-formatted strings.",
@@ -4019,10 +3998,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.",
-  "@lessonAdviceClimbingCost": {
-    "description": "How-to-improve advice for the climbing-fuel lesson (#2693 C6). Embedded in the GPX recording export."
-  },
   "insightRestartCost": "{count} stop-and-go restarts: wasted {liters} L",
   "@insightRestartCost": {
     "description": "Cost-line copy for the stop-and-go restart insight on the Trip detail screen (#2694 C8) — extra fuel from accelerating a fully-stopped car back up to speed. Placeholders are pre-formatted strings.",
@@ -4035,70 +4010,9 @@
       }
     }
   },
-  "lessonAdviceRestartCost": "Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.",
-  "@lessonAdviceRestartCost": {
-    "description": "How-to-improve advice for the stop-and-go restart lesson (#2694 C8). Embedded in the GPX recording export."
-  },
-  "lessonCombustionHealthLeanBorderline": "Mixture looks a little lean — the engine added fuel ({pctTrim}% trim) to compensate",
-  "@lessonCombustionHealthLeanBorderline": {
-    "description": "Combustion-health HEURISTIC headline (#2931), borderline lean case. Deliberately tentative ('looks a little lean', 'compensate') — a coarse health signal from sustained positive fuel trim, NOT a diagnosis of a fault. Placeholder is the pre-formatted mean total-trim percent.",
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Mixture looks lean — the engine sustained a large {pctTrim}% fuel addition, a possible inefficiency",
-  "@lessonCombustionHealthLeanMarked": {
-    "description": "Combustion-health HEURISTIC headline (#2931), marked lean case (large sustained positive trim). Still tentative ('looks', 'possible inefficiency') — never claims a definite fault. Placeholder is the pre-formatted mean total-trim percent.",
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Mixture looks a little rich — the engine pulled fuel ({pctTrim}% trim) to compensate",
-  "@lessonCombustionHealthRichBorderline": {
-    "description": "Combustion-health HEURISTIC headline (#2931), borderline rich case. Deliberately tentative — a coarse health signal from sustained negative fuel trim, NOT a diagnosis. Placeholder is the pre-formatted mean total-trim percent (magnitude).",
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Mixture looks rich — the engine sustained a large {pctTrim}% fuel cut, a possible inefficiency",
-  "@lessonCombustionHealthRichMarked": {
-    "description": "Combustion-health HEURISTIC headline (#2931), marked rich case (large sustained negative trim). Still tentative ('looks', 'possible inefficiency') — never claims a definite fault. Placeholder is the pre-formatted mean total-trim percent (magnitude).",
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Engine ran rich under load ({pctShare}% of the warm drive) — possible wasted fuel",
-  "@lessonCombustionHealthEnrichment": {
-    "description": "Combustion-health HEURISTIC headline (#2931), commanded-enrichment case — the ECU commanded a rich mixture (lambda < 1) for a large share of the warm engine window. Tentative ('possible wasted fuel'). Placeholder is the pre-formatted percent of the warm drive spent enriched.",
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristic health signal, not a diagnosis",
   "@lessonCombustionHealthSubtitle": {
     "description": "Subtitle under every combustion-health lesson (#2931) making it explicit that the line is a coarse heuristic from fuel trims / commanded lambda, NOT a per-cylinder diagnosis or a diagnostic certainty."
-  },
-  "lessonAdviceCombustionHealthLean": "A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.",
-  "@lessonAdviceCombustionHealthLean": {
-    "description": "How-to-improve advice for the lean combustion-health heuristic (#2931). Frames it as a heads-up to confirm with a proper scan, never as a definite fault. Embedded in the GPX recording export."
-  },
-  "lessonAdviceCombustionHealthRich": "A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.",
-  "@lessonAdviceCombustionHealthRich": {
-    "description": "How-to-improve advice for the rich combustion-health heuristic (#2931). Frames it as a heads-up to confirm with a proper scan, never as a definite fault. Embedded in the GPX recording export."
-  },
-  "lessonAdviceCombustionHealthEnrichment": "Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.",
-  "@lessonAdviceCombustionHealthEnrichment": {
-    "description": "How-to-improve advice for the commanded-enrichment combustion-health heuristic (#2931). Points at the driving that triggers enrichment. Embedded in the GPX recording export."
   },
   "lessonTransportTitle": "Engine data missing for most of this trip",
   "@lessonTransportTitle": {
@@ -4137,15 +4051,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "description": "#4221 — evidence-first lesson headline: no litres (a modelled litre figure is never shown). Placeholders are pre-formatted strings.",
     "placeholders": {
       "pctTime": {

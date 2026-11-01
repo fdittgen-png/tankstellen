@@ -904,11 +904,8 @@
   "insightIdling": "Dīkstāvē ({pctTime}% no brauciena): iztērēts {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% no brauciena",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Braukšana zemā pārnesumā ({minutes} min)",
   "lessonAdviceIdling": "Garās apstāšanās reizēs izslēdziet dzinēju, nevis ļaujiet tam darboties tukšgaitā.",
-  "lessonAdviceHighRpm": "Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs nebūtu augsto apgriezienu zonā.",
   "lessonAdviceHardAccel": "Spiediet gāzi vienmērīgi — gluda paātrināšanās patērē mazāk degvielas.",
-  "lessonAdviceLowGear": "Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs darbotos zemākos un ekonomiskākos apgriezienos.",
   "drivingScoreCardTitle": "Braukšanas novērtējums",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Kompozīts novērtējums no dīkstāves, straujo paātrinājumu, asas bremzēšanas un augsta RPM laika. Salīdzinājums \"labāks par X% no iepriekšējiem braucieniem\" nāks nākamajā laidienā.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Liela, ilgstoša slodze liek dzinējam darboties ar bagātu maisījumu — mainiet ātrumu uz augstāku un atslogojiet ilgstošos kāpumos, lai saglabātu maisījumu liesu.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Ļoti labs",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Uzņemiet ātrumu pirms kalna un vienmērīgi pieaugiet ar gāzi — strauja braukšana kalnā patērē papildu degvielu.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} apstāšanās un atkārtošanās: izniekots {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Paredziet satiksmi un virzieties brīvgaitā uz apstāšanos, lai rullētu, nevis atsāktu — atdalīšanās no pilnas apstāšanās ir visdārgākā daļa.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS efektivitāte",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Maisījums šķiet nedaudz liess — dzinējs pievienoja degvielu ({pctTrim} % korekcija), lai kompensētu",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Maisījums šķiet liess — dzinējs ilgstoši uzturēja lielu degvielas pievienojumu ({pctTrim} %), iespējama neefektivitāte",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Maisījums šķiet nedaudz bagāts — dzinējs atņēma degvielu ({pctTrim} % korekcija), lai kompensētu",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Maisījums šķiet bagāts — dzinējs ilgstoši uzturēja lielu degvielas samazinājumu ({pctTrim} %), iespējama neefektivitāte",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Dzinējs slodzē darbojās ar bagātu maisījumu ({pctShare} % no braukšanas ar siltu dzinēju) — iespējama degvielas izšķērdēšana",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heiristisks stāvokļa signāls, nevis diagnoze",
-  "lessonAdviceCombustionHealthLean": "Ilgstoša korekcija uz liesu maisījumu var nozīmēt gaisa noplūdi ieplūdē, vāju degvielas padevi vai novecojušu sensoru. Ja patēriņš vai darbība pasliktinās, servisa diagnostika to var apstiprināt.",
-  "lessonAdviceCombustionHealthRich": "Ilgstoša korekcija uz bagātu maisījumu var nozīmēt tekošu sprauslu, pārāk augstu degvielas spiedienu vai sensoru, kas rāda par daudz. Ja patēriņš vai darbība pasliktinās, servisa diagnostika to var apstiprināt.",
-  "lessonAdviceCombustionHealthEnrichment": "Bagāts maisījums lielā slodzē dedzina papildu degvielu. Pārslēdzieties uz augstāku pārnesumu agrāk un garās paātrināšanās atlaidiet gāzi, lai dzinējs paliktu tuvu stehiometriskam maisījumam.",
   "pipTapToRestore": "Pieskarieties, lai atvērtu pilno lietotni",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

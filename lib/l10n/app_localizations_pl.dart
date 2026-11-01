@@ -4600,25 +4600,12 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Jazda na niskim biegu ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Podczas dłuższych postojów wyłączaj silnik, zamiast pozostawiać go na biegu jałowym.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Zmieniaj na wyższy bieg wcześniej, aby utrzymać silnik poza zakresem wysokich obrotów.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Naciskaj gaz płynnie — równomierne przyspieszanie zużywa mniej paliwa.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Zmieniaj na wyższy bieg wcześniej, aby silnik pracował na niższych, oszczędniejszych obrotach.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4651,10 +4638,6 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Duże, długotrwałe obciążenie powoduje wzbogacenie mieszanki — zmieniaj biegi wcześniej i zmniejsz obciążenie na długich podjazdach, aby mieszanka pozostała uboga.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4664,58 +4647,13 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Wejdź w wzniesienie z impetu i płynnie dawaj gaz — gwałtowne przyspieszanie pod górę zużywa dodatkowe paliwo.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count zatrzymań i ruszeń: zmarnowano $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Przewiduj ruch i jedź na wybiegu do zatrzymań, by toczyć się zamiast ruszać od zera — ruszenie z miejsca to najbardziej paliwożerny element jazdy w korkach.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Mieszanka wygląda na nieco ubogą — silnik dodał paliwa (korekta $pctTrim %), aby to skompensować';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Mieszanka wygląda na ubogą — silnik utrzymywał dużą, $pctTrim % korektę wzbogacającą; możliwa nieefektywność';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Mieszanka wygląda na nieco bogatą — silnik odjął paliwa (korekta $pctTrim %), aby to skompensować';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Mieszanka wygląda na bogatą — silnik utrzymywał dużą, $pctTrim % korektę zubażającą; możliwa nieefektywność';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Silnik pracował na bogatej mieszance pod obciążeniem ($pctShare % jazdy na ciepłym silniku) — możliwa strata paliwa';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heurystyczny sygnał stanu, nie diagnoza';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Utrzymująca się korekta w stronę ubogiej mieszanki może oznaczać nieszczelność dolotu, słabe zasilanie paliwem lub starzejący się czujnik. Jeśli spalanie lub praca silnika się pogorszą, diagnostyka w warsztacie może to potwierdzić.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Utrzymująca się korekta w stronę bogatej mieszanki może oznaczać nieszczelny wtryskiwacz, zbyt wysokie ciśnienie paliwa lub zawyżający czujnik. Jeśli spalanie lub praca silnika się pogorszą, diagnostyka w warsztacie może to potwierdzić.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Bogata mieszanka pod dużym obciążeniem spala dodatkowe paliwo. Zmieniaj biegi wcześniej i odpuszczaj gaz przy długich przyspieszeniach, aby silnik pozostał blisko mieszanki stechiometrycznej.';
 
   @override
   String get lessonTransportTitle =>
@@ -4743,11 +4681,6 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

@@ -904,11 +904,8 @@
   "insightIdling": "Prosti tek ({pctTime}% vožnje): porabljeno {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% vožnje",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Napenjanje v nizki prestavi ({minutes} min)",
   "lessonAdviceIdling": "Ob daljših postankih ugasnite motor, namesto da ga pustite v prostem teku.",
-  "lessonAdviceHighRpm": "Prej prestavite navzgor, da motor ostane zunaj območja visokih vrtljajev.",
   "lessonAdviceHardAccel": "Plin pritiskajte nežno — enakomerno pospeševanje porabi manj goriva.",
-  "lessonAdviceLowGear": "Prej prestavite navzgor, da se motor umiri pri nižjih in varčnejših vrtljajih.",
   "drivingScoreCardTitle": "Ocena vožnje",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Sestavljena ocena iz prostega teka, nenadnih pospeševanj, nenadnega zaviranja in časa pri visoki vrtljajnosti. Primerjava »boljše od X% preteklih voženj« bo dodana v prihodnji različici.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Velika, trajna obremenitev povzroči bogato mešanico — pri dolgih vzponih prestavljajte zgodaj in rahljajte plin, da ohranite pusto mešanico.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Zelo dobro",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Ohranite zagon pred vzponom in enakomerno dodajajte plin — hitri sunki na vzponu povečajo porabo goriva.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} ponovnih zagonov po ustavitvi: zapravljenih {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Predvidite promet in se drsno približajte postanku, da se kotalite namesto da se ustavite — odhod z mesta mirovanja je najtežji del vožnje z ustavljanjem.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "Učinkovitost GPS",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Zmes se zdi nekoliko revna — motor je dodajal gorivo (korekcija {pctTrim} %), da bi to nadomestil",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Zmes se zdi revna — motor je trajno dodajal veliko goriva ({pctTrim} %), možna neučinkovitost",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Zmes se zdi nekoliko bogata — motor je odvzemal gorivo (korekcija {pctTrim} %), da bi to nadomestil",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Zmes se zdi bogata — motor je trajno odvzemal veliko goriva ({pctTrim} %), možna neučinkovitost",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Motor je pod obremenitvijo tekel bogato ({pctShare} % ogrete vožnje) — možna potrata goriva",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Hevristični signal stanja, ne diagnoza",
-  "lessonAdviceCombustionHealthLean": "Trajna korekcija proti revni zmesi lahko pomeni uhajanje zraka v sesalnem delu, šibko oskrbo z gorivom ali starajoč se senzor. Če se poraba ali tek poslabšata, lahko diagnostika v delavnici to potrdi.",
-  "lessonAdviceCombustionHealthRich": "Trajna korekcija proti bogati zmesi lahko pomeni puščajočo šobo, previsok tlak goriva ali senzor, ki kaže preveč. Če se poraba ali tek poslabšata, lahko diagnostika v delavnici to potrdi.",
-  "lessonAdviceCombustionHealthEnrichment": "Bogata zmes pri veliki obremenitvi porabi dodatno gorivo. Prestavljajte navzgor prej in pri dolgih pospeševanjih popustite plin, da motor ostane blizu stehiometrične zmesi.",
   "pipTapToRestore": "Dotaknite se, da odprete celotno aplikacijo",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

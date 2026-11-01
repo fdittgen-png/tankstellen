@@ -28,9 +28,8 @@ class ClimbingCostRule implements DrivingLessonRule {
     if (insight == null) return null;
 
     final pct = formatLessonPercent(insight.percentOfTrip);
-    final gradePct = formatLessonPercent(
-      (insight.metadata['gradePercent'] ?? 0).toDouble(),
-    );
+    final gradePct =
+        formatLessonPercent((insight.metadata['gradePercent'] ?? 0).toDouble());
     return DrivingLesson(
       id: id,
       polarity: LessonPolarity.info,

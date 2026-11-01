@@ -4616,25 +4616,12 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Mersul în treaptă mică ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Opriți motorul la opririle lungi în loc să-l lăsați la ralanti.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Schimbați mai devreme într-o treaptă superioară pentru a menține motorul în afara zonei de turații înalte.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Apăsați lin pedala de accelerație — o accelerare uniformă consumă mai puțin combustibil.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Schimbați mai devreme într-o treaptă superioară pentru ca motorul să funcționeze la turații mai mici și mai economice.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4667,10 +4654,6 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Sarcina mare și susținută face motorul să ruleze bogat — schimbați treapta devreme și reduceți pe urcări lungi pentru a menține amestecul sărac.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4680,58 +4663,13 @@ class AppLocalizationsRo extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Mențineți viteza la intrarea pe deal și apăsați pedala treptat — accelerările brusce pe o urcare ard carburant suplimentar.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count porniri în trafic stop-and-go: risipit $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Anticipați traficul și rulați liber spre opriri pentru a merge pe inerție mai degrabă decât să reporniți — pornirea de pe loc este cea mai consumatoare parte din circulația stop-and-go.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Amestecul pare ușor sărac — motorul a adăugat combustibil (corecție de $pctTrim %) pentru a compensa';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Amestecul pare sărac — motorul a menținut o adăugare mare de combustibil, de $pctTrim %, o posibilă ineficiență';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Amestecul pare ușor bogat — motorul a scos combustibil (corecție de $pctTrim %) pentru a compensa';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Amestecul pare bogat — motorul a menținut o reducere mare de combustibil, de $pctTrim %, o posibilă ineficiență';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Motorul a mers bogat sub sarcină ($pctShare % din condusul la cald) — posibil combustibil irosit';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Semnal euristic de stare, nu un diagnostic';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'O corecție susținută spre amestec sărac poate însemna o infiltrare de aer la admisie, o alimentare slabă cu combustibil sau un senzor îmbătrânit. Dacă se înrăutățesc consumul sau funcționarea, o diagnoză în service poate confirma.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'O corecție susținută spre amestec bogat poate însemna un injector care pierde, o presiune prea mare a combustibilului sau un senzor care citește în plus. Dacă se înrăutățesc consumul sau funcționarea, o diagnoză în service poate confirma.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Amestecul bogat la sarcină mare arde combustibil în plus. Schimbă treapta mai devreme și ridică piciorul la accelerările lungi, ca motorul să rămână aproape de un amestec stoichiometric.';
 
   @override
   String get lessonTransportTitle =>
@@ -4759,11 +4697,6 @@ class AppLocalizationsRo extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

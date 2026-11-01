@@ -76,9 +76,8 @@ class CombustionHealthSignal {
   });
 
   /// The honest no-signal result.
-  static const CombustionHealthSignal none = CombustionHealthSignal(
-    fired: false,
-  );
+  static const CombustionHealthSignal none =
+      CombustionHealthSignal(fired: false);
 
   /// Whether the heuristic surfaced a combustion-health line at all.
   final bool fired;

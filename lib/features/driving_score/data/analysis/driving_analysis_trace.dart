@@ -285,8 +285,9 @@ class DrivingAnalysisTrace {
                 // through the accuracy/min-speed gates.
                 'gates': const {
                   'maxAccelG': 'instantaneous sample-to-sample peak, clamped',
-                  'events': 'sustained >=1.0s at >=3.0 (accel) / >=3.5 (brake) '
-                      'm/s2, accuracy- and min-speed-gated',
+                  'events':
+                      'sustained >=1.0s at >=3.0 (accel) / >=3.5 (brake) '
+                          'm/s2, accuracy- and min-speed-gated',
                 },
                 'meanSpeedKmh': _round(gpsFeatures!.meanSpeedKmh, 1),
                 'speedBandSeconds': {
@@ -309,7 +310,8 @@ class DrivingAnalysisTrace {
         // termination is unknown, so "not recorded" is explicit rather
         // than a missing key the reader has to interpret.
         'session': {
-          'terminationReason': termination?.reason.name ?? 'unrecorded',
+          'terminationReason':
+              termination?.reason.name ?? 'unrecorded',
           if (termination?.detail != null)
             'terminationDetail': termination!.detail,
           'automatic': automatic,
@@ -354,10 +356,7 @@ class DrivingAnalysisTrace {
         // disagrees pinpoints exactly which judgment to retune.
         'lessons': [
           for (final l in lessons)
-            {
-              'id': l.id,
-              'polarity': l.polarity.name,
-              'title': l.title,
+            {'id': l.id, 'polarity': l.polarity.name, 'title': l.title,
               'metricValue': l.metricValue,
               'advice': l.advice,
             },

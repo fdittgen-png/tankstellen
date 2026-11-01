@@ -210,16 +210,14 @@ class ImuStretchTracker {
       return;
     }
     if (_confirmedOutcome == null) _unconfirmedCount++;
-    _records.add(
-      ImuEventRecord(
-        outcome: outcome,
+    _records.add(ImuEventRecord(
+      outcome: outcome,
         startedAt: _startedAt,
         peakMps2: _peakMps2,
-        durationSec: _duration,
-        startSpeedKmh: _startSpeedKmh,
-        netSpeedDeltaKmh: _lastNetDeltaKmh,
-        peakYawRadPerSec: _peakYaw,
-      ),
-    );
+      durationSec: _duration,
+      startSpeedKmh: _startSpeedKmh,
+      netSpeedDeltaKmh: _lastNetDeltaKmh,
+      peakYawRadPerSec: _peakYaw,
+    ));
   }
 }

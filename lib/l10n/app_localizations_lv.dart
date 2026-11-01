@@ -4609,25 +4609,12 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Braukšana zemā pārnesumā ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Garās apstāšanās reizēs izslēdziet dzinēju, nevis ļaujiet tam darboties tukšgaitā.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs nebūtu augsto apgriezienu zonā.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Spiediet gāzi vienmērīgi — gluda paātrināšanās patērē mazāk degvielas.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs darbotos zemākos un ekonomiskākos apgriezienos.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4660,10 +4647,6 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Liela, ilgstoša slodze liek dzinējam darboties ar bagātu maisījumu — mainiet ātrumu uz augstāku un atslogojiet ilgstošos kāpumos, lai saglabātu maisījumu liesu.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4673,58 +4656,13 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Uzņemiet ātrumu pirms kalna un vienmērīgi pieaugiet ar gāzi — strauja braukšana kalnā patērē papildu degvielu.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count apstāšanās un atkārtošanās: izniekots $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Paredziet satiksmi un virzieties brīvgaitā uz apstāšanos, lai rullētu, nevis atsāktu — atdalīšanās no pilnas apstāšanās ir visdārgākā daļa.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Maisījums šķiet nedaudz liess — dzinējs pievienoja degvielu ($pctTrim % korekcija), lai kompensētu';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Maisījums šķiet liess — dzinējs ilgstoši uzturēja lielu degvielas pievienojumu ($pctTrim %), iespējama neefektivitāte';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Maisījums šķiet nedaudz bagāts — dzinējs atņēma degvielu ($pctTrim % korekcija), lai kompensētu';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Maisījums šķiet bagāts — dzinējs ilgstoši uzturēja lielu degvielas samazinājumu ($pctTrim %), iespējama neefektivitāte';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Dzinējs slodzē darbojās ar bagātu maisījumu ($pctShare % no braukšanas ar siltu dzinēju) — iespējama degvielas izšķērdēšana';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heiristisks stāvokļa signāls, nevis diagnoze';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Ilgstoša korekcija uz liesu maisījumu var nozīmēt gaisa noplūdi ieplūdē, vāju degvielas padevi vai novecojušu sensoru. Ja patēriņš vai darbība pasliktinās, servisa diagnostika to var apstiprināt.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Ilgstoša korekcija uz bagātu maisījumu var nozīmēt tekošu sprauslu, pārāk augstu degvielas spiedienu vai sensoru, kas rāda par daudz. Ja patēriņš vai darbība pasliktinās, servisa diagnostika to var apstiprināt.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Bagāts maisījums lielā slodzē dedzina papildu degvielu. Pārslēdzieties uz augstāku pārnesumu agrāk un garās paātrināšanās atlaidiet gāzi, lai dzinējs paliktu tuvu stehiometriskam maisījumam.';
 
   @override
   String get lessonTransportTitle =>
@@ -4752,11 +4690,6 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

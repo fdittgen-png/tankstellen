@@ -904,11 +904,8 @@
   "insightIdling": "Voľnobeh ({pctTime}% jazdy): premrhaných {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% jazdy",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Jazda na nízky prevodový stupeň ({minutes} min)",
   "lessonAdviceIdling": "Pri dlhých zastaveniach vypínajte motor, namiesto toho aby ste ho nechávali bežať na voľnobeh.",
-  "lessonAdviceHighRpm": "Preraďte nahor skôr, aby ste udržali motor mimo pásma vysokých otáčok.",
   "lessonAdviceHardAccel": "Plynulo pridávajte plyn — rovnomerné zrýchľovanie spotrebuje menej paliva.",
-  "lessonAdviceLowGear": "Preraďte nahor skôr, aby sa motor ustálil na nižších, úspornejších otáčkach.",
   "drivingScoreCardTitle": "Jazdné skóre",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Kompozitné skóre z voľnobehu, prudkých zrýchlení, prudkého brzdenia a času na vysoké RPM. Porovnanie \"lepšie ako X% minulých jázd\" bude dostupné v nasledujúcej verzii.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Ťažká trvalá záťaž spôsobuje bohatú zmes motora — skoro radťe a uvoľnite na dlhých stúpaniach, aby zmes zostala chudobná.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Veľmi dobrý",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Naberajte rýchlosť pred kopcom a plynne dávajte plyn — prudké pridávanie na stúpaní spaľuje extra palivo.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} štartov zo zastávky: premárnených {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Predvídajte premávku a voľným behom sa blížte k zastávkam, aby ste sa skôr váľali, ako zastavili — rozjazd z úplného zastavenia je najúspornejšia časť stop-and-go.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS efektivita",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Zmes sa zdá mierne chudobná — motor pridával palivo (korekcia {pctTrim} %), aby to vyrovnal",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Zmes sa zdá chudobná — motor trvalo pridával veľké množstvo paliva ({pctTrim} %), možná neefektivita",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Zmes sa zdá mierne bohatá — motor uberal palivo (korekcia {pctTrim} %), aby to vyrovnal",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Zmes sa zdá bohatá — motor trvalo uberal veľké množstvo paliva ({pctTrim} %), možná neefektivita",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Motor bežal pri zaťažení na bohatú zmes ({pctShare} % zahriatej jazdy) — možné plytvanie palivom",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristický signál stavu, nie diagnóza",
-  "lessonAdviceCombustionHealthLean": "Trvalá korekcia smerom k chudobnej zmesi môže znamenať prisávanie vzduchu v saní, slabé zásobovanie palivom alebo starnúci snímač. Ak sa spotreba alebo chod zhorší, diagnostika v servise to môže potvrdiť.",
-  "lessonAdviceCombustionHealthRich": "Trvalá korekcia smerom k bohatej zmesi môže znamenať netesný vstrekovač, vysoký tlak paliva alebo snímač, ktorý nadhodnocuje. Ak sa spotreba alebo chod zhorší, diagnostika v servise to môže potvrdiť.",
-  "lessonAdviceCombustionHealthEnrichment": "Bohatá zmes pri vysokom zaťažení spaľuje palivo navyše. Raďte nahor skôr a pri dlhom zrýchľovaní uberte plyn, aby motor zostal blízko stechiometrickej zmesi.",
   "pipTapToRestore": "Ťuknutím otvoríte celú aplikáciu",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

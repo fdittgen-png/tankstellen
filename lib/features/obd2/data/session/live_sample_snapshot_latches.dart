@@ -72,11 +72,10 @@ mixin _LiveSampleSnapshotLatches {
         signal == VehicleSignal.widebandPhi
             ? _precision.measuredPhiReading()
             : _signals.reading(signal),
-        isDiesel: resolveMixtureConstants(
-              _vehicle,
-              sessionFuelTypeKey: sessionFuelTypeKey,
-              measuredEthanolPercent: _precision.ethanolPercent,
-            ).kind ==
+        isDiesel: resolveMixtureConstants(_vehicle,
+                    sessionFuelTypeKey: sessionFuelTypeKey,
+                    measuredEthanolPercent: _precision.ethanolPercent)
+                .kind ==
             ResolvedFuelKind.diesel,
       );
 
@@ -128,7 +127,6 @@ mixin _LiveSampleSnapshotLatches {
     }
     return best;
   }
-
   double? get latestOilTempC => _latest(VehicleSignal.oilTemp);
   double? get latestAmbientTempC => _latest(VehicleSignal.ambientAirTemp);
 
@@ -154,8 +152,7 @@ mixin _LiveSampleSnapshotLatches {
     _latestLatitude = latitude;
     _latestLongitude = longitude;
     // #2692 C4-B — chokepoint isFinite guard (NaN altitude poisoned grade math).
-    _latestAltitudeM =
-        (altitudeM != null && altitudeM.isFinite) ? altitudeM : null;
+    _latestAltitudeM = (altitudeM != null && altitudeM.isFinite) ? altitudeM : null;
     _latestHAccuracyM = hAccuracyM;
     _latestBearingDeg = bearingDeg;
   }

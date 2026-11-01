@@ -4618,25 +4618,12 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Βαριά φόρτωση σε χαμηλή ταχύτητα ($minutes λεπτά)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Σβήνετε τον κινητήρα στις μεγάλες στάσεις αντί να τον αφήνετε στο ρελαντί.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Αλλάζετε νωρίτερα σε υψηλότερη σχέση για να κρατάτε τον κινητήρα εκτός της ζώνης υψηλών στροφών.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Πατάτε απαλά το γκάζι — η ομαλή επιτάχυνση καταναλώνει λιγότερο καύσιμο.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Αλλάζετε νωρίτερα σε υψηλότερη σχέση ώστε ο κινητήρας να σταθεροποιείται σε χαμηλότερες, πιο οικονομικές στροφές.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4669,10 +4656,6 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Βαρύ, παρατεταμένο φορτίο κάνει τον κινητήρα να τρέχει πλούσια — αλλάξτε σχέση νωρίς και χαλαρώστε στις μεγάλες ανηφόρες για να διατηρήσετε το μείγμα λεπτό.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4682,58 +4665,13 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Διατηρήστε ορμή στην ανηφόρα και δώστε γκάζι ομαλά — η εκρηκτική επιτάχυνση σε ανηφόρα κατανώνει επιπλέον καύσιμο.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count επανεκκινήσεις stop-and-go: σπάταλα $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Προβλέψτε την κίνηση και αφεθείτε σε αδράνεια προς τις στάσεις ώστε να κυλάτε αντί να ξεκινάτε εκ νέου — η εκκίνηση από ακινησία είναι το πιο ενεργοβόρο στάδιο της stop-and-go κυκλοφορίας.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Το μείγμα φαίνεται λίγο φτωχό — ο κινητήρας πρόσθεσε καύσιμο (διόρθωση $pctTrim %) για να αντισταθμίσει';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Το μείγμα φαίνεται φτωχό — ο κινητήρας διατήρησε μεγάλη προσθήκη καυσίμου $pctTrim %, πιθανή αναποτελεσματικότητα';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Το μείγμα φαίνεται λίγο πλούσιο — ο κινητήρας αφαίρεσε καύσιμο (διόρθωση $pctTrim %) για να αντισταθμίσει';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Το μείγμα φαίνεται πλούσιο — ο κινητήρας διατήρησε μεγάλη μείωση καυσίμου $pctTrim %, πιθανή αναποτελεσματικότητα';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Ο κινητήρας δούλεψε πλούσια υπό φορτίο ($pctShare % της ζεστής οδήγησης) — πιθανή σπατάλη καυσίμου';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Ευρετικό σήμα κατάστασης, όχι διάγνωση';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Μια παρατεταμένη διόρθωση προς φτωχό μείγμα μπορεί να σημαίνει διαρροή αέρα στην εισαγωγή, αδύναμη τροφοδοσία καυσίμου ή γερασμένο αισθητήρα. Αν επιδεινωθεί η κατανάλωση ή η λειτουργία, μια διάγνωση σε συνεργείο μπορεί να το επιβεβαιώσει.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Μια παρατεταμένη διόρθωση προς πλούσιο μείγμα μπορεί να σημαίνει μπεκ που στάζει, υψηλή πίεση καυσίμου ή αισθητήρα που μετρά παραπάνω. Αν επιδεινωθεί η κατανάλωση ή η λειτουργία, μια διάγνωση σε συνεργείο μπορεί να το επιβεβαιώσει.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Το πλούσιο μείγμα υπό μεγάλο φορτίο καίει επιπλέον καύσιμο. Αλλάξτε σχέση νωρίτερα και ξεγκαζώστε στις παρατεταμένες επιταχύνσεις, ώστε ο κινητήρας να μένει κοντά σε στοιχειομετρικό μείγμα.';
 
   @override
   String get lessonTransportTitle =>
@@ -4761,11 +4699,6 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

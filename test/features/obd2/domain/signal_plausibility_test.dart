@@ -46,17 +46,12 @@ void main() {
 
   group('the clamps are unchanged — marking does not touch the math', () {
     test('an implausible φ still clamps to the band edge', () {
-      expect(
-        effectiveAfrForPhi(kPetrolAfr, 1.9),
-        effectiveAfrForPhi(kPetrolAfr, kMaxCommandedPhi),
-      );
+      expect(effectiveAfrForPhi(kPetrolAfr, 1.9),
+          effectiveAfrForPhi(kPetrolAfr, kMaxCommandedPhi));
       expect(
         effectiveAfrForMixture(kDieselAfr, measuredPhi: 0.01, isDiesel: true),
-        effectiveAfrForMixture(
-          kDieselAfr,
-          measuredPhi: kMinDieselMeasuredPhi,
-          isDiesel: true,
-        ),
+        effectiveAfrForMixture(kDieselAfr,
+            measuredPhi: kMinDieselMeasuredPhi, isDiesel: true),
       );
     });
 
@@ -81,62 +76,36 @@ void main() {
           signal: s,
           value: v == null
               ? const DataValue<double>.unknown(
-                  reason: DataUnknownReason.notMeasuredYet,
-                )
+                  reason: DataUnknownReason.notMeasuredYet)
               : DataValue<double>.measured(v),
         );
 
     test('marks raw lambda and baro, leaves everything else unchecked', () {
-      expect(
-        markPlausibility(
-          r(VehicleSignal.commandedPhi, 0.4),
-          isDiesel: false,
-        ).plausibility,
-        _implausible,
-      );
-      expect(
-        markPlausibility(
-          r(VehicleSignal.baroPressure, 95),
-          isDiesel: false,
-        ).plausibility,
-        _plausible,
-      );
-      expect(
-        markPlausibility(
-          r(VehicleSignal.widebandPhi, 3.0),
-          isDiesel: true,
-        ).plausibility,
-        _plausible,
-      );
-      expect(
-        markPlausibility(
-          r(VehicleSignal.widebandPhi, 3.0),
-          isDiesel: false,
-        ).plausibility,
-        _implausible,
-      );
-      expect(
-        markPlausibility(
-          r(VehicleSignal.coolantTemp, 500),
-          isDiesel: false,
-        ).plausibility,
-        SignalPlausibility.notChecked,
-      );
+      expect(markPlausibility(r(VehicleSignal.commandedPhi, 0.4),
+              isDiesel: false)
+          .plausibility, _implausible);
+      expect(markPlausibility(r(VehicleSignal.baroPressure, 95),
+              isDiesel: false)
+          .plausibility, _plausible);
+      expect(markPlausibility(r(VehicleSignal.widebandPhi, 3.0),
+              isDiesel: true)
+          .plausibility, _plausible);
+      expect(markPlausibility(r(VehicleSignal.widebandPhi, 3.0),
+              isDiesel: false)
+          .plausibility, _implausible);
+      expect(markPlausibility(r(VehicleSignal.coolantTemp, 500),
+              isDiesel: false)
+          .plausibility, SignalPlausibility.notChecked);
     });
 
-    test('keeps the unclamped value, and leaves a missing value unmarked', () {
-      final marked = markPlausibility(
-        r(VehicleSignal.commandedPhi, 0.4),
-        isDiesel: false,
-      );
+    test('keeps the unclamped value, and leaves a missing value unmarked',
+        () {
+      final marked =
+          markPlausibility(r(VehicleSignal.commandedPhi, 0.4), isDiesel: false);
       expect(marked.valueOrNull, 0.4);
-      expect(
-        markPlausibility(
-          r(VehicleSignal.commandedPhi, null),
-          isDiesel: false,
-        ).plausibility,
-        SignalPlausibility.notChecked,
-      );
+      expect(markPlausibility(r(VehicleSignal.commandedPhi, null),
+              isDiesel: false)
+          .plausibility, SignalPlausibility.notChecked);
     });
 
     test('a stale value is still marked', () {
@@ -144,10 +113,8 @@ void main() {
         signal: VehicleSignal.baroPressure,
         value: Stale<double>(30, age: Duration(minutes: 1)),
       );
-      expect(
-        markPlausibility(stale, isDiesel: false).plausibility,
-        _implausible,
-      );
+      expect(markPlausibility(stale, isDiesel: false).plausibility,
+          _implausible);
     });
   });
 }

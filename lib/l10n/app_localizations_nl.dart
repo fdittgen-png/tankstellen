@@ -4597,25 +4597,12 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Te laag toerental ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Zet de motor uit bij lange stops in plaats van hem stationair te laten draaien.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Schakel eerder op om de motor uit het hoge toerenbereik te houden.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Geef rustig gas — soepel accelereren verbruikt minder brandstof.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Schakel eerder op zodat de motor in een lager, zuiniger toerental komt.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4648,10 +4635,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Zware, aanhoudende belasting maakt het mengsel te rijk — schakel vroeg en verminder de belasting bij lange beklimmingen om het mengsel mager te houden.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4661,58 +4644,13 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Neem vaart mee een heuvel op en geef gas geleidelijk — optrekken op een helling verbruikt extra brandstof.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count stop-and-go-herstarten: $liters L verspild';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Anticipeer op het verkeer en rol naar stops zodat je uitrolt in plaats van opnieuw optrekt — optrekken vanuit stilstand is het meest brandstofvretende deel van stop-and-go.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Het mengsel lijkt iets arm — de motor voegde brandstof toe ($pctTrim % correctie) om te compenseren';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Het mengsel lijkt arm — de motor hield een grote brandstoftoevoeging van $pctTrim % aan, een mogelijke inefficiëntie';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Het mengsel lijkt iets rijk — de motor nam brandstof weg ($pctTrim % correctie) om te compenseren';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Het mengsel lijkt rijk — de motor hield een grote brandstofvermindering van $pctTrim % aan, een mogelijke inefficiëntie';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'De motor draaide rijk onder belasting ($pctShare % van de warme rit) — mogelijk verspilde brandstof';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristisch gezondheidssignaal, geen diagnose';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Een aanhoudende correctie richting arm mengsel kan wijzen op een lek in de inlaat, een zwakke brandstoftoevoer of een verouderde sensor. Als het verbruik of het loopgedrag verslechtert, kan een uitleesbeurt bij de garage dit bevestigen.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Een aanhoudende correctie richting rijk mengsel kan wijzen op een lekkende injector, een te hoge brandstofdruk of een sensor die te hoog meet. Als het verbruik of het loopgedrag verslechtert, kan een uitleesbeurt bij de garage dit bevestigen.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Rijk mengsel onder zware belasting verbrandt extra brandstof. Schakel eerder op en laat het gas los bij lang optrekken, zodat de motor dicht bij een stoichiometrisch mengsel kan blijven.';
 
   @override
   String get lessonTransportTitle =>
@@ -4740,11 +4678,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

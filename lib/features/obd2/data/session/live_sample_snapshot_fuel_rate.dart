@@ -50,10 +50,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
   /// #4159 — the last [deriveFuelRateLPerHour] figure with provenance (see
   /// `fuelRateReadingOf`). Reads only: records no breadcrumb.
   SignalReading fuelRateReading() => fuelRateReadingOf(
-        _lastFuelRateLPerHour,
-        _lastFuelRateSource,
-        at: _lastFuelRateAt,
-      );
+      _lastFuelRateLPerHour, _lastFuelRateSource, at: _lastFuelRateAt);
 
   /// Derive the current fuel rate (L/h) from whatever snapshot
   /// values have landed so far — the scheduler has already done the
@@ -113,18 +110,16 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     );
     _lastPumpGainResolution = gainResolution;
     final pumpGain = gainResolution.gain;
-    final displacement =
-        _vehicle?.manualEngineDisplacementCcOverride?.round() ??
-            _vehicle?.engineDisplacementCc ??
-            1000;
+    final displacement = _vehicle?.manualEngineDisplacementCcOverride
+            ?.round() ??
+        _vehicle?.engineDisplacementCc ??
+        1000;
     // #1422 phase 1 — manual override → stored profile (when learned or
     // non-default) → engine-tech helper on the reference catalog row →
     // hard 0.85 fallback.
     final ve = _vehicle?.manualVolumetricEfficiencyOverride ??
-        profileVolumetricEfficiency(
-          _vehicle,
-          hasReferenceVehicle: _referenceVehicle != null,
-        ) ??
+        profileVolumetricEfficiency(_vehicle,
+            hasReferenceVehicle: _referenceVehicle != null) ??
         (_referenceVehicle != null
             ? defaultVolumetricEfficiency(_referenceVehicle)
             : 0.85);
@@ -161,7 +156,7 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
           collector?.recordFlag(
             Obd2BreadcrumbCollector.flag9dVs5eDivergent,
             'rate9d=${lph.toStringAsFixed(2)};'
-            'pid5e=${direct5e.toStringAsFixed(2)}',
+                'pid5e=${direct5e.toStringAsFixed(2)}',
           );
         }
         _lastFuelRateBranch = Obd2BranchTag.pid5E;
@@ -231,12 +226,13 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       final mafSnapshot = _latest(VehicleSignal.maf);
       if (mafSnapshot != null) {
         final mafDerived = mafSnapshot * 3600.0 / (afr * density);
-        if (mafDerived > 0 && (direct - mafDerived).abs() / mafDerived > 0.5) {
+        if (mafDerived > 0 &&
+            (direct - mafDerived).abs() / mafDerived > 0.5) {
           collector?.recordFlag(
             Obd2BreadcrumbCollector.flag5eVsMafDivergent,
             'direct=${direct.toStringAsFixed(2)};'
-            'mafDerived=${mafDerived.toStringAsFixed(2)};'
-            'maf=${mafSnapshot.toStringAsFixed(2)}',
+                'mafDerived=${mafDerived.toStringAsFixed(2)};'
+                'maf=${mafSnapshot.toStringAsFixed(2)}',
           );
         }
       }
@@ -266,11 +262,8 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
       // diesel (they don't model a lean-burn mixture).
       // #4233 — through the fuzzy stage, which applies the gain once.
       final corrected = estimatedFuelRateLPerHour(
-        skipTrim ? raw : _applyTrim(raw),
-        FuzzyPhysicsBasis.maf,
-        pumpGain: pumpGain,
-        context: _fuzzyContext(),
-      );
+          skipTrim ? raw : _applyTrim(raw), FuzzyPhysicsBasis.maf,
+          pumpGain: pumpGain, context: _fuzzyContext());
       collector?.record(
         branch: Obd2BranchTag.maf,
         fuelRateLPerHour: corrected,
@@ -342,11 +335,8 @@ mixin _LiveSampleSnapshotFuelRate on _LiveSampleSnapshotLatches {
     }
     // #3430 — trim correction skipped on diesel (petrol stoich feedback).
     final corrected = estimatedFuelRateLPerHour(
-      skipTrim ? raw : _applyTrim(raw),
-      FuzzyPhysicsBasis.speedDensity,
-      pumpGain: pumpGain,
-      context: _fuzzyContext(),
-    ); // #4233 — as MAF
+        skipTrim ? raw : _applyTrim(raw), FuzzyPhysicsBasis.speedDensity,
+        pumpGain: pumpGain, context: _fuzzyContext()); // #4233 — as MAF
     collector?.record(
       branch: Obd2BranchTag.speedDensity,
       fuelRateLPerHour: corrected,

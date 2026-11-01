@@ -904,11 +904,8 @@
   "insightIdling": "Tomgang ({pctTime}% af turen): spildt {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% af turen",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Kørsel i lavt gear ({minutes} min)",
   "lessonAdviceIdling": "Sluk motoren ved lange stop i stedet for at lade den gå i tomgang.",
-  "lessonAdviceHighRpm": "Skift tidligere op for at holde motoren uden for det høje omdrejningsområde.",
   "lessonAdviceHardAccel": "Giv blødt gas — jævn acceleration bruger mindre brændstof.",
-  "lessonAdviceLowGear": "Skift op tidligere, så motoren falder til ro i et lavere, mere økonomisk gear.",
   "drivingScoreCardTitle": "Kørescore",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Sammensat score fra tomgang, hårde accelerationer, hård opbremsning og høj-RPM-tid. En 'bedre end X% af tidligere ture'-sammenligning kommer i en kommende udgivelse.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Kraftig, vedvarende belastning gør motoren fedkørende — skift op tidligt og lad op ved lange stigninger for at holde blandingen mager.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Meget god",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Bevar farten op ad bakken og giv jævnt gas — at surge på en stigning brænder ekstra brændstof.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} stop-og-kør-genstarter: spildte {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Forudse trafikken og frihjul mod stop, så du ruller i stedet for at starte fra stilstand — at køre fra stillestående er den mest brændstofkrævende del af stop-og-kør.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS-effektivitet",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Blandingen ser lidt mager ud — motoren tilførte brændstof ({pctTrim} % korrektion) for at kompensere",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Blandingen ser mager ud — motoren fastholdt en stor brændstoftilførsel på {pctTrim} %, en mulig ineffektivitet",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Blandingen ser lidt fed ud — motoren trak brændstof fra ({pctTrim} % korrektion) for at kompensere",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Blandingen ser fed ud — motoren fastholdt en stor brændstofreduktion på {pctTrim} %, en mulig ineffektivitet",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Motoren kørte fedt under belastning ({pctShare} % af den varme kørsel) — muligt brændstofspild",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heuristisk sundhedssignal, ikke en diagnose",
-  "lessonAdviceCombustionHealthLean": "En vedvarende korrektion mod mager blanding kan betyde en luftlækage i indsugningen, svag brændstofforsyning eller en ældet sensor. Bliver forbruget eller motorgangen dårligere, kan en værkstedsdiagnose bekræfte det.",
-  "lessonAdviceCombustionHealthRich": "En vedvarende korrektion mod fed blanding kan betyde en utæt indsprøjtningsdyse, for højt brændstoftryk eller en sensor, der viser for meget. Bliver forbruget eller motorgangen dårligere, kan en værkstedsdiagnose bekræfte det.",
-  "lessonAdviceCombustionHealthEnrichment": "Fed blanding under høj belastning brænder ekstra brændstof. Skift op tidligt, og let på speederen ved lange accelerationer, så motoren kan holde sig tæt på en støkiometrisk blanding.",
   "pipTapToRestore": "Tryk for at åbne hele appen",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7041,16 +6983,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

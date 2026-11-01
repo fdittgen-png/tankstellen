@@ -139,7 +139,9 @@ class SituationClassifier {
     }
     if (candidate == _pending) {
       // Still pending — check if the debounce has elapsed.
-      if (sample.timestamp.difference(_pendingSince!).inMilliseconds >=
+      if (sample.timestamp
+              .difference(_pendingSince!)
+              .inMilliseconds >=
           transitionDebounce.inMilliseconds) {
         _current = candidate;
         _pending = null;
@@ -162,9 +164,7 @@ class SituationClassifier {
     // cars do this on deceleration. Detected when fuelRate is
     // effectively zero while moving at >20 km/h.
     final fuelRate = s.fuelRateLPerHour;
-    if (fuelRate != null &&
-        fuelRate < 0.1 &&
-        s.speedKmh > 20 &&
+    if (fuelRate != null && fuelRate < 0.1 && s.speedKmh > 20 &&
         s.rpm > 0 &&
         kMeasuredFuelSourceTags.contains(s.fuelSource)) {
       return DrivingSituation.fuelCutCoast;
@@ -174,7 +174,10 @@ class SituationClassifier {
     // throttle >50%. Use the last ~2 s of samples to compute accel.
     final accel = _recentAccelMps2(windowSeconds: 2);
     final throttle = s.throttlePercent;
-    if (accel != null && accel > 1.5 && throttle != null && throttle > 50) {
+    if (accel != null &&
+        accel > 1.5 &&
+        throttle != null &&
+        throttle > 50) {
       return DrivingSituation.hardAccel;
     }
 
@@ -205,7 +208,10 @@ class SituationClassifier {
 
     // Idle: basically stationary with the engine running. Short
     // window of ≥5 s so a momentary stop at a light doesn't count.
-    if (avgSpeed <= 2 && avgRpm > 0 && avgThrottle < 5 && _spanSeconds() >= 5) {
+    if (avgSpeed <= 2 &&
+        avgRpm > 0 &&
+        avgThrottle < 5 &&
+        _spanSeconds() >= 5) {
       return DrivingSituation.idle;
     }
 
@@ -355,8 +361,7 @@ class SituationClassifier {
       }
     }
     start ??= _samples.first;
-    final dt =
-        now.timestamp.difference(start.timestamp).inMilliseconds / 1000.0;
+    final dt = now.timestamp.difference(start.timestamp).inMilliseconds / 1000.0;
     if (dt <= 0) return null;
     final dv = (now.speedKmh - start.speedKmh) / 3.6; // km/h → m/s
     return dv / dt;

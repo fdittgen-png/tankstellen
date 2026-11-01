@@ -59,7 +59,8 @@ enum BaselineAltitudeStratum {
   /// (1/5.255))`. Null baro → [seaLevel].
   static BaselineAltitudeStratum forBaroKpa(double? baroKpa) {
     if (baroKpa == null || baroKpa <= 0) return seaLevel;
-    final altitudeM = 44330.0 * (1 - math.pow(baroKpa / 101.325, 1 / 5.255));
+    final altitudeM =
+        44330.0 * (1 - math.pow(baroKpa / 101.325, 1 / 5.255));
     return forAltitudeM(altitudeM);
   }
 }

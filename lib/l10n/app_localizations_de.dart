@@ -4611,25 +4611,12 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Im niedrigen Gang gefahren ($minutes Min.)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Bei längeren Stopps den Motor ausschalten statt im Leerlauf laufen zu lassen.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Früher hochschalten, um den Motor aus dem hohen Drehzahlbereich zu halten.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Sanfter Gas geben – gleichmäßiges Beschleunigen spart Sprit.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Früher hochschalten, damit der Motor in einem niedrigeren, effizienteren Gang läuft.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4663,10 +4650,6 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Hohe Dauerlast lässt den Motor anfetten – früher hochschalten und an langen Steigungen Gas wegnehmen, damit das Gemisch mager bleibt.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4676,58 +4659,13 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Vor Steigungen Schwung mitnehmen und gleichmäßig Gas geben – schub­weises Beschleunigen am Berg kostet zusätzlich Sprit.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count Anfahrten aus dem Stand: $liters L verschwendet';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Vorausschauend fahren und vor Stopps ausrollen, statt anzuhalten – das Anfahren aus dem Stand verbraucht im Stop-and-go am meisten.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Gemisch wirkt etwas mager – der Motor hat zum Ausgleich Sprit zugegeben ($pctTrim% Korrektur)';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Gemisch wirkt mager – der Motor hielt dauerhaft eine große Spritzugabe von $pctTrim% – mögliche Ineffizienz';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Gemisch wirkt etwas fett – der Motor hat zum Ausgleich Sprit weggenommen ($pctTrim% Korrektur)';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Gemisch wirkt fett – der Motor hielt dauerhaft eine große Spritreduktion von $pctTrim% – mögliche Ineffizienz';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Motor lief unter Last fett ($pctShare% der warmen Fahrt) – möglicherweise verschwendeter Sprit';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristisches Gesundheitssignal, keine Diagnose';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Eine dauerhafte Magerkorrektur kann auf ein Falschluftleck, eine schwache Spritzufuhr oder einen alternden Sensor hindeuten. Bei steigendem Verbrauch oder schlechterem Lauf bringt eine Werkstattdiagnose Klarheit.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Eine dauerhafte Fettkorrektur kann auf eine undichte Einspritzdüse, zu hohen Spritdruck oder einen falsch messenden Sensor hindeuten. Bei steigendem Verbrauch oder schlechterem Lauf bringt eine Werkstattdiagnose Klarheit.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Fettes Laufen unter hoher Last verbraucht zusätzlich Sprit. Früher hochschalten und bei langen Zügen Gas wegnehmen, damit der Motor näher am stöchiometrischen Gemisch bleibt.';
 
   @override
   String get lessonTransportTitle =>
@@ -4755,11 +4693,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Vollgas ($pctTime% der Fahrt)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Fettes Gemisch unter Last ($pctTime% der Fahrt)';
   }
 
   @override

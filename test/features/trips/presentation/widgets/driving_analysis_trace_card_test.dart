@@ -34,12 +34,10 @@ TripSummary _summary() => const TripSummary(
       kind: TripKind.gpsOnly,
     );
 
-Widget _host(
-  Set<Feature> features, {
+Widget _host(Set<Feature> features, {
   List<TripSample> samples = const [],
   TripSummary? summary,
-}) =>
-    ProviderScope(
+}) => ProviderScope(
       overrides: [enabledFeaturesProvider.overrideWithValue(features)],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -60,7 +58,8 @@ void main() {
   // are covered by driving_analysis_trace_export_test.dart; that real-IO path
   // does not progress under the testWidgets fake-async clock, so here we only
   // assert the dev-gating and that the action is wired.
-  testWidgets('renders nothing unless Feature.debugMode is on', (tester) async {
+  testWidgets('renders nothing unless Feature.debugMode is on',
+      (tester) async {
     await tester.pumpWidget(_host(const {}));
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.bug_report_outlined), findsNothing);

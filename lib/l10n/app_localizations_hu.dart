@@ -4610,25 +4610,12 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Alacsony fokozatban küszködés ($minutes perc)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Hosszú megállóknál kapcsolja ki a motort, ahelyett hogy üresjáraton hagyná.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Kapcsoljon feljebb korábban, hogy a motor a magas fordulatszámú tartományon kívül maradjon.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Finoman adjon gázt — az egyenletes gyorsítás kevesebb üzemanyagot fogyaszt.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Kapcsoljon feljebb hamarabb, hogy a motor alacsonyabb, takarékosabb fordulatszámon járjon.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4661,10 +4648,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'A nagy, tartós terhelés gazdag keveréket okoz — korai sebességváltással és visszafogással hosszú emelkedőkön tartsa soványan a keveréket.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4674,58 +4657,13 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Vigyen lendületet a dombra, és adagolja finoman a gázt — emelkedőn való hirtelen gyorsítás extra üzemanyagot éget.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count stop-and-go újraindulás: $liters L pazarlás';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Számolja előre a forgalmat, és guruljon a megállók felé, hogy guruljon inkább, mint megálljon teljesen — a holttpontról való elindulás a legfogyasztóbb része a stop-and-go-nak.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'A keverék kissé szegénynek tűnik — a motor üzemanyagot adott hozzá ($pctTrim% korrekció), hogy ellensúlyozza';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'A keverék szegénynek tűnik — a motor tartósan nagy, $pctTrim%-os üzemanyag-hozzáadást tartott fenn; lehetséges hatékonyságvesztés';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'A keverék kissé dúsnak tűnik — a motor üzemanyagot vont el ($pctTrim% korrekció), hogy ellensúlyozza';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'A keverék dúsnak tűnik — a motor tartósan nagy, $pctTrim%-os üzemanyag-elvonást tartott fenn; lehetséges hatékonyságvesztés';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'A motor terhelés alatt dúsan járt (a meleg vezetés $pctShare%-ában) — lehetséges üzemanyag-pazarlás';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heurisztikus állapotjelzés, nem diagnózis';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'A tartósan szegény irányú korrekció szívóoldali levegőszivárgásra, gyenge üzemanyag-ellátásra vagy öregedő érzékelőre utalhat. Ha a fogyasztás vagy a járás romlik, egy szervizdiagnosztika megerősítheti.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'A tartósan dús irányú korrekció szivárgó injektorra, túl magas üzemanyagnyomásra vagy felfelé tévedő érzékelőre utalhat. Ha a fogyasztás vagy a járás romlik, egy szervizdiagnosztika megerősítheti.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'A dús keverék nagy terhelésnél többlet üzemanyagot éget. Válts fel korábban, és engedd el a gázt a hosszú gyorsításoknál, hogy a motor a sztöchiometrikus keverék közelében maradhasson.';
 
   @override
   String get lessonTransportTitle =>
@@ -4753,11 +4691,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

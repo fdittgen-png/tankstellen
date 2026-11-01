@@ -904,11 +904,8 @@
   "insightIdling": "Marcha lenta ({pctTime}% da viagem): desperdiçou {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% da viagem",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "A forçar numa mudança baixa ({minutes} min)",
   "lessonAdviceIdling": "Desligue o motor em paragens longas em vez de o deixar ao ralenti.",
-  "lessonAdviceHighRpm": "Mude de mudança mais cedo para manter o motor fora da faixa de rotações altas.",
   "lessonAdviceHardAccel": "Acelere suavemente — uma aceleração gradual gasta menos combustível.",
-  "lessonAdviceLowGear": "Suba de mudança mais cedo para que o motor fique em rotações mais baixas e económicas.",
   "drivingScoreCardTitle": "Pontuação de condução",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Pontuação composta de marcha lenta, acelerações bruscas, travagens bruscas e tempo em RPM alto. Uma comparação 'melhor do que X% das viagens anteriores' será incluída numa versão futura.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Uma carga pesada e sustentada faz o motor funcionar com mistura rica — mude de velocidade cedo e reduza a carga em subidas longas para manter a mistura magra.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Muito bom",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Leve impulso para a subida e pressione o acelerador de forma suave — acelerar num sobe consome combustível extra.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} arranques parado-andar: desperdiçou {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Antecipe o trânsito e aproxime-se das paragens por inércia para rolar em vez de arrancar — partir do ponto morto é a parte que mais consome no stop-and-go.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "Eficiência GPS",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "A mistura parece um pouco pobre — o motor adicionou combustível (correção de {pctTrim} %) para compensar",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "A mistura parece pobre — o motor manteve uma adição de combustível elevada de {pctTrim} %, uma possível ineficiência",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "A mistura parece um pouco rica — o motor retirou combustível (correção de {pctTrim} %) para compensar",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "A mistura parece rica — o motor manteve um corte de combustível elevado de {pctTrim} %, uma possível ineficiência",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "O motor andou rico sob carga ({pctShare} % da condução a quente) — possível combustível desperdiçado",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Sinal heurístico de saúde, não um diagnóstico",
-  "lessonAdviceCombustionHealthLean": "Uma correção prolongada para mistura pobre pode indicar uma entrada de ar na admissão, um fornecimento de combustível fraco ou um sensor envelhecido. Se o consumo ou o funcionamento piorarem, um diagnóstico em oficina pode confirmar.",
-  "lessonAdviceCombustionHealthRich": "Uma correção prolongada para mistura rica pode indicar um injetor com fuga, pressão de combustível elevada ou um sensor a ler por excesso. Se o consumo ou o funcionamento piorarem, um diagnóstico em oficina pode confirmar.",
-  "lessonAdviceCombustionHealthEnrichment": "Andar com mistura rica sob carga elevada gasta combustível extra. Suba de mudança mais cedo e alivie o pé nas acelerações longas para que o motor se mantenha perto de uma mistura estequiométrica.",
   "pipTapToRestore": "Toque para abrir a app completa",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7041,16 +6983,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {

@@ -4603,25 +4603,12 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'In marcia bassa ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Spegni il motore durante le soste lunghe invece di lasciarlo al minimo.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Cambia marcia prima per tenere il motore fuori dalla fascia degli alti regimi.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Accelera con dolcezza: un\'accelerazione graduale consuma meno carburante.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Sali di marcia prima così il motore si assesta a regimi più bassi e più efficienti.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4654,10 +4641,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Un carico pesante e prolungato fa andare il motore con miscela ricca — cambia marcia anticipato e alleggerisci sulle salite lunghe per mantenere la miscela magra.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4667,58 +4650,13 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Mantieni lo slancio in salita e spingi sull\'acceleratore con gradualità — accelerare bruscamente in salita consuma più carburante.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count ripartenze stop-and-go: $liters L sprecati';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Anticipa il traffico e rallenta in rilascio verso le fermate per scorrere invece di ripartire da fermo — ripartire da fermo è la fase più dispendiosa dello stop-and-go.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'La miscela sembra un po\' magra: il motore ha aggiunto carburante (correzione del $pctTrim %) per compensare';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'La miscela sembra magra: il motore ha mantenuto un\'aggiunta di carburante elevata, del $pctTrim %, una possibile inefficienza';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'La miscela sembra un po\' ricca: il motore ha tolto carburante (correzione del $pctTrim %) per compensare';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'La miscela sembra ricca: il motore ha mantenuto un taglio di carburante elevato, del $pctTrim %, una possibile inefficienza';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Il motore ha girato ricco sotto carico ($pctShare % della guida a caldo): possibile carburante sprecato';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Segnale euristico di salute, non una diagnosi';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Una correzione prolungata verso una miscela magra può indicare un\'infiltrazione d\'aria nell\'aspirazione, un\'alimentazione di carburante debole o un sensore invecchiato. Se consumi o funzionamento peggiorano, una diagnosi in officina può confermarlo.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Una correzione prolungata verso una miscela ricca può indicare un iniettore che perde, una pressione del carburante alta o un sensore che legge in eccesso. Se consumi o funzionamento peggiorano, una diagnosi in officina può confermarlo.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Girare con miscela ricca sotto forte carico brucia carburante in più. Cambia marcia prima e alza il piede nelle accelerazioni lunghe, così il motore resta vicino a una miscela stechiometrica.';
 
   @override
   String get lessonTransportTitle =>
@@ -4746,11 +4684,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

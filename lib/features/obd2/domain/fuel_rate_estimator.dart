@@ -327,17 +327,15 @@ double? estimateFuelRateLPerHourFromMap({
   // Kilograms of air per second (ideal gas law × VE).
   final airMassKgPerS =
       (mapPa * displacementM3 * intakesPerSecond * etaV) /
-      (_gasConstant * iatKelvin);
+          (_gasConstant * iatKelvin);
   // #2456 — ambient air-density correction. A measured baro below sea
   // level (altitude) thins the charge, above raises it; clamped so a
   // garbage reading can't invert or blow up the air mass. Null → 1.0,
   // i.e. the pre-#2456 sea-level assumption, unchanged.
   final baroFactor = baroKpa == null
       ? 1.0
-      : (baroKpa / kSeaLevelBaroKpa).clamp(
-          kMinBaroDensityFactor,
-          kMaxBaroDensityFactor,
-        );
+      : (baroKpa / kSeaLevelBaroKpa)
+          .clamp(kMinBaroDensityFactor, kMaxBaroDensityFactor);
   final airMassGPerS = airMassKgPerS * 1000.0 * baroFactor;
   // #2456 / #3426 — when true φ (reciprocal of PID 0x44 lambda) is
   // present, divide by the effective AFR (`afr / φ`) instead of the
