@@ -6,13 +6,26 @@ import 'package:tankstellen/features/obd2/data/protocol/diagnostics/diagnostic_h
 
 /// #4549 — the continuous health plan and its stated frequencies.
 void main() {
-  Map<String, double> rates(List<DiagnosticHealthCommand> plan) =>
-      {for (final c in plan) c.command: c.hz};
+  Map<String, double> rates(List<DiagnosticHealthCommand> plan) => {
+    for (final c in plan) c.command: c.hz,
+  };
 
   test('the named health set carries the #4549 rates', () {
     final r = rates(buildDiagnosticHealthPlan(alreadyPolled: const {}));
     expect(r['0142'], 2); // control-module voltage
     expect(r['01A4'], 2); // gear
+    for (final command in [
+      '0106',
+      '0107',
+      '0108',
+      '0109',
+      '010A',
+      '010E',
+      '010F',
+      '0110',
+    ]) {
+      expect(r[command], 0.5, reason: command);
+    }
     expect(r['0103'], 0.5); // fuel-system status
     expect(r['0114'], 0.5); // O2 narrowband
     expect(r['0132'], 0.5); // EVAP vapour pressure
@@ -20,13 +33,16 @@ void main() {
     expect(r['013C'], 0.2); // catalyst temperature
     expect(r['03'], closeTo(1 / 30, 1e-9)); // stored DTCs every 30 s
     expect(r['07'], closeTo(1 / 30, 1e-9)); // pending DTCs every 30 s
-    expect(DiagnosticHealthRates.batteryVoltageInterval,
-        const Duration(seconds: 1));
+    expect(
+      DiagnosticHealthRates.batteryVoltageInterval,
+      const Duration(seconds: 1),
+    );
   });
 
   test('already-polled commands are never subscribed twice', () {
-    final r = rates(buildDiagnosticHealthPlan(
-        alreadyPolled: const {'0142', '010C', '03'}));
+    final r = rates(
+      buildDiagnosticHealthPlan(alreadyPolled: const {'0142', '010C', '03'}),
+    );
     expect(r.containsKey('0142'), isFalse);
     expect(r.containsKey('03'), isFalse);
     expect(r.containsKey('01A4'), isTrue);
@@ -37,10 +53,12 @@ void main() {
     final none = rates(buildDiagnosticHealthPlan(alreadyPolled: const {}));
     expect(none.containsKey('015E'), isFalse);
     final advertised = {0x0C, 0x20, 0x5E, 0x62};
-    final r = rates(buildDiagnosticHealthPlan(
-      alreadyPolled: const {'010C'},
-      advertised: advertised.contains,
-    ));
+    final r = rates(
+      buildDiagnosticHealthPlan(
+        alreadyPolled: const {'010C'},
+        advertised: advertised.contains,
+      ),
+    );
     expect(r['015E'], DiagnosticHealthRates.slow);
     expect(r['0162'], DiagnosticHealthRates.slow);
     expect(r.containsKey('0120'), isFalse);

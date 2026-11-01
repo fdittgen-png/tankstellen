@@ -71,7 +71,9 @@ class DrivingAnalysisTrace {
   /// acquires a lease (S4 / #4352b) — and unknown is never "protected".
   ///
   /// Purely additive; v5 readers that ignore unknown keys still parse.
-  static const int schema = 6;
+  /// v7: health signal summaries and provenance classes; exported files also
+  /// attach the exact session's optional diagnostic evidence.
+  static const int schema = 7;
 
   final DateTime capturedAt;
 
@@ -191,6 +193,16 @@ class DrivingAnalysisTrace {
           // (ADR 0024 §7); additive, the stored figure above is unchanged.
           'consumptionSource': _consumption.sourceClass.name,
           'consumptionVersion': _consumption.version?.toJson(),
+          'fuelEstimationContext': {
+            'dominantFuelSource': summary.dominantFuelSource,
+            'volumetricEfficiencyUsed': summary.volumetricEfficiencyUsed,
+            'pumpGainApplied': summary.pumpGainApplied,
+            'pumpGainFuelKey': summary.pumpGainFuelKey,
+            'fuelLitersConsumed': summary.fuelLitersConsumed,
+            'estimatedFuelLitersConsumed': summary.estimatedFuelLitersConsumed,
+            'caution': 'Estimated consumption is not an independent measured '
+                'fuel-use test; do not diagnose a fault from it alone.',
+          },
           'distanceSource': summary.distanceSource,
           // #3599 — engine-off transport (tow/flatbed/train) telemetry.
           'engineRunningSeconds': _roundN(summary.engineRunningSeconds, 1),

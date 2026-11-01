@@ -251,7 +251,7 @@ void main() {
       ).toJson();
 
       final block = json['obd2Features'] as Map<String, dynamic>;
-      expect(block['fuelSource'], 'measured');
+      expect(block['fuelSource'], 'unknown');
       expect(block['obd2Coverage'], 1.0);
       expect((block['rpm'] as Map)['mean'], 2000.0);
       expect((block['signalCoverage'] as Map)['engineLoadPercent'], 1.0);
@@ -291,7 +291,7 @@ void main() {
       // block: artifact channel + FGS capability + session verdict).
       // #3794 had bumped it to 5 (session + obd2Link); #3499/#3501 to 4
       // (obd2Coverage + verdict); the #3433 precision keys are unchanged.
-      expect(json['schema'], 6);
+      expect(json['schema'], 7);
       final block = json['obd2Features'] as Map<String, dynamic>;
       expect((block['measuredPhi'] as Map)['mean'], 1.0);
       expect((block['ethanolPercent'] as Map)['mean'], 10.0);

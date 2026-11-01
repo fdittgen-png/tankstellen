@@ -120,7 +120,7 @@ mixin _TripRecordingEmit
     // the slow-cadence interval since the last stamp; otherwise the four
     // raw keys stay null (carried-forward = simply not re-written) so the
     // payload doesn't balloon at the 4 Hz emit rate.
-    final captureRaw = _diagnosticCapture &&
+    final captureRaw = (_diagnosticCapture || _fullDiag != null) &&
         intervalElapsed(
             _lastDiagnosticCaptureAt, nowTs, _diagnosticCaptureInterval);
     if (captureRaw) _lastDiagnosticCaptureAt = nowTs;
