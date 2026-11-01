@@ -259,8 +259,9 @@ class BaselineRollingState {
   /// Normalize raw stored lambda to stoichiometric demand, preserving the
   /// original baseline coefficients and historical normalization convention.
   static double _lambdaNormalization(double? lambda) {
-    if (lambda == null || !lambda.isFinite || lambda < 0.5 || lambda > 1.5)
+    if (lambda == null || !lambda.isFinite || lambda < 0.5 || lambda > 1.5) {
       return 1;
+    }
     return lambda;
   }
 

@@ -272,8 +272,9 @@ CombustionHealthSignal combustionHealthSignal(List<TripSample> samples) {
     final lambda = s.lambda;
     if (lambda != null && lambda.isFinite && lambda > 0 && lambda < 2) {
       lambdaSamples++;
-      if (isRichCommandedLambda(lambda, threshold: kCombustionRichLambda))
+      if (isRichCommandedLambda(lambda, threshold: kCombustionRichLambda)) {
         enrichedSamples++;
+      }
     }
   }
 

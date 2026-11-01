@@ -116,8 +116,9 @@ DrivingDimensions computeDrivingDimensions(
     if (prev.speedKmh >= 50) cruiseSpeeds.add(prev.speedKmh);
   }
   idle.endRun();
-  if (highRunSec >= kSustainedHighSpeed.inSeconds)
+  if (highRunSec >= kSustainedHighSpeed.inSeconds) {
     sustainedHighSec += highRunSec;
+  }
 
   final dims = <DrivingDimensionKind, DrivingDimension>{};
   void put(DrivingDimension d) => dims[d.kind] = d;
