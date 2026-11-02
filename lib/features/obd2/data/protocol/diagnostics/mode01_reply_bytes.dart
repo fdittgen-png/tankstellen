@@ -8,21 +8,20 @@ library;
 /// Data bytes of the Mode 01 reply to [pid] in [reply] (first answering
 /// ECU), or null. `41 0C 1A F8` → `[0x1A, 0xF8]`.
 List<int>? mode01Bytes(String reply, int pid) {
-  final tokens = reply
-      .toUpperCase()
-      .split(RegExp(r'[\s|]+'))
-      .where((t) => t.isNotEmpty)
-      .toList(growable: false);
   final want = pid.toRadixString(16).toUpperCase().padLeft(2, '0');
-  for (var i = 0; i + 1 < tokens.length; i++) {
-    if (tokens[i] != '41' || tokens[i + 1] != want) continue;
-    final out = <int>[];
-    for (var j = i + 2; j < tokens.length; j++) {
-      final v = int.tryParse(tokens[j], radix: 16);
-      if (v == null || tokens[j].length != 2 || tokens[j] == '41') break;
-      out.add(v);
+  // Preserve ECU message boundaries; 0x41 is also a valid payload byte.
+  for (final line in reply.toUpperCase().split(RegExp(r'[|\r\n>]'))) {
+    final tokens = line.trim().split(RegExp(r'\s+'));
+    for (var i = 0; i + 1 < tokens.length; i++) {
+      if (tokens[i] != '41' || tokens[i + 1] != want) continue;
+      final out = <int>[];
+      for (var j = i + 2; j < tokens.length; j++) {
+        final v = int.tryParse(tokens[j], radix: 16);
+        if (v == null || tokens[j].length != 2) break;
+        out.add(v);
+      }
+      return out.isEmpty ? null : out;
     }
-    return out.isEmpty ? null : out;
   }
   return null;
 }

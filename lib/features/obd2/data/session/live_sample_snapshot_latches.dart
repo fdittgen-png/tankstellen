@@ -97,8 +97,8 @@ mixin _LiveSampleSnapshotLatches {
   // controller's `_emit` persists onto each TripSample (#2459). The
   // raw mixture inputs (MAF / MAP / STFT / LTFT) are read here too so the
   // diagnostic-capture path can stamp them for post-hoc re-derivation.
-  // (Named λ pre-#3426; the commanded wire value is the SAE fuel–air
-  // equivalence ratio φ — see `effectiveAfrForPhi`.)
+  // Legacy *Phi getters retain raw OBD lambda for codec/live compatibility.
+  // The fuel-math input adapter converts lambda to true phi exactly once.
   double? get latestCommandedPhi => _latest(VehicleSignal.commandedPhi);
   double? get latestBaroKpa => _latest(VehicleSignal.baroPressure);
   double? get latestAbsLoadPercent => _latest(VehicleSignal.absoluteLoad);

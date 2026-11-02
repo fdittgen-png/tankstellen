@@ -3419,6 +3419,59 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Inferred low gear ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of warm samples)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of trip duration)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.';
+
+  @override
   String get approachOverlaySection => 'Fuel Station Radar';
 
   @override
@@ -4511,25 +4564,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Labouring in low gear ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Turn the engine off at long stops instead of letting it idle.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Shift up earlier to keep the engine out of the high-RPM band.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Ease onto the throttle — smooth acceleration uses less fuel.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Shift up sooner so the engine settles into a lower, more efficient gear.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4562,10 +4602,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Heavy, sustained load makes the engine run rich — short-shift and back off on long climbs to keep the mixture lean.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4575,58 +4611,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Carry momentum into a hill and feed the throttle smoothly — surging on a climb burns extra fuel.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count stop-and-go restarts: wasted $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Anticipate traffic and coast toward stops so you roll rather than restart — pulling away from a dead stop is the thirstiest part of stop-and-go.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Mixture looks a little lean — the engine added fuel ($pctTrim% trim) to compensate';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Mixture looks lean — the engine sustained a large $pctTrim% fuel addition, a possible inefficiency';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Mixture looks a little rich — the engine pulled fuel ($pctTrim% trim) to compensate';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Mixture looks rich — the engine sustained a large $pctTrim% fuel cut, a possible inefficiency';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Engine ran rich under load ($pctShare% of the warm drive) — possible wasted fuel';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristic health signal, not a diagnosis';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'A sustained lean-correcting trim can mean an intake-air leak, a weak fuel supply, or an ageing sensor. If consumption or running quality worsens, a workshop scan can confirm.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'A sustained rich-correcting trim can mean a leaking injector, high fuel pressure, or an over-reading sensor. If consumption or running quality worsens, a workshop scan can confirm.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Running rich under heavy load burns extra fuel. Short-shift and ease off on long pulls so the engine can stay near a stoichiometric mixture.';
 
   @override
   String get lessonTransportTitle =>
@@ -4654,11 +4645,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override
@@ -8256,7 +8242,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get obd2ReportDriveNoGear =>
-      'This car does not report the selected gear over standard OBD2, so moments are detected from speed, engine speed and pedal.';
+      'No usable gear reading was recorded. The displayed moments are inferred from speed, engine speed and pedal; they do not establish a gearbox fault.';
 
   @override
   String get obd2ReportEngineTitle => 'Engine';
@@ -8286,12 +8272,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String obd2ReportMixtureRich(String trim) {
-    return 'Fuel trims average $trim %: the engine runs rich and the computer is removing fuel. This fits a fuel smell — injectors, fuel-pressure regulator or the purge valve.';
+    return 'Fuel trims average $trim %: the ECU is removing fuel. This correction does not establish that the final mixture remains rich or identify a failed component.';
   }
 
   @override
   String obd2ReportMixtureLean(String trim) {
-    return 'Fuel trims average $trim %: the engine runs lean and the computer is adding fuel — possible air leak or weak fuel delivery.';
+    return 'Fuel trims average $trim %: the ECU is adding fuel. This correction does not establish that the final mixture remains lean or identify a failed component.';
   }
 
   @override
@@ -15786,6 +15772,59 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return '⟦Îñƒéřřéđ łóŵ ǧéář ($minutes ɱîñ) ········⟧';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      '⟦Á ĥîǧĥéř ǧéář ɱáý řéđúçé ŘƤṀ ŵĥéñ łóáđ áñđ řóáđ çóñđîŧîóñš áłłóŵ. Ŧĥîš ǧéář éšŧîɱáŧé đóéš ñóŧ éšŧáƀłîšĥ łóŵ-ŘƤṀ łúǧǧîñǧ. ············································⟧';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      '⟦Ŧîɱé áƀóṽé 3000 ŘƤṀ îš á ĥéúřîšŧîç éẋƥóšúřé, ñóŧ ƥřóóƒ óƒ ɱîšúšé. Çóñšîđéř ŧĥé éñǧîñé, łóáđ áñđ řóáđ çóñđîŧîóñš ƀéƒóřé çĥáñǧîñǧ ǧéář. ···············································⟧';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      '⟦Çłîɱƀîñǧ řéɋúîřéš áđđîŧîóñáł éñéřǧý éṽéñ ŵîŧĥ šɱóóŧĥ đřîṽîñǧ. Ŧĥîš řóúŧé çóšŧ îš ñóŧ á đřîṽîñǧ ƒáúłŧ. ······································⟧';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      '⟦Ŧřáƒƒîç óř šîǧñáłš ɱáý řéɋúîřé ŧĥéšé šŧóƥš. Ŧĥîš îš áñ éñéřǧý çóšŧ, ñóŧ ƥřóóƒ ŧĥáŧ ŧĥé šŧóƥš ŵéřé áṽóîđáƀłé. ·······································⟧';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return '⟦Ƥóšîŧîṽé çóɱƀîñéđ ƒúéł çóřřéçŧîóñ; ɱéáñ ŁŦƑŦ ɱáǧñîŧúđé $pctTrim% ·····················⟧';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return '⟦Ñéǧáŧîṽé çóɱƀîñéđ ƒúéł çóřřéçŧîóñ; ɱéáñ ŁŦƑŦ ɱáǧñîŧúđé $pctTrim% ·····················⟧';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      '⟦Ŧĥé ÉÇÚ îš áđĵúšŧîñǧ ƒúéł đéłîṽéřý. Ŧĥîš đóéš ñóŧ îđéñŧîƒý á ƒáîłéđ çóɱƥóñéñŧ óř ƥřóṽé ŧĥé ƒîñáł ɱîẋŧúřé řéɱáîñš łéáñ óř řîçĥ. Çĥéçķ ŧĥé řéçóřđéđ ṽáłúéš, óƥéřáŧîñǧ çóñđîŧîóñš áñđ ƒáúłŧ çóđéš. ·······································································⟧';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return '⟦ÉÇÚ çóɱɱáñđéđ éñřîçĥɱéñŧ ($pctShare% óƒ ŵářɱ šáɱƥłéš) ················⟧';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      '⟦Éñřîçĥɱéñŧ çáñ ƥřóŧéçŧ ŧĥé éñǧîñé úñđéř łóáđ. Ŧĥé řéçóřđîñǧ áłóñé đóéš ñóŧ éšŧáƀłîšĥ á ƒáúłŧ óř áṽóîđáƀłé ŵášŧé. ··········································⟧';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return '⟦ÉÇÚ çóɱɱáñđéđ éñřîçĥɱéñŧ ($pctShare% óƒ ŧřîƥ đúřáŧîóñ) ················⟧';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      '⟦Šŧáñđářđ ÓƁĐ óƀšéřṽáŧîóñš đó ñóŧ áššéšš á řóƀóŧîžéđ ǧéářƀóẋ óř áçŧúáŧóř ƒóřçé. Đîáǧñóšîñǧ á ƒáîłéđ šĥîƒŧ řéɋúîřéš ǧéářƀóẋ-šƥéçîƒîç ƒáúłŧš áñđ řéɋúéšŧéđ ṽéřšúš áçŧúáł ǧéář, çłúŧçĥ áñđ šéłéçŧóř đáŧá. ···········································································⟧';
+
+  @override
   String get approachOverlaySection => '⟦Ƒúéł Šŧáŧîóñ Řáđář ·······⟧';
 
   @override
@@ -16918,25 +16957,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return '⟦Łáƀóúřîñǧ îñ łóŵ ǧéář ($minutes ɱîñ) ·········⟧';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       '⟦Ŧúřñ ŧĥé éñǧîñé óƒƒ áŧ łóñǧ šŧóƥš îñšŧéáđ óƒ łéŧŧîñǧ îŧ îđłé. ······················⟧';
 
   @override
-  String get lessonAdviceHighRpm =>
-      '⟦Šĥîƒŧ úƥ éářłîéř ŧó ķééƥ ŧĥé éñǧîñé óúŧ óƒ ŧĥé ĥîǧĥ-ŘƤṀ ƀáñđ. ······················⟧';
-
-  @override
   String get lessonAdviceHardAccel =>
       '⟦Éášé óñŧó ŧĥé ŧĥřóŧŧłé — šɱóóŧĥ áççéłéřáŧîóñ úšéš łéšš ƒúéł. ······················⟧';
-
-  @override
-  String get lessonAdviceLowGear =>
-      '⟦Šĥîƒŧ úƥ šóóñéř šó ŧĥé éñǧîñé šéŧŧłéš îñŧó á łóŵéř, ɱóřé éƒƒîçîéñŧ ǧéář. ··························⟧';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -16970,10 +16996,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      '⟦Ĥéáṽý, šúšŧáîñéđ łóáđ ɱáķéš ŧĥé éñǧîñé řúñ řîçĥ — šĥóřŧ-šĥîƒŧ áñđ ƀáçķ óƒƒ óñ łóñǧ çłîɱƀš ŧó ķééƥ ŧĥé ɱîẋŧúřé łéáñ. ·········································⟧';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -16983,58 +17005,13 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      '⟦Çářřý ɱóɱéñŧúɱ îñŧó á ĥîłł áñđ ƒééđ ŧĥé ŧĥřóŧŧłé šɱóóŧĥłý — šúřǧîñǧ óñ á çłîɱƀ ƀúřñš éẋŧřá ƒúéł. ···································⟧';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '⟦$count šŧóƥ-áñđ-ǧó řéšŧářŧš: ŵášŧéđ $liters Ł ···········⟧';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      '⟦Áñŧîçîƥáŧé ŧřáƒƒîç áñđ çóášŧ ŧóŵářđ šŧóƥš šó ýóú řółł řáŧĥéř ŧĥáñ řéšŧářŧ — ƥúłłîñǧ áŵáý ƒřóɱ á đéáđ šŧóƥ îš ŧĥé ŧĥîřšŧîéšŧ ƥářŧ óƒ šŧóƥ-áñđ-ǧó. ····················································⟧';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return '⟦Ṁîẋŧúřé łóóķš á łîŧŧłé łéáñ — ŧĥé éñǧîñé áđđéđ ƒúéł ($pctTrim% ŧřîɱ) ŧó çóɱƥéñšáŧé ··························⟧';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return '⟦Ṁîẋŧúřé łóóķš łéáñ — ŧĥé éñǧîñé šúšŧáîñéđ á łářǧé $pctTrim% ƒúéł áđđîŧîóñ, á ƥóššîƀłé îñéƒƒîçîéñçý ·································⟧';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return '⟦Ṁîẋŧúřé łóóķš á łîŧŧłé řîçĥ — ŧĥé éñǧîñé ƥúłłéđ ƒúéł ($pctTrim% ŧřîɱ) ŧó çóɱƥéñšáŧé ··························⟧';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return '⟦Ṁîẋŧúřé łóóķš řîçĥ — ŧĥé éñǧîñé šúšŧáîñéđ á łářǧé $pctTrim% ƒúéł çúŧ, á ƥóššîƀłé îñéƒƒîçîéñçý ·······························⟧';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return '⟦Éñǧîñé řáñ řîçĥ úñđéř łóáđ ($pctShare% óƒ ŧĥé ŵářɱ đřîṽé) — ƥóššîƀłé ŵášŧéđ ƒúéł ························⟧';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       '⟦Ĥéúřîšŧîç ĥéáłŧĥ šîǧñáł, ñóŧ á đîáǧñóšîš ···············⟧';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      '⟦Á šúšŧáîñéđ łéáñ-çóřřéçŧîñǧ ŧřîɱ çáñ ɱéáñ áñ îñŧáķé-áîř łéáķ, á ŵéáķ ƒúéł šúƥƥłý, óř áñ áǧéîñǧ šéñšóř. Îƒ çóñšúɱƥŧîóñ óř řúññîñǧ ɋúáłîŧý ŵóřšéñš, á ŵóřķšĥóƥ šçáñ çáñ çóñƒîřɱ. ·······························································⟧';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      '⟦Á šúšŧáîñéđ řîçĥ-çóřřéçŧîñǧ ŧřîɱ çáñ ɱéáñ á łéáķîñǧ îñĵéçŧóř, ĥîǧĥ ƒúéł ƥřéššúřé, óř áñ óṽéř-řéáđîñǧ šéñšóř. Îƒ çóñšúɱƥŧîóñ óř řúññîñǧ ɋúáłîŧý ŵóřšéñš, á ŵóřķšĥóƥ šçáñ çáñ çóñƒîřɱ. ··································································⟧';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      '⟦Řúññîñǧ řîçĥ úñđéř ĥéáṽý łóáđ ƀúřñš éẋŧřá ƒúéł. Šĥóřŧ-šĥîƒŧ áñđ éášé óƒƒ óñ łóñǧ ƥúłłš šó ŧĥé éñǧîñé çáñ šŧáý ñéář á šŧóîçĥîóɱéŧřîç ɱîẋŧúřé. ···················································⟧';
 
   @override
   String get lessonTransportTitle =>
@@ -17062,11 +17039,6 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
   @override
   String insightFullThrottleShare(String pctTime) {
     return '⟦Ƒúłł ŧĥřóŧŧłé ($pctTime% óƒ ŧřîƥ) ········⟧';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return '⟦Řîçĥ ɱîẋŧúřé úñđéř łóáđ ($pctTime% óƒ ŧřîƥ) ············⟧';
   }
 
   @override
@@ -20756,7 +20728,7 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String get obd2ReportDriveNoGear =>
-      '⟦Ŧĥîš çář đóéš ñóŧ řéƥóřŧ ŧĥé šéłéçŧéđ ǧéář óṽéř šŧáñđářđ ÓƁĐ2, šó ɱóɱéñŧš ářé đéŧéçŧéđ ƒřóɱ šƥééđ, éñǧîñé šƥééđ áñđ ƥéđáł. ············································⟧';
+      '⟦Ñó úšáƀłé ǧéář řéáđîñǧ ŵáš řéçóřđéđ. Ŧĥé đîšƥłáýéđ ɱóɱéñŧš ářé îñƒéřřéđ ƒřóɱ šƥééđ, éñǧîñé šƥééđ áñđ ƥéđáł; ŧĥéý đó ñóŧ éšŧáƀłîšĥ á ǧéářƀóẋ ƒáúłŧ. ······················································⟧';
 
   @override
   String get obd2ReportEngineTitle => '⟦Éñǧîñé ···⟧';
@@ -20786,12 +20758,12 @@ class AppLocalizationsEnXa extends AppLocalizationsEn {
 
   @override
   String obd2ReportMixtureRich(String trim) {
-    return '⟦Ƒúéł ŧřîɱš áṽéřáǧé $trim %: ŧĥé éñǧîñé řúñš řîçĥ áñđ ŧĥé çóɱƥúŧéř îš řéɱóṽîñǧ ƒúéł. Ŧĥîš ƒîŧš á ƒúéł šɱéłł — îñĵéçŧóřš, ƒúéł-ƥřéššúřé řéǧúłáŧóř óř ŧĥé ƥúřǧé ṽáłṽé. ························································⟧';
+    return '⟦Ƒúéł ŧřîɱš áṽéřáǧé $trim %: ŧĥé ÉÇÚ îš řéɱóṽîñǧ ƒúéł. Ŧĥîš çóřřéçŧîóñ đóéš ñóŧ éšŧáƀłîšĥ ŧĥáŧ ŧĥé ƒîñáł ɱîẋŧúřé řéɱáîñš řîçĥ óř îđéñŧîƒý á ƒáîłéđ çóɱƥóñéñŧ. ·······················································⟧';
   }
 
   @override
   String obd2ReportMixtureLean(String trim) {
-    return '⟦Ƒúéł ŧřîɱš áṽéřáǧé $trim %: ŧĥé éñǧîñé řúñš łéáñ áñđ ŧĥé çóɱƥúŧéř îš áđđîñǧ ƒúéł — ƥóššîƀłé áîř łéáķ óř ŵéáķ ƒúéł đéłîṽéřý. ·········································⟧';
+    return '⟦Ƒúéł ŧřîɱš áṽéřáǧé $trim %: ŧĥé ÉÇÚ îš áđđîñǧ ƒúéł. Ŧĥîš çóřřéçŧîóñ đóéš ñóŧ éšŧáƀłîšĥ ŧĥáŧ ŧĥé ƒîñáł ɱîẋŧúřé řéɱáîñš łéáñ óř îđéñŧîƒý á ƒáîłéđ çóɱƥóñéñŧ. ······················································⟧';
   }
 
   @override

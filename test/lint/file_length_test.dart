@@ -441,7 +441,7 @@ void main() {
     // #4386 — 611 → 637: the #4196 unverified streak's 4x cap emits an
     // honest terminal condition instead of looping silently for the drive.
     'lib/features/obd2/data/session/dropped_session_manager.dart': 637,
-    'lib/features/driving_score/data/driving_score_calculator.dart': 556,
+    'lib/features/driving_score/data/driving_score_calculator.dart': 554,
     'lib/features/profile/presentation/screens/developer_tools/pump_ocr_tester_screen.dart': 525,
     // #4073 — 523 → 502: the private percentile copy moved to core/utils/stats.dart.
     'lib/features/trips/domain/services/gear_inference.dart': 502,

@@ -43,6 +43,9 @@ class ImuEventRecord {
   /// GPS-speed change never picked a direction).
   final String outcome;
 
+  /// First observed strong-signal sample; absent on legacy records.
+  final DateTime? startedAt;
+
   /// Peak horizontal linear-accel magnitude over the stretch, m/s².
   final double peakMps2;
 
@@ -60,6 +63,7 @@ class ImuEventRecord {
 
   const ImuEventRecord({
     required this.outcome,
+    this.startedAt,
     required this.peakMps2,
     required this.durationSec,
     required this.startSpeedKmh,
@@ -73,6 +77,7 @@ class ImuEventRecord {
   /// calibration only needs magnitude-distribution resolution.
   Map<String, Object?> toJson() => {
         'o': outcome,
+        if (startedAt != null) 't': startedAt!.millisecondsSinceEpoch,
         'p': _r(peakMps2),
         'd': _r(durationSec),
         's': _r(startSpeedKmh),
@@ -86,6 +91,9 @@ class ImuEventRecord {
     double num_(Object? v) => v is num ? v.toDouble() : 0.0;
     return ImuEventRecord(
       outcome: o,
+      startedAt: j['t'] is num
+          ? DateTime.fromMillisecondsSinceEpoch((j['t'] as num).toInt())
+          : null,
       peakMps2: num_(j['p']),
       durationSec: num_(j['d']),
       startSpeedKmh: num_(j['s']),
@@ -103,6 +111,7 @@ class ImuStretchTracker {
   int _dropped = 0;
 
   bool _open = false;
+  DateTime? _startedAt;
   double _peakMps2 = 0;
   double _peakYaw = 0;
   double _duration = 0;
@@ -124,6 +133,7 @@ class ImuStretchTracker {
   /// `horizMag >= kHardAccelThresholdMps2` stretch predicate.
   void onSample({
     required bool strong,
+    DateTime? timestamp,
     required double dt,
     required double horizMag,
     required double yawRate,
@@ -134,6 +144,7 @@ class ImuStretchTracker {
     if (strong) {
       if (!_open) {
         _open = true;
+        _startedAt = timestamp;
         _peakMps2 = 0;
         _peakYaw = 0;
         _duration = 0;
@@ -201,7 +212,8 @@ class ImuStretchTracker {
     if (_confirmedOutcome == null) _unconfirmedCount++;
     _records.add(ImuEventRecord(
       outcome: outcome,
-      peakMps2: _peakMps2,
+        startedAt: _startedAt,
+        peakMps2: _peakMps2,
       durationSec: _duration,
       startSpeedKmh: _startSpeedKmh,
       netSpeedDeltaKmh: _lastNetDeltaKmh,

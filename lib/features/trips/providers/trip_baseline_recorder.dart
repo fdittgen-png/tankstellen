@@ -309,6 +309,7 @@ class TripBaselineRecorder {
       throttlePercent: r.throttlePercent ?? r.engineLoadPercent,
       engineLoadPercent: r.engineLoadPercent,
       fuelRateLPerHour: r.fuelRateLPerHour,
+      fuelSource: r.fuelSource?.name,
       // #2515 — coolant lets the rule path detect a cold-start warm-up;
       // the confident grade lets it separate a flat sustained load
       // (towing) from a hill climb.

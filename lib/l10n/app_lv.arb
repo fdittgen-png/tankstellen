@@ -904,11 +904,8 @@
   "insightIdling": "Dīkstāvē ({pctTime}% no brauciena): iztērēts {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% no brauciena",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Braukšana zemā pārnesumā ({minutes} min)",
   "lessonAdviceIdling": "Garās apstāšanās reizēs izslēdziet dzinēju, nevis ļaujiet tam darboties tukšgaitā.",
-  "lessonAdviceHighRpm": "Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs nebūtu augsto apgriezienu zonā.",
   "lessonAdviceHardAccel": "Spiediet gāzi vienmērīgi — gluda paātrināšanās patērē mazāk degvielas.",
-  "lessonAdviceLowGear": "Pārslēdziet augstāku pārnesumu agrāk, lai dzinējs darbotos zemākos un ekonomiskākos apgriezienos.",
   "drivingScoreCardTitle": "Braukšanas novērtējums",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Kompozīts novērtējums no dīkstāves, straujo paātrinājumu, asas bremzēšanas un augsta RPM laika. Salīdzinājums \"labāks par X% no iepriekšējiem braucieniem\" nāks nākamajā laidienā.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Liela, ilgstoša slodze liek dzinējam darboties ar bagātu maisījumu — mainiet ātrumu uz augstāku un atslogojiet ilgstošos kāpumos, lai saglabātu maisījumu liesu.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Ļoti labs",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Uzņemiet ātrumu pirms kalna un vienmērīgi pieaugiet ar gāzi — strauja braukšana kalnā patērē papildu degvielu.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} apstāšanās un atkārtošanās: izniekots {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Paredziet satiksmi un virzieties brīvgaitā uz apstāšanos, lai rullētu, nevis atsāktu — atdalīšanās no pilnas apstāšanās ir visdārgākā daļa.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS efektivitāte",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Maisījums šķiet nedaudz liess — dzinējs pievienoja degvielu ({pctTrim} % korekcija), lai kompensētu",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Maisījums šķiet liess — dzinējs ilgstoši uzturēja lielu degvielas pievienojumu ({pctTrim} %), iespējama neefektivitāte",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Maisījums šķiet nedaudz bagāts — dzinējs atņēma degvielu ({pctTrim} % korekcija), lai kompensētu",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Maisījums šķiet bagāts — dzinējs ilgstoši uzturēja lielu degvielas samazinājumu ({pctTrim} %), iespējama neefektivitāte",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Dzinējs slodzē darbojās ar bagātu maisījumu ({pctShare} % no braukšanas ar siltu dzinēju) — iespējama degvielas izšķērdēšana",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heiristisks stāvokļa signāls, nevis diagnoze",
-  "lessonAdviceCombustionHealthLean": "Ilgstoša korekcija uz liesu maisījumu var nozīmēt gaisa noplūdi ieplūdē, vāju degvielas padevi vai novecojušu sensoru. Ja patēriņš vai darbība pasliktinās, servisa diagnostika to var apstiprināt.",
-  "lessonAdviceCombustionHealthRich": "Ilgstoša korekcija uz bagātu maisījumu var nozīmēt tekošu sprauslu, pārāk augstu degvielas spiedienu vai sensoru, kas rāda par daudz. Ja patēriņš vai darbība pasliktinās, servisa diagnostika to var apstiprināt.",
-  "lessonAdviceCombustionHealthEnrichment": "Bagāts maisījums lielā slodzē dedzina papildu degvielu. Pārslēdzieties uz augstāku pārnesumu agrāk un garās paātrināšanās atlaidiet gāzi, lai dzinējs paliktu tuvu stehiometriskam maisījumam.",
   "pipTapToRestore": "Pieskarieties, lai atvērtu pilno lietotni",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
@@ -12099,6 +12031,91 @@
   },
   "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
   "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisLowGearInferredTitle": "Inferred low gear ({minutes} min)",
+  "@analysisLowGearInferredTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisLowGearAdvice": "A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.",
+  "@analysisLowGearAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisHighRpmAdvice": "Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.",
+  "@analysisHighRpmAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisClimbContextAdvice": "Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.",
+  "@analysisClimbContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisRestartContextAdvice": "Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.",
+  "@analysisRestartContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisFuelTrimAddition": "Positive combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimAddition": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimRemoval": "Negative combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimRemoval": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimAdvice": "The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.",
+  "@analysisFuelTrimAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichment": "ECU commanded enrichment ({pctShare}% of warm samples)",
+  "@analysisCommandedEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCommandedEnrichmentAdvice": "Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.",
+  "@analysisCommandedEnrichmentAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichmentTrip": "ECU commanded enrichment ({pctShare}% of trip duration)",
+  "@analysisCommandedEnrichmentTrip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTransmissionScope": "Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.",
+  "@analysisTransmissionScope": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

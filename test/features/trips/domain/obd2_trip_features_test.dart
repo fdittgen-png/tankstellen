@@ -75,12 +75,12 @@ void main() {
       expect(f.rpm.mean, closeTo((800 + 2000 + 3500) / 3, 1e-6));
     });
 
-    test('fuelSource = measured when any real fuel PID landed', () {
+    test('untagged legacy fuel rates have unknown provenance', () {
       final f = Obd2TripFeatures.fromSamples([
         _s(sec: 0, rpm: 1500, fuelRateLPerHour: 2.1),
         _s(sec: 1, rpm: 1600, estimatedFuelRateLPerHour: 3.0),
       ])!;
-      expect(f.fuelSource, Obd2FuelSource.measured);
+      expect(f.fuelSource, Obd2FuelSource.unknown);
     });
 
     test('fuelSource = estimated when only the GPS-physics estimate exists', () {

@@ -100,7 +100,7 @@ DrivingDimensions computeDrivingDimensions(
     }
 
     final accel = points[i - 1].accelMps2;
-    if (accel != null && accel < -0.3 && prev.fuelRateLPerHour != null) {
+    if (accel != null && accel < -0.3 && isFuelCutObservable(prev)) {
       fuelRateDecelSec += dt;
       if (prev.fuelRateLPerHour! < 0.1 && prev.speedKmh > 20) fuelCutSec += dt;
     }
@@ -116,7 +116,9 @@ DrivingDimensions computeDrivingDimensions(
     if (prev.speedKmh >= 50) cruiseSpeeds.add(prev.speedKmh);
   }
   idle.endRun();
-  if (highRunSec >= kSustainedHighSpeed.inSeconds) sustainedHighSec += highRunSec;
+  if (highRunSec >= kSustainedHighSpeed.inSeconds) {
+    sustainedHighSec += highRunSec;
+  }
 
   final dims = <DrivingDimensionKind, DrivingDimension>{};
   void put(DrivingDimension d) => dims[d.kind] = d;
@@ -246,7 +248,8 @@ DrivingDimensions computeDrivingDimensions(
   // habit — the climb itself is never the penalty.
   if (climbSec < 60) {
     put(const DrivingDimension.unknown(DrivingDimensionKind.hillBehaviour,
-        context: 'no confident climb'));
+        context: 'fewer than 60 s of confident climb with demand evidence',
+      ));
   } else {
     final climbShare = climbFullSec / climbSec;
     final flatShare = flatSec > 0 ? flatFullSec / flatSec : 0.0;
@@ -276,7 +279,8 @@ DrivingDimensions computeDrivingDimensions(
           ? DimensionConfidence.medium
           : DimensionConfidence.high,
       evidenceCount: rpmSec.round(),
-      context: 'high RPM ${highRpmSec.round()} s',
+      context:
+            'uniform >3000 rpm exposure ${highRpmSec.round()} s; inferred low-gear ${(secondsBelowOptimalGear ?? 0).round()} s',
     ));
   }
 
@@ -300,7 +304,9 @@ DrivingDimensions computeDrivingDimensions(
   // Coasting: decelerations taken as fuel cut — needs a fuel-rate signal.
   if (fuelRateDecelSec < 10) {
     put(const DrivingDimension.unknown(DrivingDimensionKind.coasting,
-        context: 'no fuel-rate signal while slowing'));
+        context:
+            'fuel cut unavailable: no direct fuel-flow evidence while slowing',
+      ));
   } else {
     put(DrivingDimension(
       kind: DrivingDimensionKind.coasting,

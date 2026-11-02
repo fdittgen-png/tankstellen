@@ -100,6 +100,13 @@ void main() {
   });
 
   group('drive', () {
+    test('RPM and speed alone cannot certify transmission health', () {
+      final t = _Trace()..cruise(0, 10, 14.0);
+      final result = analyzeDiagnosticRecording(t.text).transmission;
+      expect(result.gearReported, isFalse);
+      expect(result.episodes, isEmpty);
+      expect(result.verdict, HealthVerdict.notReported);
+    });
     test('engine near idle at 15 km/h with the pedal pressed is an episode, '
         'stamped with the voltage', () {
       final t = _Trace()..cruise(0, 10, 14.0);
@@ -133,7 +140,7 @@ void main() {
       }
       final r = analyzeDiagnosticRecording(t.text).transmission;
       expect(r.episodes, isEmpty);
-      expect(r.verdict, HealthVerdict.good);
+      expect(r.verdict, HealthVerdict.notReported);
     });
 
     test('the gearbox reporting neutral while moving is a problem', () {

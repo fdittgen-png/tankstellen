@@ -3434,6 +3434,59 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Inferred low gear ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of warm samples)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of trip duration)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.';
+
+  @override
   String get approachOverlaySection =>
       'Preklapanje pri prilasku benzinskoj postaji';
 
@@ -4540,25 +4593,12 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Vožnja u niskom stupnju ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Na duljim zaustavljanjima ugasite motor umjesto da ga ostavljate raditi u praznom hodu.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Mijenjajte ranije u viši stupanj kako biste motor držali izvan zone visokih okretaja.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Lagano pritišćite papučicu gasa — ravnomjerno ubrzavanje troši manje goriva.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Mijenjajte u viši stupanj ranije kako bi motor radio na nižim, ekonomičnijim okretajima.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4591,10 +4631,6 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Jako, dugotrajno opterećenje čini motor prebogatim — kratko mjenjajte brzinu i pустите na dugim usponima da smjesa ostane siromašna.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4604,58 +4640,13 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Zadržite zamah pri ulasku u uspon i ravnomjerno povećavajte gas — nagle promjene na usponu troše više goriva.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count zaustavljanja i ponovnih kretanja: izgubljeno $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Predvidite promet i kližite prema zaustavljanjima kako biste klizali, a ne stajali — kretanje s mjesta najtroši više goriva u stop-start vožnji.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Smjesa se čini malo siromašnom — motor je dodavao gorivo (korekcija $pctTrim %) da nadoknadi';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Smjesa se čini siromašnom — motor je trajno dodavao mnogo goriva ($pctTrim %), moguća neučinkovitost';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Smjesa se čini malo bogatom — motor je oduzimao gorivo (korekcija $pctTrim %) da nadoknadi';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Smjesa se čini bogatom — motor je trajno oduzimao mnogo goriva ($pctTrim %), moguća neučinkovitost';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Motor je radio bogato pod opterećenjem ($pctShare % zagrijane vožnje) — moguće rasipanje goriva';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristički signal stanja, ne dijagnoza';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Trajna korekcija prema siromašnoj smjesi može značiti propuštanje zraka u usisu, slab dovod goriva ili ostarjeli senzor. Ako se potrošnja ili rad pogoršaju, dijagnostika u servisu to može potvrditi.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Trajna korekcija prema bogatoj smjesi može značiti brizgaljku koja propušta, previsok tlak goriva ili senzor koji pokazuje previše. Ako se potrošnja ili rad pogoršaju, dijagnostika u servisu to može potvrditi.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Bogata smjesa pod velikim opterećenjem troši dodatno gorivo. Prebacujte ranije u viši stupanj i popustite gas pri dugim ubrzanjima kako bi motor ostao blizu stehiometrijske smjese.';
 
   @override
   String get lessonTransportTitle =>
@@ -4683,11 +4674,6 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

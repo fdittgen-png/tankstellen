@@ -1,0 +1,14 @@
+{
+  "analysisLowGearInferredTitle": "Rapport court estimé ({minutes} min)",
+  "analysisLowGearAdvice": "Un rapport supérieur peut réduire le régime si la charge et la route le permettent. Cette estimation ne prouve pas un sous-régime.",
+  "analysisHighRpmAdvice": "Le temps au-dessus de 3 000 tr/min est un indicateur heuristique, pas une preuve de mauvais usage. Tenir compte du moteur, de la charge et de la route.",
+  "analysisClimbContextAdvice": "Une montée demande davantage d’énergie même avec une conduite fluide. Ce coût du parcours n’est pas une faute de conduite.",
+  "analysisRestartContextAdvice": "La circulation ou la signalisation ont pu imposer ces arrêts. Leur coût énergétique ne prouve pas qu’ils étaient évitables.",
+  "analysisFuelTrimAddition": "Correction totale positive du carburant ; amplitude moyenne LTFT {pctTrim} %",
+  "analysisFuelTrimRemoval": "Correction totale négative du carburant ; amplitude moyenne LTFT {pctTrim} %",
+  "analysisFuelTrimAdvice": "Le calculateur ajuste l’injection. Cela ne désigne pas une pièce défaillante et ne prouve pas que le mélange final reste pauvre ou riche. Vérifier les valeurs enregistrées, les conditions moteur et les codes défaut.",
+  "analysisCommandedEnrichment": "Enrichissement commandé par le calculateur ({pctShare} % des lectures moteur chaud)",
+  "analysisCommandedEnrichmentAdvice": "L’enrichissement peut protéger le moteur sous charge. Cet enregistrement seul ne démontre ni un défaut ni un gaspillage évitable.",
+  "analysisCommandedEnrichmentTrip": "Enrichissement commandé ({pctShare} % de la durée du trajet)",
+  "analysisTransmissionScope": "Les observations OBD standard n’évaluent ni une boîte robotisée ni la force des actionneurs. Un refus de passage nécessite les défauts propres à la boîte et les consignes comparées aux valeurs réelles du rapport, de l’embrayage et de la sélection."
+}

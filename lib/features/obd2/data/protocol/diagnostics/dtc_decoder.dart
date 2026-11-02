@@ -37,7 +37,7 @@ List<String> decodeDtcReply(String command, String reply) {
 
   for (final message in _messages(reply)) {
     final bytes = message.bytes;
-    if (bytes.isEmpty || bytes.first != echo) continue;
+    if (bytes.isEmpty || bytes.first != echo || !_complete(message, mode)) continue;
     if (mode == 0x02) {
       // Freeze-frame DTC: `42 02 <frame> <A> <B>`.
       if (bytes.length >= 5 && bytes[1] == 0x02) add(bytes[3], bytes[4]);
@@ -47,7 +47,7 @@ List<String> decodeDtcReply(String command, String reply) {
     final counted = payload.isNotEmpty &&
         (message.multiFrame
             ? payload.first * 2 + 1 <= payload.length
-            : payload.length.isOdd && payload.first * 2 == payload.length - 1);
+            : payload.length.isOdd && payload.first * 2 <= payload.length - 1);
     if (counted) {
       // CAN: a count byte, then exactly 2×count bytes (ISO-TP may pad).
       payload = payload.sublist(1, 1 + payload.first * 2);
@@ -57,6 +57,28 @@ List<String> decodeDtcReply(String command, String reply) {
     }
   }
   return out;
+}
+
+/// Whether at least one complete positive DTC response was received.
+/// A bare service echo or incomplete counted CAN payload is not a successful
+/// empty scan and must never replace the previously observed code list.
+bool isCompleteDtcReply(String command, String reply) {
+  final mode = _modeOf(command);
+  if (mode == null) return false;
+  return _messages(reply).any((m) => _complete(m, mode));
+}
+
+bool _complete(_Message message, int mode) {
+  final b = message.bytes;
+  if (b.isEmpty || b.first != mode + 0x40) return false;
+  if (mode == 0x02) return b.length >= 5 && b[1] == 0x02;
+  if (mode != 0x03 && mode != 0x07 && mode != 0x0A) return false;
+  final payload = b.sublist(1);
+  if (payload.isEmpty) return false;
+  if (message.multiFrame || payload.length.isOdd) {
+    return payload.first * 2 + 1 <= payload.length;
+  }
+  return payload.length >= 2; // legacy K-line code pairs, including zero padding
 }
 
 /// Format one two-byte DTC: the top two bits of [a] select the system
@@ -98,7 +120,7 @@ List<_Message> _messages(String reply) {
   final lines = reply
       .toUpperCase()
       .replaceAll('>', '\n')
-      .split(RegExp(r'[\r\n]+'))
+      .split(RegExp(r'[\r\n|]+'))
       .map((l) => l.trim())
       .where((l) => l.isNotEmpty);
   for (final line in lines) {

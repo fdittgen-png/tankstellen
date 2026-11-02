@@ -40,8 +40,8 @@ enum SignalUnit {
   /// Kilopascals, absolute.
   kPa,
 
-  /// Dimensionless fuel–air equivalence ratio φ (1.0 = stoichiometric,
-  /// above 1 rich).
+  /// Raw OBD lambda (1.0 stoichiometric; below 1 rich). CommandedPhi
+  /// and widebandPhi enum names are legacy aliases for this wire value.
   equivalenceRatio,
 
   /// Degrees Celsius.

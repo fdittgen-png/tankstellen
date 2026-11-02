@@ -3450,6 +3450,59 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Inferred low gear ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of warm samples)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of trip duration)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.';
+
+  @override
   String get approachOverlaySection => 'Töltőállomás-megközelítési átfedés';
 
   @override
@@ -4557,25 +4610,12 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Alacsony fokozatban küszködés ($minutes perc)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Hosszú megállóknál kapcsolja ki a motort, ahelyett hogy üresjáraton hagyná.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Kapcsoljon feljebb korábban, hogy a motor a magas fordulatszámú tartományon kívül maradjon.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Finoman adjon gázt — az egyenletes gyorsítás kevesebb üzemanyagot fogyaszt.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Kapcsoljon feljebb hamarabb, hogy a motor alacsonyabb, takarékosabb fordulatszámon járjon.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4608,10 +4648,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'A nagy, tartós terhelés gazdag keveréket okoz — korai sebességváltással és visszafogással hosszú emelkedőkön tartsa soványan a keveréket.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4621,58 +4657,13 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Vigyen lendületet a dombra, és adagolja finoman a gázt — emelkedőn való hirtelen gyorsítás extra üzemanyagot éget.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count stop-and-go újraindulás: $liters L pazarlás';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Számolja előre a forgalmat, és guruljon a megállók felé, hogy guruljon inkább, mint megálljon teljesen — a holttpontról való elindulás a legfogyasztóbb része a stop-and-go-nak.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'A keverék kissé szegénynek tűnik — a motor üzemanyagot adott hozzá ($pctTrim% korrekció), hogy ellensúlyozza';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'A keverék szegénynek tűnik — a motor tartósan nagy, $pctTrim%-os üzemanyag-hozzáadást tartott fenn; lehetséges hatékonyságvesztés';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'A keverék kissé dúsnak tűnik — a motor üzemanyagot vont el ($pctTrim% korrekció), hogy ellensúlyozza';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'A keverék dúsnak tűnik — a motor tartósan nagy, $pctTrim%-os üzemanyag-elvonást tartott fenn; lehetséges hatékonyságvesztés';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'A motor terhelés alatt dúsan járt (a meleg vezetés $pctShare%-ában) — lehetséges üzemanyag-pazarlás';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heurisztikus állapotjelzés, nem diagnózis';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'A tartósan szegény irányú korrekció szívóoldali levegőszivárgásra, gyenge üzemanyag-ellátásra vagy öregedő érzékelőre utalhat. Ha a fogyasztás vagy a járás romlik, egy szervizdiagnosztika megerősítheti.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'A tartósan dús irányú korrekció szivárgó injektorra, túl magas üzemanyagnyomásra vagy felfelé tévedő érzékelőre utalhat. Ha a fogyasztás vagy a járás romlik, egy szervizdiagnosztika megerősítheti.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'A dús keverék nagy terhelésnél többlet üzemanyagot éget. Válts fel korábban, és engedd el a gázt a hosszú gyorsításoknál, hogy a motor a sztöchiometrikus keverék közelében maradhasson.';
 
   @override
   String get lessonTransportTitle =>
@@ -4700,11 +4691,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

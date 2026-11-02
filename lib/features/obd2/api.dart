@@ -95,3 +95,6 @@ export 'providers/obd2_recording_pipeline.dart';
 export 'providers/obd2_self_test_controller.dart';
 // #3963 — the self-running connection reset the drop banners embed.
 export 'presentation/widgets/obd2_auto_reset.dart';
+
+// Portable health evidence for a trip's explicitly linked local recording.
+export 'data/diagnostics/diagnostic_evidence_loader.dart' show loadDiagnosticEvidence;

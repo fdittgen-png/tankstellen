@@ -109,6 +109,7 @@ void main() {
           rpm: 2200,
           throttlePercent: 0,
           fuelRateLPerHour: 0,
+        fuelSource: 'pid5E',
         ));
       }
       final situation = c.onSample(DrivingSample(
@@ -117,6 +118,7 @@ void main() {
         rpm: 2200,
         throttlePercent: 0,
         fuelRateLPerHour: 0,
+        fuelSource: 'pid5E',
       ));
       expect(situation, DrivingSituation.fuelCutCoast);
     });

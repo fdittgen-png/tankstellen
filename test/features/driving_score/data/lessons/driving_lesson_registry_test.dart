@@ -194,7 +194,7 @@ void main() {
       final fired =
           reg.evaluate(summary(secondsBelowOptimalGear: 180), idleSamples(), l);
       final lowGear = fired.firstWhere((e) => e.id == lowGearLessonId);
-      expect(lowGear.title, 'Labouring in low gear (3 min)');
+      expect(lowGear.title, 'Inferred low gear (3 min)');
       expect(lowGear.metricValue, 180);
       // No subtitle / trailing — matches the legacy gear-coaching row.
       expect(lowGear.subtitle, isNull);

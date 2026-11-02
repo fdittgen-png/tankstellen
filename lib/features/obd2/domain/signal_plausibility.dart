@@ -51,3 +51,17 @@ SignalPlausibility classifyBaroKpa(double baroKpa) => _inBand(
       kMinBaroDensityFactor,
       kMaxBaroDensityFactor,
     );
+
+/// Live and persisted OBD aliases carry lambda, not true phi.
+SignalPlausibility classifyCommandedLambda(double lambda) =>
+    classifyCommandedPhi(
+      lambda.isFinite && lambda > 0 ? 1 / lambda : double.nan,
+    );
+SignalPlausibility classifyMeasuredLambda(
+  double lambda, {
+  required bool isDiesel,
+}) =>
+    classifyMeasuredPhi(
+      lambda.isFinite && lambda > 0 ? 1 / lambda : double.nan,
+      isDiesel: isDiesel,
+    );

@@ -904,11 +904,8 @@
   "insightIdling": "Alapjárat ({pctTime}% az útból): pazarolt {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% az útból",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Alacsony fokozatban küszködés ({minutes} perc)",
   "lessonAdviceIdling": "Hosszú megállóknál kapcsolja ki a motort, ahelyett hogy üresjáraton hagyná.",
-  "lessonAdviceHighRpm": "Kapcsoljon feljebb korábban, hogy a motor a magas fordulatszámú tartományon kívül maradjon.",
   "lessonAdviceHardAccel": "Finoman adjon gázt — az egyenletes gyorsítás kevesebb üzemanyagot fogyaszt.",
-  "lessonAdviceLowGear": "Kapcsoljon feljebb hamarabb, hogy a motor alacsonyabb, takarékosabb fordulatszámon járjon.",
   "drivingScoreCardTitle": "Vezetési pontszám",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Összetett pontszám az alapjáratból, erős gyorsításokból, erős fékezésekből és magas fordulatszám-időből. Egy 'jobb, mint az elmúlt utak X%-a' összehasonlítás egy következő kiadásban fog megjelenni.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "A nagy, tartós terhelés gazdag keveréket okoz — korai sebességváltással és visszafogással hosszú emelkedőkön tartsa soványan a keveréket.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Kiváló",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Vigyen lendületet a dombra, és adagolja finoman a gázt — emelkedőn való hirtelen gyorsítás extra üzemanyagot éget.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} stop-and-go újraindulás: {liters} L pazarlás",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Számolja előre a forgalmat, és guruljon a megállók felé, hogy guruljon inkább, mint megálljon teljesen — a holttpontról való elindulás a legfogyasztóbb része a stop-and-go-nak.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS-hatékonyság",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "A keverék kissé szegénynek tűnik — a motor üzemanyagot adott hozzá ({pctTrim}% korrekció), hogy ellensúlyozza",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "A keverék szegénynek tűnik — a motor tartósan nagy, {pctTrim}%-os üzemanyag-hozzáadást tartott fenn; lehetséges hatékonyságvesztés",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "A keverék kissé dúsnak tűnik — a motor üzemanyagot vont el ({pctTrim}% korrekció), hogy ellensúlyozza",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "A keverék dúsnak tűnik — a motor tartósan nagy, {pctTrim}%-os üzemanyag-elvonást tartott fenn; lehetséges hatékonyságvesztés",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "A motor terhelés alatt dúsan járt (a meleg vezetés {pctShare}%-ában) — lehetséges üzemanyag-pazarlás",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heurisztikus állapotjelzés, nem diagnózis",
-  "lessonAdviceCombustionHealthLean": "A tartósan szegény irányú korrekció szívóoldali levegőszivárgásra, gyenge üzemanyag-ellátásra vagy öregedő érzékelőre utalhat. Ha a fogyasztás vagy a járás romlik, egy szervizdiagnosztika megerősítheti.",
-  "lessonAdviceCombustionHealthRich": "A tartósan dús irányú korrekció szivárgó injektorra, túl magas üzemanyagnyomásra vagy felfelé tévedő érzékelőre utalhat. Ha a fogyasztás vagy a járás romlik, egy szervizdiagnosztika megerősítheti.",
-  "lessonAdviceCombustionHealthEnrichment": "A dús keverék nagy terhelésnél többlet üzemanyagot éget. Válts fel korábban, és engedd el a gázt a hosszú gyorsításoknál, hogy a motor a sztöchiometrikus keverék közelében maradhasson.",
   "pipTapToRestore": "Koppints a teljes app megnyitásához",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
@@ -12095,6 +12027,91 @@
   },
   "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
   "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisLowGearInferredTitle": "Inferred low gear ({minutes} min)",
+  "@analysisLowGearInferredTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisLowGearAdvice": "A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.",
+  "@analysisLowGearAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisHighRpmAdvice": "Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.",
+  "@analysisHighRpmAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisClimbContextAdvice": "Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.",
+  "@analysisClimbContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisRestartContextAdvice": "Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.",
+  "@analysisRestartContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisFuelTrimAddition": "Positive combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimAddition": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimRemoval": "Negative combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimRemoval": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimAdvice": "The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.",
+  "@analysisFuelTrimAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichment": "ECU commanded enrichment ({pctShare}% of warm samples)",
+  "@analysisCommandedEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCommandedEnrichmentAdvice": "Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.",
+  "@analysisCommandedEnrichmentAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichmentTrip": "ECU commanded enrichment ({pctShare}% of trip duration)",
+  "@analysisCommandedEnrichmentTrip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTransmissionScope": "Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.",
+  "@analysisTransmissionScope": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

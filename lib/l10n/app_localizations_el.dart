@@ -3451,6 +3451,59 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Inferred low gear ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of warm samples)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of trip duration)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.';
+
+  @override
   String get approachOverlaySection =>
       'Επικάλυψη κατά την προσέγγιση πρατηρίου';
 
@@ -4565,25 +4618,12 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Βαριά φόρτωση σε χαμηλή ταχύτητα ($minutes λεπτά)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Σβήνετε τον κινητήρα στις μεγάλες στάσεις αντί να τον αφήνετε στο ρελαντί.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Αλλάζετε νωρίτερα σε υψηλότερη σχέση για να κρατάτε τον κινητήρα εκτός της ζώνης υψηλών στροφών.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Πατάτε απαλά το γκάζι — η ομαλή επιτάχυνση καταναλώνει λιγότερο καύσιμο.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Αλλάζετε νωρίτερα σε υψηλότερη σχέση ώστε ο κινητήρας να σταθεροποιείται σε χαμηλότερες, πιο οικονομικές στροφές.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4616,10 +4656,6 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Βαρύ, παρατεταμένο φορτίο κάνει τον κινητήρα να τρέχει πλούσια — αλλάξτε σχέση νωρίς και χαλαρώστε στις μεγάλες ανηφόρες για να διατηρήσετε το μείγμα λεπτό.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4629,58 +4665,13 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Διατηρήστε ορμή στην ανηφόρα και δώστε γκάζι ομαλά — η εκρηκτική επιτάχυνση σε ανηφόρα κατανώνει επιπλέον καύσιμο.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count επανεκκινήσεις stop-and-go: σπάταλα $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Προβλέψτε την κίνηση και αφεθείτε σε αδράνεια προς τις στάσεις ώστε να κυλάτε αντί να ξεκινάτε εκ νέου — η εκκίνηση από ακινησία είναι το πιο ενεργοβόρο στάδιο της stop-and-go κυκλοφορίας.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Το μείγμα φαίνεται λίγο φτωχό — ο κινητήρας πρόσθεσε καύσιμο (διόρθωση $pctTrim %) για να αντισταθμίσει';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Το μείγμα φαίνεται φτωχό — ο κινητήρας διατήρησε μεγάλη προσθήκη καυσίμου $pctTrim %, πιθανή αναποτελεσματικότητα';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Το μείγμα φαίνεται λίγο πλούσιο — ο κινητήρας αφαίρεσε καύσιμο (διόρθωση $pctTrim %) για να αντισταθμίσει';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Το μείγμα φαίνεται πλούσιο — ο κινητήρας διατήρησε μεγάλη μείωση καυσίμου $pctTrim %, πιθανή αναποτελεσματικότητα';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Ο κινητήρας δούλεψε πλούσια υπό φορτίο ($pctShare % της ζεστής οδήγησης) — πιθανή σπατάλη καυσίμου';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Ευρετικό σήμα κατάστασης, όχι διάγνωση';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Μια παρατεταμένη διόρθωση προς φτωχό μείγμα μπορεί να σημαίνει διαρροή αέρα στην εισαγωγή, αδύναμη τροφοδοσία καυσίμου ή γερασμένο αισθητήρα. Αν επιδεινωθεί η κατανάλωση ή η λειτουργία, μια διάγνωση σε συνεργείο μπορεί να το επιβεβαιώσει.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Μια παρατεταμένη διόρθωση προς πλούσιο μείγμα μπορεί να σημαίνει μπεκ που στάζει, υψηλή πίεση καυσίμου ή αισθητήρα που μετρά παραπάνω. Αν επιδεινωθεί η κατανάλωση ή η λειτουργία, μια διάγνωση σε συνεργείο μπορεί να το επιβεβαιώσει.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Το πλούσιο μείγμα υπό μεγάλο φορτίο καίει επιπλέον καύσιμο. Αλλάξτε σχέση νωρίτερα και ξεγκαζώστε στις παρατεταμένες επιταχύνσεις, ώστε ο κινητήρας να μένει κοντά σε στοιχειομετρικό μείγμα.';
 
   @override
   String get lessonTransportTitle =>
@@ -4708,11 +4699,6 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

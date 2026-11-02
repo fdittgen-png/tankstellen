@@ -86,8 +86,10 @@ void main() {
     expect(find.textContaining('dropped below 12 V 3 times'), findsOneWidget);
     expect(find.textContaining('1 moments where power did not reach'), findsOneWidget);
     expect(find.textContaining('03:12'), findsOneWidget);
-    expect(find.textContaining('the engine runs rich'), findsOneWidget);
+    expect(find.textContaining('does not establish that the final mixture remains rich'), findsOneWidget);
     expect(find.textContaining('P0730 · transmission'), findsOneWidget);
+    expect(find.textContaining('do not assess a robotized gearbox'), findsOneWidget);
+    expect(find.textContaining('No usable gear reading was recorded'), findsOneWidget);
     expect(find.text('The engine warning light is ON.'), findsOneWidget);
     expect(find.textContaining('01A4'), findsOneWidget);
   });

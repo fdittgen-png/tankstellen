@@ -30,10 +30,11 @@ class HighRpmRule implements DrivingLessonRule {
     final pct = formatLessonPercent(insight.percentOfTrip);
     return DrivingLesson(
       id: id,
+      polarity: LessonPolarity.info,
       impact: insight.percentOfTrip,
       metricValue: (insight.metadata['highRpmSeconds'] ?? 0).toDouble(),
       title: l.insightHighRpmShare(pct),
-      advice: l.lessonAdviceHighRpm,
+      advice: l.analysisHighRpmAdvice,
       subtitle: l.insightSubtitlePctOfTrip(pct),
       trailing: approxLitersTrailing(insight, l), // #4221
     );

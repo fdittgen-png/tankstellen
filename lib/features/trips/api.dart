@@ -112,3 +112,6 @@ export 'providers/trip_ve_recompute_provider.dart';
 export 'providers/wakelock_facade.dart';
 // #3869 — the one-ZIP export writes one GPX per trip.
 export 'data/exporters/gpx_exporter.dart' show buildGpxXml;
+
+export 'domain/fuel_signal_evidence.dart';
+export 'domain/imu_event_record.dart' show kImuEventRecordCap, kImuUnconfirmedRecordCap;

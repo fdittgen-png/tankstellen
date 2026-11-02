@@ -904,11 +904,8 @@
   "insightIdling": "Tuščioji eiga ({pctTime}% kelionės): švaisyta {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% kelionės",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Važiavimas žemoje pavaros ({minutes} min)",
   "lessonAdviceIdling": "Ilgų sustojimų metu išjunkite variklį, užuot palikę jį veikti tuščiąja eiga.",
-  "lessonAdviceHighRpm": "Anksčiau perjunkite aukštesnę pavarą, kad variklis liktų ne aukštų apsukų zonoje.",
   "lessonAdviceHardAccel": "Spauskite akceleratorių tolygiai — sklandus įsibėgėjimas naudoja mažiau degalų.",
-  "lessonAdviceLowGear": "Perjunkite aukštesnę pavarą anksčiau, kad variklis suktųsi mažesnėmis ir ekonomiškesnėmis apsukomis.",
   "drivingScoreCardTitle": "Vairavimo balas",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Sudėtinis balas iš tuščiosios eigos, staigių greitinimų, staigaus stabdymo ir laiko su dideliais apsukimais. Lyginimas \"geriau nei X% ankstesnių kelionių\" bus įtrauktas vėlesnėje versijoje.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Sunki ilgalaikė apkrova priverčia variklį veikti praturtinto mišinio režimu — keiskite pavaras anksčiau ir mažinkite apkrovą ilgose pakiluose, kad mišinys liktų liesas.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Labai gerai",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Įgaukite pagreitį prieš kalną ir sklandžiai atidarykite dujas — staigus spaudimas kalnagūbryje padidina kuro sąnaudas.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} sustok-pajudek paleidimų: iššvaistyta {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Numatykite eismą ir riedėkite link sustojimų, kad ridėtumėtės, o ne startuotumėte iš naujo — pajudėjimas iš vietos yra brangiausia sustok-pajudek dalis.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "GPS efektyvumas",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Mišinys atrodo šiek tiek liesas — variklis pridėjo degalų ({pctTrim} % korekcija), kad kompensuotų",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Mišinys atrodo liesas — variklis nuolat pridėjo daug degalų ({pctTrim} %), galimas neefektyvumas",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Mišinys atrodo šiek tiek riebus — variklis sumažino degalų ({pctTrim} % korekcija), kad kompensuotų",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Mišinys atrodo riebus — variklis nuolat gerokai mažino degalų ({pctTrim} %), galimas neefektyvumas",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Variklis esant apkrovai dirbo riebiu mišiniu ({pctShare} % važiavimo įšilus) — galimai iššvaistyti degalai",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Euristinis būklės signalas, ne diagnozė",
-  "lessonAdviceCombustionHealthLean": "Ilgalaikė korekcija link liesos mišinio gali reikšti oro nuotėkį įsiurbime, silpną degalų tiekimą arba senstantį jutiklį. Jei sąnaudos ar variklio darbas blogėja, servisas diagnostika gali tai patvirtinti.",
-  "lessonAdviceCombustionHealthRich": "Ilgalaikė korekcija link riebaus mišinio gali reikšti nesandarų purkštuką, per aukštą degalų slėgį arba per daug rodantį jutiklį. Jei sąnaudos ar variklio darbas blogėja, serviso diagnostika gali tai patvirtinti.",
-  "lessonAdviceCombustionHealthEnrichment": "Riebus mišinys esant didelei apkrovai degina papildomus degalus. Anksčiau perjunkite aukštesnę pavarą ir ilgai greitėdami atleiskite akceleratorių, kad variklis išliktų arti stechiometrinio mišinio.",
   "pipTapToRestore": "Bakstelėkite, kad atidarytumėte visą programą",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
@@ -12099,6 +12031,91 @@
   },
   "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
   "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisLowGearInferredTitle": "Inferred low gear ({minutes} min)",
+  "@analysisLowGearInferredTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisLowGearAdvice": "A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.",
+  "@analysisLowGearAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisHighRpmAdvice": "Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.",
+  "@analysisHighRpmAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisClimbContextAdvice": "Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.",
+  "@analysisClimbContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisRestartContextAdvice": "Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.",
+  "@analysisRestartContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisFuelTrimAddition": "Positive combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimAddition": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimRemoval": "Negative combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimRemoval": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimAdvice": "The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.",
+  "@analysisFuelTrimAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichment": "ECU commanded enrichment ({pctShare}% of warm samples)",
+  "@analysisCommandedEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCommandedEnrichmentAdvice": "Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.",
+  "@analysisCommandedEnrichmentAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichmentTrip": "ECU commanded enrichment ({pctShare}% of trip duration)",
+  "@analysisCommandedEnrichmentTrip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTransmissionScope": "Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.",
+  "@analysisTransmissionScope": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

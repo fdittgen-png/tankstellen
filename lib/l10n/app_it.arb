@@ -904,11 +904,8 @@
   "insightIdling": "Fermo al minimo ({pctTime}% del percorso): sprecato {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% del percorso",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "In marcia bassa ({minutes} min)",
   "lessonAdviceIdling": "Spegni il motore durante le soste lunghe invece di lasciarlo al minimo.",
-  "lessonAdviceHighRpm": "Cambia marcia prima per tenere il motore fuori dalla fascia degli alti regimi.",
   "lessonAdviceHardAccel": "Accelera con dolcezza: un'accelerazione graduale consuma meno carburante.",
-  "lessonAdviceLowGear": "Sali di marcia prima così il motore si assesta a regimi più bassi e più efficienti.",
   "drivingScoreCardTitle": "Punteggio di guida",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Punteggio composito da fermo al minimo, accelerazioni brusche, frenate brusche e tempo ad alto numero di giri. Un confronto \"migliore del X% dei percorsi passati\" sarà aggiunto in un aggiornamento futuro.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Un carico pesante e prolungato fa andare il motore con miscela ricca — cambia marcia anticipato e alleggerisci sulle salite lunghe per mantenere la miscela magra.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Molto buono",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Mantieni lo slancio in salita e spingi sull'acceleratore con gradualità — accelerare bruscamente in salita consuma più carburante.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} ripartenze stop-and-go: {liters} L sprecati",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Anticipa il traffico e rallenta in rilascio verso le fermate per scorrere invece di ripartire da fermo — ripartire da fermo è la fase più dispendiosa dello stop-and-go.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "Efficienza GPS",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "La miscela sembra un po' magra: il motore ha aggiunto carburante (correzione del {pctTrim} %) per compensare",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "La miscela sembra magra: il motore ha mantenuto un'aggiunta di carburante elevata, del {pctTrim} %, una possibile inefficienza",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "La miscela sembra un po' ricca: il motore ha tolto carburante (correzione del {pctTrim} %) per compensare",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "La miscela sembra ricca: il motore ha mantenuto un taglio di carburante elevato, del {pctTrim} %, una possibile inefficienza",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Il motore ha girato ricco sotto carico ({pctShare} % della guida a caldo): possibile carburante sprecato",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Segnale euristico di salute, non una diagnosi",
-  "lessonAdviceCombustionHealthLean": "Una correzione prolungata verso una miscela magra può indicare un'infiltrazione d'aria nell'aspirazione, un'alimentazione di carburante debole o un sensore invecchiato. Se consumi o funzionamento peggiorano, una diagnosi in officina può confermarlo.",
-  "lessonAdviceCombustionHealthRich": "Una correzione prolungata verso una miscela ricca può indicare un iniettore che perde, una pressione del carburante alta o un sensore che legge in eccesso. Se consumi o funzionamento peggiorano, una diagnosi in officina può confermarlo.",
-  "lessonAdviceCombustionHealthEnrichment": "Girare con miscela ricca sotto forte carico brucia carburante in più. Cambia marcia prima e alza il piede nelle accelerazioni lunghe, così il motore resta vicino a una miscela stechiometrica.",
   "pipTapToRestore": "Tocca per aprire l'app completa",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7041,16 +6983,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
@@ -11602,6 +11534,91 @@
   },
   "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
   "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisLowGearInferredTitle": "Inferred low gear ({minutes} min)",
+  "@analysisLowGearInferredTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisLowGearAdvice": "A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.",
+  "@analysisLowGearAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisHighRpmAdvice": "Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.",
+  "@analysisHighRpmAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisClimbContextAdvice": "Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.",
+  "@analysisClimbContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisRestartContextAdvice": "Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.",
+  "@analysisRestartContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisFuelTrimAddition": "Positive combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimAddition": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimRemoval": "Negative combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimRemoval": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimAdvice": "The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.",
+  "@analysisFuelTrimAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichment": "ECU commanded enrichment ({pctShare}% of warm samples)",
+  "@analysisCommandedEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCommandedEnrichmentAdvice": "Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.",
+  "@analysisCommandedEnrichmentAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichmentTrip": "ECU commanded enrichment ({pctShare}% of trip duration)",
+  "@analysisCommandedEnrichmentTrip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTransmissionScope": "Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.",
+  "@analysisTransmissionScope": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

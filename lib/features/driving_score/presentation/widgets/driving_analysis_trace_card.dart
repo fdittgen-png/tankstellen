@@ -7,6 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../feature_management/api.dart';
 import '../../data/analysis/driving_analysis_trace.dart';
+import '../../data/analysis/mixture_lesson_evidence.dart';
+import '../../data/analysis/kinematic_timeline_evidence.dart';
 import '../../data/analysis/driving_analysis_trace_export.dart';
 import '../../data/driving_dimensions_calculator.dart';
 import '../../domain/driving_score.dart';
@@ -99,12 +101,16 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
   Future<void> _export(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
     final l = AppLocalizations.of(context);
+    final dimensions = computeDrivingDimensions(
+      samples,
+      secondsBelowOptimalGear: summary.secondsBelowOptimalGear,
+    );
     final trace = DrivingAnalysisTrace(
       capturedAt: DateTime.now(),
       summary: summary,
       score: score,
       lessons: lessons,
-      gpsFeatures: gpsFeatures,
+      gpsFeatures: gpsFeatures ?? GpsDrivingFeatures.from(samples),
       obd2Features: Obd2TripFeatures.fromSamples(samples),
       gpsCoverage: gpsCoverage,
       // #3499 (schema v4) — engine-sample coverage + reason, so a null
@@ -120,9 +126,10 @@ class DrivingAnalysisTraceCard extends ConsumerWidget {
       adapterMac: entry?.adapterMac,
       automatic: entry?.automatic ?? false,
       roadLoad: RoadLoadTrack.from(samples).toTrace(), // #4203
-      dimensions: computeDrivingDimensions(samples,
-              secondsBelowOptimalGear: summary.secondsBelowOptimalGear)
-          .toJson(), // #4205
+      dimensions: dimensions.toJson(),
+      patternEvidence: dimensions.totals.toJson(),
+      mixtureLessonEvidence: mixtureLessonEvidence(samples),
+      kinematicTimeline: kinematicTimelineEvidence(samples),
     );
     final ok = await DrivingAnalysisTraceExport.export(trace);
     if (!context.mounted) return;

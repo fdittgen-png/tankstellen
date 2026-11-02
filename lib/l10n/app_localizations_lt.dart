@@ -3450,6 +3450,59 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Inferred low gear ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of warm samples)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of trip duration)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.';
+
+  @override
   String get approachOverlaySection => 'Užklotis artėjant prie degalinės';
 
   @override
@@ -4555,25 +4608,12 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Važiavimas žemoje pavaros ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Ilgų sustojimų metu išjunkite variklį, užuot palikę jį veikti tuščiąja eiga.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Anksčiau perjunkite aukštesnę pavarą, kad variklis liktų ne aukštų apsukų zonoje.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Spauskite akceleratorių tolygiai — sklandus įsibėgėjimas naudoja mažiau degalų.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Perjunkite aukštesnę pavarą anksčiau, kad variklis suktųsi mažesnėmis ir ekonomiškesnėmis apsukomis.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4606,10 +4646,6 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Sunki ilgalaikė apkrova priverčia variklį veikti praturtinto mišinio režimu — keiskite pavaras anksčiau ir mažinkite apkrovą ilgose pakiluose, kad mišinys liktų liesas.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4619,58 +4655,13 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Įgaukite pagreitį prieš kalną ir sklandžiai atidarykite dujas — staigus spaudimas kalnagūbryje padidina kuro sąnaudas.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count sustok-pajudek paleidimų: iššvaistyta $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Numatykite eismą ir riedėkite link sustojimų, kad ridėtumėtės, o ne startuotumėte iš naujo — pajudėjimas iš vietos yra brangiausia sustok-pajudek dalis.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Mišinys atrodo šiek tiek liesas — variklis pridėjo degalų ($pctTrim % korekcija), kad kompensuotų';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Mišinys atrodo liesas — variklis nuolat pridėjo daug degalų ($pctTrim %), galimas neefektyvumas';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Mišinys atrodo šiek tiek riebus — variklis sumažino degalų ($pctTrim % korekcija), kad kompensuotų';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Mišinys atrodo riebus — variklis nuolat gerokai mažino degalų ($pctTrim %), galimas neefektyvumas';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Variklis esant apkrovai dirbo riebiu mišiniu ($pctShare % važiavimo įšilus) — galimai iššvaistyti degalai';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Euristinis būklės signalas, ne diagnozė';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Ilgalaikė korekcija link liesos mišinio gali reikšti oro nuotėkį įsiurbime, silpną degalų tiekimą arba senstantį jutiklį. Jei sąnaudos ar variklio darbas blogėja, servisas diagnostika gali tai patvirtinti.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Ilgalaikė korekcija link riebaus mišinio gali reikšti nesandarų purkštuką, per aukštą degalų slėgį arba per daug rodantį jutiklį. Jei sąnaudos ar variklio darbas blogėja, serviso diagnostika gali tai patvirtinti.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Riebus mišinys esant didelei apkrovai degina papildomus degalus. Anksčiau perjunkite aukštesnę pavarą ir ilgai greitėdami atleiskite akceleratorių, kad variklis išliktų arti stechiometrinio mišinio.';
 
   @override
   String get lessonTransportTitle =>
@@ -4698,11 +4689,6 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

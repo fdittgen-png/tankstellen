@@ -904,11 +904,8 @@
   "insightIdling": "Bieg jałowy ({pctTime}% trasy): zmarnowano {liters} L",
   "insightSubtitlePctOfTrip": "{pctTime}% trasy",
   "insightTrailingLitersWasted": "+{liters} L",
-  "insightLowGear": "Jazda na niskim biegu ({minutes} min)",
   "lessonAdviceIdling": "Podczas dłuższych postojów wyłączaj silnik, zamiast pozostawiać go na biegu jałowym.",
-  "lessonAdviceHighRpm": "Zmieniaj na wyższy bieg wcześniej, aby utrzymać silnik poza zakresem wysokich obrotów.",
   "lessonAdviceHardAccel": "Naciskaj gaz płynnie — równomierne przyspieszanie zużywa mniej paliwa.",
-  "lessonAdviceLowGear": "Zmieniaj na wyższy bieg wcześniej, aby silnik pracował na niższych, oszczędniejszych obrotach.",
   "drivingScoreCardTitle": "Wynik jazdy",
   "drivingScoreCardOutOf": "/100",
   "drivingScoreCardSubtitle": "Wynik złożony z biegu jałowego, gwałtownych przyspieszeń, gwałtownego hamowania i czasu przy wysokich obrotach. Porównanie 'lepszy niż X% poprzednich tras' pojawi się w przyszłej wersji.",
@@ -1983,10 +1980,6 @@
       }
     }
   },
-  "lessonAdviceLambdaEnrichment": "Duże, długotrwałe obciążenie powoduje wzbogacenie mieszanki — zmieniaj biegi wcześniej i zmniejsz obciążenie na długich podjazdach, aby mieszanka pozostała uboga.",
-  "@lessonAdviceLambdaEnrichment": {
-    "description": "MT — needs native review"
-  },
   "drivingScoreClassVeryGood": "Bardzo dobry",
   "@drivingScoreClassVeryGood": {
     "description": "MT — needs native review"
@@ -3024,10 +3017,6 @@
       }
     }
   },
-  "lessonAdviceClimbingCost": "Wejdź w wzniesienie z impetu i płynnie dawaj gaz — gwałtowne przyspieszanie pod górę zużywa dodatkowe paliwo.",
-  "@lessonAdviceClimbingCost": {
-    "description": "MT — needs native review"
-  },
   "insightRestartCost": "{count} zatrzymań i ruszeń: zmarnowano {liters} L",
   "@insightRestartCost": {
     "description": "MT — needs native review",
@@ -3039,10 +3028,6 @@
         "type": "String"
       }
     }
-  },
-  "lessonAdviceRestartCost": "Przewiduj ruch i jedź na wybiegu do zatrzymań, by toczyć się zamiast ruszać od zera — ruszenie z miejsca to najbardziej paliwożerny element jazdy w korkach.",
-  "@lessonAdviceRestartCost": {
-    "description": "MT — needs native review"
   },
   "gpsKpiCardTitle": "Efektywność GPS",
   "@gpsKpiCardTitle": {
@@ -3642,50 +3627,7 @@
       }
     }
   },
-  "lessonCombustionHealthLeanBorderline": "Mieszanka wygląda na nieco ubogą — silnik dodał paliwa (korekta {pctTrim} %), aby to skompensować",
-  "@lessonCombustionHealthLeanBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthLeanMarked": "Mieszanka wygląda na ubogą — silnik utrzymywał dużą, {pctTrim} % korektę wzbogacającą; możliwa nieefektywność",
-  "@lessonCombustionHealthLeanMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichBorderline": "Mieszanka wygląda na nieco bogatą — silnik odjął paliwa (korekta {pctTrim} %), aby to skompensować",
-  "@lessonCombustionHealthRichBorderline": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthRichMarked": "Mieszanka wygląda na bogatą — silnik utrzymywał dużą, {pctTrim} % korektę zubażającą; możliwa nieefektywność",
-  "@lessonCombustionHealthRichMarked": {
-    "placeholders": {
-      "pctTrim": {
-        "type": "String"
-      }
-    }
-  },
-  "lessonCombustionHealthEnrichment": "Silnik pracował na bogatej mieszance pod obciążeniem ({pctShare} % jazdy na ciepłym silniku) — możliwa strata paliwa",
-  "@lessonCombustionHealthEnrichment": {
-    "placeholders": {
-      "pctShare": {
-        "type": "String"
-      }
-    }
-  },
   "lessonCombustionHealthSubtitle": "Heurystyczny sygnał stanu, nie diagnoza",
-  "lessonAdviceCombustionHealthLean": "Utrzymująca się korekta w stronę ubogiej mieszanki może oznaczać nieszczelność dolotu, słabe zasilanie paliwem lub starzejący się czujnik. Jeśli spalanie lub praca silnika się pogorszą, diagnostyka w warsztacie może to potwierdzić.",
-  "lessonAdviceCombustionHealthRich": "Utrzymująca się korekta w stronę bogatej mieszanki może oznaczać nieszczelny wtryskiwacz, zbyt wysokie ciśnienie paliwa lub zawyżający czujnik. Jeśli spalanie lub praca silnika się pogorszą, diagnostyka w warsztacie może to potwierdzić.",
-  "lessonAdviceCombustionHealthEnrichment": "Bogata mieszanka pod dużym obciążeniem spala dodatkowe paliwo. Zmieniaj biegi wcześniej i odpuszczaj gaz przy długich przyspieszeniach, aby silnik pozostał blisko mieszanki stechiometrycznej.",
   "pipTapToRestore": "Dotknij, aby otworzyć pełną aplikację",
   "obd2TestAdapterTransportClassic": "Classic (SPP)",
   "obd2TestAdapterTransportBle": "Bluetooth LE",
@@ -7533,16 +7475,6 @@
   },
   "insightFullThrottleShare": "Full throttle ({pctTime}% of trip)",
   "@insightFullThrottleShare": {
-    "x-mt": "needs-native-review",
-    "description": "MT — needs native review",
-    "placeholders": {
-      "pctTime": {
-        "type": "String"
-      }
-    }
-  },
-  "insightLambdaEnrichmentShare": "Rich mixture under load ({pctTime}% of trip)",
-  "@insightLambdaEnrichmentShare": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review",
     "placeholders": {
@@ -12094,6 +12026,91 @@
   },
   "consumptionStatsNeedsFullWindow": "Add another full fill to measure consumption.",
   "@consumptionStatsNeedsFullWindow": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisLowGearInferredTitle": "Inferred low gear ({minutes} min)",
+  "@analysisLowGearInferredTitle": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisLowGearAdvice": "A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.",
+  "@analysisLowGearAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisHighRpmAdvice": "Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.",
+  "@analysisHighRpmAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisClimbContextAdvice": "Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.",
+  "@analysisClimbContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisRestartContextAdvice": "Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.",
+  "@analysisRestartContextAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisFuelTrimAddition": "Positive combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimAddition": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimRemoval": "Negative combined fuel correction; mean LTFT magnitude {pctTrim}%",
+  "@analysisFuelTrimRemoval": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctTrim": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisFuelTrimAdvice": "The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.",
+  "@analysisFuelTrimAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichment": "ECU commanded enrichment ({pctShare}% of warm samples)",
+  "@analysisCommandedEnrichment": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCommandedEnrichmentAdvice": "Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.",
+  "@analysisCommandedEnrichmentAdvice": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review"
+  },
+  "analysisCommandedEnrichmentTrip": "ECU commanded enrichment ({pctShare}% of trip duration)",
+  "@analysisCommandedEnrichmentTrip": {
+    "x-mt": "needs-native-review",
+    "description": "MT — needs native review",
+    "placeholders": {
+      "pctShare": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTransmissionScope": "Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.",
+  "@analysisTransmissionScope": {
     "x-mt": "needs-native-review",
     "description": "MT — needs native review"
   }

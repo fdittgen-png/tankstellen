@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import 'dart:collection';
+import 'trip_fuel_source.dart';
 
 /// Driving situation classifier (#768).
 ///
@@ -63,6 +64,7 @@ class DrivingSample {
   final double? throttlePercent;
   final double? engineLoadPercent;
   final double? fuelRateLPerHour;
+  final String? fuelSource;
 
   /// Engine coolant temperature in °C (PID 0x05), #2515. Null when the
   /// car doesn't surface it. Used by [SituationClassifier] to detect a
@@ -81,6 +83,7 @@ class DrivingSample {
     this.throttlePercent,
     this.engineLoadPercent,
     this.fuelRateLPerHour,
+    this.fuelSource,
     this.coolantTempC,
     this.gradePct = 0,
   });
@@ -161,7 +164,9 @@ class SituationClassifier {
     // cars do this on deceleration. Detected when fuelRate is
     // effectively zero while moving at >20 km/h.
     final fuelRate = s.fuelRateLPerHour;
-    if (fuelRate != null && fuelRate < 0.1 && s.speedKmh > 20) {
+    if (fuelRate != null && fuelRate < 0.1 && s.speedKmh > 20 &&
+        s.rpm > 0 &&
+        kMeasuredFuelSourceTags.contains(s.fuelSource)) {
       return DrivingSituation.fuelCutCoast;
     }
 

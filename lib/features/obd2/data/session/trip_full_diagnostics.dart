@@ -3,6 +3,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import '../../../trips/api.dart' show RecordingSessionJournal;
 
 import 'package:flutter/foundation.dart';
 
@@ -65,9 +66,10 @@ class TripFullDiagnostics {
   Set<String> get subscribedCommands => Set.unmodifiable(_subscribed);
 
   /// Open the trace. Never throws.
-  Future<void> begin() async {
+  Future<void> begin({RecordingSessionJournal? journal}) async {
     _trace = await _beginTrace(_header);
     _lastFile = _trace?.file;
+    journal?.diagnosticRecordingFile = _lastFile?.uri.pathSegments.last;
   }
 
   /// Annotate the trace (identity reads, termination).

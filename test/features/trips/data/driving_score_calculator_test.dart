@@ -426,6 +426,7 @@ void main() {
             speedKmh: 60,
             rpm: 1500,
             fuelRateLPerHour: 0.0,
+            fuelSource: 'pid5E',
           ),
       ];
       final result = computeDrivingScore(samples);
@@ -444,6 +445,7 @@ void main() {
             speedKmh: 60,
             rpm: 1500,
             fuelRateLPerHour: 0.0,
+            fuelSource: 'pid5E',
           ),
       ];
       final result = computeDrivingScore(coast);
@@ -496,7 +498,7 @@ void main() {
       expect(with300.score, lessThan(without.score));
     });
 
-    test('λ-enrichment penalty fires when commanded λ < 1', () {
+    test('λ-enrichment penalty fires when commanded lambda < 1', () {
       final samples = <TripSample>[
         for (var i = 0; i <= 10; i++)
           TripSample(

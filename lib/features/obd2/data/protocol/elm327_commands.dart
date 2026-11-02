@@ -253,13 +253,10 @@ class Elm327Commands {
   /// Request fuel tank level input (%). Mode 01, PID 2F. (#717)
   static const fuelTankLevelCommand = '012F\r';
 
-  /// Request the commanded fuel–air equivalence ratio φ. Mode 01, PID 44
-  /// (#2456, convention verified #3426). Formula: φ = (256·A + B) × 2 /
-  /// 65536 (dimensionless). Per SAE J1979 φ ≈ 1.0 at stoichiometry;
-  /// **φ < 1 is lean, φ > 1 is power-enrichment** (λ = 1/φ). Replacing
-  /// the assumed-stoich AFR with `stoichAFR / φ` is the biggest
-  /// fuel-estimate accuracy win on the no-MAF speed-density path (the
-  /// Peugeot). Response: "41 44 XX YY".
+  /// Request commanded lambda. Mode 01, PID44: (256*A+B)/32768.
+  /// Lambda <1 is rich, >1 lean. Historical names remain compatible;
+  /// the live mixture adapter converts once to true phi for fuel math.
+  /// Response: "41 44 XX YY".
   static const commandedEquivalenceRatioCommand = '0144\r';
 
   /// Request absolute barometric pressure (kPa). Mode 01, PID 33 (#2456).

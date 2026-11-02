@@ -154,7 +154,7 @@ mixin _TripRecordingLifecycle
     // (the auto-vs-manual flag rides the entry + the export's session
     // block, so the timeline needn't repeat it)
     _sessionJournal.start(at: _startedAt);
-    await _fullDiag?.begin(); // #4548 — before any OBD work
+    await _fullDiag?.begin(journal: _sessionJournal); // before any OBD work
     // #3858 (Epic #3855) — the vehicle's power state decides how a
     // recording begins. EVs have no rpm to trust; tell the model.
     final power = Obd2VehiclePower.instance;

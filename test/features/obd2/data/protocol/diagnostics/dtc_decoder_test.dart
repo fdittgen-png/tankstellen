@@ -6,6 +6,19 @@ import 'package:tankstellen/features/obd2/data/protocol/diagnostics/dtc_decoder.
 
 /// #4550 — the DTC decoder behind the trace's readable `dtc` marks.
 void main() {
+  test('complete DTC replies preserve compact, empty, legacy and multi-frame shapes', () {
+    for (final reply in ['43 00>', '4300', '43 01 71', '43 01 03 01>', '43 01 01 71 00 00',
+      '00A\r0: 43 04 01 33 02 44\r1: 03 01 07 30 00 00>']) {
+      expect(isCompleteDtcReply('03', reply), isTrue, reason: reply);
+    }
+    expect(decodeDtcReply('03', '43 01 01 71 00 00'), ['P0171']);
+    expect(decodeDtcReply('03', '430101710000'), ['P0171']);
+    for (final reply in ['43', '43 01', '43 02 01 71', 'NO DATA', '43 ZZ']) {
+      expect(isCompleteDtcReply('03', reply), isFalse, reason: reply);
+      expect(decodeDtcReply('03', reply), isEmpty);
+    }
+  });
+
   group('formatDtc', () {
     test('system letter, first digit and the three hex digits', () {
       expect(formatDtc(0x01, 0x33), 'P0133');

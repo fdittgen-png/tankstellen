@@ -56,6 +56,15 @@ abstract final class DiagnosticHealthRates {
 const Map<int, double> kDiagnosticHealthPids = {
   0x42: DiagnosticHealthRates.fast, // control-module voltage
   0xA4: DiagnosticHealthRates.fast, // transmission actual gear
+  0x06: DiagnosticHealthRates.medium, // STFT bank 1
+  0x07: DiagnosticHealthRates.medium, // LTFT bank 1
+  0x08: DiagnosticHealthRates.medium, // STFT bank 2 (if exposed)
+  0x09: DiagnosticHealthRates.medium, // LTFT bank 2
+  0x0A: DiagnosticHealthRates.medium, // petrol fuel pressure, gauge
+  0x0B: DiagnosticHealthRates.medium, // MAP
+  0x0E: DiagnosticHealthRates.medium, // ignition advance (not knock retard)
+  0x0F: DiagnosticHealthRates.medium, // intake air temperature
+  0x10: DiagnosticHealthRates.medium, // MAF
   0x03: DiagnosticHealthRates.medium, // fuel-system status (open/closed loop)
   0x14: DiagnosticHealthRates.medium, // O2 B1S1 (narrowband) + STFT
   0x15: DiagnosticHealthRates.medium, // O2 B1S2
@@ -71,6 +80,8 @@ const Map<int, double> kDiagnosticHealthPids = {
   0x45: DiagnosticHealthRates.medium, // relative throttle position
   0x47: DiagnosticHealthRates.medium, // absolute throttle position B
   0x49: DiagnosticHealthRates.medium, // accelerator pedal position D
+  0x13: DiagnosticHealthRates.slow, // oxygen-sensor location bitmap, two banks
+  0x1D: DiagnosticHealthRates.slow, // oxygen-sensor location bitmap, four banks
   0x01: DiagnosticHealthRates.slow, // MIL, DTC count, readiness monitors
   0x1F: DiagnosticHealthRates.slow, // run time since engine start
   0x21: DiagnosticHealthRates.slow, // distance with MIL on
@@ -127,8 +138,13 @@ List<DiagnosticHealthCommand> buildDiagnosticHealthPlan({
       }
       final cmd = mode01Command(pid);
       if (alreadyPolled.contains(cmd) || !advertised(pid)) continue;
-      plan.add(DiagnosticHealthCommand(cmd, DiagnosticHealthRates.slow,
-          priority: false));
+      plan.add(
+        DiagnosticHealthCommand(
+          cmd,
+          DiagnosticHealthRates.slow,
+          priority: false,
+        ),
+      );
     }
   }
   return plan;
@@ -141,10 +157,19 @@ List<DiagnosticHealthCommand> buildDiagnosticHealthPlan({
 const List<String> kDiagnosticSnapshotCommands = [
   'ATDP', // protocol in use
   'ATRV', // adapter supply voltage
+  '03', '07', // stored/pending DTCs also at the trip boundaries
   '0101', // MIL, DTC count, readiness monitors
   '0A', // permanent DTCs
   '020200', // freeze-frame DTC
-  '020400', '020500', '020C00', '020D00', '021100', '024200', // freeze frame
+  '020300', '020400', '020500', '020600', '020700',
+  '020A00', '020B00', '020C00', '020D00', '020E00', '020F00',
+  '021000',
+  '021100',
+  '021400',
+  '021500',
+  '022200',
+  '022300',
+  '024200', // freeze frame
   '0902', // VIN
   '0904', // calibration id
   '0906', // calibration verification number

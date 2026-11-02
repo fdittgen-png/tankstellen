@@ -3431,6 +3431,59 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Inferred low gear ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of warm samples)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of trip duration)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.';
+
+  @override
   String get approachOverlaySection => 'Aseman lähestymisilmoitus';
 
   @override
@@ -4533,25 +4586,12 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Kynsi alhaisella vaihteella ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Sammuta moottori pitkien pysähdysten ajaksi sen sijaan, että annat sen käydä tyhjäkäynnillä.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Vaihda aiemmin suuremmalle vaihteelle pitääksesi moottorin pois korkean kierrosluvun alueelta.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Paina kaasua pehmeästi — tasainen kiihdytys kuluttaa vähemmän polttoainetta.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Vaihda aiemmin suuremmalle, jotta moottori asettuu matalammille ja taloudellisemmille kierroksille.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4584,10 +4624,6 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Raskas ja pitkäkestoinen kuormitus tekee seoksesta rikkaan — vaihdayhteen ylöspäin ajoissa ja vähennä kaasua pitkillä nousuilla, jotta seos pysyy laihana.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4597,58 +4633,13 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Ota vauhti nousua ennen ja syötä kaasua tasaisesti — nousun aikana kaasuaminen kuluttaa ylimääräistä polttoainetta.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count pysähdys-ja-lähtö-käynnistystä: tuhlattiin $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Ennakoi liikenne ja liuku pysähdystä kohti, jotta pyörät pyörivät pysähtymisen sijaan — liikenteessä paikaltaan lähteminen on polttoaineintensiteetiltään kalleinta.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'Seos vaikuttaa hieman laihalta — moottori lisäsi polttoainetta ($pctTrim % korjaus) kompensoidakseen';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'Seos vaikuttaa laihalta — moottori piti yllä suurta $pctTrim % polttoainelisäystä, mahdollinen tehottomuus';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'Seos vaikuttaa hieman rikkaalta — moottori vähensi polttoainetta ($pctTrim % korjaus) kompensoidakseen';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'Seos vaikuttaa rikkaalta — moottori piti yllä suurta $pctTrim % polttoainevähennystä, mahdollinen tehottomuus';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'Moottori kävi rikkaalla kuormitettuna ($pctShare % lämpimästä ajosta) — mahdollisesti hukattua polttoainetta';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Heuristinen kuntosignaali, ei diagnoosi';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Pitkäkestoinen korjaus laihan seoksen suuntaan voi tarkoittaa imuilmavuotoa, heikkoa polttoaineensyöttöä tai ikääntynyttä anturia. Jos kulutus tai käynti heikkenee, korjaamon diagnoosi voi vahvistaa asian.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Pitkäkestoinen korjaus rikkaan seoksen suuntaan voi tarkoittaa vuotavaa suutinta, liian korkeaa polttoaineen painetta tai liikaa näyttävää anturia. Jos kulutus tai käynti heikkenee, korjaamon diagnoosi voi vahvistaa asian.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Rikas seos suurella kuormalla polttaa ylimääräistä polttoainetta. Vaihda isommalle aiemmin ja kevennä kaasua pitkissä kiihdytyksissä, jotta moottori pysyy lähellä stoikiometristä seosta.';
 
   @override
   String get lessonTransportTitle =>
@@ -4676,11 +4667,6 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override

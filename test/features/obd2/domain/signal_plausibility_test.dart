@@ -80,17 +80,17 @@ void main() {
               : DataValue<double>.measured(v),
         );
 
-    test('marks φ and baro, leaves everything else unchecked', () {
-      expect(markPlausibility(r(VehicleSignal.commandedPhi, 1.9),
+    test('marks raw lambda and baro, leaves everything else unchecked', () {
+      expect(markPlausibility(r(VehicleSignal.commandedPhi, 0.4),
               isDiesel: false)
           .plausibility, _implausible);
       expect(markPlausibility(r(VehicleSignal.baroPressure, 95),
               isDiesel: false)
           .plausibility, _plausible);
-      expect(markPlausibility(r(VehicleSignal.widebandPhi, 0.1),
+      expect(markPlausibility(r(VehicleSignal.widebandPhi, 3.0),
               isDiesel: true)
           .plausibility, _plausible);
-      expect(markPlausibility(r(VehicleSignal.widebandPhi, 0.1),
+      expect(markPlausibility(r(VehicleSignal.widebandPhi, 3.0),
               isDiesel: false)
           .plausibility, _implausible);
       expect(markPlausibility(r(VehicleSignal.coolantTemp, 500),
@@ -101,8 +101,8 @@ void main() {
     test('keeps the unclamped value, and leaves a missing value unmarked',
         () {
       final marked =
-          markPlausibility(r(VehicleSignal.commandedPhi, 1.9), isDiesel: false);
-      expect(marked.valueOrNull, 1.9);
+          markPlausibility(r(VehicleSignal.commandedPhi, 0.4), isDiesel: false);
+      expect(marked.valueOrNull, 0.4);
       expect(markPlausibility(r(VehicleSignal.commandedPhi, null),
               isDiesel: false)
           .plausibility, SignalPlausibility.notChecked);

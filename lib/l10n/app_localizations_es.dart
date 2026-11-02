@@ -3446,6 +3446,59 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String analysisLowGearInferredTitle(String minutes) {
+    return 'Inferred low gear ($minutes min)';
+  }
+
+  @override
+  String get analysisLowGearAdvice =>
+      'A higher gear may reduce RPM when load and road conditions allow. This gear estimate does not establish low-RPM lugging.';
+
+  @override
+  String get analysisHighRpmAdvice =>
+      'Time above 3000 RPM is a heuristic exposure, not proof of misuse. Consider the engine, load and road conditions before changing gear.';
+
+  @override
+  String get analysisClimbContextAdvice =>
+      'Climbing requires additional energy even with smooth driving. This route cost is not a driving fault.';
+
+  @override
+  String get analysisRestartContextAdvice =>
+      'Traffic or signals may require these stops. This is an energy cost, not proof that the stops were avoidable.';
+
+  @override
+  String analysisFuelTrimAddition(String pctTrim) {
+    return 'Positive combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String analysisFuelTrimRemoval(String pctTrim) {
+    return 'Negative combined fuel correction; mean LTFT magnitude $pctTrim%';
+  }
+
+  @override
+  String get analysisFuelTrimAdvice =>
+      'The ECU is adjusting fuel delivery. This does not identify a failed component or prove the final mixture remains lean or rich. Check the recorded values, operating conditions and fault codes.';
+
+  @override
+  String analysisCommandedEnrichment(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of warm samples)';
+  }
+
+  @override
+  String get analysisCommandedEnrichmentAdvice =>
+      'Enrichment can protect the engine under load. The recording alone does not establish a fault or avoidable waste.';
+
+  @override
+  String analysisCommandedEnrichmentTrip(String pctShare) {
+    return 'ECU commanded enrichment ($pctShare% of trip duration)';
+  }
+
+  @override
+  String get analysisTransmissionScope =>
+      'Standard OBD observations do not assess a robotized gearbox or actuator force. Diagnosing a failed shift requires gearbox-specific faults and requested versus actual gear, clutch and selector data.';
+
+  @override
   String get approachOverlaySection =>
       'Superposición al acercarse a una estación';
 
@@ -4559,25 +4612,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String insightLowGear(String minutes) {
-    return 'Forzando una marcha corta ($minutes min)';
-  }
-
-  @override
   String get lessonAdviceIdling =>
       'Apaga el motor en las paradas largas en lugar de dejarlo al ralentí.';
 
   @override
-  String get lessonAdviceHighRpm =>
-      'Cambia antes a una marcha más larga para mantener el motor fuera de la banda de altas revoluciones.';
-
-  @override
   String get lessonAdviceHardAccel =>
       'Acelera suavemente: una aceleración progresiva consume menos combustible.';
-
-  @override
-  String get lessonAdviceLowGear =>
-      'Sube de marcha antes para que el motor gire a menos revoluciones y consuma menos.';
 
   @override
   String insightHighSpeedBandNoFuel(String pctTime) {
@@ -4610,10 +4650,6 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceLambdaEnrichment =>
-      'Una carga pesada y sostenida enriquece la mezcla — cambia de marcha pronto y afloja en subidas largas para mantener la mezcla estequiométrica.';
-
-  @override
   String insightClimbingCost(
     String gradePercent,
     String pctTime,
@@ -4623,58 +4659,13 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get lessonAdviceClimbingCost =>
-      'Toma impulso antes de la subida y alimenta el acelerador con suavidad — acelerar a fondo en una cuesta quema combustible extra.';
-
-  @override
   String insightRestartCost(String count, String liters) {
     return '$count arranques en stop-and-go: malgastados $liters L';
   }
 
   @override
-  String get lessonAdviceRestartCost =>
-      'Anticípate al tráfico y rueda por inercia hacia las paradas para rodar en lugar de arrancar — arrancar desde parado es la parte que más combustible consume.';
-
-  @override
-  String lessonCombustionHealthLeanBorderline(String pctTrim) {
-    return 'La mezcla parece algo pobre: el motor añadió combustible (corrección del $pctTrim %) para compensar';
-  }
-
-  @override
-  String lessonCombustionHealthLeanMarked(String pctTrim) {
-    return 'La mezcla parece pobre: el motor mantuvo una adición de combustible grande, del $pctTrim %, una posible ineficiencia';
-  }
-
-  @override
-  String lessonCombustionHealthRichBorderline(String pctTrim) {
-    return 'La mezcla parece algo rica: el motor quitó combustible (corrección del $pctTrim %) para compensar';
-  }
-
-  @override
-  String lessonCombustionHealthRichMarked(String pctTrim) {
-    return 'La mezcla parece rica: el motor mantuvo un recorte de combustible grande, del $pctTrim %, una posible ineficiencia';
-  }
-
-  @override
-  String lessonCombustionHealthEnrichment(String pctShare) {
-    return 'El motor fue con mezcla rica bajo carga ($pctShare % del viaje en caliente): posible combustible desperdiciado';
-  }
-
-  @override
   String get lessonCombustionHealthSubtitle =>
       'Señal heurística de salud, no un diagnóstico';
-
-  @override
-  String get lessonAdviceCombustionHealthLean =>
-      'Una corrección sostenida hacia mezcla pobre puede indicar una entrada de aire en la admisión, un suministro de combustible débil o un sensor envejecido. Si el consumo o el funcionamiento empeoran, un diagnóstico en taller puede confirmarlo.';
-
-  @override
-  String get lessonAdviceCombustionHealthRich =>
-      'Una corrección sostenida hacia mezcla rica puede indicar un inyector con fugas, una presión de combustible alta o un sensor que lee de más. Si el consumo o el funcionamiento empeoran, un diagnóstico en taller puede confirmarlo.';
-
-  @override
-  String get lessonAdviceCombustionHealthEnrichment =>
-      'Ir con mezcla rica bajo mucha carga quema combustible extra. Sube de marcha antes y levanta el pie en las aceleraciones largas para que el motor se mantenga cerca de una mezcla estequiométrica.';
 
   @override
   String get lessonTransportTitle =>
@@ -4702,11 +4693,6 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String insightFullThrottleShare(String pctTime) {
     return 'Full throttle ($pctTime% of trip)';
-  }
-
-  @override
-  String insightLambdaEnrichmentShare(String pctTime) {
-    return 'Rich mixture under load ($pctTime% of trip)';
   }
 
   @override
