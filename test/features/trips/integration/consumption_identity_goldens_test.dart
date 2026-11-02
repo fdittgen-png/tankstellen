@@ -18,7 +18,7 @@ import 'consumption_lambda_corrections.dart';
 /// expectations overlaid explicitly; the historical map remains untouched.
 void main() {
   late Map<String, String> actual;
-  const expected = {
+  final expected = {
     ...kConsumptionIdentityGoldens,
     ...kConsumptionLambdaCorrections,
   };
