@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'consumption_identity_goldens.dart';
 import 'consumption_identity_streams.dart';
+import 'consumption_lambda_corrections.dart';
 
 /// #4233 (Epic #4222) — wiring the fuzzy engine into the producers changes
 /// no figure: every stream in `consumption_identity_streams.dart` must
@@ -12,12 +13,31 @@ import 'consumption_identity_streams.dart';
 /// wiring. The engine ships neutral rules (ADR 0023), so the epic's
 /// validation gate is satisfied by identity (ADR 0024) — and this is the
 /// test that proves it. A red entry is a changed production figure: fix
-/// the code, never the golden.
+/// the code, never regenerate the golden. #4572 deliberately corrects the
+/// separate raw-lambda protocol bug, with ten independently calculated
+/// expectations overlaid explicitly; the historical map remains untouched.
 void main() {
   late Map<String, String> actual;
+  const expected = {
+    ...kConsumptionIdentityGoldens,
+    ...kConsumptionLambdaCorrections,
+  };
 
   setUpAll(() async {
     actual = await collectConsumptionFigures();
+  });
+
+  test('lambda correction is limited to the ten affected existing rate keys', () {
+    final allowed = {
+      for (final vehicle in ['raw', 'scalar', 'flex'])
+        for (final branch in [
+          'maf10MeasuredPhi', 'maf10CommandedPhi', 'speedDensityFull',
+        ]) 'live/$vehicle/$branch/rate',
+      'live/diesel/maf10MeasuredPhi/rate',
+    };
+    expect(kConsumptionLambdaCorrections.keys.toSet(), allowed);
+    expect(kConsumptionIdentityGoldens.keys,
+        containsAll(kConsumptionLambdaCorrections.keys));
   });
 
   test('no stream was dropped or added', () {
@@ -37,15 +57,15 @@ void main() {
     'calibrator/', // PhysicsScaleCalibrator.calibrate
     'recorder', // TripRecorder.buildSummary
   ]) {
-    test('$stream figures are bit-identical to the pre-#4233 goldens', () {
+    test('$stream figures retain identity except the verified lambda correction', () {
       final keys = kConsumptionIdentityGoldens.keys
           .where((k) => k.startsWith(stream))
           .toList();
       expect(keys, isNotEmpty);
       final drift = [
         for (final k in keys)
-          if (actual[k] != kConsumptionIdentityGoldens[k])
-            '$k: ${kConsumptionIdentityGoldens[k]} → ${actual[k]}',
+          if (actual[k] != expected[k])
+            '$k: ${expected[k]} → ${actual[k]}',
       ];
       expect(drift, isEmpty, reason: drift.join('\n'));
     });
